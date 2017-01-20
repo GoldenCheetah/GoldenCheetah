@@ -31,6 +31,8 @@
 #include "DragBar.h"
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
+#include "CloudDBVersion.h"
+#include "CloudDBTelemetry.h"
 #endif
 
 #ifdef Q_OS_MAC
@@ -293,6 +295,10 @@ class MainWindow : public QMainWindow
 
         // Miscellany
         QSignalMapper *toolMapper;
+
+
+        CloudDBVersionClient *versionClient;
+        CloudDBTelemetryClient *telemetryClient;
 
 };
 

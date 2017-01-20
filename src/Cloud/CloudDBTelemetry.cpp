@@ -18,6 +18,7 @@
 
 #include "CloudDBTelemetry.h"
 #include "CloudDBCommon.h"
+#include "GcUpgrade.h"
 
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -40,24 +41,39 @@ CloudDBTelemetryClient::~CloudDBTelemetryClient() {
 }
 
 void
-CloudDBTelemetryClient::storeTelemetry() {
+CloudDBTelemetryClient::upsertTelemetry() {
 
-    QScopedPointer<QNetworkAccessManager> l_nam(new QNetworkAccessManager());
-    QNetworkReply *l_reply;
+    QNetworkAccessManager *l_nam = new QNetworkAccessManager(this);
 
     QString  l_telemetry_url_base = CloudDBCommon::cloudDBBaseURL + QString("telemetry");
 
     QNetworkRequest request;
     CloudDBCommon::prepareRequest(request, l_telemetry_url_base);
-    // empty createDate is filled with time.now() in CloudDB
-    l_reply = l_nam->post(request, "{ \"createDate\": \"\" }");
 
-    // blocking request (need to wait otherwise NetworkAccessManager is destroyed for call finished)
-    QEventLoop loop;
-    connect(l_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    QString os;
+#ifdef Q_OS_LINUX
+    os = "Linux";
+#endif
 
-    // ignore any errors or reply - user does not need to be informed in case of problems
+#ifdef WIN32
+    os = "Windows";
+#endif
+
+#ifdef Q_OS_MAC
+    os = "macOS";
+#endif
+
+
+    // make sure we have a unique ID - if not created yet, create one and store for the future
+    QString id = appsettings->value(NULL, GC_TELEMETRY_ID, QUuid::createUuid().toString()).toString();
+    appsettings->setValue(GC_TELEMETRY_ID, id);
+
+    // empty lastChange is filled with time.now() in CloudDB
+    QString payload = QString("{ \"key\" : \"%1\", \"lastChange\": \"\", \"operatingSystem\" : \"%2\", \"version\" : \"%3\"}").arg(id).arg( os ).arg( VERSION_LATEST );
+    l_nam->put(request, payload.toUtf8());
+
+    // the request is asynchronously - the user does not care about any response - so we just skip it
+
 }
 
 
@@ -69,54 +85,40 @@ CloudDBAcceptTelemetryDialog::CloudDBAcceptTelemetryDialog()
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QPushButton *important = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxInformation), "", this);
-    important->setFixedSize(80,80);
-    important->setFlat(true);
-    important->setIconSize(QSize(80,80));
-    important->setAutoFillBackground(false);
-    important->setFocusPolicy(Qt::NoFocus);
-
-    QLabel *header = new QLabel(this);
-    header->setWordWrap(true);
-    header->setTextFormat(Qt::RichText);
-    header->setText(QString(tr("<b><big>Please read carefully before accepting !</big></b>")));
-
-    QHBoxLayout *toprow = new QHBoxLayout;
-    toprow->addWidget(important);
-    toprow->addWidget(header);
-    layout->addLayout(toprow);
-
     QLabel *text = new QLabel(this);
     text->setWordWrap(true);
     text->setTextFormat(Qt::RichText);
-    text->setText(tr("<center><b>GoldenCheetah User Location Storage</b><br>"
-                     "GoldenCheetah would like to store your location, retrieved from your IP address "
-                     "to get an overview, where GoldenCheetah users are located to create location aware "
-                     "statics of GoldenCheetah users.<br>"
-                     "The location will be derived and stored once from your current IP address.<br>"
-                     "GoldenCheetah will NOT store your IP address, but only derived location information "
-                     "which are Country, City, Region and City Lattitude/Longitude.<br>"
+    text->setText(tr("<center><b>GoldenCheetah User Location Data</b><br>"
+                     "We want to start collecting data about where our active users are located and which operating "
+                     "system and GoldenCheetah version they are using. The collection is done via our Cloud DB. "
+                     "We would like to use your IP address to determine your location and count how often you "
+                     "are using GoldenCheetah. Besides the data mentioned we do not store any personal "
+                     "information in our Cloud DB. <br><br>"
+                     "<b>Can we please record your location, OS and GoldenCheetah version ?"
                      ));
 
     layout->addWidget(text);
 
-    proceedButton = new QPushButton(tr("Yes, a agree that my current location is stored in GoldenCheetah's CloudDB"), this);
-    proceedButton->setEnabled(true);
-    connect(proceedButton, SIGNAL(clicked()), this, SLOT(acceptConditions()));
-    abortButton = new QPushButton(tr("No, I do not want my location to be stored in GoldenCheetah's CloudDB"), this);
-    abortButton->setDefault(true);
-    connect(abortButton, SIGNAL(clicked()), this, SLOT(rejectConditions()));
+    QHBoxLayout *lastRow = new QHBoxLayout;
 
-    layout->addStretch();
-    layout->addWidget(abortButton);
-    layout->addWidget(proceedButton);
+    noButton = new QPushButton(tr("No"), this);
+    connect(noButton, SIGNAL(clicked()), this, SLOT(rejectConditions()));
+    yesButton = new QPushButton(tr("Yes"), this);
+    yesButton->setDefault(true);
+    connect(yesButton, SIGNAL(clicked()), this, SLOT(acceptConditions()));
+
+    lastRow->addStretch();
+    lastRow->addWidget(noButton);
+    lastRow->addWidget(yesButton);
+
+    layout->addLayout(lastRow);
 
 }
 
 void CloudDBAcceptTelemetryDialog::acceptConditions() {
 
     // document the decision
-    appsettings->setValue(GC_ALLOW_TELEMETRY, "userAccepted");
+    appsettings->setValue(GC_ALLOW_TELEMETRY, true);
     appsettings->setValue(GC_ALLOW_TELEMETRY_DATE, QDateTime::currentDateTime().toString(Qt::ISODate));
 
     accept();
@@ -125,7 +127,7 @@ void CloudDBAcceptTelemetryDialog::acceptConditions() {
 void CloudDBAcceptTelemetryDialog::rejectConditions() {
 
     // document the decision
-    appsettings->setValue(GC_ALLOW_TELEMETRY, "userRejected");
+    appsettings->setValue(GC_ALLOW_TELEMETRY, false);
     appsettings->setValue(GC_ALLOW_TELEMETRY_DATE, QDateTime::currentDateTime().toString(Qt::ISODate));
 
     reject();
