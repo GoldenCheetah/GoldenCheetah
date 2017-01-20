@@ -46,15 +46,19 @@ public:
     CloudDBVersionClient();
     ~CloudDBVersionClient();
 
-    static QList<VersionAPIGetV1> getLatestVersions();
+    void informUserAboutLatestVersions();
 
     static int CloudDBVersion_Release;
     static int CloudDBVersion_ReleaseCandidate;
     static int CloudDBVersion_DevelopmentBuild;
 
+private slots:
+
+    void showVersionPopup(QNetworkReply*);
+
 private:
 
-    static bool unmarshallAPIGetV1(QByteArray , QList<VersionAPIGetV1> *versionList );
+    bool unmarshallAPIGetV1(QByteArray , QList<VersionAPIGetV1> *versionList );
 
 };
 

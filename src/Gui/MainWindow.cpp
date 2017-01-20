@@ -630,7 +630,7 @@ MainWindow::MainWindow(const QDir &home)
 
 #ifdef GC_HAS_CLOUD_DB
 
-#if 0  // temporarily de-activated
+    telemetryClient = new CloudDBTelemetryClient();
     if (appsettings->value(NULL, GC_ALLOW_TELEMETRY, "undefined").toString() == "undefined" ) {
         // ask user if storing is allowed
 
@@ -638,18 +638,16 @@ MainWindow::MainWindow(const QDir &home)
         CloudDBAcceptTelemetryDialog acceptDialog;
         acceptDialog.setModal(true);
         if (acceptDialog.exec() == QDialog::Accepted) {
-            CloudDBTelemetryClient::storeTelemetry();
+            telemetryClient->upsertTelemetry();
         };
+    } else if (appsettings->value(NULL, GC_ALLOW_TELEMETRY, false).toBool()) {
+        telemetryClient->upsertTelemetry();
     }
-#endif
 
-    QList<VersionAPIGetV1> versions = CloudDBVersionClient::getLatestVersions();
-    if (versions.count() > 0) {
-        CloudDBUpdateAvailableDialog updateAvailableDialog(versions);
-        updateAvailableDialog.setModal(true);
-        // we are not interested in the result - update check status is updated as part of the dialog box
-        updateAvailableDialog.exec();
-    }
+    versionClient = new CloudDBVersionClient();
+    versionClient->informUserAboutLatestVersions();
+
+
 
 #endif
 
