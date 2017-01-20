@@ -1059,6 +1059,8 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyUnPause();
 
+        emit setNotification(tr("Resuming.."), 2);
+
     } else if (status&RT_RUNNING) {
 
         qDebug() << "pause...";
@@ -1083,6 +1085,8 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // tell the world
         context->notifyPause();
+
+        emit setNotification(tr("Paused.."), 2);
 
     } else if (status&RT_CONNECTED) {
 
@@ -1172,11 +1176,14 @@ void TrainSidebar::Start()       // when start button is pressed
         }
         gui_timer->start(REFRESHRATE);      // start recording
 
+        emit setNotification(tr("Starting.."), 2);
     }
 }
 
 void TrainSidebar::Pause()        // pause capture to recalibrate
 {
+    // Not convinced this function is ever reached, these are handled in Start()
+
     // we're not running fool!
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1200,7 +1207,6 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
         // tell the world
         context->notifyUnPause();
-
     } else {
 
         session_elapsed_msec += session_time.elapsed();
@@ -1315,6 +1321,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     displayWorkoutDistance = displayDistance = 0;
     guiUpdate();
 
+    emit setNotification(tr("Stopped.."), 2);
+
     return;
 }
 
@@ -1379,6 +1387,8 @@ void TrainSidebar::Connect()
     foreach(int dev, activeDevices) Devices[dev].controller->start();
     setStatusFlags(RT_CONNECTED);
     gui_timer->start(REFRESHRATE);
+
+    emit setNotification(tr("Connected.."), 2);
 }
 
 void TrainSidebar::Disconnect()
@@ -1395,6 +1405,8 @@ void TrainSidebar::Disconnect()
     clearStatusFlags(RT_CONNECTED);
 
     gui_timer->stop();
+
+    emit setNotification(tr("Disconnected.."), 2);
 }
 
 //----------------------------------------------------------------------
@@ -1622,6 +1634,8 @@ void TrainSidebar::newLap()
         spdcount  = 0;
 
         context->notifyNewLap();
+
+        emit setNotification(tr("New lap.."), 2);
     }
 }
 
@@ -1813,6 +1827,8 @@ void TrainSidebar::FFwd()
         context->notifySeek(+1); // in case of video with RLV file synchronisation just ask to go forward
     }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
+
+    emit setNotification(tr("Fast forward.."), 2);
 }
 
 void TrainSidebar::Rewind()
@@ -1832,6 +1848,8 @@ void TrainSidebar::Rewind()
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
     }
+
+    emit setNotification(tr("Rewind.."), 2);
 }
 
 
@@ -1873,6 +1891,8 @@ void TrainSidebar::Higher()
         else
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
+
+    emit setNotification(tr("Increasing intensity.."), 2);
 }
 
 // lower load/gradient
@@ -1897,6 +1917,8 @@ void TrainSidebar::Lower()
         else
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
+
+    emit setNotification(tr("Decreasing intensity.."), 2);
 }
 
 void TrainSidebar::setLabels()

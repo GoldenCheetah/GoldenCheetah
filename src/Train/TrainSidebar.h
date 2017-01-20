@@ -125,13 +125,14 @@ class TrainSidebar : public GcWindow
         int currentStatus() {return status;}
 
     signals:
-
         void deviceSelected();
         void start();
         void pause();
         void stop();
         void intensityChanged(int value);
         void statusChanged(int status);
+        void setNotification(QString msg, int timeout);
+        void clearNotification(void);
 
     private slots:
         void deviceTreeWidgetSelectionChanged();

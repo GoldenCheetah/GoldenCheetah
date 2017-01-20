@@ -23,62 +23,13 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QCheckBox>
+#include <QPlainTextEdit>
+#include <QTimer>
 
 TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     QWidget(parent),
     m_trainSidebar(trainSidebar)
 {
-    QHBoxLayout *intensityControlLayout = new QHBoxLayout();
-
-    QIcon upIcon(":images/oxygen/up-arrow-bw.png");
-    QPushButton *loadUp = new QPushButton(upIcon, "", this);
-    loadUp->setFocusPolicy(Qt::NoFocus);
-    loadUp->setIconSize(QSize(64,64));
-    loadUp->setAutoFillBackground(false);
-    loadUp->setAutoDefault(false);
-    loadUp->setFlat(true);
-    loadUp->setAutoRepeat(true);
-    loadUp->setAutoRepeatInterval(50);
-#if QT_VERSION > 0x050400
-    loadUp->setShortcut(Qt::Key_Plus);
-#endif
-    loadUp->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-
-    QIcon downIcon(":images/oxygen/down-arrow-bw.png");
-    QPushButton *loadDown = new QPushButton(downIcon, "", this);
-    loadDown->setFocusPolicy(Qt::NoFocus);
-    loadDown->setIconSize(QSize(64,64));
-    loadDown->setAutoFillBackground(false);
-    loadDown->setAutoDefault(false);
-    loadDown->setFlat(true);
-    loadDown->setAutoRepeat(true);
-    loadDown->setAutoRepeatInterval(50);
-#if QT_VERSION > 0x050400
-    loadDown->setShortcut(Qt::Key_Minus);
-#endif
-    loadDown->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;"); 
-
-    QSlider *intensitySlider = new QSlider(Qt::Vertical, this);
-    intensitySlider->setAutoFillBackground(false);
-    intensitySlider->setFocusPolicy(Qt::NoFocus);
-    intensitySlider->setMinimum(75);
-    intensitySlider->setMaximum(125);
-    intensitySlider->setValue(100);
-
-    intensityControlLayout->addWidget(loadDown);
-    intensityControlLayout->addWidget(loadUp);
-    intensityControlLayout->addWidget(intensitySlider);
-    intensityControlLayout->addStretch();
-
-    intensityControlLayout->setContentsMargins(0,0,0,0);
-    intensityControlLayout->setSpacing(0);
-
-    connect(loadUp, SIGNAL(clicked()), m_trainSidebar, SLOT(Higher()));
-    connect(loadDown, SIGNAL(clicked()), m_trainSidebar, SLOT(Lower()));
-    connect(intensitySlider, SIGNAL(valueChanged(int)), m_trainSidebar, SLOT(adjustIntensity(int)));
-    connect(m_trainSidebar, SIGNAL(intensityChanged(int)), intensitySlider, SLOT(setValue(int)));
-
-
     // Control buttons
     QHBoxLayout *toolbuttons = new QHBoxLayout;
     toolbuttons->setSpacing(0);
@@ -166,14 +117,70 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
 #endif
     toolbuttons->addWidget(m_lapButton);
 
-    QCheckBox *hideOnIdle = new QCheckBox(tr("Auto Hide"), this);
-    intensityControlLayout->addWidget(hideOnIdle);
+    QIcon upIcon(":images/oxygen/up.png");
+    loadUp = new QPushButton(upIcon, "", this);
+    loadUp->setFocusPolicy(Qt::NoFocus);
+    loadUp->setIconSize(QSize(64,64));
+    loadUp->setAutoFillBackground(false);
+    loadUp->setAutoDefault(false);
+    loadUp->setFlat(true);
+    loadUp->setAutoRepeat(true);
+    loadUp->setAutoRepeatInterval(50);
+    loadUp->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+#if QT_VERSION > 0x050400
+    loadUp->setShortcut(Qt::Key_Plus);
+#endif
+    toolbuttons->addWidget(loadUp);
 
+    QIcon downIcon(":images/oxygen/down.png");
+    loadDown = new QPushButton(downIcon, "", this);
+    loadDown->setFocusPolicy(Qt::NoFocus);
+    loadDown->setIconSize(QSize(64,64));
+    loadDown->setAutoFillBackground(false);
+    loadDown->setAutoDefault(false);
+    loadDown->setFlat(true);
+    loadDown->setAutoRepeat(true);
+    loadDown->setAutoRepeatInterval(50);
+    loadDown->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+#if QT_VERSION > 0x050400
+    loadDown->setShortcut(Qt::Key_Minus);
+#endif
+    toolbuttons->addWidget(loadDown);
+
+    intensitySlider = new QSlider(Qt::Vertical, this);
+    intensitySlider->setAutoFillBackground(false);
+    intensitySlider->setFocusPolicy(Qt::NoFocus);
+    intensitySlider->setMinimum(75);
+    intensitySlider->setMaximum(125);
+    intensitySlider->setValue(100);
+    toolbuttons->addWidget(intensitySlider);
+
+    // notification area
+    QHBoxLayout *notifications = new QHBoxLayout();
+    notifications->setSpacing(0);
+    notifications->setContentsMargins(0,0,0,0);
+
+    notificationText = new QPlainTextEdit();
+    notifications->addWidget(notificationText);
+
+    QFont font("Monospace");
+    font.setStyleHint(QFont::TypeWriter);
+    font.setBold(1);
+    font.setPointSize(14);
+
+    notificationText->setFont(font);
+    notificationText->setStyleSheet("QPlainTextEdit {background-color: black; color: red}");
+    notificationText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    notificationText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    notificationText->setTextInteractionFlags(Qt::NoTextInteraction);
+    notificationText->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+    //QCheckBox *hideOnIdle = new QCheckBox(tr("Auto Hide"), this);
+    //intensityControlLayout->addWidget(hideOnIdle);
 
     QHBoxLayout *allControlsLayout = new QHBoxLayout();
-    allControlsLayout->addStretch();
     allControlsLayout->addLayout(toolbuttons);
-    allControlsLayout->addLayout(intensityControlLayout);
+    allControlsLayout->addLayout(notifications);
 
     connect(m_playButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Start()));
     connect(m_rewindButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Rewind()));
@@ -184,18 +191,51 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(m_trainSidebar->context, SIGNAL(pause()), this, SLOT(updatePlayButtonIcon()));
     connect(m_trainSidebar->context, SIGNAL(unpause()), this, SLOT(updatePlayButtonIcon()));
     connect(m_trainSidebar->context, SIGNAL(stop()), this, SLOT(updatePlayButtonIcon()));
-    connect(hideOnIdle, SIGNAL(stateChanged(int)), this, SLOT(autoHideCheckboxChanged(int)));
+    //connect(hideOnIdle, SIGNAL(stateChanged(int)), this, SLOT(autoHideCheckboxChanged(int)));
     connect(m_trainSidebar, SIGNAL(statusChanged(int)), this, SLOT(statusChanged(int)));
     connect(m_connectButton, SIGNAL(clicked()), m_trainSidebar, SLOT(toggleConnect()));
+
+    connect(loadUp, SIGNAL(clicked()), m_trainSidebar, SLOT(Higher()));
+    connect(loadDown, SIGNAL(clicked()), m_trainSidebar, SLOT(Lower()));
+    connect(intensitySlider, SIGNAL(valueChanged(int)), m_trainSidebar, SLOT(adjustIntensity(int)));
+    connect(m_trainSidebar, SIGNAL(intensityChanged(int)), intensitySlider, SLOT(setValue(int)));
+
+    connect(m_trainSidebar, SIGNAL(setNotification(QString, int)), this, SLOT(setNotification(QString, int)));
+    connect(m_trainSidebar, SIGNAL(clearNotification(void)), this, SLOT(clearNotification(void)));
 
     this->setContentsMargins(0,0,0,0);
     this->setFocusPolicy(Qt::NoFocus);
     this->setAutoFillBackground(false);
     this->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     this->setLayout(allControlsLayout);
-
-    this->setFixedHeight(100);
     this->installEventFilter(trainSidebar);
+
+    // Ensure the bottom bar is sized to show 3 lines of notification text
+    // but don't allow it to crop the buttons if smaller font is used..
+    int buttonHeight = m_connectButton->sizeHint().height();
+    int notificationHeight = 3 * notificationText->fontMetrics().lineSpacing();
+    int contentHeight = qMax(buttonHeight, notificationHeight);
+
+    int layoutMargins = allControlsLayout->contentsMargins().top() +
+                        allControlsLayout->contentsMargins().bottom();
+
+    // Adding an extra quarter line looks more symmetrical
+    int extra = notificationHeight / 12;
+
+    this->setFixedHeight(contentHeight + layoutMargins + extra);
+
+    //qDebug() << "Button height" << buttonHeight;
+    //qDebug() << "Notification line spacing" << notificationText->fontMetrics().lineSpacing();
+    //qDebug() << "bottombar margins:" << this->contentsMargins();
+    //qDebug() << "- allControlsLayout margins:" << allControlsLayout->contentsMargins();
+    //qDebug() << " - toolbuttons margins:" << toolbuttons->contentsMargins();
+    //qDebug() << " - notifications margins:" << notifications->contentsMargins();
+    //qDebug() << "  - notificationText margins:" << notificationText->contentsMargins();
+    //notificationText->setPlainText("LINE1\nLINE2\nLINE3");
+
+    // Create a timer for notifications, but don't start yet
+    notificationTimer = new QTimer(this);
+    connect(notificationTimer, SIGNAL(timeout()), SLOT(clearNotification()));
 }
 
 void TrainBottom::updatePlayButtonIcon()
@@ -237,6 +277,9 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        loadUp->setEnabled(false);
+        loadDown->setEnabled(false);
+        intensitySlider->setEnabled(false);
         return;
     }
 
@@ -249,6 +292,9 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        loadUp->setEnabled(false);
+        loadDown->setEnabled(false);
+        intensitySlider->setEnabled(false);
         return;
     }
 
@@ -261,6 +307,9 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        loadUp->setEnabled(false);
+        loadDown->setEnabled(false);
+        intensitySlider->setEnabled(false);
         return;
     }
 
@@ -273,7 +322,30 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(true);
         m_rewindButton->setEnabled(true);
         m_lapButton->setEnabled(true);
+        loadUp->setEnabled(true);
+        loadDown->setEnabled(true);
+        intensitySlider->setEnabled(true);
         return;
     }
 
+}
+
+void TrainBottom::setNotification(QString msg, int timeout)
+{
+    if (timeout > 0) {
+        notificationTimer->setInterval(timeout * 1000);
+        notificationTimer->setSingleShot(true);
+        notificationTimer->start();
+    } else {
+        // stop any running timer
+        notificationTimer->stop();
+    }
+
+    notificationText->clear();
+    notificationText->setPlainText(msg);
+}
+
+void TrainBottom::clearNotification(void)
+{
+    notificationText->clear();
 }
