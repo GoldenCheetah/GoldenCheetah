@@ -1059,6 +1059,8 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyUnPause();
 
+        emit setNotification(tr("Resuming.."), 2);
+
     } else if (status&RT_RUNNING) {
 
         qDebug() << "pause...";
@@ -1083,6 +1085,8 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // tell the world
         context->notifyPause();
+
+        emit setNotification(tr("Paused.."), 2);
 
     } else if (status&RT_CONNECTED) {
 
@@ -1134,8 +1138,19 @@ void TrainSidebar::Start()       // when start button is pressed
         lap_elapsed_msec = 0;
         wbalr = 0;
         wbal = WPRIME;
-        calibrating = false;
         lapAudioThisLap = true;
+
+        //reset all calibration data
+        calibrating = startCalibration = restartCalibration = finishCalibration = false;
+        calibrationSpindownTime = calibrationZeroOffset = calibrationTargetSpeed = 0;
+        calibrationCadence = calibrationCurrentSpeed = calibrationTorque = 0;
+        calibrationState = CALIBRATION_STATE_IDLE;
+        calibrationType = CALIBRATION_TYPE_NOT_SUPPORTED;
+        calibrationDeviceIndex = -1;
+        clearStatusFlags(RT_CALIBRATING);
+        //foreach(int dev, activeDevices) { // Do for selected device only
+        //    Devices[dev].controller->resetCalibrationState();
+        //}
 
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
@@ -1172,11 +1187,14 @@ void TrainSidebar::Start()       // when start button is pressed
         }
         gui_timer->start(REFRESHRATE);      // start recording
 
+        emit setNotification(tr("Starting.."), 2);
     }
 }
 
 void TrainSidebar::Pause()        // pause capture to recalibrate
 {
+    // Not convinced this function is ever reached, these are handled in Start()
+
     // we're not running fool!
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1200,7 +1218,6 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
         // tell the world
         context->notifyUnPause();
-
     } else {
 
         session_elapsed_msec += session_time.elapsed();
@@ -1247,7 +1264,17 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 
-    calibrating = false;
+    //reset all calibration data
+    calibrating = startCalibration = restartCalibration = finishCalibration = false;
+    calibrationSpindownTime = calibrationZeroOffset = calibrationTargetSpeed = 0;
+    calibrationCadence = calibrationCurrentSpeed = calibrationTorque = 0;
+    calibrationState = CALIBRATION_STATE_IDLE;
+    calibrationType = CALIBRATION_TYPE_NOT_SUPPORTED;
+    calibrationDeviceIndex = -1;
+    clearStatusFlags(RT_CALIBRATING);
+    //foreach(int dev, activeDevices) { // Do for selected device only
+    //    Devices[dev].controller->resetCalibrationState();
+    //}
 
     load = 0;
     slope = 0.0;
@@ -1315,6 +1342,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     displayWorkoutDistance = displayDistance = 0;
     guiUpdate();
 
+    emit setNotification(tr("Stopped.."), 2);
+
     return;
 }
 
@@ -1376,9 +1405,14 @@ void TrainSidebar::Connect()
 
     activeDevices = devices();
 
-    foreach(int dev, activeDevices) Devices[dev].controller->start();
+    foreach(int dev, activeDevices) {
+        Devices[dev].controller->start();
+        Devices[dev].controller->resetCalibrationState();
+    }
     setStatusFlags(RT_CONNECTED);
     gui_timer->start(REFRESHRATE);
+
+    emit setNotification(tr("Connected.."), 2);
 }
 
 void TrainSidebar::Disconnect()
@@ -1395,6 +1429,8 @@ void TrainSidebar::Disconnect()
     clearStatusFlags(RT_CONNECTED);
 
     gui_timer->stop();
+
+    emit setNotification(tr("Disconnected.."), 2);
 }
 
 //----------------------------------------------------------------------
@@ -1419,11 +1455,52 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
     // get latest telemetry from devices
     if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
         if(calibrating) {
-            foreach(int dev, activeDevices) { // Do for Computrainers only.  Need to check with other devices
+            foreach(int dev, activeDevices) { // Do for selected device only
                 RealtimeData local = rtData;
-                if (Devices[dev].type == DEV_CT)
-                  Devices[dev].controller->getRealtimeData(local); // See if the F3 button has been pressed
+
+                if (calibrationDeviceIndex == dev) {
+                    // need telemetry for calibration dialog updates
+                    // (and F3 button press for Computrainer)
+
+                    Devices[dev].controller->getRealtimeData(local);
+                    calibrationCurrentSpeed = local.getSpeed();
+                    calibrationTorque = local.getTorque();
+                    calibrationCadence = local.getCadence();
+
+                    calibrationTargetSpeed = Devices[dev].controller->getCalibrationTargetSpeed();
+
+                    calibrationState = Devices[dev].controller->getCalibrationState();
+
+                    calibrationSpindownTime =  Devices[dev].controller->getCalibrationSpindownTime();
+                    calibrationZeroOffset =  Devices[dev].controller->getCalibrationZeroOffset();
+
+                    // if calibration is moving out of pending state..
+                    if ((calibrationState == CALIBRATION_STATE_PENDING) && startCalibration) {
+                        startCalibration = false;
+                        qDebug() << "Sending calibration request..";
+                        Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_REQUESTED);
+                    }
+
+                    // if calibration was already requested, but not receiving updates, then try again..
+                    if ((calibrationState == CALIBRATION_STATE_STARTING) && restartCalibration) {
+                        restartCalibration = false;
+                        qDebug() << "No response to our calibration request, re-requesting..";
+                        Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_REQUESTED);
+                    }
+
+                }
             }
+
+            // calibration has completed (or failed), toggle out of calibration state
+            // - do this outside of dev loop in case of no valid/supported device
+            if (finishCalibration) {
+                finishCalibration = false;
+                Calibrate();
+            }
+
+            // Update the calibration dialog if necessary
+            updateCalibration();
+
             // and exit.  Nothing else to do until we finish calibrating
             return;
         } else {
@@ -1622,6 +1699,8 @@ void TrainSidebar::newLap()
         spdcount  = 0;
 
         context->notifyNewLap();
+
+        emit setNotification(tr("New lap.."), 2);
     }
 }
 
@@ -1740,16 +1819,25 @@ void TrainSidebar::loadUpdate()
 
 void TrainSidebar::Calibrate()
 {
-    static QProgressDialog *bar=NULL;
+    // Check we're running (and not paused) before attempting
+    // calibration, buttons should be disabled to prevent this,
+    // but could be triggered by remote control..
+    if ((status & RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
+        toggleCalibration();
+        updateCalibration();
+    }
+}
 
-    // toggle calibration
+void TrainSidebar::toggleCalibration()
+{
     if (calibrating) {
-        bar->reset(); // will hide...
 
-        // restart gui etc
+        // exiting calibration - restart gui etc
         session_time.start();
         lap_time.start();
         load_period.restart();
+
+        clearStatusFlags(RT_CALIBRATING);
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         context->notifyUnPause(); // get video started again, amongst other things
@@ -1758,46 +1846,215 @@ void TrainSidebar::Calibrate()
         if (status&RT_MODE_ERGO) {
 
             foreach(int dev, activeDevices) {
-                Devices[dev].controller->setMode(RT_MODE_ERGO);
-                Devices[dev].controller->setLoad(load);
+                if (calibrationDeviceIndex == dev) {
+                    Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
+                    Devices[dev].controller->setMode(RT_MODE_ERGO);
+                    Devices[dev].controller->setLoad(load);
+                }
             }
         } else {
 
             foreach(int dev, activeDevices) {
-                Devices[dev].controller->setMode(RT_MODE_SPIN);
-                Devices[dev].controller->setGradient(slope);
+                if (calibrationDeviceIndex == dev) {
+                    Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
+                    Devices[dev].controller->setMode(RT_MODE_SPIN);
+                    Devices[dev].controller->setGradient(slope);
+                }
             }
         }
 
     } else {
 
-        if (bar == NULL) {
-            QString title = tr("Calibrating...\nPress F3 on Controller when done.");
-            bar = new QProgressDialog(title, tr("Done"), 0, 0, this);
-            bar->setWindowModality(Qt::WindowModal);
-            bar->setMinimumDuration(0);
-            bar->setAutoClose(true); // hide when reset
-            connect(bar, SIGNAL(canceled()), this, SLOT(Calibrate()));
-        }
-        bar->show();
-
-        // pause gui/load, streaming and recording
-        // but keep the gui ticking so we get realtime telemetry to detect the F3 keypad =button press
+        // entering calibration - pause gui/load, streaming and recording
+        // but keep the gui ticking so we get realtime telemetry for calibration
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
 
+        setStatusFlags(RT_CALIBRATING);
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
 
         context->notifyPause(); // get video started again, amongst other things
 
-        // only do this for computrainers!
-        foreach(int dev, activeDevices)
-            if (Devices[dev].type == DEV_CT)
+        calibrationDeviceIndex = getCalibrationIndex();
+
+        // only do this for the selected device
+        foreach(int dev, devices()) {
+            if (calibrationDeviceIndex == dev) {
+                calibrationType = Devices[dev].controller->getCalibrationType();
+
+                // trainer (tacx vortex smart) doesn't appear to reduce resistance automatically when entering calibration mode
+                if (status&RT_MODE_ERGO)
+                    Devices[dev].controller->setLoad(0);
+                else
+                    Devices[dev].controller->setGradient(0);
+
+
                 Devices[dev].controller->setMode(RT_MODE_CALIBRATE);
+                Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_PENDING);
+            }
+        }
+
+        if (calibrationDeviceIndex == -1)
+            qDebug() << "No device(s) found with calibration support";
+        else
+            qDebug() << "Device" << calibrationDeviceIndex << "being used for calibration";
     }
-    calibrating = !calibrating;
+
+    startCalibration = restartCalibration = finishCalibration = false;
+    calibrating = !calibrating; // toggle calibration
+}
+
+void TrainSidebar::updateCalibration()
+{
+    static QString status;
+    static uint8_t lastState, stateCount;
+
+    //qDebug() << "TrainSidebar::updateCalibration()" << calibrating << calibrationState << stateCount;
+
+    if (!calibrating) {
+
+        stateCount = 1;
+
+        // leaving calibration, clear any notification text
+        status = QString(tr("Exiting calibration.."));
+        emit setNotification(status,3);
+
+    } else {
+
+        // Track how long we've been in the same state
+        if (calibrationState == lastState)
+            stateCount++;
+        else
+            stateCount = 1;
+
+        // update message depending on calibration type and state
+        switch (calibrationType) {
+
+        case CALIBRATION_TYPE_NOT_SUPPORTED:
+            status = QString(tr("Calibration not supported for this device."));
+            if ((stateCount % 10) == 0) {
+                finishCalibration = true;
+            }
+            break;
+
+        case CALIBRATION_TYPE_COMPUTRAINER:
+            status = QString(tr("Calibrating...\nPress F3 on Controller when done."));
+            break;
+
+        case CALIBRATION_TYPE_SPINDOWN:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+                break;
+
+            case CALIBRATION_STATE_PENDING:
+                // Can go straight into spindown calibration
+                startCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_REQUESTED:
+                status = QString(tr("Requesting calibration.."));
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                status = QString(tr("Requesting calibration.."));
+                // if just spinning here, the device has not responded to calibration request
+                if ((stateCount % 5) == 0)
+                    restartCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                status = QString(tr("Calibrating..."));
+                break;
+
+            case CALIBRATION_STATE_POWER:
+                status = QString(tr("Calibrating...\nCurrent speed %1 kph\nIncrease speed to %2 kph")).arg(QString::number(calibrationCurrentSpeed, 'f', 1), QString::number(calibrationTargetSpeed, 'f', 1));
+                break;
+
+            case CALIBRATION_STATE_COAST:
+                status = QString(tr("Calibrating...\nStop pedalling until speed drops to 0"));
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                // display zero offset and spindown stats
+                status = QString(tr("Calibration completed successfully!\nSpindown %1 ms\nZero Offset %2")).arg(QString::number(calibrationSpindownTime), QString::number(calibrationZeroOffset));;
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed!"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            }
+            break;
+
+        case CALIBRATION_TYPE_ZERO_OFFSET:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+                break;
+
+            case CALIBRATION_STATE_PENDING:
+                // Wait for cadence to be zero before requesting zero offset calibration
+                status = QString(tr("Unclip or stop pedalling to begin calibration.."));
+                if (calibrationCadence == 0)
+                    startCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_REQUESTED:
+                status = QString(tr("Requesting calibration.."));
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                break;
+
+            case CALIBRATION_STATE_POWER:
+                break;
+
+            case CALIBRATION_STATE_COAST:
+                status = QString(tr("Calibrating...\nUnclip or stop pedalling until process is completed..\nTorque %1")).arg(QString::number(calibrationTorque, 'f', 3));
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                // yuk, zero offset for FE-C devices is unsigned, but for power meters is signed..
+                status = QString(tr("Calibration completed successfully!\nZero Offset %1\nTorque %2")).arg(QString::number((int16_t)calibrationZeroOffset), QString::number(calibrationTorque, 'f', 3));;
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed!"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            }
+            break;
+        }
+
+        lastState = calibrationState;
+
+        // set notification text, no timeout
+        emit setNotification(status, 0);
+    }
 }
 
 void TrainSidebar::FFwd()
@@ -1813,6 +2070,8 @@ void TrainSidebar::FFwd()
         context->notifySeek(+1); // in case of video with RLV file synchronisation just ask to go forward
     }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
+
+    emit setNotification(tr("Fast forward.."), 2);
 }
 
 void TrainSidebar::Rewind()
@@ -1832,6 +2091,8 @@ void TrainSidebar::Rewind()
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
     }
+
+    emit setNotification(tr("Rewind.."), 2);
 }
 
 
@@ -1873,6 +2134,8 @@ void TrainSidebar::Higher()
         else
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
+
+    emit setNotification(tr("Increasing intensity.."), 2);
 }
 
 // lower load/gradient
@@ -1897,6 +2160,8 @@ void TrainSidebar::Lower()
         else
             foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
+
+    emit setNotification(tr("Decreasing intensity.."), 2);
 }
 
 void TrainSidebar::setLabels()
@@ -2277,4 +2542,31 @@ void TrainSidebar::clearStatusFlags(int flags)
     context->isPaused  = (status&RT_PAUSED);
 
     emit statusChanged(status);
+}
+
+int TrainSidebar::getCalibrationIndex()
+{
+    // select the least recently calibrated GC device that reports calibration capabilities.
+    //
+    // note that for for ANT devices, the calibration class handles the case of multiple sensors
+    // with support for calibration, and will select a suitable device/channel for calibration each time.
+
+    int   index = -1;
+    QTime lastCal = QTime::currentTime();
+
+    foreach(int dev, devices()) {
+        if (Devices[dev].controller->getCalibrationType()) {
+            // device supports calibration
+            //qDebug() << "Device" << dev << "supports calibration, last cal attempt timestamp is" << Devices[dev].controller->getCalibrationTimestamp();
+            if (Devices[dev].controller->getCalibrationTimestamp() < lastCal) {
+                // older (or no) calibration timestamp, select this device
+                lastCal = Devices[dev].controller->getCalibrationTimestamp();
+                index = dev;
+            }
+        }
+    }
+    if (index != -1)
+        Devices[index].controller->setCalibrationTimestamp();
+
+    return index;
 }

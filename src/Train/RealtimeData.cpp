@@ -215,6 +215,10 @@ double RealtimeData::getRPS() const
     return rps;
 }
 
+double RealtimeData::getTorque() const
+{
+    return torque;
+}
 void RealtimeData::setTrainerStatusAvailable(bool status)
 {
     this->trainerStatusAvailable = status;
@@ -544,6 +548,11 @@ double RealtimeData::getSmO2() const { return smo2; }
 double RealtimeData::gettHb() const { return thb; }
 double RealtimeData::getHHb() const { return hhb; }
 double RealtimeData::getO2Hb() const { return o2hb; }
+
+void RealtimeData::setTorque(double torque)
+{
+    this->torque = torque;
+}
 
 void RealtimeData::setLap(long lap)
 {

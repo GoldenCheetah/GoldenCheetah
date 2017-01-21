@@ -80,6 +80,7 @@ public:
     void setRTE(double);
     void setLPS(double);
     void setRPS(double);
+    void setTorque(double);
 
     const char *getName() const;
 
@@ -111,7 +112,7 @@ public:
     double getRTE() const;
     double getLPS() const;
     double getRPS() const;
-
+    double getTorque() const;
 
     void setTrainerStatusAvailable(bool status);
     bool getTrainerStatusAvailable() const;
@@ -136,6 +137,7 @@ private:
     double cadence;      // in rpm
     double smo2, thb;
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
+    double torque; // raw torque data for calibration display
 
     // derived data
     double distance;

@@ -59,6 +59,7 @@
 #define RT_WORKOUT      0x0800        // is running a workout
 #define RT_STREAMING    0x1000        // is streaming to a remote peer
 #define RT_CONNECTED    0x2000        // is connected to devices
+#define RT_CALIBRATING  0x4000        // is calibrating
 
 // msecs constants for timers
 #define REFRESHRATE    200 // screen refresh in milliseconds
@@ -125,13 +126,14 @@ class TrainSidebar : public GcWindow
         int currentStatus() {return status;}
 
     signals:
-
         void deviceSelected();
         void start();
         void pause();
         void stop();
         void intensityChanged(int value);
         void statusChanged(int status);
+        void setNotification(QString msg, int timeout);
+        void clearNotification(void);
 
     private slots:
         void deviceTreeWidgetSelectionChanged();
@@ -158,6 +160,8 @@ class TrainSidebar : public GcWindow
 
         void viewChanged(int index);
 
+        int  getCalibrationIndex(void);
+
     public slots:
         void configChanged(qint32);
         void deleteWorkouts(); // deletes selected workouts
@@ -179,6 +183,9 @@ class TrainSidebar : public GcWindow
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!
         void resetLapTimer(); //reset the lap timer
+
+        void toggleCalibration();
+        void updateCalibration();
 
         // Timed actions
         void guiUpdate();           // refreshes the telemetry
@@ -254,6 +261,13 @@ class TrainSidebar : public GcWindow
         QFile *recordFile;      // where we record!
         ErgFile *ergFile;       // workout file
         VideoSyncFile *videosyncFile;       // videosync file
+
+        bool     startCalibration, restartCalibration, finishCalibration;
+        int      calibrationDeviceIndex;
+        uint8_t  calibrationType, calibrationState;
+        uint16_t calibrationSpindownTime, calibrationZeroOffset;
+        double   calibrationTargetSpeed, calibrationCurrentSpeed;
+        double   calibrationCadence, calibrationTorque;
 
         long total_msecs,
              lap_msecs,

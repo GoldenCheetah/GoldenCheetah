@@ -66,6 +66,15 @@ public:
     void setGradient(double);
     void setMode(int);
 
+    // passing calibration state between trainer and TrainSidebar
+    uint8_t  getCalibrationType();
+    double   getCalibrationTargetSpeed();
+    uint8_t  getCalibrationState();
+    void     setCalibrationState(uint8_t);
+    uint16_t getCalibrationSpindownTime();
+    uint16_t getCalibrationZeroOffset();
+    void     resetCalibrationState();
+
 signals:
     void foundDevice(int channel, int device_number, int device_id); // channelInfo
     void lostDevice(int channel);            // dropInfo
