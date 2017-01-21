@@ -76,6 +76,9 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
 void
 RCanvas::configChanged(qint32)
 {
+    // set the background
+    setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
+
     // set background etc to the prevailing defaults
     QPalette p = palette();
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
