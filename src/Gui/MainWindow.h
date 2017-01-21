@@ -297,8 +297,10 @@ class MainWindow : public QMainWindow
         QSignalMapper *toolMapper;
 
 
+#ifdef GC_HAS_CLOUD_DB
         CloudDBVersionClient *versionClient;
         CloudDBTelemetryClient *telemetryClient;
+#endif
 
 };
 
