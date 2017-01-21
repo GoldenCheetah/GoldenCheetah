@@ -199,6 +199,11 @@ bool ANT::modeSLOPE(void) const
     return mode==RT_MODE_SLOPE;
 }
 
+bool ANT::modeCALIBRATE(void) const
+{
+    return mode==RT_MODE_CALIBRATE;
+}
+
 double ANT::channelValue2(int channel)
 {
     return antChannel[channel]->channelValue2();
@@ -296,12 +301,14 @@ ANT::setLoad(double load)
     // if we have a vortex trainer connected, relay the change in target power to the brake
     if (vortexChannel != -1)
     {
+        qDebug() << "Setting vortex target power to" << load;
         sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
     }
 
     // if we have a FE-C trainer connected, relay the change in target power to the brake
     if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_POWER_MODE_CAPABILITY))
     {
+        qDebug() << "Setting fitness equipment target power to" << load;
         sendMessage(ANTMessage::fecSetTargetPower(fecChannel, (int)load));
     }
 }
@@ -332,6 +339,16 @@ void ANT::requestFecCapabilities()
     sendMessage(ANTMessage::fecRequestCapabilities(fecChannel));
 }
 
+void ANT::requestFecCalibration(uint8_t type)
+{
+    sendMessage(ANTMessage::fecRequestCalibration(fecChannel, type));
+}
+
+void ANT::requestPwrCalibration(uint8_t channel, uint8_t type)
+{
+    sendMessage(ANTMessage::requestPwrCalibration(channel, type));
+}
+
 void ANT::refreshVortexLoad()
 {
     if (vortexChannel == -1)
@@ -355,6 +372,7 @@ ANT::setGradient(double gradient)
     if ((fecChannel != -1) && (antChannel[fecChannel]->capabilities() & FITNESS_EQUIPMENT_SIMUL_MODE_CAPABILITY))
     {
         //set fitness equipment target gradient
+        qDebug() << "Setting fitness equipment target gradient to" << gradient;
         sendMessage(ANTMessage::fecSetTrackResistance(fecChannel, gradient, currentRollingResistance));
         currentGradient = gradient;
         // TODO : obtain acknowledge / confirm value using fecRequestCommandStatus

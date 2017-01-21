@@ -467,12 +467,14 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                             break;
 
                         case ANT_SPORT_ZEROOFFSET_SUCCESS: //0xAC
-                        // is also ANT_SPORT_AUTOZERO_SUCCESS: // 0xAC
+                            // is also ANT_SPORT_AUTOZERO_SUCCESS: // 0xAC
+                            calibrationOffset =  message[10] + (message[11]<<8);
                             autoZeroStatus = message[6];
                             break;
 
                         case ANT_SPORT_ZEROOFFSET_FAIL: //0xAF
-                        // is also ANT_SPORT_AUTOZERO_FAIL: // 0xAF
+                            // is also ANT_SPORT_AUTOZERO_FAIL: // 0xAF
+                            calibrationOffset =  message[10] + (message[11]<<8);
                             autoZeroStatus = message[6];
                             break;
 
@@ -521,6 +523,27 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
                 switch (data_page)
                 {
+                case FITNESS_EQUIPMENT_CALIBRATION_REQUEST_PAGE:
+                    // response back from trainer at end of calibration
+                    fecCalibrationReq = message[5];
+                    fecTemperature    = message[7];
+                    fecZeroOffset     = message[8];
+                    fecZeroOffset    |= (message[9]) << 8;
+                    fecSpindownTime   = message[10];
+                    fecSpindownTime  |= (message[11]) << 8;
+                    break;
+
+                case FITNESS_EQUIPMENT_CALIBRATION_PROGRESS_PAGE:
+                    // periodic responses during calibration
+                    fecCalibrationStatus     = message[5];
+                    fecCalibrationConditions = message[6];
+                    fecTemperature           = message[7];
+                    fecTargetSpeed           = message[8];
+                    fecTargetSpeed          |= (message[9]) << 8;
+                    fecTargetSpindownTime    = message[10];
+                    fecTargetSpindownTime   |= (message[11]) << 8;
+                    break;
+
                 case FITNESS_EQUIPMENT_GENERAL_PAGE:
                      //based on "ANT+ Device Profile Fitness Equipment" rev 4.1 p 42: 6.5.2 Data page 0x10 - General FE Data
                      fecEqtType = message[5] & 0x1F;
@@ -600,6 +623,14 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                     }
                     break;
 
+                case ANT_MANUFACTURER_ID_PAGE: // 0x50
+                    break;
+
+                case ANT_PRODUCT_INFO_PAGE: // 0x51
+                    break;
+
+                default:
+                    break;
                 }
                 break;
 
@@ -1101,6 +1132,33 @@ ANTMessage ANTMessage::fecRequestCommandStatus(const uint8_t channel, const uint
                       0x01,        // requested transmission response (1 time only)
                       page,        // requested page (0x30 = resistance, 0x31 = power, 0x32 = wind, 0x33 = slope/track)
                       0x01);       // request data page
+}
+
+ANTMessage ANTMessage::fecRequestCalibration(const uint8_t channel, const uint8_t type)
+{
+    qDebug() << "Sending ANT_SPORT_CALIBRATION_MESSAGE (FE-C) on channel" << channel;
+
+    // based on ANT+ Device Profile Fitness Equipment, Rev 4.1 p 38: 6.4.1  Data Page 1 – Calibration Request and Response Page
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      ANT_SPORT_CALIBRATION_MESSAGE,        // data page request
+                      type,                                 // spindown, zero offset, or none (does not seem to cancel an ongoing calibration?)
+                      0x00,                                 // reserved
+                      0xFF,                                 // temperature - set to invalid in request
+                      0xFF, 0xFF,                           // zero offset - set to invalid in request
+                      0xFF, 0xFF);                          // spin down time - set to invalid in request
+}
+
+ANTMessage ANTMessage::requestPwrCalibration(const uint8_t channel, const uint8_t type)
+{
+    qDebug() << "Sending ANT_SPORT_CALIBRATION_MESSAGE (Power) on channel" << channel;
+
+    // based on ANT+ Device Profile Bicycle Power, Rev 4.0 p 38: 6.4.1  Data Page 1 – Calibration Request and Response Page
+    return ANTMessage(9, ANT_ACK_DATA, channel,
+                      ANT_SPORT_CALIBRATION_MESSAGE,        // data page request
+                      type,                                 // calibration request type
+                      0xFF, 0xFF,                           // reserved
+                      0xFF, 0xFF,                           // reserved
+                      0xFF, 0xFF);                          // reserved
 }
 
 ANTMessage ANTMessage::controlDeviceAvailability(const uint8_t channel)
