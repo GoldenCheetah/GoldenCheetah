@@ -29,8 +29,8 @@
 #include <QJsonParseError>
 #endif
 
-OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL) :
-    context(context), site(site), baseURL(baseURL)
+OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QString clientsecret) :
+    context(context), site(site), baseURL(baseURL), clientsecret(clientsecret)
 {
 
     setAttribute(Qt::WA_DeleteOnClose);
@@ -149,9 +149,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL) :
         //urlstr = QString("https://whats.todaysplan.com.au/en/authorize/");
         if (baseURL=="") baseURL="https://whats.todaysplan.com.au";
         urlstr = QString("%1/authorize/").arg(baseURL);
-#ifdef GC_TODAYSPLAN_CLIENT_ID
         urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
-#endif
     }
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
@@ -285,7 +283,11 @@ OAuthDialog::urlChanged(const QUrl &url)
                 urlstr = QString("%1/rest/oauth/access_token?").arg(baseURL);
                 params.addQueryItem("client_id", GC_TODAYSPLAN_CLIENT_ID);
 #ifdef GC_TODAYSPLAN_CLIENT_SECRET
-                params.addQueryItem("client_secret", GC_TODAYSPLAN_CLIENT_SECRET);
+                if (clientsecret != "")
+                    params.addQueryItem("client_secret", clientsecret);
+                else
+                    params.addQueryItem("client_secret", GC_TODAYSPLAN_CLIENT_SECRET);
+
 #endif
                 params.addQueryItem("grant_type", "authorization_code");
                 params.addQueryItem("redirect_uri", "https://goldencheetah.github.io/blank.html");

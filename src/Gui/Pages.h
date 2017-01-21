@@ -273,6 +273,7 @@ class CredentialsPage : public QScrollArea
         QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
 
         QLineEdit *tdpURL;
+        QLineEdit *tdpUserKey;
 
         QLineEdit *scURL;
         QLineEdit *scUser;

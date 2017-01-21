@@ -590,6 +590,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(tdpurllabel, ++row, 0);
     grid->addWidget(tdpURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
 
+    QLabel *tdpuserkeylabel = new QLabel("Key (optional)"); // don't translate a technical term
+    tdpUserKey = new QLineEdit(this);
+    tdpUserKey->setText(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_USERKEY, "").toString());
+    grid->addWidget(tdpuserkeylabel, ++row, 0);
+    grid->addWidget(tdpUserKey, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
+
     grid->addWidget(tdpauthLabel, ++row, 0);
     grid->addWidget(tdpAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "")!="")
@@ -1056,7 +1062,7 @@ void CredentialsPage::authoriseStrava()
 
 void CredentialsPage::authoriseTodaysPlan()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN, tdpURL->text());
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN, tdpURL->text(), tdpUserKey->text());
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1146,6 +1152,7 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_URL, tdpURL->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_USERKEY, tdpUserKey->text());
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
     appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_USER, scUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_PASS, scPass->text());
