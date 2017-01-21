@@ -19,6 +19,7 @@
 
 // Abstract base class for Realtime device controllers
 #include "RealtimeData.h"
+#include "CalibrationData.h"
 #include "TrainSidebar.h"
 
 #ifndef _GC_RealtimeController_h
@@ -61,6 +62,17 @@ public:
     virtual void setGradient(double) { return; }
     virtual void setMode(int) { return; }
 
+    virtual uint8_t  getCalibrationType() { return CALIBRATION_TYPE_NOT_SUPPORTED; }
+    virtual double   getCalibrationTargetSpeed() { return 0; }
+    virtual uint8_t  getCalibrationState() { return CALIBRATION_STATE_IDLE; }
+    virtual void     setCalibrationState(uint8_t) {return; }
+    virtual uint16_t getCalibrationSpindownTime() { return 0; }
+    virtual uint16_t getCalibrationZeroOffset() { return 0; }
+    virtual void     resetCalibrationState() { return; }
+
+    void   setCalibrationTimestamp();
+    QTime  getCalibrationTimestamp();
+
     // post process, based upon device configuration
     void processRealtimeData(RealtimeData &rtData);
     void processSetup();
@@ -68,6 +80,7 @@ public:
 private:
     DeviceConfiguration *dc;
     DeviceConfiguration devConf;
+    QTime lastCalTimestamp;
 };
 
 #endif // _GC_RealtimeController_h

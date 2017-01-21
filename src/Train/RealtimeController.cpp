@@ -611,3 +611,15 @@ RealtimeController::processSetup()
         break;
     }
 }
+
+void
+RealtimeController::setCalibrationTimestamp()
+{
+    lastCalTimestamp = QTime::currentTime();
+}
+
+QTime
+RealtimeController::getCalibrationTimestamp()
+{
+    return lastCalTimestamp;
+}

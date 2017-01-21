@@ -117,6 +117,19 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
 #endif
     toolbuttons->addWidget(m_lapButton);
 
+    QIcon calIcon(":images/oxygen/cal.png");
+    cal = new QPushButton(calIcon, "", this);
+    cal->setFocusPolicy(Qt::NoFocus);
+    cal->setIconSize(QSize(64,64));
+    cal->setAutoFillBackground(false);
+    cal->setAutoDefault(false);
+    cal->setFlat(true);
+    cal->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    #if QT_VERSION > 0x050400
+        cal->setShortcut(Qt::Key_C);
+    #endif
+    toolbuttons->addWidget(cal);
+
     QIcon upIcon(":images/oxygen/up.png");
     loadUp = new QPushButton(upIcon, "", this);
     loadUp->setFocusPolicy(Qt::NoFocus);
@@ -194,6 +207,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     //connect(hideOnIdle, SIGNAL(stateChanged(int)), this, SLOT(autoHideCheckboxChanged(int)));
     connect(m_trainSidebar, SIGNAL(statusChanged(int)), this, SLOT(statusChanged(int)));
     connect(m_connectButton, SIGNAL(clicked()), m_trainSidebar, SLOT(toggleConnect()));
+    connect(cal, SIGNAL(clicked()), m_trainSidebar, SLOT(Calibrate()));
 
     connect(loadUp, SIGNAL(clicked()), m_trainSidebar, SLOT(Higher()));
     connect(loadDown, SIGNAL(clicked()), m_trainSidebar, SLOT(Lower()));
@@ -277,6 +291,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
         intensitySlider->setEnabled(false);
@@ -292,6 +307,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
         intensitySlider->setEnabled(false);
@@ -307,6 +323,23 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        cal->setEnabled(false);
+        loadUp->setEnabled(false);
+        loadDown->setEnabled(false);
+        intensitySlider->setEnabled(false);
+        return;
+    }
+
+    // running & calibrating
+    if ((status&RT_CALIBRATING) && (status&RT_RUNNING)) {
+        m_connectButton->setIcon(connectedIcon);
+        m_connectButton->setEnabled(false);
+        m_playButton->setEnabled(false);
+        m_stopButton->setEnabled(true);
+        m_forwardButton->setEnabled(false);
+        m_rewindButton->setEnabled(false);
+        m_lapButton->setEnabled(false);
+        cal->setEnabled(true);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
         intensitySlider->setEnabled(false);
@@ -322,6 +355,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(true);
         m_rewindButton->setEnabled(true);
         m_lapButton->setEnabled(true);
+        cal->setEnabled(true);
         loadUp->setEnabled(true);
         loadDown->setEnabled(true);
         intensitySlider->setEnabled(true);
