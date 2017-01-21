@@ -38,16 +38,13 @@ int CloudDBVersionClient::CloudDBVersion_DevelopmentBuild = 30;
 
 
 CloudDBVersionClient::CloudDBVersionClient() {
-    // only static members
+
 }
 CloudDBVersionClient::~CloudDBVersionClient() {
-    // only static members
-
 }
 
-
-QList<VersionAPIGetV1>
-CloudDBVersionClient::getLatestVersions() {
+void
+CloudDBVersionClient::informUserAboutLatestVersions() {
 
     // consider any updates done since the last start and consider only newer versions
     int lastVersion = appsettings->value(NULL, GC_LAST_VERSION_CHECKED, 0).toInt();
@@ -56,30 +53,35 @@ CloudDBVersionClient::getLatestVersions() {
         lastVersion = VERSION_LATEST;
     }
 
-    QList<VersionAPIGetV1> retrieved;
-
-    QScopedPointer<QNetworkAccessManager> l_nam(new QNetworkAccessManager());
-    QNetworkReply *l_reply;
+    QNetworkAccessManager *l_nam = new QNetworkAccessManager(this);
 
     QNetworkRequest request;
     QUrlQuery query;
     query.addQueryItem("version", QString::number(lastVersion));
     CloudDBCommon::prepareRequest(request, CloudDBCommon::cloudDBBaseURL+"version", &query);
-    l_reply = l_nam->get(request);
+    l_nam->get(request);
 
-    // blocking request
-    QEventLoop loop;
-    connect(l_reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    connect(l_nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(showVersionPopup(QNetworkReply*)));
+
+}
+
+void
+CloudDBVersionClient::showVersionPopup(QNetworkReply * l_reply) {
+
+    QList<VersionAPIGetV1> retrieved;
 
     if (l_reply->error() == QNetworkReply::NoError) {
         QByteArray result = l_reply->readAll();
         unmarshallAPIGetV1(result, &retrieved);
-    };   // silently ignore network errors, since the user can't do anything about it anyway
+    }
 
-    return retrieved;
+    if (retrieved.count() > 0) {
+        CloudDBUpdateAvailableDialog updateAvailableDialog(retrieved);
+        updateAvailableDialog.setModal(true);
+        // we are not interested in the result - update check status is updated as part of the dialog box
+        updateAvailableDialog.exec();
+    }
 }
-
 
 
 bool
@@ -125,6 +127,8 @@ CloudDBVersionClient::unmarshallAPIGetV1(QByteArray json, QList<VersionAPIGetV1>
 
     return true;
 }
+
+
 
 
 CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1> versions) : versions(versions)
@@ -182,15 +186,15 @@ CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1
     QHBoxLayout *lastRow = new QHBoxLayout;
 
     doNotAskAgainButton = new QPushButton(tr("Do not ask again for these versions"), this);
-    doNotAskAgainButton->setEnabled(true);
     connect(doNotAskAgainButton, SIGNAL(clicked()), this, SLOT(doNotAskAgain()));
-    askAgainNextStartButton = new QPushButton(tr("Show available versions again on next start"), this);
+    askAgainNextStartButton = new QPushButton(tr("Show new versions on next start"), this);
     askAgainNextStartButton->setDefault(true);
     connect(askAgainNextStartButton, SIGNAL(clicked()), this, SLOT(askAgainOnNextStart()));
 
-    lastRow->addWidget(askAgainNextStartButton);
+
     lastRow->addStretch();
     lastRow->addWidget(doNotAskAgainButton);
+    lastRow->addWidget(askAgainNextStartButton);
     layout->addLayout(lastRow);
 
 }
