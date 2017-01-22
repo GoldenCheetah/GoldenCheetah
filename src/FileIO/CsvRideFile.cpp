@@ -658,7 +658,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         continue;
                     }
 
-                    QRegExp timestampRegEx("^\([0-9]*\):\([0-9]*\)$");
+                    QRegExp timestampRegEx("^([0-9]*):([0-9]*)$");
                     QString timestamp = line.section(',', 0, 0);
 
 

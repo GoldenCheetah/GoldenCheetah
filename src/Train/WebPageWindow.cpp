@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "RideImportWizard.h"
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "SmallPlot.h"
@@ -58,7 +59,7 @@ class WebDownloadInterceptor : public QWebEngineUrlRequestInterceptor
         WebDownloadInterceptor() : QWebEngineUrlRequestInterceptor(Q_NULLPTR) {}
 
     public slots:
-        void interceptRequest(QWebEngineUrlRequestInfo &info) {
+        void interceptRequest(QWebEngineUrlRequestInfo &) {
             //qDebug()<<info.requestUrl().toString();
         }
 };
@@ -282,10 +283,42 @@ WebPageWindow::event(QEvent *event)
 void
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 {
-    //qDebug()<<"Download Requested:"<<item->url().toString();
+    qDebug()<<"Download Requested:"<<item->path()<<item->url().toString();
+
+    qDebug() << "Format: " <<  item->savePageFormat();
+    qDebug() << "Path: " << item->path();
+    qDebug() << "Type: " << item->type();
+    qDebug() << "MimeType: " << item->mimeType();
+
+    // lets go get it!
+    filenames.clear();
+    filenames << item->path();
+
+    // set save
+    connect(item, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64,qint64)));
+    connect(item, SIGNAL(finished()), this, SLOT(downloadFinished()));
+
+    // kick off download
+    item->accept(); // lets download it!
 }
+
 void
-WebPageWindow::linkHovered(QString link)
+WebPageWindow::downloadFinished()
+{
+    // now try and import it (if download failed file won't exist)
+    // dialog is self deleting
+    RideImportWizard *dialog = new RideImportWizard(filenames, context);
+    dialog->process(); // do it!
+}
+
+void
+WebPageWindow::downloadProgress(qint64 a, qint64 b)
+{
+    qDebug()<<"downloading..." << a<< b;
+}
+
+void
+WebPageWindow::linkHovered(QString)
 {
     //qDebug()<<"hovering over:" << link;
 }
