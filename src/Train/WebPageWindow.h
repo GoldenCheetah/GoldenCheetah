@@ -97,6 +97,8 @@ class WebPageWindow : public GcChartWindow
         void userUrl();
         void forceReplot();
         void configChanged(qint32);
+        void downloadProgress(qint64, qint64);
+        void downloadFinished();
 
 #ifdef NOWEBKIT
         void downloadRequested(QWebEngineDownloadItem*);
@@ -109,6 +111,9 @@ class WebPageWindow : public GcChartWindow
     private:
         Context *context;
         QVBoxLayout *layout;
+
+        // downloading
+        QStringList filenames;
 
         // setting dialog
         QLabel *customUrlLabel;
