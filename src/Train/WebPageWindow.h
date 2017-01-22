@@ -97,10 +97,10 @@ class WebPageWindow : public GcChartWindow
         void userUrl();
         void forceReplot();
         void configChanged(qint32);
-        void downloadProgress(qint64, qint64);
-        void downloadFinished();
 
 #ifdef NOWEBKIT
+        void downloadProgress(qint64, qint64);
+        void downloadFinished();
         void downloadRequested(QWebEngineDownloadItem*);
         void linkHovered(QString);
 #else
