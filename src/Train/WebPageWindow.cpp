@@ -283,12 +283,12 @@ WebPageWindow::event(QEvent *event)
 void
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 {
-    qDebug()<<"Download Requested:"<<item->path()<<item->url().toString();
+    //qDebug()<<"Download Requested:"<<item->path()<<item->url().toString();
 
-    qDebug() << "Format: " <<  item->savePageFormat();
-    qDebug() << "Path: " << item->path();
-    qDebug() << "Type: " << item->type();
-    qDebug() << "MimeType: " << item->mimeType();
+    //qDebug() << "Format: " <<  item->savePageFormat();
+    //qDebug() << "Path: " << item->path();
+    //qDebug() << "Type: " << item->type();
+    //qDebug() << "MimeType: " << item->mimeType();
 
     // lets go get it!
     filenames.clear();
@@ -314,7 +314,7 @@ WebPageWindow::downloadFinished()
 void
 WebPageWindow::downloadProgress(qint64 a, qint64 b)
 {
-    qDebug()<<"downloading..." << a<< b;
+    //qDebug()<<"downloading..." << a<< b;
 }
 
 void
