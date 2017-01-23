@@ -633,6 +633,16 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         HEADERS += Train/BT40Controller.h Train/BT40Device.h
         SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
     }
+
+    # qt charts in QT5.7 or higher
+    greaterThan(QT_MINOR_VERSION, 6) {
+        QT += charts
+
+        # overview in the new summary chart with moveable tiles
+        DEFINES += GC_HAVE_OVERVIEW
+        HEADERS += Charts/OverviewWindow.h
+        SOURCES += Charts/OverviewWindow.cpp
+    }
 }
 
 

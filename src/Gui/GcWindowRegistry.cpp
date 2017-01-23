@@ -60,6 +60,9 @@
 #include "RChart.h"
 #endif
 #include "PlanningWindow.h"
+#ifdef GC_HAVE_OVERVIEW
+#include "OverviewWindow.h"
+#endif
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -81,8 +84,9 @@ GcWindowRegistry::initialize()
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
     { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
-    { VIEW_HOME,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
+    //{ VIEW_HOME,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
+    { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Activity Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
@@ -240,6 +244,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
+#endif
+#if GC_HAVE_OVERVIEW
+    case GcWindowTypes::Overview: returning = new OverviewWindow(context); break;
+#else
+    case GcWindowTypes::Overview: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     default: return NULL; break;

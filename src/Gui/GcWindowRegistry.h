@@ -67,7 +67,8 @@ enum gcwinid {
         RConsole = 38,
         RConsoleSeason = 39,
         SeasonPlan = 40,
-        WebPageWindow = 41
+        WebPageWindow = 41,
+        Overview = 42
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
