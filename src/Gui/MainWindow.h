@@ -204,8 +204,6 @@ class MainWindow : public QMainWindow
         void tweetRide();
 #endif
         void share();
-        void uploadTodaysPlan();
-        void syncTodaysPlan();
         void manualProcess(QString);
 #if QT_VERSION > 0x050000
         void uploadDropbox();
@@ -216,6 +214,9 @@ class MainWindow : public QMainWindow
 
         void uploadSixCycle();
         void syncSixCycle();
+
+        void uploadTodaysPlan();
+        void syncTodaysPlan();
 #endif
         void uploadLocalFileStore();
         void syncLocalFileStore();

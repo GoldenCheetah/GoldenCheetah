@@ -181,6 +181,8 @@ void GCColor::setupColors()
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(0xec,0xec,0xec) },
 #endif
 #endif
+        { tr("Overview Background"), "COVERVIEWBACKGROUND", QColor(0,0,0) },
+        { tr("Overview Card Background"), "CCARDBACKGROUND", QColor(52,52,52) },
         { "", "", QColor(0,0,0) },
     };
 
