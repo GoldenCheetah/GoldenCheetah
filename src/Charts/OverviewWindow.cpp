@@ -19,6 +19,8 @@
 
 #include "OverviewWindow.h"
 
+#include <QGraphicsSceneMouseEvent>
+
 OverviewWindow::OverviewWindow(Context *context) :
     GcChartWindow(context), context(context)
 {
@@ -34,18 +36,47 @@ OverviewWindow::OverviewWindow(Context *context) :
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(this);
-    view->setScene(scene);
 
     // how to move etc
-    view->setDragMode(QGraphicsView::ScrollHandDrag);
+    //view->setDragMode(QGraphicsView::ScrollHandDrag);
     view->setRenderHint(QPainter::Antialiasing, true);
     view->setFrameStyle(QFrame::NoFrame);
-
+    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    view->setScene(scene);
     main->addWidget(view);
     setChartLayout(main);
 
+    // XXX lets hack in some tiles to start (will load from config later XXX
+    newCard(0, 1, 5);
+    newCard(0, 2, 10);
+    newCard(0, 3, 10);
+    newCard(0, 4, 5);
+    newCard(1, 1, 10);
+    newCard(1, 2, 5);
+    newCard(1, 3, 10);
+    newCard(1, 4, 5);
+    newCard(2, 1, 10);
+    newCard(2, 2, 5);
+    newCard(2, 3, 10);
+    newCard(2, 4, 5);
+    newCard(3, 1, 5);
+    newCard(3, 2, 10);
+    newCard(3, 3, 5);
+    newCard(3, 4, 10);
+
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
+
+    // sort out the view
+    updateGeometry();
+
+    // now scale to fit... nothing fancy for now
+    view->setSceneRect(scene->itemsBoundingRect());
+    view->fitInView(view->sceneRect(), Qt::KeepAspectRatio);
+
+    // watch the view for mouse events
+    view->setMouseTracking(true);
+    scene->installEventFilter(this);
 }
 
 void
@@ -53,6 +84,48 @@ OverviewWindow::resizeEvent(QResizeEvent *)
 {
     // hmmm, this isn't quite right !
     view->fitInView(view->sceneRect(), Qt::KeepAspectRatio);
+}
+
+static bool cardSort(const Card* left, const Card* right)
+{
+    return (left->column < right->column ? true : (left->column == right->column && left->order < right->order ? true : false));
+}
+
+void
+OverviewWindow::updateGeometry()
+{
+
+    // order the items to their positions
+    qSort(cards.begin(), cards.end(), cardSort);
+
+    int y=25;
+    int column=0;
+
+    // just set their geometry for now, no interaction
+    for(int i=0; i<cards.count(); i++) {
+
+        // move on to next column
+        if (cards[i]->column > column) { y=25; column = cards[i]->column; }
+
+        // set geometry
+        int ty = y;
+        int tx = 25 + (column*400) + (column*25);
+        int twidth = 400;
+        int theight = cards[i]->deep * 25;
+
+        cards[i]->setGeometry(tx, ty, twidth, theight);
+
+        // add to scene if new
+        if (!cards[i]->onscene) {
+            scene->addItem(cards[i]);
+            qDebug()<<"add col,order:"<<cards[i]->column<<cards[i]->order<<"y,x,width,height"<<ty<<tx<<twidth<<theight;
+            cards[i]->onscene = true;
+        }
+
+        // set spot for next tile
+        y += theight + 25;
+    }
+    qDebug()<<"scene="<<scene->itemsBoundingRect();
 }
 
 void
@@ -119,6 +192,16 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
         }
 
+    } else  if (event->type() == QEvent::GraphicsSceneMouseMove) {
+
+        // where am i ?
+        QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+        QGraphicsItem *item = scene->itemAt(pos, view->transform());
+
+        qDebug()<<"mouse:"<<pos;
+        if (item) {
+            qDebug()<<"POP..";
+        }
     }
     return returning;
 }
