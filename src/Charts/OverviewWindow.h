@@ -29,6 +29,23 @@
 // QGraphics
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QGraphicsWidget>
+
+class OverviewWindow;
+
+// keep it simple for now
+class Card : public QGraphicsWidget
+{
+    public:
+
+        Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false) {
+            setAutoFillBackground(true);
+        }
+
+        // which column, sequence and size in rows
+        int column, order, deep;
+        bool onscene;
+};
 
 // qt
 #include <QtGui>
@@ -47,9 +64,20 @@ class OverviewWindow : public GcChartWindow
         // trap signals
         void configChanged(qint32);
 
-        // show hide toolbar if too small
+        // viewport resized
         void resizeEvent(QResizeEvent * event);
 
+        // set geometry on the widgets (size and pos)
+        void updateGeometry();
+
+        // create a card
+        Card *newCard(int column, int order, int deep) { Card *add = new Card(deep);
+                                                         add->column = column;
+                                                         add->order = order;
+                                                         add->deep = deep;
+                                                         cards.append(add);
+                                                         return add;
+                                                        }
     protected:
         bool eventFilter(QObject *obj, QEvent *event);
 
@@ -58,6 +86,8 @@ class OverviewWindow : public GcChartWindow
         Context *context;
         QGraphicsScene *scene;
         QGraphicsView *view;
+
+        QList<Card*> cards;
 
 };
 
