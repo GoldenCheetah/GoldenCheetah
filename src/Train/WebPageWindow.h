@@ -104,6 +104,9 @@ class WebPageWindow : public GcChartWindow
         void downloadRequested(QWebEngineDownloadItem*);
         void linkHovered(QString);
 #else
+        // getting data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
         void download(const QNetworkRequest &request);
         void unsupportedContent(QNetworkReply * reply);
 #endif
@@ -114,6 +117,7 @@ class WebPageWindow : public GcChartWindow
 
         // downloading
         QStringList filenames;
+        QMap<QNetworkReply*, QByteArray*> buffers;
 
         // setting dialog
         QLabel *customUrlLabel;
