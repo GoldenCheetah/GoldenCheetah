@@ -26,7 +26,6 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
-
 #ifndef TODAYSPLAN_DEBUG
 // TODO(gille): This should be a command line flag.
 #define TODAYSPLAN_DEBUG false
@@ -86,6 +85,8 @@ TodaysPlan::open(QStringList &errors)
     // use the configed URL
     QString url = QString("%1/rest/users/delegates/users")
           .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+
+    printd("URL used: %s\n", url.toStdString().c_str());
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -176,6 +177,8 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     // QString url("https://whats.todaysplan.com.au/rest/files/search/0/100");
     QString url = QString("%1/rest/users/activities/search/0/100")
           .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+
+    printd("URL used: %s\n", url.toStdString().c_str());
 
 
     //url="https://staging.todaysplan.com.au/rest/files/search/0/100";
@@ -298,6 +301,8 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename)
     QString url = QString("%1/rest/files/upload")
           .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
+    printd("URL used: %s\n", url.toStdString().c_str());
+
     QNetworkRequest request = QNetworkRequest(url);
 
     // MULTIPART *****************
@@ -340,7 +345,7 @@ TodaysPlan::writeFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s", reply->readAll().toStdString().c_str());
+    printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
     if (reply->error() == QNetworkReply::NoError) {
         notifyWriteComplete(
@@ -367,7 +372,7 @@ TodaysPlan::readFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s", buffers.value(reply)->toStdString().c_str());
+    printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
 
     notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
