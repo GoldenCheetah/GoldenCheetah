@@ -333,6 +333,67 @@ WebPageWindow::download(const QNetworkRequest &request)
 void
 WebPageWindow::unsupportedContent(QNetworkReply * reply)
 {
-    //qDebug()<<"Unsupported Content: "<<reply->url();
+    QRegExp filenameRegEx("^attachment; filename=\"(.*)\"$");
+    if (filenameRegEx.exactMatch(reply->rawHeader("Content-Disposition"))) {
+
+        QString filename = filenameRegEx.cap(1);
+        //qDebug()<<"Unsupported Content: "<<reply->url()<<filename;
+
+        // connect the dots
+        connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
+        connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
+
+        // remember what we started, but only one at a time XXX
+        filenames.clear();
+        filenames << filename;
+        QByteArray *data = new QByteArray;
+        buffers.insert(reply, data);
+
+        // kick off the fetch
+        data->append(reply->readAll());
+    }
+    return;
+}
+
+void
+WebPageWindow::readyRead()
+{
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    buffers.value(reply)->append(reply->readAll());
+}
+
+void
+WebPageWindow::readFileCompleted()
+{
+    //qDebug()<<"WebPageWindow::readFileCompleted\n";
+
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+
+    //qDebug()<<"WebPageWindow::reply" << buffers.value(reply)->constData();
+
+    // process it then ........
+    QString name = QString("%1/%2")
+                 .arg(const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->temp().absolutePath())
+                 .arg(filenames.at(0));
+
+    QFile readme(name);
+
+    if (readme.open(QFile::ReadWrite)) {
+
+        filenames.clear();
+        filenames << name;
+
+        // save the file away
+        readme.write(*buffers.value(reply), buffers.value(reply)->length());
+        readme.close();
+
+        // now process it
+        RideImportWizard *dialog = new RideImportWizard(filenames, context);
+        dialog->process(); // do it!
+    }
+
+    // clean up
+    delete buffers.value(reply);
+    buffers.remove(reply);
 }
 #endif
