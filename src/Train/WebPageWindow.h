@@ -99,9 +99,14 @@ class WebPageWindow : public GcChartWindow
         void configChanged(qint32);
 
 #ifdef NOWEBKIT
+        void downloadProgress(qint64, qint64);
+        void downloadFinished();
         void downloadRequested(QWebEngineDownloadItem*);
         void linkHovered(QString);
 #else
+        // getting data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
         void download(const QNetworkRequest &request);
         void unsupportedContent(QNetworkReply * reply);
 #endif
@@ -109,6 +114,10 @@ class WebPageWindow : public GcChartWindow
     private:
         Context *context;
         QVBoxLayout *layout;
+
+        // downloading
+        QStringList filenames;
+        QMap<QNetworkReply*, QByteArray*> buffers;
 
         // setting dialog
         QLabel *customUrlLabel;

@@ -151,8 +151,9 @@
 #define GC_SWIMPACE                     "<global-general>swimpace"
 #define GC_ELEVATION_HYSTERESIS         "<global-general>elevationHysteresis"
 #define GC_UNIT                         "<global-general>unit"
-#define GC_ALLOW_TELEMETRY              "<global-general>telemetry"
-#define GC_ALLOW_TELEMETRY_DATE         "<global-general>telemetryDate"
+#define GC_ALLOW_TELEMETRY              "<global-general>telemetryAllowed"
+#define GC_ALLOW_TELEMETRY_DATE         "<global-general>telemetryDecisionDate"
+#define GC_TELEMETRY_ID                 "<global-general>telemetryId"
 #define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
 
 
@@ -298,6 +299,7 @@
 //Today's Plan
 #define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
 #define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
+#define GC_TODAYSPLAN_USERKEY           "<athlete-private>todaysplan_userkey"
 //SixCycle
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"

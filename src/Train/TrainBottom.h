@@ -23,6 +23,8 @@
 
 class TrainSidebar;
 class QPushButton;
+class QSlider;
+class QPlainTextEdit;
 
 class TrainBottom : public QWidget
 {
@@ -33,12 +35,17 @@ public:
 private:
     TrainSidebar *m_trainSidebar;
     QPushButton *m_playButton, *m_rewindButton, *m_stopButton, *m_forwardButton;
-    QPushButton *m_lapButton, *m_connectButton;
+    QPushButton *m_lapButton, *m_connectButton, *loadDown, *loadUp, *cal;
+    QSlider *intensitySlider;
+    QPlainTextEdit *notificationText;
+    QTimer *notificationTimer;
 
 private slots:
     void updatePlayButtonIcon();
     void autoHideCheckboxChanged(int state);
     void statusChanged(int status);
+    void setNotification(QString msg, int timeout);
+    void clearNotification(void);
 
 signals:
     void autoHideChanged(bool enabled);

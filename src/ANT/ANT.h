@@ -25,6 +25,7 @@
 //
 #include "GoldenCheetah.h"
 #include "RealtimeData.h"
+#include "CalibrationData.h"
 #include "DeviceConfiguration.h"
 
 //
@@ -313,6 +314,8 @@ struct setChannelAtom {
 #define FOOTPOD_SPEED_CADENCE           0x02
 
 // ant+ fitness equipment profile data pages
+#define FITNESS_EQUIPMENT_CALIBRATION_REQUEST_PAGE  0x01
+#define FITNESS_EQUIPMENT_CALIBRATION_PROGRESS_PAGE 0x02
 #define FITNESS_EQUIPMENT_GENERAL_PAGE              0x10
 #define FITNESS_EQUIPMENT_STATIONARY_SPECIFIC_PAGE  0x15
 #define FITNESS_EQUIPMENT_TRAINER_SPECIFIC_PAGE     0x19
@@ -352,6 +355,18 @@ struct setChannelAtom {
 #define FITNESS_EQUIPMENT_POWER_NOK_LOWSPEED        0x01 // trainer unable to brake as per request due to low speed
 #define FITNESS_EQUIPMENT_POWER_NOK_HIGHSPEED       0x02 // trainer unable to brake as per request due to high speed
 #define FITNESS_EQUIPMENT_POWER_NOK                 0x03 // trainer unable to brake as per request (no details available)
+
+#define FITNESS_EQUIPMENT_CAL_REQ_NONE              0x00
+#define FITNESS_EQUIPMENT_CAL_REQ_ZERO_OFFSET       0x40
+#define FITNESS_EQUIPMENT_CAL_REQ_SPINDOWN          0x80
+
+#define FITNESS_EQUIPMENT_CAL_COND_TEMP_LO          0x16
+#define FITNESS_EQUIPMENT_CAL_COND_TEMP_OK          0x20
+#define FITNESS_EQUIPMENT_CAL_COND_TEMP_HI          0x30
+
+#define FITNESS_EQUIPMENT_CAL_COND_SPEED_LO         0x40
+#define FITNESS_EQUIPMENT_CAL_COND_SPEED_OK         0x80
+#define FITNESS_EQUIPMENT_CAL_COND_SPEED_HI         0xC0
 
 #define ANT_MANUFACTURER_ID_PAGE                    0x50
 #define ANT_PRODUCT_INFO_PAGE                       0x51
@@ -485,6 +500,76 @@ public:
     void handleChannelEvent(void);
     void processMessage(void);
 
+    // calibration
+    uint8_t getCalibrationType()
+    {
+        return calibration.getType();
+    }
+
+    uint8_t getCalibrationState()
+    {
+        return calibration.getState();
+    }
+
+    double getCalibrationTargetSpeed()
+    {
+        return calibration.getTargetSpeed();
+    }
+
+    uint16_t getCalibrationZeroOffset()
+    {
+        return calibration.getZeroOffset();
+    }
+
+    uint16_t getCalibrationSpindownTime()
+    {
+        return calibration.getZeroOffset();
+    }
+
+    void setCalibrationState(uint8_t state)
+    {
+        calibration.setState(state);
+    }
+
+    void setCalibrationType(uint8_t channel, uint8_t type)
+    {
+        calibration.setType(channel, type);
+    }
+
+    void setCalibrationTargetSpeed(double target)
+    {
+        calibration.setTargetSpeed(target);
+    }
+
+    void setCalibrationZeroOffset(uint16_t offset)
+    {
+        calibration.setZeroOffset(offset);
+    }
+
+    void setCalibrationSpindownTime(uint16_t time)
+    {
+        calibration.setSpindownTime(time);
+    }
+
+    void setCalibrationTimestamp(uint8_t channel, double time)
+    {
+        calibration.setTimestamp(channel, time);
+    }
+
+    void setCalibrationRequired(uint8_t channel, bool requested)
+    {
+        calibration.setRequested(channel, requested);
+    }
+
+    uint8_t getCalibrationChannel()
+    {
+        return calibration.getActiveChannel();
+    }
+
+    void resetCalibrationState()
+    {
+        calibration.resetCalibrationState();
+    }
 
     // serial i/o lifted from Computrainer.cpp
     void setDevice(QString devname);
@@ -496,6 +581,7 @@ public:
 
     bool modeERGO(void) const;
     bool modeSLOPE(void) const;
+    bool modeCALIBRATE(void) const;
 
     // channels update our telemetry
     double channelValue(int channel);
@@ -549,10 +635,17 @@ public:
         telemetry.setRPS(rps);
     }
 
+    void setTorque(double torque) {
+        telemetry.setTorque(torque);
+    }
+
     void setFecChannel(int channel);
     void refreshFecLoad();
     void refreshFecGradient();
     void requestFecCapabilities();
+    void requestFecCalibration(uint8_t type);
+
+    void requestPwrCalibration(uint8_t channel, uint8_t type);
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
@@ -573,6 +666,8 @@ private:
     void run();
 
     RealtimeData telemetry;
+    CalibrationData calibration;
+
     QMutex pvars;  // lock/unlock access to telemetry data between thread and controller
     int Status;     // what status is the client in?
     bool configuring; // set to true if we're in configuration mode.

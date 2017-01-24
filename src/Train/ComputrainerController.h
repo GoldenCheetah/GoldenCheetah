@@ -48,6 +48,9 @@ public:
     void setLoad(double);
     void setGradient(double);
     void setMode(int);
+
+    // calibration
+    uint8_t  getCalibrationType() { return CALIBRATION_TYPE_COMPUTRAINER; }
 };
 
 #endif // _GC_ComputrainerController_h

@@ -46,7 +46,7 @@
 // nothing doing in base class, for now
 FileStore::FileStore(Context *context) :
     uploadCompression(zip), downloadCompression(zip),
-    filetype(uploadType::JSON), useMetric(false), useEndDate(false), context(context)
+    filetype(JSON), useMetric(false), useEndDate(false), context(context)
 {
 }
 

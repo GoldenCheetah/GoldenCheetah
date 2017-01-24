@@ -150,6 +150,49 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
     processRealtimeData(rtData);
 }
 
+uint8_t
+ANTlocalController::getCalibrationType()
+{
+    return myANTlocal->getCalibrationType();
+}
+
+double
+ANTlocalController::getCalibrationTargetSpeed()
+{
+    return myANTlocal->getCalibrationTargetSpeed();
+}
+
+uint8_t
+ANTlocalController::getCalibrationState()
+{
+    return myANTlocal->getCalibrationState();
+}
+
+uint16_t
+ANTlocalController::getCalibrationSpindownTime()
+{
+    return myANTlocal->getCalibrationSpindownTime();
+}
+
+uint16_t
+ANTlocalController::getCalibrationZeroOffset()
+{
+    return myANTlocal->getCalibrationZeroOffset();
+}
+
+void
+ANTlocalController::setCalibrationState(uint8_t state)
+{
+    myANTlocal->setCalibrationState(state);
+}
+
+void
+ANTlocalController::resetCalibrationState()
+{
+    myANTlocal->resetCalibrationState();
+}
+
+
 void ANTlocalController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
 
 void ANTlocalController::antRemoteControl(uint16_t command)

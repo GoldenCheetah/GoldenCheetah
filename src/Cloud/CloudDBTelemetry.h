@@ -34,9 +34,8 @@ public:
     CloudDBTelemetryClient();
     ~CloudDBTelemetryClient();
 
-    static void storeTelemetry();
+    void upsertTelemetry();
 
-private:
 
 
 };
@@ -55,8 +54,8 @@ private slots:
 
 private:
 
-    QPushButton *proceedButton;
-    QPushButton *abortButton;
+    QPushButton *yesButton;
+    QPushButton *noButton;
 
 };
 

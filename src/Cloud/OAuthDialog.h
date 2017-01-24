@@ -64,7 +64,7 @@ public:
         TODAYSPLAN,
     } OAuthSite;
 
-    OAuthDialog(Context *context, OAuthSite site, QString baseURL="");
+    OAuthDialog(Context *context, OAuthSite site, QString baseURL="", QString clientsecret="");
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -91,6 +91,7 @@ private:
     bool noSSLlib;
     OAuthSite site;
     QString baseURL; // can be passed, but typically is blank (used by Todays Plan)
+    QString clientsecret; // can be passed, but typicall is blank (used by Todays Plan)
 
     QVBoxLayout *layout;
 
