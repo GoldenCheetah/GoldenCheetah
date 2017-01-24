@@ -125,7 +125,15 @@ OverviewWindow::updateGeometry()
         if (!cards[i]->isVisible()) continue;
 
         // move on to next column
-        if (cards[i]->column > column) { y=25; column = cards[i]->column; }
+        if (cards[i]->column > column) {
+            int diff = cards[i]->column - column - 1;
+            if (diff > 0) {
+                // there are empty columns so shift the cols to the right
+                // to the left to fill  the gap left
+                for(int j=i; j<cards.count();j++) cards[j]->column -= diff;
+            }
+            y=25; column = cards[i]->column;
+        }
 
         // set geometry
         int ty = y;
