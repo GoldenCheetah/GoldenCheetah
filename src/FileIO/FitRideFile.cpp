@@ -2967,9 +2967,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
 
     write_uint8(fields, field_num);
     write_uint8(fields, field_size);
-    qDebug() << fields->toHex();
     write_uint8(fields, base_type);
-    qDebug() << fields->toHex();
 
     if ( ride->areDataPresent()->lat ) {
         num_fields ++;
@@ -3080,24 +3078,6 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         write_uint8(fields, base_type);
     }*/
 
-    /*num_fields ++;
-    field_num = 3; // heart_rate
-    field_size = 1;
-    base_type = 2;
-
-    write_uint8(fields, field_num);
-    write_uint8(fields, field_size);
-    write_uint8(fields, base_type);
-
-    num_fields ++;
-    field_num = 7; // power
-    field_size = 2;
-    base_type = 4;
-
-    write_uint8(fields, field_num);
-    write_uint8(fields, field_size);
-    write_uint8(fields, base_type);*/
-
     write_uint8(array, num_fields);
     array->append(fields->data(), fields->size());
 
@@ -3138,12 +3118,6 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( ride->areDataPresent()->lrbalance ) {
             write_uint8(array, point->lrbalance);
         }*/
-
-        /*int value = 853367909;
-        write_uint32(array, value, true);
-        write_uint8(array, 0);
-        write_uint16(array, 150, true);
-        break;*/
     }
 
 }
@@ -3184,24 +3158,11 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
 
     write_file_id(&data, ride); // 0
     //write_file_creator(&data); // 49
-
     write_session(&data, ride, computed); // 18 x12
-    //data += QByteArray::fromHex("40 00 01 00 12 1a 05 01 00 12 01 02 34 02 83 10 01 02 14 02 84 0e 02 84 39 01 01 24 02 84 25 02 84 13 01 02 11 01 02 15 02 84 0f 02 84 22 02 84 02 04 86 fd 04 86 41 14 86 44 18 86 16 02 84 17 02 84 09 04 86 07 04 86 3b 04 86 08 04 86 30 04 86 23 02 84 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 32 dd 5c 64 32 dd 5c 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
-
     //write_start_event(&data, ride); // 21 x15
-    //data += QByteArray::fromHex("40 00 01 00 15 05 00 01 00 01 01 00 04 01 02 03 04 86 fd 04 86 00 00 00 00 00 00 00 01 32 dd 5c 64");
-
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // 20 x14
-    //data += QByteArray::fromHex("40 00 01 00 14 09 fd 04 86 04 01 02 05 04 86 03 01 02 07 02 84 06 02 84 1e 01 02 02 02 84 09 02 83 00 32 dd 5c 65 4b 00 00 00 00 00 00 96 10 47 00 09 c4 00 00");
-    //data += QByteArray::fromHex("40 00 01 00 14 03 fd 04 86                   03 01 02 07 02 84                                     00 32 dd 5c 65                00 00 96                     ");
-
-
     //write_stop_event(&data, ride); // 21 x15
-    //data += QByteArray::fromHex("40 00 01 00 15 05 00 01 00 01 01 00 04 01 02 03 04 86 fd 04 86 00 00 04 00 00 00 00 01 32 dd 5c 65 00 08 09 01 ff ff ff ff 32 dd 5c 98");
-
     //write_activity(&data, ride); // 34 x22
-    //data += QByteArray::fromHex("40 00 01 00 22 06 03 01 00 04 01 00 02 01 00 01 02 84 fd 04 86 00 04 86 00 1a 01 00 00 01 32 dd 5c 98 00 00 03 e8");
-
     write_header(&array, data.size());
     array += data;
 
@@ -3219,10 +3180,7 @@ FitFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     if (!file.open(QIODevice::WriteOnly)) return(false);
     file.resize(0);
     QDataStream out(&file);
-    //out << (qint8)14;
     out.setByteOrder(QDataStream::LittleEndian);
-    //qDebug() << out;
-    //out << content;
     file.write(content);
     file.close();
     return(true);
