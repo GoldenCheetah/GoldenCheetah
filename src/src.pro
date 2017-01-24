@@ -638,12 +638,15 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     greaterThan(QT_MINOR_VERSION, 6) {
         QT += charts
 
-        # overview in the new summary chart with moveable tiles
-        DEFINES += GC_HAVE_OVERVIEW
-        HEADERS += Charts/OverviewWindow.h
-        SOURCES += Charts/OverviewWindow.cpp
     }
 }
+
+# whilst its just a QGraphics prototype lets always enable it
+# as soon as we need qt charts for the cards we can remove it
+# overview in the new summary chart with moveable tiles
+DEFINES += GC_HAVE_OVERVIEW
+HEADERS += Charts/OverviewWindow.h
+SOURCES += Charts/OverviewWindow.cpp
 
 
 ###=====================

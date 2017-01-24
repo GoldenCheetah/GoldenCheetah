@@ -31,6 +31,9 @@
 #include <QGraphicsView>
 #include <QGraphicsWidget>
 
+// qt
+#include <QtGui>
+
 class OverviewWindow;
 
 // keep it simple for now
@@ -40,15 +43,24 @@ class Card : public QGraphicsWidget
 
         Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false) {
             setAutoFillBackground(true);
+            brush = QBrush(GColor(CCARDBACKGROUND));
         }
+
+        // what to do if clicked XXX just a hack for now
+        void clicked();
 
         // which column, sequence and size in rows
         int column, order, deep;
         bool onscene;
-};
 
-// qt
-#include <QtGui>
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *p=0) {
+            painter->setBrush(brush);
+            painter->fillRect(QRectF(0,0,geometry().width(),geometry().height()), brush);
+
+        }
+
+        QBrush brush;
+};
 
 class OverviewWindow : public GcChartWindow
 {
@@ -88,6 +100,9 @@ class OverviewWindow : public GcChartWindow
         QGraphicsView *view;
 
         QList<Card*> cards;
+
+        // for animating
+        QParallelAnimationGroup *group;
 
 };
 
