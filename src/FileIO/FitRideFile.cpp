@@ -2996,7 +2996,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         qDebug() << fields->toHex();
     }
 
-    if ( withAlt && ride->areDataPresent()->alt ) {
+    /*if ( withAlt && ride->areDataPresent()->alt ) {
         num_fields ++;
         field_num = 2; // altitude
         field_size = 2;
@@ -3005,7 +3005,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         write_uint8(fields, field_num);
         write_uint8(fields, field_size);
         write_uint8(fields, base_type);
-    }
+    }*/
     if ( withHr && ride->areDataPresent()->hr ) {
         num_fields ++;
         field_num = 3; // heart_rate
@@ -3090,10 +3090,10 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         int value = point->secs + ride->startTime().toTime_t() - qbase_time.toTime_t();
         write_uint32(array, value, true);
 
-        if ( ride->areDataPresent()->lat ) {
+        /*if ( ride->areDataPresent()->lat ) {
             write_uint32(array, point->lat, true);
             write_uint32(array, point->lon, true);
-        }
+        }*/
         if ( withAlt && ride->areDataPresent()->alt ) {
             write_uint16(array, (point->alt+500) * 5, true);
         }
@@ -3156,13 +3156,13 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     // The file may also contain record, event, length and/or hrv messages.
     // All data messages in an activity file (other than hrv) are related by a timestamp.
 
-    write_file_id(&data, ride); // 0
-    //write_file_creator(&data); // 49
-    write_session(&data, ride, computed); // 18 x12
-    //write_start_event(&data, ride); // 21 x15
-    write_record(&data, ride, withAlt, withWatts, withHr, withCad); // 20 x14
-    //write_stop_event(&data, ride); // 21 x15
-    //write_activity(&data, ride); // 34 x22
+    write_file_id(&data, ride); // file_id 0
+    //write_file_creator(&data); // file_creator 49
+    write_session(&data, ride, computed); // session 18 (x12)
+    //write_start_event(&data, ride); // event 21 (x15)
+    write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)
+    //write_stop_event(&data, ride); // event 21 (x15)
+    write_activity(&data, ride); // activity 34 (x22)
     write_header(&array, data.size());
     array += data;
 
