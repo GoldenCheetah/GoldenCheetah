@@ -22,7 +22,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), context(context)
+    GcChartWindow(context), context(context), group(NULL)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -63,6 +63,22 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard(3, 2, 10);
     newCard(3, 3, 5);
     newCard(3, 4, 10);
+    newCard(4, 1, 5);
+    newCard(4, 2, 10);
+    newCard(4, 3, 10);
+    newCard(4, 4, 5);
+    newCard(5, 1, 10);
+    newCard(5, 2, 5);
+    newCard(5, 3, 10);
+    newCard(5, 4, 5);
+    newCard(6, 1, 10);
+    newCard(6, 2, 5);
+    newCard(6, 3, 10);
+    newCard(6, 4, 5);
+    newCard(7, 1, 5);
+    newCard(7, 2, 10);
+    newCard(7, 3, 5);
+    newCard(7, 4, 10);
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
@@ -94,6 +110,7 @@ static bool cardSort(const Card* left, const Card* right)
 void
 OverviewWindow::updateGeometry()
 {
+    bool animated=false;
 
     // order the items to their positions
     qSort(cards.begin(), cards.end(), cardSort);
@@ -104,6 +121,9 @@ OverviewWindow::updateGeometry()
     // just set their geometry for now, no interaction
     for(int i=0; i<cards.count(); i++) {
 
+        // don't show hidden
+        if (!cards[i]->isVisible()) continue;
+
         // move on to next column
         if (cards[i]->column > column) { y=25; column = cards[i]->column; }
 
@@ -113,19 +133,44 @@ OverviewWindow::updateGeometry()
         int twidth = 400;
         int theight = cards[i]->deep * 25;
 
-        cards[i]->setGeometry(tx, ty, twidth, theight);
 
         // add to scene if new
         if (!cards[i]->onscene) {
+            cards[i]->setGeometry(tx, ty, twidth, theight);
             scene->addItem(cards[i]);
-            qDebug()<<"add col,order:"<<cards[i]->column<<cards[i]->order<<"y,x,width,height"<<ty<<tx<<twidth<<theight;
             cards[i]->onscene = true;
+
+        } else if (cards[i]->geometry().x() != tx ||
+                   cards[i]->geometry().y() != ty ||
+                   cards[i]->geometry().width() != twidth ||
+                   cards[i]->geometry().height() != theight) {
+
+            // its moved, so animate that.
+            if (animated == false) {
+
+                // we've got an animation to perform
+                animated = true;
+
+                // we're starting to animate so clear and restart any animations
+                if (group) group->clear();
+                else  group = new QParallelAnimationGroup(this);
+            }
+
+            // add an animation for this movement
+            QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
+            animation->setDuration(200);
+            animation->setStartValue(cards[i]->geometry());
+            animation->setEndValue(QRect(tx,ty,twidth,theight));
+            animation->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
+
+            group->addAnimation(animation);
         }
 
         // set spot for next tile
         y += theight + 25;
     }
-    qDebug()<<"scene="<<scene->itemsBoundingRect();
+
+    if (animated) group->start();
 }
 
 void
@@ -192,16 +237,31 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
         }
 
-    } else  if (event->type() == QEvent::GraphicsSceneMouseMove) {
+    } else  if (event->type() == QEvent::GraphicsSceneMousePress) {
 
         // where am i ?
         QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
         QGraphicsItem *item = scene->itemAt(pos, view->transform());
 
-        qDebug()<<"mouse:"<<pos;
         if (item) {
-            qDebug()<<"POP..";
+            static_cast<Card*>(item)->clicked();
+            updateGeometry();
+            scene->update();
+            view->update();
         }
     }
     return returning;
+}
+
+
+void
+Card::clicked()
+{
+    if (isVisible()) hide();
+    else show();
+
+    //if (brush.color() == GColor(CCARDBACKGROUND)) brush.setColor(Qt::red);
+    //else brush.setColor(GColor(CCARDBACKGROUND));
+
+    update(geometry());
 }
