@@ -594,15 +594,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     slope = line.section(',', 11, 11).toDouble();
                     temp = line.section(',', 12, 12)=="" ? double(RideFile::NA) : line.section(',', 12, 12).toDouble();
                     interval = line.section(',', 13, 13).toInt();
-                    lrbalance = line.section(',', 14, 14).toInt();
-                    lte = line.section(',', 15, 15).toInt();
-                    rte = line.section(',', 16, 16).toInt();
-                    lps = line.section(',', 17, 17).toInt();
-                    rps = line.section(',', 18, 18).toInt();
-                    smo2 = line.section(',', 19, 19).toInt();
-                    thb = line.section(',', 20, 20).toInt();
-                    //UNUSED o2hb = line.section(',', 21, 21).toInt();
-                    //UNUSED hhb = line.section(',', 22, 22).toInt();
+                    lrbalance = line.section(',', 14, 14).toDouble();
+                    lte = line.section(',', 15, 15).toDouble();
+                    rte = line.section(',', 16, 16).toDouble();
+                    lps = line.section(',', 17, 17).toDouble();
+                    rps = line.section(',', 18, 18).toDouble();
+                    smo2 = line.section(',', 19, 19).toDouble();
+                    thb = line.section(',', 20, 20).toDouble();
+                    //UNUSED o2hb = line.section(',', 21, 21).toDouble();
+                    //UNUSED hhb = line.section(',', 22, 22).toDouble();
                     target = line.section(',', 23, 23).toInt();
 
                 } else if (csvType == peripedal) {
