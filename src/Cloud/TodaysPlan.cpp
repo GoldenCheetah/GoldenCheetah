@@ -194,7 +194,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
     jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
     jsonString += "\"isNotNull\": [\"fileId\"]}, ";
-    jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"training\"], "; //\"avgWatts\"
+    jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\"], "; //\"avgWatts\"
     jsonString += "\"opts\": 0 ";
     jsonString += "}";
 
@@ -232,14 +232,13 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             add->isDir = false;
             add->distance = each["distance"].toInt()/1000.0;
             add->duration = each["training"].toInt();
+            add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
+
             //add->size
             //add->modified
 
-            //QString name = QDateTime::fromMSecsSinceEpoch(each["ts"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
-            //add->name = name;
-            QJsonObject fileindex = each["fileindex"].toObject();
-            add->name = QFileInfo(fileindex["filename"].toString()).fileName();
-
+            //QJsonObject fileindex = each["fileindex"].toObject();
+            //add->name = QFileInfo(fileindex["filename"].toString()).fileName();
 
             returning << add;
         }
@@ -264,7 +263,8 @@ TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
 
     // lets connect and get basic info on the root directory
     QString url = QString("%1/rest/files/download/%2")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString()).arg(remoteid);
+          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
+          .arg(remoteid);
 
     printd("url:%s\n", url.toStdString().c_str());
 
