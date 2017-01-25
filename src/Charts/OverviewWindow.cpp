@@ -166,10 +166,10 @@ OverviewWindow::updateGeometry()
 
             // add an animation for this movement
             QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
-            animation->setDuration(200);
+            animation->setDuration(250);
             animation->setStartValue(cards[i]->geometry());
             animation->setEndValue(QRect(tx,ty,twidth,theight));
-            animation->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
+            animation->setEasingCurve(QEasingCurve(QEasingCurve::InOutCubic));
 
             group->addAnimation(animation);
         }
