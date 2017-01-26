@@ -99,8 +99,8 @@ OverviewWindow::updateGeometry()
     // order the items to their positions
     qSort(cards.begin(), cards.end(), cardSort);
 
-    int y=50;
-    int column=0;
+    int y=70;
+    int column=-1;
 
     // just set their geometry for now, no interaction
     for(int i=0; i<cards.count(); i++) {
@@ -108,7 +108,7 @@ OverviewWindow::updateGeometry()
         // don't show hidden
         if (!cards[i]->isVisible()) continue;
 
-        // move on to next column
+        // move on to next column, check if first item too
         if (cards[i]->column > column) {
             int diff = cards[i]->column - column - 1;
             if (diff > 0) {
@@ -116,14 +116,14 @@ OverviewWindow::updateGeometry()
                 // to the left to fill  the gap left
                 for(int j=i; j<cards.count();j++) cards[j]->column -= diff;
             }
-            y=50; column = cards[i]->column;
+            y=70; column = cards[i]->column;
         }
 
         // set geometry
         int ty = y;
-        int tx = 50 + (column*400) + (column*50);
-        int twidth = 400;
-        int theight = cards[i]->deep * 50;
+        int tx = 70 + (column*800) + (column*70);
+        int twidth = 800;
+        int theight = cards[i]->deep * 70;
 
 
         // add to scene if new
@@ -150,16 +150,16 @@ OverviewWindow::updateGeometry()
 
             // add an animation for this movement
             QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
-            animation->setDuration(250);
+            animation->setDuration(300);
             animation->setStartValue(cards[i]->geometry());
             animation->setEndValue(QRect(tx,ty,twidth,theight));
-            animation->setEasingCurve(QEasingCurve(QEasingCurve::InOutCubic));
+            animation->setEasingCurve(QEasingCurve(QEasingCurve::InOutBack));
 
             group->addAnimation(animation);
         }
 
         // set spot for next tile
-        y += theight + 50;
+        y += theight + 70;
     }
 
     if (animated) group->start();
