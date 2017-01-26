@@ -63,22 +63,6 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard(3, 2, 10);
     newCard(3, 3, 5);
     newCard(3, 4, 10);
-    newCard(4, 1, 5);
-    newCard(4, 2, 10);
-    newCard(4, 3, 10);
-    newCard(4, 4, 5);
-    newCard(5, 1, 10);
-    newCard(5, 2, 5);
-    newCard(5, 3, 10);
-    newCard(5, 4, 5);
-    newCard(6, 1, 10);
-    newCard(6, 2, 5);
-    newCard(6, 3, 10);
-    newCard(6, 4, 5);
-    newCard(7, 1, 5);
-    newCard(7, 2, 10);
-    newCard(7, 3, 5);
-    newCard(7, 4, 10);
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
@@ -115,7 +99,7 @@ OverviewWindow::updateGeometry()
     // order the items to their positions
     qSort(cards.begin(), cards.end(), cardSort);
 
-    int y=25;
+    int y=50;
     int column=0;
 
     // just set their geometry for now, no interaction
@@ -132,14 +116,14 @@ OverviewWindow::updateGeometry()
                 // to the left to fill  the gap left
                 for(int j=i; j<cards.count();j++) cards[j]->column -= diff;
             }
-            y=25; column = cards[i]->column;
+            y=50; column = cards[i]->column;
         }
 
         // set geometry
         int ty = y;
-        int tx = 25 + (column*400) + (column*25);
+        int tx = 50 + (column*400) + (column*50);
         int twidth = 400;
-        int theight = cards[i]->deep * 25;
+        int theight = cards[i]->deep * 50;
 
 
         // add to scene if new
@@ -175,7 +159,7 @@ OverviewWindow::updateGeometry()
         }
 
         // set spot for next tile
-        y += theight + 25;
+        y += theight + 50;
     }
 
     if (animated) group->start();

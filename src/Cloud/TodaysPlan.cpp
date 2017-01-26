@@ -226,13 +226,18 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             QJsonObject each = results.at(i).toObject();
             FileStoreEntry *add = newFileStoreEntry();
 
+            // file details
+            QJsonObject fileindex = each["fileindex"].toObject();
+            QString suffix = QFileInfo(fileindex["filename"].toString()).suffix();
+            if (suffix == "") suffix=".json";
+
             //TodaysPlan has full path, we just want the file name
             add->label = QFileInfo(each["name"].toString()).fileName();
             add->id = QString("%1").arg(each["fileId"].toInt());
             add->isDir = false;
             add->distance = each["distance"].toInt()/1000.0;
             add->duration = each["training"].toInt();
-            add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=".json";
+            add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=suffix;
 
             //add->size
             //add->modified
