@@ -154,7 +154,9 @@
 #define GC_ALLOW_TELEMETRY              "<global-general>telemetryAllowed"
 #define GC_ALLOW_TELEMETRY_DATE         "<global-general>telemetryDecisionDate"
 #define GC_TELEMETRY_ID                 "<global-general>telemetryId"
+#define GC_TELEMETRY_UPDATE_COUNTER     "<global-general>telemetryUpdateCounter"
 #define GC_LAST_VERSION_CHECKED         "<global-general>lastVersionChecked"
+#define GC_LAST_VERSION_CHECK_DATE      "<global-general>lastVersionCheckDate"
 
 
 

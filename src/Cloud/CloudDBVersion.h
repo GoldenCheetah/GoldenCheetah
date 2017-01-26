@@ -37,6 +37,8 @@ struct VersionAPIGetV1 {
 
 enum VersionType {Release=10, ReleaseCandidate=20, DevelopmentBuild=30};
 
+
+
 class CloudDBVersionClient : public QObject
 {
     Q_OBJECT
@@ -46,11 +48,13 @@ public:
     CloudDBVersionClient();
     ~CloudDBVersionClient();
 
-    void informUserAboutLatestVersions();
-
     static int CloudDBVersion_Release;
     static int CloudDBVersion_ReleaseCandidate;
     static int CloudDBVersion_DevelopmentBuild;
+
+    static int CloudDBVersion_Days_Delay;
+
+    void informUserAboutLatestVersions();
 
 private slots:
 
@@ -59,6 +63,8 @@ private slots:
 private:
 
     bool unmarshallAPIGetV1(QByteArray , QList<VersionAPIGetV1> *versionList );
+
+
 
 };
 
