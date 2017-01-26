@@ -40,6 +40,11 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
 
     // First initialisation for altitude (not initialised for each point)
     alt= 0;
+    // length-by-length pool swimming XData
+    swimXdata = new XDataSeries();
+    swimXdata->name = "SWIM";
+    swimXdata->valuename << "TYPE";
+    swimXdata->valuename << "DURATION";
 }
 
 bool
@@ -150,6 +155,9 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
     } else if (qName == "Trackpoint") {
 
+        // Some TCX lap swimming files uses distance = 0 for no distance...
+        if (swim == Swim && distance == 0) distance = -1;
+
         // Some TCX files have Speed, some have Distance
         // Lets derive Speed from Distance or vice-versa
         // If we have neither Speed nor Distance then we
@@ -249,6 +257,14 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     double deltaSecs = secs - lastLength;
                     double deltaDist = (distance - last_distance) / deltaSecs;
                     double kph = 3600.0 * deltaDist;
+                    // length-by-length Swim XData
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = lastLength;
+                    p->km = last_distance;
+                    p->number[0] = deltaDist > 0 ? 1 : 0;
+                    p->number[1] = deltaSecs;
+                    swimXdata->datapoints.append(p);
+
                     for (int i = rideFile->timeIndex(lastLength);
                          i>= 0 && i < rideFile->dataPoints().size() &&
                          rideFile->dataPoints()[i]->secs <= secs;
@@ -265,6 +281,16 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             } else {
 
                 // smart recording is on and delta is less than GarminHWM seconds
+                // length-by-length Swim XData
+                if (swim == Swim && deltaSecs > 0) {
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = prevPoint->secs;
+                    p->km = last_distance;
+                    p->number[0] = deltaDist > 0 ? 1 : 0;
+                    p->number[1] = deltaSecs;
+                    swimXdata->datapoints.append(p);
+                    lastLength = p->secs + deltaSecs;
+                }
                 // or it is pool swimming and we limit expansion for safety
                 for(int i = 1; i <= deltaSecs && i <= 300*GarminHWM.toInt(); i++) {
                     double weight = i/ deltaSecs;
@@ -309,6 +335,16 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         last_time = time;
     } else if (qName == "Lap") {
         // for pool swimming, laps with distance 0 are pauses, without trackpoints
+        // length-by-length Swim XData
+        if (swim == Swim && distance == 0.0) {
+            XDataPoint *p = new XDataPoint();
+            p->secs = secs;
+            p->km = last_distance;
+            p->number[0] = 0;
+            p->number[1] = round(lapSecs);
+            swimXdata->datapoints.append(p);
+            lastLength = secs + round(lapSecs);
+        }
         // expand only if Smart Recording is enabled
         if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
             // fill in the pause, partially if too long
@@ -337,6 +373,12 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       lap);
             last_time = last_time.addSecs(round(lapSecs));
         }
+    } else if (qName == "Activity") {
+        // Add length-by-length Swim XData, if present
+        if (swimXdata->datapoints.count()>0)
+            rideFile->addXData("SWIM", swimXdata);
+        else
+            delete swimXdata;
     }
     return true;
 }
