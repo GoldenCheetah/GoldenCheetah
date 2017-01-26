@@ -83,6 +83,13 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
     double rtime = 0;
     double rdist = 0;
 
+    // length-by-length Swim XData
+    XDataSeries *swimXdata = new XDataSeries();
+    swimXdata->name = "SWIM";
+    swimXdata->valuename << "TYPE";
+    swimXdata->valuename << "DURATION";
+    swimXdata->valuename << "STROKES";
+
     while (!node.isNull()) {
 
         // athlete
@@ -330,6 +337,16 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                     add.kph = add.km > rdist ? (add.km - rdist)*3600/deltaSecs : 0.0;
                     if (add.kph == 0.0) add.cad = 0; // rest => no stroke rate
                 }
+                // length-by-length Swim XData
+                if (lapSwim == true) {
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = rtime;
+                    p->km = rdist;
+                    p->number[0] = (add.km > rdist) ? 1 : 0;
+                    p->number[1] = deltaSecs;
+                    p->number[2] = round(add.cad * deltaSecs / 60.0);
+                    swimXdata->datapoints.append(p);
+                }
 
                 // only smooth the maximal smart recording gap defined in
                 // preferences - we don't want to crash / stall on bad
@@ -570,6 +587,13 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
                 break;
         }
     }
+
+    // Add length-by-length Swim XData, if present
+    if (swimXdata->datapoints.count()>0)
+        rideFile->addXData("SWIM", swimXdata);
+    else
+        delete swimXdata;
+
     return rideFile;
 }
 

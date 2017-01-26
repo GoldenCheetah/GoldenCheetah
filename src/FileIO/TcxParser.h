@@ -57,6 +57,7 @@ private:
     double lapSecs; // for pause intervals in pool swimming files
     enum { NotSwim, MayBeSwim, Swim } swim; // to detect pool swimming files
     double lastLength; // for pool swimming files
+    XDataSeries *swimXdata; // length-by-length pool swim XData
 
     bool   first; // first ride found, when it may contain collections!
     int	   lap;
