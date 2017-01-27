@@ -121,7 +121,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 {
     if (qName == "Time") {
         time = convertToLocalTime(buffer);
-        secs = start_time.secsTo(time);
+        secs = double(start_time.msecsTo(time)) / 1000.00f;
 
     } else if (qName == "DistanceMeters") { distance = buffer.toDouble() / 1000; }
     else if (qName == "TotalTimeSeconds") { lapSecs = buffer.toDouble(); }
@@ -167,7 +167,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // compute the elapsed time and distance traveled since the
             // last recorded trackpoint
-            double delta_t = last_time.secsTo(time);
+            double delta_t = double(last_time.msecsTo(time)) / 1000.0f;
 
             // Derive speed from distance
             if (speed == 0 && distance >0) {
