@@ -331,8 +331,15 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                 }
 
-            }
+            } else {
 
+                // not hovering over tile, so if still have a resize cursor
+                // set it back to the normal arrow pointer
+                if (resizecursor) {
+                    resizecursor = false;
+                    setCursor(QCursor(Qt::ArrowCursor));
+                }
+            }
 
         } else if (mode == CONFIG && state == DRAG) {          // dragging?
 
