@@ -7141,6 +7141,44 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         emit resized();
     }
 
+    // mouse wheel zoom logic
+    if (event->type() == QEvent::Wheel && obj->objectName() == "QwtPlotCanvas") {
+        static ulong lastEvent = 0;
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+        const bool increasingZoom = wheelEvent->delta() > 0;
+        ulong timeDiff = QDateTime::currentMSecsSinceEpoch() - lastEvent;
+        lastEvent = QDateTime::currentMSecsSinceEpoch();
+        QxtSpanSlider* slider = window->spanSlider;
+
+        QwtPlotCanvas* canvas = static_cast<QwtPlotCanvas*>(obj);
+        float posPercent = wheelEvent->x() / static_cast<float>(canvas->width());
+        if (timeDiff > 120)
+            timeDiff = 120;
+        int adjustment = 150 - timeDiff;
+        // the slider is in seconds but we want the zoom speed to be of roughly consistent behavior for files of all durations
+        // so normalize the adjustment to a duration of 30 mins or 1800 s which was used for tuning the magic values here
+        adjustment = adjustment * ((slider->maximum() - slider->minimum()) / 1800.0);
+        if (!increasingZoom)
+            adjustment = -adjustment;
+
+        int lower = slider->lowerValue();
+        lower += adjustment * posPercent;
+        int upper = slider->upperValue();
+        upper += -adjustment * (1.0-posPercent);
+        if (lower < slider->minimum())
+            lower = slider->minimum();
+        if (upper > slider->maximum())
+            upper = slider->maximum();
+        const float maxZoomPercent = 0.05f;
+        const int totalRange = slider->maximum() - slider->minimum();
+        if (upper > lower && (!increasingZoom || (upper - lower) >= (totalRange * maxZoomPercent))) {
+            slider->setLowerValue(lower);
+            slider->setUpperValue(upper);
+            window->zoomChanged();
+        }
+        return true;
+    }
+
     // REFERENCE LINE FOR POWER
     if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts || scope == RideFile::aTISS || 
         scope == RideFile::anTISS || scope == RideFile::IsoPower || scope == RideFile::aPower || scope == RideFile::xPower) {
