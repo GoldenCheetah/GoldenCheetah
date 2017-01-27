@@ -41,9 +41,11 @@ class Card : public QGraphicsWidget
 {
     public:
 
-        Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false) {
+        Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false),
+                                                invisible(false) {
             setAutoFillBackground(true);
             brush = QBrush(GColor(CCARDBACKGROUND));
+            setZValue(10);
         }
 
         // what to do if clicked XXX just a hack for now
@@ -52,6 +54,7 @@ class Card : public QGraphicsWidget
         // which column, sequence and size in rows
         int column, order, deep;
         bool onscene;
+        bool invisible;
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *p=0) {
             painter->setBrush(brush);
@@ -70,6 +73,11 @@ class OverviewWindow : public GcChartWindow
 
         OverviewWindow(Context *context);
 
+        // are we just looking or changing
+        enum { VIEW, CONFIG } mode;
+
+        // current state for event processing
+        enum { NONE, DRAG } state;
 
    public slots:
 
@@ -91,18 +99,28 @@ class OverviewWindow : public GcChartWindow
                                                          return add;
                                                         }
     protected:
+
+        // process events
         bool eventFilter(QObject *obj, QEvent *event);
 
     private:
 
+        // gui setup
         Context *context;
         QGraphicsScene *scene;
         QGraphicsView *view;
+        QParallelAnimationGroup *group;
 
+        // content
         QList<Card*> cards;
 
-        // for animating
-        QParallelAnimationGroup *group;
+        // state data
+        union OverviewState {
+            struct {
+                double offx, offy; // mouse grab position on card
+                Card *card;        // index of card in QList
+            } drag;
+        } stateData;
 
 };
 

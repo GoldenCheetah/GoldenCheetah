@@ -22,7 +22,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), context(context), group(NULL)
+    GcChartWindow(context), context(context), group(NULL), mode(CONFIG), state(NONE)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -132,10 +132,11 @@ OverviewWindow::updateGeometry()
             scene->addItem(cards[i]);
             cards[i]->onscene = true;
 
-        } else if (cards[i]->geometry().x() != tx ||
-                   cards[i]->geometry().y() != ty ||
-                   cards[i]->geometry().width() != twidth ||
-                   cards[i]->geometry().height() != theight) {
+        } else if (cards[i]->invisible == false &&
+                   (cards[i]->geometry().x() != tx ||
+                    cards[i]->geometry().y() != ty ||
+                    cards[i]->geometry().width() != twidth ||
+                    cards[i]->geometry().height() != theight)) {
 
             // its moved, so animate that.
             if (animated == false) {
@@ -150,10 +151,10 @@ OverviewWindow::updateGeometry()
 
             // add an animation for this movement
             QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
-            animation->setDuration(300);
+            animation->setDuration(200);
             animation->setStartValue(cards[i]->geometry());
             animation->setEndValue(QRect(tx,ty,twidth,theight));
-            animation->setEasingCurve(QEasingCurve(QEasingCurve::InOutQuint));
+            animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
 
             group->addAnimation(animation);
         }
@@ -231,17 +232,111 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
     } else  if (event->type() == QEvent::GraphicsSceneMousePress) {
 
-        // where am i ?
-        QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
-        QGraphicsItem *item = scene->itemAt(pos, view->transform());
+        // we will process clicks when configuring so long as we're
+        // not in the middle of something else - this is to start
+        // dragging a card around
+        if (mode == CONFIG && state == NONE) {
 
-        if (item) {
-            static_cast<Card*>(item)->clicked();
+            // we always trap clicks when configuring, to avoid
+            // any inadvertent processing of clicks in the widget
+            event->accept();
+            returning = true;
+
+            // where am i ?
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+            QGraphicsItem *item = scene->itemAt(pos, view->transform());
+            Card *card = static_cast<Card*>(item);
+
+            if (card) {
+
+                // we're grabbing a card, so lets
+                // work out the offset so we can move
+                // it around when we start dragging
+                state = DRAG;
+                card->invisible = true;
+                card->setZValue(100);
+
+                stateData.drag.card = card;
+                stateData.drag.offx = pos.x() - card->geometry().x();
+                stateData.drag.offy = pos.y() - card->geometry().y();
+
+                // what is the offset?
+                //updateGeometry();
+                scene->update();
+                view->update();
+            }
+        }
+
+    } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        // stop dragging
+        if (mode == CONFIG && state == DRAG) {
+
+            // we want this one
+            event->accept();
+            returning = true;
+
+            // end state;
+            state = NONE;
+
+            stateData.drag.card->invisible = false;
+            stateData.drag.card->setZValue(10);
+
+            // drop it down
+            updateGeometry();
+            scene->update();
+            view->update();
+        }
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
+
+        // dragging?
+        if (mode == CONFIG && state == DRAG) {
+
+            // we'll take this
+            event->accept();
+            returning = true;
+
+            // where am i ?
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+
+            // move the card being dragged
+            stateData.drag.card->setPos(pos.x()-stateData.drag.offx, pos.y()-stateData.drag.offy);
+
+            // should I move?
+            QList<QGraphicsItem *> overlaps = scene->items(pos);
+
+            // we always overlap with ourself, so see if more
+            if (overlaps.count() > 1) {
+
+                Card *over = static_cast<Card*>(overlaps[1]);
+                if (pos.y()-over->geometry().y() > over->geometry().height()/2) {
+                    // place below the one its over
+                    stateData.drag.card->column = over->column;
+                    stateData.drag.card->order = over->order+1;
+                    for(int i=cards.indexOf(over); i< cards.count(); i++) {
+                        if (cards[i]->column == over->column && cards[i]->order > over->order)
+                            cards[i]->order += 1;
+                    }
+                } else {
+
+                    // place below the one its over
+                    stateData.drag.card->column = over->column;
+                    stateData.drag.card->order = over->order-1;
+                    for(int i=cards.indexOf(over)-1; i< cards.count(); i++) {
+                        if (i && cards[i]->column == over->column && cards[i]->order >= (over->order-1))
+                            cards[i]->order += 1;
+                    }
+                }
+            }
+
+            // drop it down
             updateGeometry();
             scene->update();
             view->update();
         }
     }
+
     return returning;
 }
 
