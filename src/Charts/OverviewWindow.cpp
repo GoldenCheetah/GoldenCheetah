@@ -311,21 +311,46 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                 Card *over = static_cast<Card*>(overlaps[1]);
                 if (pos.y()-over->geometry().y() > over->geometry().height()/2) {
+
                     // place below the one its over
                     stateData.drag.card->column = over->column;
                     stateData.drag.card->order = over->order+1;
                     for(int i=cards.indexOf(over); i< cards.count(); i++) {
-                        if (cards[i]->column == over->column && cards[i]->order > over->order)
+                        if (i>=0 && cards[i]->column == over->column && cards[i]->order > over->order && cards[i] != stateData.drag.card)
                             cards[i]->order += 1;
                     }
+
                 } else {
 
-                    // place below the one its over
+                    // place above the one its over
                     stateData.drag.card->column = over->column;
-                    stateData.drag.card->order = over->order-1;
-                    for(int i=cards.indexOf(over)-1; i< cards.count(); i++) {
-                        if (i && cards[i]->column == over->column && cards[i]->order >= (over->order-1))
+                    stateData.drag.card->order = over->order;
+                    for(int i=0; i< cards.count(); i++) {
+                        if (i>=0 && cards[i]->column == over->column && cards[i]->order >= (over->order) && cards[i] != stateData.drag.card)
                             cards[i]->order += 1;
+                    }
+
+                }
+            } else {
+
+                // create a new column to the right?
+                int targetcol = (pos.x()-stateData.drag.offx)/870;
+                if (cards.last() && cards.last()->column < targetcol) {
+                    stateData.drag.card->column = cards.last()->column + 1;
+                    stateData.drag.card->order = 0;
+
+                } else {
+
+                    // add to the end of the column
+                    int last = -1;
+                    for(int i=0; i<cards.count() && cards[i]->column <= targetcol; i++) {
+                        if (cards[i]->column == targetcol) last=i;
+                    }
+
+                    // so long as its been dragged below the last entry on the column !
+                    if (last >= 0 && pos.y() > cards[last]->geometry().bottom()) {
+                        stateData.drag.card->column = targetcol;
+                        stateData.drag.card->order = cards[last]->order+1;
                     }
                 }
             }
