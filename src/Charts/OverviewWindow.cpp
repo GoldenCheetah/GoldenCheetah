@@ -22,7 +22,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), context(context), group(NULL), mode(CONFIG), state(NONE)
+    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), resizecursor(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -249,28 +249,44 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             if (card) {
 
-                // we're grabbing a card, so lets
-                // work out the offset so we can move
-                // it around when we start dragging
-                state = DRAG;
-                card->invisible = true;
-                card->setZValue(100);
+               // are we on the boundary of the card?
+               double offx = pos.x()-card->geometry().x();
+               double offy = pos.y()-card->geometry().y();
 
-                stateData.drag.card = card;
-                stateData.drag.offx = pos.x() - card->geometry().x();
-                stateData.drag.offy = pos.y() - card->geometry().y();
 
-                // what is the offset?
-                //updateGeometry();
-                scene->update();
-                view->update();
+               if (card->geometry().height()-offy < 10) {
+
+                    state = RESIZE;
+                    card->setZValue(100);
+
+                    stateData.resize.card = card;
+                    stateData.resize.deep = card->deep;
+                    stateData.resize.posy = pos.y();
+
+               } else {
+                    // we're grabbing a card, so lets
+                    // work out the offset so we can move
+                    // it around when we start dragging
+                    state = DRAG;
+                    card->invisible = true;
+                    card->setZValue(100);
+
+                    stateData.drag.card = card;
+                    stateData.drag.offx = offx;
+                    stateData.drag.offy = offy;
+
+                    // what is the offset?
+                    //updateGeometry();
+                    scene->update();
+                    view->update();
+                }
             }
         }
 
     } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
         // stop dragging
-        if (mode == CONFIG && state == DRAG) {
+        if (mode == CONFIG && (state == DRAG || state == RESIZE)) {
 
             // we want this one
             event->accept();
@@ -290,8 +306,35 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
 
-        // dragging?
-        if (mode == CONFIG && state == DRAG) {
+        if (mode == CONFIG && state == NONE) {                 // hovering
+
+            // where am i ?
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+            QGraphicsItem *item = scene->itemAt(pos, view->transform());
+            Card *card = static_cast<Card*>(item);
+
+            if (card) {
+
+                // are we on the boundary of the card?
+                double offx = pos.x()-card->geometry().x();
+                double offy = pos.y()-card->geometry().y();
+
+                if (resizecursor == false && card->geometry().height()-offy < 10) {
+
+                    resizecursor = true;
+                    setCursor(QCursor(Qt::SizeVerCursor));
+
+                } else if (resizecursor == true && card->geometry().height()-offy > 10) {
+
+                    resizecursor = false;
+                    setCursor(QCursor(Qt::ArrowCursor));
+
+                }
+
+            }
+
+
+        } else if (mode == CONFIG && state == DRAG) {          // dragging?
 
             // we'll take this
             event->accept();
@@ -359,6 +402,23 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             updateGeometry();
             scene->update();
             view->update();
+
+        } else if (mode == CONFIG && state == RESIZE) {
+
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+
+            // resize in rows, so in 75px units
+            int addrows = (pos.y() - stateData.resize.posy) / 75;
+            int setdeep = stateData.resize.deep + addrows;
+            if (setdeep < 3) setdeep=3;
+
+            stateData.resize.card->deep = setdeep;
+
+            // drop it down
+            updateGeometry();
+            scene->update();
+            view->update();
+
         }
     }
 

@@ -56,7 +56,7 @@ class Card : public QGraphicsWidget
         bool onscene;
         bool invisible;
 
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *o, QWidget *p=0) {
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             painter->setBrush(brush);
             painter->fillRect(QRectF(0,0,geometry().width(),geometry().height()), brush);
 
@@ -77,7 +77,7 @@ class OverviewWindow : public GcChartWindow
         enum { VIEW, CONFIG } mode;
 
         // current state for event processing
-        enum { NONE, DRAG } state;
+        enum { NONE, DRAG, RESIZE } state;
 
    public slots:
 
@@ -110,6 +110,7 @@ class OverviewWindow : public GcChartWindow
         QGraphicsScene *scene;
         QGraphicsView *view;
         QParallelAnimationGroup *group;
+        bool resizecursor;          // is the cursor set to resize?
 
         // content
         QList<Card*> cards;
@@ -120,6 +121,12 @@ class OverviewWindow : public GcChartWindow
                 double offx, offy; // mouse grab position on card
                 Card *card;        // index of card in QList
             } drag;
+
+            struct {
+                double posy;
+                int deep;
+                Card *card;
+            } resize;
         } stateData;
 
 };
