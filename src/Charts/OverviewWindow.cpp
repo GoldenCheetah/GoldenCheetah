@@ -153,7 +153,7 @@ OverviewWindow::updateGeometry()
             animation->setDuration(300);
             animation->setStartValue(cards[i]->geometry());
             animation->setEndValue(QRect(tx,ty,twidth,theight));
-            animation->setEasingCurve(QEasingCurve(QEasingCurve::InOutBack));
+            animation->setEasingCurve(QEasingCurve(QEasingCurve::InOutQuint));
 
             group->addAnimation(animation);
         }
