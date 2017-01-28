@@ -84,11 +84,15 @@ class OverviewWindow : public GcChartWindow
         // trap signals
         void configChanged(qint32);
 
-        // viewport resized
-        void resizeEvent(QResizeEvent * event);
+        // scale on first show
+        void showEvent(QShowEvent *) { updateView(); }
+        void resizeEvent(QResizeEvent *) { updateView(); }
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
+
+        // set scale, zoom etc appropriately
+        void updateView();
 
         // create a card
         Card *newCard(int column, int order, int deep) { Card *add = new Card(deep);
@@ -111,6 +115,7 @@ class OverviewWindow : public GcChartWindow
         QGraphicsView *view;
         QParallelAnimationGroup *group;
         bool resizecursor;          // is the cursor set to resize?
+        bool block;                 // block event processing
 
         // content
         QList<Card*> cards;
