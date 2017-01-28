@@ -22,7 +22,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), resizecursor(false)
+    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), resizecursor(false), block(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -70,20 +70,9 @@ OverviewWindow::OverviewWindow(Context *context) :
     // sort out the view
     updateGeometry();
 
-    // now scale to fit... nothing fancy for now
-    view->setSceneRect(scene->itemsBoundingRect());
-    view->fitInView(view->sceneRect(), Qt::KeepAspectRatio);
-
     // watch the view for mouse events
     view->setMouseTracking(true);
     scene->installEventFilter(this);
-}
-
-void
-OverviewWindow::resizeEvent(QResizeEvent *)
-{
-    // hmmm, this isn't quite right !
-    view->fitInView(view->sceneRect(), Qt::KeepAspectRatio);
 }
 
 static bool cardSort(const Card* left, const Card* right)
@@ -100,6 +89,7 @@ OverviewWindow::updateGeometry()
     qSort(cards.begin(), cards.end(), cardSort);
 
     int y=70;
+    int maxy = y;
     int column=-1;
 
     // just set their geometry for now, no interaction
@@ -126,6 +116,9 @@ OverviewWindow::updateGeometry()
         int theight = cards[i]->deep * 70;
 
 
+        // for setting the scene rectangle
+        if (maxy < ty+theight+70) maxy = ty+theight+70;
+
         // add to scene if new
         if (!cards[i]->onscene) {
             cards[i]->setGeometry(tx, ty, twidth, theight);
@@ -146,12 +139,15 @@ OverviewWindow::updateGeometry()
 
                 // we're starting to animate so clear and restart any animations
                 if (group) group->clear();
-                else  group = new QParallelAnimationGroup(this);
+                else {
+                    group = new QParallelAnimationGroup(this);
+                    //connect(group, SIGNAL(finished()), this, SLOT(fitView()));
+                }
             }
 
             // add an animation for this movement
             QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
-            animation->setDuration(200);
+            animation->setDuration(300);
             animation->setStartValue(cards[i]->geometry());
             animation->setEndValue(QRect(tx,ty,twidth,theight));
             animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
@@ -163,6 +159,9 @@ OverviewWindow::updateGeometry()
         y += theight + 70;
     }
 
+    // set the scene rectangle, columns start at 0
+    QRectF rect(0, 0, (column+1) * 870 + 70, maxy);
+    scene->setSceneRect(rect);
     if (animated) group->start();
 }
 
@@ -199,9 +198,28 @@ OverviewWindow::configChanged(qint32)
     repaint();
 }
 
+void
+OverviewWindow::updateView()
+{
+    scene->update();
+
+    // fit to scene width XXX need to fix scrollbars.
+    double scale = view->frameGeometry().width() / scene->sceneRect().width();
+    QRectF viewRect(0,0, scene->sceneRect().width(), view->frameGeometry().height() / scale);
+    view->scale(scale,scale);
+    view->setSceneRect(viewRect);
+
+
+    view->fitInView(viewRect, Qt::KeepAspectRatio);
+    view->update();
+}
+
 bool
 OverviewWindow::eventFilter(QObject *, QEvent *event)
 {
+    if (block) return false;
+
+    block = true;
     bool returning = false;
 
     // we only filter out keyboard shortcuts for undo redo etc
@@ -300,11 +318,16 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // drop it down
             updateGeometry();
-            scene->update();
-            view->update();
+            updateView();
         }
 
     } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
+
+        // thanks we'll intercept that
+        if (mode == CONFIG) {
+            event->accept();
+            returning = true;
+        }
 
         if (mode == CONFIG && state == NONE) {                 // hovering
 
@@ -342,10 +365,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             }
 
         } else if (mode == CONFIG && state == DRAG) {          // dragging?
-
-            // we'll take this
-            event->accept();
-            returning = true;
 
             // where am i ?
             QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
@@ -385,7 +404,16 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                 // create a new column to the right?
                 int targetcol = (pos.x()-stateData.drag.offx)/870;
-                if (cards.last() && cards.last()->column < targetcol) {
+                if (targetcol < 0) {
+
+                    // new col to left
+                    for(int i=0; i< cards.count(); i++) cards[i]->column += 1;
+                    stateData.drag.card->column = 0;
+                    stateData.drag.card->order = 0;
+
+                } else if (cards.last() && cards.last()->column < targetcol) {
+
+                    // new col to the right
                     stateData.drag.card->column = cards.last()->column + 1;
                     stateData.drag.card->order = 0;
 
@@ -407,8 +435,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // drop it down
             updateGeometry();
-            scene->update();
-            view->update();
+            updateView();
 
         } else if (mode == CONFIG && state == RESIZE) {
 
@@ -423,12 +450,11 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // drop it down
             updateGeometry();
-            scene->update();
-            view->update();
-
+            updateView();
         }
     }
 
+    block = false;
     return returning;
 }
 
