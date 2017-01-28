@@ -237,13 +237,15 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             add->isDir = false;
             add->distance = each["distance"].toInt()/1000.0;
             add->duration = each["training"].toInt();
-            add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+=suffix;
+            add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
 
             //add->size
             //add->modified
 
             //QJsonObject fileindex = each["fileindex"].toObject();
             //add->name = QFileInfo(fileindex["filename"].toString()).fileName();
+
+            printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
 
             returning << add;
         }
