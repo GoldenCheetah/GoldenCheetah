@@ -36,6 +36,9 @@ int CloudDBVersionClient::CloudDBVersion_Release = 10;
 int CloudDBVersionClient::CloudDBVersion_ReleaseCandidate = 20;
 int CloudDBVersionClient::CloudDBVersion_DevelopmentBuild = 30;
 
+// minimum number of days between each check
+int CloudDBVersionClient::CloudDBVersion_Days_Delay = 10;
+
 
 CloudDBVersionClient::CloudDBVersionClient() {
 
@@ -45,6 +48,10 @@ CloudDBVersionClient::~CloudDBVersionClient() {
 
 void
 CloudDBVersionClient::informUserAboutLatestVersions() {
+
+    // update check is done only once every xx days - to save DB read quota
+    QDate lastUpdateCheck = (appsettings->value(NULL, GC_LAST_VERSION_CHECK_DATE, QDate(1990, 1, 1)).toDate());
+    if (lastUpdateCheck.addDays(CloudDBVersionClient::CloudDBVersion_Days_Delay) > QDate::currentDate()) return;
 
     // consider any updates done since the last start and consider only newer versions
     int lastVersion = appsettings->value(NULL, GC_LAST_VERSION_CHECKED, 0).toInt();
@@ -63,6 +70,8 @@ CloudDBVersionClient::informUserAboutLatestVersions() {
 
     connect(l_nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(showVersionPopup(QNetworkReply*)));
 
+    // check is done, update the date for next check period
+    appsettings->setValue(GC_LAST_VERSION_CHECK_DATE, QDate::currentDate());
 }
 
 void
@@ -185,9 +194,9 @@ CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1
 
     QHBoxLayout *lastRow = new QHBoxLayout;
 
-    doNotAskAgainButton = new QPushButton(tr("Do not ask again for these versions"), this);
+    doNotAskAgainButton = new QPushButton(tr("Do not show these versions again"), this);
     connect(doNotAskAgainButton, SIGNAL(clicked()), this, SLOT(doNotAskAgain()));
-    askAgainNextStartButton = new QPushButton(tr("Show new versions on next start"), this);
+    askAgainNextStartButton = new QPushButton(tr("Show available versions again in %1 days").arg(CloudDBVersionClient::CloudDBVersion_Days_Delay), this);
     askAgainNextStartButton->setDefault(true);
     connect(askAgainNextStartButton, SIGNAL(clicked()), this, SLOT(askAgainOnNextStart()));
 

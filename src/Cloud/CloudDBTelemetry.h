@@ -36,6 +36,9 @@ public:
 
     void upsertTelemetry();
 
+    static int CloudDBTelemetry_UpsertFrequence;
+
+
 
 
 };
