@@ -31,17 +31,24 @@
 #include <QDateTime>
 
 
+int CloudDBTelemetryClient::CloudDBTelemetry_UpsertFrequence = 25;
+
 
 CloudDBTelemetryClient::CloudDBTelemetryClient()
 {
-  // only static members
 }
 CloudDBTelemetryClient::~CloudDBTelemetryClient() {
-  // only static members
 }
 
 void
 CloudDBTelemetryClient::upsertTelemetry() {
+
+    // do not update every time, but only every xx times GC is opened to save DB write quota
+    int telemetryCount = appsettings->value(NULL, GC_TELEMETRY_UPDATE_COUNTER, 0).toInt();
+    if (telemetryCount > 0 ) {
+        appsettings->setValue(GC_TELEMETRY_UPDATE_COUNTER, --telemetryCount);
+        return;
+    }
 
     QNetworkAccessManager *l_nam = new QNetworkAccessManager(this);
 
@@ -69,10 +76,16 @@ CloudDBTelemetryClient::upsertTelemetry() {
     appsettings->setValue(GC_TELEMETRY_ID, id);
 
     // empty lastChange is filled with time.now() in CloudDB
-    QString payload = QString("{ \"key\" : \"%1\", \"lastChange\": \"\", \"operatingSystem\" : \"%2\", \"version\" : \"%3\"}").arg(id).arg( os ).arg( VERSION_LATEST );
+    QString payload = QString("{ \"key\" : \"%1\", \"lastChange\" : \"\", \"operatingSystem\" : \"%2\","
+                              " \"version\" : \"%3\", \"increment\" : %4 }")
+                      .arg(id).arg( os ).arg( VERSION_LATEST )
+                      .arg(CloudDBTelemetryClient::CloudDBTelemetry_UpsertFrequence);
     l_nam->put(request, payload.toUtf8());
 
     // the request is asynchronously - the user does not care about any response - so we just skip it
+
+    // now we reset the countdown counter
+    appsettings->setValue(GC_TELEMETRY_UPDATE_COUNTER, CloudDBTelemetryClient::CloudDBTelemetry_UpsertFrequence);
 
 }
 
