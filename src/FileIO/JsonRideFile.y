@@ -58,6 +58,7 @@ struct JsonContext {
     double JsonNumber;
     QStringList JsonRideFileerrors;
     QMap <QString, QString> JsonOverrides;
+    int JsonHRV;
 
     XDataSeries xdataseries;
     XDataPoint xdatapoint;
@@ -118,6 +119,7 @@ static QString protect(const QString string)
 %token REFERENCES
 %token XDATA
 %token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP
+%token HRV MSECS
 %token LRBALANCE LTE RTE LPS RPS THB SMO2 RVERT RCAD RCON
 %token LPCO RPCO LPPB RPPB LPPE RPPE LPPPB RPPPB LPPPE RPPPE
 
@@ -150,6 +152,7 @@ rideelement: starttime
             | references
             | samples
             | xdata
+    	    | hrv_samples
             ;
 
 /*
@@ -358,7 +361,16 @@ series: SECS ':' number                 { jc->JsonPoint.secs = jc->JsonNumber; }
         | string ':' string
         ;
 
+hrv_samples: HRV ':' '[' hrv_sample_list ']' ;
+hrv_sample_list: hrv_sample | hrv_sample_list ',' hrv_sample ;
+hrv_sample: '{' hrv_series_list '}'             { jc->JsonRide->appendHRV(jc->JsonHRV);
+		                                }
 
+hrv_series_list: hrv_series | hrv_series_list ',' hrv_series ;
+hrv_series: MSECS ':' number                 { jc->JsonHRV = jc->JsonNumber; }
+            | string ':' number              { }
+            | string ':' string
+            ;
 /*
  * Primitives
  */
@@ -748,6 +760,24 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
             first = false;
         }
 
+        out += "\n\t\t]";
+    }
+    //
+    // HRV heart rate variability
+    //
+    if (ride->HRV_.count()) {
+
+        out += ",\n\t\t\"HRV\":[\n";
+        bool first = true;
+        foreach (int hrv, ride->HRV_) {
+            if (first) first=false;
+            else out += ",\n";
+            out += "\t\t\t{ ";
+            // always store time
+            out += "\"MSECS\":" + QString("%1").arg(hrv);
+            // sample points in here!
+            out += " }";
+	}
         out += "\n\t\t]";
     }
 
