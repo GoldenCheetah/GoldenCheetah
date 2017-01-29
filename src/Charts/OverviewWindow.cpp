@@ -22,7 +22,8 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), resizecursor(false), block(false)
+    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL),
+                            yresizecursor(false), xresizecursor(false), block(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -45,6 +46,9 @@ OverviewWindow::OverviewWindow(Context *context) :
     view->setScene(scene);
     main->addWidget(view);
     setChartLayout(main);
+
+    // default column widths - max 10 columns;
+    columns << 400 << 800 << 800 << 400 << 800 << 800 << 400 << 800 << 800 << 400;
 
     // XXX lets hack in some tiles to start (will load from config later XXX
     newCard(0, 1, 5);
@@ -92,6 +96,8 @@ OverviewWindow::updateGeometry()
     int maxy = y;
     int column=-1;
 
+    int x=70;
+
     // just set their geometry for now, no interaction
     for(int i=0; i<cards.count(); i++) {
 
@@ -100,19 +106,27 @@ OverviewWindow::updateGeometry()
 
         // move on to next column, check if first item too
         if (cards[i]->column > column) {
+
+            // once past the first column we need to update x
+            if (column >= 0) x+= columns[column] + 70;
+
             int diff = cards[i]->column - column - 1;
             if (diff > 0) {
+
                 // there are empty columns so shift the cols to the right
-                // to the left to fill  the gap left
+                // to the left to fill  the gap left and all  the column
+                // widths also need to move down too
+                for(int j=cards[i]->column-1; j < 8; j++) columns[j]=columns[j+1];
                 for(int j=i; j<cards.count();j++) cards[j]->column -= diff;
             }
             y=70; column = cards[i]->column;
+
         }
 
         // set geometry
         int ty = y;
-        int tx = 70 + (column*800) + (column*70);
-        int twidth = 800;
+        int tx = x;
+        int twidth = columns[column];
         int theight = cards[i]->deep * 70;
 
 
@@ -160,7 +174,7 @@ OverviewWindow::updateGeometry()
     }
 
     // set the scene rectangle, columns start at 0
-    QRectF rect(0, 0, (column+1) * 870 + 70, maxy);
+    QRectF rect(0, 0, columns[column] + x + 70, maxy);
     scene->setSceneRect(rect);
     if (animated) group->start();
 }
@@ -274,14 +288,24 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                if (card->geometry().height()-offy < 10) {
 
-                    state = RESIZE;
+                    state = YRESIZE;
                     card->setZValue(100);
 
-                    stateData.resize.card = card;
-                    stateData.resize.deep = card->deep;
-                    stateData.resize.posy = pos.y();
+                    stateData.yresize.card = card;
+                    stateData.yresize.deep = card->deep;
+                    stateData.yresize.posy = pos.y();
+#if 0
+               } else if (card->geometry().width()-offx < 10) {
 
+                    state = XRESIZE;
+                    card->setZValue(100);
+
+                    stateData.xresize.card = card;
+                    stateData.xresize.width = card->deep;
+                    stateData.xresize.posx = pos.x();
+#endif
                } else {
+
                     // we're grabbing a card, so lets
                     // work out the offset so we can move
                     // it around when we start dragging
@@ -292,6 +316,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.drag.card = card;
                     stateData.drag.offx = offx;
                     stateData.drag.offy = offy;
+                    stateData.drag.width = columns[card->column];
 
                     // what is the offset?
                     //updateGeometry();
@@ -304,7 +329,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
     } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
         // stop dragging
-        if (mode == CONFIG && (state == DRAG || state == RESIZE)) {
+        if (mode == CONFIG && (state == DRAG || state == YRESIZE)) {
 
             // we want this one
             event->accept();
@@ -342,14 +367,26 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 double offx = pos.x()-card->geometry().x();
                 double offy = pos.y()-card->geometry().y();
 
-                if (resizecursor == false && card->geometry().height()-offy < 10) {
+                if (yresizecursor == false && card->geometry().height()-offy < 10) {
 
-                    resizecursor = true;
+                    yresizecursor = true;
                     setCursor(QCursor(Qt::SizeVerCursor));
 
-                } else if (resizecursor == true && card->geometry().height()-offy > 10) {
+                } else if (yresizecursor == true && card->geometry().height()-offy > 10) {
 
-                    resizecursor = false;
+                    yresizecursor = false;
+                    setCursor(QCursor(Qt::ArrowCursor));
+
+                }
+
+                if (xresizecursor == false && card->geometry().width()-offx < 10) {
+
+                    xresizecursor = true;
+                    setCursor(QCursor(Qt::SizeHorCursor));
+
+                } else if (xresizecursor == true && card->geometry().width()-offx > 10) {
+
+                    xresizecursor = false;
                     setCursor(QCursor(Qt::ArrowCursor));
 
                 }
@@ -358,8 +395,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                 // not hovering over tile, so if still have a resize cursor
                 // set it back to the normal arrow pointer
-                if (resizecursor) {
-                    resizecursor = false;
+                if (yresizecursor || xresizecursor) {
+                    xresizecursor = yresizecursor = false;
                     setCursor(QCursor(Qt::ArrowCursor));
                 }
             }
@@ -402,20 +439,42 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 }
             } else {
 
+                // columns are now variable width
+                //int targetcol = (pos.x()-stateData.drag.offx)/870;
                 // create a new column to the right?
-                int targetcol = (pos.x()-stateData.drag.offx)/870;
-                if (targetcol < 0) {
+                int x=70;
+                int targetcol = -1;
+                for(int i=0; i<10; i++) {
+                    if (pos.x() > x && pos.x() < (x+columns[i]+70)) {
+                        targetcol = i;
+                        break;
+                    }
+                    x += columns[i]+70;
+                }
 
-                    // new col to left
-                    for(int i=0; i< cards.count(); i++) cards[i]->column += 1;
-                    stateData.drag.card->column = 0;
-                    stateData.drag.card->order = 0;
+                if (cards.last()->column < 9 && targetcol < 0) {
 
-                } else if (cards.last() && cards.last()->column < targetcol) {
+                    // don't keep moving - if we're already alone in column 0 then no move is needed
+                    if (stateData.drag.card->column != 0 || (cards.count()>1 && cards[1]->column == 0)) {
+
+                        // new col to left
+                        for(int i=0; i< cards.count(); i++) cards[i]->column += 1;
+                        stateData.drag.card->column = 0;
+                        stateData.drag.card->order = 0;
+
+                        // shift columns widths to the right
+                        for(int i=9; i>0; i--) columns[i] = columns[i-1];
+                        columns[0] = stateData.drag.width;
+                    }
+
+                } else if (cards.last()->column < 9 && cards.last() && cards.last()->column < targetcol) {
 
                     // new col to the right
                     stateData.drag.card->column = cards.last()->column + 1;
                     stateData.drag.card->order = 0;
+
+                    // make column width sane as source width
+                    columns[cards.last()->column+1] = stateData.drag.width;
 
                 } else {
 
@@ -437,16 +496,16 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             updateGeometry();
             updateView();
 
-        } else if (mode == CONFIG && state == RESIZE) {
+        } else if (mode == CONFIG && state == YRESIZE) {
 
             QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
 
             // resize in rows, so in 75px units
-            int addrows = (pos.y() - stateData.resize.posy) / 75;
-            int setdeep = stateData.resize.deep + addrows;
+            int addrows = (pos.y() - stateData.yresize.posy) / 75;
+            int setdeep = stateData.yresize.deep + addrows;
             if (setdeep < 3) setdeep=3;
 
-            stateData.resize.card->deep = setdeep;
+            stateData.yresize.card->deep = setdeep;
 
             // drop it down
             updateGeometry();

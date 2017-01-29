@@ -77,7 +77,7 @@ class OverviewWindow : public GcChartWindow
         enum { VIEW, CONFIG } mode;
 
         // current state for event processing
-        enum { NONE, DRAG, RESIZE } state;
+        enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
    public slots:
 
@@ -114,24 +114,34 @@ class OverviewWindow : public GcChartWindow
         QGraphicsScene *scene;
         QGraphicsView *view;
         QParallelAnimationGroup *group;
-        bool resizecursor;          // is the cursor set to resize?
+        bool yresizecursor;          // is the cursor set to resize?
+        bool xresizecursor;          // is the cursor set to resize?
         bool block;                 // block event processing
 
         // content
-        QList<Card*> cards;
+        QVector<int> columns;       // column widths
+        QList<Card*> cards;         // tiles
 
         // state data
         union OverviewState {
             struct {
                 double offx, offy; // mouse grab position on card
                 Card *card;        // index of card in QList
+                int width;         // how big was I when I started dragging?
             } drag;
 
             struct {
                 double posy;
                 int deep;
                 Card *card;
-            } resize;
+            } yresize;
+
+            struct {
+                double posx;
+                int width;
+                Card *card;
+            } xresize;
+
         } stateData;
 
 };
