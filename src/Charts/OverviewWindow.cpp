@@ -174,8 +174,8 @@ OverviewWindow::updateGeometry()
     }
 
     // set the scene rectangle, columns start at 0
-    QRectF rect(0, 0, columns[column] + x + 70, maxy);
-    scene->setSceneRect(rect);
+    sceneRect = QRectF(0, 0, columns[column] + x + 70, maxy);
+
     if (animated) group->start();
 }
 
@@ -215,17 +215,20 @@ OverviewWindow::configChanged(qint32)
 void
 OverviewWindow::updateView()
 {
+    scene->setSceneRect(sceneRect);
     scene->update();
 
-    // fit to scene width XXX need to fix scrollbars.
-    double scale = view->frameGeometry().width() / scene->sceneRect().width();
-    QRectF viewRect(0,0, scene->sceneRect().width(), view->frameGeometry().height() / scale);
-    view->scale(scale,scale);
-    view->setSceneRect(viewRect);
+    // don'r scale whilst resizing on x?
+    if (state != XRESIZE && state != DRAG) {
+        // fit to scene width XXX need to fix scrollbars.
+        double scale = view->frameGeometry().width() / scene->sceneRect().width();
+        QRectF viewRect(0,0, scene->sceneRect().width(), view->frameGeometry().height() / scale);
+        view->scale(scale,scale);
+        view->setSceneRect(viewRect);
 
-
-    view->fitInView(viewRect, Qt::KeepAspectRatio);
-    view->update();
+        view->fitInView(viewRect, Qt::KeepAspectRatio);
+        view->update();
+    }
 }
 
 bool
@@ -289,21 +292,19 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                if (card->geometry().height()-offy < 10) {
 
                     state = YRESIZE;
-                    card->setZValue(100);
 
                     stateData.yresize.card = card;
                     stateData.yresize.deep = card->deep;
                     stateData.yresize.posy = pos.y();
-#if 0
+
                } else if (card->geometry().width()-offx < 10) {
 
                     state = XRESIZE;
-                    card->setZValue(100);
 
-                    stateData.xresize.card = card;
-                    stateData.xresize.width = card->deep;
+                    stateData.xresize.column = card->column;
+                    stateData.xresize.width = columns[card->column];
                     stateData.xresize.posx = pos.x();
-#endif
+
                } else {
 
                     // we're grabbing a card, so lets
@@ -329,17 +330,20 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
     } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
         // stop dragging
-        if (mode == CONFIG && (state == DRAG || state == YRESIZE)) {
+        if (mode == CONFIG && (state == DRAG || state == YRESIZE || state == XRESIZE)) {
 
             // we want this one
             event->accept();
             returning = true;
 
+            // set back to visible if dragging
+            if (state == DRAG) {
+                stateData.drag.card->invisible = false;
+                stateData.drag.card->setZValue(10);
+            }
+
             // end state;
             state = NONE;
-
-            stateData.drag.card->invisible = false;
-            stateData.drag.card->setZValue(10);
 
             // drop it down
             updateGeometry();
@@ -508,6 +512,20 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             stateData.yresize.card->deep = setdeep;
 
             // drop it down
+            updateGeometry();
+            updateView();
+        } else if (mode == CONFIG && state == XRESIZE) {
+
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+
+            // multiples of 50 (smaller than margin)
+            int addblocks = (pos.x() - stateData.xresize.posx) / 50;
+            int setcolumn = stateData.xresize.width + (addblocks * 50);
+            if (setcolumn < 200) setcolumn = 200;
+
+            columns[stateData.xresize.column] = setcolumn;
+
+            // animate
             updateGeometry();
             updateView();
         }

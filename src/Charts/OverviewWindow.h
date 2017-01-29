@@ -114,15 +114,17 @@ class OverviewWindow : public GcChartWindow
         QGraphicsScene *scene;
         QGraphicsView *view;
         QParallelAnimationGroup *group;
-        bool yresizecursor;          // is the cursor set to resize?
-        bool xresizecursor;          // is the cursor set to resize?
-        bool block;                 // block event processing
+        QRectF sceneRect;
 
         // content
         QVector<int> columns;       // column widths
         QList<Card*> cards;         // tiles
 
         // state data
+        bool yresizecursor;          // is the cursor set to resize?
+        bool xresizecursor;          // is the cursor set to resize?
+        bool block;                 // block event processing
+
         union OverviewState {
             struct {
                 double offx, offy; // mouse grab position on card
@@ -139,7 +141,7 @@ class OverviewWindow : public GcChartWindow
             struct {
                 double posx;
                 int width;
-                Card *card;
+                int column;
             } xresize;
 
         } stateData;
