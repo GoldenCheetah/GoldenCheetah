@@ -16,6 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+// geometry basics
+static int SPACING = 30;
+static int ROWHEIGHT = 70;
 
 #include "OverviewWindow.h"
 
@@ -96,11 +99,11 @@ OverviewWindow::updateGeometry()
     // order the items to their positions
     qSort(cards.begin(), cards.end(), cardSort);
 
-    int y=70;
+    int y=SPACING;
     int maxy = y;
     int column=-1;
 
-    int x=70;
+    int x=SPACING;
 
     // just set their geometry for now, no interaction
     for(int i=0; i<cards.count(); i++) {
@@ -112,7 +115,7 @@ OverviewWindow::updateGeometry()
         if (cards[i]->column > column) {
 
             // once past the first column we need to update x
-            if (column >= 0) x+= columns[column] + 70;
+            if (column >= 0) x+= columns[column] + SPACING;
 
             int diff = cards[i]->column - column - 1;
             if (diff > 0) {
@@ -123,7 +126,7 @@ OverviewWindow::updateGeometry()
                 for(int j=cards[i]->column-1; j < 8; j++) columns[j]=columns[j+1];
                 for(int j=i; j<cards.count();j++) cards[j]->column -= diff;
             }
-            y=70; column = cards[i]->column;
+            y=SPACING; column = cards[i]->column;
 
         }
 
@@ -131,11 +134,11 @@ OverviewWindow::updateGeometry()
         int ty = y;
         int tx = x;
         int twidth = columns[column];
-        int theight = cards[i]->deep * 70;
+        int theight = cards[i]->deep * ROWHEIGHT;
 
 
         // for setting the scene rectangle
-        if (maxy < ty+theight+70) maxy = ty+theight+70;
+        if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
 
         // add to scene if new
         if (!cards[i]->onscene) {
@@ -174,11 +177,11 @@ OverviewWindow::updateGeometry()
         }
 
         // set spot for next tile
-        y += theight + 70;
+        y += theight + SPACING;
     }
 
     // set the scene rectangle, columns start at 0
-    sceneRect = QRectF(0, 0, columns[column] + x + 70, maxy);
+    sceneRect = QRectF(0, 0, columns[column] + x + SPACING, maxy);
 
     if (animated) group->start();
 }
@@ -481,16 +484,15 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             } else {
 
                 // columns are now variable width
-                //int targetcol = (pos.x()-stateData.drag.offx)/870;
                 // create a new column to the right?
-                int x=70;
+                int x=SPACING;
                 int targetcol = -1;
                 for(int i=0; i<10; i++) {
-                    if (pos.x() > x && pos.x() < (x+columns[i]+70)) {
+                    if (pos.x() > x && pos.x() < (x+columns[i]+SPACING)) {
                         targetcol = i;
                         break;
                     }
-                    x += columns[i]+70;
+                    x += columns[i]+SPACING;
                 }
 
                 if (cards.last()->column < 9 && targetcol < 0) {
