@@ -69,6 +69,8 @@ class OverviewWindow : public GcChartWindow
 {
     Q_OBJECT
 
+    Q_PROPERTY(QRectF viewRect READ getViewRect WRITE setViewRect)
+
     public:
 
         OverviewWindow(Context *context);
@@ -78,6 +80,9 @@ class OverviewWindow : public GcChartWindow
 
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
+
+        void setViewRect(QRectF);
+        QRectF getViewRect() const { return viewRect; }
 
    public slots:
 
@@ -113,8 +118,14 @@ class OverviewWindow : public GcChartWindow
         Context *context;
         QGraphicsScene *scene;
         QGraphicsView *view;
+
+        // for animating transitions
         QParallelAnimationGroup *group;
+        QPropertyAnimation *viewchange;
+
+        // scene and view
         QRectF sceneRect;
+        QRectF viewRect;
 
         // content
         QVector<int> columns;       // column widths

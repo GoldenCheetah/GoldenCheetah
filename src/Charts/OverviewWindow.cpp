@@ -71,6 +71,10 @@ OverviewWindow::OverviewWindow(Context *context) :
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
 
+    // for changing the view
+    viewchange = new QPropertyAnimation(this, "viewRect");
+    viewchange->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
+
     // sort out the view
     updateGeometry();
 
@@ -220,15 +224,48 @@ OverviewWindow::updateView()
 
     // don'r scale whilst resizing on x?
     if (state != XRESIZE && state != DRAG) {
-        // fit to scene width XXX need to fix scrollbars.
-        double scale = view->frameGeometry().width() / scene->sceneRect().width();
-        QRectF viewRect(0,0, scene->sceneRect().width(), view->frameGeometry().height() / scale);
-        view->scale(scale,scale);
-        view->setSceneRect(viewRect);
 
-        view->fitInView(viewRect, Qt::KeepAspectRatio);
-        view->update();
+        // much of a resize / change ?
+        double dx = fabs(viewRect.x() - sceneRect.x());
+        double dy = fabs(viewRect.y() - sceneRect.y());
+        double dwidth = fabs(viewRect.width() - sceneRect.width());
+        double dheight = fabs(viewRect.height() - sceneRect.height());
+
+        // scale immediately if not a bit change
+        // otherwise it feels unresponsive
+        if (viewRect.width() == 0 || (dx < 20 && dy < 20 && dwidth < 20 && dheight < 20)) {
+            setViewRect(sceneRect);
+        } else {
+
+            // tempting to make this longer but feels ponderous at longer durations
+            viewchange->setDuration(400);
+            viewchange->setStartValue(viewRect);
+            viewchange->setEndValue(sceneRect);
+            viewchange->start();
+        }
     }
+}
+
+void
+OverviewWindow::setViewRect(QRectF rect)
+{
+    //static bool __block = false;
+    //if (__block) return;
+
+    //__block = true;
+    viewRect = rect;
+
+    // fit to scene width XXX need to fix scrollbars.
+    double scale = view->frameGeometry().width() / viewRect.width();
+    QRectF scaledRect(0,0, viewRect.width(), view->frameGeometry().height() / scale);
+
+    // scale to selection
+    view->scale(scale,scale);
+    view->setSceneRect(scaledRect);
+    view->fitInView(scaledRect, Qt::KeepAspectRatio);
+    view->update();
+
+    //__block = false;
 }
 
 bool
