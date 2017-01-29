@@ -223,7 +223,7 @@ OverviewWindow::updateView()
     scene->update();
 
     // don'r scale whilst resizing on x?
-    if (state != XRESIZE && state != DRAG) {
+    if (state != YRESIZE && state != XRESIZE && state != DRAG) {
 
         // much of a resize / change ?
         double dx = fabs(viewRect.x() - sceneRect.x());
@@ -551,6 +551,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             // drop it down
             updateGeometry();
             updateView();
+
         } else if (mode == CONFIG && state == XRESIZE) {
 
             QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
