@@ -42,6 +42,7 @@
 
 #define LAP_TYPE     19
 #define RECORD_TYPE  20
+#define HRV_TYPE 78
 #define SEGMENT_TYPE 142
 
 static int fitFileReaderRegistered =
@@ -132,6 +133,7 @@ struct FitFileReaderState
     XDataSeries *swimXdata;
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
+    XDataSeries *hrvXdata;
     QMap<int, QString> deviceInfos;
     QList<QString> dataInfos;
 
@@ -1029,6 +1031,36 @@ struct FitFileReaderState
         }
         last_event = event;
         last_event_type = event_type;
+    }
+
+    void decodeHRV(const FitDefinition &def,
+                   const std::vector<FitValue>& values) {
+      int rrvalue;
+      int i=0;
+      double hrv_time=0.0;
+      int n=hrvXdata->datapoints.count();
+
+      if (n>0)
+	hrv_time = hrvXdata->datapoints[n-1]->secs;
+
+      foreach(const FitField &field, def.fields) {
+	FitValue value = values[i++];
+	if ( value.type == ListValue && field.num == 0){
+	  for (int j=0; j<value.list.size(); j++)
+	    {
+	      rrvalue = int(value.list.at(j));
+	      hrv_time += rrvalue/1000.0;
+
+	      if (rrvalue == -1){
+		break;
+	      }
+	      XDataPoint *p = new XDataPoint();
+	      p->secs = hrv_time;
+	      p->number[0] = rrvalue;
+	      hrvXdata->datapoints.append(p);
+	    }
+	}
+      }
     }
 
     void decodeLap(const FitDefinition &def, int time_offset,
@@ -2533,7 +2565,9 @@ struct FitFileReaderState
                 case 53: /* speed zone */
                 case 55: /* monitoring */
                 case 72: /* training file (undocumented) : new since garmin 800 */
-                case 78: /* hrv */
+                case HRV_TYPE:
+		  decodeHRV(def, values);
+		  break; /* hrv */
                 case 79: /* HR zone (undocumented) ; see details below: */
                          /* #253: timestamp / #1: default Min HR / #2: default Max HR / #5: user Min HR / #6: user Max HR */
                 case 103: /* monitoring info */
@@ -2604,6 +2638,11 @@ struct FitFileReaderState
         swimXdata->unitname << "secs";
         swimXdata->valuename << "STROKES";
         swimXdata->unitname << "";
+
+	hrvXdata = new XDataSeries();
+	hrvXdata->name = "HRV";
+	hrvXdata->valuename << "R-R";
+	hrvXdata->unitname << "msecs";
 
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";
@@ -2716,6 +2755,11 @@ struct FitFileReaderState
                 rideFile->addXData("SWIM", swimXdata);
             else
                 delete swimXdata;
+
+            if (hrvXdata->datapoints.count()>0)
+                rideFile->addXData("HRV", hrvXdata);
+            else
+                delete hrvXdata;
 
             if (deveXdata->datapoints.count()>0)
                 rideFile->addXData("DEVELOPER", deveXdata);
