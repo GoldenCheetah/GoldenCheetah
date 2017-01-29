@@ -514,8 +514,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.drag.card->column = cards.last()->column + 1;
                     stateData.drag.card->order = 0;
 
-                    // make column width sane as source width
-                    columns[cards.last()->column+1] = stateData.drag.width;
+                    // make column width same as source width
+                    columns[stateData.drag.card->column] = stateData.drag.width;
 
                 } else {
 
