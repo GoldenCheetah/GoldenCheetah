@@ -274,6 +274,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::rcontact: return QString("gct");
         case RideFile::gear: return QString("gearratio");
         case RideFile::index: return QString("index");
+        case RideFile::hrv: return QString("R_R");
         default: return QString("unknown");
         }
     } else {
@@ -330,6 +331,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::gear: return QString(tr("Gear Ratio"));
         case RideFile::wbal: return QString(tr("W' Consumed"));
         case RideFile::index: return QString(tr("Sample Index"));
+        case RideFile::hrv: return QString(tr("R-R"));
         default: return QString(tr("Unknown"));
         }
     }
@@ -389,6 +391,7 @@ RideFile::colorFor(SeriesType series)
     case RideFile::vam:
     case RideFile::lon:
     case RideFile::lat:
+    case RideFile::hrv: return GColor(CHEARTRATE);
     default: return GColor(CPLOTMARKER);
     }
 }
@@ -449,6 +452,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::rvert: return QString(tr("cm"));
     case RideFile::rcontact: return QString(tr("ms"));
     case RideFile::gear: return QString(tr("ratio"));
+    case RideFile::hrv: return QString(tr("seconds"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -772,7 +776,19 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             i->stop -= timeOffset;
         }
 
-        // calculate derived data series -- after data fixers applied above
+	// Update presens, min, max and avg of HRV
+	result->dataPresent.hrv = !result->HRV_.empty();
+	if (result->dataPresent.hrv)
+	    {
+		result->minHrv = 10000;
+		result->maxHrv = 0;
+		foreach(int rr, result->HRV_) {
+		    if (rr<result->minHrv) result->minHrv=rr;
+		    if (rr>result->maxHrv) result->maxHrv=rr;
+		}
+	    }
+
+	    // calculate derived data series -- after data fixers applied above
         if (context) result->recalculateDerivedSeries();
 
         // what data is present - after processor in case 'derived' or adjusted
@@ -1368,6 +1384,11 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
     updateAvg(point);
 }
 
+void RideFile::appendHRV(int value)
+{
+    HRV_.append(value);
+}
+
 void RideFile::appendPoint(const RideFilePoint &point)
 {
     appendPoint(point.secs,point.cad,point.hr,point.km,point.kph,
@@ -1508,6 +1529,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case wprime : dataPresent.wprime = value; break;
         case tcore : dataPresent.tcore = value; break;
         case wbal : break; // not present
+        case hrv : dataPresent.hrv = value; break;
         default:
         case none : break;
     }
@@ -1564,6 +1586,7 @@ RideFile::isDataPresent(SeriesType series)
         case gear : return dataPresent.gear; break;
         case interval : return dataPresent.interval; break;
         case tcore : return dataPresent.tcore; break;
+        case hrv : return dataPresent.hrv; break;
         default:
         case none : return false; break;
     }
@@ -1610,6 +1633,7 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case rcontact : dataPoints_[index]->rcontact = value; break;
         case interval : dataPoints_[index]->interval = value; break;
         case tcore : dataPoints_[index]->tcore = value; break;
+        case hrv : HRV_[index] = value; break;
         default:
         case none : break;
     }
@@ -1735,6 +1759,9 @@ RideFilePoint::setValue(RideFile::SeriesType series, double value)
 double
 RideFile::getPointValue(int index, SeriesType series) const
 {
+  if (series==RideFile::hrv)
+    return HRV_[index];
+  else
     return dataPoints_[index]->value(series);
 }
 
@@ -1823,6 +1850,7 @@ RideFile::decimalsFor(SeriesType series)
         case wprime : return 0; break;
         case wbal : return 0; break;
         case tcore : return 2; break;
+        case hrv : return 0; break;
         default:
         case none : break;
     }
@@ -3071,6 +3099,7 @@ static struct {
 	{ "RIGHTPPPB", RideFile::rpppb },
 	{ "LEFTPPPE", RideFile::lpppe },
 	{ "RIGHTPPPE", RideFile::rpppe },
+	{ "HRV", RideFile::hrv },
 	{ "", RideFile::none  },
 };
 
