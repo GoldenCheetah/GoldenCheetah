@@ -63,7 +63,7 @@ extern const QChar deltaChar;
 struct RideFileDataPresent
 {
     // basic (te = torqueeffectiveness, ps = pedal smoothness)
-    bool secs, cad, hr, hrv, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
+    bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
     bool lrbalance, lte, rte, lps, rps, lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe;
     bool smo2, thb, interval;
 
@@ -75,7 +75,7 @@ struct RideFileDataPresent
 
     // whether non-zero data of each field is present
     RideFileDataPresent():
-        secs(false), cad(false), hr(false), hrv(false), km(false),
+        secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false),
@@ -206,7 +206,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal, tcore, clength, aPowerKg, index, hrv,
+                          wbal, tcore, clength, aPowerKg, index,
                           none }; // none must ALWAYS be last
         typedef enum seriestype SeriesType;
 
@@ -275,10 +275,8 @@ class RideFile : public QObject // QObject to emit signals
 
         void updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint);
 
-	void appendHRV(int);
-
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
-        const QVector<int> &hrvPoints() const {return HRV_;}
+
         // recalculate all the derived data series
         // might want to move to a factory for these
         // at some point, but for now hard coded
@@ -427,10 +425,6 @@ class RideFile : public QObject // QObject to emit signals
         WPrime *wprime_;
         double weight_; // cached to save calls to getWeight();
         double totalCount, totalTemp;
-
-	// Heart rate variability does not match length of RideFilePoint
-        QVector<int> HRV_;
-	int minHrv, maxHrv;
 
         QVariant getPointFromValue(double value, SeriesType series) const;
         void updateMin(RideFilePoint* point);

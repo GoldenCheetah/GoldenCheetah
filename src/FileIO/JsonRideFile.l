@@ -124,8 +124,6 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"REFERENCES\"      return REFERENCES;
 \"SAMPLES\"         return SAMPLES;
 \"SECS\"            return SECS;
-\"HRV\"             return HRV;
-\"MSECS\"           return MSECS;
 \"KM\"              return KM;
 \"WATTS\"           return WATTS;
 \"NM\"              return NM;
