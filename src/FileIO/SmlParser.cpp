@@ -301,21 +301,38 @@ SmlParser::endElement(const QString&, const QString&, const QString& qName)
         }
     }
 
-    else if (qName == "Data" && !rideFile->isDataPresent(rideFile->hr))
-    {   // R-R data and no HR in samples: backfill using EWMA filtered R-R
+    else if (qName == "Data")
+    {   // R-R data: store in XData, when no HR in samples backfill
+        // using EWMA filtered R-R
         double secs = 0.0;
         double ewmaRR = -1.0;
         const double ewmaTC = 5.0;
+        XDataSeries *hrvXdata = new XDataSeries();
+        hrvXdata->name = "HRV";
+        hrvXdata->valuename << "R-R";
+        hrvXdata->unitname << "msecs";
         foreach (QString strRR, buffer.split(" ")) {
             double rr = strRR.toDouble() / 1000.0;
             if (ewmaRR < 0.0) ewmaRR = rr;
             else ewmaRR += (rr - ewmaRR)/ewmaTC;
-            for (int i = 0; secs + rr >= trunc(secs) + i + 1; i++) {
-                rideFile->dataPoints()[rideFile->timeIndex(secs + i)]->hr = round(60.0/ ewmaRR);
+            if (!rideFile->isDataPresent(rideFile->hr)) {
+                for (int i = 0; secs + rr >= trunc(secs) + i + 1; i++) {
+                    rideFile->dataPoints()[rideFile->timeIndex(secs + i)]->hr = round(60.0/ ewmaRR);
+                }
             }
             secs += rr;
+            XDataPoint *p = new XDataPoint();
+            p->secs = secs;
+            p->km = 0;
+            p->number[0] = rr * 1000.0;
+            hrvXdata->datapoints.append(p);
         }
-        if (ewmaRR >= 0.0) rideFile->setDataPresent(rideFile->hr, true);
+        if (ewmaRR >= 0.0 && !rideFile->isDataPresent(rideFile->hr))
+            rideFile->setDataPresent(rideFile->hr, true);
+        if (hrvXdata->datapoints.count()>0)
+            rideFile->addXData("HRV", hrvXdata);
+        else
+            delete hrvXdata;
     }
 
     else if (qName == "Samples")
