@@ -70,6 +70,7 @@ class OverviewWindow : public GcChartWindow
     Q_OBJECT
 
     Q_PROPERTY(QRectF viewRect READ getViewRect WRITE setViewRect)
+    Q_PROPERTY(int viewY READ getViewY WRITE setViewY)
 
     public:
 
@@ -81,6 +82,11 @@ class OverviewWindow : public GcChartWindow
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
+        // for smooth scrolling
+        void setViewY(int x) { _viewY =x; updateView(); }
+        int getViewY() const { return _viewY; }
+
+        // for smooth scaling
         void setViewRect(QRectF);
         QRectF getViewRect() const { return viewRect; }
 
@@ -92,6 +98,9 @@ class OverviewWindow : public GcChartWindow
         // scale on first show
         void showEvent(QShowEvent *) { updateView(); }
         void resizeEvent(QResizeEvent *) { updateView(); }
+
+        // scrolling
+        void scrollTo(int y);
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
@@ -110,7 +119,7 @@ class OverviewWindow : public GcChartWindow
     protected:
 
         // process events
-        bool eventFilter(QObject *obj, QEvent *event);
+        bool eventFilter(QObject *, QEvent *event);
 
     private:
 
@@ -122,8 +131,10 @@ class OverviewWindow : public GcChartWindow
         // for animating transitions
         QParallelAnimationGroup *group;
         QPropertyAnimation *viewchange;
+        QPropertyAnimation *scroller;
 
         // scene and view
+        int _viewY;
         QRectF sceneRect;
         QRectF viewRect;
 

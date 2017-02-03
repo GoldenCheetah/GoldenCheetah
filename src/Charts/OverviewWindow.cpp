@@ -17,15 +17,15 @@
  */
 
 // geometry basics
-static int SPACING = 30;
-static int ROWHEIGHT = 70;
+static int SPACING = 25;
+static int ROWHEIGHT = 75;
 
 #include "OverviewWindow.h"
 
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL),
+    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
                             yresizecursor(false), xresizecursor(false), block(false)
 {
     setContentsMargins(0,0,0,0);
@@ -77,6 +77,10 @@ OverviewWindow::OverviewWindow(Context *context) :
     // for changing the view
     viewchange = new QPropertyAnimation(this, "viewRect");
     viewchange->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
+
+    // for scrolling the view
+    scroller = new QPropertyAnimation(this, "viewY");
+    scroller->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
 
     // sort out the view
     updateGeometry();
@@ -231,12 +235,13 @@ OverviewWindow::updateView()
         // much of a resize / change ?
         double dx = fabs(viewRect.x() - sceneRect.x());
         double dy = fabs(viewRect.y() - sceneRect.y());
+        double vy = fabs(viewRect.y()-double(_viewY));
         double dwidth = fabs(viewRect.width() - sceneRect.width());
         double dheight = fabs(viewRect.height() - sceneRect.height());
 
         // scale immediately if not a bit change
         // otherwise it feels unresponsive
-        if (viewRect.width() == 0 || (dx < 20 && dy < 20 && dwidth < 20 && dheight < 20)) {
+        if (viewRect.width() == 0 || (vy < 20 && dx < 20 && dy < 20 && dwidth < 20 && dheight < 20)) {
             setViewRect(sceneRect);
         } else {
 
@@ -250,17 +255,39 @@ OverviewWindow::updateView()
 }
 
 void
+OverviewWindow::scrollTo(int newY)
+{
+    if ((newY +view->sceneRect().height()) > sceneRect.bottom())
+        newY = sceneRect.bottom() - view->sceneRect().height();
+    if (newY < 0)
+        newY = 0;
+
+    if (_viewY != newY) {
+
+        if (abs(_viewY - newY) < 20) {
+            // for small scroll increments just do it, its tedious to wait for animations
+            _viewY = newY;
+            sceneRect.moveTo(0, _viewY);
+        } else {
+
+            // make it snappy for short distances
+            if (abs(_viewY-newY) < 100) scroller->setDuration(100);
+            else scroller->setDuration(150);
+            scroller->setStartValue(_viewY);
+            scroller->setEndValue(newY);
+            scroller->start();
+        }
+    }
+}
+
+void
 OverviewWindow::setViewRect(QRectF rect)
 {
-    //static bool __block = false;
-    //if (__block) return;
-
-    //__block = true;
     viewRect = rect;
 
     // fit to scene width XXX need to fix scrollbars.
     double scale = view->frameGeometry().width() / viewRect.width();
-    QRectF scaledRect(0,0, viewRect.width(), view->frameGeometry().height() / scale);
+    QRectF scaledRect(0,_viewY, viewRect.width(), view->frameGeometry().height() / scale);
 
     // scale to selection
     view->scale(scale,scale);
@@ -303,6 +330,21 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             }
             break;
 
+        case Qt::Key_PageDown:
+            scrollTo(_viewY + view->sceneRect().height());
+            break;
+
+        case Qt::Key_PageUp:
+            scrollTo(_viewY - view->sceneRect().height());
+            break;
+
+        case Qt::Key_Down:
+            scrollTo(_viewY + ROWHEIGHT);
+            break;
+
+        case Qt::Key_Up:
+            scrollTo(_viewY - ROWHEIGHT);
+            break;
         }
 
     } else  if (event->type() == QEvent::GraphicsSceneMousePress) {
@@ -544,7 +586,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
 
             // resize in rows, so in 75px units
-            int addrows = (pos.y() - stateData.yresize.posy) / 75;
+            int addrows = (pos.y() - stateData.yresize.posy) / ROWHEIGHT;
             int setdeep = stateData.yresize.deep + addrows;
             if (setdeep < 3) setdeep=3;
 
