@@ -2418,8 +2418,9 @@ struct FitFileReaderState
                         size = 4;
                         value.type = FloatValue;
                         value.f = read_float32(&count);
+                        if (value.f != value.f) // No NAN
+                            value.f = 0;
                         size = field.size;
-
                         break;
 
                     //case 9: // FLOAT64
