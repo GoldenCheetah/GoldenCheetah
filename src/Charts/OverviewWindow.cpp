@@ -287,8 +287,9 @@ void
 OverviewWindow::scrollTo(int newY)
 {
 
-    // bound the target to the top or a screenful from the bottom
-    if ((newY +view->sceneRect().height()) > sceneRect.bottom())
+    // bound the target to the top or a screenful from the bottom, except when we're
+    // resizing on Y as we are expanding the scene by increasing the size of an object
+    if ((state != YRESIZE) && (newY +view->sceneRect().height()) > sceneRect.bottom())
         newY = sceneRect.bottom() - view->sceneRect().height();
     if (newY < 0)
         newY = 0;
@@ -308,7 +309,7 @@ OverviewWindow::scrollTo(int newY)
 
             // make it snappy for short distances - ponderous for drag scroll
             // and vaguely snappy for page by page scrolling
-            if (state == DRAG || state == YRESIZE) scroller->setDuration(800);
+            if (state == DRAG || state == YRESIZE) scroller->setDuration(500);
             else if (abs(_viewY-newY) < 100) scroller->setDuration(150);
             else scroller->setDuration(250);
             scroller->setStartValue(_viewY);
