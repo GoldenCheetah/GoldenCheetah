@@ -26,7 +26,7 @@ static int ROWHEIGHT = 75;
 
 OverviewWindow::OverviewWindow(Context *context) :
     GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
-                            yresizecursor(false), xresizecursor(false), block(false)
+                            yresizecursor(false), xresizecursor(false), block(false), scrolling(false)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -81,6 +81,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // for scrolling the view
     scroller = new QPropertyAnimation(this, "viewY");
     scroller->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
+    connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
 
     // sort out the view
     updateGeometry();
@@ -141,7 +142,7 @@ OverviewWindow::updateGeometry()
         int theight = cards[i]->deep * ROWHEIGHT;
 
 
-        // for setting the scene rectangle
+        // for setting the scene rectangle - but ignore a card if we are dragging it
         if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
 
         // add to scene if new
@@ -230,7 +231,7 @@ OverviewWindow::updateView()
     scene->update();
 
     // don'r scale whilst resizing on x?
-    if (state != YRESIZE && state != XRESIZE && state != DRAG) {
+    if (scrolling || (state != YRESIZE && state != XRESIZE && state != DRAG)) {
 
         // much of a resize / change ?
         double dx = fabs(viewRect.x() - sceneRect.x());
@@ -255,8 +256,38 @@ OverviewWindow::updateView()
 }
 
 void
+OverviewWindow::edgeScroll()
+{
+    // already scrolling, so don't move
+    if (scrolling) return;
+
+    // we basically scroll the view if the cursor is on the top or
+    // bottom of the screen. This is done ponderously to give the
+    // user time to react to it. The downstream functions realise
+    // this because state will be drag/resize and scrolling will be
+    // true. We only edge scroll in drag and resize state at present.
+    if (state == DRAG || state == YRESIZE) {
+
+        QPointF pos =this->mapFromGlobal(QCursor::pos());
+        if (pos.y() < 50 ) {
+
+            // at the top of the screen, go up a qtr of a screen
+            scrollTo(_viewY - (view->sceneRect().height()/4));
+
+        } else if ((geometry().height()-pos.y()) < 50) {
+
+            // at the bottom of the screen, go down a qtr of a screen
+            scrollTo(_viewY + (view->sceneRect().height()/4));
+
+        }
+    }
+}
+
+void
 OverviewWindow::scrollTo(int newY)
 {
+
+    // bound the target to the top or a screenful from the bottom
     if ((newY +view->sceneRect().height()) > sceneRect.bottom())
         newY = sceneRect.bottom() - view->sceneRect().height();
     if (newY < 0)
@@ -265,14 +296,21 @@ OverviewWindow::scrollTo(int newY)
     if (_viewY != newY) {
 
         if (abs(_viewY - newY) < 20) {
+
             // for small scroll increments just do it, its tedious to wait for animations
             _viewY = newY;
             sceneRect.moveTo(0, _viewY);
+
         } else {
 
-            // make it snappy for short distances
-            if (abs(_viewY-newY) < 100) scroller->setDuration(100);
-            else scroller->setDuration(150);
+            // disable other view updates whilst scrolling
+            scrolling = true;
+
+            // make it snappy for short distances - ponderous for drag scroll
+            // and vaguely snappy for page by page scrolling
+            if (state == DRAG || state == YRESIZE) scroller->setDuration(800);
+            else if (abs(_viewY-newY) < 100) scroller->setDuration(150);
+            else scroller->setDuration(250);
             scroller->setStartValue(_viewY);
             scroller->setEndValue(newY);
             scroller->start();
@@ -293,9 +331,23 @@ OverviewWindow::setViewRect(QRectF rect)
     view->scale(scale,scale);
     view->setSceneRect(scaledRect);
     view->fitInView(scaledRect, Qt::KeepAspectRatio);
+
+    // if we're dragging, as the view changes it can be really jarring
+    // as the dragged item is not under the mouse then snaps back
+    // this might need to be cleaned up as a little too much of spooky
+    // action at a distance going on here !
+    if (state == DRAG) {
+
+        // update drag point
+        QPoint vpos = view->mapFromGlobal(QCursor::pos());
+        QPointF pos = view->mapToScene(vpos);
+
+        // move the card being dragged
+        stateData.drag.card->setPos(pos.x()-stateData.drag.offx, pos.y()-stateData.drag.offy);
+    }
+
     view->update();
 
-    //__block = false;
 }
 
 bool
@@ -434,6 +486,9 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
 
+        // check for autoscrolling at edges
+        edgeScroll();
+
         // thanks we'll intercept that
         if (mode == CONFIG) {
             event->accept();
@@ -487,7 +542,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 }
             }
 
-        } else if (mode == CONFIG && state == DRAG) {          // dragging?
+        } else if (mode == CONFIG && state == DRAG && !scrolling) {          // dragging?
 
             // where am i ?
             QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();

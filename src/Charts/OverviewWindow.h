@@ -100,7 +100,9 @@ class OverviewWindow : public GcChartWindow
         void resizeEvent(QResizeEvent *) { updateView(); }
 
         // scrolling
+        void edgeScroll();
         void scrollTo(int y);
+        void scrollFinished() { scrolling = false; updateView(); }
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
@@ -145,7 +147,8 @@ class OverviewWindow : public GcChartWindow
         // state data
         bool yresizecursor;          // is the cursor set to resize?
         bool xresizecursor;          // is the cursor set to resize?
-        bool block;                 // block event processing
+        bool block;                  // block event processing
+        bool scrolling;              // scrolling the view?
 
         union OverviewState {
             struct {
