@@ -71,6 +71,8 @@ class TodaysPlan : public FileStore {
 
         QMap<QNetworkReply*, QByteArray*> buffers;
 
+        QString userId;
+
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 };

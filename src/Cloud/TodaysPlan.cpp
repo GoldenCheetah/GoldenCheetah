@@ -113,7 +113,27 @@ TodaysPlan::open(QStringList &errors)
 
     // if path was returned all is good, lets set root
     if (parseError.error == QJsonParseError::NoError) {
-         printd("NoError");
+        printd("NoError");
+
+        userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+
+        if (document.array().count()>1) {
+            if (userId.length()==0) {
+                errors << tr("Please re-authorise and select an athlete");
+            }
+            else {
+                bool found = false;
+                for (int i=0;i<document.array().count();i++) {
+                    if (document.array()[i].toObject()["id"].toInt() == userId.toInt()) {
+                        if (document.array()[i].toObject()["relationship"].toString() == "coach" ||
+                            document.array()[i].toObject()["relationship"].toString() == "manager")
+                            found = true;
+                    }
+                }
+                if (!found)
+                    errors << tr("It seems you can't access anymore to this athlete. Please re-authorise.");
+            }
+        }
         // we have a root
         root_ = newFileStoreEntry();
 
@@ -121,11 +141,6 @@ TodaysPlan::open(QStringList &errors)
         root_->name = "/";
         root_->isDir = true;
         root_->size = 0;
-
-        // happy with what we got ?
-        if (root_->name != "/") errors << tr("invalid root path.");
-        if (root_->isDir != true) errors << tr("root is not a directory.");
-
     } else {
         errors << tr("problem parsing TodaysPlan data");
     }
@@ -188,15 +203,21 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
     request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
 
+    QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+
     // application/json
     QByteArray jsonString;
     jsonString += "{\"criteria\": {";
+    if (userId.length()>0)
+        jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
     jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
     jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
     jsonString += "\"isNotNull\": [\"fileId\"]}, ";
     jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\"], "; //\"avgWatts\"
     jsonString += "\"opts\": 0 ";
     jsonString += "}";
+
+    printd("request: %s\n", jsonString.toStdString().c_str());
 
     QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
     request.setRawHeader("Content-Length", jsonStringDataSize);
@@ -323,7 +344,16 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename)
 
     QHttpPart jsonPart;
     jsonPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"json\""));
-    QString json = QString("{ filename: \"%1\" }").arg(remotename);
+
+    QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+
+    QString json;
+    if (userId.length()>0) {
+        json  = QString("{ filename: \"%1\", userId: %2 }").arg(remotename).arg(userId);
+    } else {
+        json  = QString("{ filename: \"%1\" }").arg(remotename);
+    }
+    printd("request: %s\n", json.toStdString().c_str());
     jsonPart.setBody(json.toLatin1());
 
     QHttpPart attachmentPart;

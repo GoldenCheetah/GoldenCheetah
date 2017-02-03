@@ -597,11 +597,19 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(tdpUserKey, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
 
     grid->addWidget(tdpauthLabel, ++row, 0);
-    grid->addWidget(tdpAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    QGridLayout *tdplayout = new QGridLayout;
+    tdplayout->addWidget(tdpAuthorise, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addLayout(tdplayout, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
     if (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "")!="")
-        grid->addWidget(tdpAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+        tdplayout->addWidget(tdpAuthorised, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
     else
         tdpAuthorised->hide(); // if no token no show
+
+
+    QLabel *tdpathletenamelabel = new QLabel(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_NAME, "").toString());
+    tdplayout->addWidget(tdpathletenamelabel, 0, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     connect(tdpAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTodaysPlan()));
 
