@@ -300,7 +300,7 @@ OverviewWindow::scrollTo(int newY)
 
             // for small scroll increments just do it, its tedious to wait for animations
             _viewY = newY;
-            sceneRect.moveTo(0, _viewY);
+            updateView();
 
         } else {
 
@@ -309,7 +309,7 @@ OverviewWindow::scrollTo(int newY)
 
             // make it snappy for short distances - ponderous for drag scroll
             // and vaguely snappy for page by page scrolling
-            if (state == DRAG || state == YRESIZE) scroller->setDuration(500);
+            if (state == DRAG || state == YRESIZE) scroller->setDuration(400);
             else if (abs(_viewY-newY) < 100) scroller->setDuration(150);
             else scroller->setDuration(250);
             scroller->setStartValue(_viewY);
@@ -399,6 +399,14 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             scrollTo(_viewY - ROWHEIGHT);
             break;
         }
+
+    } else  if (event->type() == QEvent::GraphicsSceneWheel) {
+
+        // take it as applied
+        QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(event);
+        scrollTo(_viewY - (w->delta()));
+        event->accept();
+        returning = true;
 
     } else  if (event->type() == QEvent::GraphicsSceneMousePress) {
 
