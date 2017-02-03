@@ -111,6 +111,7 @@ private:
     KQOAuthRequest *oauthRequest;
 #endif
 
+    void listUsers();
 };
 
 #endif // OAUTHDIALOG_H

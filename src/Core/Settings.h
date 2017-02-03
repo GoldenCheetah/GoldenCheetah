@@ -302,6 +302,9 @@
 #define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
 #define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
 #define GC_TODAYSPLAN_USERKEY           "<athlete-private>todaysplan_userkey"
+#define GC_TODAYSPLAN_ATHLETE_ID        "<athlete-private>todaysplan_athlete_id"
+#define GC_TODAYSPLAN_ATHLETE_NAME      "<athlete-private>todaysplan_athlete_name"
+
 //SixCycle
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
