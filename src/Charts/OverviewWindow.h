@@ -34,6 +34,7 @@
 
 // qt
 #include <QtGui>
+#include <QScrollBar>
 
 class OverviewWindow;
 
@@ -59,7 +60,7 @@ class Card : public QGraphicsWidget
             //effect->setBlurRadius(3);
             //setGraphicsEffect(effect);
 
-            setAutoFillBackground(true);
+            setAutoFillBackground(false);
             brush = QBrush(GColor(CCARDBACKGROUND));
             setZValue(10);
         }
@@ -74,7 +75,7 @@ class Card : public QGraphicsWidget
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             painter->setBrush(brush);
-            painter->fillRect(QRectF(0,0,geometry().width(),geometry().height()), brush);
+            painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
 
         }
 
@@ -98,15 +99,15 @@ class OverviewWindow : public GcChartWindow
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
+    public slots:
+
         // for smooth scrolling
-        void setViewY(int x) { _viewY =x; updateView(); }
+        void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
         int getViewY() const { return _viewY; }
 
         // for smooth scaling
         void setViewRect(QRectF);
         QRectF getViewRect() const { return viewRect; }
-
-   public slots:
 
         // trap signals
         void configChanged(qint32);
@@ -145,6 +146,7 @@ class OverviewWindow : public GcChartWindow
         Context *context;
         QGraphicsScene *scene;
         QGraphicsView *view;
+        QScrollBar *scrollbar;
 
         // for animating transitions
         QParallelAnimationGroup *group;
