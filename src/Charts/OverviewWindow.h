@@ -43,6 +43,16 @@ class Card : public QGraphicsWidget
 
         Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false),
                                                 invisible(false) {
+
+            // no mouse event delivery allowed to contained QWidgets-
+            // this is so we can normal embed charts etc
+            // but you can't interact (e.g. steal focus, mousewheel etc) whilst
+            // they are in the dashboard. In order to interact you will need to
+            // have focus explicitly enabled by the parent, e.g. by clicking on it
+            // or maximising it etc
+            //child->setAttribute(Qt::WA_TransparentForMouseEvents);
+            //child->setAttribute(Qt::WA_ForceDisabled);
+
             setAutoFillBackground(true);
             brush = QBrush(GColor(CCARDBACKGROUND));
             setZValue(10);
@@ -100,7 +110,7 @@ class OverviewWindow : public GcChartWindow
         void resizeEvent(QResizeEvent *) { updateView(); }
 
         // scrolling
-        void edgeScroll();
+        void edgeScroll(bool down);
         void scrollTo(int y);
         void scrollFinished() { scrolling = false; updateView(); }
 
@@ -149,6 +159,7 @@ class OverviewWindow : public GcChartWindow
         bool xresizecursor;          // is the cursor set to resize?
         bool block;                  // block event processing
         bool scrolling;              // scrolling the view?
+        double lasty;                // to see if the mouse is moving up or down
 
         union OverviewState {
             struct {
