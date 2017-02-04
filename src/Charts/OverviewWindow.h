@@ -120,6 +120,7 @@ class OverviewWindow : public GcChartWindow
         void edgeScroll(bool down);
         void scrollTo(int y);
         void scrollFinished() { scrolling = false; updateView(); }
+        void scrollbarMoved(int x) { if (!scrolling && !setscrollbar) { setViewY(x); }}
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
@@ -167,6 +168,7 @@ class OverviewWindow : public GcChartWindow
         bool xresizecursor;          // is the cursor set to resize?
         bool block;                  // block event processing
         bool scrolling;              // scrolling the view?
+        bool setscrollbar;           // distinguish between user and program actions
         double lasty;                // to see if the mouse is moving up or down
 
         union OverviewState {
