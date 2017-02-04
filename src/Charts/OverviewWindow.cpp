@@ -16,10 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-// geometry basics
-static int SPACING = 80;
-static int ROWHEIGHT = 80;
-
 #include "OverviewWindow.h"
 
 #include "TabView.h"
@@ -86,7 +82,7 @@ OverviewWindow::OverviewWindow(Context *context) :
 
     // for scrolling the view
     scroller = new QPropertyAnimation(this, "viewY");
-    scroller->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
+    scroller->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
 
     // sort out the view
     updateGeometry();
@@ -337,7 +333,7 @@ OverviewWindow::scrollTo(int newY)
 
             // make it snappy for short distances - ponderous for drag scroll
             // and vaguely snappy for page by page scrolling
-            if (state == DRAG || state == YRESIZE) scroller->setDuration(400);
+            if (state == DRAG || state == YRESIZE) scroller->setDuration(300);
             else if (abs(_viewY-newY) < 100) scroller->setDuration(150);
             else scroller->setDuration(250);
             scroller->setStartValue(_viewY);
@@ -432,7 +428,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
         // take it as applied
         QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(event);
-        scrollTo(_viewY - (w->delta()));
+        scrollTo(_viewY - (w->delta()*2));
         event->accept();
         returning = true;
 

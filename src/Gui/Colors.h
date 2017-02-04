@@ -25,6 +25,10 @@
 #include <QColor>
 #include <QLabel>
 
+
+// A selection of distinct colours, user can adjust also
+extern QList<QColor> standardColors;
+
 class Context;
 
 // set appearace defaults based upon screen size

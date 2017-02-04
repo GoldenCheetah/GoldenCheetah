@@ -35,6 +35,9 @@
 // qt
 #include <QtGui>
 #include <QScrollBar>
+// geometry basics
+#define SPACING 80
+#define ROWHEIGHT 80
 
 class OverviewWindow;
 
@@ -75,7 +78,12 @@ class Card : public QGraphicsWidget
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             painter->setBrush(brush);
-            painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
+            QPainterPath path;
+            path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/6, ROWHEIGHT/6);
+            painter->setPen(Qt::NoPen);
+            painter->fillPath(path, brush.color());
+            painter->drawPath(path);
+            //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
 
         }
 
