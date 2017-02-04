@@ -229,7 +229,12 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             // file details
             QJsonObject fileindex = each["fileindex"].toObject();
             QString suffix = QFileInfo(fileindex["filename"].toString()).suffix();
-            if (suffix == "") suffix=".json";
+            if (suffix == "") {
+                suffix = ".json";
+            } else {
+                suffix = "." + suffix; // QFileInfo .suffix() does not contain the '.'
+            }
+
 
             //TodaysPlan has full path, we just want the file name
             add->label = QFileInfo(each["name"].toString()).fileName();
