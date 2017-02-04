@@ -269,13 +269,16 @@ OverviewWindow::updateView()
         }
     }
 
-    // now set scrollbar
-    scrollbar->setMinimum(0);
-    scrollbar->setMaximum(scene->sceneRect().height()-view->sceneRect().height());
-    scrollbar->setValue(_viewY);
-    scrollbar->setPageStep(view->sceneRect().height());
-    if (view->sceneRect().height() >= scene->sceneRect().height()) scrollbar->setEnabled(false);
-    else scrollbar->setEnabled(true);
+    if (view->sceneRect().height() >= scene->sceneRect().height()) {
+        scrollbar->setEnabled(false);
+    } else {
+        // now set scrollbar
+        scrollbar->setMinimum(0);
+        scrollbar->setMaximum(scene->sceneRect().height()-view->sceneRect().height());
+        scrollbar->setValue(_viewY);
+        scrollbar->setPageStep(view->sceneRect().height());
+        scrollbar->setEnabled(true);
+    }
 }
 
 void
