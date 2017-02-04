@@ -22,6 +22,7 @@ static int ROWHEIGHT = 80;
 
 #include "OverviewWindow.h"
 
+#include "TabView.h"
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
@@ -33,13 +34,12 @@ OverviewWindow::OverviewWindow(Context *context) :
 
     setControls(NULL);
 
-    QVBoxLayout *main = new QVBoxLayout;
-
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    QHBoxLayout *main = new QHBoxLayout;
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(this);
+    scrollbar = new QScrollBar(Qt::Vertical, this);
 
     // how to move etc
     //view->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -47,7 +47,10 @@ OverviewWindow::OverviewWindow(Context *context) :
     view->setFrameStyle(QFrame::NoFrame);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setScene(scene);
+
+    // layout
     main->addWidget(view);
+    main->addWidget(scrollbar);
     setChartLayout(main);
 
     // default column widths - max 10 columns;
@@ -83,7 +86,6 @@ OverviewWindow::OverviewWindow(Context *context) :
     // for scrolling the view
     scroller = new QPropertyAnimation(this, "viewY");
     scroller->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
-    connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
 
     // sort out the view
     updateGeometry();
@@ -91,6 +93,11 @@ OverviewWindow::OverviewWindow(Context *context) :
     // watch the view for mouse events
     view->setMouseTracking(true);
     scene->installEventFilter(this);
+
+    // once all widgets created we can connect the signals
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
+    connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(setViewY(int)));
 }
 
 static bool cardSort(const Card* left, const Card* right)
@@ -204,6 +211,7 @@ OverviewWindow::configChanged(qint32)
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
     scene->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
+    scrollbar->setStyleSheet(TabView::ourStyleSheet());
 
     // text edit colors
     QPalette palette;
@@ -260,6 +268,14 @@ OverviewWindow::updateView()
             viewchange->start();
         }
     }
+
+    // now set scrollbar
+    scrollbar->setMinimum(0);
+    scrollbar->setMaximum(scene->sceneRect().height()-view->sceneRect().height());
+    scrollbar->setValue(_viewY);
+    scrollbar->setPageStep(view->sceneRect().height());
+    if (view->sceneRect().height() >= scene->sceneRect().height()) scrollbar->setEnabled(false);
+    else scrollbar->setEnabled(true);
 }
 
 void
@@ -460,6 +476,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     // it around when we start dragging
                     state = DRAG;
                     card->invisible = true;
+                    card->brush = GColor(CPLOTMARKER); //XXX hack whilst they're tiles
                     card->setZValue(100);
 
                     stateData.drag.card = card;
@@ -489,6 +506,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 stateData.drag.card->invisible = false;
                 stateData.drag.card->setZValue(10);
                 stateData.drag.card->placing = true;
+                stateData.drag.card->brush = GColor(CCARDBACKGROUND);
             }
 
             // end state;
@@ -505,7 +523,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
         QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
 
         // check for autoscrolling at edges
-        edgeScroll(lasty < pos.y());
+        if (state == DRAG || state == YRESIZE) edgeScroll(lasty < pos.y());
 
         // remember pos
         lasty = pos.y();
