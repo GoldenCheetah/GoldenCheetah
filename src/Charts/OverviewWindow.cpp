@@ -27,7 +27,8 @@ static int ROWHEIGHT = 80;
 
 OverviewWindow::OverviewWindow(Context *context) :
     GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
-                            yresizecursor(false), xresizecursor(false), block(false), scrolling(false), lasty(-1)
+                            yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
+                            setscrollbar(false), lasty(-1)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -97,7 +98,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // once all widgets created we can connect the signals
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
-    connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(setViewY(int)));
+    connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
 }
 
 static bool cardSort(const Card* left, const Card* right)
@@ -272,12 +273,15 @@ OverviewWindow::updateView()
     if (view->sceneRect().height() >= scene->sceneRect().height()) {
         scrollbar->setEnabled(false);
     } else {
+
         // now set scrollbar
+        setscrollbar = true;
         scrollbar->setMinimum(0);
         scrollbar->setMaximum(scene->sceneRect().height()-view->sceneRect().height());
         scrollbar->setValue(_viewY);
         scrollbar->setPageStep(view->sceneRect().height());
         scrollbar->setEnabled(true);
+        setscrollbar = false;
     }
 }
 
