@@ -30,6 +30,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsWidget>
+#include <QGraphicsDropShadowEffect>
 
 // qt
 #include <QtGui>
@@ -42,7 +43,7 @@ class Card : public QGraphicsWidget
     public:
 
         Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false),
-                                                invisible(false) {
+                                                placing(false), invisible(false) {
 
             // no mouse event delivery allowed to contained QWidgets-
             // this is so we can normal embed charts etc
@@ -52,6 +53,11 @@ class Card : public QGraphicsWidget
             // or maximising it etc
             //child->setAttribute(Qt::WA_TransparentForMouseEvents);
             //child->setAttribute(Qt::WA_ForceDisabled);
+
+            // shadow (disabled, isn't appropriate)
+            //QGraphicsDropShadowEffect * effect = new QGraphicsDropShadowEffect();
+            //effect->setBlurRadius(3);
+            //setGraphicsEffect(effect);
 
             setAutoFillBackground(true);
             brush = QBrush(GColor(CCARDBACKGROUND));
@@ -63,7 +69,7 @@ class Card : public QGraphicsWidget
 
         // which column, sequence and size in rows
         int column, order, deep;
-        bool onscene;
+        bool onscene, placing;
         bool invisible;
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
