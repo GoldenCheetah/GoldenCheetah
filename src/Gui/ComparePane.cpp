@@ -36,28 +36,6 @@
 #include <QFormLayout>
 #include <QTextEdit>
 
-//
-// A selection of distinct colours, user can adjust also
-//
-static QList<QColor> standardColors;
-static bool initStandardColors()
-{
-    standardColors << QColor(Qt::magenta);
-    standardColors << QColor(Qt::cyan);
-    standardColors << QColor(Qt::yellow);
-    standardColors << QColor(Qt::red);
-    standardColors << QColor(Qt::blue);
-    standardColors << QColor(Qt::gray);
-    standardColors << QColor(Qt::darkCyan);
-    standardColors << QColor(Qt::green);
-    standardColors << QColor(Qt::darkRed);
-    standardColors << QColor(Qt::darkGreen);
-    standardColors << QColor(Qt::darkBlue);
-    standardColors << QColor(Qt::darkMagenta);
-
-    return true;
-}
-static bool init = initStandardColors();
 
 QColor standardColor(int num)
 {
