@@ -51,25 +51,27 @@ OverviewWindow::OverviewWindow(Context *context) :
     setChartLayout(main);
 
     // default column widths - max 10 columns;
-    columns << 400 << 800 << 800 << 400 << 800 << 800 << 400 << 800 << 800 << 400;
+    // note the sizing is such that each card is the equivalent of a full screen
+    // so we can embed charts etc without compromising what they can display
+    columns << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800;
 
     // XXX lets hack in some tiles to start (will load from config later XXX
-    newCard(0, 1, 5);
-    newCard(0, 2, 10);
-    newCard(0, 3, 10);
-    newCard(0, 4, 5);
-    newCard(1, 1, 10);
-    newCard(1, 2, 5);
-    newCard(1, 3, 10);
-    newCard(1, 4, 5);
-    newCard(2, 1, 10);
-    newCard(2, 2, 5);
-    newCard(2, 3, 10);
-    newCard(2, 4, 5);
-    newCard(3, 1, 5);
-    newCard(3, 2, 10);
-    newCard(3, 3, 5);
-    newCard(3, 4, 10);
+    newCard(0, 1, 14);
+    newCard(0, 2, 20);
+    newCard(0, 3, 20);
+    newCard(0, 4, 14);
+    newCard(1, 1, 20);
+    newCard(1, 2, 14);
+    newCard(1, 3, 20);
+    newCard(1, 4, 14);
+    newCard(2, 1, 20);
+    newCard(2, 2, 14);
+    newCard(2, 3, 20);
+    newCard(2, 4, 14);
+    newCard(3, 1, 14);
+    newCard(3, 2, 20);
+    newCard(3, 3, 14);
+    newCard(3, 4, 20);
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
@@ -176,7 +178,12 @@ OverviewWindow::updateGeometry()
             animation->setDuration(300);
             animation->setStartValue(cards[i]->geometry());
             animation->setEndValue(QRect(tx,ty,twidth,theight));
-            animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
+
+            // when placing a little feedback helps
+            if (cards[i]->placing) {
+                animation->setEasingCurve(QEasingCurve(QEasingCurve::OutBack));
+                cards[i]->placing = false;
+            } else animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
 
             group->addAnimation(animation);
         }
@@ -481,6 +488,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             if (state == DRAG) {
                 stateData.drag.card->invisible = false;
                 stateData.drag.card->setZValue(10);
+                stateData.drag.card->placing = true;
             }
 
             // end state;
