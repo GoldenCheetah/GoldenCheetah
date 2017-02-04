@@ -17,8 +17,8 @@
  */
 
 // geometry basics
-static int SPACING = 25;
-static int ROWHEIGHT = 75;
+static int SPACING = 80;
+static int ROWHEIGHT = 80;
 
 #include "OverviewWindow.h"
 
@@ -26,7 +26,7 @@ static int ROWHEIGHT = 75;
 
 OverviewWindow::OverviewWindow(Context *context) :
     GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
-                            yresizecursor(false), xresizecursor(false), block(false), scrolling(false)
+                            yresizecursor(false), xresizecursor(false), block(false), scrolling(false), lasty(-1)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -256,25 +256,23 @@ OverviewWindow::updateView()
 }
 
 void
-OverviewWindow::edgeScroll()
+OverviewWindow::edgeScroll(bool down)
 {
     // already scrolling, so don't move
     if (scrolling) return;
-
-    // we basically scroll the view if the cursor is on the top or
-    // bottom of the screen. This is done ponderously to give the
-    // user time to react to it. The downstream functions realise
-    // this because state will be drag/resize and scrolling will be
-    // true. We only edge scroll in drag and resize state at present.
+    // we basically scroll the view if the cursor is at or above
+    // the top of the view, or at or below the bottom and the mouse
+    // is moving away. Needs to work in normal and full screen.
     if (state == DRAG || state == YRESIZE) {
 
         QPointF pos =this->mapFromGlobal(QCursor::pos());
-        if (pos.y() < 50 ) {
+
+        if (!down && pos.y() <= 0) {
 
             // at the top of the screen, go up a qtr of a screen
             scrollTo(_viewY - (view->sceneRect().height()/4));
 
-        } else if ((geometry().height()-pos.y()) < 50) {
+        } else if (down && (geometry().height()-pos.y()) <= 0) {
 
             // at the bottom of the screen, go down a qtr of a screen
             scrollTo(_viewY + (view->sceneRect().height()/4));
@@ -495,8 +493,14 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
 
+        // where is the mouse now?
+        QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+
         // check for autoscrolling at edges
-        edgeScroll();
+        edgeScroll(lasty < pos.y());
+
+        // remember pos
+        lasty = pos.y();
 
         // thanks we'll intercept that
         if (mode == CONFIG) {
@@ -507,7 +511,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
         if (mode == CONFIG && state == NONE) {                 // hovering
 
             // where am i ?
-            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
             QGraphicsItem *item = scene->itemAt(pos, view->transform());
             Card *card = static_cast<Card*>(item);
 
@@ -552,9 +555,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             }
 
         } else if (mode == CONFIG && state == DRAG && !scrolling) {          // dragging?
-
-            // where am i ?
-            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
 
             // move the card being dragged
             stateData.drag.card->setPos(pos.x()-stateData.drag.offx, pos.y()-stateData.drag.offy);
@@ -647,8 +647,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
         } else if (mode == CONFIG && state == YRESIZE) {
 
-            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
-
             // resize in rows, so in 75px units
             int addrows = (pos.y() - stateData.yresize.posy) / ROWHEIGHT;
             int setdeep = stateData.yresize.deep + addrows;
@@ -661,8 +659,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             updateView();
 
         } else if (mode == CONFIG && state == XRESIZE) {
-
-            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
 
             // multiples of 50 (smaller than margin)
             int addblocks = (pos.x() - stateData.xresize.posx) / 50;
