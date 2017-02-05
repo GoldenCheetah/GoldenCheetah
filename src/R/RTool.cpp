@@ -1946,7 +1946,7 @@ RTool::dfForActivity(RideFile *f, int split, QString join)
                 SET_VECTOR_ELT(ans, next, vector);
 
                 // give it a name
-                SET_STRING_ELT(names, next, Rf_mkChar(QString("%1_%2").arg(it.value()->name).arg(series).toLatin1().constData()));
+                SET_STRING_ELT(names, next, Rf_mkChar(QString("%1_%2").arg(it.value()->name).arg(series.replace(" ","_")).toLatin1().constData()));
 
                 next++;
             }
