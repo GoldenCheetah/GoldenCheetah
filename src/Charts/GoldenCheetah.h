@@ -88,6 +88,7 @@ private:
 
     QWidget *_controls;
 
+    bool showtitle;
     QString _title;
     QString _subtitle;
     //QString _instanceName;
@@ -148,7 +149,7 @@ public:
 
     void setTitle(QString x);
     QString title() const;
-
+    void setShowTitle(bool x) { showtitle=x; }
 
     void setRideItem(RideItem *);
     RideItem *rideItem() const;
