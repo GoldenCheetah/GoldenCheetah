@@ -28,7 +28,7 @@ OverviewWindow::OverviewWindow(Context *context) :
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
-
+    setShowTitle(false);
     setControls(NULL);
 
     QHBoxLayout *main = new QHBoxLayout;
@@ -405,6 +405,14 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 //workout->undo();
                 returning=true;
             }
+            break;
+
+        case Qt::Key_Home:
+            scrollTo(0);
+            break;
+
+        case Qt::Key_End:
+            scrollTo(scene->sceneRect().bottom());
             break;
 
         case Qt::Key_PageDown:

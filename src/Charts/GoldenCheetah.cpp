@@ -198,6 +198,7 @@ GcWindow::GcWindow()
     setMouseTracking(true);
     setProperty("color", GColor(CPLOTBACKGROUND));
     setProperty("nomenu", false);
+    showtitle = true;
     menu = NULL;
 
     // make sure its underneath the toggle button
@@ -230,6 +231,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setControls(NULL);
     setRideItem(NULL);
     setTitle("");
+    showtitle=true;
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
@@ -309,27 +311,29 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QString title = property("title").toString();
         QString heading = subtitle != "" ? subtitle : title;
 
-        // pen color needs to contrast to background color
-        QColor bgColor = property("color").value<QColor>();
-        QColor fgColor = GCColor::invertColor(bgColor); // return the contrasting color
+        if (showtitle) {
+            // pen color needs to contrast to background color
+            QColor bgColor = property("color").value<QColor>();
+            QColor fgColor = GCColor::invertColor(bgColor); // return the contrasting color
 
-        painter.setPen(fgColor);
-        painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
-
-        if (isCompare()) {
-            // overlay in highlight color
-            QColor over = QColor(Qt::red);
-            over.setAlpha(220);
-            painter.setPen(over);
+            painter.setPen(fgColor);
             painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
-        }
 
-        if (isFiltered()) {
-            // overlay in highlight color
-            QColor over = GColor(CCALCURRENT);
-            over.setAlpha(220);
-            painter.setPen(over);
-            painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
+            if (isCompare()) {
+                // overlay in highlight color
+                QColor over = QColor(Qt::red);
+                over.setAlpha(220);
+                painter.setPen(over);
+                painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
+            }
+
+            if (isFiltered()) {
+                // overlay in highlight color
+                QColor over = GColor(CCALCURRENT);
+                over.setAlpha(220);
+                painter.setPen(over);
+                painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
+            }
         }
 
         // border
