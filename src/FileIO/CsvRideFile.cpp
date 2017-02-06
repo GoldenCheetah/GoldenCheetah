@@ -153,7 +153,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     QRegExp moxyCSV("FW Part Number:", Qt::CaseInsensitive);
     QRegExp smo2CSV("Type,Local Number,Message");
-    QRegExp gcCSV("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
+    QRegExp gcCSV("secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb");
+    QRegExp gcCSVold("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
     QRegExp periCSV("mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Target Power,Heart Rate,Speed,Power,Cadence");
     QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
     QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
@@ -282,7 +283,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                    ++lineno;
                    continue;
                }
-                else if(gcCSV.indexIn(line) != -1) {
+                else if(gcCSV.indexIn(line) != -1 || gcCSVold.indexIn(line) != -1) {
                     csvType = gc;
                     rideFile->setDeviceType("GoldenCheetah");
                     rideFile->setFileFormat("GoldenCheetah CSV (csv)");
@@ -1163,7 +1164,7 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
 
     if (format == gc) {
         // CSV File header
-        out << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+        out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb\n";
 
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->secs == 0.0)
