@@ -793,3 +793,15 @@ ColorLabel::paintEvent(QPaintEvent *)
 
     painter.restore();
 }
+
+QIcon colouredIconFromPNG(QString filename, QColor color)
+{
+    QImage pngImage;
+    pngImage.load(filename);
+
+    // adjust color for black
+    QImage colored = pngImage.convertToFormat(QImage::Format_Indexed8);
+    colored.setColor(0, color.rgb());
+
+    return QIcon(QPixmap::fromImage(colored));
+}

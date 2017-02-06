@@ -22,16 +22,30 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
+    GcChartWindow(context), mode(VIEW), state(NONE), context(context), group(NULL), _viewY(0),
                             yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
                             setscrollbar(false), lasty(-1)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
+    setProperty("nomenu", true);
     setShowTitle(false);
     setControls(NULL);
 
+    // configure icon in gray (not active and plotmarker for active)
+    grayConfig = colouredIconFromPNG(":images/configure.png", GColor(CCARDBACKGROUND));
+    blueConfig =  colouredIconFromPNG(":images/configure.png", GColor(CPLOTMARKER));
+
+    QVBoxLayout *all = new QVBoxLayout;
     QHBoxLayout *main = new QHBoxLayout;
+
+    // config button at the top
+    configButton = new QPushButton(grayConfig, "", this);
+    configButton->setFixedSize(30,30);
+    configButton->setAutoFillBackground(false);
+    configButton->setFlat(true);
+    configButton->setContentsMargins(0,0,0,0);
+    configButton->setIconSize(QSize(30,30));
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
@@ -48,7 +62,13 @@ OverviewWindow::OverviewWindow(Context *context) :
     // layout
     main->addWidget(view);
     main->addWidget(scrollbar);
-    setChartLayout(main);
+
+    // vertical has config button
+    all->addWidget(configButton, 0, Qt::AlignRight);
+    all->addLayout(main);
+
+    // all the widgets
+    setChartLayout(all);
 
     // default column widths - max 10 columns;
     // note the sizing is such that each card is the equivalent of a full screen
@@ -73,9 +93,6 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard(3, 3, 14);
     newCard(3, 4, 20);
 
-    // set the widgets etc
-    configChanged(CONFIG_APPEARANCE);
-
     // for changing the view
     viewchange = new QPropertyAnimation(this, "viewRect");
     viewchange->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
@@ -95,6 +112,43 @@ OverviewWindow::OverviewWindow(Context *context) :
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
     connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
+    connect(configButton, SIGNAL(clicked()), this, SLOT(configToggle()));
+
+    // set the widgets etc
+    configChanged(CONFIG_APPEARANCE);
+}
+
+void
+OverviewWindow::configToggle()
+{
+    // switch mode
+    if (mode == VIEW) {
+
+       mode = CONFIG;
+       configButton->setIcon(blueConfig);
+
+    } else {
+
+       mode = VIEW;
+       configButton->setIcon(grayConfig);
+
+    }
+
+    // redraw
+    updateGeometry();
+    updateView();
+}
+
+// cards need to show they are in config mode
+void
+Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+    painter->setBrush(brush);
+    QPainterPath path;
+    path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
+    painter->setPen(Qt::NoPen);
+    painter->fillPath(path, brush.color());
+    painter->drawPath(path);
+    //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
 }
 
 static bool cardSort(const Card* left, const Card* right)
@@ -147,6 +201,9 @@ OverviewWindow::updateGeometry()
         int twidth = columns[column];
         int theight = cards[i]->deep * ROWHEIGHT;
 
+        // make em smaller when configuring visual cue stolen from Windows Start Menu
+        int add = (mode == CONFIG) ? (ROWHEIGHT/2) : 0;
+
 
         // for setting the scene rectangle - but ignore a card if we are dragging it
         if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
@@ -158,10 +215,10 @@ OverviewWindow::updateGeometry()
             cards[i]->onscene = true;
 
         } else if (cards[i]->invisible == false &&
-                   (cards[i]->geometry().x() != tx ||
-                    cards[i]->geometry().y() != ty ||
-                    cards[i]->geometry().width() != twidth ||
-                    cards[i]->geometry().height() != theight)) {
+                   (cards[i]->geometry().x() != tx+add ||
+                    cards[i]->geometry().y() != ty+add ||
+                    cards[i]->geometry().width() != twidth-(add*2) ||
+                    cards[i]->geometry().height() != theight-(add*2))) {
 
             // its moved, so animate that.
             if (animated == false) {
@@ -181,7 +238,7 @@ OverviewWindow::updateGeometry()
             QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
             animation->setDuration(300);
             animation->setStartValue(cards[i]->geometry());
-            animation->setEndValue(QRect(tx,ty,twidth,theight));
+            animation->setEndValue(QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2)));
 
             // when placing a little feedback helps
             if (cards[i]->placing) {

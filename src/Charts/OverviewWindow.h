@@ -35,6 +35,8 @@
 // qt
 #include <QtGui>
 #include <QScrollBar>
+#include <QIcon>
+
 // geometry basics
 #define SPACING 80
 #define ROWHEIGHT 80
@@ -68,6 +70,9 @@ class Card : public QGraphicsWidget
             setZValue(10);
         }
 
+        // my parent
+        OverviewWindow *parent;
+
         // what to do if clicked XXX just a hack for now
         void clicked();
 
@@ -76,16 +81,7 @@ class Card : public QGraphicsWidget
         bool onscene, placing;
         bool invisible;
 
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
-            painter->setBrush(brush);
-            QPainterPath path;
-            path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
-            painter->setPen(Qt::NoPen);
-            painter->fillPath(path, brush.color());
-            painter->drawPath(path);
-            //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
-
-        }
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
         QBrush brush;
 };
@@ -108,6 +104,9 @@ class OverviewWindow : public GcChartWindow
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
     public slots:
+
+        // switch config off / on
+        void configToggle();
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
@@ -141,6 +140,7 @@ class OverviewWindow : public GcChartWindow
                                                          add->column = column;
                                                          add->order = order;
                                                          add->deep = deep;
+                                                         add->parent = this;
                                                          cards.append(add);
                                                          return add;
                                                         }
@@ -166,6 +166,10 @@ class OverviewWindow : public GcChartWindow
         int _viewY;
         QRectF sceneRect;
         QRectF viewRect;
+
+        // icons for configuration
+        QPushButton *configButton;
+        QIcon grayConfig, blueConfig;
 
         // content
         QVector<int> columns;       // column widths

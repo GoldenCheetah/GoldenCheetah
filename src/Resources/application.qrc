@@ -89,7 +89,7 @@
         <file>translations/gc_cs.qm</file>
         <file>translations/gc_es.qm</file>
         <file>translations/gc_pt.qm</file>
-        <file>translations/gc_zh-cn.qm</file>        
+        <file>translations/gc_zh-cn.qm</file>
         <file>translations/gc_zh-tw.qm</file>
         <file>translations/gc_nl.qm</file>
         <file>translations/gc_sv.qm</file>
@@ -161,5 +161,6 @@
         <file>images/oxygen/up.png</file>
         <file>images/oxygen/down.png</file>
         <file>audio/lap.wav</file>
+        <file>images/configure.png</file>
     </qresource>
 </RCC>
