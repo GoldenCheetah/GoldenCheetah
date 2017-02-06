@@ -202,7 +202,7 @@ OverviewWindow::updateGeometry()
         int theight = cards[i]->deep * ROWHEIGHT;
 
         // make em smaller when configuring visual cue stolen from Windows Start Menu
-        int add = (mode == CONFIG) ? (ROWHEIGHT/2) : 0;
+        int add = (state == DRAG) ? (ROWHEIGHT/2) : 0;
 
 
         // for setting the scene rectangle - but ignore a card if we are dragging it
