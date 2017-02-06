@@ -476,7 +476,8 @@ HomeWindow::styleChanged(int id)
         case 0 : // they are tabs in a TabWidget
             tabbed->addWidget(charts[i]);
             chartbar->addWidget(charts[i]->property("title").toString());
-            charts[i]->setContentsMargins(0,25,0,0);
+            if(charts[i]->showTitle() == true) charts[i]->setContentsMargins(0,25,0,0);
+            else charts[i]->setContentsMargins(0,0,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->hide(); // we need to show on tab selection!
@@ -626,7 +627,8 @@ HomeWindow::addChart(GcChartWindow* newone)
         switch (currentStyle) {
 
         case 0 :
-            newone->setContentsMargins(0,25,0,0);
+            if (newone->showTitle()) newone->setContentsMargins(0,25,0,0);
+            else newone->setContentsMargins(0,0,0,0);
             newone->setResizable(false); // we need to show on tab selection!
             //tabbed->addTab(newone, newone->property("title").toString());
             tabbed->addWidget(newone);

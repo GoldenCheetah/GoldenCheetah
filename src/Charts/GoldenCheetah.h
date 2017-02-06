@@ -150,6 +150,7 @@ public:
     void setTitle(QString x);
     QString title() const;
     void setShowTitle(bool x) { showtitle=x; }
+    bool showTitle() const { return showtitle; }
 
     void setRideItem(RideItem *);
     RideItem *rideItem() const;
