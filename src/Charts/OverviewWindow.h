@@ -105,9 +105,6 @@ class OverviewWindow : public GcChartWindow
 
     public slots:
 
-        // switch config off / on
-        void configToggle();
-
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
         int getViewY() const { return _viewY; }
@@ -166,10 +163,6 @@ class OverviewWindow : public GcChartWindow
         int _viewY;
         QRectF sceneRect;
         QRectF viewRect;
-
-        // icons for configuration
-        QPushButton *configButton;
-        QIcon grayConfig, blueConfig;
 
         // content
         QVector<int> columns;       // column widths

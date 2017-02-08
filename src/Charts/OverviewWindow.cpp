@@ -22,7 +22,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
-    GcChartWindow(context), mode(VIEW), state(NONE), context(context), group(NULL), _viewY(0),
+    GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
                             yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
                             setscrollbar(false), lasty(-1)
 {
@@ -32,20 +32,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     setShowTitle(false);
     setControls(NULL);
 
-    // configure icon in gray (not active and plotmarker for active)
-    grayConfig = colouredIconFromPNG(":images/configure.png", GColor(CCARDBACKGROUND));
-    blueConfig =  colouredIconFromPNG(":images/configure.png", GColor(CPLOTMARKER));
-
-    QVBoxLayout *all = new QVBoxLayout;
     QHBoxLayout *main = new QHBoxLayout;
-
-    // config button at the top
-    configButton = new QPushButton(grayConfig, "", this);
-    configButton->setFixedSize(30,30);
-    configButton->setAutoFillBackground(false);
-    configButton->setFlat(true);
-    configButton->setContentsMargins(0,0,0,0);
-    configButton->setIconSize(QSize(30,30));
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
@@ -63,12 +50,8 @@ OverviewWindow::OverviewWindow(Context *context) :
     main->addWidget(view);
     main->addWidget(scrollbar);
 
-    // vertical has config button
-    all->addWidget(configButton, 0, Qt::AlignRight);
-    all->addLayout(main);
-
     // all the widgets
-    setChartLayout(all);
+    setChartLayout(main);
 
     // default column widths - max 10 columns;
     // note the sizing is such that each card is the equivalent of a full screen
@@ -94,6 +77,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard(3, 4, 20);
 
     // for changing the view
+    group = new QParallelAnimationGroup(this);
     viewchange = new QPropertyAnimation(this, "viewRect");
     viewchange->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
 
@@ -112,31 +96,9 @@ OverviewWindow::OverviewWindow(Context *context) :
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
     connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
-    connect(configButton, SIGNAL(clicked()), this, SLOT(configToggle()));
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
-}
-
-void
-OverviewWindow::configToggle()
-{
-    // switch mode
-    if (mode == VIEW) {
-
-       mode = CONFIG;
-       configButton->setIcon(blueConfig);
-
-    } else {
-
-       mode = VIEW;
-       configButton->setIcon(grayConfig);
-
-    }
-
-    // redraw
-    updateGeometry();
-    updateView();
 }
 
 // cards need to show they are in config mode
@@ -160,6 +122,7 @@ void
 OverviewWindow::updateGeometry()
 {
     bool animated=false;
+    group->clear();
 
     // order the items to their positions
     qSort(cards.begin(), cards.end(), cardSort);
@@ -220,19 +183,8 @@ OverviewWindow::updateGeometry()
                     cards[i]->geometry().width() != twidth-(add*2) ||
                     cards[i]->geometry().height() != theight-(add*2))) {
 
-            // its moved, so animate that.
-            if (animated == false) {
-
-                // we've got an animation to perform
-                animated = true;
-
-                // we're starting to animate so clear and restart any animations
-                if (group) group->clear();
-                else {
-                    group = new QParallelAnimationGroup(this);
-                    //connect(group, SIGNAL(finished()), this, SLOT(fitView()));
-                }
-            }
+            // we've got an animation to perform
+            animated = true;
 
             // add an animation for this movement
             QPropertyAnimation *animation = new QPropertyAnimation(cards[i], "geometry");
@@ -744,7 +696,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             // resize in rows, so in 75px units
             int addrows = (pos.y() - stateData.yresize.posy) / ROWHEIGHT;
             int setdeep = stateData.yresize.deep + addrows;
-            if (setdeep < 3) setdeep=3;
+
+            //min and max height
+            if (setdeep < 5) setdeep=5; // min of 5 rows
+            if (setdeep > 25) setdeep=25; // max of 25 rows
 
             stateData.yresize.card->deep = setdeep;
 
@@ -757,7 +712,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             // multiples of 50 (smaller than margin)
             int addblocks = (pos.x() - stateData.xresize.posx) / 50;
             int setcolumn = stateData.xresize.width + (addblocks * 50);
-            if (setcolumn < 200) setcolumn = 200;
+
+            // min max width
+            if (setcolumn < 800) setcolumn = 800;
+            if (setcolumn > 1600) setcolumn = 1600;
 
             columns[stateData.xresize.column] = setcolumn;
 
