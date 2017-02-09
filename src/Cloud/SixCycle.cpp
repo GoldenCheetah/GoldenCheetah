@@ -268,15 +268,15 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
             //add->name = name;
             QString dateString = each["activityStartDateTime"].toString();
             QString suffix = QFileInfo(add->id).suffix();
-            QDateTime endTime= QDateTime::fromString(dateString, Qt::ISODate);
+            QDateTime startTime= QDateTime::fromString(dateString, Qt::ISODate).toLocalTime();
             QChar zero = QLatin1Char ( '0' );
             add->name = QString ( "%1_%2_%3_%4_%5_%6.%7" )
-                                       .arg ( endTime.date().year(), 4, 10, zero )
-                                       .arg ( endTime.date().month(), 2, 10, zero )
-                                       .arg ( endTime.date().day(), 2, 10, zero )
-                                       .arg ( endTime.time().hour(), 2, 10, zero )
-                                       .arg ( endTime.time().minute(), 2, 10, zero )
-                                       .arg ( endTime.time().second(), 2, 10, zero )
+                                       .arg ( startTime.date().year(), 4, 10, zero )
+                                       .arg ( startTime.date().month(), 2, 10, zero )
+                                       .arg ( startTime.date().day(), 2, 10, zero )
+                                       .arg ( startTime.time().hour(), 2, 10, zero )
+                                       .arg ( startTime.time().minute(), 2, 10, zero )
+                                       .arg ( startTime.time().second(), 2, 10, zero )
                                        .arg ( suffix );
 
             printd("entry: %s (%s) [%s]\n", add->name.toStdString().c_str(), add->label.toStdString().c_str(), dateString.toStdString().c_str());
