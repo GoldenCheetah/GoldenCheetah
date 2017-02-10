@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "Context.h"
 #include "RideItem.h"
+#include "RideMetric.h"
 
 // QGraphics
 #include <QGraphicsScene>
@@ -73,6 +74,7 @@ class Card : public QGraphicsWidget
 
             // a sensible default?
             type = NONE;
+            metric = NULL;
         }
 
         void setData(RideItem *item);
@@ -81,6 +83,7 @@ class Card : public QGraphicsWidget
         enum cardType { NONE, METRIC, META, SERIES, ZONE } type;
         typedef enum cardType CardType;
         QString value, units;
+        RideMetric *metric;
 
         // settings
         struct {
