@@ -144,14 +144,29 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
 
     if (type == METRIC) {
+
+        // we need the metric units
+        if (metric == NULL) {
+            // get the metric details
+            RideMetricFactory &factory = RideMetricFactory::instance();
+            metric = const_cast<RideMetric*>(factory.rideMetric(settings.symbol));
+            if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
+        }
+
         // paint the value in the middle using a font 2xROWHEIGHT
         QFont bigfont;
         bigfont.setPointSize(ROWHEIGHT*2);
         painter->setPen(GColor(CPLOTMARKER));
         painter->setFont(bigfont);
 
-        // mid is slightly higher to account for space around title
-        double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f);
+        QFont smallfont;
+        smallfont.setPointSize(ROWHEIGHT*0.6f);
+
+        double addy = 0;
+        if (units != "" && units != tr("seconds")) addy = QFontMetrics(smallfont).height();
+
+        // mid is slightly higher to account for space around title, move mid up
+        double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
 
         // we align centre and mid
         QFontMetrics fm(bigfont);
@@ -159,6 +174,15 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+
+        // now units
+        if (addy > 0) {
+            painter->setPen(QColor(100,100,100));
+            painter->setFont(smallfont);
+
+            painter->drawText(QPointF((geometry().width() - QFontMetrics(smallfont).width(units)) / 2.0f,
+                                  mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
+        }
     }
 }
 
@@ -747,7 +771,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             int setdeep = stateData.yresize.deep + addrows;
 
             //min height
-            if (setdeep < 7) setdeep=7; // min of 5 rows
+            if (setdeep < 6) setdeep=6; // min of 6 rows
 
             stateData.yresize.card->deep = setdeep;
 
