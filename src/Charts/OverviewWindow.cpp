@@ -19,6 +19,7 @@
 #include "OverviewWindow.h"
 
 #include "TabView.h"
+#include "Athlete.h"
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
@@ -59,22 +60,24 @@ OverviewWindow::OverviewWindow(Context *context) :
     columns << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800;
 
     // XXX lets hack in some tiles to start (will load from config later XXX
-    newCard("Duration", 0, 1, 14);
+    newCard("Duration", 0, 1, 14, Card::METRIC, "workout_time");
     newCard("Route", 0, 2, 20);
     newCard("Power Zones", 0, 3, 20);
-    newCard("Distance", 0, 4, 14);
+    newCard("Distance", 0, 4, 14, Card::METRIC, "total_distance");
     newCard("W'bal Zones", 1, 1, 20);
-    newCard("Stress", 1, 2, 14);
-    newCard("Pace Zones", 1, 3, 20);
-    newCard("Heartrate Zones", 1, 4, 14);
+    newCard("Stress", 1, 2, 14, Card::METRIC, "coggan_tss");
+    newCard("Intensity", 1, 3, 14, Card::METRIC, "coggan_if");
+    newCard("Equivalent Power", 1, 4, 14, Card::METRIC, "coggan_np");
+    newCard("Pace Zones", 1, 5, 20);
+    newCard("Heartrate Zones", 1, 5, 14);
     newCard("Power Model", 2, 1, 20);
     newCard("Intervals", 2, 2, 14);
-    newCard("Cadence", 2, 3, 20);
-    newCard("Heartrate", 2, 4, 14);
-    newCard("Power", 3, 1, 14);
+    newCard("Cadence", 2, 3, 20, Card::METRIC, "average_cad");
+    newCard("Heartrate", 2, 4, 14, Card::METRIC, "average_hr");
+    newCard("Power", 3, 1, 14, Card::METRIC, "average_power");
     newCard("RPE", 3, 2, 20);
     newCard("HRV", 3, 3, 14);
-    newCard("Speed", 3, 4, 20);
+    newCard("Speed", 3, 4, 20, Card::METRIC, "average_speed");
 
     // for changing the view
     group = new QParallelAnimationGroup(this);
@@ -96,9 +99,29 @@ OverviewWindow::OverviewWindow(Context *context) :
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
     connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
+}
+
+// when a ride is selected we need to notify all the cards
+void
+OverviewWindow::rideSelected()
+{
+    // ride item changed
+    foreach(Card *card, cards) card->setData(myRideItem);
+
+    // update
+    updateView();
+}
+
+void
+Card::setData(RideItem *item)
+{
+    if (type == METRIC) {
+        value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
+    }
 }
 
 // cards need to show they are in config mode
@@ -111,14 +134,32 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     painter->fillPath(path, brush.color());
     painter->drawPath(path);
     painter->setPen(GColor(CPLOTGRID));
-    painter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
+    //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     QFont titlefont;
     titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
     //titlefont.setWeight(QFont::Bold);
     painter->setPen(QColor(200,200,200));
     painter->setFont(titlefont);
-    painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont).height()), name);
+    painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
+
+    if (type == METRIC) {
+        // paint the value in the middle using a font 2xROWHEIGHT
+        QFont bigfont;
+        bigfont.setPointSize(ROWHEIGHT*2);
+        painter->setPen(GColor(CPLOTMARKER));
+        painter->setFont(bigfont);
+
+        // mid is slightly higher to account for space around title
+        double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f);
+
+        // we align centre and mid
+        QFontMetrics fm(bigfont);
+        QRectF rect = QFontMetrics(bigfont, parent->device()).boundingRect(value);
+
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+    }
 }
 
 static bool cardSort(const Card* left, const Card* right)
@@ -705,9 +746,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             int addrows = (pos.y() - stateData.yresize.posy) / ROWHEIGHT;
             int setdeep = stateData.yresize.deep + addrows;
 
-            //min and max height
-            if (setdeep < 5) setdeep=5; // min of 5 rows
-            if (setdeep > 25) setdeep=25; // max of 25 rows
+            //min height
+            if (setdeep < 7) setdeep=7; // min of 5 rows
 
             stateData.yresize.card->deep = setdeep;
 
