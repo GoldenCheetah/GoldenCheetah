@@ -3132,9 +3132,10 @@ void write_activity(QByteArray *array, const RideFile *ride) {
     value = 1;
     write_int8(array, value);
 
-    value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
-    write_int32(array, value, true);
-
+    if (ride->dataPoints().last()) {
+        value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
+        write_int32(array, value, true);
+    }
 }
 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
