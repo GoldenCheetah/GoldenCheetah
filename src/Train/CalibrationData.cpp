@@ -141,7 +141,7 @@ void CalibrationData::setActiveChannel()
     // - else consider timestamps from last calibration attempt
     // - else pick any device supporting calibration
 
-    uint8_t count;
+    uint8_t count=0;
 
     // Do nothing if calibration in progress
     if (state != CALIBRATION_STATE_IDLE && state != CALIBRATION_STATE_SUCCESS && state != CALIBRATION_STATE_FAILURE)
