@@ -59,22 +59,22 @@ OverviewWindow::OverviewWindow(Context *context) :
     columns << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800;
 
     // XXX lets hack in some tiles to start (will load from config later XXX
-    newCard(0, 1, 14);
-    newCard(0, 2, 20);
-    newCard(0, 3, 20);
-    newCard(0, 4, 14);
-    newCard(1, 1, 20);
-    newCard(1, 2, 14);
-    newCard(1, 3, 20);
-    newCard(1, 4, 14);
-    newCard(2, 1, 20);
-    newCard(2, 2, 14);
-    newCard(2, 3, 20);
-    newCard(2, 4, 14);
-    newCard(3, 1, 14);
-    newCard(3, 2, 20);
-    newCard(3, 3, 14);
-    newCard(3, 4, 20);
+    newCard("Duration", 0, 1, 14);
+    newCard("Route", 0, 2, 20);
+    newCard("Power Zones", 0, 3, 20);
+    newCard("Distance", 0, 4, 14);
+    newCard("W'bal Zones", 1, 1, 20);
+    newCard("Stress", 1, 2, 14);
+    newCard("Pace Zones", 1, 3, 20);
+    newCard("Heartrate Zones", 1, 4, 14);
+    newCard("Power Model", 2, 1, 20);
+    newCard("Intervals", 2, 2, 14);
+    newCard("Cadence", 2, 3, 20);
+    newCard("Heartrate", 2, 4, 14);
+    newCard("Power", 3, 1, 14);
+    newCard("RPE", 3, 2, 20);
+    newCard("HRV", 3, 3, 14);
+    newCard("Speed", 3, 4, 20);
 
     // for changing the view
     group = new QParallelAnimationGroup(this);
@@ -110,7 +110,15 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     painter->setPen(Qt::NoPen);
     painter->fillPath(path, brush.color());
     painter->drawPath(path);
+    painter->setPen(GColor(CPLOTGRID));
+    painter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
+    QFont titlefont;
+    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
+    //titlefont.setWeight(QFont::Bold);
+    painter->setPen(QColor(200,200,200));
+    painter->setFont(titlefont);
+    painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont).height()), name);
 }
 
 static bool cardSort(const Card* left, const Card* right)

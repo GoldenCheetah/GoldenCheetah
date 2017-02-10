@@ -48,7 +48,8 @@ class Card : public QGraphicsWidget
 {
     public:
 
-        Card(int deep) : QGraphicsWidget(NULL), column(0), order(0), deep(deep), onscene(false),
+        Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
+                                                column(0), order(0), deep(deep), onscene(false),
                                                 placing(false), invisible(false) {
 
             // no mouse event delivery allowed to contained QWidgets-
@@ -75,6 +76,9 @@ class Card : public QGraphicsWidget
 
         // what to do if clicked XXX just a hack for now
         void clicked();
+
+        // name
+        QString name;
 
         // which column, sequence and size in rows
         int column, order, deep;
@@ -133,7 +137,7 @@ class OverviewWindow : public GcChartWindow
         void updateView();
 
         // create a card
-        Card *newCard(int column, int order, int deep) { Card *add = new Card(deep);
+        Card *newCard(QString name, int column, int order, int deep) { Card *add = new Card(deep, name);
                                                          add->column = column;
                                                          add->order = order;
                                                          add->deep = deep;
