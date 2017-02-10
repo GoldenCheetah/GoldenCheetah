@@ -1172,7 +1172,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         // draw border of each cell
         QPen rpen;
         rpen.setWidth(1);
-        rpen.setColor(GColor(CPLOTGRID));
+        rpen.setColor(GColor(CPLOTBACKGROUND));
         QPen isColor = painter->pen();
         QFont isFont = painter->font();
         painter->setPen(rpen);
@@ -1245,7 +1245,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
                 // border
                 QPen rpen;
                 rpen.setWidth(1);
-                rpen.setColor(GColor(CPLOTGRID));
+                rpen.setColor(GColor(CPLOTBACKGROUND));
                 QPen isColor = painter->pen();
                 QFont isFont = painter->font();
                 painter->setPen(rpen);
