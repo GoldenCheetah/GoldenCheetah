@@ -25,6 +25,7 @@
 #include "Units.h"
 #include "Colors.h"
 #include "Context.h"
+#include "RideItem.h"
 
 // QGraphics
 #include <QGraphicsScene>
@@ -69,7 +70,25 @@ class Card : public QGraphicsWidget
             setAutoFillBackground(false);
             brush = QBrush(GColor(CCARDBACKGROUND));
             setZValue(10);
+
+            // a sensible default?
+            type = NONE;
         }
+
+        void setData(RideItem *item);
+
+        // what type am I?
+        enum cardType { NONE, METRIC, META, SERIES, ZONE } type;
+        typedef enum cardType CardType;
+        QString value, units;
+
+        // settings
+        struct {
+
+            QString symbol;
+            RideFile::SeriesType series;
+
+        } settings;
 
         // my parent
         OverviewWindow *parent;
@@ -107,7 +126,16 @@ class OverviewWindow : public GcChartWindow
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
+        // used by children
+        Context *context;
+
+        // to get paint device
+        QGraphicsView *device() { return view; }
+
     public slots:
+
+        // ride item changed
+        void rideSelected();
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
@@ -137,11 +165,14 @@ class OverviewWindow : public GcChartWindow
         void updateView();
 
         // create a card
-        Card *newCard(QString name, int column, int order, int deep) { Card *add = new Card(deep, name);
+        Card *newCard(QString name, int column, int order, int deep, Card::CardType type=Card::NONE, QString symbol="") {
+                                                         Card *add = new Card(deep, name);
                                                          add->column = column;
                                                          add->order = order;
                                                          add->deep = deep;
                                                          add->parent = this;
+                                                         add->type = type;
+                                                         add->settings.symbol = symbol;
                                                          cards.append(add);
                                                          return add;
                                                         }
@@ -153,7 +184,6 @@ class OverviewWindow : public GcChartWindow
     private:
 
         // gui setup
-        Context *context;
         QGraphicsScene *scene;
         QGraphicsView *view;
         QScrollBar *scrollbar;
