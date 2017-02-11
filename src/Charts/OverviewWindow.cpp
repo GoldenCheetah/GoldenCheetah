@@ -57,27 +57,37 @@ OverviewWindow::OverviewWindow(Context *context) :
     // default column widths - max 10 columns;
     // note the sizing is such that each card is the equivalent of a full screen
     // so we can embed charts etc without compromising what they can display
-    columns << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800 << 1600 << 1600 << 800;
+    columns << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200;
 
-    // XXX lets hack in some tiles to start (will load from config later XXX
-    newCard("Duration", 0, 1, 14, Card::METRIC, "workout_time");
-    newCard("Route", 0, 2, 20);
-    newCard("Power Zones", 0, 3, 20);
-    newCard("Distance", 0, 4, 14, Card::METRIC, "total_distance");
-    newCard("W'bal Zones", 1, 1, 20);
-    newCard("Stress", 1, 2, 14, Card::METRIC, "coggan_tss");
-    newCard("Intensity", 1, 3, 14, Card::METRIC, "coggan_if");
-    newCard("Equivalent Power", 1, 4, 14, Card::METRIC, "coggan_np");
-    newCard("Pace Zones", 1, 5, 20);
-    newCard("Heartrate Zones", 1, 5, 14);
-    newCard("Power Model", 2, 1, 20);
-    newCard("Intervals", 2, 2, 14);
-    newCard("Cadence", 2, 3, 20, Card::METRIC, "average_cad");
-    newCard("Heartrate", 2, 4, 14, Card::METRIC, "average_hr");
-    newCard("Power", 3, 1, 14, Card::METRIC, "average_power");
-    newCard("RPE", 3, 2, 20);
-    newCard("HRV", 3, 3, 14);
-    newCard("Speed", 3, 4, 20, Card::METRIC, "average_speed");
+    // XXX lets hack in some tiles to start (will load from config later) XXX
+
+    // column 0
+    newCard("Sport", 0, 0, 5);
+    newCard("Duration", 0, 1, 5, Card::METRIC, "workout_time");
+    newCard("Route", 0, 2, 10);
+    newCard("Distance", 0, 3, 5, Card::METRIC, "total_distance");
+    newCard("Climbing", 0, 4, 5, Card::METRIC, "elevation_gain");
+    newCard("Speed", 0, 6, 5, Card::METRIC, "average_speed");
+
+    // column 1
+    newCard("Heartrate", 1, 0, 5, Card::METRIC, "average_hr");
+    newCard("HRV", 1, 1, 5);
+    newCard("Heartrate Zones", 1, 2, 10);
+    newCard("Pace Zones", 1, 3, 11);
+    newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
+
+    // column 2
+    newCard("RPE", 2, 0, 5);
+    newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
+    newCard("W'bal Zones", 2, 2, 10);
+    newCard("Intervals", 2, 3, 17);
+
+    // column 3
+    newCard("Power", 3, 0, 5, Card::METRIC, "average_power");
+    newCard("Intensity", 3, 1, 5, Card::METRIC, "coggan_if");
+    newCard("Power Zones", 3, 2, 10);
+    newCard("Equivalent Power", 3, 3, 5, Card::METRIC, "coggan_np");
+    newCard("Power Model", 3, 4, 11);
 
     // for changing the view
     group = new QParallelAnimationGroup(this);
@@ -142,6 +152,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     painter->setPen(QColor(200,200,200));
     painter->setFont(titlefont);
     painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
+
+    // only paint contents if not dragging
+    if (drag) return;
 
     if (type == METRIC) {
 
@@ -569,6 +582,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     // it around when we start dragging
                     state = DRAG;
                     card->invisible = true;
+                    card->drag = true;
                     card->brush = GColor(CPLOTMARKER); //XXX hack whilst they're tiles
                     card->setZValue(100);
 
@@ -599,6 +613,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 stateData.drag.card->invisible = false;
                 stateData.drag.card->setZValue(10);
                 stateData.drag.card->placing = true;
+                stateData.drag.card->drag = false;
                 stateData.drag.card->brush = GColor(CCARDBACKGROUND);
             }
 
@@ -771,7 +786,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             int setdeep = stateData.yresize.deep + addrows;
 
             //min height
-            if (setdeep < 6) setdeep=6; // min of 6 rows
+            if (setdeep < 5) setdeep=5; // min of 5 rows
 
             stateData.yresize.card->deep = setdeep;
 

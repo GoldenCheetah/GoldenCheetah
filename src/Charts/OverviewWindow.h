@@ -52,7 +52,7 @@ class Card : public QGraphicsWidget
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
                                                 column(0), order(0), deep(deep), onscene(false),
-                                                placing(false), invisible(false) {
+                                                placing(false), drag(false), invisible(false) {
 
             // no mouse event delivery allowed to contained QWidgets-
             // this is so we can normal embed charts etc
@@ -104,7 +104,7 @@ class Card : public QGraphicsWidget
 
         // which column, sequence and size in rows
         int column, order, deep;
-        bool onscene, placing;
+        bool onscene, placing, drag;
         bool invisible;
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
