@@ -178,6 +178,9 @@ Card::setData(RideItem *item)
 
     if (type == ZONE) {
 
+        // enable animation when setting values (disabled at all other times)
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+
         if (parent->context->athlete->hrZones(item->isRun)) {
 
             int numhrzones;
@@ -202,7 +205,10 @@ void
 Card::geometryChanged() {
 
     // if we contain charts etc lets update their geom
-    if (parent->state != OverviewWindow::DRAG && (type == ZONE || type == SERIES) && chart)  {
+    if ((type == ZONE || type == SERIES) && chart)  {
+
+        // disable animation when changing geometry
+        chart->setAnimationOptions(QChart::NoAnimation);
 
         QRectF geom = geometry();
         chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));

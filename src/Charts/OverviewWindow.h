@@ -236,7 +236,7 @@ class OverviewWindow : public GcChartWindow
                                                             add->barseries->append(add->barset);
                                                             add->chart->addSeries(add->barseries);
                                                             add->chart->setTitle(""); // none wanted
-                                                            add->chart->setAnimationOptions(QChart::SeriesAnimations);
+                                                            add->chart->setAnimationOptions(QChart::NoAnimation);
                                                             add->barcategoryaxis = new QBarCategoryAxis(this);
                                                             add->barcategoryaxis->setLabelsFont(mid);
                                                             add->barcategoryaxis->setLabelsColor(QColor(100,100,100));
