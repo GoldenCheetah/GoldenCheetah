@@ -187,22 +187,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         return returning;
     }
 
-    // lets connect and get activities list
-    // old API ?
-    // QString url("https://whats.todaysplan.com.au/rest/files/search/0/100");
-    QString url = QString("%1/rest/users/activities/search/0/100")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
-
-    printd("URL used: %s\n", url.toStdString().c_str());
-
-
-    //url="https://staging.todaysplan.com.au/rest/files/search/0/100";
-
-    // request using the bearer token
-    QNetworkRequest request(url);
-    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
-
+    // Prepare the Search Payload
     QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
 
     // application/json
@@ -217,59 +202,88 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     jsonString += "\"opts\": 0 ";
     jsonString += "}";
 
+    QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
+
     printd("request: %s\n", jsonString.toStdString().c_str());
 
-    QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
-    request.setRawHeader("Content-Length", jsonStringDataSize);
+    // Do Paginated Access to the Activities List
+    const int pageSize = 100;
+    int offset = 0;
+    int resultCount = INT_MAX;
 
-    QNetworkReply *reply = nam->post(request, jsonString);
+    while (offset < resultCount) {
 
-    // blocking request
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+        // lets connect and get the next set of activities
+        QString url = QString("%1/rest/users/activities/search/%2/%3")
+                .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
+                .arg(QString::number(offset)).arg(QString::number(pageSize));
 
-    // did we get a good response ?
-    QByteArray r = reply->readAll();
-    printd("response: %s\n", r.toStdString().c_str());
+        printd("URL used: %s\n", url.toStdString().c_str());
 
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+        // request using the bearer token
+        QNetworkRequest request(url);
+        request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+        request.setRawHeader("Content-Length", jsonStringDataSize);
 
-    // if path was returned all is good, lets set root
-    if (parseError.error == QJsonParseError::NoError) {
-        // results ?
-        QJsonObject result = document.object()["result"].toObject();
-        QJsonArray results = result["results"].toArray();
+        QNetworkReply *reply = nam->post(request, jsonString);
 
-        // lets look at that then
-        for(int i=0; i<results.size(); i++) {
-            QJsonObject each = results.at(i).toObject();
-            FileStoreEntry *add = newFileStoreEntry();
+        // blocking request
+        QEventLoop loop;
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-            // file details
-            QJsonObject fileindex = each["fileindex"].toObject();
-            QString suffix = QFileInfo(fileindex["filename"].toString()).suffix();
-            if (suffix == "") suffix = "json";
+        // did we get a good response ?
+        QByteArray r = reply->readAll();
+        printd("response: %s\n", r.toStdString().c_str());
+
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+        // if path was returned all is good, lets set root
+        if (parseError.error == QJsonParseError::NoError) {
+
+            // number of Result Items
+            resultCount = document.object()["cnt"].toInt();
+
+            // results ?
+            QJsonObject result = document.object()["result"].toObject();
+            QJsonArray results = result["results"].toArray();
+
+            // lets look at that then
+            for(int i=0; i<results.size(); i++) {
+                QJsonObject each = results.at(i).toObject();
+                FileStoreEntry *add = newFileStoreEntry();
+
+                // file details
+                QJsonObject fileindex = each["fileindex"].toObject();
+                QString suffix = QFileInfo(fileindex["filename"].toString()).suffix();
+                if (suffix == "") suffix = "json";
 
 
-            //TodaysPlan has full path, we just want the file name
-            add->label = QFileInfo(each["name"].toString()).fileName();
-            add->id = QString("%1").arg(each["fileId"].toInt());
-            add->isDir = false;
-            add->distance = each["distance"].toInt()/1000.0;
-            add->duration = each["training"].toInt();
-            add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
+                //TodaysPlan has full path, we just want the file name
+                add->label = QFileInfo(each["name"].toString()).fileName();
+                add->id = QString("%1").arg(each["fileId"].toInt());
+                add->isDir = false;
+                add->distance = each["distance"].toInt()/1000.0;
+                add->duration = each["training"].toInt();
+                add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
 
-            //add->size
-            //add->modified
+                //add->size
+                //add->modified
 
-            //QJsonObject fileindex = each["fileindex"].toObject();
-            //add->name = QFileInfo(fileindex["filename"].toString()).fileName();
+                //QJsonObject fileindex = each["fileindex"].toObject();
+                //add->name = QFileInfo(fileindex["filename"].toString()).fileName();
 
-            printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
+                printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
 
-            returning << add;
+                returning << add;
+            }
+            // next page
+            offset += pageSize;
+        } else {
+            // we had a parsing error - so something is wrong - stop requesting more data by ending the loop
+            offset = INT_MAX;
         }
     }
 
