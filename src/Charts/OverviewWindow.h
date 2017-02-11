@@ -25,8 +25,10 @@
 #include "Units.h"
 #include "Colors.h"
 #include "Context.h"
+#include "Athlete.h"
 #include "RideItem.h"
 #include "RideMetric.h"
+#include "HrZones.h"
 
 // QGraphics
 #include <QGraphicsScene>
@@ -39,6 +41,11 @@
 #include <QScrollBar>
 #include <QIcon>
 
+// qt charts
+#include <QtCharts>
+#include <QBarSet>
+#include <QBarSeries>
+
 // geometry basics
 #define SPACING 80
 #define ROWHEIGHT 80
@@ -48,34 +55,29 @@ class OverviewWindow;
 // keep it simple for now
 class Card : public QGraphicsWidget
 {
+    Q_OBJECT
+
     public:
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
                                                 column(0), order(0), deep(deep), onscene(false),
                                                 placing(false), drag(false), invisible(false) {
 
-            // no mouse event delivery allowed to contained QWidgets-
-            // this is so we can normal embed charts etc
-            // but you can't interact (e.g. steal focus, mousewheel etc) whilst
-            // they are in the dashboard. In order to interact you will need to
-            // have focus explicitly enabled by the parent, e.g. by clicking on it
-            // or maximising it etc
-            //child->setAttribute(Qt::WA_TransparentForMouseEvents);
-            //child->setAttribute(Qt::WA_ForceDisabled);
-
-            // shadow (disabled, isn't appropriate)
-            //QGraphicsDropShadowEffect * effect = new QGraphicsDropShadowEffect();
-            //effect->setBlurRadius(3);
-            //setGraphicsEffect(effect);
-
             setAutoFillBackground(false);
+            setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
+
             brush = QBrush(GColor(CCARDBACKGROUND));
             setZValue(10);
 
             // a sensible default?
             type = NONE;
             metric = NULL;
+            chart = NULL;
+
+            // watch geom changes
+            connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
+
 
         void setData(RideItem *item);
 
@@ -102,6 +104,15 @@ class Card : public QGraphicsWidget
         // name
         QString name;
 
+        // qt chart
+        QChart *chart;
+
+        // bar chart
+        QBarSet *barset;
+        QBarSeries *barseries;
+        QStringList categories;
+        QBarCategoryAxis *barcategoryaxis;
+
         // which column, sequence and size in rows
         int column, order, deep;
         bool onscene, placing, drag;
@@ -110,6 +121,10 @@ class Card : public QGraphicsWidget
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
         QBrush brush;
+
+    public slots:
+
+        void geometryChanged();
 };
 
 class OverviewWindow : public GcChartWindow
@@ -167,7 +182,80 @@ class OverviewWindow : public GcChartWindow
         // set scale, zoom etc appropriately
         void updateView();
 
-        // create a card
+        // create a card - zones / series
+        Card *newCard(QString name, int column, int order, int deep, Card::CardType type, RideFile::SeriesType x) {
+                                                         Card *add = new Card(deep, name);
+                                                         add->column = column;
+                                                         add->order = order;
+                                                         add->deep = deep;
+                                                         add->parent = this;
+                                                         add->type = type;
+                                                         add->settings.series = x;
+                                                         cards.append(add);
+                                                         add->chart = new QChart(add);
+                                                         add->chart->setBackgroundVisible(false); // draw on canvas
+                                                         add->chart->legend()->setVisible(false); // no legends
+
+                                                         // we have a big font for charts
+                                                         QFont mid;
+                                                         mid.setPointSize(ROWHEIGHT/2);
+                                                         add->chart->setFont(mid);
+
+                                                         if (type == Card::ZONE) {
+                                                            add->barset = new QBarSet(tr("Time In Zone"), this);
+                                                            add->barset->setLabelFont(mid);
+                                                            if (add->settings.series == RideFile::hr) {
+                                                                add->barset->setLabelColor(GColor(CHEARTRATE));
+                                                                add->barset->setBorderColor(GColor(CHEARTRATE));
+                                                                add->barset->setBrush(GColor(CHEARTRATE));
+                                                            } else if (add->settings.series == RideFile::watts) {
+                                                                add->barset->setLabelColor(GColor(CPOWER));
+                                                                add->barset->setBorderColor(GColor(CPOWER));
+                                                                add->barset->setBrush(GColor(CPOWER));
+                                                            } else if (add->settings.series == RideFile::wbal) {
+                                                                add->barset->setLabelColor(GColor(CWBAL));
+                                                                add->barset->setBorderColor(GColor(CWBAL));
+                                                                add->barset->setBrush(GColor(CWBAL));
+                                                            } else if (add->settings.series == RideFile::kph) {
+                                                                add->barset->setLabelColor(GColor(CSPEED));
+                                                                add->barset->setBorderColor(GColor(CSPEED));
+                                                                add->barset->setBrush(GColor(CSPEED));
+                                                            }
+                                                            // how many?
+                                                            if (context->athlete->hrZones(false)) {
+                                                                // set the zero values
+                                                                for(int i=0; i<context->athlete->hrZones(false)->getScheme().nzones_default; i++) {
+                                                                    *add->barset << 0;
+                                                                    add->categories << context->athlete->hrZones(false)->getScheme().zone_default_name[i];
+                                                                }
+                                                            }
+                                                            add->barseries = new QBarSeries(this);
+                                                            add->barseries->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+                                                            add->barseries->setLabelsVisible(true);
+                                                            add->barseries->setLabelsFormat("@value %");
+                                                            add->barseries->append(add->barset);
+                                                            add->chart->addSeries(add->barseries);
+                                                            add->chart->setTitle(""); // none wanted
+                                                            add->chart->setAnimationOptions(QChart::SeriesAnimations);
+                                                            add->barcategoryaxis = new QBarCategoryAxis(this);
+                                                            add->barcategoryaxis->setLabelsFont(mid);
+                                                            add->barcategoryaxis->setLabelsColor(QColor(100,100,100));
+                                                            add->barcategoryaxis->setGridLineVisible(false);
+                                                            add->barcategoryaxis->setCategories(add->categories);
+                                                            add->chart->createDefaultAxes();
+                                                            add->chart->setAxisX(add->barcategoryaxis, add->barseries);
+                                                            add->chart->axisY(add->barseries)->setGridLineVisible(false);
+                                                            QPen axisPen(GColor(CCARDBACKGROUND));
+                                                            axisPen.setWidth(0.5); // almost invisibke
+                                                            add->barcategoryaxis->setLinePen(axisPen);
+                                                            add->chart->axisY(add->barseries)->setLinePen(axisPen);
+                                                            add->chart->axisY(add->barseries)->setLabelsVisible(false);
+                                                            add->chart->axisY(add->barseries)->setRange(0,100);
+                                                         }
+                                                         return add;
+                                                        }
+
+        // create a card - metric
         Card *newCard(QString name, int column, int order, int deep, Card::CardType type=Card::NONE, QString symbol="") {
                                                          Card *add = new Card(deep, name);
                                                          add->column = column;

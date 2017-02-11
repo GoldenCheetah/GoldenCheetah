@@ -20,6 +20,7 @@
 
 #include "TabView.h"
 #include "Athlete.h"
+#include "HrZones.h"
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
@@ -72,7 +73,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // column 1
     newCard("Heartrate", 1, 0, 5, Card::METRIC, "average_hr");
     newCard("HRV", 1, 1, 5);
-    newCard("Heartrate Zones", 1, 2, 10);
+    newCard("Heartrate Zones", 1, 2, 10, Card::ZONE, RideFile::hr);
     newCard("Pace Zones", 1, 3, 11);
     newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
 
@@ -126,11 +127,86 @@ OverviewWindow::rideSelected()
     updateView();
 }
 
+static const QStringList timeInZones = QStringList()
+        << "time_in_zone_L1"
+        << "time_in_zone_L2"
+        << "time_in_zone_L3"
+        << "time_in_zone_L4"
+        << "time_in_zone_L5"
+        << "time_in_zone_L6"
+        << "time_in_zone_L7"
+        << "time_in_zone_L8"
+        << "time_in_zone_L9"
+        << "time_in_zone_L10";
+
+static const QStringList paceTimeInZones = QStringList()
+        << "time_in_zone_P1"
+        << "time_in_zone_P2"
+        << "time_in_zone_P3"
+        << "time_in_zone_P4"
+        << "time_in_zone_P5"
+        << "time_in_zone_P6"
+        << "time_in_zone_P7"
+        << "time_in_zone_P8"
+        << "time_in_zone_P9"
+        << "time_in_zone_P10";
+
+static const QStringList timeInZonesHR = QStringList()
+        << "percent_in_zone_H1"
+        << "percent_in_zone_H2"
+        << "percent_in_zone_H3"
+        << "percent_in_zone_H4"
+        << "percent_in_zone_H5"
+        << "percent_in_zone_H6"
+        << "percent_in_zone_H7"
+        << "percent_in_zone_H8"
+        << "percent_in_zone_H9"
+        << "percent_in_zone_H10";
+
+static const QStringList timeInZonesWBAL = QStringList()
+        << "wtime_in_zone_L1"
+        << "wtime_in_zone_L2"
+        << "wtime_in_zone_L3"
+        << "wtime_in_zone_L4";
+
 void
 Card::setData(RideItem *item)
 {
     if (type == METRIC) {
         value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
+    }
+
+    if (type == ZONE) {
+
+        if (parent->context->athlete->hrZones(item->isRun)) {
+
+            int numhrzones;
+            int hrrange = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
+            if (hrrange > -1) {
+
+                numhrzones = parent->context->athlete->hrZones(item->isRun)->numZones(hrrange);
+
+                for(int i=0; i<categories.count() && i < numhrzones;i++) {
+                    barset->replace(i, round(item->getForSymbol(timeInZonesHR[i])));
+                }
+            } else {
+                for(int i=0; i<5; i++) barset->replace(i, 0);
+            }
+        } else {
+            for(int i=0; i<5; i++) barset->replace(i, 0);
+        }
+    }
+}
+
+void
+Card::geometryChanged() {
+
+    // if we contain charts etc lets update their geom
+    if (parent->state != OverviewWindow::DRAG && (type == ZONE || type == SERIES) && chart)  {
+
+        QRectF geom = geometry();
+        chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+        chart->update();
     }
 }
 
@@ -196,6 +272,11 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             painter->drawText(QPointF((geometry().width() - QFontMetrics(smallfont).width(units)) / 2.0f,
                                   mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
         }
+    }
+
+    if (type == ZONE) {
+        // we are painting the chart basically.
+        //chart->paint();
     }
 }
 
@@ -552,6 +633,9 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             QGraphicsItem *item = scene->itemAt(pos, view->transform());
             Card *card = static_cast<Card*>(item);
 
+            // ignore other scene elements (e.g. charts)
+            if (!cards.contains(card)) card=NULL;
+
             if (card) {
 
                // are we on the boundary of the card?
@@ -581,6 +665,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     // work out the offset so we can move
                     // it around when we start dragging
                     state = DRAG;
+                    if (card->chart) card->chart->hide(); // whilst dragging around
                     card->invisible = true;
                     card->drag = true;
                     card->brush = GColor(CPLOTMARKER); //XXX hack whilst they're tiles
@@ -610,6 +695,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // set back to visible if dragging
             if (state == DRAG) {
+                if (stateData.drag.card->chart) stateData.drag.card->chart->show();
                 stateData.drag.card->invisible = false;
                 stateData.drag.card->setZValue(10);
                 stateData.drag.card->placing = true;
@@ -647,6 +733,9 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             // where am i ?
             QGraphicsItem *item = scene->itemAt(pos, view->transform());
             Card *card = static_cast<Card*>(item);
+
+            // ignore other scene elements (e.g. charts)
+            if (!cards.contains(card)) card=NULL;
 
             if (card) {
 
@@ -694,7 +783,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             stateData.drag.card->setPos(pos.x()-stateData.drag.offx, pos.y()-stateData.drag.offy);
 
             // should I move?
-            QList<QGraphicsItem *> overlaps = scene->items(pos);
+            QList<QGraphicsItem *> overlaps;
+            foreach(QGraphicsItem *p, scene->items(pos))
+                if(cards.contains(static_cast<Card*>(p)))
+                    overlaps << p;
 
             // we always overlap with ourself, so see if more
             if (overlaps.count() > 1) {
