@@ -34,7 +34,7 @@
 #include "../qzip/zipreader.h"
 
 #ifdef Q_CC_MSVC
-#include <QtZlib/zlib.h>>
+#include <QtZlib/zlib.h>
 #else
 #include <zlib.h>
 #endif
@@ -588,7 +588,7 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
         if (p->modified.date() == QDate::currentDate())
             item->setText(2, p->modified.toString("hh:mm:ss"));
         else
-            item->setText(2, p->modified.toString("d MMM yyyy"));
+            item->setText(2, p->modified.toString(tr("d MMM yyyy")));
     }
 }
 
@@ -910,7 +910,7 @@ FileStoreSyncDialog::refreshClicked()
         add->setText(1, workouts[i]->name);
         add->setTextAlignment(1, Qt::AlignCenter);
 
-        add->setText(2, ridedatetime.toString("MMM d, yyyy"));
+        add->setText(2, ridedatetime.toString(tr("MMM d, yyyy")));
         add->setTextAlignment(2, Qt::AlignLeft);
         add->setText(3, ridedatetime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
@@ -960,7 +960,7 @@ FileStoreSyncDialog::refreshClicked()
         add->setTextAlignment(4, Qt::AlignCenter);
         add->setText(6, workouts[i]->id); // download_id
 
-        if (rideFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(Qt::Checked);
+        if (rideFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(true);
         else {
             exists->setChecked(Qt::Unchecked);
 
@@ -973,7 +973,7 @@ FileStoreSyncDialog::refreshClicked()
 
             sync->setText(1, workouts[i]->name);
             sync->setTextAlignment(1, Qt::AlignCenter);
-            sync->setText(2, ridedatetime.toString("MMM d, yyyy"));
+            sync->setText(2, ridedatetime.toString(tr("MMM d, yyyy")));
             sync->setTextAlignment(2, Qt::AlignLeft);
             sync->setText(3, ridedatetime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
@@ -1018,7 +1018,7 @@ FileStoreSyncDialog::refreshClicked()
 
         add->setText(1, ride->fileName);
         add->setTextAlignment(1, Qt::AlignLeft);
-        add->setText(2, ride->dateTime.toString("MMM d, yyyy"));
+        add->setText(2, ride->dateTime.toString(tr("MMM d, yyyy")));
         add->setTextAlignment(2, Qt::AlignLeft);
         add->setText(3, ride->dateTime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
@@ -1051,7 +1051,7 @@ FileStoreSyncDialog::refreshClicked()
                            .arg ( ride->dateTime.time().second(), 2, 10, zero );
 
         // check if on <FileStore> already
-        if (uploadFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(Qt::Checked);
+        if (uploadFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(true);
         else {
             exists->setChecked(Qt::Unchecked);
 
@@ -1064,7 +1064,7 @@ FileStoreSyncDialog::refreshClicked()
 
             sync->setText(1, ride->fileName);
             sync->setTextAlignment(1, Qt::AlignCenter);
-            sync->setText(2, ride->dateTime.toString("MMM d, yyyy"));
+            sync->setText(2, ride->dateTime.toString(tr("MMM d, yyyy")));
             sync->setTextAlignment(2, Qt::AlignLeft);
             sync->setText(3, ride->dateTime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
@@ -1086,7 +1086,7 @@ FileStoreSyncDialog::refreshClicked()
 void
 FileStoreSyncDialog::tabChanged(int idx)
 {
-    if (downloadButton->text() == "Abort") return;
+    if (downloadButton->text() == tr("Abort")) return;
 
     switch (idx) {
 
@@ -1185,7 +1185,7 @@ FileStoreSyncDialog::downloadClicked()
         rideListDown->setSortingEnabled(true);
         rideListUp->setSortingEnabled(true);
         progressLabel->setText("");
-        downloadButton->setText("Download");
+        downloadButton->setText(tr("Download"));
         downloading=false;
         aborted=true;
         cancelButton->show();
@@ -1195,7 +1195,7 @@ FileStoreSyncDialog::downloadClicked()
         rideListUp->setSortingEnabled(true);
         downloading=true;
         aborted=false;
-        downloadButton->setText("Abort");
+        downloadButton->setText(tr("Abort"));
         cancelButton->hide();
     }
 
@@ -1297,7 +1297,7 @@ FileStoreSyncDialog::syncNext()
     rideListUp->setSortingEnabled(true);
     rideListSync->setSortingEnabled(true);
     progressLabel->setText(tr("Sync complete"));
-    downloadButton->setText("Synchronize");
+    downloadButton->setText(tr("Synchronize"));
     downloading=false;
     aborted=false;
     sync=false;
@@ -1351,7 +1351,7 @@ FileStoreSyncDialog::downloadNext()
     rideListDown->setSortingEnabled(true);
     rideListUp->setSortingEnabled(true);
     progressLabel->setText(tr("Downloads complete"));
-    downloadButton->setText("Download");
+    downloadButton->setText(tr("Download"));
     downloading=false;
     aborted=false;
     cancelButton->show();
@@ -1464,7 +1464,7 @@ FileStoreSyncDialog::uploadNext()
     rideListDown->setSortingEnabled(true);
     rideListUp->setSortingEnabled(true);
     progressLabel->setText(tr("Uploads complete"));
-    downloadButton->setText("Upload");
+    downloadButton->setText(tr("Upload"));
     downloading=false;
     aborted=false;
     cancelButton->show();
