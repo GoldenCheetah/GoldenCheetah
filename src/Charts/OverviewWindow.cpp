@@ -23,6 +23,7 @@
 
 #include "Zones.h"
 #include "HrZones.h"
+#include "PaceZones.h"
 
 #include <QGraphicsSceneMouseEvent>
 
@@ -77,7 +78,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Heartrate", 1, 0, 5, Card::METRIC, "average_hr");
     newCard("HRV", 1, 1, 5);
     newCard("Heartrate Zones", 1, 2, 10, Card::ZONE, RideFile::hr);
-    newCard("Pace Zones", 1, 3, 11);
+    newCard("Pace Zones", 1, 3, 11, Card::ZONE, RideFile::kph);
     newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
 
     // column 2
@@ -197,6 +198,17 @@ Card::setType(CardType type, RideFile::SeriesType series)
         }
 
         //
+        // PACE
+        //
+        if (series == RideFile::kph && parent->context->athlete->paceZones(false)) {
+            // set the zero values
+            for(int i=0; i<parent->context->athlete->paceZones(false)->getScheme().nzones_default; i++) {
+                *barset << 0;
+                categories << parent->context->athlete->paceZones(false)->getScheme().zone_default_name[i];
+            }
+        }
+
+        //
         // W'BAL
         //
         if (series == RideFile::wbal) {
@@ -254,16 +266,16 @@ static const QStringList timeInZones = QStringList()
         << "percent_in_zone_L10";
 
 static const QStringList paceTimeInZones = QStringList()
-        << "time_in_zone_P1"
-        << "time_in_zone_P2"
-        << "time_in_zone_P3"
-        << "time_in_zone_P4"
-        << "time_in_zone_P5"
-        << "time_in_zone_P6"
-        << "time_in_zone_P7"
-        << "time_in_zone_P8"
-        << "time_in_zone_P9"
-        << "time_in_zone_P10";
+        << "percent_in_zone_P1"
+        << "percent_in_zone_P2"
+        << "percent_in_zone_P3"
+        << "percent_in_zone_P4"
+        << "percent_in_zone_P5"
+        << "percent_in_zone_P6"
+        << "percent_in_zone_P7"
+        << "percent_in_zone_P8"
+        << "percent_in_zone_P9"
+        << "percent_in_zone_P10";
 
 static const QStringList timeInZonesHR = QStringList()
         << "percent_in_zone_H1"
@@ -342,6 +354,35 @@ Card::setData(RideItem *item)
                     numzones = parent->context->athlete->zones(item->isRun)->numZones(range);
                     for(int i=0; i<categories.count() && i < numzones;i++) {
                         barset->replace(i, round(item->getForSymbol(timeInZones[i])));
+                    }
+
+                } else {
+
+                    for(int i=0; i<5; i++) barset->replace(i, 0);
+                }
+
+            } else {
+
+                for(int i=0; i<5; i++) barset->replace(i, 0);
+            }
+        }
+        break;
+
+        //
+        // PACE
+        //
+        case RideFile::kph:
+        {
+            if ((item->isRun || item->isSwim) && parent->context->athlete->paceZones(item->isSwim)) {
+
+                int numzones;
+                int range = parent->context->athlete->paceZones(item->isSwim)->whichRange(item->dateTime.date());
+
+                if (range > -1) {
+
+                    numzones = parent->context->athlete->paceZones(item->isSwim)->numZones(range);
+                    for(int i=0; i<categories.count() && i < numzones;i++) {
+                        barset->replace(i, round(item->getForSymbol(paceTimeInZones[i])));
                     }
 
                 } else {
