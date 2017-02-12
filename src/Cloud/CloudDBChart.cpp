@@ -990,7 +990,10 @@ CloudDBChartListDialog::editUserEdit(){
                 } else {
                     return;
                 }
+            } else {
+                return;
             }
+
         }
 
         // updated chart appears on top of the list / and needs to be filtered
