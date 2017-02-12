@@ -83,7 +83,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // column 2
     newCard("RPE", 2, 0, 5);
     newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
-    newCard("W'bal Zones", 2, 2, 10);
+    newCard("W'bal Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17);
 
     // column 3
@@ -194,6 +194,14 @@ Card::setType(CardType type, RideFile::SeriesType series)
                 *barset << 0;
                 categories << parent->context->athlete->zones(false)->getScheme().zone_default_name[i];
             }
+        }
+
+        //
+        // W'BAL
+        //
+        if (series == RideFile::wbal) {
+            categories << "Low" << "Med" << "High" << "Ext";
+            *barset << 0 << 0 << 0 << 0;
         }
 
         // bar series and categories setup, same for all
@@ -344,6 +352,21 @@ Card::setData(RideItem *item)
             } else {
 
                 for(int i=0; i<5; i++) barset->replace(i, 0);
+            }
+        }
+        break;
+
+        case RideFile::wbal:
+        {
+            // get total time in zones
+            double sum=0;
+            for(int i=0; i<4; i++) sum += round(item->getForSymbol(timeInZonesWBAL[i]));
+
+            // update as percent of total
+            for(int i=0; i<4; i++) {
+                double time =round(item->getForSymbol(timeInZonesWBAL[i]));
+                if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                else barset->replace(i, 0);
             }
         }
         break;
