@@ -634,8 +634,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
     }
 
-    # qt charts in QT5.7 or higher
-    greaterThan(QT_MINOR_VERSION, 6) {
+    # qt charts is officially supported from QT5.8 or higher
+    # in 5.7 it is a tech preview and not always available
+    greaterThan(QT_MINOR_VERSION, 7) {
         QT += charts
 
         # Dashboard uses qt charts, so needs at least Qt 5.7
