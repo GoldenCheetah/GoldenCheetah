@@ -67,7 +67,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // XXX lets hack in some tiles to start (will load from config later) XXX
 
     // column 0
-    newCard("Sport", 0, 0, 5);
+    newCard("Sport", 0, 0, 5, Card::META, "Sport");
     newCard("Duration", 0, 1, 5, Card::METRIC, "workout_time");
     newCard("Route", 0, 2, 10);
     newCard("Distance", 0, 3, 5, Card::METRIC, "total_distance");
@@ -82,7 +82,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
 
     // column 2
-    newCard("RPE", 2, 0, 5);
+    newCard("RPE", 2, 0, 5, Card::META, "RPE");
     newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
     newCard("W'bal Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17);
@@ -302,6 +302,10 @@ Card::setData(RideItem *item)
         value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
     }
 
+    if (type == META) {
+        value = item->getText(settings.symbol, "");
+    }
+
     if (type == ZONE) {
 
         // enable animation when setting values (disabled at all other times)
@@ -453,10 +457,10 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     // only paint contents if not dragging
     if (drag) return;
 
-    if (type == METRIC) {
+    if (type == METRIC || type == META) {
 
         // we need the metric units
-        if (metric == NULL) {
+        if (type == METRIC && metric == NULL) {
             // get the metric details
             RideMetricFactory &factory = RideMetricFactory::instance();
             metric = const_cast<RideMetric*>(factory.rideMetric(settings.symbol));
@@ -493,11 +497,6 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             painter->drawText(QPointF((geometry().width() - QFontMetrics(smallfont).width(units)) / 2.0f,
                                   mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
         }
-    }
-
-    if (type == ZONE) {
-        // we are painting the chart basically.
-        //chart->paint();
     }
 }
 
