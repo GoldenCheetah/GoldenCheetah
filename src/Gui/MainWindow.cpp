@@ -1766,7 +1766,14 @@ MainWindow::setOpenWindowMenu()
     while (i.hasNext()) {
 
         QString name = i.next();
-
+#ifdef NOWEBKIT
+#ifdef WIN32
+        // QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
+        QStringList webEngineDirs;
+        webEngineDirs << "QtWebEngine" << "cache";
+        if (webEngineDirs.contains(name)) continue;
+#endif
+#endif
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -1808,7 +1815,14 @@ MainWindow::setOpenTabMenu()
     while (i.hasNext()) {
 
         QString name = i.next();
-
+#ifdef NOWEBKIT
+#ifdef WIN32
+        // QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
+        QStringList webEngineDirs;
+        webEngineDirs << "QtWebEngine" << "cache";
+        if (webEngineDirs.contains(name)) continue;
+#endif
+#endif
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -1850,7 +1864,14 @@ MainWindow::setBackupAthleteMenu()
     while (i.hasNext()) {
 
         QString name = i.next();
-
+#ifdef NOWEBKIT
+#ifdef WIN32
+        // QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
+        QStringList webEngineDirs;
+        webEngineDirs << "QtWebEngine" << "cache";
+        if (webEngineDirs.contains(name)) continue;
+#endif
+#endif
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 

@@ -97,7 +97,14 @@ ChooseCyclistDialog::getList()
     QStringListIterator i(home.entryList(QDir::Dirs | QDir::NoDotAndDotDot));
     while (i.hasNext()) {
         QString name = i.next();
-
+#ifdef NOWEBKIT
+#ifdef WIN32
+        // QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
+        QStringList webEngineDirs;
+        webEngineDirs << "QtWebEngine" << "cache";
+        if (webEngineDirs.contains(name)) continue;
+#endif
+#endif
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
         // get avatar image if it exists
