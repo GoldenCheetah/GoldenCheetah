@@ -20,7 +20,10 @@
 
 #include "TabView.h"
 #include "Athlete.h"
+
+#include "Zones.h"
 #include "HrZones.h"
+
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
@@ -86,7 +89,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // column 3
     newCard("Power", 3, 0, 5, Card::METRIC, "average_power");
     newCard("Intensity", 3, 1, 5, Card::METRIC, "coggan_if");
-    newCard("Power Zones", 3, 2, 10);
+    newCard("Power Zones", 3, 2, 10, Card::ZONE, RideFile::watts);
     newCard("Equivalent Power", 3, 3, 5, Card::METRIC, "coggan_np");
     newCard("Power Model", 3, 4, 11);
 
@@ -127,17 +130,120 @@ OverviewWindow::rideSelected()
     updateView();
 }
 
+// configure the cards
+void
+Card::setType(CardType type, RideFile::SeriesType series)
+{
+    this->type = type;
+    settings.series = series;
+
+    // basic chart setup
+    chart = new QChart(this);
+    chart->setBackgroundVisible(false); // draw on canvas
+    chart->legend()->setVisible(false); // no legends
+    chart->setTitle(""); // none wanted
+    chart->setAnimationOptions(QChart::NoAnimation);
+
+    // we have a mid sized font for chart labels etc
+    QFont mid;
+    mid.setPointSize(ROWHEIGHT/2);
+    chart->setFont(mid);
+
+    if (type == Card::ZONE) {
+
+        // needs a set of bars
+        barset = new QBarSet(tr("Time In Zone"), this);
+        barset->setLabelFont(mid);
+
+        if (settings.series == RideFile::hr) {
+            barset->setLabelColor(GColor(CHEARTRATE));
+            barset->setBorderColor(GColor(CHEARTRATE));
+            barset->setBrush(GColor(CHEARTRATE));
+        } else if (settings.series == RideFile::watts) {
+            barset->setLabelColor(GColor(CPOWER));
+            barset->setBorderColor(GColor(CPOWER));
+            barset->setBrush(GColor(CPOWER));
+        } else if (settings.series == RideFile::wbal) {
+            barset->setLabelColor(GColor(CWBAL));
+            barset->setBorderColor(GColor(CWBAL));
+            barset->setBrush(GColor(CWBAL));
+        } else if (settings.series == RideFile::kph) {
+            barset->setLabelColor(GColor(CSPEED));
+            barset->setBorderColor(GColor(CSPEED));
+            barset->setBrush(GColor(CSPEED));
+        }
+
+
+        //
+        // HEARTRATE
+        //
+        if (series == RideFile::hr && parent->context->athlete->hrZones(false)) {
+            // set the zero values
+            for(int i=0; i<parent->context->athlete->hrZones(false)->getScheme().nzones_default; i++) {
+                *barset << 0;
+                categories << parent->context->athlete->hrZones(false)->getScheme().zone_default_name[i];
+            }
+        }
+
+        //
+        // POWER
+        //
+        if (series == RideFile::watts && parent->context->athlete->zones(false)) {
+            // set the zero values
+            for(int i=0; i<parent->context->athlete->zones(false)->getScheme().nzones_default; i++) {
+                *barset << 0;
+                categories << parent->context->athlete->zones(false)->getScheme().zone_default_name[i];
+            }
+        }
+
+        // bar series and categories setup, same for all
+        barseries = new QBarSeries(this);
+        barseries->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+        barseries->setLabelsVisible(true);
+        barseries->setLabelsFormat("@value %");
+        barseries->append(barset);
+        chart->addSeries(barseries);
+
+
+        // x-axis labels etc
+        barcategoryaxis = new QBarCategoryAxis(this);
+        barcategoryaxis->setLabelsFont(mid);
+        barcategoryaxis->setLabelsColor(QColor(100,100,100));
+        barcategoryaxis->setGridLineVisible(false);
+        barcategoryaxis->setCategories(categories);
+
+        // config axes
+        QPen axisPen(GColor(CCARDBACKGROUND));
+        axisPen.setWidth(0.5); // almost invisibke
+        chart->createDefaultAxes();
+        chart->setAxisX(barcategoryaxis, barseries);
+        barcategoryaxis->setLinePen(axisPen);
+        chart->axisY(barseries)->setLinePen(axisPen);
+        chart->axisY(barseries)->setLabelsVisible(false);
+        chart->axisY(barseries)->setRange(0,100);
+        chart->axisY(barseries)->setGridLineVisible(false);
+    }
+}
+
+void
+Card::setType(CardType type, QString symbol)
+{
+    // metric or meta
+    this->type = type;
+    settings.symbol = symbol;
+}
+
 static const QStringList timeInZones = QStringList()
-        << "time_in_zone_L1"
-        << "time_in_zone_L2"
-        << "time_in_zone_L3"
-        << "time_in_zone_L4"
-        << "time_in_zone_L5"
-        << "time_in_zone_L6"
-        << "time_in_zone_L7"
-        << "time_in_zone_L8"
-        << "time_in_zone_L9"
-        << "time_in_zone_L10";
+        << "percent_in_zone_L1"
+        << "percent_in_zone_L2"
+        << "percent_in_zone_L3"
+        << "percent_in_zone_L4"
+        << "percent_in_zone_L5"
+        << "percent_in_zone_L6"
+        << "percent_in_zone_L7"
+        << "percent_in_zone_L8"
+        << "percent_in_zone_L9"
+        << "percent_in_zone_L10";
 
 static const QStringList paceTimeInZones = QStringList()
         << "time_in_zone_P1"
@@ -181,23 +287,68 @@ Card::setData(RideItem *item)
         // enable animation when setting values (disabled at all other times)
         chart->setAnimationOptions(QChart::SeriesAnimations);
 
-        if (parent->context->athlete->hrZones(item->isRun)) {
+        switch(settings.series) {
 
-            int numhrzones;
-            int hrrange = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
-            if (hrrange > -1) {
+        //
+        // HEARTRATE
+        //
+        case RideFile::hr:
+        {
+            if (parent->context->athlete->hrZones(item->isRun)) {
 
-                numhrzones = parent->context->athlete->hrZones(item->isRun)->numZones(hrrange);
+                int numhrzones;
+                int hrrange = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
 
-                for(int i=0; i<categories.count() && i < numhrzones;i++) {
-                    barset->replace(i, round(item->getForSymbol(timeInZonesHR[i])));
+                if (hrrange > -1) {
+
+                    numhrzones = parent->context->athlete->hrZones(item->isRun)->numZones(hrrange);
+                    for(int i=0; i<categories.count() && i < numhrzones;i++) {
+                        barset->replace(i, round(item->getForSymbol(timeInZonesHR[i])));
+                    }
+
+                } else {
+
+                    for(int i=0; i<5; i++) barset->replace(i, 0);
                 }
+
             } else {
+
                 for(int i=0; i<5; i++) barset->replace(i, 0);
             }
-        } else {
-            for(int i=0; i<5; i++) barset->replace(i, 0);
         }
+        break;
+
+        //
+        // POWER
+        //
+        default:
+        case RideFile::watts:
+        {
+            if (parent->context->athlete->zones(item->isRun)) {
+
+                int numzones;
+                int range = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
+
+                if (range > -1) {
+
+                    numzones = parent->context->athlete->zones(item->isRun)->numZones(range);
+                    for(int i=0; i<categories.count() && i < numzones;i++) {
+                        barset->replace(i, round(item->getForSymbol(timeInZones[i])));
+                    }
+
+                } else {
+
+                    for(int i=0; i<5; i++) barset->replace(i, 0);
+                }
+
+            } else {
+
+                for(int i=0; i<5; i++) barset->replace(i, 0);
+            }
+        }
+        break;
+
+        } // switch
     }
 }
 

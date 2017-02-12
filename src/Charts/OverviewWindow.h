@@ -59,6 +59,10 @@ class Card : public QGraphicsWidget
 
     public:
 
+        // what type am I?
+        enum cardType { NONE, METRIC, META, SERIES, ZONE } type;
+        typedef enum cardType CardType;
+
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
                                                 column(0), order(0), deep(deep), onscene(false),
                                                 placing(false), drag(false), invisible(false) {
@@ -78,12 +82,13 @@ class Card : public QGraphicsWidget
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
 
+        // configuration
+        void setType(CardType type, RideFile::SeriesType series);   // time in zone, data
+        void setType(CardType type, QString symbol);                // metric meta
 
+        // setup data after ride selected
         void setData(RideItem *item);
 
-        // what type am I?
-        enum cardType { NONE, METRIC, META, SERIES, ZONE } type;
-        typedef enum cardType CardType;
         QString value, units;
         RideMetric *metric;
 
@@ -189,69 +194,8 @@ class OverviewWindow : public GcChartWindow
                                                          add->order = order;
                                                          add->deep = deep;
                                                          add->parent = this;
-                                                         add->type = type;
-                                                         add->settings.series = x;
+                                                         add->setType(type, x);
                                                          cards.append(add);
-                                                         add->chart = new QChart(add);
-                                                         add->chart->setBackgroundVisible(false); // draw on canvas
-                                                         add->chart->legend()->setVisible(false); // no legends
-
-                                                         // we have a big font for charts
-                                                         QFont mid;
-                                                         mid.setPointSize(ROWHEIGHT/2);
-                                                         add->chart->setFont(mid);
-
-                                                         if (type == Card::ZONE) {
-                                                            add->barset = new QBarSet(tr("Time In Zone"), this);
-                                                            add->barset->setLabelFont(mid);
-                                                            if (add->settings.series == RideFile::hr) {
-                                                                add->barset->setLabelColor(GColor(CHEARTRATE));
-                                                                add->barset->setBorderColor(GColor(CHEARTRATE));
-                                                                add->barset->setBrush(GColor(CHEARTRATE));
-                                                            } else if (add->settings.series == RideFile::watts) {
-                                                                add->barset->setLabelColor(GColor(CPOWER));
-                                                                add->barset->setBorderColor(GColor(CPOWER));
-                                                                add->barset->setBrush(GColor(CPOWER));
-                                                            } else if (add->settings.series == RideFile::wbal) {
-                                                                add->barset->setLabelColor(GColor(CWBAL));
-                                                                add->barset->setBorderColor(GColor(CWBAL));
-                                                                add->barset->setBrush(GColor(CWBAL));
-                                                            } else if (add->settings.series == RideFile::kph) {
-                                                                add->barset->setLabelColor(GColor(CSPEED));
-                                                                add->barset->setBorderColor(GColor(CSPEED));
-                                                                add->barset->setBrush(GColor(CSPEED));
-                                                            }
-                                                            // how many?
-                                                            if (context->athlete->hrZones(false)) {
-                                                                // set the zero values
-                                                                for(int i=0; i<context->athlete->hrZones(false)->getScheme().nzones_default; i++) {
-                                                                    *add->barset << 0;
-                                                                    add->categories << context->athlete->hrZones(false)->getScheme().zone_default_name[i];
-                                                                }
-                                                            }
-                                                            add->barseries = new QBarSeries(this);
-                                                            add->barseries->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
-                                                            add->barseries->setLabelsVisible(true);
-                                                            add->barseries->setLabelsFormat("@value %");
-                                                            add->barseries->append(add->barset);
-                                                            add->chart->addSeries(add->barseries);
-                                                            add->chart->setTitle(""); // none wanted
-                                                            add->chart->setAnimationOptions(QChart::NoAnimation);
-                                                            add->barcategoryaxis = new QBarCategoryAxis(this);
-                                                            add->barcategoryaxis->setLabelsFont(mid);
-                                                            add->barcategoryaxis->setLabelsColor(QColor(100,100,100));
-                                                            add->barcategoryaxis->setGridLineVisible(false);
-                                                            add->barcategoryaxis->setCategories(add->categories);
-                                                            add->chart->createDefaultAxes();
-                                                            add->chart->setAxisX(add->barcategoryaxis, add->barseries);
-                                                            add->chart->axisY(add->barseries)->setGridLineVisible(false);
-                                                            QPen axisPen(GColor(CCARDBACKGROUND));
-                                                            axisPen.setWidth(0.5); // almost invisibke
-                                                            add->barcategoryaxis->setLinePen(axisPen);
-                                                            add->chart->axisY(add->barseries)->setLinePen(axisPen);
-                                                            add->chart->axisY(add->barseries)->setLabelsVisible(false);
-                                                            add->chart->axisY(add->barseries)->setRange(0,100);
-                                                         }
                                                          return add;
                                                         }
 
@@ -262,8 +206,7 @@ class OverviewWindow : public GcChartWindow
                                                          add->order = order;
                                                          add->deep = deep;
                                                          add->parent = this;
-                                                         add->type = type;
-                                                         add->settings.symbol = symbol;
+                                                         add->setType(type, symbol);
                                                          cards.append(add);
                                                          return add;
                                                         }
