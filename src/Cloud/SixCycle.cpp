@@ -56,7 +56,7 @@ SixCycle::SixCycle(Context *context) : FileStore(context), context(context), roo
     // how is data uploaded and downloaded?
     uploadCompression = none;
     downloadCompression = none;
-    filetype = FileStore::uploadType::PWX;
+    filetype = FileStore::uploadType::TCX;
 
     session_token = ""; // not authenticated yet
 
