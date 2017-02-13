@@ -57,6 +57,7 @@ class RideCache : public QObject
         // query the cache
         int count() const { return rides_.count(); }
         RideItem *getRide(QString filename);
+        RideItem *getRide(QDateTime dateTime);
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
 
