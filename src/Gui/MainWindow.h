@@ -40,6 +40,19 @@
 #include <AvailabilityMacros.h>
 #endif
 
+#if defined(NOWEBKIT) && defined(WIN32)
+// Macro to avoid Code Duplication in multiple files
+// QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
+# define SKIP_QTWE_CACHE \
+   QStringList webEngineDirs; \
+   webEngineDirs << "QtWebEngine" << "cache"; \
+   if (webEngineDirs.contains(name)) continue;
+#else
+# define SKIP_QTWE_CACHE
+#endif
+
+
+
 class QTFullScreen;
 class GcToolBar;
 class GcScopeBar;
