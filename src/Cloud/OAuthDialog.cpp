@@ -56,6 +56,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
 
     #if defined(NOWEBKIT) || (QT_VERSION > 0x050000 && defined(Q_OS_MAC))
     view = new QWebEngineView();
+    view->page()->profile()->setHttpCacheType(QWebEngineProfile::NoCache);
     #else
     view = new QWebView();
     #endif

@@ -23,6 +23,7 @@
 #include <QDir>
 #ifdef NOWEBKIT
 #include <QWebEngineView>
+#include <QWebEngineProfile>
 #else
 #include <QWebView>
 #include <QWebFrame>

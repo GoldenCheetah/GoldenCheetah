@@ -45,6 +45,7 @@
 #include <QWebEngineHistoryItem>
 #include <QWebEnginePage>
 #include <QWebEngineView>
+#include <QWebEngineProfile>
 #endif
 
 

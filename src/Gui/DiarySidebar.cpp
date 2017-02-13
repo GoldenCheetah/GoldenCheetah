@@ -112,6 +112,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     summary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
     summary->page()->view()->setContentsMargins(0,0,0,0);
     //XXX WEBENGINE XXX summary->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+    summary->page()->profile()->setHttpCacheType(QWebEngineProfile::NoCache);
 #else
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
