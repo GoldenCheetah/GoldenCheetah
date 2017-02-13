@@ -725,7 +725,7 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     
     // time
     QDomElement time = doc.createElement("time");
-    text = doc.createTextNode(ride->startTime().toString(Qt::ISODate));
+    text = doc.createTextNode(ride->startTime().toUTC().toString(Qt::ISODate));
     time.appendChild(text);
     root.appendChild(time);
 
