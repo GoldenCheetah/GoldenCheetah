@@ -238,7 +238,9 @@ Card::setType(CardType type, RideFile::SeriesType series)
         chart->createDefaultAxes();
         chart->setAxisX(barcategoryaxis, barseries);
         barcategoryaxis->setLinePen(axisPen);
+        barcategoryaxis->setLineVisible(false);
         chart->axisY(barseries)->setLinePen(axisPen);
+        chart->axisY(barseries)->setLineVisible(false);
         chart->axisY(barseries)->setLabelsVisible(false);
         chart->axisY(barseries)->setRange(0,100);
         chart->axisY(barseries)->setGridLineVisible(false);
