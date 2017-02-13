@@ -843,6 +843,17 @@ RideCache::getRide(QString filename)
     return NULL;
 }
 
+RideItem *
+RideCache::getRide(QDateTime dateTime)
+{
+    foreach(RideItem *item, rides())
+        if (item->dateTime == dateTime)
+            return item;
+    return NULL;
+}
+
+
+
 QHash<QString,int>
 RideCache::getRankedValues(QString field)
 {
