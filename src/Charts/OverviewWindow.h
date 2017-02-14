@@ -45,10 +45,14 @@
 #include <QtCharts>
 #include <QBarSet>
 #include <QBarSeries>
+#include <QLineSeries>
 
 // geometry basics
 #define SPACING 80
 #define ROWHEIGHT 80
+
+// sparklines number of points
+#define SPARKPOINTS 21
 
 class OverviewWindow;
 
@@ -92,6 +96,9 @@ class Card : public QGraphicsWidget
         QString value, units;
         RideMetric *metric;
 
+        // when dragging around
+        void setDrag(bool x);
+
         // settings
         struct {
 
@@ -117,6 +124,10 @@ class Card : public QGraphicsWidget
         QBarSeries *barseries;
         QStringList categories;
         QBarCategoryAxis *barcategoryaxis;
+
+        // sparkline
+        QLineSeries *lineseries;
+        QScatterSeries *me;
 
         // which column, sequence and size in rows
         int column, order, deep;
