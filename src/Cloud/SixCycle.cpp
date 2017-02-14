@@ -54,7 +54,7 @@ SixCycle::SixCycle(Context *context) : FileStore(context), context(context), roo
     connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     // how is data uploaded and downloaded?
-    uploadCompression = none;
+    uploadCompression = gzip;
     downloadCompression = none;
     filetype = FileStore::uploadType::TCX;
 
