@@ -20,6 +20,7 @@
 
 #include "TabView.h"
 #include "Athlete.h"
+#include "RideCache.h"
 
 #include "Zones.h"
 #include "HrZones.h"
@@ -257,6 +258,46 @@ Card::setType(CardType type, QString symbol)
     // metric or meta
     this->type = type;
     settings.symbol = symbol;
+
+    // we may plot the metric sparkline if the tile is big enough
+    if (type == METRIC) {
+        chart = new QChart(this);
+
+        // usual setup so no background or legend
+        chart->setBackgroundVisible(false); // draw on canvas
+        chart->legend()->setVisible(false); // no legends
+        chart->setTitle(""); // none wanted
+        chart->setAnimationOptions(QChart::NoAnimation);
+
+        // line series shows last 10 rides
+        QPen pen(QColor(200,200,200));
+        pen.setWidth(15);
+        lineseries = new QLineSeries(this);
+        lineseries->setPen(pen);
+        for(int i=0; i<SPARKPOINTS+1; i++) lineseries->append(QPointF(i,0));
+        chart->addSeries(lineseries);
+
+        me = new QScatterSeries(this);
+        me->append(SPARKPOINTS,0);
+        me->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        me->setMarkerSize(50);
+        me->setColor(GColor(CPLOTMARKER));
+        chart->addSeries(me);
+        chart->createDefaultAxes();
+
+        // set axis, and then hide it!
+        chart->axisX(lineseries)->setLineVisible(false);
+        chart->axisX(lineseries)->setLabelsVisible(false);
+        chart->axisX(lineseries)->setGridLineVisible(false);
+        chart->axisX(lineseries)->setRange(0,SPARKPOINTS+5);
+        chart->axisY(lineseries)->setLineVisible(false);
+        chart->axisY(lineseries)->setLabelsVisible(false);
+        chart->axisY(lineseries)->setGridLineVisible(false);
+        chart->axisY(lineseries)->setRange(-25,250);
+
+        chart->axisY(me)->setRange(-25,250);
+        chart->axisX(me)->setRange(0,SPARKPOINTS+5);
+    }
 }
 
 static const QStringList timeInZones = QStringList()
@@ -306,6 +347,41 @@ Card::setData(RideItem *item)
 {
     if (type == METRIC) {
         value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
+        lineseries->replace(SPARKPOINTS, SPARKPOINTS, value.toDouble());
+        me->replace(0, SPARKPOINTS, value.toDouble());
+
+        // set the chart values with the last 10 rides
+        int index = parent->context->athlete->rideCache->rides().indexOf(item);
+
+        // enable animation when setting values (disabled at all other times)
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+
+        if (index < 0) {
+            for(int i=0; i<SPARKPOINTS; i++) {
+                lineseries->replace(i, i, 0);
+            }
+        } else {
+            int j=0;
+            for(j=0;j>index-SPARKPOINTS && j<SPARKPOINTS; j++) {
+                // prefix with zeroes
+                lineseries->replace(j, j, 0);
+            }
+
+            double min=99999999;
+            double max=-99999999;
+            for(; j<SPARKPOINTS; j++) {
+                // get last n values
+                int offset = index-(SPARKPOINTS-j);
+
+                // get value from items before me
+                RideItem *prior = parent->context->athlete->rideCache->rides().at(offset);
+                double v = prior->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+                lineseries->replace(j, j, v);
+                if (v>max) max=v;
+                if (v<min) min=v;
+            }
+            //chart->axisY(lineseries)->setRange(min,max); //XXX need to fix axis calculation
+        }
     }
 
     if (type == META) {
@@ -427,7 +503,19 @@ Card::setData(RideItem *item)
 }
 
 void
+Card::setDrag(bool x)
+{
+    drag = x;
+
+    // hide stuff
+    if (drag && chart) chart->hide();
+    if (!drag) geometryChanged();
+}
+
+void
 Card::geometryChanged() {
+
+    QRectF geom = geometry();
 
     // if we contain charts etc lets update their geom
     if ((type == ZONE || type == SERIES) && chart)  {
@@ -435,9 +523,22 @@ Card::geometryChanged() {
         // disable animation when changing geometry
         chart->setAnimationOptions(QChart::NoAnimation);
 
-        QRectF geom = geometry();
         chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
         chart->update();
+    }
+
+    if (type == METRIC) {
+
+        // disable animation when changing geometry
+        chart->setAnimationOptions(QChart::NoAnimation);
+
+        // space enough?
+        if (!drag && geom.height() > (ROWHEIGHT*9)) {
+            chart->show();
+            chart->setGeometry(20, ROWHEIGHT*5, geom.width()-40, geom.height()-20-(ROWHEIGHT*5));
+        } else {
+            chart->hide();
+        }
     }
 }
 
@@ -495,6 +596,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
         // mid is slightly higher to account for space around title, move mid up
         double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
+
+        // if we're deep enough to show the sparkline then stop
+        if (geometry().height() > (ROWHEIGHT*9)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
 
         // we align centre and mid
         QFontMetrics fm(bigfont);
@@ -903,9 +1007,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     // work out the offset so we can move
                     // it around when we start dragging
                     state = DRAG;
-                    if (card->chart) card->chart->hide(); // whilst dragging around
                     card->invisible = true;
-                    card->drag = true;
+                    card->setDrag(true);
                     card->brush = GColor(CPLOTMARKER); //XXX hack whilst they're tiles
                     card->setZValue(100);
 
@@ -933,11 +1036,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // set back to visible if dragging
             if (state == DRAG) {
-                if (stateData.drag.card->chart) stateData.drag.card->chart->show();
                 stateData.drag.card->invisible = false;
                 stateData.drag.card->setZValue(10);
                 stateData.drag.card->placing = true;
-                stateData.drag.card->drag = false;
+                stateData.drag.card->setDrag(false);
                 stateData.drag.card->brush = GColor(CCARDBACKGROUND);
             }
 
