@@ -380,7 +380,8 @@ Card::setData(RideItem *item)
                 if (v>max) max=v;
                 if (v<min) min=v;
             }
-            //chart->axisY(lineseries)->setRange(min,max); //XXX need to fix axis calculation
+            double diff = (max-min)/10.0f;
+            chart->axisY(lineseries)->setRange(min-diff,max+diff); // add 10% to each direction
         }
     }
 
