@@ -71,12 +71,12 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Sport", 0, 0, 5, Card::META, "Sport");
     newCard("Duration", 0, 1, 5, Card::METRIC, "workout_time");
     newCard("Route", 0, 2, 10);
-    newCard("Distance", 0, 3, 5, Card::METRIC, "total_distance");
+    newCard("Distance", 0, 3, 9, Card::METRIC, "total_distance");
     newCard("Climbing", 0, 4, 5, Card::METRIC, "elevation_gain");
     newCard("Speed", 0, 6, 5, Card::METRIC, "average_speed");
 
     // column 1
-    newCard("Heartrate", 1, 0, 5, Card::METRIC, "average_hr");
+    newCard("Heartrate", 1, 0, 9, Card::METRIC, "average_hr");
     newCard("HRV", 1, 1, 5);
     newCard("Heartrate Zones", 1, 2, 10, Card::ZONE, RideFile::hr);
     newCard("Pace Zones", 1, 3, 11, Card::ZONE, RideFile::kph);
@@ -84,12 +84,12 @@ OverviewWindow::OverviewWindow(Context *context) :
 
     // column 2
     newCard("RPE", 2, 0, 5, Card::META, "RPE");
-    newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
+    newCard("Stress", 2, 1, 9, Card::METRIC, "coggan_tss");
     newCard("W'bal Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17);
 
     // column 3
-    newCard("Power", 3, 0, 5, Card::METRIC, "average_power");
+    newCard("Power", 3, 0, 9, Card::METRIC, "average_power");
     newCard("Intensity", 3, 1, 5, Card::METRIC, "coggan_if");
     newCard("Power Zones", 3, 2, 10, Card::ZONE, RideFile::watts);
     newCard("Equivalent Power", 3, 3, 5, Card::METRIC, "coggan_np");
@@ -520,9 +520,9 @@ Card::geometryChanged() {
     // if we contain charts etc lets update their geom
     if ((type == ZONE || type == SERIES) && chart)  {
 
+        if (!drag) chart->show();
         // disable animation when changing geometry
         chart->setAnimationOptions(QChart::NoAnimation);
-
         chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
         chart->update();
     }
@@ -533,9 +533,9 @@ Card::geometryChanged() {
         chart->setAnimationOptions(QChart::NoAnimation);
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*9)) {
+        if (!drag && geom.height() > (ROWHEIGHT*6)) {
             chart->show();
-            chart->setGeometry(20, ROWHEIGHT*5, geom.width()-40, geom.height()-20-(ROWHEIGHT*5));
+            chart->setGeometry(20, ROWHEIGHT*4, geom.width()-40, geom.height()-20-(ROWHEIGHT*4));
         } else {
             chart->hide();
         }
@@ -598,7 +598,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
 
         // if we're deep enough to show the sparkline then stop
-        if (geometry().height() > (ROWHEIGHT*9)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
+        if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
 
         // we align centre and mid
         QFontMetrics fm(bigfont);
