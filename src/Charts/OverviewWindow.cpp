@@ -147,7 +147,11 @@ Card::setType(CardType type, RideFile::SeriesType series)
 
     // we have a mid sized font for chart labels etc
     QFont mid;
+#ifdef Q_OS_MAC
+    mid.setPointSize(double(ROWHEIGHT) * 0.75f);
+#else
     mid.setPointSize(ROWHEIGHT/2);
+#endif
     chart->setFont(mid);
 
     if (type == Card::ZONE) {
@@ -471,12 +475,20 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
         // paint the value in the middle using a font 2xROWHEIGHT
         QFont bigfont;
+#ifdef Q_OS_MAC
+        bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
+#else
         bigfont.setPointSize(ROWHEIGHT*2);
+#endif
         painter->setPen(GColor(CPLOTMARKER));
         painter->setFont(bigfont);
 
         QFont smallfont;
+#ifdef Q_OS_MAC
+        smallfont.setPointSize(ROWHEIGHT);
+#else
         smallfont.setPointSize(ROWHEIGHT*0.6f);
+#endif
 
         double addy = 0;
         if (units != "" && units != tr("seconds")) addy = QFontMetrics(smallfont).height();
@@ -511,7 +523,11 @@ void
 OverviewWindow::updateGeometry()
 {
     bool animated=false;
-    group->clear();
+
+    // prevent a memory leak
+    group->stop();
+    delete group;
+    group = new QParallelAnimationGroup(this);
 
     // order the items to their positions
     qSort(cards.begin(), cards.end(), cardSort);
