@@ -51,8 +51,8 @@
 #define SPACING 80
 #define ROWHEIGHT 80
 
-// sparklines number of points
-#define SPARKPOINTS 21
+// sparklines number of points - look back 2 weeks
+#define SPARKDAYS 14
 
 class OverviewWindow;
 
@@ -128,6 +128,8 @@ class Card : public QGraphicsWidget
         // sparkline
         QLineSeries *lineseries;
         QScatterSeries *me;
+        double min,max;
+        bool showrange;
 
         // which column, sequence and size in rows
         int column, order, deep;

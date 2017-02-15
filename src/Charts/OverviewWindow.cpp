@@ -274,11 +274,11 @@ Card::setType(CardType type, QString symbol)
         pen.setWidth(15);
         lineseries = new QLineSeries(this);
         lineseries->setPen(pen);
-        for(int i=0; i<SPARKPOINTS+1; i++) lineseries->append(QPointF(i,0));
+        for(int i=0; i<SPARKDAYS+1; i++) lineseries->append(QPointF(i,0));
         chart->addSeries(lineseries);
 
         me = new QScatterSeries(this);
-        me->append(SPARKPOINTS,0);
+        me->append(SPARKDAYS,0);
         me->setMarkerShape(QScatterSeries::MarkerShapeCircle);
         me->setMarkerSize(50);
         me->setColor(GColor(CPLOTMARKER));
@@ -289,14 +289,14 @@ Card::setType(CardType type, QString symbol)
         chart->axisX(lineseries)->setLineVisible(false);
         chart->axisX(lineseries)->setLabelsVisible(false);
         chart->axisX(lineseries)->setGridLineVisible(false);
-        chart->axisX(lineseries)->setRange(0,SPARKPOINTS+5);
+        chart->axisX(lineseries)->setRange(0,SPARKDAYS+5);
         chart->axisY(lineseries)->setLineVisible(false);
         chart->axisY(lineseries)->setLabelsVisible(false);
         chart->axisY(lineseries)->setGridLineVisible(false);
         chart->axisY(lineseries)->setRange(-25,250);
 
         chart->axisY(me)->setRange(-25,250);
-        chart->axisX(me)->setRange(0,SPARKPOINTS+5);
+        chart->axisX(me)->setRange(0,SPARKDAYS+5);
     }
 }
 
@@ -346,9 +346,14 @@ void
 Card::setData(RideItem *item)
 {
     if (type == METRIC) {
+
+        // get last 30 days, if they exist
+        QList<QPointF> points;
+
+        // include current activity value
         value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
-        lineseries->replace(SPARKPOINTS, SPARKPOINTS, value.toDouble());
-        me->replace(0, SPARKPOINTS, value.toDouble());
+        me->replace(0, SPARKDAYS, value.toDouble());
+        points << QPointF(SPARKDAYS, value.toDouble());
 
         // set the chart values with the last 10 rides
         int index = parent->context->athlete->rideCache->rides().indexOf(item);
@@ -356,33 +361,43 @@ Card::setData(RideItem *item)
         // enable animation when setting values (disabled at all other times)
         chart->setAnimationOptions(QChart::SeriesAnimations);
 
-        if (index < 0) {
-            for(int i=0; i<SPARKPOINTS; i++) {
-                lineseries->replace(i, i, 0);
-            }
-        } else {
-            int j=0;
-            for(j=0;j>index-SPARKPOINTS && j<SPARKPOINTS; j++) {
-                // prefix with zeroes
-                lineseries->replace(j, j, 0);
-            }
-
-            double min=99999999;
-            double max=-99999999;
-            for(; j<SPARKPOINTS; j++) {
-                // get last n values
-                int offset = index-(SPARKPOINTS-j);
+        int offset = 1;
+        min = value.toDouble();
+        max = value.toDouble();
+        while(index-offset >=0) { // ultimately go no further back than first ever ride
 
                 // get value from items before me
-                RideItem *prior = parent->context->athlete->rideCache->rides().at(offset);
+                RideItem *prior = parent->context->athlete->rideCache->rides().at(index-offset);
+
+                // are we still in range ?
+                int old= prior->dateTime.daysTo(item->dateTime);
+                if (old > SPARKDAYS) break;
+
                 double v = prior->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
-                lineseries->replace(j, j, v);
-                if (v>max) max=v;
-                if (v<min) min=v;
-            }
-            double diff = (max-min)/10.0f;
-            chart->axisY(lineseries)->setRange(min-diff,max+diff); // add 10% to each direction
+
+                // new no zero value
+                if (v) {
+                    points<<QPointF(SPARKDAYS-old, v);
+                    if (v < min) min = v;
+                    if (v > max) max = v;
+                }
+                offset++;
         }
+
+        // add some space, if only one value +/- 10%
+        double diff = (max-min)/10.0f;
+        showrange=true;
+        if (diff==0) {
+            showrange=false;
+            diff = value.toDouble()/10.0f;
+        }
+
+        // update the sparkline
+        lineseries->replace(points);
+
+        // set range
+        chart->axisY(lineseries)->setRange(min-diff,max+diff); // add 10% to each direction
+        chart->axisY(me)->setRange(min-diff,max+diff); // add 10% to each direction
     }
 
     if (type == META) {
@@ -615,6 +630,24 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
             painter->drawText(QPointF((geometry().width() - QFontMetrics(smallfont).width(units)) / 2.0f,
                                   mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
+        }
+
+        // paint the range if the chart is shown
+        if (showrange && chart->isVisible()) {
+            // in small font max min at top bottom right of chart
+            double top = chart->geometry().top();
+            double bottom = chart->geometry().bottom();
+            double right = chart->geometry().right();
+
+            painter->setPen(QColor(100,100,100));
+            painter->setFont(smallfont);
+
+            QString upper=QString("%1").arg(max);
+            QString lower=QString("%1").arg(min);
+            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(upper) - 40,
+                                  top - 40 + (fm.ascent() / 3.0f)), upper);
+            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 40,
+                                  bottom -40), lower);
         }
     }
 }
