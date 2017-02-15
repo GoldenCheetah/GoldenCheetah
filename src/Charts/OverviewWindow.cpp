@@ -540,7 +540,6 @@ Card::geometryChanged() {
         // disable animation when changing geometry
         chart->setAnimationOptions(QChart::NoAnimation);
         chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
-        chart->update();
     }
 
     if (type == METRIC) {
@@ -930,8 +929,11 @@ OverviewWindow::setViewRect(QRectF rect)
 bool
 OverviewWindow::eventFilter(QObject *, QEvent *event)
 {
-    if (block) return false;
-
+    if (block || (event->type() != QEvent::KeyPress && event->type() != QEvent::GraphicsSceneWheel &&
+                  event->type() != QEvent::GraphicsSceneMousePress && event->type() != QEvent::GraphicsSceneMouseRelease &&
+                  event->type() != QEvent::GraphicsSceneMouseMove)) {
+        return false;
+    }
     block = true;
     bool returning = false;
 
