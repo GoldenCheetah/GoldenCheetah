@@ -7134,6 +7134,11 @@ AllPlot::intervalHover(IntervalItem *chosen)
     replot();
 }
 
+static bool isPlotCanvas(const QObject* const object)
+{
+    return object->objectName() == "QwtPlotCanvas";
+}
+
 bool
 AllPlot::eventFilter(QObject *obj, QEvent *event)
 {
@@ -7141,8 +7146,52 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         emit resized();
     }
 
-    // mouse wheel zoom logic
-    if (event->type() == QEvent::Wheel && obj->objectName() == "QwtPlotCanvas") {
+    // panning activation / deactivation
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::MouseButton::MiddleButton)
+        {
+            isPanning = true;
+            panOriginX = mouseEvent->globalX();
+        }
+    }
+    else if (event->type() == QEvent::MouseButtonRelease)
+    {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::MouseButton::MiddleButton)
+            isPanning = false;
+    }
+    else if (isPanning && event->type() == QEvent::MouseMove)
+    {
+        // the actual panning logic
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        int diffX = mouseEvent->globalX() - panOriginX;
+        QxtSpanSlider* slider = window->spanSlider;
+
+        // ride length in seconds
+        int total = slider->maximum() - slider->minimum();
+        int movement = (int)(diffX * (total / 1000.0));
+        if (movement != 0)
+        {
+            panOriginX = mouseEvent->globalX();
+            int newLower = slider->lowerValue() + movement;
+            int newUpper = slider->upperValue() + movement;
+            if (newUpper <= slider->maximum() && newLower >= slider->minimum())
+            {
+                slider->setLowerValue(newLower);
+                slider->setUpperValue(newUpper);
+                if (slider->lowerValue() < slider->minimum())
+                    slider->setLowerValue(slider->minimum());
+                if (slider->upperValue() > slider->maximum())
+                    slider->setUpperValue(slider->maximum());
+                window->zoomChanged();
+            }
+        }
+    }
+
+     // mouse wheel zoom logic
+    if (event->type() == QEvent::Wheel && isPlotCanvas(obj)) {
         static ulong lastEvent = 0;
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
         const bool increasingZoom = wheelEvent->delta() > 0;
