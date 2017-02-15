@@ -2,3 +2,4 @@
 *.pbxproj -crlf -diff -merge
 src/translations/* linguist-documentation
 src/Resources/translations/* linguist-documentation
+test/* linguist-vendored
