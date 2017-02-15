@@ -128,7 +128,7 @@ class Card : public QGraphicsWidget
         // sparkline
         QLineSeries *lineseries;
         QScatterSeries *me;
-        double min,max;
+        QString upper, lower;
         bool showrange;
 
         // which column, sequence and size in rows
