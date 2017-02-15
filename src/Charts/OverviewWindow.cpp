@@ -85,7 +85,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // column 2
     newCard("RPE", 2, 0, 5, Card::META, "RPE");
     newCard("Stress", 2, 1, 9, Card::METRIC, "coggan_tss");
-    newCard("W'bal Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
+    newCard("Fatigue Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17);
 
     // column 3
@@ -352,8 +352,12 @@ Card::setData(RideItem *item)
 
         // include current activity value
         value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
-        me->replace(0, SPARKDAYS, value.toDouble());
-        points << QPointF(SPARKDAYS, value.toDouble());
+
+        double v = (units == tr("seconds")) ?
+        item->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
+        : item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+        me->replace(0, SPARKDAYS, v);
+        points << QPointF(SPARKDAYS, v);
 
         // set the chart values with the last 10 rides
         int index = parent->context->athlete->rideCache->rides().indexOf(item);
@@ -362,8 +366,8 @@ Card::setData(RideItem *item)
         chart->setAnimationOptions(QChart::SeriesAnimations);
 
         int offset = 1;
-        min = value.toDouble();
-        max = value.toDouble();
+        double min = v;
+        double max = v;
         while(index-offset >=0) { // ultimately go no further back than first ever ride
 
                 // get value from items before me
@@ -373,7 +377,11 @@ Card::setData(RideItem *item)
                 int old= prior->dateTime.daysTo(item->dateTime);
                 if (old > SPARKDAYS) break;
 
-                double v = prior->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+                // get value
+                double v = (units == tr("seconds")) ?
+                prior->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
+                : prior->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+
 
                 // new no zero value
                 if (v) {
@@ -398,6 +406,15 @@ Card::setData(RideItem *item)
         // set range
         chart->axisY(lineseries)->setRange(min-diff,max+diff); // add 10% to each direction
         chart->axisY(me)->setRange(min-diff,max+diff); // add 10% to each direction
+
+        // set the values for upper lower
+        if (units == tr("seconds")) {
+            upper = time_to_string(max, true);
+            lower = time_to_string(min, true);
+        } else {
+            upper = QString("%1").arg(max);
+            lower = QString("%1").arg(min);
+        }
     }
 
     if (type == META) {
@@ -560,6 +577,7 @@ Card::geometryChanged() {
 // cards need to show they are in config mode
 void
 Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
     painter->setBrush(brush);
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
@@ -641,8 +659,6 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             painter->setPen(QColor(100,100,100));
             painter->setFont(smallfont);
 
-            QString upper=QString("%1").arg(max);
-            QString lower=QString("%1").arg(min);
             painter->drawText(QPointF(right - QFontMetrics(smallfont).width(upper) - 40,
                                   top - 40 + (fm.ascent() / 3.0f)), upper);
             painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 40,
