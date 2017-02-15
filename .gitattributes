@@ -1,0 +1,4 @@
+# Added this line to .gitattributes
+*.pbxproj -crlf -diff -merge
+src/translations/* linguist-documentation
+src/Resources/translations/* linguist-documentation
