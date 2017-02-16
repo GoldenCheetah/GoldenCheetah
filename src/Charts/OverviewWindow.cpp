@@ -427,6 +427,11 @@ static const QStringList timeInZonesWBAL = QStringList()
 void
 Card::setData(RideItem *item)
 {
+
+    // stop any animation before starting, just in case- stops a crash
+    // when we update a chart in the middle of its animation
+    if (chart) chart->setAnimationOptions(QChart::NoAnimation);
+
     if (type == METRIC) {
 
         // get last 30 days, if they exist
