@@ -781,7 +781,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         }
 
         // paint the range if the chart is shown
-        if (showrange && chart->isVisible()) {
+        if (showrange && chart && chart->isVisible()) {
             // in small font max min at top bottom right of chart
             double top = chart->geometry().top();
             double bottom = chart->geometry().bottom();
