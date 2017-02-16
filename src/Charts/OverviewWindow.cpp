@@ -21,6 +21,7 @@
 #include "TabView.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "IntervalItem.h"
 
 #include "Zones.h"
 #include "HrZones.h"
@@ -86,7 +87,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("RPE", 2, 0, 5, Card::META, "RPE");
     newCard("Stress", 2, 1, 9, Card::METRIC, "coggan_tss");
     newCard("Fatigue Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
-    newCard("Intervals", 2, 3, 17);
+    newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
     newCard("Power", 3, 0, 9, Card::METRIC, "average_power");
@@ -130,6 +131,13 @@ OverviewWindow::rideSelected()
 
     // update
     updateView();
+}
+
+// empty card
+void
+Card::setType(CardType type)
+{
+    setType(type, "");
 }
 
 // configure the cards
@@ -277,12 +285,12 @@ Card::setType(CardType type, QString symbol)
         for(int i=0; i<SPARKDAYS+1; i++) lineseries->append(QPointF(i,0));
         chart->addSeries(lineseries);
 
-        me = new QScatterSeries(this);
-        me->append(SPARKDAYS,0);
-        me->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-        me->setMarkerSize(50);
-        me->setColor(GColor(CPLOTMARKER));
-        chart->addSeries(me);
+        scatterseries = new QScatterSeries(this);
+        scatterseries->append(SPARKDAYS,0);
+        scatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        scatterseries->setMarkerSize(50);
+        scatterseries->setColor(GColor(CPLOTMARKER));
+        chart->addSeries(scatterseries);
         chart->createDefaultAxes();
 
         // set axis, and then hide it!
@@ -295,8 +303,82 @@ Card::setType(CardType type, QString symbol)
         chart->axisY(lineseries)->setGridLineVisible(false);
         chart->axisY(lineseries)->setRange(-25,250);
 
-        chart->axisY(me)->setRange(-25,250);
-        chart->axisX(me)->setRange(0,SPARKDAYS+5);
+        chart->axisY(scatterseries)->setRange(-25,250);
+        chart->axisX(scatterseries)->setRange(0,SPARKDAYS+5);
+    }
+}
+
+// interval
+void
+Card::setType(CardType type, QString xsymbol, QString ysymbol)
+{
+    // metric or meta
+    this->type = type;
+    settings.xsymbol = xsymbol;
+    settings.ysymbol = ysymbol;
+
+    // we may plot the metric sparkline if the tile is big enough
+    if (type == INTERVAL) {
+        chart = new QChart(this);
+
+        // we have a mid sized font for chart labels etc
+        QFont mid;
+#ifdef Q_OS_MAC
+        mid.setPointSize(double(ROWHEIGHT) * 0.75f);
+#else
+        mid.setPointSize(ROWHEIGHT/2);
+#endif
+        chart->setFont(mid);
+
+        // usual setup so no background or legend
+        chart->setBackgroundVisible(false); // draw on canvas
+        chart->legend()->setVisible(false); // no legends
+        chart->setTitle(""); // none wanted
+        chart->setAnimationOptions(QChart::NoAnimation);
+
+        // line series shows last 10 rides
+        QPen pen(QColor(200,200,200));
+        pen.setWidth(15);
+        systemscatterseries = new QScatterSeries(this);
+        systemscatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        systemscatterseries->setMarkerSize(50);
+        systemscatterseries->setColor(QColor(100,100,100));
+        chart->addSeries(systemscatterseries);
+        peakscatterseries = new QScatterSeries(this);
+        peakscatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        peakscatterseries->setMarkerSize(50);
+        peakscatterseries->setColor(QColor(150,150,150));
+        chart->addSeries(peakscatterseries);
+        userscatterseries = new QScatterSeries(this);
+        userscatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        userscatterseries->setMarkerSize(75);
+        userscatterseries->setColor(GColor(CPLOTMARKER));
+        chart->addSeries(userscatterseries);
+        chart->createDefaultAxes();
+
+        // set axis, and then hide it!
+        chart->axisY(peakscatterseries)->setGridLinePen(QPen(QColor(100,100,100)));
+        chart->axisY(userscatterseries)->setGridLinePen(QPen(QColor(100,100,100)));
+        chart->axisY(systemscatterseries)->setGridLinePen(QPen(QColor(100,100,100)));
+        chart->axisX(peakscatterseries)->setLabelsFont(mid);
+        chart->axisX(userscatterseries)->setLabelsFont(mid);
+        chart->axisX(systemscatterseries)->setLabelsFont(mid);
+        chart->axisY(peakscatterseries)->setLabelsFont(mid);
+        chart->axisY(userscatterseries)->setLabelsFont(mid);
+        chart->axisY(systemscatterseries)->setLabelsFont(mid);
+        chart->axisX(peakscatterseries)->setGridLineVisible(false);
+        chart->axisY(peakscatterseries)->setGridLineVisible(true);
+        chart->axisX(userscatterseries)->setGridLineVisible(false);
+        chart->axisY(userscatterseries)->setGridLineVisible(true);
+        chart->axisX(systemscatterseries)->setGridLineVisible(false);
+        chart->axisY(systemscatterseries)->setGridLineVisible(true);
+
+        //chart->axisX(scatterseries)->setLineVisible(false);
+        //chart->axisX(scatterseries)->setLabelsVisible(false);
+        //chart->axisX(scatterseries)->setRange(0,SPARKDAYS+5);
+        //chart->axisY(scatterseries)->setLineVisible(false);
+        //chart->axisY(scatterseries)->setLabelsVisible(false);
+        //chart->axisY(scatterseries)->setGridLineVisible(false);
     }
 }
 
@@ -356,7 +438,7 @@ Card::setData(RideItem *item)
         double v = (units == tr("seconds")) ?
         item->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
         : item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
-        me->replace(0, SPARKDAYS, v);
+        scatterseries->replace(0, SPARKDAYS, v);
         points << QPointF(SPARKDAYS, v);
 
         // set the chart values with the last 10 rides
@@ -405,7 +487,7 @@ Card::setData(RideItem *item)
 
         // set range
         chart->axisY(lineseries)->setRange(min-diff,max+diff); // add 10% to each direction
-        chart->axisY(me)->setRange(min-diff,max+diff); // add 10% to each direction
+        chart->axisY(scatterseries)->setRange(min-diff,max+diff); // add 10% to each direction
 
         // set the values for upper lower
         if (units == tr("seconds")) {
@@ -533,6 +615,55 @@ Card::setData(RideItem *item)
 
         } // switch
     }
+
+    if (type == INTERVAL) {
+
+        chart->setAnimationOptions(QChart::AllAnimations); // grid lines change - need a visual cue
+
+        double minx = 999999999;
+        double maxx =-999999999;
+        double miny = 999999999;
+        double maxy =-999999999;
+
+        //set the x, y series
+        QList<QPointF> peaks, user, system;
+        foreach(IntervalItem *interval, item->intervals()) {
+            // get the x and y VALUE
+            double x = interval->getForSymbol(settings.xsymbol, parent->context->athlete->useMetricUnits);
+            double y = interval->getForSymbol(settings.ysymbol, parent->context->athlete->useMetricUnits);
+
+            if (interval->type == RideFileInterval::PEAKPOWER || interval->type == RideFileInterval::PEAKPACE)
+                peaks <<  QPointF(x,y);
+            else if (interval->type == RideFileInterval::USER)
+                user <<  QPointF(x,y);
+            else
+                system << QPointF(x,y);
+
+            if (x<minx) minx=x;
+            if (y<miny) miny=y;
+            if (x>maxx) maxx=x;
+            if (y>maxy) maxy=y;
+        }
+        peakscatterseries->replace(peaks);
+        userscatterseries->replace(user);
+        systemscatterseries->replace(system);
+
+        // set scale
+        double ydiff = (maxy-miny) / 10.0f;
+        if (miny >= 0 && ydiff > miny) miny = ydiff;
+        double xdiff = (maxx-minx) / 10.0f;
+        if (minx >= 0 && xdiff > minx) minx = xdiff;
+        maxx=round(maxx); minx=round(minx); xdiff=round(xdiff);
+        maxy=round(maxy); miny=round(miny); ydiff=round(ydiff);
+
+        chart->axisY(peakscatterseries)->setRange(miny-ydiff,maxy+ydiff); // add 10% to each direction
+        chart->axisY(systemscatterseries)->setRange(miny-ydiff,maxy+ydiff); // add 10% to each direction
+        chart->axisY(userscatterseries)->setRange(miny-ydiff,maxy+ydiff); // add 10% to each direction
+
+        chart->axisX(peakscatterseries)->setRange(minx-xdiff,maxx+xdiff); // add 10% to each direction
+        chart->axisX(systemscatterseries)->setRange(minx-xdiff,maxx+xdiff); // add 10% to each direction
+        chart->axisX(userscatterseries)->setRange(minx-xdiff,maxx+xdiff); // add 10% to each direction
+    }
 }
 
 void
@@ -551,7 +682,7 @@ Card::geometryChanged() {
     QRectF geom = geometry();
 
     // if we contain charts etc lets update their geom
-    if ((type == ZONE || type == SERIES) && chart)  {
+    if ((type == INTERVAL || type == ZONE || type == SERIES) && chart)  {
 
         if (!drag) chart->show();
         // disable animation when changing geometry
@@ -723,7 +854,7 @@ OverviewWindow::updateGeometry()
         int theight = cards[i]->deep * ROWHEIGHT;
 
         // make em smaller when configuring visual cue stolen from Windows Start Menu
-        int add = (state == DRAG) ? (ROWHEIGHT/2) : 0;
+        int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
 
 
         // for setting the scene rectangle - but ignore a card if we are dragging it
@@ -1286,7 +1417,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // min max width
             if (setcolumn < 800) setcolumn = 800;
-            if (setcolumn > 1600) setcolumn = 1600;
+            if (setcolumn > 2400) setcolumn = 2400;
 
             columns[stateData.xresize.column] = setcolumn;
 
