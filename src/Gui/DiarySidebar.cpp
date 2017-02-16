@@ -105,6 +105,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 #ifdef NOWEBKIT
     // WebEngine
     summary = new QWebEngineView(this);
+    summary->setEnabled(false);
     summary->setContentsMargins(0,0,0,0);
     summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     summary->setAcceptDrops(false);
