@@ -221,6 +221,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
 #ifdef NOWEBKIT
     summary = new QWebEngineView(this);
+    summary->setEnabled(false);
     summary->setContentsMargins(0,0,0,0);
     summary->page()->view()->setContentsMargins(0,0,0,0);
     //XXX WEBENGINEsummary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
