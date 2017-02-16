@@ -64,7 +64,7 @@ class Card : public QGraphicsWidget
     public:
 
         // what type am I?
-        enum cardType { NONE, METRIC, META, SERIES, ZONE } type;
+        enum cardType { NONE, METRIC, META, SERIES, INTERVAL, ZONE } type;
         typedef enum cardType CardType;
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
@@ -87,8 +87,10 @@ class Card : public QGraphicsWidget
         }
 
         // configuration
+        void setType(CardType type); // NONE
         void setType(CardType type, RideFile::SeriesType series);   // time in zone, data
         void setType(CardType type, QString symbol);                // metric meta
+        void setType(CardType type, QString xsymbol, QString ysymbol); // interval
 
         // setup data after ride selected
         void setData(RideItem *item);
@@ -102,7 +104,7 @@ class Card : public QGraphicsWidget
         // settings
         struct {
 
-            QString symbol;
+            QString symbol, xsymbol, ysymbol;
             RideFile::SeriesType series;
 
         } settings;
@@ -127,7 +129,7 @@ class Card : public QGraphicsWidget
 
         // sparkline
         QLineSeries *lineseries;
-        QScatterSeries *me;
+        QScatterSeries *scatterseries, *peakscatterseries, *userscatterseries, *systemscatterseries;
         QString upper, lower;
         bool showrange;
 
@@ -200,6 +202,17 @@ class OverviewWindow : public GcChartWindow
         // set scale, zoom etc appropriately
         void updateView();
 
+        Card *newCard(QString name, int column, int order, int deep) {
+                                                         Card *add = new Card(deep, name);
+                                                         add->column = column;
+                                                         add->order = order;
+                                                         add->deep = deep;
+                                                         add->parent = this;
+                                                         add->setType(Card::NONE);
+                                                         cards.append(add);
+                                                         return add;
+                                                        }
+
         // create a card - zones / series
         Card *newCard(QString name, int column, int order, int deep, Card::CardType type, RideFile::SeriesType x) {
                                                          Card *add = new Card(deep, name);
@@ -213,13 +226,25 @@ class OverviewWindow : public GcChartWindow
                                                         }
 
         // create a card - metric
-        Card *newCard(QString name, int column, int order, int deep, Card::CardType type=Card::NONE, QString symbol="") {
+        Card *newCard(QString name, int column, int order, int deep, Card::CardType type, QString symbol) {
                                                          Card *add = new Card(deep, name);
                                                          add->column = column;
                                                          add->order = order;
                                                          add->deep = deep;
                                                          add->parent = this;
                                                          add->setType(type, symbol);
+                                                         cards.append(add);
+                                                         return add;
+                                                        }
+        // create a card - interval
+        Card *newCard(QString name, int column, int order, int deep, Card::CardType type, QString xsymbol,
+                       QString ysymbol) {
+                                                         Card *add = new Card(deep, name);
+                                                         add->column = column;
+                                                         add->order = order;
+                                                         add->deep = deep;
+                                                         add->parent = this;
+                                                         add->setType(type, xsymbol, ysymbol);
                                                          cards.append(add);
                                                          return add;
                                                         }
