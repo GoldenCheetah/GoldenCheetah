@@ -23,6 +23,7 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideImportWizard.h"
+#include "RideCache.h"
 
 #include "RideAutoImportConfig.h"
 #include "HelpWhatsThis.h"
@@ -968,6 +969,11 @@ RideImportWizard::abortClicked()
         // check if a ride at this point of time already exists in /activities - if yes, skip import
         if (QFileInfo(finalActivitiesFulltarget).exists()) { tableWidget->item(i,5)->setText(tr("Error - Activity file exists")); continue; }
 
+        // in addition, also check the RideCache for a Ride with the same point in Time in UTC, which also indicates
+        // that there was already a ride imported - reason is that RideCache start time is in UTC, while the file Name is in "localTime"
+        // which causes problems when importing the same file (for files which do not have time/date in the file name),
+        // while the computer has been set to a different time zone
+        if (context->athlete->rideCache->getRide(ridedatetime.toUTC())) { tableWidget->item(i,5)->setText(tr("Error - Activity file with same start date/time exists")); continue; };
 
         // SAVE STEP 4 - copy the source file to "/imports" directory (if it's not taken from there as source)
         // add the date/time of the target to the source file name (for identification)
