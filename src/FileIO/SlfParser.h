@@ -47,6 +47,7 @@ private:
     double	secs;
     int		wheelSize;
     double	samplingRate;
+    double  sampleCount, sampleSecs;
 
     double	distance;
 
