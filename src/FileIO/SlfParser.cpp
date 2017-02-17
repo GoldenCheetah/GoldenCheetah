@@ -41,6 +41,8 @@ SlfParser::startElement( const QString&, const QString&,
     if (qName == "Activity")
     {
         secs = 0.0;
+        sampleCount = 0.0;
+        sampleSecs = 0.0;
         distance = 0.0;
         lap = 0;
     } else if (qName == "Computer")
@@ -89,6 +91,9 @@ SlfParser::startElement( const QString&, const QString&,
         double temp = qAttributes.value("temperature").toDouble();
         double slope = qAttributes.value("incline").toDouble();
         rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power, alt, lon, lat, headwind, slope, temp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, lap);
+        sampleCount += 1.0;
+        sampleSecs = secs;
+
     } 
     return true;
 }
@@ -207,6 +212,14 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
                                   0.0, 0.0, 0.0, 0.0,
                                   lap);
             secs += samplingRate;
+        }
+    }
+    else if (qName == "Entries")
+    {
+        // Rox 11 does not provide the samplingRate any more - if it's still Zero at the end of the file,
+        // calculate the rate based on number of samples and last "secs" value - Rox 11 allows 1-2-5-10-20 secs sampling so round to integer
+        if (rideFile->recIntSecs() == 0.0 && sampleCount > 0 && sampleSecs > 0.0) {
+            rideFile->setRecIntSecs(double(qRound(sampleSecs / sampleCount)));  // strip of the decimals since Rox does not have any
         }
     }
     return true;
