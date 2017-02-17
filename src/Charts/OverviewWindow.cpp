@@ -27,6 +27,7 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+#include <cmath>
 #include <QGraphicsSceneMouseEvent>
 
 OverviewWindow::OverviewWindow(Context *context) :
@@ -77,20 +78,20 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Speed", 0, 6, 5, Card::METRIC, "average_speed");
 
     // column 1
-    newCard("Heartrate", 1, 0, 9, Card::METRIC, "average_hr");
+    newCard("Heartrate", 1, 0, 8, Card::METRIC, "average_hr");
     newCard("HRV", 1, 1, 5);
     newCard("Heartrate Zones", 1, 2, 10, Card::ZONE, RideFile::hr);
     newCard("Pace Zones", 1, 3, 11, Card::ZONE, RideFile::kph);
     newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
 
     // column 2
-    newCard("RPE", 2, 0, 5, Card::META, "RPE");
-    newCard("Stress", 2, 1, 9, Card::METRIC, "coggan_tss");
+    newCard("Stress", 2, 0, 8, Card::METRIC, "coggan_tss");
+    newCard("RPE", 2, 1, 5, Card::META, "RPE");
     newCard("Fatigue Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
-    newCard("Power", 3, 0, 9, Card::METRIC, "average_power");
+    newCard("Power", 3, 0, 8, Card::METRIC, "average_power");
     newCard("Intensity", 3, 1, 5, Card::METRIC, "coggan_if");
     newCard("Power Zones", 3, 2, 10, Card::ZONE, RideFile::watts);
     newCard("Equivalent Power", 3, 3, 5, Card::METRIC, "coggan_np");
@@ -126,8 +127,16 @@ OverviewWindow::OverviewWindow(Context *context) :
 void
 OverviewWindow::rideSelected()
 {
+
+// profiling the code
+//QTime timer;
+//timer.start();
+
     // ride item changed
     foreach(Card *card, cards) card->setData(myRideItem);
+
+// profiling the code
+//qDebug()<<"took:"<<timer.elapsed();
 
     // update
     updateView();
@@ -269,42 +278,8 @@ Card::setType(CardType type, QString symbol)
 
     // we may plot the metric sparkline if the tile is big enough
     if (type == METRIC) {
-        chart = new QChart(this);
 
-        // usual setup so no background or legend
-        chart->setBackgroundVisible(false); // draw on canvas
-        chart->legend()->setVisible(false); // no legends
-        chart->setTitle(""); // none wanted
-        chart->setAnimationOptions(QChart::NoAnimation);
-
-        // line series shows last 10 rides
-        QPen pen(QColor(200,200,200));
-        pen.setWidth(15);
-        lineseries = new QLineSeries(this);
-        lineseries->setPen(pen);
-        for(int i=0; i<SPARKDAYS+1; i++) lineseries->append(QPointF(i,0));
-        chart->addSeries(lineseries);
-
-        scatterseries = new QScatterSeries(this);
-        scatterseries->append(SPARKDAYS,0);
-        scatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-        scatterseries->setMarkerSize(50);
-        scatterseries->setColor(GColor(CPLOTMARKER));
-        chart->addSeries(scatterseries);
-        chart->createDefaultAxes();
-
-        // set axis, and then hide it!
-        chart->axisX(lineseries)->setLineVisible(false);
-        chart->axisX(lineseries)->setLabelsVisible(false);
-        chart->axisX(lineseries)->setGridLineVisible(false);
-        chart->axisX(lineseries)->setRange(0,SPARKDAYS+5);
-        chart->axisY(lineseries)->setLineVisible(false);
-        chart->axisY(lineseries)->setLabelsVisible(false);
-        chart->axisY(lineseries)->setGridLineVisible(false);
-        chart->axisY(lineseries)->setRange(-25,250);
-
-        chart->axisY(scatterseries)->setRange(-25,250);
-        chart->axisX(scatterseries)->setRange(0,SPARKDAYS+5);
+        sparkline = new Sparkline(this, SPARKDAYS+1, name);
     }
 }
 
@@ -443,14 +418,10 @@ Card::setData(RideItem *item)
         double v = (units == tr("seconds")) ?
         item->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
         : item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
-        scatterseries->replace(0, SPARKDAYS, v);
         points << QPointF(SPARKDAYS, v);
 
         // set the chart values with the last 10 rides
         int index = parent->context->athlete->rideCache->rides().indexOf(item);
-
-        // enable animation when setting values (disabled at all other times)
-        chart->setAnimationOptions(QChart::SeriesAnimations);
 
         int offset = 1;
         double min = v;
@@ -488,11 +459,10 @@ Card::setData(RideItem *item)
         }
 
         // update the sparkline
-        lineseries->replace(points);
+        sparkline->setPoints(points);
 
         // set range
-        chart->axisY(lineseries)->setRange(min-diff,max+diff); // add 10% to each direction
-        chart->axisY(scatterseries)->setRange(min-diff,max+diff); // add 10% to each direction
+        sparkline->setRange(min-diff,max+diff); // add 10% to each direction
 
         // set the values for upper lower
         if (units == tr("seconds")) {
@@ -623,7 +593,66 @@ Card::setData(RideItem *item)
 
     if (type == INTERVAL) {
 
-        chart->setAnimationOptions(QChart::AllAnimations); // grid lines change - need a visual cue
+        // there is a memory leak in qt chart xyseries (amongst many I suspect)
+        // so we delete the series every now and again which loses animation
+        // but at least keeps the memory footprint and performance degrage down
+        if (delcounter++ > 10) {
+            delcounter = 0;
+
+            // wipe entirely!
+            delete peakscatterseries;
+            delete userscatterseries;
+            delete systemscatterseries;
+
+            // line series shows last 10 rides
+            QPen pen(QColor(200,200,200));
+            pen.setWidth(15);
+            systemscatterseries = new QScatterSeries(this);
+            systemscatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+            systemscatterseries->setMarkerSize(50);
+            systemscatterseries->setColor(QColor(100,100,100));
+            chart->addSeries(systemscatterseries);
+            peakscatterseries = new QScatterSeries(this);
+            peakscatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+            peakscatterseries->setMarkerSize(50);
+            peakscatterseries->setColor(QColor(150,150,150));
+            chart->addSeries(peakscatterseries);
+            userscatterseries = new QScatterSeries(this);
+            userscatterseries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+            userscatterseries->setMarkerSize(75);
+            userscatterseries->setColor(GColor(CPLOTMARKER));
+            chart->addSeries(userscatterseries);
+            chart->createDefaultAxes();
+
+            QFont mid;
+#ifdef Q_OS_MAC
+            mid.setPointSize(double(ROWHEIGHT) * 0.75f);
+#else
+            mid.setPointSize(ROWHEIGHT/2);
+#endif
+            chart->setFont(mid);
+
+            // set axis, and then hide it!
+            chart->axisY(peakscatterseries)->setGridLinePen(QPen(QColor(100,100,100)));
+            chart->axisY(userscatterseries)->setGridLinePen(QPen(QColor(100,100,100)));
+            chart->axisY(systemscatterseries)->setGridLinePen(QPen(QColor(100,100,100)));
+            chart->axisX(peakscatterseries)->setLabelsFont(mid);
+            chart->axisX(userscatterseries)->setLabelsFont(mid);
+            chart->axisX(systemscatterseries)->setLabelsFont(mid);
+            chart->axisY(peakscatterseries)->setLabelsFont(mid);
+            chart->axisY(userscatterseries)->setLabelsFont(mid);
+            chart->axisY(systemscatterseries)->setLabelsFont(mid);
+            chart->axisX(peakscatterseries)->setGridLineVisible(false);
+            chart->axisY(peakscatterseries)->setGridLineVisible(true);
+            chart->axisX(userscatterseries)->setGridLineVisible(false);
+            chart->axisY(userscatterseries)->setGridLineVisible(true);
+            chart->axisX(systemscatterseries)->setGridLineVisible(false);
+            chart->axisY(systemscatterseries)->setGridLineVisible(true);
+
+            geometryChanged();
+        }
+
+        //chart->setAnimationOptions(QChart::AllAnimations); // grid lines change - need a visual cue
 
         double minx = 999999999;
         double maxx =-999999999;
@@ -697,15 +726,12 @@ Card::geometryChanged() {
 
     if (type == METRIC) {
 
-        // disable animation when changing geometry
-        chart->setAnimationOptions(QChart::NoAnimation);
-
         // space enough?
         if (!drag && geom.height() > (ROWHEIGHT*6)) {
-            chart->show();
-            chart->setGeometry(20, ROWHEIGHT*4, geom.width()-40, geom.height()-20-(ROWHEIGHT*4));
+            sparkline->show();
+            sparkline->setGeometry(20, ROWHEIGHT*4, geom.width()-40, geom.height()-20-(ROWHEIGHT*4));
         } else {
-            chart->hide();
+            sparkline->hide();
         }
     }
 }
@@ -718,7 +744,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
     painter->setPen(Qt::NoPen);
-    painter->fillPath(path, brush.color());
+    //painter->fillPath(path, brush.color());
     painter->drawPath(path);
     painter->setPen(GColor(CPLOTGRID));
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
@@ -786,19 +812,99 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         }
 
         // paint the range if the chart is shown
-        if (showrange && chart && chart->isVisible()) {
+        if (showrange && sparkline && sparkline->isVisible()) {
+
+            //sparkline->paint(painter, option, widget);
+
             // in small font max min at top bottom right of chart
-            double top = chart->geometry().top();
-            double bottom = chart->geometry().bottom();
-            double right = chart->geometry().right();
+            double top = sparkline->geometry().top();
+            double bottom = sparkline->geometry().bottom();
+            double right = sparkline->geometry().right();
 
             painter->setPen(QColor(100,100,100));
             painter->setFont(smallfont);
 
-            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(upper) - 40,
-                                  top - 40 + (fm.ascent() / 3.0f)), upper);
-            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 40,
+            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(upper) - 80,
+                                  top - 40 + (fm.ascent() / 2.0f)), upper);
+            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 80,
                                   bottom -40), lower);
+        }
+    }
+}
+
+Sparkline::Sparkline(QGraphicsWidget *parent, int count, QString name) : QGraphicsItem(NULL), parent(parent), count(count), name(name)
+{
+    min = max = 0.0f;
+    setGeometry(20,20,100,100);
+    setZValue(11);
+}
+
+void
+Sparkline::setRange(double min, double max)
+{
+    this->min = min;
+    this->max = max;
+}
+
+void
+Sparkline::setPoints(QList<QPointF>x)
+{
+    points = x;
+}
+
+QVariant Sparkline::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+     if (change == ItemPositionChange && parent->scene())  prepareGeometryChange();
+     return QGraphicsItem::itemChange(change, value);
+}
+
+void
+Sparkline::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width,height);
+
+    // we need to go onto the scene !
+    if (scene() == NULL && parent->scene()) parent->scene()->addItem(this);
+
+    // set our geom
+    prepareGeometryChange();
+}
+
+void
+Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    // if no points just leave blank
+    if (points.isEmpty() || (max-min)==0) return;
+
+    // so draw a line connecting the points
+    double xfactor = (geom.width() - (ROWHEIGHT*6)) / SPARKDAYS;
+    double xoffset = boundingRect().left()+(ROWHEIGHT*2);
+    double yfactor = (geom.height()-(ROWHEIGHT)) / (max-min);
+    double bottom = boundingRect().bottom()-ROWHEIGHT/2;
+
+    // draw a sparkline -- need more than 1 point !
+    if (points.count() > 1) {
+
+        QPainterPath path;
+        path.moveTo((points[0].x()*xfactor)+xoffset, bottom-((points[0].y()-min)*yfactor));
+        for(int i=1; i<points.count();i++) {
+            path.lineTo((points[i].x()*xfactor)+xoffset, bottom-((points[i].y()-min)*yfactor));
+        }
+
+        QPen pen(QColor(150,150,150));
+        pen.setWidth(8);
+        //pen.setStyle(Qt::DotLine);
+        pen.setJoinStyle(Qt::RoundJoin);
+        painter->setPen(pen);
+        painter->drawPath(path);
+
+        // and the last one is a dot for this value
+        double x = (points.first().x()*xfactor)+xoffset-25;
+        double y = bottom-((points.first().y()-min)*yfactor)-25;
+        if (std::isfinite(x) && std::isfinite(y)) {
+            painter->setBrush(QBrush(GColor(CPLOTMARKER).darker(150)));
+            painter->setPen(Qt::NoPen);
+            painter->drawEllipse(QRectF(x, y, 50, 50));
         }
     }
 }
@@ -867,8 +973,8 @@ OverviewWindow::updateGeometry()
 
         // add to scene if new
         if (!cards[i]->onscene) {
-            cards[i]->setGeometry(tx, ty, twidth, theight);
             scene->addItem(cards[i]);
+            cards[i]->setGeometry(tx, ty, twidth, theight);
             cards[i]->onscene = true;
 
         } else if (cards[i]->invisible == false &&

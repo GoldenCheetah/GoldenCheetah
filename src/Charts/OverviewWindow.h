@@ -55,6 +55,7 @@
 #define SPARKDAYS 14
 
 class OverviewWindow;
+class Sparkline;
 
 // keep it simple for now
 class Card : public QGraphicsWidget
@@ -81,10 +82,18 @@ class Card : public QGraphicsWidget
             type = NONE;
             metric = NULL;
             chart = NULL;
+            sparkline = NULL;
+
+            // mem leak
+            delcounter=0;
 
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
+
+        // keep track of reuse of xyseries and delete to
+        // try and minimise memory leak in Qt Chart
+        int delcounter;
 
         // configuration
         void setType(CardType type); // NONE
@@ -128,6 +137,8 @@ class Card : public QGraphicsWidget
         QBarCategoryAxis *barcategoryaxis;
 
         // sparkline
+        Sparkline *sparkline;
+
         QLineSeries *lineseries;
         QScatterSeries *scatterseries, *peakscatterseries, *userscatterseries, *systemscatterseries;
         QString upper, lower;
@@ -145,6 +156,35 @@ class Card : public QGraphicsWidget
     public slots:
 
         void geometryChanged();
+};
+
+class Sparkline : public QGraphicsItem
+{
+    public:
+        Sparkline(QGraphicsWidget *parent, int count,QString name=""); // create and say how many days
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        void setPoints(QList<QPointF>);
+        void setRange(double min, double max); // upper lower
+
+        // needed as pure virtual in QGraphicsItem
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+        QRectF boundingRect() const { return QRectF(parent->geometry().x() + geom.x(),
+                                                    parent->geometry().y() + geom.y(),
+                                                    geom.width(), geom.height());
+        }
+
+    private:
+        QGraphicsWidget *parent;
+        QRectF geom;
+        int count;
+        QString name;
+        double min, max;
+        QList<QPointF> points;
 };
 
 class OverviewWindow : public GcChartWindow
