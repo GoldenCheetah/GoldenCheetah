@@ -124,6 +124,7 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(int maptype READ mapType WRITE setMapType USER true)
     Q_PROPERTY(bool showmarkers READ showMarkers WRITE setShowMarkers USER true)
     Q_PROPERTY(bool showfullplot READ showFullPlot WRITE setFullPlot USER true)
+    Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString osmtsurl READ osmTSUrl WRITE setOsmTSUrl USER true)
 
@@ -141,13 +142,16 @@ class RideMapWindow : public GcChartWindow
 
 
         QComboBox *mapCombo, *tileCombo;
-        QCheckBox *showMarkersCk, *showFullPlotCk;
+        QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
         QLabel *osmCustomTSTitle, *osmCustomTSLabel, *osmCustomTSUrlLabel;
         QLineEdit *osmCustomTSUrl;
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
         void setMapType(int x) { mapCombo->setCurrentIndex(x); }
+
+        bool showIntervals() const { return showInt->isChecked(); }
+        void setShowIntervals(bool x) { showInt->setChecked(x); }
 
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
@@ -167,6 +171,7 @@ class RideMapWindow : public GcChartWindow
         void tileTypeSelected(int x);
         void showMarkersChanged(int value);
         void showFullPlotChanged(int value);
+        void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
         void osmCustomTSURLTextChanged(QString text);
 
