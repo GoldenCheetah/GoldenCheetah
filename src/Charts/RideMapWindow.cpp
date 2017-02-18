@@ -69,10 +69,13 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     showMarkersCk = new QCheckBox();
     showFullPlotCk = new QCheckBox();
+    showInt = new QCheckBox();
+    showInt->setChecked(true);
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
+    commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
     osmCustomTSTitle = new QLabel(tr("Open Street Map - Custom Tile Server settings"));
@@ -102,6 +105,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
+    connect(showInt, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
     connect(osmCustomTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(osmCustomTSUrl, SIGNAL(textChanged(QString)), this, SLOT(osmCustomTSURLTextChanged(QString)));
@@ -233,6 +237,13 @@ RideMapWindow::showMarkersChanged(int value)
 {
     Q_UNUSED(value);
     forceReplot();
+}
+
+void
+RideMapWindow::showIntervalsChanged(int value)
+{
+    // show or hide the helper
+    overlayWidget->setVisible(value);
 }
 
 void
