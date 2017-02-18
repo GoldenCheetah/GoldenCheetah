@@ -72,7 +72,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     // column 0
     newCard("Sport", 0, 0, 5, Card::META, "Sport");
     newCard("Duration", 0, 1, 5, Card::METRIC, "workout_time");
-    newCard("Route", 0, 2, 10);
+    newCard("Route", 0, 2, 20, Card::ROUTE);
     newCard("Distance", 0, 3, 9, Card::METRIC, "total_distance");
     newCard("Climbing", 0, 4, 5, Card::METRIC, "elevation_gain");
     newCard("Speed", 0, 6, 5, Card::METRIC, "average_speed");
@@ -127,7 +127,6 @@ OverviewWindow::OverviewWindow(Context *context) :
 void
 OverviewWindow::rideSelected()
 {
-
 // profiling the code
 //QTime timer;
 //timer.start();
@@ -146,7 +145,35 @@ OverviewWindow::rideSelected()
 void
 Card::setType(CardType type)
 {
-    setType(type, "");
+    if (type == NONE) {
+        this->type = type;
+    }
+
+    // create a map (for now, add profile later
+    if (type == ROUTE) {
+
+        this->type = type;
+
+        // create a map chart and set to top level window
+        map = new RideMapWindow(parent->context, RideMapWindow::GOOGLE);
+        map->setParent(NULL);
+
+        // set sensible settings
+        map->setShowIntervals(false);
+        map->setShowMarkers(false);
+        map->setShowIntervals(false);
+        map->browser()->setEnabled(false); // don't grab focus!
+
+        // apply a dark style option
+        QFile css(":/web/googlemap/dark.css");
+        css.open(QFile::ReadOnly);
+        map->setStyleOptions(css.readAll().constData());
+        css.close();
+
+        // hide until added to scene
+        map->hide();
+        proxy = NULL;
+    }
 }
 
 // configure the cards
@@ -406,6 +433,10 @@ Card::setData(RideItem *item)
     // stop any animation before starting, just in case- stops a crash
     // when we update a chart in the middle of its animation
     if (chart) chart->setAnimationOptions(QChart::NoAnimation);
+
+    if (type == ROUTE) {
+        map->setProperty("ride", QVariant::fromValue<RideItem*>(item));
+    }
 
     if (type == METRIC) {
 
@@ -714,6 +745,20 @@ void
 Card::geometryChanged() {
 
     QRectF geom = geometry();
+
+    // route map needs adding to scene etc
+    if (type == ROUTE && scene() != NULL) {
+
+
+        if (proxy == NULL) {
+            // add to the scene
+            proxy = scene()->addWidget(map);
+            proxy->setZValue(11);
+            proxy->show();
+        }
+
+        map->setGeometry(geom.x()+20,geom.y()+20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+    }
 
     // if we contain charts etc lets update their geom
     if ((type == INTERVAL || type == ZONE || type == SERIES) && chart)  {
