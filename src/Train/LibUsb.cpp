@@ -399,18 +399,20 @@ struct usb_dev_handle* LibUsb::OpenFortius()
                                     qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
                                     qDebug()<<"did you remember to setup a udev rule for this device?";
                                 }
+                            } else {
+                                rc = usb_claim_interface(udev, interface);
+                                if (rc < 0) {
+                                    qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+                                } else {
+                                    if (OperatingSystem != OSX) {
+                                        // fails on Mac OS X, we don't actually need it anyway
+                                        rc = usb_set_altinterface(udev, alternate);
+                                        if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                                    }
+
+                                    return udev;
+                                }
                             }
-
-                            rc = usb_claim_interface(udev, interface);
-                            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-
-                            if (OperatingSystem != OSX) {
-                                // fails on Mac OS X, we don't actually need it anyway
-                                rc = usb_set_altinterface(udev, alternate);
-                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                            }
-
-                            return udev;
                         }
                     }
 
@@ -480,7 +482,7 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                 (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
 
                 //Avoid noisy output
-                //qDebug() << "Found a Garmin USB2 ANT+ stick";
+                qDebug() << "Found a Garmin USB2 ANT+ stick:" << QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
 
                 if ((udev = usb_open(dev))) {
 
@@ -500,18 +502,20 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                                     qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
                                     qDebug()<<"did you remember to setup a udev rule for this device?";
                                 }
+                            } else {
+                                rc = usb_claim_interface(udev, interface);
+                                if (rc < 0) {
+                                    qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+                                } else {
+                                    if (OperatingSystem != OSX) {
+                                        // fails on Mac OS X, we don't actually need it anyway
+                                        rc = usb_set_altinterface(udev, alternate);
+                                        if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                                    }
+
+                                    return udev;
+                                }
                             }
-
-                            rc = usb_claim_interface(udev, interface);
-                            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-
-                            if (OperatingSystem != OSX) {
-                                // fails on Mac OS X, we don't actually need it anyway
-                                rc = usb_set_altinterface(udev, alternate);
-                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                            }
-
-                            return udev;
                         }
                     }
 
