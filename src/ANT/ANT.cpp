@@ -478,6 +478,12 @@ ANT::setup()
 //            qDebug() << "ANT device reset successful !";
     } while (!ANT_Reset_Acknowledge && attempts++<3);
 
+    // Error if we've not received an acknowlegement
+    if (!ANT_Reset_Acknowledge) {
+        qDebug() << "ANT+ reset not acknowledged, closing..";
+        Status = 0;
+    }
+
     sendMessage(ANTMessage::setNetworkKey(1, key));
 
     // pair with specified devices on next available channel
