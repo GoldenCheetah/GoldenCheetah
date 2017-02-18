@@ -100,6 +100,7 @@ private:
     bool _resizable;
     bool _gripped;
     int _style;
+    bool _noevents; // don't work with events
 
     enum drag { None, Close, Flip, Move, Left, Right, Top, Bottom, TLCorner, TRCorner, BLCorner, BRCorner };
     typedef enum drag DragState;
@@ -131,15 +132,15 @@ signals:
 
 public:
 
-    GcWindow();
-    ~GcWindow();
     GcWindow(Context *context);
+    ~GcWindow();
 
     //void _setInstanceName(QString x); // GOBJECTS can set their instance name, but not be GcWindows
     //QString instanceName() const;
 
     // must call this before set controls
     void addAction(QAction *act) { actions << act; }
+    void setNoEvents(bool x) { _noevents = x; }
 
     void virtual setControls(QWidget *x);
     QWidget *controls() const;

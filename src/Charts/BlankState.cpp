@@ -24,7 +24,7 @@
 //
 // Replace home window when no ride
 //
-BlankStatePage::BlankStatePage(Context *context) : context(context), canShow_(true)
+BlankStatePage::BlankStatePage(Context *context) : GcWindow(context), context(context), canShow_(true)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addStretch();
