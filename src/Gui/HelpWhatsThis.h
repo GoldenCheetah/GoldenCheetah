@@ -64,6 +64,7 @@ Q_OBJECT
                  MenuBar_Tools_AirDens_EST,
                  MenuBar_Tools_VDOT_CALC,
                  MenuBar_Tools_Download_ERGDB,
+                 MenuBar_Tools_Download_TP,
                  MenuBar_Tools_CreateWorkout,
                  MenuBar_Tools_ScanDisk_WorkoutVideo,
                  MenuBar_Tools_CreateHeatMap,

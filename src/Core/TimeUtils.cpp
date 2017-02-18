@@ -72,6 +72,27 @@ QString time_to_string_for_sorting(double secs)
     return result;
 }
 
+QString time_to_string_minutes(double secs)
+{
+    // negs are bad
+    if (secs<0) secs=0;
+
+    QString result;
+    if (secs < 60) result = QString("00:00"); // special case for < 60s
+    else{
+        unsigned rounded = static_cast<unsigned>(round(secs));
+        if (rounded >= 3600) {
+            result += QString("%1").arg(rounded / 3600, 2, 10, QLatin1Char('0'));
+            rounded %= 3600;
+            result += ":";
+        } else {
+            result += "00:";
+        }
+        result += QString("%1").arg(rounded / 60, 2, 10, QLatin1Char('0'));
+    }
+    return result;
+}
+
 double str_to_interval(QString s)
 {
     QRegExp rx("(\\d+\\s*h)?\\s*(\\d{1,2}\\s*m)?\\s*(\\d{1,2})(\\.\\d+)?\\s*s");

@@ -42,6 +42,7 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "ErgDB.h"
+#include "TodaysPlanWorkoutDownload.h"
 #include "Library.h"
 #include "LibraryParser.h"
 #include "TrainDB.h"
@@ -484,6 +485,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
+    optionsMenu->addAction(tr("Download workouts from Today's Plan..."), this, SLOT(downloadTodaysPlanWorkouts()));
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
@@ -2040,6 +2042,28 @@ MainWindow::downloadErgDB()
         "Please check your preference settings."));
     }
 }
+
+/*----------------------------------------------------------------------
+ * TodaysPlan Workouts
+ *--------------------------------------------------------------------*/
+
+void
+MainWindow::downloadTodaysPlanWorkouts()
+{
+    QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
+
+    QFileInfo fi(workoutDir);
+
+    if (fi.exists() && fi.isDir()) {
+        TodaysPlanWorkoutDownload *d = new TodaysPlanWorkoutDownload(currentTab->context);
+        d->exec();
+    } else{
+        QMessageBox::critical(this, tr("Workout Directory Invalid"),
+        tr("The workout directory is not configured, or the directory selected no longer exists.\n\n"
+        "Please check your preference settings."));
+    }
+}
+
 
 /*----------------------------------------------------------------------
  * Workout/Media Library
