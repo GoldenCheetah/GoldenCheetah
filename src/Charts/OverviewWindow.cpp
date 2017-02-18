@@ -158,7 +158,12 @@ Card::setType(CardType type)
         map = new RideMapWindow(parent->context, RideMapWindow::GOOGLE);
         map->setParent(NULL);
 
-        // set sensible settings
+        // disable gc chart specific functionality
+        map->setNoEvents(true); // disable chart window mouse events
+        map->setProperty("nomenu", true);
+        map->setProperty("color", GColor(CCARDBACKGROUND));
+
+        // set map to sensible defaults
         map->setShowIntervals(false);
         map->setShowMarkers(false);
         map->setShowIntervals(false);
@@ -434,8 +439,13 @@ Card::setData(RideItem *item)
     // when we update a chart in the middle of its animation
     if (chart) chart->setAnimationOptions(QChart::NoAnimation);
 
-    if (type == ROUTE) {
-        map->setProperty("ride", QVariant::fromValue<RideItem*>(item));
+    if (type == ROUTE && scene() != NULL) {
+
+        // only if we're place on the scene
+        if (item->ride() && item->ride()->areDataPresent()->lat) {
+            if (map->isHidden()) map->show();
+            map->setProperty("ride", QVariant::fromValue<RideItem*>(item));
+        } else map->hide();
     }
 
     if (type == METRIC) {
@@ -1450,7 +1460,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                 // not hovering over tile, so if still have a resize cursor
                 // set it back to the normal arrow pointer
-                if (yresizecursor || xresizecursor) {
+                if (yresizecursor || xresizecursor || cursor().shape() != Qt::ArrowCursor) {
                     xresizecursor = yresizecursor = false;
                     setCursor(QCursor(Qt::ArrowCursor));
                 }

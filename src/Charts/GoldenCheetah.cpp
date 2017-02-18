@@ -168,6 +168,8 @@ bool GcWindow::resizable() const
 // tiny sizes as a result
 void GcWindow::moveEvent(QMoveEvent *)
 {
+    if (_noevents) return;
+
     if (dragState != Move) setDragState(None);
 }
 
@@ -179,43 +181,6 @@ void GcWindow::setGripped(bool x)
 bool GcWindow::gripped() const
 {
     return _gripped;
-}
-
-GcWindow::GcWindow()
-{
-    qRegisterMetaType<QWidget*>("controls");
-    qRegisterMetaType<RideItem*>("ride");
-    qRegisterMetaType<GcWinID>("type");
-    qRegisterMetaType<QColor>("color");
-    qRegisterMetaType<DateRange>("dateRange");
-    qRegisterMetaType<bool>("nomenu");
-    revealed = false;
-    setControls(NULL);
-    setRideItem(NULL);
-    setTitle("");
-    setContentsMargins(0,0,0,0);
-    setResizable(false);
-    setMouseTracking(true);
-    setProperty("color", GColor(CPLOTBACKGROUND));
-    setProperty("nomenu", false);
-    showtitle = true;
-    menu = NULL;
-
-    // make sure its underneath the toggle button
-    menuButton = new QPushButton(this);
-    menuButton->setStyleSheet("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; }");
-    //menuButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-    menuButton->setText(tr("More..."));
-    menuButton->setFocusPolicy(Qt::NoFocus);
-    //menuButton->setArrowType(Qt::NoArrow);
-    //menuButton->setPopupMode(QPushButton::InstantPopup);
-
-    menu = new QMenu(this);
-    menuButton->setMenu(menu);
-    menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
-    menuButton->hide();
-
-    menuButton->move(1,1);
 }
 
 GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
@@ -254,6 +219,8 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
 
     menuButton->hide();
     menuButton->move(1,1);
+
+    _noevents = false;
 }
 
 GcWindow::~GcWindow()
@@ -368,6 +335,8 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 void
 GcWindow::mousePressEvent(QMouseEvent *e)
 {
+    if (_noevents) return;
+
     // always propagate
     e->ignore();
 
@@ -404,6 +373,8 @@ GcWindow::mousePressEvent(QMouseEvent *e)
 void
 GcWindow::mouseReleaseEvent(QMouseEvent *e)
 {
+    if (_noevents) return;
+
     // always propagate
     e->ignore();
 
@@ -457,6 +428,8 @@ GcWindow::spotHotSpot(QMouseEvent *e)
 void
 GcWindow::mouseMoveEvent(QMouseEvent *e)
 {
+    if (_noevents) return;
+
     // always propagate
     e->ignore();
 
@@ -627,6 +600,8 @@ GcWindow::setNewSize(int w, int h)
 void
 GcWindow::setDragState(DragState d)
 {
+    if (_noevents) return;
+
     dragState = d;
     setProperty("gripped", dragState == Move ? true : false);
     setCursorShape(d);
@@ -635,6 +610,8 @@ GcWindow::setDragState(DragState d)
 void
 GcWindow::setCursorShape(DragState d)
 {
+    if (_noevents) return;
+
     // set cursor
     switch (d) {
     case Bottom:
@@ -667,6 +644,8 @@ GcWindow::setCursorShape(DragState d)
 void
 GcWindow::enterEvent(QEvent *)
 {
+    if (_noevents) return;
+
     if (property("nomenu") == false && property("isManager").toBool() == false) {
         if (contentsMargins().top() > 20) menuButton->setFixedSize(80,30);
         else menuButton->setFixedSize(80, 15);
@@ -678,6 +657,8 @@ GcWindow::enterEvent(QEvent *)
 void
 GcWindow::leaveEvent(QEvent *)
 {
+    if (_noevents) return;
+
     menuButton->hide();
 }
 
