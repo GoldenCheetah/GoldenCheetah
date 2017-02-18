@@ -187,25 +187,6 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         return returning;
     }
 
-    // Prepare the Search Payload
-    QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
-
-    // application/json
-    QByteArray jsonString;
-    jsonString += "{\"criteria\": {";
-    if (userId.length()>0)
-        jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
-    jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
-    jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
-    jsonString += "\"isNotNull\": [\"fileId\"]}, ";
-    jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\"], "; //\"avgWatts\"
-    jsonString += "\"opts\": 0 ";
-    jsonString += "}";
-
-    QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
-
-    printd("request: %s\n", jsonString.toStdString().c_str());
-
     // Do Paginated Access to the Activities List
     const int pageSize = 100;
     int offset = 0;
@@ -213,20 +194,55 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
 
     while (offset < resultCount) {
 
-        // lets connect and get the next set of activities
-        QString url = QString("%1/rest/users/activities/search/%2/%3")
+        QString url;
+        QString searchCommand;
+        if (offset == 0) {
+            // fist call
+            searchCommand = "search";
+        } else {
+            // subsequent pages
+            searchCommand = "page";
+        }
+
+        url = QString("%1/rest/users/activities/%2/%3/%4")
                 .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
-                .arg(QString::number(offset)).arg(QString::number(pageSize));
+                .arg(searchCommand)
+                .arg(QString::number(offset))
+                .arg(QString::number(pageSize));;
 
         printd("URL used: %s\n", url.toStdString().c_str());
 
         // request using the bearer token
         QNetworkRequest request(url);
+        QNetworkReply *reply;
         request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-        request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
-        request.setRawHeader("Content-Length", jsonStringDataSize);
+        if (offset == 0) {
 
-        QNetworkReply *reply = nam->post(request, jsonString);
+            // Prepare the Search Payload for First Call to Search
+            QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+            // application/json
+            QByteArray jsonString;
+            jsonString += "{\"criteria\": {";
+            if (userId.length()>0)
+                jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
+            jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
+            jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
+            jsonString += "\"isNotNull\": [\"fileId\"]}, ";
+            jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\"], "; //\"avgWatts\"
+            jsonString += "\"opts\": 0 ";
+            jsonString += "}";
+
+            printd("request: %s\n", jsonString.toStdString().c_str());
+
+            QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
+
+            request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+            request.setRawHeader("Content-Length", jsonStringDataSize);
+            reply = nam->post(request, jsonString);
+        } else {
+            // get further pages of the Search
+            reply = nam->get(request);
+        }
 
         // blocking request
         QEventLoop loop;
@@ -244,7 +260,9 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         if (parseError.error == QJsonParseError::NoError) {
 
             // number of Result Items
-            resultCount = document.object()["cnt"].toInt();
+            if (offset == 0) {
+                resultCount = document.object()["cnt"].toInt();
+            }
 
             // results ?
             QJsonObject result = document.object()["result"].toObject();
