@@ -30,6 +30,9 @@
 #include "RideMetric.h"
 #include "HrZones.h"
 
+// google map
+#include "RideMapWindow.h"
+
 // QGraphics
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -51,8 +54,8 @@
 #define SPACING 80
 #define ROWHEIGHT 80
 
-// sparklines number of points - look back 2 weeks
-#define SPARKDAYS 14
+// sparklines number of points - look back 6 weeks
+#define SPARKDAYS 42
 
 class OverviewWindow;
 class Sparkline;
@@ -65,7 +68,7 @@ class Card : public QGraphicsWidget
     public:
 
         // what type am I?
-        enum cardType { NONE, METRIC, META, SERIES, INTERVAL, ZONE } type;
+        enum cardType { NONE, ROUTE, METRIC, META, SERIES, INTERVAL, ZONE } type;
         typedef enum cardType CardType;
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
@@ -96,7 +99,7 @@ class Card : public QGraphicsWidget
         int delcounter;
 
         // configuration
-        void setType(CardType type); // NONE
+        void setType(CardType type); // NONE and Route
         void setType(CardType type, RideFile::SeriesType series);   // time in zone, data
         void setType(CardType type, QString symbol);                // metric meta
         void setType(CardType type, QString xsymbol, QString ysymbol); // interval
@@ -129,6 +132,10 @@ class Card : public QGraphicsWidget
 
         // qt chart
         QChart *chart;
+
+        // route shows a stylised google map
+        RideMapWindow *map;
+        QGraphicsProxyWidget *proxy;
 
         // bar chart
         QBarSet *barset;
@@ -241,6 +248,18 @@ class OverviewWindow : public GcChartWindow
 
         // set scale, zoom etc appropriately
         void updateView();
+
+        // create a route card
+        Card *newCard(QString name, int column, int order, int deep, Card::CardType type) {
+                                                         Card *add = new Card(deep, name);
+                                                         add->column = column;
+                                                         add->order = order;
+                                                         add->deep = deep;
+                                                         add->parent = this;
+                                                         add->setType(type);
+                                                         cards.append(add);
+                                                         return add;
+                                                        }
 
         Card *newCard(QString name, int column, int order, int deep) {
                                                          Card *add = new Card(deep, name);

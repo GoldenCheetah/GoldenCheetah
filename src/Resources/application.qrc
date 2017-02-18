@@ -162,5 +162,6 @@
         <file>images/oxygen/down.png</file>
         <file>audio/lap.wav</file>
         <file>images/configure.png</file>
+        <file>web/googlemap/dark.css</file>
     </qresource>
 </RCC>

@@ -126,6 +126,7 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showfullplot READ showFullPlot WRITE setFullPlot USER true)
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
+    Q_PROPERTY(QString styleoptions READ getStyleOptions WRITE setStyleOptions  USER false)
     Q_PROPERTY(QString osmtsurl READ osmTSUrl WRITE setOsmTSUrl USER true)
 
 
@@ -139,7 +140,11 @@ class RideMapWindow : public GcChartWindow
         RideMapWindow(Context *, int mapType);
         ~RideMapWindow();
         bool first;
+        QString styleoptions;
 
+#ifdef NOWEBKIT
+        QWebEngineView *browser() { return view; }
+#endif
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
@@ -165,6 +170,8 @@ class RideMapWindow : public GcChartWindow
         QString osmTSUrl() const { return osmCustomTSUrl->text(); }
         void setOsmTSUrl(QString x) { osmCustomTSUrl->setText(x) ;}
 
+        QString getStyleOptions() const { return styleoptions; }
+        void setStyleOptions(QString x) { styleoptions=x; }
 
     public slots:
         void mapTypeSelected(int x);
