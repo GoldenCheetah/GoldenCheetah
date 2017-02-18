@@ -738,7 +738,8 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/DeviceTypes.h Train/DialWindow.h Train/ErgDBDownloadDialog.h Train/ErgDB.h Train/ErgFile.h Train/ErgFilePlot.h \
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
-           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
+           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/TodaysPlanWorkoutDownload.h \
+           Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h
 
@@ -826,7 +827,8 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/DeviceTypes.cpp Train/DialWindow.cpp Train/ErgDB.cpp Train/ErgDBDownloadDialog.cpp Train/ErgFile.cpp Train/ErgFilePlot.cpp \
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
-           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
+           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/TodaysPlanWorkoutDownload.cpp \
+           Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp
 

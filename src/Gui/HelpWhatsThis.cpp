@@ -125,7 +125,9 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Tools_VDOT_CALC:
         return text.arg("Menu%20Bar_Tools").arg(tr("Calculation of VDOT and Threshold Pace according to Daniels' Running Formula"));
     case MenuBar_Tools_Download_ERGDB:
-        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding"));
+        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding"));
+    case MenuBar_Tools_Download_TP:
+        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts from your Today's Plan account for Train - Indoor Riding"));
     case MenuBar_Tools_CreateWorkout:
         return text.arg("Menu%20Bar_Tools").arg(tr("Creation of a new Workout for Train - Indoor Riding"));
     case MenuBar_Tools_ScanDisk_WorkoutVideo:
