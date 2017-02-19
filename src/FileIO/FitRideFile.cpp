@@ -2855,6 +2855,21 @@ void write_header(QByteArray *array, quint32 data_size) {
     write_int16(array, header_crc, false);
 }
 
+void write_message_definition(QByteArray *array, int global_msg_num, int num_fields) {
+    // Definition ------
+    write_int8(array, 64); // definition_header
+    write_int8(array, 0); // reserved
+    write_int8(array, 1); // is_big_endian
+    write_int16(array, global_msg_num, true);
+    write_int8(array, num_fields);
+}
+
+void write_field_definition(QByteArray *array, int field_num, int field_size, int base_type) {
+    write_int8(array, field_num);
+    write_int8(array, field_size);
+    write_int8(array, base_type);
+}
+
 void write_file_id(QByteArray *array, const RideFile *ride) {
     // 0	type
     // 1	manufacturer
@@ -2864,97 +2879,75 @@ void write_file_id(QByteArray *array, const RideFile *ride) {
     // 5	number
     // 8	product_name
 
-    int definition_header = 64;
-    int reserved = 0;
-    int is_big_endian = 1;
-    int global_msg_num = 0;
-    int num_fields = 2;
+    write_message_definition(array, 0, 2); // global_msg_num, num_fields
 
-    // Definition ------
-    write_int8(array, definition_header);
-    write_int8(array, reserved);
-    write_int8(array, is_big_endian);
-    write_int16(array, global_msg_num, true);
-    write_int8(array, num_fields);
-
-    // Field (1)
-    int field_num = 0; // type
-    int field_size = 1;
-    int base_type = 0;
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Field (2)
-    field_num = 4; // time_created
-    field_size = 4;
-    base_type = 134; // 6 0x86
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+    write_field_definition(array, 0, 1, 0); // 1. type (0)
+    write_field_definition(array, 4, 4, 134); // 2. time_created (4)
 
     // Record ------
     int record_header = 0;
 
-
+    // 0. header
     write_int8(array, record_header);
-    int value = 4; // file:activity
+    // 1. type file:activity
+    int value = 4;
     write_int8(array, value);
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t(); // time_created
+    // 2. time_created
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
 }
 
 void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
-    int definition_header = 64;
-    int reserved = 0;
-    int is_big_endian = 1;
-    int global_msg_num = 18;
-    int num_fields = 4;
 
-    // Definition ------
-    write_int8(array, definition_header);
-    write_int8(array, reserved);
-    write_int8(array, is_big_endian);
-    write_int16(array, global_msg_num, true);
-    write_int8(array, num_fields);
+    write_message_definition(array, 18, 4); // global_msg_num, num_fields
 
-    // Field (1)
-    int field_num = 253; // timestamp
-    int field_size = 4;
-    int base_type = 134; // 6 0x86
+    write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 2, 4, 134); // start_time (4)
+    write_field_definition(array, 7, 4, 134); // total_elapsed_time (7)
+    write_field_definition(array, 5, 1, 0); // sport (5)
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+    // Record ------
+    int record_header = 0;
 
-    // Field (2)
-    field_num = 2; // start_time
-    field_size = 4;
-    base_type = 134; // 6 0x86
+    // 0. header
+    write_int8(array, record_header);
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+    // 1. timestamp
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    write_int32(array, value, true);
 
-    // Field (3)
-    field_num = 7; // total_elapsed_time
-    field_size = 4;
-    base_type = 134; // 6 0x86
+    // 2. start_time
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    write_int32(array, value, true);
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+    // 3. total_elapsed_time
+    value = computed.value("workout_time")->value(true) * 1000;
+    write_int32(array, value, true);
 
-    // Field (4)
-    field_num = 5; // sport
-    field_size = 1;
-    base_type = 0;
+    // 4. sport
+    write_int8(array, 2);
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+}
+
+void write_lap(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
+
+    write_message_definition(array, 19, 3); // global_msg_num, num_fields
+
+    write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 0, 1, 0); // event (0)
+    write_field_definition(array, 1, 1, 0); // event_type (1)
+
+}
+
+void write_start_event(QByteArray *array, const RideFile *ride) {
+
+    write_message_definition(array, 21, 3); // global_msg_num, num_fields
+
+    write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 0, 1, 0); // event (0)
+    write_field_definition(array, 1, 1, 0); // event_type (1)
+
+
 
     // Record ------
     int record_header = 0;
@@ -2964,112 +2957,46 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
 
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
-    write_int32(array, value, true);
-
-    write_int32(array, 2000, true);
-
-    write_int8(array, 2);
-
-}
-
-void write_start_event(QByteArray *array, const RideFile *ride) {
-    int definition_header = 64;
-    int reserved = 0;
-    int is_big_endian = 1;
-    int global_msg_num = 21;
-    int num_fields = 3;
-
-    // Definition ------
-    write_int8(array, definition_header);
-    write_int8(array, reserved);
-    write_int8(array, is_big_endian);
-    write_int16(array, global_msg_num, true);
-    write_int8(array, num_fields);
-
-    // Field (1)
-    int field_num = 0; // event
-    int field_size = 1;
-    int base_type = 0;
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Field (2)
-    field_num = 1; // event_type
-    field_size = 1;
-    base_type = 0;
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Field (3)
-    field_num = 253; // timestamp
-    field_size = 4;
-    base_type = 134; // 6 0x86
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Record ------
-    int record_header = 0;
-
-    write_int8(array, record_header);
-
-    int value = 0;
+    value = 0;
     write_int8(array, value);
 
     value = 0;
     write_int8(array, value);
 
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
-    write_int32(array, value, true);
-
 }
 
 void write_stop_event(QByteArray *array, const RideFile *ride) {
-    int definition_header = 64;
-    int reserved = 0;
-    int is_big_endian = 1;
-    int global_msg_num = 21;
-    int num_fields = 3;
 
-    // Definition ------
-    write_int8(array, definition_header);
-    write_int8(array, reserved);
-    write_int8(array, is_big_endian);
-    write_int16(array, global_msg_num, true);
-    write_int8(array, num_fields);
+    write_message_definition(array, 21, 3); // global_msg_num, num_fields
 
-    // Field (1)
-    int field_num = 0; // event
-    int field_size = 1;
-    int base_type = 0;
+    write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 0, 1, 0); // event (0)
+    write_field_definition(array, 1, 1, 0); // event_type (1)
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
 
-    // Field (2)
-    field_num = 1; // event_type
-    field_size = 1;
-    base_type = 0;
+    // Record ------
+    int record_header = 0;
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+    write_int8(array, record_header);
 
-    // Field (3)
-    field_num = 253; // timestamp
-    field_size = 4;
-    base_type = 134; // 6 0x86
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t() + 2;
+    write_int32(array, value, true);
 
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
+    value = 0;
+    write_int8(array, value);
+
+    value = 4;
+    write_int8(array, value);
+}
+
+void write_activity(QByteArray *array, const RideFile *ride) {
+
+    write_message_definition(array, 34, 3); // global_msg_num, num_fields
+
+    write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 3, 1, 0); // event (3)
+    write_field_definition(array, 1, 1, 0); // event_type (1)
+
 
     // Record ------
     int record_header = 0;
@@ -3077,152 +3004,49 @@ void write_stop_event(QByteArray *array, const RideFile *ride) {
     write_int8(array, record_header);
 
     int value = 0;
-    write_int8(array, value);
-
-    value = 4;
-    write_int8(array, value);
-
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t() + 2;
+    if (ride->dataPoints().last()) {
+        value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
+    }
     write_int32(array, value, true);
 
-}
-
-void write_activity(QByteArray *array, const RideFile *ride) {
-    int definition_header = 64;
-    int reserved = 0;
-    int is_big_endian = 1;
-    int global_msg_num = 34;
-    int num_fields = 3;
-
-    // Definition ------
-    write_int8(array, definition_header);
-    write_int8(array, reserved);
-    write_int8(array, is_big_endian);
-    write_int16(array, global_msg_num, true);
-    write_int8(array, num_fields);
-
-    // Field (1)
-    int field_num = 3; // event
-    int field_size = 1;
-    int base_type = 0;
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Field (2)
-    field_num = 1; // event_type
-    field_size = 1;
-    base_type = 0;
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Field (3)
-    field_num = 253; // timestamp
-    field_size = 4;
-    base_type = 134; // 6 0x86
-
-    write_int8(array, field_num);
-    write_int8(array, field_size);
-    write_int8(array, base_type);
-
-    // Record ------
-    int record_header = 0;
-
-    write_int8(array, record_header);
-
-    int value = 26;
+    value = 26;
     write_int8(array, value);
 
     value = 1;
     write_int8(array, value);
 
-    if (ride->dataPoints().last()) {
-        value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
-        write_int32(array, value, true);
-    }
 }
 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
-    int definition_header = 64;
-    int reserved = 0;
-    int is_big_endian = 1;
-    int global_msg_num = 20;
     int num_fields = 1;
-
-    // Definition ------
-    write_int8(array, definition_header);
-    write_int8(array, reserved);
-    write_int8(array, is_big_endian);
-    write_int16(array, global_msg_num, true);
-
     QByteArray *fields = new QByteArray();
 
-    int field_num = 253; // timestamp
-    int field_size = 4;
-    int base_type = 134; // 6 0x86
-
-    write_int8(fields, field_num);
-    write_int8(fields, field_size);
-    write_int8(fields, base_type);
+    write_field_definition(fields, 253, 4, 134); // timestamp (253)
 
     if ( ride->areDataPresent()->lat ) {
-        num_fields ++;
-        field_num = 0; // position_lat
-        field_size = 4;
-        base_type = 133; // 5 0x85
-
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        num_fields ++;        
+        write_field_definition(fields, 0, 4, 133); // position_lat (0)
 
         num_fields ++;
-        field_num = 1; // position_long
-        field_size = 4;
-        base_type = 133; // 5 0x85
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 1, 4, 133); // position_long (2)
     }
     if ( withAlt && ride->areDataPresent()->alt ) {
         num_fields ++;
-        field_num = 2; // altitude
-        field_size = 2;
-        base_type = 132; // 4 0x84
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 2, 2, 132); // altitude (2) 4 0x84
     }
     if ( withHr && ride->areDataPresent()->hr ) {
         num_fields ++;
-        field_num = 3; // heart_rate
-        field_size = 1;
-        base_type = 2;
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 3, 1, 2); // heart_rate (3)
     }
     if ( withCad && ride->areDataPresent()->cad ) {
         num_fields ++;
-        field_num = 4; // cadence
-        field_size = 1;
-        base_type = 2;
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 4, 1, 2); // cadence (4)
     }
     if ( ride->areDataPresent()->km ) {
         num_fields ++;
-        field_num = 5; // distance
-        field_size = 4;
-        base_type = 134; // 6 0x86
+        int field_num = 5; // distance
+        int field_size = 4;
+        int base_type = 134; // 6 0x86
 
         write_int8(fields, field_num);
         write_int8(fields, field_size);
@@ -3230,9 +3054,9 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
     }
     if ( ride->areDataPresent()->kph ) {
         num_fields ++;
-        field_num = 6; // speed
-        field_size = 2;
-        base_type = 132; // 4 0x84
+        int field_num = 6; // speed
+        int field_size = 2;
+        int base_type = 132; // 4 0x84
 
         write_int8(fields, field_num);
         write_int8(fields, field_size);
@@ -3240,9 +3064,9 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
     }
     if ( withWatts && ride->areDataPresent()->watts ) {
         num_fields ++;
-        field_num = 7; // power
-        field_size = 2;
-        base_type = 132; // 4 0x84
+        int field_num = 7; // power
+        int field_size = 2;
+        int base_type = 132; // 4 0x84
 
         write_int8(fields, field_num);
         write_int8(fields, field_size);
@@ -3270,7 +3094,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         write_int8(fields, base_type);
     }*/
 
-    write_int8(array, num_fields);
+    write_message_definition(array, 20, num_fields); // global_msg_num, num_fields
     array->append(fields->data(), fields->size());
 
     // Record ------
@@ -3350,11 +3174,13 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
 
     write_file_id(&data, ride); // file_id 0
     //write_file_creator(&data); // file_creator 49
+    write_activity(&data, ride); // lap 19 (x11)
     write_session(&data, ride, computed); // session 18 (x12)
+    //write_lap();
     //write_start_event(&data, ride); // event 21 (x15)
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)
     //write_stop_event(&data, ride); // event 21 (x15)
-    write_activity(&data, ride); // activity 34 (x22)
+    //write_activity(&data, ride); // activity 34 (x22)
     write_header(&array, data.size());
     array += data;
 
