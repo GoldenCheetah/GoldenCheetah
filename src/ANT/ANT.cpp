@@ -264,8 +264,24 @@ void ANT::run()
     {
         // read more bytes from the device
         uint8_t byte;
-        if (rawRead(&byte, 1) > 0) receiveByte((unsigned char)byte);
-        else msleep(5);
+
+        int rc = rawRead(&byte, 1);
+
+        if (rc > 0)
+            receiveByte((unsigned char)byte);
+        else {
+
+            // Recognise USB device removal. Linux transitions through -5 (I/O error)
+            // to -6 (No such device or address). Windows seems to stick on -5
+
+            if ((rc == -ENXIO) || (rc == -EIO && OperatingSystem == WINDOWS))
+            {
+                qDebug() << "Error communicating with USB ANT device!! Device removed?";
+                Status = 0;
+            }
+
+            msleep(5);
+        }
 
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
