@@ -348,6 +348,9 @@ struct FitFileReaderState
                 case 2157: return "Garmin FR230";
                 case 2204: return "Garmin Edge 1000 Explore";
                 case 2238: return "Garmin Edge 20";
+                case 2337: return "Garmin Vivoactive HR";
+                case 2347: return "Garmin Vivosmart HR+";
+                case 2348: return "Garmin Vivosmart HR";
                 case 2413: return "Garmin Fenix 3 HR";
                 case 2431: return "Garmin FR235";
                 case 2530: return "Garmin Edge 820";
