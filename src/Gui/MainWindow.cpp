@@ -862,7 +862,6 @@ MainWindow::addChartFromCloudDB()
 
     if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserImport, currentTab->currentView())) {
         if (currentTab->context->cdbChartListDialog->exec() == QDialog::Accepted) {
-            QList<QMap<QString,QString> > charts;
 
             // get selected chartDef
             QList<QString> chartDefs = currentTab->context->cdbChartListDialog->getSelectedSettings();

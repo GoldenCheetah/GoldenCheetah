@@ -702,11 +702,16 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     int lastIndex = (g_currentIndex+const_stepSize > g_currentHeaderList->size()) ? g_currentHeaderList->size() : g_currentIndex+const_stepSize;
 
     QString view = tr("unknown");
-    switch(g_chartView) {
+    if (g_role == CloudDBCommon::UserImport ) {
+        switch(g_chartView) {
         case 0 : view = tr("Trends"); break;
         case 1 : view = tr("Activities"); break;
         case 2 : view = tr("Diary"); break;
         case 3 : view = tr("Train"); break;
+        }
+    } else
+    {
+        view = tr("All Views");
     }
     showing->setText(QString(showingTextTemplate)
                      .arg(QString::number(chartCount))
