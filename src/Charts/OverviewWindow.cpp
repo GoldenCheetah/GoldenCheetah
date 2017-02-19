@@ -153,31 +153,7 @@ Card::setType(CardType type)
     if (type == ROUTE) {
 
         this->type = type;
-
-        // create a map chart and set to top level window
-        map = new RideMapWindow(parent->context, RideMapWindow::GOOGLE);
-        map->setParent(NULL);
-
-        // disable gc chart specific functionality
-        map->setNoEvents(true); // disable chart window mouse events
-        map->setProperty("nomenu", true);
-        map->setProperty("color", GColor(CCARDBACKGROUND));
-
-        // set map to sensible defaults
-        map->setShowIntervals(false);
-        map->setShowMarkers(false);
-        map->setShowIntervals(false);
-        map->browser()->setEnabled(false); // don't grab focus!
-
-        // apply a dark style option
-        QFile css(":/web/googlemap/dark.css");
-        css.open(QFile::ReadOnly);
-        map->setStyleOptions(css.readAll().constData());
-        css.close();
-
-        // hide until added to scene
-        map->hide();
-        proxy = NULL;
+        routeline = new Routeline(this, name);
     }
 }
 
@@ -443,9 +419,9 @@ Card::setData(RideItem *item)
 
         // only if we're place on the scene
         if (item->ride() && item->ride()->areDataPresent()->lat) {
-            if (map->isHidden()) map->show();
-            map->setProperty("ride", QVariant::fromValue<RideItem*>(item));
-        } else map->hide();
+            if (!routeline->isVisible()) routeline->show();
+            routeline->setData(item);
+        } else routeline->hide();
     }
 
     if (type == METRIC) {
@@ -757,17 +733,13 @@ Card::geometryChanged() {
     QRectF geom = geometry();
 
     // route map needs adding to scene etc
-    if (type == ROUTE && scene() != NULL) {
+    if (type == ROUTE) {
 
+        if (!drag) {
+            if (myRideItem && myRideItem->ride() && myRideItem->ride()->areDataPresent()->lat) routeline->show();
+            routeline->setGeometry(20,ROWHEIGHT+40, geom.width()-40, geom.height()-(60+ROWHEIGHT));
 
-        if (proxy == NULL) {
-            // add to the scene
-            proxy = scene()->addWidget(map);
-            proxy->setZValue(11);
-            proxy->show();
-        }
-
-        map->setGeometry(geom.x()+20,geom.y()+20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+        } else routeline->hide();
     }
 
     // if we contain charts etc lets update their geom
@@ -962,6 +934,132 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
             painter->drawEllipse(QRectF(x, y, 50, 50));
         }
     }
+}
+
+Routeline::Routeline(QGraphicsWidget *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name)
+{
+    setGeometry(20,20,100,100);
+    setZValue(11);
+}
+
+void
+Routeline::setData(RideItem *item)
+{
+    // no data, no plot
+    if (item == NULL || !item->ride() || item->ride()->areDataPresent()->lat == false) {
+        path = QPainterPath();
+        return;
+    }
+
+    // step 1 normalise the points
+
+    // set points as ratio from topleft corner
+    // and also calculate aspect ratio - to ensure
+    // values are mapped to maintain the ratio (!)
+
+    //
+    // Find the top left and bottom right extents
+    // of the trace and calculate offset, factor
+    // and ratios to apply to each data point
+    //
+    double minlat=999, minlon=999;
+    double maxlat=-999, maxlon=-999;
+
+    foreach(RideFilePoint *p, item->ride()->dataPoints()) {
+
+        // ignore zero values and out of bounds
+        if (p->lat == 0 || p->lon == 0 ||
+            p->lon < -180 || p->lon > 180 ||
+            p->lat < -90 || p->lat > 90) continue;
+
+        if (p->lat > maxlat) maxlat=p->lat;
+        if (p->lat < minlat) minlat=p->lat;
+        if (p->lon < minlon) minlon=p->lon;
+        if (p->lon > maxlon) maxlon=p->lon;
+    }
+
+    // calculate aspect ratio
+    path = QPainterPath();
+    double xdiff = (maxlon - minlon);
+    double ydiff = (maxlat - minlat);
+    double aspectratio = ydiff/xdiff;
+    width = geom.width();
+
+    // create a painterpath that uses a 1x1 aspect ratio
+    // based upon the GPS co-ords
+    int count=0;
+    height = geom.width() * aspectratio;
+    int lines=0;
+    foreach(RideFilePoint *p, item->ride()->dataPoints()){
+
+        // ignore zero values and out of bounds
+        if (p->lat == 0 || p->lon == 0 ||
+            p->lon < -180 || p->lon > 180 ||
+            p->lat < -90 || p->lat > 90) continue;
+
+        // filter out most of the points, take 1 in 20
+        if (--count < 0) { // first
+
+            //path.moveTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
+            //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
+
+            path.moveTo((geom.width() / (xdiff / (p->lon - minlon))),
+                        (height-(height / (ydiff / (p->lat - minlat)))));
+            count=30;
+
+        } else if (count == 0) { // every 20th
+
+            //path.lineTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
+            //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
+            path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
+                        (height-(height / (ydiff / (p->lat - minlat)))));
+            count=30;
+            lines++;
+
+        }
+    }
+}
+
+QVariant Routeline::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+     if (change == ItemPositionChange && parent->scene())  prepareGeometryChange();
+     return QGraphicsItem::itemChange(change, value);
+}
+
+void
+Routeline::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width,height);
+
+    // we need to go onto the scene !
+    if (scene() == NULL && parent->scene()) parent->scene()->addItem(this);
+
+    // set our geom
+    prepareGeometryChange();
+}
+
+void
+Routeline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    QPen pen(QColor(150,150,150));
+    painter->setPen(pen);
+
+    // draw the route, but scale it to fit what we have
+    double scale = geom.width() / width;
+    if (height * scale > geom.height())  scale = geom.height() / height;
+
+    // and center it too
+    double midx=scale*width/2;
+    double midy=scale*height/2;
+    painter->translate(QPointF(boundingRect().x() + ((geom.width()/2)-midx),
+                               boundingRect().y()+((geom.height()/2)-midy)));
+
+    // set painter scale - and keep original aspect ratio
+    painter->scale(scale,scale);
+    pen.setWidth(20.0f);
+    painter->setPen(pen);
+    painter->drawPath(path);
+    return;
 }
 
 static bool cardSort(const Card* left, const Card* right)

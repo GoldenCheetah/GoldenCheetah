@@ -59,6 +59,7 @@
 
 class OverviewWindow;
 class Sparkline;
+class Routeline;
 
 // keep it simple for now
 class Card : public QGraphicsWidget
@@ -133,18 +134,17 @@ class Card : public QGraphicsWidget
         // qt chart
         QChart *chart;
 
-        // route shows a stylised google map
-        RideMapWindow *map;
-        QGraphicsProxyWidget *proxy;
-
-        // bar chart
+        // ZONE bar chart
         QBarSet *barset;
         QBarSeries *barseries;
         QStringList categories;
         QBarCategoryAxis *barcategoryaxis;
 
-        // sparkline
+        // METRIC sparkline
         Sparkline *sparkline;
+
+        // ROUTE visualisation
+        Routeline *routeline;
 
         QLineSeries *lineseries;
         QScatterSeries *scatterseries, *peakscatterseries, *userscatterseries, *systemscatterseries;
@@ -165,6 +165,7 @@ class Card : public QGraphicsWidget
         void geometryChanged();
 };
 
+// tufte style sparkline to plot metric history
 class Sparkline : public QGraphicsItem
 {
     public:
@@ -192,6 +193,34 @@ class Sparkline : public QGraphicsItem
         QString name;
         double min, max;
         QList<QPointF> points;
+};
+
+// visualisation of a GPS route as a shape
+class Routeline : public QGraphicsItem
+{
+    public:
+        Routeline(QGraphicsWidget *parent, QString name=""); // create and say how many days
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        void setData(RideItem *item);
+
+        // needed as pure virtual in QGraphicsItem
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+        QRectF boundingRect() const { return QRectF(parent->geometry().x() + geom.x(),
+                                                    parent->geometry().y() + geom.y(),
+                                                    geom.width(), geom.height());
+        }
+
+    private:
+        QGraphicsWidget *parent;
+        QRectF geom;
+        QString name;
+        QPainterPath path;
+        double width, height; // size of painterpath, so we scale to fit on paint
 };
 
 class OverviewWindow : public GcChartWindow
