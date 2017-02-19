@@ -1088,6 +1088,10 @@ struct FitFileReaderState
                 DumpFitValue(value);
             }
 
+            // ignore any developer fields in laps
+            if ( field.deve_idx > -1)
+                continue;
+
             switch (field.num) {
                 case 253:
                     time = value.v + qbase_time.toTime_t();
