@@ -116,6 +116,7 @@ class RideItem : public QObject
 
         // access the metric value
         double getForSymbol(QString name, bool useMetricUnits=true);
+        double getCountForSymbol(QString name);
 
         // as a well formatted string
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
