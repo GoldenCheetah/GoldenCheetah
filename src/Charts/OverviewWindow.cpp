@@ -28,6 +28,7 @@
 #include "PaceZones.h"
 
 #include "PMCData.h"
+#include "RideMetadata.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
@@ -75,32 +76,33 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Status", 0, 0, 8, Card::PMC, "coggan_tss");
     newCard("Sport", 0, 1, 5, Card::META, "Sport");
     newCard("Duration", 0, 2, 9, Card::METRIC, "workout_time");
-    newCard("Climbing", 0, 3, 5, Card::METRIC, "elevation_gain");
-    newCard("Cadence", 0, 4, 5, Card::METRIC, "average_cad");
-    newCard("Equivalent Power", 0, 5, 5, Card::METRIC, "coggan_np");
+    newCard("Notes", 0, 3, 19, Card::META, "Notes");
 
     // column 1
     newCard("HRV", 1, 0, 8);
     newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
     newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
+    newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
+    newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
+    newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
 
     // column 2
     newCard("RPE", 2, 0, 8, Card::META, "RPE");
     newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
     newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
-    newCard("Intervals", 2, 3, 15, Card::INTERVAL, "workout_time", "average_power");
+    newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
     newCard("Intensity", 3, 0, 8, Card::METRIC, "coggan_if");
     newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
     newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
-    newCard("Power Model", 3, 3, 15);
+    newCard("Power Model", 3, 3, 17);
 
     // column 4
     newCard("Distance", 4, 0, 8, Card::METRIC, "total_distance");
     newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
     newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
-    newCard("Route", 4, 3, 15, Card::ROUTE);
+    newCard("Route", 4, 3, 17, Card::ROUTE);
 
     // for changing the view
     group = new QParallelAnimationGroup(this);
@@ -292,6 +294,19 @@ Card::setType(CardType type, QString symbol)
     // we may plot the metric sparkline if the tile is big enough
     if (type == METRIC) {
         sparkline = new Sparkline(this, SPARKDAYS+1, name);
+    }
+
+    // meta fields type?
+    if (type == META) {
+
+        //  Get the field type
+        fieldtype = -1;
+        foreach(FieldDefinition p, parent->context->athlete->rideMetadata()->getFields()) {
+            if (p.name == symbol) {
+                fieldtype = p.type;
+                break;
+             }
+        }
     }
 }
 
@@ -817,7 +832,36 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     // only paint contents if not dragging
     if (drag) return;
 
-    if (type == METRIC || type == META) {
+    if (type == META && fieldtype >= 0) {
+
+        // mid is slightly higher to account for space around title, move mid up
+        double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f);
+
+        // we align centre and mid
+        QFontMetrics fm(bigfont);
+        QRectF rect = QFontMetrics(bigfont, parent->device()).boundingRect(value);
+
+        if (fieldtype == FIELD_TEXTBOX) {
+            // long texts need to be formatted into a smaller font an word wrapped
+            painter->setPen(QColor(150,150,150));
+            painter->setFont(smallfont);
+
+            // draw text and wrap / truncate to bounding rectangle
+            painter->drawText(QRectF(ROWHEIGHT, ROWHEIGHT*2.5, geometry().width()-(ROWHEIGHT*2),
+                                                   geometry().height()-(ROWHEIGHT*4)), value);
+        } else {
+
+            // any other kind of metadata just paint it
+            painter->setPen(GColor(CPLOTMARKER));
+            painter->setFont(bigfont);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+        }
+
+
+    }
+
+    if (type == METRIC) {
 
         // we need the metric units
         if (type == METRIC && metric == NULL) {

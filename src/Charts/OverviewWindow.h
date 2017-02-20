@@ -74,7 +74,7 @@ class Card : public QGraphicsWidget
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
                                                 column(0), order(0), deep(deep), onscene(false),
-                                                placing(false), drag(false), invisible(false) {
+                                                placing(false), drag(false), invisible(false), fieldtype(-1) {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -158,6 +158,7 @@ class Card : public QGraphicsWidget
         int column, order, deep;
         bool onscene, placing, drag;
         bool invisible;
+        int fieldtype;
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
