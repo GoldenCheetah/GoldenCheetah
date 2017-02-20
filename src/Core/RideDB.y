@@ -119,6 +119,8 @@ ride: '{' rideelement_list '}'                                  {
                                                                     jc->item.clearIntervals();
                                                                     jc->item.overrides_.clear();
                                                                     jc->item.fileName = "";
+                                                                    jc->count = "";
+                                                                    jc->value = "";
                                                                 }
 
 
@@ -169,12 +171,25 @@ metrics_list: metric | metrics_list ',' metric ;
 metric: metric_key ':' metric_value                             /* metric computed value */
                                                                 {
                                                                     const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
-                                                                    if (m) jc->item.metrics()[m->index()] = $3.toDouble();
+                                                                    if (m) {
+                                                                        jc->item.metrics()[m->index()] = $3.toDouble();
+                                                                        jc->item.counts()[m->index()] = 0; // we don't write zero values
+                                                                    }
                                                                     else qDebug()<<"metric not found:"<<$1;
+                                                                }
+      | metric_key ':' '[' metric_value ',' metric_count ']'    {
+                                                                    const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
+                                                                    if (m) {
+                                                                        jc->item.metrics()[m->index()] = $4.toDouble();
+                                                                        jc->item.counts()[m->index()] = $6.toDouble();
+                                                                    }
+                                                                    else qDebug()<<"metric not found:"<<$1;
+
                                                                 }
 
 metric_key : string                                             { jc->key = jc->JsonString; }
 metric_value : string                                           { jc->value = jc->JsonString; }
+metric_count : string                                           { jc->count = jc->JsonString; }
 
 /*
  * INTERVALS
@@ -216,12 +231,24 @@ interval_metrics_list: interval_metric | interval_metrics_list ',' interval_metr
 interval_metric: interval_metric_key ':' interval_metric_value                             /* metric computed value */
                                                                 { 
                                                                     const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
-                                                                    if (m) jc->interval.metrics()[m->index()] = $3.toDouble();
-                                                                    else qDebug()<<"metric not found:"<<$1;
-                                                                }
+                                                                    if (m) {
+                                                                        jc->interval.metrics()[m->index()] = $3.toDouble();
+                                                                        jc->interval.counts()[m->index()] = 0; /* we don't write zeroes */
+                                                                    } else qDebug()<<"metric not found:"<<$1;
+                                                               }
+               | interval_metric_key ':' '[' interval_metric_value ',' interval_metric_count ']'
+                                                                {
+                                                                    const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
+                                                                    if (m) {
+                                                                        jc->interval.metrics()[m->index()] = $4.toDouble();
+                                                                        jc->interval.counts()[m->index()] = $6.toDouble();
+                                                                    } else qDebug()<<"metric not found:"<<$1;
+                                                               }
+               ;
 
 interval_metric_key : string                                    { jc->key = jc->JsonString; }
 interval_metric_value : string                                  { jc->value = jc->JsonString; }
+interval_metric_count : string                                  { jc->count = jc->JsonString; }
 
 /*
  * Metadata TAGS
@@ -408,7 +435,16 @@ void RideCache::save()
                 if (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f) {
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
-                    stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
+
+                    // if count is 0 don't write it
+                    if (item->counts()[index] == 0) {
+                        stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
+                    } else {
+
+                        // count is not 1, so lets write it
+                        stream << "\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\", \""
+                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) <<"\" ] ";
+                    }
                 }
             }
             stream << "\n\t\t}";
@@ -507,7 +543,16 @@ void RideCache::save()
                             if (interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) {
                                 if (!firstMetric) stream << ",\n";
                                 firstMetric = false;
-                                stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
+
+                                // if count is 0 don't write it
+                                if (interval->counts()[index] == 0) {
+                                    stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
+                                } else {
+
+                                    // count is not 1, so lets write it
+                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\", \""
+                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) <<"\" ] ";
+                                }
                             }
                         }
                         stream << "\n\t\t\t\t}";

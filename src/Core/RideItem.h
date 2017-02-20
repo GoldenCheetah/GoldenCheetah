@@ -62,6 +62,7 @@ class RideItem : public QObject
 
         // precomputed metrics & user overrides
         QVector<double> metrics_;
+        QVector<double> count_;
 
         // metadata (used by navigator)
         QMap<QString,QString> metadata_;
@@ -148,6 +149,7 @@ class RideItem : public QObject
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
+        QVector<double> &counts() { return count_; }
         const QStringList errors() { return errors_; }
         double getWeight(int type=0);
 

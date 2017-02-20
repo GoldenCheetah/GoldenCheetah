@@ -39,12 +39,14 @@ IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, dou
     this->rideInterval = NULL;
     this->rideItem_ = const_cast<RideItem*>(ride);
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
+    count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 IntervalItem::IntervalItem() : rideItem_(NULL), name(""), type(RideFileInterval::USER), start(0), stop(0),
                                startKM(0), stopKM(0), displaySequence(0), color(Qt::black), rideInterval(NULL)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
+    count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 void
@@ -95,6 +97,7 @@ IntervalItem::refresh()
 
     // resize and set to zero
     metrics_.fill(0, factory.metricCount());
+    count_.fill(0, factory.metricCount());
 
     // ok, lets collect the metrics
     QHash<QString,RideMetricPtr> computed=RideMetric::computeMetrics(rideItem_, Specification(this, f->recIntSecs()), factory.allMetrics());
@@ -106,12 +109,15 @@ IntervalItem::refresh()
     while (i.hasNext()) {
         i.next();
         metrics_[i.value()->index()] = i.value()->value();
+        count_[i.value()->index()] = i.value()->count();
     }
 
     // clean any bad values
     for(int j=0; j<factory.metricCount(); j++)
-        if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
+        if (std::isinf(metrics_[j]) || std::isnan(metrics_[j])) {
             metrics_[j] = 0.00f;
+            count_[j] = 0.00f;
+        }
 }
 
 
