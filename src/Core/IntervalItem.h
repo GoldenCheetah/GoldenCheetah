@@ -71,7 +71,9 @@ class IntervalItem
         // precomputed metrics
         void refresh();
         QVector<double> metrics_;
+        QVector<double> count_;
         QVector<double> &metrics() { return metrics_; }
+        QVector<double> &counts() { return count_; }
 
         // extracted sample data
         RideFileInterval *rideInterval;

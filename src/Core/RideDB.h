@@ -39,8 +39,9 @@
 // 1.4       5 Sep 15  Mark Liversedge         overrides_ in RideItem
 // 1.5      15 Dec 15  Mark Liversedge         zone ranges added as part of metric compute() refactor
 // 1.6      16 Jul 16  Mark Liversedge         xdata added
+// 1.7      20 Feb 17  Mark Liversedge         Metric count (if nonzero) added
 
-#define RIDEDB_VERSION "1.6"
+#define RIDEDB_VERSION "1.7"
 
 class APIWebService;
 class HttpResponse;
@@ -69,7 +70,7 @@ struct RideDBContext {
     // term state data is held in these variables
     QString JsonString;
     QStringList JsonStringList;
-    QString key, value;
+    QString key, value, count;
     QStringList errors;
 
     // is cache/rideDB.json an older version ?

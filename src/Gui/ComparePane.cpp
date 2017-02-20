@@ -802,10 +802,12 @@ ComparePane::dropEvent(QDropEvent *event)
 
             QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.rideItem, Specification(), factory.allMetrics());
             add.rideItem->metrics_.fill(0, factory.metricCount());
+            add.rideItem->count_.fill(0, factory.metricCount());
             QHashIterator<QString, RideMetricPtr> l(computed);
             while (l.hasNext()) {
                 l.next();
                 add.rideItem->metrics_[l.value()->index()] = l.value()->value();
+                add.rideItem->count_[l.value()->index()] = l.value()->count();
             }
             for(int j=0; j<factory.metricCount(); j++)
                 if (std::isinf(add.rideItem->metrics_[j]) || std::isnan(add.rideItem->metrics_[j]))
@@ -946,10 +948,12 @@ ComparePane::dropEvent(QDropEvent *event)
                             const RideMetricFactory &factory = RideMetricFactory::instance();
                             QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(add.rideItem, Specification(), factory.allMetrics());
                             add.rideItem->metrics_.fill(0, factory.metricCount());
+                            add.rideItem->count_.fill(0, factory.metricCount());
                             QHashIterator<QString, RideMetricPtr> l(computed);
                             while (l.hasNext()) {
                                 l.next();
                                 add.rideItem->metrics_[l.value()->index()] = l.value()->value();
+                                add.rideItem->count_[l.value()->index()] = l.value()->count();
                             }
                             for(int j=0; j<factory.metricCount(); j++)
                                 if (std::isinf(add.rideItem->metrics_[j]) || std::isnan(add.rideItem->metrics_[j]))

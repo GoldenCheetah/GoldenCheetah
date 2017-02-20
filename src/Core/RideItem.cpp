@@ -47,6 +47,7 @@ RideItem::RideItem()
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
     color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
+    count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
@@ -55,6 +56,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
     color(QColor(1,1,1)), isRun(false), isSwim(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
+    count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned)
@@ -64,6 +66,7 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
     metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
+    count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 // Create a new RideItem destined for the ride cache and used for caching
@@ -74,6 +77,7 @@ RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
+    count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 // clone a ride item
@@ -83,7 +87,8 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     ride_ = NULL;
     fileCache_ = NULL;
     metrics_ = here.metrics_;
-	metadata_ = here.metadata_;
+    count_ = here.count_;
+    metadata_ = here.metadata_;
     xdata_ = here.xdata_;
     errors_ = here.errors_;
     intervals_ = here.intervals_;
@@ -127,6 +132,7 @@ RideItem::setFrom(QHash<QString, RideMetricPtr> computed)
     while (i.hasNext()) {
         i.next();
         metrics_[i.value()->index()] = i.value()->value();
+        count_[i.value()->index()] = i.value()->count();
     }
 }
 
@@ -588,6 +594,7 @@ RideItem::refresh()
         // ressize and initialize so we can store metric values at
         // RideMetric::index offsets into the metrics_ qvector
         metrics_.fill(0, factory.metricCount());
+        count_.fill(0, factory.metricCount());
 
         // we compute all with not specification (not an interval)
         QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(this, Specification(), factory.allMetrics());
@@ -598,12 +605,15 @@ RideItem::refresh()
             i.next();
             //DEBUG if (i.value()->isUser()) qDebug()<<dateTime.date()<<i.value()->symbol()<<i.value()->value();
             metrics_[i.value()->index()] = i.value()->value();
+            count_[i.value()->index()] = i.value()->count();
         }
 
         // clean any bad values
         for(int j=0; j<factory.metricCount(); j++)
-            if (std::isinf(metrics_[j]) || std::isnan(metrics_[j]))
+            if (std::isinf(metrics_[j]) || std::isnan(metrics_[j])) {
                 metrics_[j] = 0.00f;
+                count_[j] = 0.00f;
+            }
 
         // Update auto intervals AFTER ridefilecache as used for bests
         updateIntervals();
