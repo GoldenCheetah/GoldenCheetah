@@ -2929,13 +2929,30 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
 
 }
 
-void write_lap(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
-
+void write_lap(QByteArray *array, const RideFile *ride) {
     write_message_definition(array, 19, 3); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 0); // event (0)
     write_field_definition(array, 1, 1, 0); // event_type (1)
+
+
+    // Record ------
+    int record_header = 0;
+
+    write_int8(array, record_header);
+
+    int value = 0;
+    if (ride->dataPoints().last()) {
+        value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
+    }
+    write_int32(array, value, true);
+
+    value = 9; // lap
+    write_int8(array, value);
+
+    value = 1;
+    write_int8(array, value);
 
 }
 
@@ -3044,33 +3061,15 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
     }
     if ( ride->areDataPresent()->km ) {
         num_fields ++;
-        int field_num = 5; // distance
-        int field_size = 4;
-        int base_type = 134; // 6 0x86
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 5, 4, 134); // distance (5)
     }
     if ( ride->areDataPresent()->kph ) {
         num_fields ++;
-        int field_num = 6; // speed
-        int field_size = 2;
-        int base_type = 132; // 4 0x84
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 6, 2, 132); // speed (6)
     }
     if ( withWatts && ride->areDataPresent()->watts ) {
         num_fields ++;
-        int field_num = 7; // power
-        int field_size = 2;
-        int base_type = 132; // 4 0x84
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 7, 2, 132); // power (7)
     }
     /* can be NA...
     if ( ride->areDataPresent()->temp ) {
@@ -3174,13 +3173,13 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
 
     write_file_id(&data, ride); // file_id 0
     //write_file_creator(&data); // file_creator 49
-    write_activity(&data, ride); // lap 19 (x11)
+    write_activity(&data, ride); // activity 34 (x22)
     write_session(&data, ride, computed); // session 18 (x12)
-    //write_lap();
+    write_lap(&data, ride); // lap 19 (x11)
     //write_start_event(&data, ride); // event 21 (x15)
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)
     //write_stop_event(&data, ride); // event 21 (x15)
-    //write_activity(&data, ride); // activity 34 (x22)
+    //write_activity(&data, ride); //
     write_header(&array, data.size());
     array += data;
 
