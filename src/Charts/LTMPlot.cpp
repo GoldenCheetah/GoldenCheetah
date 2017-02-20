@@ -2676,7 +2676,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
         }
 
         if (value || wantZero) {
-            unsigned long seconds = ride->getForSymbol("workout_time");
+            unsigned long seconds = ride->getCountForSymbol(metricDetail.metric->symbol());
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
                     while (lastDay<currentDay && n<=maxdays) {

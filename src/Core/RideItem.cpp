@@ -712,6 +712,18 @@ RideItem::getForSymbol(QString name, bool useMetricUnits)
     return 0.0f;
 }
 
+double
+RideItem::getCountForSymbol(QString name)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+        // return the precomputed metric value
+        const RideMetric *m = factory.rideMetric(name);
+        if (m)  return count_[m->index()];
+    }
+    return 0.0f;
+}
+
 QString
 RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 {
