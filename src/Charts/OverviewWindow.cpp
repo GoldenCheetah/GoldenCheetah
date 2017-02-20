@@ -74,31 +74,33 @@ OverviewWindow::OverviewWindow(Context *context) :
     // column 0
     newCard("Status", 0, 0, 8, Card::PMC, "coggan_tss");
     newCard("Sport", 0, 1, 5, Card::META, "Sport");
-    newCard("Duration", 0, 2, 5, Card::METRIC, "workout_time");
-    newCard("Route", 0, 3, 20, Card::ROUTE);
-    newCard("Distance", 0, 4, 9, Card::METRIC, "total_distance");
-    newCard("Climbing", 0, 5, 5, Card::METRIC, "elevation_gain");
-    newCard("Speed", 0, 6, 6, Card::METRIC, "average_speed");
+    newCard("Duration", 0, 2, 9, Card::METRIC, "workout_time");
+    newCard("Climbing", 0, 3, 5, Card::METRIC, "elevation_gain");
+    newCard("Cadence", 0, 4, 5, Card::METRIC, "average_cad");
+    newCard("Equivalent Power", 0, 5, 5, Card::METRIC, "coggan_np");
 
     // column 1
-    newCard("Heartrate", 1, 0, 8, Card::METRIC, "average_hr");
-    newCard("HRV", 1, 1, 5);
-    newCard("Heartrate Zones", 1, 2, 10, Card::ZONE, RideFile::hr);
-    newCard("Pace Zones", 1, 3, 11, Card::ZONE, RideFile::kph);
-    newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
+    newCard("HRV", 1, 0, 8);
+    newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
+    newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
 
     // column 2
-    newCard("Stress", 2, 0, 8, Card::METRIC, "coggan_tss");
-    newCard("RPE", 2, 1, 5, Card::META, "RPE");
-    newCard("Fatigue Zones", 2, 2, 10, Card::ZONE, RideFile::wbal);
-    newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
+    newCard("RPE", 2, 0, 8, Card::META, "RPE");
+    newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
+    newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
+    newCard("Intervals", 2, 3, 15, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
-    newCard("Power", 3, 0, 8, Card::METRIC, "average_power");
-    newCard("Intensity", 3, 1, 5, Card::METRIC, "coggan_if");
-    newCard("Power Zones", 3, 2, 10, Card::ZONE, RideFile::watts);
-    newCard("Equivalent Power", 3, 3, 5, Card::METRIC, "coggan_np");
-    newCard("Power Model", 3, 4, 11);
+    newCard("Intensity", 3, 0, 8, Card::METRIC, "coggan_if");
+    newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
+    newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
+    newCard("Power Model", 3, 3, 15);
+
+    // column 4
+    newCard("Distance", 4, 0, 8, Card::METRIC, "total_distance");
+    newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
+    newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
+    newCard("Route", 4, 3, 15, Card::ROUTE);
 
     // for changing the view
     group = new QParallelAnimationGroup(this);
