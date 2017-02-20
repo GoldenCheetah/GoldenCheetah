@@ -1089,7 +1089,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     bool rideBG = appsettings->value(this,GC_RIDEBG,false).toBool();
 
     // state of item
-    bool hover = option.state & QStyle::State_MouseOver;
+    bool hover = false; //disable this, its annoying option.state & QStyle::State_MouseOver;
     bool selected = option.state & QStyle::State_Selected;
     bool focus = option.state & QStyle::State_HasFocus;
     //bool isRun = rideNavigator->tableView->model()->data(index, Qt::UserRole+2).toBool();

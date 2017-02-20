@@ -595,7 +595,7 @@ QColor PMCData::ltsColor(double value, QColor defaultColor)
 {
     //if (value < 30) return QColor(Qt::red);
     //if (value < 80) return QColor(Qt::yellow);
-    if (value > 80) return QColor(Qt::green);
+    if (value > 75) return QColor(Qt::green);
     if (value > 100) return QColor(Qt::blue);
     return defaultColor;
 }
@@ -608,8 +608,8 @@ QColor PMCData::stsColor(double, QColor defaultColor)
 QColor PMCData::sbColor(double value, QColor defaultColor)
 {
     if (value < -40) return QColor(Qt::red); // injury risk
-    //if (value < 25) return QColor(Qt::yellow); // injury risk
-    //if (value > -5 && value < 5) return QColor(Qt::blue); // ideal
+    if (value > 15) return QColor(Qt::yellow); // detraining risk
+    if (value >= -5 && value < 15) return QColor(Qt::green); // ideal
     return defaultColor;
 }
 
