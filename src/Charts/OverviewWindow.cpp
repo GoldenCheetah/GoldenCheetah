@@ -27,6 +27,8 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+#include "PMCData.h"
+
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
 
@@ -70,12 +72,13 @@ OverviewWindow::OverviewWindow(Context *context) :
     // XXX lets hack in some tiles to start (will load from config later) XXX
 
     // column 0
-    newCard("Sport", 0, 0, 5, Card::META, "Sport");
-    newCard("Duration", 0, 1, 5, Card::METRIC, "workout_time");
-    newCard("Route", 0, 2, 20, Card::ROUTE);
-    newCard("Distance", 0, 3, 9, Card::METRIC, "total_distance");
-    newCard("Climbing", 0, 4, 5, Card::METRIC, "elevation_gain");
-    newCard("Speed", 0, 6, 5, Card::METRIC, "average_speed");
+    newCard("Status", 0, 0, 8, Card::PMC, "coggan_tss");
+    newCard("Sport", 0, 1, 5, Card::META, "Sport");
+    newCard("Duration", 0, 2, 5, Card::METRIC, "workout_time");
+    newCard("Route", 0, 3, 20, Card::ROUTE);
+    newCard("Distance", 0, 4, 9, Card::METRIC, "total_distance");
+    newCard("Climbing", 0, 5, 5, Card::METRIC, "elevation_gain");
+    newCard("Speed", 0, 6, 6, Card::METRIC, "average_speed");
 
     // column 1
     newCard("Heartrate", 1, 0, 8, Card::METRIC, "average_hr");
@@ -280,13 +283,12 @@ Card::setType(CardType type, RideFile::SeriesType series)
 void
 Card::setType(CardType type, QString symbol)
 {
-    // metric or meta
+    // metric or meta or pmc
     this->type = type;
     settings.symbol = symbol;
 
     // we may plot the metric sparkline if the tile is big enough
     if (type == METRIC) {
-
         sparkline = new Sparkline(this, SPARKDAYS+1, name);
     }
 }
@@ -489,6 +491,18 @@ Card::setData(RideItem *item)
             upper = QString("%1").arg(max);
             lower = QString("%1").arg(min);
         }
+    }
+
+    if (type == PMC) {
+        // get lts, sts, sb, rr for the input metric
+        PMCData *pmc = parent->context->athlete->getPMCFor(settings.symbol);
+
+        QDate date = item ? item->dateTime.date() : QDate();
+        lts = pmc->lts(date);
+        sts = pmc->sts(date);
+        stress = pmc->stress(date);
+        sb = pmc->sb(date);
+        rr = pmc->rr(date);
     }
 
     if (type == META) {
@@ -767,6 +781,23 @@ Card::geometryChanged() {
 void
 Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
+    // fonts
+    QFont titlefont;
+    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
+    QFont bigfont;
+#ifdef Q_OS_MAC
+    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
+#else
+    bigfont.setPointSize(ROWHEIGHT*2);
+#endif
+
+    QFont smallfont;
+#ifdef Q_OS_MAC
+        smallfont.setPointSize(ROWHEIGHT);
+#else
+        smallfont.setPointSize(ROWHEIGHT*0.6f);
+#endif
+
     painter->setBrush(brush);
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
@@ -776,12 +807,10 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     painter->setPen(GColor(CPLOTGRID));
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
-    QFont titlefont;
-    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
     //titlefont.setWeight(QFont::Bold);
     painter->setPen(QColor(200,200,200));
     painter->setFont(titlefont);
-    painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
+    if (type != PMC) painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
 
     // only paint contents if not dragging
     if (drag) return;
@@ -796,23 +825,6 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
         }
 
-        // paint the value in the middle using a font 2xROWHEIGHT
-        QFont bigfont;
-#ifdef Q_OS_MAC
-        bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
-#else
-        bigfont.setPointSize(ROWHEIGHT*2);
-#endif
-        painter->setPen(GColor(CPLOTMARKER));
-        painter->setFont(bigfont);
-
-        QFont smallfont;
-#ifdef Q_OS_MAC
-        smallfont.setPointSize(ROWHEIGHT);
-#else
-        smallfont.setPointSize(ROWHEIGHT*0.6f);
-#endif
-
         double addy = 0;
         if (units != "" && units != tr("seconds")) addy = QFontMetrics(smallfont).height();
 
@@ -826,6 +838,8 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         QFontMetrics fm(bigfont);
         QRectF rect = QFontMetrics(bigfont, parent->device()).boundingRect(value);
 
+        painter->setPen(GColor(CPLOTMARKER));
+        painter->setFont(bigfont);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
 
@@ -855,6 +869,108 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
                                   top - 40 + (fm.ascent() / 2.0f)), upper);
             painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 80,
                                   bottom -40), lower);
+        }
+    }
+
+    if (type == PMC) {
+
+        // Lets use friendly names for TSB et al, as described on the TrainingPeaks website
+        // here: http://home.trainingpeaks.com/blog/article/4-new-mobile-features-you-should-know-about
+        // as written by Ben Pryhoda their Senior Director of Product, Device and API Integrations
+        // we will make this configurable later anyway, as calling SB 'Form' is rather dodgy.
+        QFontMetrics tfm(titlefont, parent->device());
+        QFontMetrics bfm(bigfont, parent->device());
+
+        // 4 measures to show, depending upon how much space
+        // so prioritise - SB then LTS, STS, RR
+
+        double nexty = ROWHEIGHT;
+        //
+        // Stress Balance
+        //
+        painter->setPen(QColor(200,200,200));
+        painter->setFont(titlefont);
+        QString string = QString("Form");
+        QRectF rect = tfm.boundingRect(string);
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+        nexty += rect.height() + 30;
+
+        painter->setPen(PMCData::sbColor(sb, GColor(CPLOTMARKER)));
+        painter->setFont(bigfont);
+        string = QString("%1").arg(round(sb));
+        rect = bfm.boundingRect(string);
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+        nexty += ROWHEIGHT*2;
+
+        //
+        // Long term Stress
+        //
+        if (deep > 7) {
+
+            painter->setPen(QColor(200,200,200));
+            painter->setFont(titlefont);
+            QString string = QString("Fitness");
+            QRectF rect = tfm.boundingRect(string);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                      nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+            nexty += rect.height() + 30;
+
+            painter->setPen(PMCData::ltsColor(lts, GColor(CPLOTMARKER)));
+            painter->setFont(bigfont);
+            string = QString("%1").arg(round(lts));
+            rect = bfm.boundingRect(string);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                      nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+            nexty += ROWHEIGHT*2;
+
+        }
+
+        //
+        // Short term Stress
+        //
+        if (deep > 11) {
+
+            painter->setPen(QColor(200,200,200));
+            painter->setFont(titlefont);
+            QString string = QString("Fatigue");
+            QRectF rect = tfm.boundingRect(string);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                      nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+            nexty += rect.height() + 30;
+
+            painter->setPen(PMCData::stsColor(sts, GColor(CPLOTMARKER)));
+            painter->setFont(bigfont);
+            string = QString("%1").arg(round(sts));
+            rect = bfm.boundingRect(string);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                      nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+            nexty += ROWHEIGHT*2;
+
+        }
+
+        //
+        // Ramp Rate
+        //
+        if (deep > 14) {
+
+            painter->setPen(QColor(200,200,200));
+            painter->setFont(titlefont);
+            QString string = QString("Risk");
+            QRectF rect = tfm.boundingRect(string);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                      nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+            nexty += rect.height() + 30;
+
+            painter->setPen(PMCData::rrColor(rr, GColor(CPLOTMARKER)));
+            painter->setFont(bigfont);
+            string = QString("%1").arg(round(rr));
+            rect = bfm.boundingRect(string);
+            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                      nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
+            nexty += ROWHEIGHT*2;
+
         }
     }
 }
@@ -997,7 +1113,7 @@ Routeline::setData(RideItem *item)
             p->lon < -180 || p->lon > 180 ||
             p->lat < -90 || p->lat > 90) continue;
 
-        // filter out most of the points, take 1 in 20
+        // filter out most of the points, one per minute
         if (--count < 0) { // first
 
             //path.moveTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
@@ -1005,15 +1121,15 @@ Routeline::setData(RideItem *item)
 
             path.moveTo((geom.width() / (xdiff / (p->lon - minlon))),
                         (height-(height / (ydiff / (p->lat - minlat)))));
-            count=30;
+            count=60;
 
-        } else if (count == 0) { // every 20th
+        } else if (count == 0) {
 
             //path.lineTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
             //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
             path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
                         (height-(height / (ydiff / (p->lat - minlat)))));
-            count=30;
+            count=60;
             lines++;
 
         }

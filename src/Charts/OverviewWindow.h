@@ -69,7 +69,7 @@ class Card : public QGraphicsWidget
     public:
 
         // what type am I?
-        enum cardType { NONE, ROUTE, METRIC, META, SERIES, INTERVAL, ZONE } type;
+        enum cardType { NONE, ROUTE, METRIC, META, SERIES, PMC, MODEL, INTERVAL, ZONE } type;
         typedef enum cardType CardType;
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
@@ -145,6 +145,9 @@ class Card : public QGraphicsWidget
 
         // ROUTE visualisation
         Routeline *routeline;
+
+        // PMC stress values
+        double lts, sts, stress, sb, rr;
 
         QLineSeries *lineseries;
         QScatterSeries *scatterseries, *peakscatterseries, *userscatterseries, *systemscatterseries;
@@ -313,7 +316,7 @@ class OverviewWindow : public GcChartWindow
                                                          return add;
                                                         }
 
-        // create a card - metric
+        // create a card - metric or PMC (metric is the input)
         Card *newCard(QString name, int column, int order, int deep, Card::CardType type, QString symbol) {
                                                          Card *add = new Card(deep, name);
                                                          add->column = column;
