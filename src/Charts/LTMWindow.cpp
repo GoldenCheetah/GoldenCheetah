@@ -141,7 +141,7 @@ LTMWindow::LTMWindow(Context *context) :
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
 #ifdef NOWEBKIT
     dataSummary = new QWebEngineView(this);
-    dataSummary->setEnabled(false); // stop grabbing focus
+    //XXXdataSummary->setEnabled(false); // stop grabbing focus
     dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
 #else
