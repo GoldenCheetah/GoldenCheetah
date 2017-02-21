@@ -456,6 +456,8 @@ MainWindow::MainWindow(const QDir &home)
                          SLOT(uploadGoogleDrive()), tr(""));
     shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
                          SLOT(syncGoogleDrive()), tr("Ctrl+P"));
+#endif
+#if QT_VERSION >= 0x050400
     shareMenu->addSeparator ();
     shareMenu->addAction(tr("Upload to Today's Plan"), this,
                          SLOT(uploadTodaysPlan()), tr(""));
@@ -485,7 +487,9 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
+#if QT_VERSION > 0x050000
     optionsMenu->addAction(tr("Download workouts from Today's Plan..."), this, SLOT(downloadTodaysPlanWorkouts()));
+#endif
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
@@ -2046,6 +2050,7 @@ MainWindow::downloadErgDB()
  * TodaysPlan Workouts
  *--------------------------------------------------------------------*/
 
+#if QT_VERSION > 0x050000
 void
 MainWindow::downloadTodaysPlanWorkouts()
 {
@@ -2062,7 +2067,7 @@ MainWindow::downloadTodaysPlanWorkouts()
         "Please check your preference settings."));
     }
 }
-
+#endif
 
 /*----------------------------------------------------------------------
  * Workout/Media Library
@@ -2122,6 +2127,8 @@ MainWindow::syncGoogleDrive()
     upload.exec();
 }
 
+#endif
+#if QT_VERSION >= 0x050400
 void
 MainWindow::uploadSixCycle()
 {
