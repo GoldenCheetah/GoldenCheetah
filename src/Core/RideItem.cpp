@@ -719,9 +719,14 @@ RideItem::getCountForSymbol(QString name)
     if (metrics_.size() && metrics_.size() == factory.metricCount()) {
         // return the precomputed metric value
         const RideMetric *m = factory.rideMetric(name);
-        if (m)  return count_[m->index()];
+        if (m)  {
+            // don't return zero (!)
+            double returning = count_[m->index()];
+            return returning ? returning : 1;
+        }
     }
-    return 0.0f;
+    // don't return zero, thats impossible
+    return 1.0f;
 }
 
 QString
