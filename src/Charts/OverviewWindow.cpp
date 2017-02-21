@@ -800,20 +800,18 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     // fonts
     QFont titlefont;
-    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
     QFont bigfont;
-#ifdef Q_OS_MAC
-    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
-#else
-    bigfont.setPointSize(ROWHEIGHT*2);
-#endif
-
     QFont smallfont;
 #ifdef Q_OS_MAC
-        smallfont.setPointSize(ROWHEIGHT);
+    titlefont.setPointSize(ROWHEIGHT); // need a bit of space
+    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
+    smallfont.setPointSize(ROWHEIGHT*0.8f);
 #else
-        smallfont.setPointSize(ROWHEIGHT*0.6f);
+    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
+    bigfont.setPointSize(ROWHEIGHT*2);
+    smallfont.setPointSize(ROWHEIGHT);
 #endif
+
 
     painter->setBrush(brush);
     QPainterPath path;
