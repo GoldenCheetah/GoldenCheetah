@@ -189,7 +189,9 @@ class MainWindow : public QMainWindow
         // Training View
         void addDevice();
         void downloadErgDB();
+#if QT_VERSION > 0x050000
         void downloadTodaysPlanWorkouts();
+#endif
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();
@@ -226,6 +228,8 @@ class MainWindow : public QMainWindow
         void uploadGoogleDrive();
         void syncGoogleDrive();
 
+#endif
+#if QT_VERSION >= 0x050400
         void uploadSixCycle();
         void syncSixCycle();
 
