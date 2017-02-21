@@ -92,7 +92,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 
  #ifdef NOWEBKIT
     rideSummary = new QWebEngineView(this);
-    rideSummary->setEnabled(false);
+    //XXX steals focus rideSummary->setEnabled(false);
  #else
     rideSummary = new QWebView(this);
  #endif
