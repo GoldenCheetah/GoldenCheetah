@@ -35,7 +35,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
 {
     setWindowTitle(tr("Interval Summary"));
     setReadOnly(true);
-    setEnabled(false); // stop the fucking thing grabbing keyboard focus FFS.
+    //XXXsetEnabled(false); // stop the fucking thing grabbing keyboard focus FFS.
     setFrameStyle(QFrame::NoFrame);
 #ifdef Q_OS_WIN
     QStyle *cde = QStyleFactory::create(OS_STYLE);
