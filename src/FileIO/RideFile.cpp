@@ -19,6 +19,7 @@
  */
 
 #include "RideFile.h"
+#include "FilterHRV.h"
 #include "WPrime.h"
 #include "Athlete.h"
 #include "DataProcessor.h"
@@ -771,6 +772,24 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             i->start -= timeOffset;
             i->stop -= timeOffset;
         }
+
+        // calculate derived data series -- after data fixers applied above
+        // Update presens and filter HRV
+        XDataSeries *series = result->xdata("HRV");
+
+        if (series)
+            {
+                result->setDataPresent(result->hrv, series->datapoints.count() > 0);
+                if (result->areDataPresent()->hrv)
+                    {
+                        double rrMax = appsettings->value(NULL, GC_RR_MAX, "2000.0").toDouble();
+                        double rrMin = appsettings->value(NULL, GC_RR_MIN, "270.0").toDouble();
+                        double rrFilt = appsettings->value(NULL, GC_RR_FILT, "0.2").toDouble();
+                        int rrWindow = appsettings->value(NULL, GC_RR_WINDOW, "20").toInt();
+
+                        FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
+                    }
+            }
 
         // calculate derived data series -- after data fixers applied above
         if (context) result->recalculateDerivedSeries();

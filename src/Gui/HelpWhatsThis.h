@@ -85,6 +85,7 @@ Q_OBJECT
                  MenuBar_Edit_FixLapSwim,
                  MenuBar_Edit_FixFreewheeling,
                  MenuBar_Edit_FixMoxy,
+                 MenuBar_Edit_FilterHrv,
 
                  MenuBar_View,
                  MenuBar_Help,
