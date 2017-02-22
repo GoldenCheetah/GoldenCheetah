@@ -110,6 +110,12 @@ IntervalItem::refresh()
         i.next();
         metrics_[i.value()->index()] = i.value()->value();
         count_[i.value()->index()] = i.value()->count();
+        double stdmean = i.value()->stdmean();
+        double stdvariance = i.value()->stdvariance();
+        if (stdmean || stdvariance) {
+            stdmean_.insert(i.value()->index(), stdmean);
+            stdvariance_.insert(i.value()->index(), stdvariance);
+        }
     }
 
     // clean any bad values
