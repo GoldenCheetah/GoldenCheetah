@@ -114,7 +114,13 @@ ride: '{' rideelement_list '}'                                  {
                                                                     jc->item.metadata().clear();
                                                                     jc->item.xdata().clear();
                                                                     jc->item.metrics().fill(0.0f);
+                                                                    jc->item.counts().fill(0.0f);
+                                                                    jc->item.stdmeans().clear();
+                                                                    jc->item.stdvariances().clear();
                                                                     jc->interval.metrics().fill(0.0f);
+                                                                    jc->interval.counts().fill(0.0f);
+                                                                    jc->interval.stdmeans().clear();
+                                                                    jc->interval.stdvariances().clear();
                                                                     jc->interval.route = QUuid();
                                                                     jc->item.clearIntervals();
                                                                     jc->item.overrides_.clear();
@@ -187,9 +193,23 @@ metric: metric_key ':' metric_value                             /* metric comput
 
                                                                 }
 
+      | metric_key ':' '[' metric_value ',' metric_count ',' metric_stdmean ',' metric_stdvariance ']'    {
+                                                                    const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
+                                                                    if (m) {
+                                                                        jc->item.metrics()[m->index()] = $4.toDouble();
+                                                                        jc->item.counts()[m->index()] = $6.toDouble();
+                                                                        jc->item.stdmeans().insert(m->index(), $8.toDouble());
+                                                                        jc->item.stdvariances().insert(m->index(), $10.toDouble());
+                                                                    }
+                                                                    else qDebug()<<"metric not found:"<<$1;
+
+                                                                }
+
 metric_key : string                                             { jc->key = jc->JsonString; }
 metric_value : string                                           { jc->value = jc->JsonString; }
 metric_count : string                                           { jc->count = jc->JsonString; }
+metric_stdmean : string                                         { jc->count = jc->JsonString; }
+metric_stdvariance : string                                     { jc->count = jc->JsonString; }
 
 /*
  * INTERVALS
@@ -203,6 +223,10 @@ intervals_list: intervals_list ',' interval
 interval: '{' intervalelement_list '}'                          {
                                                                      jc->item.addInterval(jc->interval);
                                                                     jc->interval.metrics().fill(0.0f);
+                                                                    jc->interval.counts().fill(0.0f);
+                                                                    jc->interval.stdmeans().clear();
+                                                                    jc->interval.stdvariances().clear();
+
                                                                 }
 
 intervalelement_list: intervalelement_list ',' interval_element
@@ -244,11 +268,23 @@ interval_metric: interval_metric_key ':' interval_metric_value                  
                                                                         jc->interval.counts()[m->index()] = $6.toDouble();
                                                                     } else qDebug()<<"metric not found:"<<$1;
                                                                }
+               | interval_metric_key ':' '[' interval_metric_value ',' interval_metric_count ',' interval_metric_stdmean ',' interval_metric_stdvariance ']'
+                                                                {
+                                                                    const RideMetric *m = RideMetricFactory::instance().rideMetric($1);
+                                                                    if (m) {
+                                                                        jc->interval.metrics()[m->index()] = $4.toDouble();
+                                                                        jc->interval.counts()[m->index()] = $6.toDouble();
+                                                                        jc->interval.stdmeans().insert(m->index(), $8.toDouble());
+                                                                        jc->interval.stdvariances().insert(m->index(), $10.toDouble());
+                                                                    } else qDebug()<<"metric not found:"<<$1;
+                                                               }
                ;
 
 interval_metric_key : string                                    { jc->key = jc->JsonString; }
 interval_metric_value : string                                  { jc->value = jc->JsonString; }
 interval_metric_count : string                                  { jc->count = jc->JsonString; }
+interval_metric_stdmean : string                                { jc->count = jc->JsonString; }
+interval_metric_stdvariance : string                            { jc->count = jc->JsonString; }
 
 /*
  * Metadata TAGS
@@ -436,14 +472,21 @@ void RideCache::save()
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
 
-                    // if count is 0 don't write it
-                    if (item->counts()[index] == 0) {
+                    // if stdmean or variance is non-zero we write all 4
+                    if (item->stdmeans().value(index, 0.0f) || item->stdvariances().value(index, 0.0f)) {
+
+                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\",\""
+                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) << "\",\""
+                                                                   << QString("%1").arg(item->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
+                                                                   << QString("%1").arg(item->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
+                    } else if (item->counts()[index] == 0) {
+                        // if count is 0 don't write it
                         stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
                     } else {
 
                         // count is not 1, so lets write it
-                        stream << "\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\", \""
-                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) <<"\" ] ";
+                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\",\""
+                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) <<"\"]";
                     }
                 }
             }
@@ -544,14 +587,21 @@ void RideCache::save()
                                 if (!firstMetric) stream << ",\n";
                                 firstMetric = false;
 
+                                if (interval->stdmeans().value(index, 0.0f) || interval->stdvariances().value(index, 0.0f)) {
+
+                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
+                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) << "\",\""
+                                                                               << QString("%1").arg(interval->stdmeans().value(index, 0.0f), 0, 'f', 5) << "\",\""
+                                                                               << QString("%1").arg(interval->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
+
                                 // if count is 0 don't write it
-                                if (interval->counts()[index] == 0) {
+                                } else if (interval->counts()[index] == 0) {
                                     stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
                                 } else {
 
                                     // count is not 1, so lets write it
-                                    stream << "\t\t\t\t\"" << name << "\": [ \"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\", \""
-                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) <<"\" ] ";
+                                    stream << "\t\t\t\t\"" << name << "\":[\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
+                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) <<"\"]";
                                 }
                             }
                         }

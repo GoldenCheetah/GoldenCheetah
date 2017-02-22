@@ -40,8 +40,9 @@
 // 1.5      15 Dec 15  Mark Liversedge         zone ranges added as part of metric compute() refactor
 // 1.6      16 Jul 16  Mark Liversedge         xdata added
 // 1.7      20 Feb 17  Mark Liversedge         Metric count (if nonzero) added
+// 1.8      22 Feb 17  Mark Liversedge         Metric stdmean() stdvariance() added
 
-#define RIDEDB_VERSION "1.7"
+#define RIDEDB_VERSION "1.8"
 
 class APIWebService;
 class HttpResponse;

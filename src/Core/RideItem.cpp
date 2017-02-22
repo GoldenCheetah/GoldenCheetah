@@ -88,6 +88,8 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     fileCache_ = NULL;
     metrics_ = here.metrics_;
     count_ = here.count_;
+    stdmean_ = here.stdmean_;
+    stdvariance_ = here.stdvariance_;
     metadata_ = here.metadata_;
     xdata_ = here.xdata_;
     errors_ = here.errors_;
@@ -133,6 +135,12 @@ RideItem::setFrom(QHash<QString, RideMetricPtr> computed)
         i.next();
         metrics_[i.value()->index()] = i.value()->value();
         count_[i.value()->index()] = i.value()->count();
+        double stdmean = i.value()->stdmean();
+        double stdvariance = i.value()->stdvariance();
+        if (stdmean || stdvariance) {
+            stdmean_.insert(i.value()->index(), stdmean);
+            stdvariance_.insert(i.value()->index(), stdvariance);
+        }
     }
 }
 
@@ -606,6 +614,12 @@ RideItem::refresh()
             //DEBUG if (i.value()->isUser()) qDebug()<<dateTime.date()<<i.value()->symbol()<<i.value()->value();
             metrics_[i.value()->index()] = i.value()->value();
             count_[i.value()->index()] = i.value()->count();
+            double stdmean = i.value()->stdmean();
+            double stdvariance = i.value()->stdvariance();
+            if (stdmean || stdvariance) {
+                stdmean_.insert(i.value()->index(), stdmean);
+                stdvariance_.insert(i.value()->index(), stdvariance);
+            }
         }
 
         // clean any bad values
@@ -727,6 +741,36 @@ RideItem::getCountForSymbol(QString name)
     }
     // don't return zero, thats impossible
     return 1.0f;
+}
+
+double
+RideItem::getStdMeanForSymbol(QString name)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+        // return the precomputed metric value
+        const RideMetric *m = factory.rideMetric(name);
+        if (m)  {
+            // don't return zero (!)
+            return stdmean_.value(m->index(), 0.0f);
+        }
+    }
+    return 0.0f;
+}
+
+double
+RideItem::getStdVarianceForSymbol(QString name)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    if (metrics_.size() && metrics_.size() == factory.metricCount()) {
+        // return the precomputed metric value
+        const RideMetric *m = factory.rideMetric(name);
+        if (m)  {
+            // don't return zero (!)
+            return stdvariance_.value(m->index(), 0.0f);
+        }
+    }
+    return 0.0f;
 }
 
 QString

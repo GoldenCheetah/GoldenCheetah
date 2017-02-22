@@ -64,6 +64,10 @@ class RideItem : public QObject
         QVector<double> metrics_;
         QVector<double> count_;
 
+        // std deviation metrics need these to aggregate
+        QMap<int, double> stdmean_;
+        QMap<int, double> stdvariance_;
+
         // metadata (used by navigator)
         QMap<QString,QString> metadata_;
 
@@ -118,6 +122,10 @@ class RideItem : public QObject
         double getForSymbol(QString name, bool useMetricUnits=true);
         double getCountForSymbol(QString name);
 
+        // access the stdmean and stdvariance value
+        double getStdMeanForSymbol(QString name);
+        double getStdVarianceForSymbol(QString name);
+
         // as a well formatted string
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
 
@@ -151,6 +159,8 @@ class RideItem : public QObject
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
         QVector<double> &counts() { return count_; }
+        QMap <int, double>&stdmeans() { return stdmean_; }
+        QMap <int, double>&stdvariances() { return stdvariance_; }
         const QStringList errors() { return errors_; }
         double getWeight(int type=0);
 

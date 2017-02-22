@@ -72,8 +72,13 @@ class IntervalItem
         void refresh();
         QVector<double> metrics_;
         QVector<double> count_;
+        QMap <int, double>stdmean_;
+        QMap <int, double>stdvariance_;
+
         QVector<double> &metrics() { return metrics_; }
         QVector<double> &counts() { return count_; }
+        QMap <int, double>&stdmeans() { return stdmean_; }
+        QMap <int, double>&stdvariances() { return stdvariance_; }
 
         // extracted sample data
         RideFileInterval *rideInterval;

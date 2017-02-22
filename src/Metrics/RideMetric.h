@@ -118,6 +118,10 @@ public:
     // for averages the count of items included in the average
     virtual double count() const { return count_; }
 
+    // for std deviation we need to provide stdmean and stdvariances values
+    virtual double stdmean() { return 0.0f; }
+    virtual double stdvariance() { return 0.0f; }
+
     // when aggregating averages, should we include zeroes ? no by default
     virtual bool aggregateZero() const { return false; }
 
