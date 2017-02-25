@@ -169,11 +169,12 @@
 #USBXPRESS_LIBS    = 
 
 # If you want support for using USB2 sticks in Train View on Linux or Windows
-# then you need to install libusb (Linux) or libusb-win32 (Windows) version 0.1.12
+# then you need to install libusb (Linux) version 0.1.12 
+# or libusb-win32 (Windows) version 1.2.6.0
 # For Linux builds download: (There is a copy in the contrib directory)
 #     http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
 # For Windows builds download:
-#     http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
+#     ttps://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/
 # You may override the INCLUDE and LIB files if you like.
 # You *must* define LIBUSB_INSTALL to use this feature.
 #LIBUSB_INSTALL = /usr/local
@@ -182,8 +183,8 @@
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from
-# ftp.videolan.org/pub/vlc/1.1.8 for your platform
-# there are sdks for Mac and Windows. On Linux you
+# ftp.videolan.org/pub/vlc/1.1.8 or http://download.videolan.org/vlc/ for 
+# your platform there are sdks for Mac and Windows. On Linux you
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest
 # builds (we need 1.1.8 or higher).
@@ -213,7 +214,8 @@
 # if you don't resample (e.g. export or merge with new recording
 # intervals) then don't bother.
 #
-# Only tested on Linux, cannot compile on Windows at present
+# Mainly tested on Linux, compilation on Windows requires
+# some modifications in the build process to build with MSVC2015 
 # Code is available at: http://www.mega-nerd.com/SRC/
 #
 #SAMPLERATE_INSTALL = /usr/local
