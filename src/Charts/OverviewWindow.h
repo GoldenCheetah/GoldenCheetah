@@ -43,6 +43,7 @@
 #include <QtGui>
 #include <QScrollBar>
 #include <QIcon>
+#include <QTimer>
 
 // qt charts
 #include <QtCharts>
@@ -175,10 +176,13 @@ class Card : public QGraphicsWidget
 };
 
 // RPE rating viz and widget to set value
-class RPErating : public QGraphicsItem
+class RPErating : public QObject, public QGraphicsItem
 {
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
     public:
-        RPErating(QGraphicsWidget *parent, QString name=""); // create and say how many days
+        RPErating(Card *parent, QString name=""); // create and say how many days
 
         // we monkey around with this *A LOT*
         void setGeometry(double x, double y, double width, double height);
@@ -194,13 +198,27 @@ class RPErating : public QGraphicsItem
                                                     geom.width(), geom.height());
         }
 
+        // for interaction
+        bool sceneEvent(QEvent *event);
+
+    public slots:
+
+        // when editing
+        void cancelEdit();
+        void applyEdit();
+
     private:
-        QGraphicsWidget *parent;
+        Card *parent;
         QString name;
         QString description;
         QRectF geom;
-        QString value;
+        QString value, oldvalue;
         QColor color;
+
+        // interaction
+        QTimer *timer;
+        bool hover;
+        bool editing;
 
 };
 
@@ -281,6 +299,7 @@ class OverviewWindow : public GcChartWindow
 
         // used by children
         Context *context;
+        QGraphicsView *view;
 
         // to get paint device
         QGraphicsView *device() { return view; }
@@ -384,7 +403,6 @@ class OverviewWindow : public GcChartWindow
 
         // gui setup
         QGraphicsScene *scene;
-        QGraphicsView *view;
         QScrollBar *scrollbar;
 
         // for animating transitions
