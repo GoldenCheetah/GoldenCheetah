@@ -2936,12 +2936,13 @@ void write_file_creator(QByteArray *array) {
 
 void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
 
-    write_message_definition(array, SESSION_MSG_NUM, 8); // global_msg_num, num_fields
+    write_message_definition(array, SESSION_MSG_NUM, 9); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 254, 2, 132); // message_index (254)
     write_field_definition(array, 0, 1, 2); // event (0)
     write_field_definition(array, 1, 1, 2); // event_type (1)
-    write_field_definition(array, 2, 4, 134); // start_time (4)
+    write_field_definition(array, 2, 4, 134); // start_time (2)
     write_field_definition(array, 5, 1, 0); // sport (5)
     write_field_definition(array, 6, 1, 2); // subsport (6)
     write_field_definition(array, 7, 4, 134); // total_elapsed_time (7)
@@ -2958,41 +2959,45 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     }
     write_int32(array, value, true);
 
-    // 2. event (0)
+    // 2. message_index (254)
+    write_int16(array, 0, true);
+
+    // 3. event (0)
     value = 9; // lap (8=session)
     write_int8(array, value);
 
-    // 3. event_type (1)
+    // 4. event_type (1)
     value = 1; // stop (4=stop_all)
     write_int8(array, value);
 
-    // 4. start_time (4)
+    // 5. start_time (4)
     value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
 
-    // 5. sport
+    // 6. sport
     write_int8(array, 2);
 
-    // 6. sub sport
+    // 7. sub sport
     write_int8(array, 0);
 
-    // 7. total_elapsed_time (7)
+    // 8. total_elapsed_time (7)
     value = computed.value("workout_time")->value(true) * 1000;
     write_int32(array, value, true);
 
-    // 8. total_distance (9)
-    value = computed.value("total_distance")->value(true) * 10;
+    // 9. total_distance (9)
+    value = computed.value("total_distance")->value(true) * 100000;
     write_int32(array, value, true);
 
 }
 
 void write_lap(QByteArray *array, const RideFile *ride) {
-    write_message_definition(array, LAP_MSG_NUM, 4); // global_msg_num, num_fields
+    write_message_definition(array, LAP_MSG_NUM, 5); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
     write_field_definition(array, 1, 1, 2); // event_type (1)
-    write_field_definition(array, 24, 1, 0); // trigger (24)
+    write_field_definition(array, 3, 4, 134); // start_time (3)
+    write_field_definition(array, 24, 1, 2); // trigger (24)
 
 
     // Record ------
@@ -3007,14 +3012,18 @@ void write_lap(QByteArray *array, const RideFile *ride) {
     write_int32(array, value, true);
 
     // 2. event
-    value = 9; // lap
+    value = 8; // session (lap=9)
     write_int8(array, value);
 
     // 3. event_type
-    value = 1; // stop
+    value = 9; // stop_all (stop=1)
     write_int8(array, value);
 
-    // 4. trigger
+    // 4. start_time
+    value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
+    write_int32(array, value, true);
+
+    // 5. trigger
     value = 7; // session_end
     write_int8(array, value);
 
@@ -3022,11 +3031,12 @@ void write_lap(QByteArray *array, const RideFile *ride) {
 
 void write_start_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, EVENT_MSG_NUM, 3); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 4); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
     write_field_definition(array, 1, 1, 2); // event_type (1)
+    write_field_definition(array, 4, 1, 2); // event_group (4)
 
 
     // Record ------
@@ -3045,15 +3055,19 @@ void write_start_event(QByteArray *array, const RideFile *ride) {
     value = 0;
     write_int8(array, value);
 
+    // 4. event_group
+    write_int8(array, 0);
+
 }
 
 void write_stop_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, EVENT_MSG_NUM, 3); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 4); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
     write_field_definition(array, 1, 1, 2); // event_type (1)
+    write_field_definition(array, 4, 1, 2); // event_group (4)
 
 
     // Record ------
@@ -3065,12 +3079,15 @@ void write_stop_event(QByteArray *array, const RideFile *ride) {
     write_int32(array, value, true);
 
     // 2. event
-    value = 0;
+    value = 0; // timer
     write_int8(array, value);
 
     // 3. event_type
-    value = 4;
+    value = 4; // stop_all
     write_int8(array, value);
+
+    // 4. event_group
+    write_int8(array, 0);
 
 }
 
@@ -3257,9 +3274,9 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
 
     write_file_id(&data, ride); // file_id 0
     //write_file_creator(&data); // file_creator 49
-    //write_start_event(&data, ride); // event 21 (x15)
+    write_start_event(&data, ride); // event 21 (x15)
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)
-    //write_stop_event(&data, ride); // event 21 (x15)
+    write_stop_event(&data, ride); // event 21 (x15)
     write_lap(&data, ride); // lap 19 (x11)
     write_session(&data, ride, computed); // session 18 (x12)
     write_activity(&data, ride, computed); // activity 34 (x22)

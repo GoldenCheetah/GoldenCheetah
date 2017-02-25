@@ -62,6 +62,7 @@ public:
         GOOGLE_CALENDAR,
         GOOGLE_DRIVE,
         TODAYSPLAN,
+        WITHINGS
     } OAuthSite;
 
     OAuthDialog(Context *context, OAuthSite site, QString baseURL="", QString clientsecret="");
