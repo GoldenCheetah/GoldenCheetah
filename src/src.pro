@@ -54,6 +54,9 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## QT5 modules we use
     QT += widgets concurrent serialport multimedia multimediawidgets
 
+    ## Always add debug information
+    CONFIG += force_debug_info
+
     ## If building with QT5 there is experimental suport for building
     ## with WebEngine now that WebKit is deprecated in QT 5.6
     ## It brings in a LOT of dependencies !
@@ -98,7 +101,6 @@ DEFINES += GC_HAVE_SOAP
 # via file extensions .lib or .a in src.pro unless the section is
 # platform specific. Instead we use directives -Ldir and -llib
 win32 {
-
     #QWT is configured to build 2 libs (release/debug) on win32 (see qwtbuild.pri)
     CONFIG(release, debug|release){
     LIBS += -L$${PWD}/../qwt/lib -lqwt
@@ -844,6 +846,10 @@ SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp
 
+## Crash Handling
+win32-msvc* {
+  SOURCES += Core/WindowsCrashHandler.cpp
+}
 
 ###======================================
 ### PENDING SOURCE FILES [not active yet]
