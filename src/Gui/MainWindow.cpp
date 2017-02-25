@@ -115,6 +115,10 @@
 #include "GcUpgrade.h"
 #endif
 
+#if defined(_MSC_VER) && defined(_WIN64)
+#include "WindowsCrashHandler.cpp"
+#endif
+
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
@@ -133,6 +137,16 @@ MainWindow::MainWindow(const QDir &home)
     // create a splash to keep user informed on first load
     // first one in middle of display, not middle of window
     setSplash(true);
+
+#if defined(_MSC_VER) && defined(_WIN64)
+    // set dbg/stacktrace directory for Windows to the athlete directory
+    // don't use the GC_HOMEDIR .ini value, since we want to have a proper path
+    // even if default athlete dirs are used.
+    QDir varHome = home;
+    varHome.cdUp();
+    setCrashFilePath(varHome.canonicalPath().toStdString());
+
+#endif
 
     // bootstrap
     Context *context = new Context(this);

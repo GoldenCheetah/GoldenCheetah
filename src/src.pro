@@ -54,8 +54,8 @@ lessThan(QT_MAJOR_VERSION, 5) {
     ## QT5 modules we use
     QT += widgets concurrent serialport multimedia multimediawidgets
 
-    ## Always add debug information
-    CONFIG += force_debug_info
+    ## Always add debug information for Windows, MSVC
+    win32-msvc* { CONFIG += force_debug_info }
 
     ## If building with QT5 there is experimental suport for building
     ## with WebEngine now that WebKit is deprecated in QT 5.6
@@ -124,7 +124,7 @@ LIBS += $${LIBZ_LIBS}
 ###===============================
 
 # Microsoft Visual Studion toolchain dependencies
-*msvc2015 {
+win32-msvc* {
 
     # we need windows kit 8.2 or higher with MSVC, offer default location
     isEmpty(WINKIT_INSTALL) WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
@@ -406,7 +406,7 @@ contains(DEFINES, "GC_HAVE_KQOAUTH") {
 
     # on MS VS the linker wants /LTCG for libkmldom due to
     # "MSIL .netmodule or module compiled with /GL found"
-    *msvc2015 { QMAKE_LFLAGS +=  /LTCG }
+    win32-msvc* { QMAKE_LFLAGS +=  /LTCG }
 
     DEFINES     += GC_HAVE_KML
     INCLUDEPATH += $${KML_INCLUDE}  $${BOOST_INCLUDE}

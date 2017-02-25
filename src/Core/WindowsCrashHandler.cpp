@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2017 Stefan Schake
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+
 // Only for Windows 64 Bit and MSVC
 #if defined(_MSC_VER) && defined(_WIN64)
 
@@ -13,14 +32,24 @@
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
+static std::string installation_crash_path = "";
+
 static std::string getCrashFileName()
 {
     using namespace std::chrono;
     auto now = system_clock::now();
     auto nowTimeT = system_clock::to_time_t(now);
     std::stringstream ret;
+    if (installation_crash_path.length() > 0 ) {
+      ret << installation_crash_path << "\\";
+    }
     ret << "crash_" << std::put_time(std::localtime(&nowTimeT), "%H%M_%d%m%y");
     return ret.str();
+}
+
+static void setCrashFilePath(std::string file_path)
+{
+   installation_crash_path = file_path;
 }
 
 static LONG WINAPI ExceptionHandler(LPEXCEPTION_POINTERS exception)
