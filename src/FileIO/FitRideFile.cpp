@@ -34,16 +34,22 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG     false // debug traces
+#define FIT_DEBUG               true // debug traces
+#define FIT_DEBUG_LEVEL         3    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
-#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+#define MATHCONST_PI            3.141592653589793238462643383279502884L /* pi */
 #endif
 
-#define LAP_TYPE     19
-#define RECORD_TYPE  20
-#define HRV_TYPE 78
-#define SEGMENT_TYPE 142
+#define FILE_ID_MSG_NUM         0
+#define SESSION_MSG_NUM         18
+#define LAP_MSG_NUM             19
+#define RECORD_MSG_NUM          20
+#define EVENT_MSG_NUM           21
+#define ACTIVITY_MSG_NUM        34
+#define FILE_CREATOR_MSG_NUM    49
+#define HRV_MSG_NUM             78
+#define SEGMENT_MSG_NUM         142
 
 static int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
@@ -840,7 +846,7 @@ struct FitFileReaderState
                 default: ; // do nothing
             }
 
-            if (FIT_DEBUG) {
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                 printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
         }
@@ -895,7 +901,7 @@ struct FitFileReaderState
                 default: ; // do nothing
             }
 
-            if (FIT_DEBUG) {
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                 printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
             //qDebug() << field.num << value.v;
@@ -1029,7 +1035,7 @@ struct FitFileReaderState
             default: ;
         }
 
-        if (FIT_DEBUG) {
+        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
             printf("event type %d\n", event_type);
         }
         last_event = event;
@@ -1076,7 +1082,7 @@ struct FitFileReaderState
         int i = 0;
         time_t this_start_time = 0;
         double total_distance = 0.0;
-        if (FIT_DEBUG)  {
+        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
             printf( " FIT decode lap \n");
         }
 
@@ -1086,7 +1092,7 @@ struct FitFileReaderState
             if( value.v == NA_VALUE )
                 continue;
 
-            if (FIT_DEBUG) {
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                 printf ("\tfield: num: %d ", field.num);
                 DumpFitValue(value);
             }
@@ -1693,10 +1699,10 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 0: // event
-                        if (FIT_DEBUG) qDebug() << " event:" << value;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " event:" << value;
                         break;
                 case 1: // event type
-                        if (FIT_DEBUG) qDebug() << " event_type:" << value;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " event_type:" << value;
                         break;
                 case 2: // start time
                         time = value + qbase_time.toTime_t();
@@ -1710,7 +1716,7 @@ struct FitFileReaderState
                         length_duration = value / 1000.0;
                         break;
                 case 4: // total timer time
-                        if (FIT_DEBUG) qDebug() << " total_timer_time:" << value;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_timer_time:" << value;
                         break;
                 case 5: // total strokes
                         total_strokes = value;
@@ -1726,13 +1732,13 @@ struct FitFileReaderState
                         cad = value;
                         break;
                 case 11: // total_calories
-                        if (FIT_DEBUG) qDebug() << " total_calories:" << value;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_calories:" << value;
                         break;
                 case 12: // length type: 0-rest, 1-strokes
                         length_type = value;
                         break;
                 case 254: // message_index
-                        if (FIT_DEBUG) qDebug() << " message_index:" << value;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " message_index:" << value;
                         break;
                 default:
                          unknown_record_fields.insert(field.num);
@@ -2010,7 +2016,7 @@ struct FitFileReaderState
             if( value.type != StringValue && value.v == NA_VALUE )
                 continue;
 
-            if (FIT_DEBUG) {
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                 printf ("\tfield: num: %d ", field.num);
                 DumpFitValue(value);
             }
@@ -2065,7 +2071,7 @@ struct FitFileReaderState
                         break;
                 case 29:  // Segment name
                     segment_name = QString(value.s.c_str());
-                    if (FIT_DEBUG)  {
+                    if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
                         printf("Found segment name: %s\n", segment_name.toStdString().c_str());
                     }
                     break;
@@ -2283,7 +2289,7 @@ struct FitFileReaderState
             def.global_msg_num = read_uint16(def.is_big_endian, &count);
             int num_fields = read_uint8(&count);
 
-            if (FIT_DEBUG)  {
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>0)  {
                 //qDebug() << "definition: local type=" << local_msg_type << "global=" << def.global_msg_num << "arch=" << def.is_big_endian << "fields=" << num_fields;
 
                 printf("definition: local type=%d global=%d arch=%d fields=%d\n",
@@ -2301,7 +2307,7 @@ struct FitFileReaderState
                 field.type = base_type & 0x1f;
                 field.deve_idx = -1;
 
-                if (FIT_DEBUG) {
+                if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                     printf("  field %d: %d bytes, num %d, type %d, size %d\n",
                            i, field.size, field.num, field.type, field.size );
                 }
@@ -2325,7 +2331,7 @@ struct FitFileReaderState
 
                     //qDebug() << "field" << field.num << "type" << field.type << "size" << field.size << "deve idx" << field.deve_idx;
 
-                    if (FIT_DEBUG) {
+                    if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                         printf("  field %d: %d bytes, num %d, type %d, size %d\n",
                                i, field.size, field.num, field.type, field.size );
                     }
@@ -2353,7 +2359,7 @@ struct FitFileReaderState
             }
             const FitDefinition &def = local_msg_types[local_msg_type];
 
-            if (FIT_DEBUG)  {
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
                 printf( "read_record message local=%d global=%d\n", local_msg_type,
                     def.global_msg_num );
             }
@@ -2366,7 +2372,7 @@ struct FitFileReaderState
                 switch (field.type) {
                     case 0: size = 1;
                             if (field.size==size) {
-                                value.type = SingleValue; value.v = read_uint8(&count); size = 1;
+                                value.type = SingleValue; value.v = read_uint8(&count);;
                              } else { // Multi-values
                                 value.type = ListValue;
                                 value.list.clear();
@@ -2457,7 +2463,7 @@ struct FitFileReaderState
 
                     // we may need to add support for float, string + byte base types here
                     default:
-                        if (FIT_DEBUG)  {
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
                             // TODO: Dump raw data.
                             printf("unknown type: %d size: %d \n", field.type,
                                    field.size);
@@ -2471,7 +2477,7 @@ struct FitFileReaderState
                 }
                 // Size is greater than expected
                 if (size < field.size) {
-                    if (FIT_DEBUG)  {
+                    if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
                          printf( "   warning : size=%d for type=%d (num=%d)\n",
                                  field.size, field.type, field.num);
                     }
@@ -2480,7 +2486,7 @@ struct FitFileReaderState
 
                 values.push_back(value);
 
-                if (FIT_DEBUG) {
+                if (FIT_DEBUG && ((FIT_DEBUG_LEVEL>2 && def.global_msg_num!=RECORD_MSG_NUM) || FIT_DEBUG_LEVEL>3 )) {
                     printf( " field: type=%d num=%d size=%d(%d) ",
                         field.type, field.num, field.size, size);
                     if (value.type == SingleValue) {
@@ -2509,15 +2515,18 @@ struct FitFileReaderState
             // seem to be filled in properly.  Sean's Cinqo, for example,
             // shows up as manufacturer #65535, even though it should be #7.
             switch (def.global_msg_num) {
-                case 0:  decodeFileId(def, time_offset, values); break;
-                case 18: decodeSession(def, time_offset, values); break; /* session */
-                case LAP_TYPE: // #19
+                case FILE_ID_MSG_NUM: // #0
+                    decodeFileId(def, time_offset, values); break;
+                case SESSION_MSG_NUM: // #18
+                    decodeSession(def, time_offset, values); break; /* session */
+                case LAP_MSG_NUM: // #19
                     decodeLap(def, time_offset, values);
                     break;
-                case RECORD_TYPE: // #20
+                case RECORD_MSG_NUM: // #20
                     decodeRecord(def, time_offset, values);
                     break;
-                case 21: decodeEvent(def, time_offset, values); break;
+                case EVENT_MSG_NUM: // #21
+                    decodeEvent(def, time_offset, values); break;
                 case 23:
                     //decodeDeviceInfo(def, time_offset, values); /* device info */
                     break;
@@ -2530,7 +2539,7 @@ struct FitFileReaderState
                 case 132:
                     decodeHr(def, time_offset, values); /* HR */
                     break;
-                case SEGMENT_TYPE: // #142
+                case SEGMENT_MSG_NUM: // #142
                     decodeSegment(def, time_offset, values); /* segment data */
                     break;
 
@@ -2562,18 +2571,18 @@ struct FitFileReaderState
                 case 31: /* course */
                 case 32: /* course point */
                 case 33: /* totals */
-                case 34: /* activity */
+                case ACTIVITY_MSG_NUM: /* #34 activity */
                 case 35: /* software */
                 case 37: /* file capabilities */
                 case 38: /* message capabilities */
                 case 39: /* field capabilities */
-                case 49: /* file creator, software version ; see details below: */
+                case FILE_CREATOR_MSG_NUM: /* #49 file creator */
                          /* #0: software version / #1: hardware version */
                 case 51: /* blood pressure */
                 case 53: /* speed zone */
                 case 55: /* monitoring */
                 case 72: /* training file (undocumented) : new since garmin 800 */
-                case HRV_TYPE:
+                case HRV_MSG_NUM:
 		  decodeHRV(def, values);
 		  break; /* hrv */
                 case 79: /* HR zone (undocumented) ; see details below: */
@@ -2879,104 +2888,160 @@ void write_file_id(QByteArray *array, const RideFile *ride) {
     // 5	number
     // 8	product_name
 
-    write_message_definition(array, 0, 2); // global_msg_num, num_fields
+    write_message_definition(array, FILE_ID_MSG_NUM, 4); // global_msg_num, num_fields
 
     write_field_definition(array, 0, 1, 0); // 1. type (0)
-    write_field_definition(array, 4, 4, 134); // 2. time_created (4)
+    write_field_definition(array, 1, 2, 132); // 2. manufacturer (1)
+    write_field_definition(array, 2, 2, 132); // 3. product (2)
+    write_field_definition(array, 4, 4, 134); // 4. time_created (4)
 
     // Record ------
     int record_header = 0;
-
-    // 0. header
     write_int8(array, record_header);
-    // 1. type file:activity
-    int value = 4;
+
+    // 1. type
+    int value = 4; //file:activity
     write_int8(array, value);
-    // 2. time_created
+
+    // 2. manufacturer
+    value = 0;
+    write_int16(array, value, true);
+
+    // 3. product
+    value = 0;
+    write_int16(array, value, true);
+
+    // 4. time_created
     value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
+}
+
+void write_file_creator(QByteArray *array) {
+    // 0	software_version	uint16
+    // 1	hardware_version	uint8
+
+    write_message_definition(array, FILE_CREATOR_MSG_NUM, 1); // global_msg_num, num_fields
+
+    write_field_definition(array, 0, 2, 132); // 1. software_version (0)
+
+    // Record ------
+    int record_header = 0;
+    write_int8(array, record_header);
+
+    // 1. software_version
+    int value = 100;
+    write_int16(array, value, true);
+
 }
 
 void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
 
-    write_message_definition(array, 18, 4); // global_msg_num, num_fields
+    write_message_definition(array, SESSION_MSG_NUM, 8); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
+    write_field_definition(array, 0, 1, 2); // event (0)
+    write_field_definition(array, 1, 1, 2); // event_type (1)
     write_field_definition(array, 2, 4, 134); // start_time (4)
-    write_field_definition(array, 7, 4, 134); // total_elapsed_time (7)
     write_field_definition(array, 5, 1, 0); // sport (5)
+    write_field_definition(array, 6, 1, 2); // subsport (6)
+    write_field_definition(array, 7, 4, 134); // total_elapsed_time (7)
+    write_field_definition(array, 9, 4, 134); // total_distance (9)
 
     // Record ------
     int record_header = 0;
-
-    // 0. header
     write_int8(array, record_header);
 
-    // 1. timestamp
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    // 1. timestamp (253)
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
+    if (ride->dataPoints().last()) {
+        value += ride->dataPoints().last()->secs;
+    }
     write_int32(array, value, true);
 
-    // 2. start_time
+    // 2. event (0)
+    value = 9; // lap (8=session)
+    write_int8(array, value);
+
+    // 3. event_type (1)
+    value = 1; // stop (4=stop_all)
+    write_int8(array, value);
+
+    // 4. start_time (4)
     value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
 
-    // 3. total_elapsed_time
+    // 5. sport
+    write_int8(array, 2);
+
+    // 6. sub sport
+    write_int8(array, 0);
+
+    // 7. total_elapsed_time (7)
     value = computed.value("workout_time")->value(true) * 1000;
     write_int32(array, value, true);
 
-    // 4. sport
-    write_int8(array, 2);
+    // 8. total_distance (9)
+    value = computed.value("total_distance")->value(true) * 10;
+    write_int32(array, value, true);
 
 }
 
 void write_lap(QByteArray *array, const RideFile *ride) {
-    write_message_definition(array, 19, 3); // global_msg_num, num_fields
+    write_message_definition(array, LAP_MSG_NUM, 4); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
-    write_field_definition(array, 0, 1, 0); // event (0)
-    write_field_definition(array, 1, 1, 0); // event_type (1)
+    write_field_definition(array, 0, 1, 2); // event (0)
+    write_field_definition(array, 1, 1, 2); // event_type (1)
+    write_field_definition(array, 24, 1, 0); // trigger (24)
 
 
     // Record ------
     int record_header = 0;
-
     write_int8(array, record_header);
 
-    int value = 0;
+    // 1. timestamp
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
     if (ride->dataPoints().last()) {
-        value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
+        value += ride->dataPoints().last()->secs;
     }
     write_int32(array, value, true);
 
+    // 2. event
     value = 9; // lap
     write_int8(array, value);
 
-    value = 1;
+    // 3. event_type
+    value = 1; // stop
+    write_int8(array, value);
+
+    // 4. trigger
+    value = 7; // session_end
     write_int8(array, value);
 
 }
 
 void write_start_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, 21, 3); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 3); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
-    write_field_definition(array, 0, 1, 0); // event (0)
-    write_field_definition(array, 1, 1, 0); // event_type (1)
-
+    write_field_definition(array, 0, 1, 2); // event (0)
+    write_field_definition(array, 1, 1, 2); // event_type (1)
 
 
     // Record ------
     int record_header = 0;
-
     write_int8(array, record_header);
 
+    // 1. timestamp
     int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
 
+    // 2. event
     value = 0;
     write_int8(array, value);
 
+    // 3. event_type
     value = 0;
     write_int8(array, value);
 
@@ -2984,54 +3049,73 @@ void write_start_event(QByteArray *array, const RideFile *ride) {
 
 void write_stop_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, 21, 3); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 3); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
-    write_field_definition(array, 0, 1, 0); // event (0)
-    write_field_definition(array, 1, 1, 0); // event_type (1)
+    write_field_definition(array, 0, 1, 2); // event (0)
+    write_field_definition(array, 1, 1, 2); // event_type (1)
 
 
     // Record ------
     int record_header = 0;
-
     write_int8(array, record_header);
 
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t() + 2;
+    // 1. timestamp
+    int value = ride->startTime().toTime_t() + 2 - qbase_time.toTime_t();
     write_int32(array, value, true);
 
+    // 2. event
     value = 0;
     write_int8(array, value);
 
+    // 3. event_type
     value = 4;
     write_int8(array, value);
+
 }
 
-void write_activity(QByteArray *array, const RideFile *ride) {
+void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
 
-    write_message_definition(array, 34, 3); // global_msg_num, num_fields
+    write_message_definition(array, ACTIVITY_MSG_NUM, 6); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
-    write_field_definition(array, 3, 1, 0); // event (3)
-    write_field_definition(array, 1, 1, 0); // event_type (1)
+    write_field_definition(array, 0, 4, 134); // total_timer_time (0)
+    write_field_definition(array, 1, 2, 132); // num_sessions (1)
+    write_field_definition(array, 2, 1, 2); // type (2)
+    write_field_definition(array, 3, 1, 2); // event (3)
+    write_field_definition(array, 4, 1, 2); // event_type (4)
 
 
     // Record ------
     int record_header = 0;
-
     write_int8(array, record_header);
 
-    int value = 0;
+    // 1. timestamp
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
     if (ride->dataPoints().last()) {
-        value = ride->startTime().toTime_t() + ride->dataPoints().last()->secs;
+        value += ride->dataPoints().last()->secs;
     }
     write_int32(array, value, true);
 
-    value = 26;
-    write_int8(array, value);
+    // 2. total_timer_time
+    value = computed.value("workout_time")->value(true) * 1000;
+    write_int32(array, value, true);
 
+    // 3. num_sessions
     value = 1;
+    write_int16(array, value, true);
+
+    // 4. type
+    value = 0; // manual
     write_int8(array, value);
 
+    // 5. event
+    value = 26; // activity
+    write_int8(array, value);
+
+    // 6. event_type
+    value = 1; // stop
+    write_int8(array, value);
 }
 
 void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
@@ -3093,7 +3177,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         write_int8(fields, base_type);
     }*/
 
-    write_message_definition(array, 20, num_fields); // global_msg_num, num_fields
+    write_message_definition(array, RECORD_MSG_NUM, num_fields); // global_msg_num, num_fields
     array->append(fields->data(), fields->size());
 
     // Record ------
@@ -3173,13 +3257,13 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
 
     write_file_id(&data, ride); // file_id 0
     //write_file_creator(&data); // file_creator 49
-    write_activity(&data, ride); // activity 34 (x22)
-    write_session(&data, ride, computed); // session 18 (x12)
-    write_lap(&data, ride); // lap 19 (x11)
     //write_start_event(&data, ride); // event 21 (x15)
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)
     //write_stop_event(&data, ride); // event 21 (x15)
-    //write_activity(&data, ride); //
+    write_lap(&data, ride); // lap 19 (x11)
+    write_session(&data, ride, computed); // session 18 (x12)
+    write_activity(&data, ride, computed); // activity 34 (x22)
+
     write_header(&array, data.size());
     array += data;
 
