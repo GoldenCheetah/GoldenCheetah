@@ -60,6 +60,7 @@
 class OverviewWindow;
 class Sparkline;
 class Routeline;
+class RPErating;
 
 // keep it simple for now
 class Card : public QGraphicsWidget
@@ -69,7 +70,7 @@ class Card : public QGraphicsWidget
     public:
 
         // what type am I?
-        enum cardType { NONE, ROUTE, METRIC, META, SERIES, PMC, MODEL, INTERVAL, ZONE } type;
+        enum cardType { NONE, RPE, ROUTE, METRIC, META, SERIES, PMC, MODEL, INTERVAL, ZONE } type;
         typedef enum cardType CardType;
 
         Card(int deep, QString name) : QGraphicsWidget(NULL), name(name),
@@ -87,6 +88,7 @@ class Card : public QGraphicsWidget
             metric = NULL;
             chart = NULL;
             sparkline = NULL;
+            rperating = NULL;
 
             // mem leak
             delcounter=0;
@@ -140,6 +142,9 @@ class Card : public QGraphicsWidget
         QStringList categories;
         QBarCategoryAxis *barcategoryaxis;
 
+        // RPE meta field
+        RPErating *rperating;
+
         // METRIC sparkline
         Sparkline *sparkline;
 
@@ -167,6 +172,36 @@ class Card : public QGraphicsWidget
     public slots:
 
         void geometryChanged();
+};
+
+// RPE rating viz and widget to set value
+class RPErating : public QGraphicsItem
+{
+    public:
+        RPErating(QGraphicsWidget *parent, QString name=""); // create and say how many days
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        void setValue(QString);
+
+        // needed as pure virtual in QGraphicsItem
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+        QRectF boundingRect() const { return QRectF(parent->geometry().x() + geom.x(),
+                                                    parent->geometry().y() + geom.y(),
+                                                    geom.width(), geom.height());
+        }
+
+    private:
+        QGraphicsWidget *parent;
+        QString name;
+        QString description;
+        QRectF geom;
+        QString value;
+        QColor color;
+
 };
 
 // tufte style sparkline to plot metric history
