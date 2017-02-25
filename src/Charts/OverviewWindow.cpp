@@ -307,6 +307,13 @@ Card::setType(CardType type, QString symbol)
                 break;
              }
         }
+
+        // sparkline if are we numeric?
+        if (fieldtype == FIELD_INTEGER || fieldtype == FIELD_DOUBLE) {
+
+            sparkline = new Sparkline(this, SPARKDAYS+1, name);
+
+        }
     }
 }
 
@@ -443,17 +450,34 @@ Card::setData(RideItem *item)
         } else routeline->hide();
     }
 
-    if (type == METRIC) {
+    // non-numeric META
+    if (!sparkline && type == META) {
+        value = item->getText(settings.symbol, "");
+    }
+
+    // set the sparkline for numeric meta fields, metrics
+    if (sparkline && (type == METRIC || type == META)) {
 
         // get last 30 days, if they exist
         QList<QPointF> points;
 
         // include current activity value
-        value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
+        double v;
+        if (type == METRIC) {
 
-        double v = (units == tr("seconds")) ?
-        item->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
-        : item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+            // get the metric value
+            value = item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits);
+            v = (units == tr("seconds")) ?
+            item->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
+            : item->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+
+        } else {
+
+            // get the metadata value
+            value = item->getText(settings.symbol, "");
+            if (fieldtype == FIELD_DOUBLE) v = value.toDouble();
+            else v = value.toInt();
+        }
         points << QPointF(SPARKDAYS, v);
 
         // set the chart values with the last 10 rides
@@ -471,11 +495,18 @@ Card::setData(RideItem *item)
                 int old= prior->dateTime.daysTo(item->dateTime);
                 if (old > SPARKDAYS) break;
 
-                // get value
-                double v = (units == tr("seconds")) ?
-                prior->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
-                : prior->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
 
+                double v;
+
+                if (type == METRIC) {
+                    v = (units == tr("seconds")) ?
+                    prior->getForSymbol(settings.symbol, parent->context->athlete->useMetricUnits)
+                    : prior->getStringForSymbol(settings.symbol, parent->context->athlete->useMetricUnits).toDouble();
+                } else {
+
+                    if (fieldtype == FIELD_DOUBLE)  v = prior->getText(settings.symbol, "").toDouble();
+                    else v = prior->getText(settings.symbol, "").toInt();
+                }
 
                 // new no zero value
                 if (v) {
@@ -520,10 +551,6 @@ Card::setData(RideItem *item)
         stress = pmc->stress(date);
         sb = pmc->sb(date);
         rr = pmc->rr(date);
-    }
-
-    if (type == META) {
-        value = item->getText(settings.symbol, "");
     }
 
     if (type == ZONE) {
@@ -782,7 +809,7 @@ Card::geometryChanged() {
         chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
     }
 
-    if (type == METRIC) {
+    if (sparkline && (type == METRIC || type == META)) {
 
         // space enough?
         if (!drag && geom.height() > (ROWHEIGHT*6)) {
@@ -809,7 +836,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 #else
     titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
     bigfont.setPointSize(ROWHEIGHT*2);
-    smallfont.setPointSize(ROWHEIGHT);
+    smallfont.setPointSize(ROWHEIGHT*0.6f);
 #endif
 
 
@@ -830,7 +857,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     // only paint contents if not dragging
     if (drag) return;
 
-    if (type == META && fieldtype >= 0) {
+    if (!sparkline && type == META && fieldtype >= 0) {
 
         // mid is slightly higher to account for space around title, move mid up
         double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f);
@@ -859,7 +886,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     }
 
-    if (type == METRIC) {
+    if (sparkline && (type == METRIC || type == META)) {
 
         // we need the metric units
         if (type == METRIC && metric == NULL) {
