@@ -73,13 +73,13 @@ OverviewWindow::OverviewWindow(Context *context) :
     // XXX lets hack in some tiles to start (will load from config later) XXX
 
     // column 0
-    newCard("Status", 0, 0, 8, Card::PMC, "coggan_tss");
+    newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss");
     newCard("Sport", 0, 1, 5, Card::META, "Sport");
     newCard("Duration", 0, 2, 9, Card::METRIC, "workout_time");
     newCard("Notes", 0, 3, 19, Card::META, "Notes");
 
     // column 1
-    newCard("HRV", 1, 0, 8);
+    newCard("HRV", 1, 0, 9);
     newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
     newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
     newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
@@ -87,19 +87,19 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
 
     // column 2
-    newCard("RPE", 2, 0, 8, Card::META, "RPE");
+    newCard("RPE", 2, 0, 9, Card::RPE);
     newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
     newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
-    newCard("Intensity", 3, 0, 8, Card::METRIC, "coggan_if");
+    newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
     newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
     newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
     newCard("Power Model", 3, 3, 17);
 
     // column 4
-    newCard("Distance", 4, 0, 8, Card::METRIC, "total_distance");
+    newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
     newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
     newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
     newCard("Route", 4, 3, 17, Card::ROUTE);
@@ -154,6 +154,17 @@ Card::setType(CardType type)
 {
     if (type == NONE) {
         this->type = type;
+    }
+
+    if (type == RPE) {
+
+        // a META widget, "RPE" using the FOSTER modified 0-10 scale
+        this->type = type;
+        settings.symbol = "RPE";
+        fieldtype = FIELD_INTEGER;
+
+        sparkline = new Sparkline(this, SPARKDAYS+1, name);
+        rperating = new RPErating(this, name);
     }
 
     // create a map (for now, add profile later
@@ -456,7 +467,7 @@ Card::setData(RideItem *item)
     }
 
     // set the sparkline for numeric meta fields, metrics
-    if (sparkline && (type == METRIC || type == META)) {
+    if (sparkline && (type == METRIC || type == META || type == RPE)) {
 
         // get last 30 days, if they exist
         QList<QPointF> points;
@@ -477,6 +488,9 @@ Card::setData(RideItem *item)
             value = item->getText(settings.symbol, "");
             if (fieldtype == FIELD_DOUBLE) v = value.toDouble();
             else v = value.toInt();
+
+            // set the RPErating if needed
+            if (rperating) rperating->setValue(value);
         }
         points << QPointF(SPARKDAYS, v);
 
@@ -809,12 +823,24 @@ Card::geometryChanged() {
         chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
     }
 
-    if (sparkline && (type == METRIC || type == META)) {
+    if (sparkline && (type == METRIC || type == META || type == RPE)) {
+
+        // make space for the rpe rating widget if needed
+        int minh=6;
+        if (type == RPE) {
+            if (!drag && geom.height() > (ROWHEIGHT*5)+20) {
+                rperating->show();
+                rperating->setGeometry(20+(ROWHEIGHT*2), ROWHEIGHT*3, geom.width()-40-(ROWHEIGHT*4), ROWHEIGHT*2);
+            } else { // not set for meta or metric
+                rperating->hide();
+            }
+            minh=7;
+        }
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*6)) {
+        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
             sparkline->show();
-            sparkline->setGeometry(20, ROWHEIGHT*4, geom.width()-40, geom.height()-20-(ROWHEIGHT*4));
+            sparkline->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
         } else {
             sparkline->hide();
         }
@@ -852,7 +878,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     //titlefont.setWeight(QFont::Bold);
     painter->setPen(QColor(200,200,200));
     painter->setFont(titlefont);
-    if (type != PMC) painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
+    if (type != PMC || drag) painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
 
     // only paint contents if not dragging
     if (drag) return;
@@ -886,7 +912,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     }
 
-    if (sparkline && (type == METRIC || type == META)) {
+    if (sparkline && (type == METRIC || type == META || type == RPE)) {
 
         // we need the metric units
         if (type == METRIC && metric == NULL) {
@@ -897,6 +923,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         }
 
         double addy = 0;
+        if (type == RPE && rperating->isVisible()) addy=ROWHEIGHT*2; // shift up for rperating
         if (units != "" && units != tr("seconds")) addy = QFontMetrics(smallfont).height();
 
         // mid is slightly higher to account for space around title, move mid up
@@ -915,7 +942,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
 
         // now units
-        if (addy > 0) {
+        if (units != "" && addy > 0) {
             painter->setPen(QColor(100,100,100));
             painter->setFont(smallfont);
 
@@ -1043,6 +1070,118 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             nexty += ROWHEIGHT*2;
 
         }
+    }
+}
+
+RPErating::RPErating(QGraphicsWidget *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name)
+{
+    setGeometry(20,20,100,100);
+    setZValue(11);
+}
+
+static QString FosterDesc[11]={
+    "Rest", // 0
+    "Very, very easy", // 1
+    "Easy", // 2
+    "Moderate", // 3
+    "Somewhat hard", // 4
+    "Hard", // 5
+    "Hard+", // 6
+    "Very hard", // 7
+    "Very hard+", // 8
+    "Very hard++", // 9
+    "Maximum"// 10
+};
+
+static QColor FosterColors[11]={
+    QColor(Qt::lightGray),// 0
+    QColor(Qt::lightGray),// 1
+    QColor(Qt::darkGreen),// 2
+    QColor(Qt::darkGreen),// 3
+    QColor(Qt::darkGreen),// 4
+    QColor(Qt::darkYellow),// 5
+    QColor(Qt::darkYellow),// 6
+    QColor(Qt::darkYellow),// 7
+    QColor(Qt::darkRed),// 8
+    QColor(Qt::darkRed),// 9
+    QColor(Qt::red),// 10
+};
+
+void
+RPErating::setValue(QString value)
+{
+    this->value = value;
+    int v = value.toInt();
+    if (v <0 || v>10) {
+        color = GColor(CPLOTMARKER);
+        description = "Invalid";
+    } else {
+        description = FosterDesc[v];
+        color = FosterColors[v];
+    }
+}
+
+QVariant RPErating::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+     if (change == ItemPositionChange && parent->scene())  prepareGeometryChange();
+     return QGraphicsItem::itemChange(change, value);
+}
+
+void
+RPErating::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width,height);
+
+    // we need to go onto the scene !
+    if (scene() == NULL && parent->scene()) parent->scene()->addItem(this);
+
+    // set our geom
+    prepareGeometryChange();
+}
+
+void
+RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    // fonts
+    QFont titlefont;
+    QFont bigfont;
+    QFont smallfont;
+#ifdef Q_OS_MAC
+    titlefont.setPointSize(ROWHEIGHT); // need a bit of space
+    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
+    smallfont.setPointSize(ROWHEIGHT*0.8f);
+#else
+    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
+    bigfont.setPointSize(ROWHEIGHT*2);
+    smallfont.setPointSize(ROWHEIGHT*0.6f);
+#endif
+
+    QPen pen(color);
+    painter->setPen(pen);
+    //painter->drawRect(QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height()));
+
+    QFontMetrics tfm(titlefont);
+    QRectF rect = tfm.boundingRect(description);
+    painter->setFont(titlefont);
+    painter->drawText(QPointF(parent->x()+geom.x()+((geometry().width() - rect.width()) / 2.0f),
+                              parent->y()+geom.y()+geom.height()-ROWHEIGHT), description); // divided by 3 to account for "gap" at top of font
+
+
+    // paint the blocks
+    double width = geom.width() / 11;
+    int i=0;
+    for(; i<= value.toInt(); i++) {
+
+        // draw a rectangle with a 5px gap
+        painter->setPen(Qt::NoPen);
+        painter->fillRect(geom.x()+parent->x()+(width *i), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.5f, QBrush(FosterColors[i]));
+    }
+
+    for(; i<= 10; i++) {
+
+        // draw a rectangle with a 5px gap
+        painter->setPen(Qt::NoPen);
+        painter->fillRect(geom.x()+parent->x()+(width *i), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.5f, QBrush(GColor(CCARDBACKGROUND).darker(200)));
     }
 }
 
