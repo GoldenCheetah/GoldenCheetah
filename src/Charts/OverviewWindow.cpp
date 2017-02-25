@@ -485,7 +485,7 @@ Card::setData(RideItem *item)
         } else {
 
             // get the metadata value
-            value = item->getText(settings.symbol, "");
+            value = item->getText(settings.symbol, "0");
             if (fieldtype == FIELD_DOUBLE) v = value.toDouble();
             else v = value.toInt();
 
@@ -1073,10 +1073,17 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     }
 }
 
-RPErating::RPErating(QGraphicsWidget *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name)
+RPErating::RPErating(Card *parent, QString name) : QObject(parent), QGraphicsItem(NULL), parent(parent), name(name), editing(false)
 {
     setGeometry(20,20,100,100);
     setZValue(11);
+    setAcceptHoverEvents(true);
+    this->setFlag(ItemIsFocusable,true);
+
+    // editing timeout when leave the widget
+    timer=new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(cancelEdit()));
 }
 
 static QString FosterDesc[11]={
@@ -1139,6 +1146,105 @@ RPErating::setGeometry(double x, double y, double width, double height)
     prepareGeometryChange();
 }
 
+bool
+RPErating::sceneEvent(QEvent *event)
+{
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+        if (editing) {
+
+            // set value based upon the location of the mouse
+            QPoint vpos = parent->parent->view->mapFromGlobal(QCursor::pos());
+            QPointF pos = parent->parent->view->mapToScene(vpos);
+            QPointF cpos = pos - parent->geometry().topLeft() - geom.topLeft();
+
+            // new value should
+            double width = geom.width() / 13; // always a block each side for a margin
+
+            double x = round((cpos.x() - width)/width);
+            if (x >=0 && x<=10) {
+
+                // set to the new value
+                setValue(QString("%1").arg(x));
+                parent->value = value;
+                parent->update();
+
+            }
+        }
+
+        // mouse moved so hover paint anyway
+        update();
+
+    } else if (editing && event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape) {
+
+        // cancel edit
+        cancelEdit();
+
+    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+        // toggle edit
+        editing = !editing;
+
+        // did we get edit
+        if (editing) {
+            this->setFocus();
+            oldvalue = value;
+
+        } else {
+
+            this->clearFocus();
+            applyEdit();
+        }
+        update();
+
+    }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+
+        // if the mouse leaves then wait 2 secs before cancelling edit
+        if (editing) timer->start(2000);
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        // we're back, so cancel that timer if needs be
+        if (editing) timer->stop();
+        update();
+    }
+    return false;
+}
+
+void
+RPErating::cancelEdit()
+{
+    editing=false;
+    parent->value=oldvalue;
+    parent->update();
+    setValue(oldvalue);
+    clearFocus();
+    update();
+}
+
+void
+RPErating::applyEdit()
+{
+    // update the item and ride
+    editing=false;
+    clearFocus();
+
+    // update the item - if we have one
+    RideItem *item = parent->parent->property("ride").value<RideItem*>();
+
+    // did it change?
+    if (item && item->ride() && item->getText("RPE","") != value) {
+
+        // change it -- this smells, since it should be abstracted in RideItem XXX
+        item->ride()->setTag("RPE", value);
+        item->notifyRideMetadataChanged();
+        item->setDirty(true);
+    }
+
+    update();
+}
+
 void
 RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
@@ -1156,10 +1262,16 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     smallfont.setPointSize(ROWHEIGHT*0.6f);
 #endif
 
-    QPen pen(color);
-    painter->setPen(pen);
-    //painter->drawRect(QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height()));
+    painter->setPen(Qt::NoPen);
 
+    // hover?
+    if (editing || isUnderMouse()) {
+        QColor darkgray(65,65,65,125);
+        if (editing) darkgray = QColor(120,120,120,120);
+        painter->fillRect(QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height()), QBrush(darkgray));
+    }
+
+    painter->setPen(QPen(color));
     QFontMetrics tfm(titlefont);
     QRectF rect = tfm.boundingRect(description);
     painter->setFont(titlefont);
@@ -1168,20 +1280,20 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
 
     // paint the blocks
-    double width = geom.width() / 11;
+    double width = geom.width() / 13; // always a block each side for a margin
     int i=0;
     for(; i<= value.toInt(); i++) {
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);
-        painter->fillRect(geom.x()+parent->x()+(width *i), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.5f, QBrush(FosterColors[i]));
+        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.25f, QBrush(FosterColors[i]));
     }
 
     for(; i<= 10; i++) {
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);
-        painter->fillRect(geom.x()+parent->x()+(width *i), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.5f, QBrush(GColor(CCARDBACKGROUND).darker(200)));
+        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.25f, QBrush(GColor(CCARDBACKGROUND).darker(200)));
     }
 }
 
@@ -1738,11 +1850,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
         // dragging a card around
         if (mode == CONFIG && state == NONE) {
 
-            // we always trap clicks when configuring, to avoid
-            // any inadvertent processing of clicks in the widget
-            event->accept();
-            returning = true;
-
             // where am i ?
             QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
             QGraphicsItem *item = scene->itemAt(pos, view->transform());
@@ -1834,12 +1941,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
         // remember pos
         lasty = pos.y();
-
-        // thanks we'll intercept that
-        if (mode == CONFIG) {
-            event->accept();
-            returning = true;
-        }
 
         if (mode == CONFIG && state == NONE) {                 // hovering
 
