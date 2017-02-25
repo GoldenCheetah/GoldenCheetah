@@ -438,6 +438,23 @@ TodaysPlanWorkoutDownload::getFileList(QString &error, QDateTime from, QDateTime
         }
     }
 
+    // check, correct the sort order - TP Api does not consider the requested sort order and may provide
+    // the workout latest in future first - since this may change don't sort if order is ok
+    // if so, re-sort so that the most recent workout is top of the list
+    if (returning.count() > 1) {
+        if (returning.first()->planDate > returning.last()->planDate) {
+            // re-sort
+            int insertAt = returning.count()-1;
+            TodaysPlanWorkoutListEntry* entry;
+
+            while (insertAt > 0) {
+                entry = returning.takeFirst();
+                returning.insert(insertAt, entry);
+                insertAt--;
+            }
+        }
+    }
+
     // all good ?
     return returning;
 }
