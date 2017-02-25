@@ -1,127 +1,214 @@
 
-THESE INSTRUCTIONS ARE OUT OF DATE. 
-PLEASE REVIEW THE INFORMATION ON THE WIKI AND IN THE FORUMS.
-
-
-https://groups.google.com/forum/#!forum/golden-cheetah-developers
-
-
-
-
-Please note: This is an old build instruction set for Version 2.x.
-
-Most of it is still fairly valid for version 3.x.
-
-Minimum build requirements are: Qt 4.8 with Qt.4.8.4 recommended.
-
-All other libs are find the best that you can except for libusb which requires 0.1.12.
-
-I have found that the cross compiler at http://mxe.cc/ to be great for building GC and SRMIO.
-
                                  +++++++++++++++++++++++
                                  WIN32 BUILD WALKTHROUGH
                                  +++++++++++++++++++++++
 
-                                       Gareth Coco
+                                     Joern Rischmueller
 
-                                        May 2011
+                                       February 2017
 
-For my install, I am installing all my files into the directory: d:\coding.
-You can use any directory structure you like, you’ll just have to change paths.
-Just ensure that any folder path you use does not have a space in it.
+This instruction will guide  you through a standard build of GoldenCheetah (without external
+dependencies or API based services included).
 
-Download the NSI installer application. I use the Portable Apps version from:
-  http://portableapps.com/apps/development/nsis_portable
-- Install in D:\Coding\NSISPortable\
+Prerequisites:
 
-Download Qt SDK from:
- http://qt.nokia.com/downloads/sdk-windows-cpp
- (File I am using is qt-sdk-win-opensource-2010.02.1.exe)
-- Install in D:\Coding\Qt
+To build on Windows you need the necessary toolchain to be installed. Since 2017
+GoldenCheetah is enabled to be build with the Microsoft Visual C++ 2015 toolchain,
+which is also the recommended toolchain to be used. Building with the "mingw" toolchain
+might still be possible, but may conflict with features needed from the Qt library
+which are no longer supported by the "mingw" version of Qt.
 
-Download the D2XX drivers:
- http://www.ftdichip.com/Drivers/D2XX.htm
- (File I am using is: CDM 202.06.00 WHQL Certified.zip)
-- Install in D:\Coding\D2XX
+Disclaimer:
 
-Download qwt-plot3d from:
- http://sourceforge.net/projects/qwtplot3d/files/
- (File I am using is qwtplot3d-0.2.7.zip)
-- Install in D:\Coding\qwtplot3d
+For any of the downloads and tools the document refers to, please check if you comply
+with the license agreements. I cannot any responsibility for any of the downloads you
+are doing.
 
-Edit D:\coding\qwtplot3d\src\qwt3d_function.cpp
-- Add at top of file: #include <cstdio>
-Edit D:\coding\qwtplot3d\qwtplot3d.pro
-- Comment out: #win32:TEMPLATE    = vclib
+You need:
 
-Then I start the “Qt Command Prompt” from the Qt SDK folder.
+- Microsoft Visual C++ 2015 - which is part of Visual Studio 2015
+  -- Download from Microsoft - they offer a "Community Edition" which is sufficient 
+     to build GoldenCheetah
+	 
+- Microsoft Windows SDK - which needs to be installed separately
+  -- Download from here: https://developer.microsoft.com/de-de/windows/downloads/windows-10-sdk
+  -- I am using the Windows 10 SDK - version 10.0.14393.795(since I build on Windows 10) - 
+     Note: building on other Windows Version(s) may require other SDK Version to be installed
+		   but was not tested 
+  -- When installing the SDK you have several options - for GoldenCheetah you need the "SDK" itself and
+     in case you want to Debug also the "Debugging Tools" to be installed. All other parts (to my experience)
+	 are not required.
+	 
+- Flex and Bison (below the version working for me)
+  -- Download from here: https://sourceforge.net/projects/winflexbison/
+  -- Use the "win_flex_bison-latest.zip" version
+  -- Unzip whereever you like and make sure that the location "win_bison.exe" and "win_flex.exe
+     are added to your "Path" environment variable
+	 
+- Qt C++ Framework
+  -- As of today, please use Qt 5.8.0 (which is the most recent official release) for Microsoft VC2015
+  -- Download is available here: https://www.qt.io/download/ - the OpenSource version is sufficient
+     to build GoldenCheetah
+	 You need to decide if you go for the 32Bit or the 64Bit version, all further descriptions will refer
+	 to the 64Bit version of Qt and the 64Bit Version of the Visual C++ Toolchain. 
+	 32 Bit follows the same concepts, you just need to download and/or configure the tools for 32 bit.
+	 The 
+  -- Install Qt and make sure that the \bin directory of Qt is added to your "Path" environment variable
+     (default path of Qt is C:\Qt\Qt5.8.0\5.8\msvc2015_64\bin)
+  -- To build GoldenCheetah we recommend to use "jom.exe" which is an "nmake" clone - see https://wiki.qt.io/Jom
+     With your Qt installation you also get QtCreator installed which is the free IDE for Qt. Jom is 
+	 part of the QtCreator installation. For the later build process, make sure that the path to "jom.exe"
+	 is added to your "Path" environment variable.
+	 (default path of QtCreator/Jom is C:\Qt\Qt5.8.0\Tools\QtCreator\bin)
+	 
+Note: Building a 32bit version / Building for Windows XP
+	-- 32bit follows the same concepts, you just need to download and/or configure the tools for 32 bit.
+	-- The Visual Studio standard toolchain as well as the SDK do not support Windows XP any more.
+	
 
-d:
-cd d:\coding\qwtplot3d\
-qmake -win32
-mingw32-make release
+	 
+Building from command line without additional dependencies:
 
-Now check out your favourite web sites until the code is built.
+For this build, I am installing all source code,... into the directory: c:\coding
 
-Leave the Qt Command Prompt window open as we use it later.
+- Download GoldenCheetah source (either using Git or downloading the ZIP file)
+  -- Download from here: https://github.com/GoldenCheetah/GoldenCheetah
+  -- Install in c:\coding\GoldenCheetah
+  
+- Setup the configuration of GoldenCheetah for the Qt windows build
+  -- Copy C:\coding\GoldenCheetah\qwt\qwtconfig.pri.in to C:\coding\GoldenCheetah\qwt\qwtconfig.pri     
+  -- Copy C:\coding\GoldenCheetah\src\gccconfig.pri.in to C:\coding\GoldenCheetah\src\gccconfig.pri 
+  -- Edit the "gcconfig.pri" file (see also instructions in the file itself)
+     Lines to be changed (from Default to New - or Add(ed):
+ 	 Default										New
+     #CONFIG += release					 		    CONFIG += release	
+     #DEFINES += NOWEBKIT                		    DEFINES += NOWEBKIT
+	 #QMAKE_LRELEASE = /usr/bin/lrelease			QMAKE_LRELEASE = lrelease
+	 
+	 Default
+	 #WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
+	 New
+	 WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.14393.0/um/x64"
+	 Note: This is the default path for the SDK - depending on how you installed the 
+	       SDK the path my deviate from the example.
+		   
+	 Add Lines
+	 CONFIG += lex
+	 CONFIG += yacc
+	 
+	 Default										New
+	 #QMAKE_LEX = win_flex							QMAKE_LEX  = win_flex --wincompat
+	 #QMAKE_YACC = win_bison						QMAKE_YACC = win_bison --file-prefix=y -t
+	 
+	 Add Lines
+	 # Make sure that LEX/YACC is executed first (to allow multi-core compilation via Jom)
+	 lex.CONFIG += target_predeps
+	 yacc_impl.CONFIG += target_predeps
+	 yacc_decl.CONFIG += target_predeps
+	 
 
-Download GoldenCheetah source
-(Either use GIT – git://github.com/GoldenCheetah/GoldenCheetah.git
- or download the zip file:
- http://github.com/GoldenCheetah/GoldenCheetah/zipball/master)
-- Install in D:\Coding\GoldenCheetah
+- Open the console tool of your choice in folder c:\coding\GoldenCheetah to run the build process
+  (I assume cmd.com with prompt ">")
+  -- Initialize the Visual C++ compile for 64 Bit Builds
+	 >CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+  -- Run "qmake" to prepare the build for Qt
+     >qmake build.pro -spec win32-msvc2015
+  -- Run "jom" to prepare and run the GoldenCheetah build
+     >jom qmake_all && jom
+     Note: When build first time you get number of error messages on .qm files missing.
+	       "RCC: Error in 'Resources\application.qrc': Cannot find file 'translations/gc_fr.qm'"
+           You can ignore these messages for your build. The .qm files will be created during
+		   the build at a later point in time via the "lrelease.exe" command you configured in 
+		   gcconfig.pri)
+	 Hint: In some (still inpredictable cases) the build stops during compilation of the "qwt"
+	       library. Just re-start it by running "jom" again, without any other action. Your
+		   build will continue without problems.
+		   
+- Wait - the compile with "jom" just uses 1 core. If you want to use more of your machine,
+  you may use "jom" with option "-j <no_of_cores>" e.g. "jom -j 4".
+  
+  
+- Since your are doing an "in-source" build you will find a release version of "GoldenCheetah.exe" 
+  in folder: "C:\coding\GoldenCheetah\src\release". You can run the .exe from that location as long
+  as the Qt libraries are on your "Path".
+  
+- To run GoldenCheetah.exe on a different machine (withoug Qt being installed), you need to collect
+  the Qt libraries. Easiest way is the "windeployqt" tool provided with Qt. 
+  Details can be found here: http://doc.qt.io/qt-5/windows-deployment.html
 
-Copy D:\Coding\GoldenCheetah\src\gccconfig.pri.in
-  to D:\Coding\GoldenCheetah\src\gccconfig.pri and edit
-- Set: D2XX_INCLUDE = d:/coding/D2XX
-- Comment out #SRMIO_INSTALL
-- Comment out: CONFIG += debug
-- Uncomment: CONFIG += static
 
-Copy D:\Coding\GoldenCheetah\qwt\qwtconfig.pri.in
-  to D:\Coding\GoldenCheetah\qwt\qwtconfig.pri and edit
-- Set win32 { INSTALLBASE    = D:/Coding/Qt  }
-- In #Qt4 win32 { section
-  – Comment out: #CONFIG           += debug     # release/debug/debug_and_release
-  – Add in:   CONFIG           += release
+Building with additional dependencies:
+ 
+We use a number of libraries for specific functions of GoldenCheetah. You find the list of dependencies
+and their sources documented in "gccconfig.pri.in". Here just a short summary which of those libraries
+are available in the official GoldenCheetah builds and some hints how to build them to be usable.
 
-Using the “Qt Command Prompt” window from before:
+Info: I plan to provide a pre-compiled set of the dependencies for the Windows version of GoldenCheetah,
+      so that not everybody has to invest the efforts to build the .dll's for the different tools.
+	  
+	  
+- SRM download support via SRMIO
+  -- Is NOT part of the official Windows builds since I was not able to create a .DLL which works
+     with an MSVC2015 based build of GoldenCheetah. If anybody finds a solution to add this dependency
+	 again - highly welcome.
+	 
+- D2XX device download support
+  -- Is part of the official Windows builds - we use the libs and do static linking.
+     The version currently used is: "CDM v2.10.00 WHQL Certified" - while there are more recent
+	 version available for download.
+	 
+- Qt Oauth library - kQoAuth
+  -- Is part of the official build as a .dll - build is done with Qt - the build uses Release 0.98
+  
+- Qt 3D plotting - qwtplot3d
+  -- Is part of the official build as a static lib - build is done with Qt - the build uses Release 0.3.0
+  
+- Google Earth .kml files (export)
+  -- Is part of the official build as a static lib - build is done with MSVC2015 - the build uses Release 1.2
+     (path of source code has changed to https://github.com/google/libkml)
 
-cd d:\coding\GoldenCheetah
-qmake -win32 -recursive
-mingw32-make release
+- iCal Calendar support (prerequisite for the "Diary" view)
+  -- Is part of the official build as a static lib - the build uses Release 1.0.1
+  
+- USB1 support via USBExpress
+  -- Is part of the official build as .dll - the build uses Release 3.5.1
+  
+- USB2 support via libusb
+  -- Is part of the official build - the build uses the pre-compiled release 1.2.6.0
+  
+- Video Playback via VLC
+  -- Is part of the official build as .dll - the build uses the pre-compiled release 2.2.1
+  
+- Resampling via libsamplerate
+  -- Is part of the official build as .dll - the build uses 
+  
 
-Go back to checking your email or favourite web sites while this builds.
+Building with integration to external services (via APIs)
 
-When all is finished, you should have a release version in:
+As of today a number of integrations with external services like Twitter, Strava, Cyclinganalytics, 
+Google Calendar, Dropbox, Today's Plan, Google Drive, CloudDB) exist in the official GoldenCheetah
+builds. The permission to use API's of such services requires a dedicated registration (in this case
+for "GoldenCheetah" as the consumer of the services) where in return the GoldenCheetah team get's 
+specific credentials to access the services.
 
-D:\Coding\GoldenCheetah\src\release\
+All of the services request that the access credentials are kept private and are under responsibility
+of the team/company/individual who has registered for the API use with the company providing the services.
 
-Next , move required build files into the d:\coding\GoldenCheetah\src\release directory.
+You can always start your personal registration process with the services to get your own credentials
+to build GoldenCheetah version which can use the service APIs. But you are doing that on your own full
+responsibility.
 
-cd d:\coding\GoldenCheetah
-copy /y ..\Qt\qt\bin\mingwm10.dll src\release\
-copy /y ..\Qt\qt\bin\QtCore4.dll src\release\
-copy /y ..\Qt\qt\bin\QtGui4.dll src\release\
-copy /y ..\Qt\qt\bin\QtSql4.dll src\release\
-copy /y ..\Qt\qt\bin\QtXml4.dll src\release\
-copy /y ..\Qt\qt\bin\QtNetwork4.dll src\release\
-copy /y ..\Qt\qt\bin\QtOpenGL4.dll src\release\
-copy /y ..\Qt\qt\bin\QtWebKit4.dll src\release\
-copy /y ..\Qt\qt\bin\QtXmlPatterns4.dll src\release\
-copy /y ..\Qt\qt\bin\phonon4.dll src\release\
-copy /y ..\Qt\qt\bin\libgcc_s_dw2-1.dll src\release\
-copy /y ..\qwtplot3d\lib\qwtplot3d.dll src\release\
-mkdir src\release\sqldrivers
-copy /y ..\Qt\qt\plugins\sqldrivers\qsqlite4.dll src\release\sqldrivers\
-mkdir src\release\imageformats
-copy /y ..\Qt\qt\plugins\imageformats\qjpeg4.dll src\release\imageformats\
+*****************************************************************************************************
 
-To build the self installer:
+Have fun to build your own version. Feedback/Contributions to this guide are welcome. The easiest way
+to contribute is to provide a pull-request.
 
-cd d:\coding\GoldenCheetah\src\win32
-d:\coding\NSISPortable\App\NSIS\makensis.exe GoldenCheetahInstall.nsi
+Cheers.
+Joern
+ 
 
-You should find the installer file in the directory you are in.
 
-Install and enjoy.
+
+
+
+  
