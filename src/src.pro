@@ -93,10 +93,6 @@ INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./
 INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve
 DEFINES += QXT_STATIC
 
-# local qtsoap handling
-include(../qtsolutions/soap/qtsoap.pri)
-DEFINES += GC_HAVE_SOAP
-
 # to make sure we are toolchain neutral we NEVER refer to a lib
 # via file extensions .lib or .a in src.pro unless the section is
 # platform specific. Instead we use directives -Ldir and -llib
