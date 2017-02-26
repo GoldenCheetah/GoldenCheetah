@@ -90,7 +90,7 @@ AthleteBackup::backupImmediate()
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Athlete Backup"));
     msgBox.setText( tr("Any unsaved data will not be included into the backup .zip file."));
-    msgBox.setInformativeText("Do you want to proceed?");
+    msgBox.setInformativeText(tr("Do you want to proceed?"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
     int ret = msgBox.exec();
@@ -103,7 +103,7 @@ AthleteBackup::backupImmediate()
         break;
     }
     if (backup(tr("Abort Backup"))) {
-       QMessageBox::information(NULL, tr("Athlete Backup"), tr("Backup successfully stored in %1").arg(backupFolder));
+       QMessageBox::information(NULL, tr("Athlete Backup"), tr("Backup successfully stored in \n%1").arg(backupFolder));
     }
 
 }
