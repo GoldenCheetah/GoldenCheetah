@@ -189,6 +189,9 @@ void MonarkConnection::requestAll()
 
 void MonarkConnection::requestPower()
 {
+    // Discard any existing data
+    m_serial->readAll();
+
     m_serial->write("power\r");
     if (!m_serial->waitForBytesWritten(500))
     {
@@ -204,6 +207,9 @@ void MonarkConnection::requestPower()
 
 void MonarkConnection::requestPulse()
 {
+    // Discard any existing data
+    m_serial->readAll();
+
     m_serial->write("pulse\r");
     if (!m_serial->waitForBytesWritten(500))
     {
@@ -219,6 +225,9 @@ void MonarkConnection::requestPulse()
 
 void MonarkConnection::requestCadence()
 {
+    // Discard any existing data
+    m_serial->readAll();
+
     m_serial->write("pedal\r");
     if (!m_serial->waitForBytesWritten(500))
     {
@@ -234,6 +243,9 @@ void MonarkConnection::requestCadence()
 
 int MonarkConnection::readConfiguredLoad()
 {
+    // Discard any existing data
+    m_serial->readAll();
+
     m_serial->write("B\r");
     if (!m_serial->waitForBytesWritten(500))
     {
@@ -248,6 +260,9 @@ int MonarkConnection::readConfiguredLoad()
 
 void MonarkConnection::identifyModel()
 {
+    // Discard any existing data
+    m_serial->readAll();
+
     QString servo = "";
 
     m_serial->write("id\r");
