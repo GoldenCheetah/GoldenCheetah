@@ -81,7 +81,7 @@ OverviewWindow::OverviewWindow(Context *context) :
 
     // column 1
     newCard("HRV", 1, 0, 9);
-    newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
+    newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr")->setBrush(QColor(01,01,01,01));
     newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
     newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
     newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
@@ -89,19 +89,19 @@ OverviewWindow::OverviewWindow(Context *context) :
 
     // column 2
     newCard("RPE", 2, 0, 9, Card::RPE);
-    newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
+    newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss")->setBrush(QColor(01,01,01,01));
     newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
     newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
-    newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
+    newCard("Power", 3, 1, 5, Card::METRIC, "average_power")->setBrush(QColor(01,01,01,01));
     newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
     newCard("Power Model", 3, 3, 17);
 
     // column 4
     newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
-    newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
+    newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed")->setBrush(QColor(01,01,01,01));
     newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
     newCard("Route", 4, 3, 17, Card::ROUTE);
 
