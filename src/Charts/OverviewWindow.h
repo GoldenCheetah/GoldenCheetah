@@ -170,6 +170,7 @@ class Card : public QGraphicsWidget
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
         QBrush brush;
+        QColor ridecolor;
 
     public slots:
 
