@@ -1875,6 +1875,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.yresize.deep = card->deep;
                     stateData.yresize.posy = pos.y();
 
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
+
                } else if (card->geometry().width()-offx < 10) {
 
                     state = XRESIZE;
@@ -1882,6 +1886,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.xresize.column = card->column;
                     stateData.xresize.width = columns[card->column];
                     stateData.xresize.posx = pos.x();
+
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
 
                } else {
 
@@ -1897,6 +1905,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.drag.offx = offx;
                     stateData.drag.offy = offy;
                     stateData.drag.width = columns[card->column];
+
+                    // thanks we'll take that
+                    event->accept();
+                    returning = true;
 
                     // what is the offset?
                     //updateGeometry();
