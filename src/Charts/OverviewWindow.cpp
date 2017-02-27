@@ -73,13 +73,14 @@ OverviewWindow::OverviewWindow(Context *context) :
     // XXX lets hack in some tiles to start (will load from config later) XXX
 
     // column 0
-    newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss")->setBrush(QColor(50,50,50));
-    newCard("Sport", 0, 1, 5, Card::META, "Sport");
-    newCard("Duration", 0, 2, 9, Card::METRIC, "workout_time");
-    newCard("Notes", 0, 3, 19, Card::META, "Notes");
+    newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss");
+    newCard("Sport", 0, 1, 5, Card::META, "Sport")->setBrush(QColor(01,01,01,01));
+    newCard("Workout Code", 0, 2, 5, Card::META, "Workout Code");
+    newCard("Duration", 0, 3, 9, Card::METRIC, "workout_time");
+    newCard("Notes", 0, 4, 13, Card::META, "Notes");
 
     // column 1
-    newCard("HRV", 1, 0, 9)->setBrush(QColor(50,50,50));
+    newCard("HRV", 1, 0, 9);
     newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
     newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
     newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
@@ -87,19 +88,19 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
 
     // column 2
-    newCard("RPE", 2, 0, 9, Card::RPE)->setBrush(QColor(50,50,50));
+    newCard("RPE", 2, 0, 9, Card::RPE);
     newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
     newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
-    newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if")->setBrush(QColor(50,50,50));
+    newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
     newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
     newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
     newCard("Power Model", 3, 3, 17);
 
     // column 4
-    newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance")->setBrush(QColor(50,50,50));
+    newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
     newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
     newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
     newCard("Route", 4, 3, 17, Card::ROUTE);
@@ -447,6 +448,8 @@ static const QStringList timeInZonesWBAL = QStringList()
 void
 Card::setData(RideItem *item)
 {
+    // use ride colors in painting?
+    ridecolor = item->color;
 
     // stop any animation before starting, just in case- stops a crash
     // when we update a chart in the middle of its animation
@@ -867,7 +870,15 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
 
     if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
-    else painter->setBrush(brush);
+    else {
+
+        // A brush color of 01010101 means use ride color (same as ride list)
+        // But then a ridecolor of 01010101 means use base colors
+        if (brush.color() == QColor(1,1,1,1)) {
+            if (ridecolor == QColor(1,1,1,1))  painter->setBrush(GColor(CCARDBACKGROUND));
+            else painter->setBrush(QBrush(ridecolor));
+        } else painter->setBrush(brush);
+    }
 
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
