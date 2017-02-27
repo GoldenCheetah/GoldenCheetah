@@ -107,6 +107,7 @@ class Card : public QGraphicsWidget
         void setType(CardType type, RideFile::SeriesType series);   // time in zone, data
         void setType(CardType type, QString symbol);                // metric meta
         void setType(CardType type, QString xsymbol, QString ysymbol); // interval
+        void setBrush(QColor x) { brush=QBrush(x); }
 
         // setup data after ride selected
         void setData(RideItem *item);

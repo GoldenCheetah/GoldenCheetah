@@ -73,13 +73,13 @@ OverviewWindow::OverviewWindow(Context *context) :
     // XXX lets hack in some tiles to start (will load from config later) XXX
 
     // column 0
-    newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss");
+    newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss")->setBrush(QColor(50,50,50));
     newCard("Sport", 0, 1, 5, Card::META, "Sport");
     newCard("Duration", 0, 2, 9, Card::METRIC, "workout_time");
     newCard("Notes", 0, 3, 19, Card::META, "Notes");
 
     // column 1
-    newCard("HRV", 1, 0, 9);
+    newCard("HRV", 1, 0, 9)->setBrush(QColor(50,50,50));
     newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
     newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
     newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
@@ -87,19 +87,19 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
 
     // column 2
-    newCard("RPE", 2, 0, 9, Card::RPE);
+    newCard("RPE", 2, 0, 9, Card::RPE)->setBrush(QColor(50,50,50));
     newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
     newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
     newCard("Intervals", 2, 3, 17, Card::INTERVAL, "workout_time", "average_power");
 
     // column 3
-    newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
+    newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if")->setBrush(QColor(50,50,50));
     newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
     newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
     newCard("Power Model", 3, 3, 17);
 
     // column 4
-    newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
+    newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance")->setBrush(QColor(50,50,50));
     newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
     newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
     newCard("Route", 4, 3, 17, Card::ROUTE);
@@ -866,7 +866,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 #endif
 
 
-    painter->setBrush(brush);
+    if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
+    else painter->setBrush(brush);
+
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
     painter->setPen(Qt::NoPen);
@@ -1889,7 +1891,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     state = DRAG;
                     card->invisible = true;
                     card->setDrag(true);
-                    card->brush = GColor(CPLOTMARKER); //XXX hack whilst they're tiles
                     card->setZValue(100);
 
                     stateData.drag.card = card;
@@ -1920,7 +1921,6 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                 stateData.drag.card->setZValue(10);
                 stateData.drag.card->placing = true;
                 stateData.drag.card->setDrag(false);
-                stateData.drag.card->brush = GColor(CCARDBACKGROUND);
             }
 
             // end state;
