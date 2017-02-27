@@ -240,9 +240,13 @@ RideMetric::computeMetrics(RideItem *item, Specification spec, const QStringList
 
             // put into value array too. user metrics will interrogate
             // this for symbol values, rather than the metric pointer
-            if (spec.interval()) spec.interval()->metrics()[m->index()] = m->value();
-            else item->metrics()[m->index()] = m->value();
-
+            // this is crucial, even though RideItem and IntervalItem both
+            // update their values directly. But only need to bother if the
+            // user has defined any local metrics.
+            if (user.count()) {
+                if (spec.interval()) spec.interval()->metrics()[m->index()] = m->value();
+                else item->metrics()[m->index()] = m->value();
+            }
 
         } else {
 
