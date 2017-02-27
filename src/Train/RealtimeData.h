@@ -43,7 +43,7 @@ public:
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
                       LeftTorqueEffectiveness, RightTorqueEffectiveness,
-                      LeftPedalSmoothness, RightPedalSmoothness};
+                      LeftPedalSmoothness, RightPedalSmoothness, Slope};
 
     typedef enum dataseries DataSeries;
 
