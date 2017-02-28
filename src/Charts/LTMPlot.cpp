@@ -2625,7 +2625,6 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
     // do we aggregate ?
     bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
-
     n=-1;
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
@@ -2635,6 +2634,9 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
     Specification spec = settings->specification;
     if (!SearchFilterBox::isNull(metricDetail.datafilter))
         spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+
+    //
+    double ymean_prev=0.0;
 
     foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
 
@@ -2694,6 +2696,8 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                 // first time thru
                 if (n<0) n=0;
 
+                ymean_prev = ride->getStdMeanForSymbol(metricDetail.symbol);
+
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
@@ -2729,6 +2733,32 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                     break;
                 case RideMetric::Peak:
                     if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*seconds)/(secondsPerGroupBy+seconds));
+                    break;
+                case RideMetric::StdDev:
+                    if (value)
+                        {
+                            double ymean_next = ride->getStdMeanForSymbol(metricDetail.symbol);
+                            double ymean =  (secondsPerGroupBy*ymean_prev + ymean_next*seconds)/(secondsPerGroupBy + seconds);
+
+                            // Combining two standard deviations using
+                            // the formula:
+                            //
+                            //   sqrt(((n1-1)*S1^2+(n2-1)*S2^2+n1*(ymean_1-ymean)^2+n2*(ymean_2-ymean)^2)/(n1+n2))
+                            //
+                            // where:
+                            //
+                            //   ymean = (n1*ymean_1 + n2*ymean_2)/(n1+n2)
+
+                            y[n] = pow(y[n],2)*(secondsPerGroupBy-1) + pow(value,2)*(seconds-1);
+                            y[n] += pow(ymean_prev - ymean,2)*secondsPerGroupBy + pow(ymean_next - ymean,2)*seconds;
+                            y[n] /= (secondsPerGroupBy + seconds);
+                            y[n] = sqrt(y[n]);
+
+                            ymean_prev = ymean;
+                        }
                     break;
                 }
                 secondsPerGroupBy += seconds; // increment for same group
@@ -2841,6 +2871,9 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
                     break;
                 case RideMetric::Peak:
                     if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
                 secondsPerGroupBy += seconds; // increment for same group
@@ -2968,6 +3001,9 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
                     break;
                 case RideMetric::Peak:
                     if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
                 secondsPerGroupBy += seconds; // increment for same group
@@ -3417,6 +3453,9 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                     break;
                 case RideMetric::Peak:
                     if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
                 secondsPerGroupBy += seconds; // increment for same group
