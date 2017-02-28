@@ -53,7 +53,7 @@ class RideMetric {
 
 public:
 
-    enum metrictype { Total, Average, Peak, Low, RunningTotal } types;
+    enum metrictype { Total, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev} types;
     typedef enum metrictype MetricType;
     int index_;
 
@@ -175,6 +175,9 @@ public:
             setValue(((value(true) * count()) + (other.value(true) * other.count()))
                                 / (count()+other.count()));
             break;
+        case MeanSquareRoot:
+            setValue(sqrt((pow(value(true), 2)* count() + pow(other.value(true), 2)* other.count())
+                          /(count()+other.count())));
         }
     }
 

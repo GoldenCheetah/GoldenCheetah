@@ -67,7 +67,7 @@ void ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
 
       if (lineno > 25 && lineno <= 27)
 	{
-	  comment.append(line + "\n");
+          comment = QString(line + "\n");
 	}
       else if (lineno == 28)
 	{
@@ -453,22 +453,31 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
   QString suffix = file.fileName();
   int n_s = suffix.length();
   /* Try to scan .pdd file if exsist */
+  QString location;
+  QString hrmFileDate;
+  QString hrmFile_orig;
+  QFile pddfile;
   if (n_s > 12)
     {
-      QString location = suffix.midRef(0, n_s - 12).toString();
-      QString hrmFileDate = suffix.midRef(n_s - 12, 6).toString();
-      QString hrmFile_orig = suffix.midRef(n_s - 12, n_s).toString();
-      QFile pddfile(location + "20" + hrmFileDate + ".pdd");
-      if (pddfile.exists())
-	{
-	  /* Scan .pdd file for main hrm, R-R version and gpx. Can use
-	     either or both if exist */
+      location = suffix.midRef(0, n_s - 12).toString();
+      hrmFileDate = suffix.midRef(n_s - 12, 6).toString();
+      hrmFile_orig = suffix.midRef(n_s - 12, n_s).toString();
+      pddfile.setFileName(location + "20" + hrmFileDate + ".pdd");
+    }
 
-	  ScanPddFile(pddfile, hrmFile, hrvFile, gpxFile, hrmFile_orig, errors, comment);
+  if (n_s > 12 && pddfile.exists())
+      {
+          /* Scan .pdd file for main hrm, R-R version and gpx. Can use
+	     either or both if exist */
+          QString pddComment;
+	  ScanPddFile(pddfile, hrmFile, hrvFile, gpxFile, hrmFile_orig, errors, pddComment);
 
 	  haveHRM = hrmFile.length() > 0 && hrmFile == hrmFile_orig;
 	  if (haveHRM)
-	    hrmfile.setFileName(location + hrmFile);
+            {
+                hrmfile.setFileName(location + hrmFile);
+                comment.append(pddComment);
+            }
 
 	  haveGPX = gpxFile.length() > 0;
 	  if (haveGPX)
@@ -477,16 +486,47 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
 	  haveHRV = hrvFile.length() > 0 && haveHRM && hrmFile != hrvFile;
 	  if (haveHRV)
 	    hrvfile.setFileName(location + hrvFile);
-	}
+
+	  if (!haveHRV&&!haveHRM)
+	    {
+	      haveHRM = true;
+	      hrmfile.setFileName(suffix);
+	    }
     }
   else
     {
-      /* Can still search for gpx */
-      int dot = suffix.lastIndexOf(".");
-      assert(dot >= 0);
+        /* Search for <filename>.gpx and <filename>.rr.hrm */
+        if (suffix.endsWith("rr.hrm"))
+            {
+                hrmfile.setFileName(QString(suffix).replace("rr.hrm",".hrm"));
+                if (hrmfile.exists()){
+                    // If both exist only read when equal to ".hrm"
+                    errors << ("This is a R-R file: \""
+                               + file.fileName() + "\"");
+                    return NULL;
+                }
+                else {
+                    // We read it as a hrm file and get the Xdata directly.
+                    haveHRV = false;
+                }
+                gpxfile.setFileName(QString(suffix).replace("rr.hrm",".gpx"));
+            }
+        else
+            {
+                hrvfile.setFileName(QString(suffix).replace(".hrm",".rr.hrm"));
+                gpxfile.setFileName(QString(suffix).replace(".hrm",".gpx"));
+                haveHRV = hrvfile.exists();
+            }
 
-      gpxfile.setFileName(suffix.left(dot)+".gpx");
-      haveGPX = gpxfile.exists();
+        hrmfile.setFileName(suffix);
+        haveHRM = hrmfile.exists();
+        if (!haveHRM)
+            {
+                errors << ("Can not find : \""
+                           + file.fileName() + "\"");
+                return NULL;
+            }
+        haveGPX = gpxfile.exists();
     }
 
 
@@ -500,6 +540,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
   hrvXdata->name = "HRV";
   hrvXdata->valuename << "R-R";
   hrvXdata->unitname << "msecs";
+
   if (haveHRM)
     {
       HrmRideFile(rideFile, gpxresult, haveGPX, hrvXdata, hrmfile, errors, comment);
