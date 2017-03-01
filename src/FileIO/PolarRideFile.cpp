@@ -27,7 +27,7 @@
 static int polarFileReaderRegistered =
   RideFileFactory::instance().registerReader("hrm", "Polar Precision", new PolarFileReader());
 
-void ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFile,
+bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFile,
 		 QString &hrmFileCompare, QStringList &errors, QString &comment)
 {
   QString section = NULL;
@@ -37,7 +37,7 @@ void ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
   if (!file.open(QFile::ReadOnly)) {
     errors << ("Could not open pdd file: \""
 	       + file.fileName() + "\"");
-    return;
+    return false;
   }
   QTextStream is(&file);
 
@@ -84,11 +84,14 @@ void ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
       if (lineno > 32 && (hrmFile == hrmFileCompare || hrvFile == hrmFileCompare))
 	{
 	  file.close();
-	  return;
+	  return true;
 	}
     }
   }
   file.close();
+  errors << ("Could not find in pdd file: \""
+	       + file.fileName() + "\"");
+  return false;
 }
 
 void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeries *hrvXdata,
@@ -133,7 +136,7 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   QList<double> intervals;
 
   if (!file.open(QFile::ReadOnly)) {
-    errors << ("Could not open pdd file: \""
+    errors << ("Could not open ride file: \""
 	       + file.fileName() + "\"");
     return;
   }
@@ -470,7 +473,18 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
           /* Scan .pdd file for main hrm, R-R version and gpx. Can use
 	     either or both if exist */
           QString pddComment;
-	  ScanPddFile(pddfile, hrmFile, hrvFile, gpxFile, hrmFile_orig, errors, pddComment);
+	  if (!ScanPddFile(pddfile, hrmFile, hrvFile, gpxFile, hrmFile_orig, errors, pddComment))
+              {
+                  // Pdd file exist but it does not contain
+                  // hrmFile_orig (probably been deleted)
+                  return NULL;
+              }
+          else if (hrmFile_orig == hrvFile && hrmFile != hrvFile)
+              {
+                  errors << ("This is a R-R file: \""
+                             + file.fileName() + "\"");
+                  return NULL;
+              }
 
 	  haveHRM = hrmFile.length() > 0 && hrmFile == hrmFile_orig;
 	  if (haveHRM)
@@ -489,8 +503,9 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
 
 	  if (!haveHRV&&!haveHRM)
 	    {
-	      haveHRM = true;
-	      hrmfile.setFileName(suffix);
+                // Don't think this will ever happen.
+                haveHRM = true;
+                hrmfile.setFileName(suffix);
 	    }
     }
   else
@@ -558,7 +573,8 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     }
   else
     {
-      errors << ("This is a R-R file: \""
+        // Don't think this will ever happen.
+      errors << ("This is a R-R file?: \""
 		 + file.fileName() + "\"");
       delete rideFile;
       delete hrvXdata;
