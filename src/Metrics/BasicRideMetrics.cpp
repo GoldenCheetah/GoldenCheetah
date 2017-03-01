@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "LTMOutliers.h"
 #include "Units.h"
 #include "Zones.h"
@@ -88,6 +89,32 @@ class ToExhaustion : public RideMetric {
 
 static bool teAdded =
     RideMetricFactory::instance().addMetric(ToExhaustion());
+
+class ElapsedTime : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ElapsedTime)
+    public:
+
+    ElapsedTime()
+    {
+        setSymbol("elapsed_time");
+        setInternalName("Elapsed Time");
+    }
+    void initialize() {
+        setName(tr("Elapsed Time"));
+        setMetricUnits(tr("secs"));
+        setImperialUnits(tr(""));
+        setDescription(tr("Only useful for intervals, time the interval started"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+        setValue(0);
+        if (spec.interval()) setValue(spec.interval()->start);
+    }
+    RideMetric *clone() const { return new ElapsedTime(*this); }
+};
+
+static bool etAdded =
+    RideMetricFactory::instance().addMetric(ElapsedTime());
 
 //////////////////////////////////////////////////////////////////////////////
 class WorkoutTime : public RideMetric {

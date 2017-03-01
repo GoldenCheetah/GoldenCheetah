@@ -110,7 +110,6 @@ class Specification
         // when working with samples
         void print();
 
-    protected:
         // when working with intervals secs start and end
         // if no interval is set then they return -1 to indicate
         // that the entire ride is in scope

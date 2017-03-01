@@ -145,7 +145,8 @@
 // 135 10  Aug 2016 Ale Martinez       Added Average Swim Pace for the 4 Strokes
 // 136 17  Oct 2016 Ale Martinez       Changed Best Times units to minutes
 // 137 16  Feb 2017 Leif Warland       Added HrvMetrics
-int DBSchemaVersion = 137;
+// 138 01  Mar 2017 Mark Liversedge	   Added elapsed_time metric for intervals
+int DBSchemaVersion = 138;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
