@@ -62,6 +62,7 @@ class OverviewWindow;
 class Sparkline;
 class Routeline;
 class RPErating;
+class BubbleViz;
 
 // keep it simple for now
 class Card : public QGraphicsWidget
@@ -106,7 +107,7 @@ class Card : public QGraphicsWidget
         void setType(CardType type); // NONE and Route
         void setType(CardType type, RideFile::SeriesType series);   // time in zone, data
         void setType(CardType type, QString symbol);                // metric meta
-        void setType(CardType type, QString xsymbol, QString ysymbol); // interval
+        void setType(CardType type, QString xsymbol, QString ysymbol, QString zsymbol); // interval
         void setBrush(QColor x) { brush=QBrush(x); }
 
         // setup data after ride selected
@@ -121,7 +122,7 @@ class Card : public QGraphicsWidget
         // settings
         struct {
 
-            QString symbol, xsymbol, ysymbol;
+            QString symbol, xsymbol, ysymbol, zsymbol;
             RideFile::SeriesType series;
 
         } settings;
@@ -156,8 +157,9 @@ class Card : public QGraphicsWidget
         // PMC stress values
         double lts, sts, stress, sb, rr;
 
-        QLineSeries *lineseries;
-        QScatterSeries *scatterseries, *peakscatterseries, *userscatterseries, *systemscatterseries;
+        // INTERVAL bubble chart
+        BubbleViz *bubble;
+
         QString upper, lower;
         bool showrange;
 
@@ -175,6 +177,54 @@ class Card : public QGraphicsWidget
     public slots:
 
         void geometryChanged();
+};
+
+// for now the basics are x and y and a radius z, color fill
+struct BPointF {
+    double x,y,z;
+    QColor fill;
+};
+
+// bubble chart, very very basic just a visualisation
+class BubbleViz : public QGraphicsItem
+{
+
+    public:
+        BubbleViz(Card *parent, QString name=""); // create and say how many days
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        // null members for now just get hooked up
+        void setPoints(QList<BPointF>points);
+
+        void setRange(double minx, double maxx, double miny, double maxy) {
+            this->minx=minx;
+            this->maxx=maxx;
+            this->miny=miny;
+            this->maxy=maxy;
+        }
+        void setAxisNames(QString xlabel, QString ylabel) { this->xlabel=xlabel; this->ylabel=ylabel; update(); }
+
+        // needed as pure virtual in QGraphicsItem
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+        QRectF boundingRect() const { return QRectF(parent->geometry().x() + geom.x(),
+                                                    parent->geometry().y() + geom.y(),
+                                                    geom.width(), geom.height());
+        }
+
+    private:
+        Card *parent;
+        QRectF geom;
+        QString name;
+
+        // chart settings
+        QList <BPointF> points;
+        double minx,maxx,miny,maxy;
+        QString xlabel, ylabel;
+        double mean, max;
 };
 
 // RPE rating viz and widget to set value
@@ -378,13 +428,13 @@ class OverviewWindow : public GcChartWindow
                                                         }
         // create a card - interval
         Card *newCard(QString name, int column, int order, int deep, Card::CardType type, QString xsymbol,
-                       QString ysymbol) {
+                       QString ysymbol, QString zsymbol) {
                                                          Card *add = new Card(deep, name);
                                                          add->column = column;
                                                          add->order = order;
                                                          add->deep = deep;
                                                          add->parent = this;
-                                                         add->setType(type, xsymbol, ysymbol);
+                                                         add->setType(type, xsymbol, ysymbol, zsymbol);
                                                          cards.append(add);
                                                          return add;
                                                         }
