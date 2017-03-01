@@ -1086,17 +1086,11 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     }
 }
 
-RPErating::RPErating(Card *parent, QString name) : QObject(parent), QGraphicsItem(NULL), parent(parent), name(name), editing(false)
+RPErating::RPErating(Card *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name)
 {
     setGeometry(20,20,100,100);
     setZValue(11);
     setAcceptHoverEvents(true);
-    this->setFlag(ItemIsFocusable,true);
-
-    // editing timeout when leave the widget
-    timer=new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(cancelEdit()));
 }
 
 static QString FosterDesc[11]={
@@ -1164,7 +1158,7 @@ RPErating::sceneEvent(QEvent *event)
 {
     if (event->type() == QEvent::GraphicsSceneHoverMove) {
 
-        if (editing) {
+        if (hover) {
 
             // set value based upon the location of the mouse
             QPoint vpos = parent->parent->view->mapFromGlobal(QCursor::pos());
@@ -1188,38 +1182,21 @@ RPErating::sceneEvent(QEvent *event)
         // mouse moved so hover paint anyway
         update();
 
-    } else if (editing && event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(event)->key() == Qt::Key_Escape) {
+    } else if (hover && event->type() == QEvent::GraphicsSceneMousePress) {
 
-        // cancel edit
-        cancelEdit();
-
-    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
-
-        // toggle edit
-        editing = !editing;
-
-        // did we get edit
-        if (editing) {
-            this->setFocus();
-            oldvalue = value;
-
-        } else {
-
-            this->clearFocus();
-            applyEdit();
-        }
+        applyEdit();
         update();
 
     }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
 
-        // if the mouse leaves then wait 2 secs before cancelling edit
-        if (editing) timer->start(2000);
+        cancelEdit();
         update();
 
     } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
 
-        // we're back, so cancel that timer if needs be
-        if (editing) timer->stop();
+        // remember what it was
+        oldvalue = value;
+        hover = true;
         update();
     }
     return false;
@@ -1228,21 +1205,20 @@ RPErating::sceneEvent(QEvent *event)
 void
 RPErating::cancelEdit()
 {
-    editing=false;
-    parent->value=oldvalue;
-    parent->update();
-    setValue(oldvalue);
-    clearFocus();
+    if (value != oldvalue || parent->value != oldvalue) {
+        parent->value=oldvalue;
+        value=oldvalue;
+        parent->update();
+        setValue(oldvalue);
+    }
+    hover = false;
     update();
+
 }
 
 void
 RPErating::applyEdit()
 {
-    // update the item and ride
-    editing=false;
-    clearFocus();
-
     // update the item - if we have one
     RideItem *item = parent->parent->property("ride").value<RideItem*>();
 
@@ -1253,8 +1229,12 @@ RPErating::applyEdit()
         item->ride()->setTag("RPE", value);
         item->notifyRideMetadataChanged();
         item->setDirty(true);
+
+        // now oldvalue is value!
+        oldvalue = value;
     }
 
+    hover = false;
     update();
 }
 
@@ -1278,9 +1258,8 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->setPen(Qt::NoPen);
 
     // hover?
-    if (editing || isUnderMouse()) {
-        QColor darkgray(65,65,65,125);
-        if (editing) darkgray = QColor(120,120,120,120);
+    if (hover) {
+        QColor darkgray(120,120,120,120);
         painter->fillRect(QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height()), QBrush(darkgray));
     }
 
