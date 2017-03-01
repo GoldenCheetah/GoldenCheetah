@@ -178,10 +178,8 @@ class Card : public QGraphicsWidget
 };
 
 // RPE rating viz and widget to set value
-class RPErating : public QObject, public QGraphicsItem
+class RPErating : public QGraphicsItem
 {
-    Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 
     public:
         RPErating(Card *parent, QString name=""); // create and say how many days
@@ -202,10 +200,6 @@ class RPErating : public QObject, public QGraphicsItem
 
         // for interaction
         bool sceneEvent(QEvent *event);
-
-    public slots:
-
-        // when editing
         void cancelEdit();
         void applyEdit();
 
@@ -218,9 +212,7 @@ class RPErating : public QObject, public QGraphicsItem
         QColor color;
 
         // interaction
-        QTimer *timer;
         bool hover;
-        bool editing;
 
 };
 
