@@ -33,6 +33,11 @@
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+
 OverviewWindow::OverviewWindow(Context *context) :
     GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
                             yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
@@ -65,45 +70,8 @@ OverviewWindow::OverviewWindow(Context *context) :
     // all the widgets
     setChartLayout(main);
 
-    // default column widths - max 10 columns;
-    // note the sizing is such that each card is the equivalent of a full screen
-    // so we can embed charts etc without compromising what they can display
+    // by default these are the column sizes (user can adjust)
     columns << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200;
-
-    // XXX lets hack in some tiles to start (will load from config later) XXX
-
-    // column 0
-    newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss");
-    newCard("Sport", 0, 1, 5, Card::META, "Sport");
-    newCard("Workout Code", 0, 2, 5, Card::META, "Workout Code");
-    newCard("Duration", 0, 3, 9, Card::METRIC, "workout_time");
-    newCard("Notes", 0, 4, 13, Card::META, "Notes");
-
-    // column 1
-    newCard("HRV", 1, 0, 9, Card::METRIC, "rMSSD");
-    newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
-    newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
-    newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
-    newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
-    newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
-
-    // column 2
-    newCard("RPE", 2, 0, 9, Card::RPE);
-    newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
-    newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
-    newCard("Intervals", 2, 3, 17, Card::INTERVAL, "elapsed_time", "average_power", "workout_time");
-
-    // column 3
-    newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
-    newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
-    newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
-    newCard("Power Model", 3, 3, 17);
-
-    // column 4
-    newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
-    newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
-    newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
-    newCard("Route", 4, 3, 17, Card::ROUTE);
 
     // for changing the view
     group = new QParallelAnimationGroup(this);
@@ -113,9 +81,6 @@ OverviewWindow::OverviewWindow(Context *context) :
     // for scrolling the view
     scroller = new QPropertyAnimation(this, "viewY");
     scroller->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
-
-    // sort out the view
-    updateGeometry();
 
     // watch the view for mouse events
     view->setMouseTracking(true);
@@ -130,9 +95,178 @@ OverviewWindow::OverviewWindow(Context *context) :
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
 
-    // we're ready to plot
+    // we're ready to plot, but not configured
+    configured=false;
     stale=true;
     current=NULL;
+}
+
+QString
+OverviewWindow::getConfiguration() const
+{
+    // return a JSON snippet to represent the entire config
+    QString config;
+
+    // setup
+    config = "{\n  \"version\":\"1.0\",\n  \"columns\":[";
+    for(int i=0; i<columns.count(); i++) {
+        config += QString("%1%2").arg(columns[i]).arg(i+1<columns.count() ? "," : "");
+    }
+    config += "],\n  \"CARDS\":[\n";
+
+    // do cards
+    foreach(Card *card, cards) {
+        // basic stuff first - name, type etc
+        config += "    { ";
+        config += "\"type\":" + QString("%1").arg(static_cast<int>(card->type)) + ",";
+        config += "\"name\":\"" + card->name + "\",";
+        config += "\"deep\":" + QString("%1").arg(card->deep) + ",";
+        config += "\"column\":" + QString("%1").arg(card->column) + ",";
+        config += "\"order\":" + QString("%1").arg(card->order) + ",";
+
+        // now the actual card settings
+        config += "\"series\":" + QString("%1").arg(static_cast<int>(card->settings.series)) + ",";
+        config += "\"symbol\":\"" + QString("%1").arg(card->settings.symbol) + "\",";
+        config += "\"xsymbol\":\"" + QString("%1").arg(card->settings.xsymbol) + "\",";
+        config += "\"ysymbol\":\"" + QString("%1").arg(card->settings.ysymbol) + "\",";
+        config += "\"zsymbol\":\"" + QString("%1").arg(card->settings.zsymbol) + "\"";
+
+        config += " }";
+
+        if (cards.last() != card) config += ",";
+        config += "\n";
+    }
+
+    config += "  ]\n}\n";
+
+    return config;
+}
+
+void
+OverviewWindow::setConfiguration(QString config)
+{
+    // XXX hack because we're not in the default layout and don't want to
+    // XXX this is just to handle setup for the very first time its run !
+    if (configured == true) return;
+    configured = true;
+
+    // DEFAULT CONFIG (FOR NOW WHEN NOT IN THE DEFAULT LAYOUT)
+    //
+    // default column widths - max 10 columns;
+    // note the sizing is such that each card is the equivalent of a full screen
+    // so we can embed charts etc without compromising what they can display
+
+ defaultsetup: // I know, but its easier than lots of nested if clauses above
+
+    if (config == "") {
+
+        columns.clear();
+        columns << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200 << 1200;
+
+        // XXX lets hack in some tiles to start (will load from config later) XXX
+
+        // column 0
+        newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss");
+        newCard("Sport", 0, 1, 5, Card::META, "Sport");
+        newCard("Workout Code", 0, 2, 5, Card::META, "Workout Code");
+        newCard("Duration", 0, 3, 9, Card::METRIC, "workout_time");
+        newCard("Notes", 0, 4, 13, Card::META, "Notes");
+
+        // column 1
+        newCard("HRV", 1, 0, 9, Card::METRIC, "rMSSD");
+        newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
+        newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
+        newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
+        newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
+        newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
+
+        // column 2
+        newCard("RPE", 2, 0, 9, Card::RPE);
+        newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
+        newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
+        newCard("Intervals", 2, 3, 17, Card::INTERVAL, "elapsed_time", "average_power", "workout_time");
+
+        // column 3
+        newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
+        newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
+        newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
+        newCard("Power Model", 3, 3, 17);
+
+        // column 4
+        newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
+        newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
+        newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
+        newCard("Route", 4, 3, 17, Card::ROUTE);
+
+        updateGeometry();
+        return;
+    }
+
+    //
+    // But by default we parse and apply (dropping back to default setup on error)
+    //
+    // parse
+    QJsonDocument doc = QJsonDocument::fromJson(config.toUtf8());
+    if (doc.isEmpty() || doc.isNull()) {
+        config="";
+        goto defaultsetup;
+    }
+
+    // parsed so lets work through it and setup the overview
+    QJsonObject root = doc.object();
+
+    // check version
+    QString version = root["version"].toString();
+    if (version != "1.0") {
+        config="";
+        goto defaultsetup;
+    }
+
+    // set columns
+    columns.clear();
+    QJsonArray cols = root["columns"].toArray();
+    foreach (const QVariant &value, cols.toVariantList()) {
+        columns << value.toInt();
+    }
+
+    // cards
+    QJsonArray CARDS = root["CARDS"].toArray();
+    foreach(const QJsonValue val, CARDS) {
+
+        // convert so we can inspect
+        QJsonObject obj = val.toObject();
+
+        // get the basics
+        QString name = obj["name"].toString();
+        int column = obj["column"].toInt();
+        int order = obj["order"].toInt();
+        int deep = obj["deep"].toInt();
+        Card::CardType type = static_cast<Card::CardType>(obj["type"].toInt());
+
+        // get the settings
+        RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
+        QString symbol=obj["symbol"].toString();
+        QString xsymbol=obj["xsymbol"].toString();
+        QString ysymbol=obj["ysymbol"].toString();
+        QString zsymbol=obj["zsymbol"].toString();
+
+        // lets create the cards
+        switch(type) {
+        case Card::NONE :
+        case Card::MODEL :
+        case Card::RPE :
+        case Card::ROUTE : newCard(name, column, order, deep, type); break;
+        case Card::METRIC :
+        case Card::PMC :
+        case Card::META : newCard(name, column, order, deep, type, symbol); break;
+        case Card::INTERVAL : newCard(name, column, order, deep, type, xsymbol, ysymbol, zsymbol); break;
+        case Card::SERIES :
+        case Card::ZONE : newCard(name, column, order, deep, type, series); break;
+        }
+    }
+
+    // put in place
+    updateGeometry();
 }
 
 // when a ride is selected we need to notify all the cards
@@ -149,6 +283,9 @@ OverviewWindow::rideSelected()
     if (current == myRideItem && stale == false) {
         return;
     }
+
+    // lets make sure its configured the first time thru
+    setConfiguration(""); // sets to default config
 
 // profiling the code
 //QTime timer;
@@ -329,6 +466,8 @@ Card::setType(CardType type, QString symbol)
 
     // meta fields type?
     if (type == META) {
+
+        this->settings.symbol = symbol;
 
         //  Get the field type
         fieldtype = -1;
