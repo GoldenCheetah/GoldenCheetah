@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "Secrets.h"
 #include <QMessageBox>
 
 #ifdef GC_HAVE_KQOAUTH

@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "TimeUtils.h"
+#include "Secrets.h"
 #include <QUrl>
 #include <kqoauthmanager.h>
 #include <kqoauthrequest.h>
