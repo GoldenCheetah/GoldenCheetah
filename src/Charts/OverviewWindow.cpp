@@ -80,7 +80,7 @@ OverviewWindow::OverviewWindow(Context *context) :
     newCard("Notes", 0, 4, 13, Card::META, "Notes");
 
     // column 1
-    newCard("HRV", 1, 0, 9);
+    newCard("HRV", 1, 0, 9, Card::METRIC, "rMSSD");
     newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
     newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
     newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
