@@ -34,7 +34,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG               true // debug traces
+#define FIT_DEBUG               false // debug traces
 #define FIT_DEBUG_LEVEL         3    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
