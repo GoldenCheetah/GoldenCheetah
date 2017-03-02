@@ -228,6 +228,7 @@ void KQOAuthManager::executeRequest(KQOAuthRequest *request) {
         urlWithParams.setQuery(query);
 #endif
         networkRequest.setUrl(urlWithParams);
+        qDebug() << "urlWithParams:" << urlWithParams;
 
         // Submit the request including the params.
         QNetworkReply *reply = d->networkManager->get(networkRequest);

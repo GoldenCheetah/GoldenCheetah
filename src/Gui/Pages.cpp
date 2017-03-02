@@ -705,34 +705,35 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(rideWithGPSPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     //////////////////////////////////////////////////
-    // Withings Wifi Scales
+    // Withings
+    //////////////////////////////////////////////////
 
-    QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
-    wip->setFont(current);
+#ifdef GC_HAVE_KQOAUTH
+    QLabel *withingsLabel = new QLabel(tr("Withings"));
+    withingsLabel->setFont(current);
 
-    QLabel *wiurlLabel = new QLabel(tr("Website"));
-    QLabel *wiuserLabel = new QLabel(tr("User Id"));
-    QLabel *wipassLabel = new QLabel(tr("Public Key"));
+    QLabel *wipauthLabel = new QLabel(tr("Authorise"));
 
-    wiURL = new QLineEdit(this);
-    wiURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
+    withingsAuthorise = new QPushButton(tr("Authorise"), this);
+    withingsAuthorised = new QPushButton(this);
+    withingsAuthorised->setContentsMargins(0,0,0,0);
+    withingsAuthorised->setIcon(passwords.scaled(16,16));
+    withingsAuthorised->setIconSize(QSize(16,16));
+    withingsAuthorised->setFixedHeight(16);
+    withingsAuthorised->setFixedWidth(16);
 
-    wiUser = new QLineEdit(this);
-    wiUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString());
+    grid->addWidget(withingsLabel, ++row, 0);
 
-    wiPass = new QLineEdit(this);
-    wiPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString());
+    grid->addWidget(wipauthLabel, ++row, 0);
+    grid->addWidget(withingsAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN, "")!="")
+        grid->addWidget(withingsAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        withingsAuthorised->hide(); // if no token no show
 
-    grid->addWidget(wip, ++row, 0);
+    connect(withingsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseWithings()));
+#endif
 
-    grid->addWidget(wiurlLabel, ++row, 0);
-    grid->addWidget(wiURL, row, 1, 0);
-
-    grid->addWidget(wiuserLabel, ++row, 0);
-    grid->addWidget(wiUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(wipassLabel, ++row, 0);
-    grid->addWidget(wiPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     //////////////////////////////////////////////////
     // Web Calendar
@@ -1041,6 +1042,17 @@ void CredentialsPage::authoriseTwitter()
         oauthDialog->exec();
     }
 }
+
+void CredentialsPage::authoriseWithings()
+{
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::WITHINGS);
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
+}
 #endif
 
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
@@ -1154,9 +1166,6 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS, sphPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELUSER, selUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELPASS, selPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_WIURL, wiURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, wiUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_WIKEY, wiPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_URL, tdpURL->text());

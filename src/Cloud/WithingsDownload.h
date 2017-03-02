@@ -27,6 +27,10 @@
 #include "Settings.h"
 #include "WithingsParser.h"
 
+#ifdef GC_HAVE_KQOAUTH
+#include <kqoauthmanager.h>
+#endif
+
 class WithingsDownload : public QObject
 {
     Q_OBJECT
@@ -47,5 +51,18 @@ private:
 
     int allMeasures;
     int newMeasures;
+
+    #ifdef GC_HAVE_KQOAUTH
+    KQOAuthManager *oauthManager;
+    KQOAuthRequest *oauthRequest;
+    #endif
+
+    void parse(QString text);
+
+private slots:
+    #ifdef GC_HAVE_KQOAUTH
+    void onRequestReady(QByteArray);
+    void onAuthorizedRequestDone();
+    #endif
 };
 #endif
