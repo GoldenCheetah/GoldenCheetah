@@ -492,6 +492,8 @@ class OverviewWindow : public GcChartWindow
 
         } stateData;
 
+        bool stale;
+        RideItem *current;
 };
 
 #endif // _GC_OverviewWindow_h
