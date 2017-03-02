@@ -227,6 +227,7 @@ class CredentialsPage : public QScrollArea
     public slots:
 #ifdef GC_HAVE_KQOAUTH
         void authoriseTwitter();
+        void authoriseWithings();
 #endif
 #if QT_VERSION >= 0x050000
         void authoriseDropbox();
@@ -253,6 +254,7 @@ class CredentialsPage : public QScrollArea
 
 #ifdef GC_HAVE_KQOAUTH
         QPushButton *twitterAuthorise;
+        QPushButton *withingsAuthorise;
 #endif
 #if QT_VERSION >= 0x050000
         QPushButton *dropboxAuthorise;
@@ -265,7 +267,7 @@ class CredentialsPage : public QScrollArea
 #endif
 
         QComboBox *dvCALDAVType;
-        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
+        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised, *withingsAuthorised;
         QPushButton *tdpAuthorise, *tdpAuthorised;
         QPushButton *networkFileStoreFolderBrowse;
         QLineEdit *networkFileStoreFolder;

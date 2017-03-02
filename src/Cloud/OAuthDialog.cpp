@@ -150,10 +150,46 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         if (baseURL=="") baseURL="https://whats.todaysplan.com.au";
         urlstr = QString("%1/authorize/").arg(baseURL);
         urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
+    } else if (site == WITHINGS) {
+
+#ifdef GC_HAVE_KQOAUTH
+        oauthRequest = new KQOAuthRequest;
+        oauthManager = new KQOAuthManager(this);
+
+        connect(oauthManager, SIGNAL(temporaryTokenReceived(QString,QString)),
+                this, SLOT(onTemporaryTokenReceived(QString, QString)));
+
+        connect(oauthManager, SIGNAL(authorizationReceived(QString,QString)),
+                this, SLOT( onAuthorizationReceived(QString, QString)));
+
+        connect(oauthManager, SIGNAL(accessTokenReceived(QString,QString)),
+                this, SLOT(onAccessTokenReceived(QString,QString)));
+
+        connect(oauthManager, SIGNAL(requestReady(QByteArray)),
+                this, SLOT(onRequestReady(QByteArray)));
+
+        connect(oauthManager, SIGNAL(authorizationPageRequested(QUrl)),
+                this, SLOT(onAuthorizationPageRequested(QUrl)));
+
+
+        oauthRequest->initRequest(KQOAuthRequest::TemporaryCredentials, QUrl("https://oauth.withings.com/account/request_token"));
+        //oauthRequest->setEnableDebugOutput(true);
+        oauthRequest->setHttpMethod(KQOAuthRequest::GET);
+
+        oauthRequest->setConsumerKey(GC_WITHINGS_CONSUMER_KEY);
+        oauthRequest->setConsumerSecretKey(GC_WITHINGS_CONSUMER_SECRET);
+        //oauthRequest->setCallbackUrl(QUrl("http://www.goldencheetah.org"));
+
+        oauthManager->setHandleUserAuthorization(true); // false to use callback
+        oauthManager->setHandleAuthorizationPageOpening(false);
+
+        oauthManager->executeRequest(oauthRequest);
+
+#endif
     }
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
-    // TWITTER
+    // TWITTER or WITHINGS
     if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS ||
         site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == TODAYSPLAN) {
         url = QUrl(urlstr);
@@ -167,22 +203,35 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
 }
 
 #ifdef GC_HAVE_KQOAUTH
-// ****************** Twitter OAUTH ******************************************************
+// ****************** OAUTH V1 (TWITTER, WITHINGS)  ************************************************
 
 void OAuthDialog::onTemporaryTokenReceived(QString, QString)
 {
-    QUrl userAuthURL("https://api.twitter.com/oauth/authorize");
+    //qDebug() << "onTemporaryTokenReceived";
+    QUrl userAuthURL;
+
+    if (site == TWITTER) {
+        userAuthURL = "https://api.twitter.com/oauth/authorize";
+    } else if (site == WITHINGS) {
+        userAuthURL = "https://oauth.withings.com/account/authorize";
+    }
 
     if( oauthManager->lastError() == KQOAuthManager::NoError) {
         oauthManager->getUserAuthorization(userAuthURL);
-    }
+    } else
+        qDebug() << "error" << oauthManager->lastError();
 
 }
 
 void OAuthDialog::onAuthorizationReceived(QString, QString) {
-    // qDebug() << "Authorization token received: " << token << verifier;
+    //qDebug() << "Authorization token received: " << token << verifier;
 
-    oauthManager->getUserAccessTokens(QUrl("https://api.twitter.com/oauth/access_token"));
+    if (site == TWITTER) {
+        oauthManager->getUserAccessTokens(QUrl("https://api.twitter.com/oauth/access_token"));
+    } else if (site == WITHINGS) {
+        oauthManager->getUserAccessTokens(QUrl("https://oauth.withings.com/account/access_token"));
+    }
+
     if( oauthManager->lastError() != KQOAuthManager::NoError) {
         QString error = QString(tr("Error fetching OAuth credentials - Endpoint: /oauth/access_token"));
         QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
@@ -192,23 +241,34 @@ void OAuthDialog::onAuthorizationReceived(QString, QString) {
 }
 
 void OAuthDialog::onAccessTokenReceived(QString token, QString tokenSecret) {
-    // qDebug() << "Access token received: " << token << tokenSecret;
+    //qDebug() << "Access token received: " << token << tokenSecret;
 
-    appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_TOKEN, token);
-    appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_SECRET,  tokenSecret);
+    QString info;
+    if (site == TWITTER) {
+        appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_TOKEN, token);
+        appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_SECRET,  tokenSecret);
 
-    QString info = QString(tr("Twitter authorization was successful."));
+        info = QString(tr("Twitter authorization was successful."));
+    } else if (site == WITHINGS) {
+        appsettings->setCValue(context->athlete->cyclist, GC_WITHINGS_TOKEN, token);
+        appsettings->setCValue(context->athlete->cyclist, GC_WITHINGS_SECRET,  tokenSecret);
+
+        info = QString(tr("Withings authorization was successful."));
+    }
+
+
     QMessageBox information(QMessageBox::Information, tr("Information"), info);
     information.exec();
     accept();
 }
 
 void OAuthDialog::onAuthorizedRequestDone() {
-    // request sent to Twitter - do nothing
+    // request sent - do nothing
 }
 
 void OAuthDialog::onRequestReady(QByteArray response) {
-    // qDebug() << "Response received: " << response;
+    //qDebug() << "Response received: " << response;
+
     QString r = response;
     if (r.contains("\"errors\"", Qt::CaseInsensitive))
     {
@@ -216,11 +276,30 @@ void OAuthDialog::onRequestReady(QByteArray response) {
              tr("There was an error during authorization. Please check the error description."));
              oautherr.setDetailedText(r); // probably blank
          oautherr.exec();
+    } else {
+        if (site == WITHINGS) {
+            QString userid;
+
+    #if QT_VERSION > 0x050000
+            QUrlQuery params;
+            params.setQuery(response);
+    #else
+            QUrl params;
+            params.setEncodedQuery(response);
+    #endif
+            userid = params.queryItemValue("userid");
+
+            if (userid.isEmpty() == false) {
+                appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, userid);
+            }
+        }
     }
 }
 
 
 void OAuthDialog::onAuthorizationPageRequested(QUrl url) {
+    //qDebug() << "AuthorizationPageRequested: " << url;
+
     // open Authorization page in view
     view->setUrl(url);
 

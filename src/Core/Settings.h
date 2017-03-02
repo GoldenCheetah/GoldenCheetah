@@ -37,7 +37,6 @@
 
 //Twitter oauth keys / see also Athlete parameter
 #define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
-#define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"
 
 //Google Calendar-CALDAV oauthkeys / see also Athlete parameter
 #define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
@@ -47,6 +46,9 @@
 
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
+
+//Withings oauth keys
+#define GC_WITHINGS_CONSUMER_KEY    "292875b6883b87e27cefd2555d1cb872b2282f02fee25b4906871314934" //< consumer key
 
 // Dropbox id
 #ifndef GC_DROPBOX_CLIENT_ID
@@ -294,8 +296,12 @@
 
 #define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
 #define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
+//Twitter
 #define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
 #define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
+//Withings
+#define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
+#define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
 //Google Calendar-CALDAV oauthkeys
 #define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
 //Strava
