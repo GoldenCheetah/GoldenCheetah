@@ -328,6 +328,7 @@ class OverviewWindow : public GcChartWindow
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString config READ getConfiguration WRITE setConfiguration USER true)
     Q_PROPERTY(QRectF viewRect READ getViewRect WRITE setViewRect)
     Q_PROPERTY(int viewY READ getViewY WRITE setViewY)
 
@@ -363,6 +364,10 @@ class OverviewWindow : public GcChartWindow
 
         // trap signals
         void configChanged(qint32);
+
+        // get/set config
+        QString getConfiguration() const;
+        void setConfiguration(QString x);
 
         // scale on first show
         void showEvent(QShowEvent *) { updateView(); }
@@ -493,6 +498,7 @@ class OverviewWindow : public GcChartWindow
         } stateData;
 
         bool stale;
+        bool configured;
         RideItem *current;
 };
 
