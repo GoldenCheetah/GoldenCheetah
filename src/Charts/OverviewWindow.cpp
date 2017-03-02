@@ -129,12 +129,27 @@ OverviewWindow::OverviewWindow(Context *context) :
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);
+
+    // we're ready to plot
+    stale=true;
+    current=NULL;
 }
 
 // when a ride is selected we need to notify all the cards
 void
 OverviewWindow::rideSelected()
 {
+    // don't plot when we're not visible, unless we have nothing plotted yet
+    if (!isVisible() && current != NULL && myRideItem != NULL) {
+        stale=true;
+        return;
+    }
+
+    // don't replot .. we already did this one
+    if (current == myRideItem && stale == false) {
+        return;
+    }
+
 // profiling the code
 //QTime timer;
 //timer.start();
@@ -147,6 +162,10 @@ OverviewWindow::rideSelected()
 
     // update
     updateView();
+
+    // ok, remember we did this one
+    current = myRideItem;
+    stale=false;
 }
 
 // empty card
