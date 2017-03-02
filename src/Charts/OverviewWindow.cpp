@@ -1369,7 +1369,7 @@ BubbleViz::setPoints(QList<BPointF> points)
 
         if (point.x < minx || point.x > maxx ||
             point.y < miny || point.y > maxy ||
-            !isfinite(point.z) || isnan(point.z)) continue;
+            !std::isfinite(point.z) || std::isnan(point.z)) continue;
 
         sum += point.z;
         count++;
@@ -1424,7 +1424,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         if (point.x < minx || point.x > maxx ||
             point.y < miny || point.y > maxy ||
-            !isfinite(point.z) || isnan(point.z)) continue;
+            !std::isfinite(point.z) || std::isnan(point.z)) continue;
 
         QPointF center(plotarea.left() + (xratio * point.x),
                        plotarea.bottom() - (yratio * point.y));
