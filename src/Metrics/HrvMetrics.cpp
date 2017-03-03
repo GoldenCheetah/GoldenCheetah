@@ -281,6 +281,7 @@ static bool rmssdAdded =
 
 
 class pnnx : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(pnnx)
 
 public:
     double msec;
@@ -328,11 +329,11 @@ public:
 
     void initialize()
     {
-        setName(QString("pNN").append(QString::number(msec, 'f', 0)));
+        setName(QString(tr("pNN")).append(QString::number(msec, 'f', 0)));
         setMetricUnits(tr("pct"));
         setImperialUnits(tr("pct"));
         setType(RideMetric::Average);
-        setDescription(QString("Percentage of differences between adjacent NN intervals that are greater than  ms").insert(78, QString::number(msec, 'f', 0)));
+        setDescription(QString(tr("Percentage of differences between adjacent NN intervals that are greater than %1 ms").arg(QString::number(msec, 'f', 0))));
     }
 
     RideMetric *clone() const { return new pnnx(*this); }
