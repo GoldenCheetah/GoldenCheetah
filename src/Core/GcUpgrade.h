@@ -83,6 +83,7 @@
 // 3956 - V3.4 FIXUPS FROM 3.4 BRANCH
 // 3957 - V3.4.1 DEVELOPMENT
 // 3958 - V3.4.1 DEVELOPMENT RELEASES START
+// 3959 - V3.5 DEVELOPMENT RENAME AND DEVBUILD 1703
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -97,8 +98,8 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3958
-#define VERSION_STRING "DEV-V3.4.1 1702"
+#define VERSION_LATEST 3959
+#define VERSION_STRING "DEV-V3.5 1703"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
