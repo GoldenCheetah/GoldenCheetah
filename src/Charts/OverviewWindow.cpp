@@ -1133,7 +1133,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     }
 }
 
-RPErating::RPErating(Card *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name)
+RPErating::RPErating(Card *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name), hover(false)
 {
     setGeometry(20,20,100,100);
     setZValue(11);
