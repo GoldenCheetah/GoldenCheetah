@@ -118,7 +118,7 @@ class FilterHrvOutliers;
 class FilterHrvOutliersConfig : public DataProcessorConfig
 {
 
-    Q_DECLARE_TR_FUNCTIONS(FilterDerivePowerConfig)
+    Q_DECLARE_TR_FUNCTIONS(FilterHrvOutliersConfig)
 
     friend class ::FilterHrvOutliers;
 protected:
