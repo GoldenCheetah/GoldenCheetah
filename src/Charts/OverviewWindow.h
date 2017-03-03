@@ -81,6 +81,7 @@ class Card : public QGraphicsWidget
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
+            setAcceptHoverEvents(true);
 
             brush = QBrush(GColor(CCARDBACKGROUND));
             setZValue(10);
@@ -98,6 +99,11 @@ class Card : public QGraphicsWidget
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
+
+        // watch mouse enter/leave
+        bool sceneEvent(QEvent *event);
+        bool inCorner();
+        bool underMouse();
 
         // keep track of reuse of xyseries and delete to
         // try and minimise memory leak in Qt Chart
@@ -160,7 +166,8 @@ class Card : public QGraphicsWidget
         // INTERVAL bubble chart
         BubbleViz *bubble;
 
-        QString upper, lower;
+        QString upper, lower, mean;
+        bool up;
         bool showrange;
 
         // which column, sequence and size in rows
@@ -173,6 +180,7 @@ class Card : public QGraphicsWidget
 
         QBrush brush;
         QColor ridecolor;
+        bool incorner;
 
     public slots:
 

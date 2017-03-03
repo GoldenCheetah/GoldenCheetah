@@ -38,6 +38,8 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+static QIcon grayConfig, whiteConfig, accentConfig;
+
 OverviewWindow::OverviewWindow(Context *context) :
     GcChartWindow(context), mode(CONFIG), state(NONE), context(context), group(NULL), _viewY(0),
                             yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
@@ -609,6 +611,7 @@ Card::setData(RideItem *item)
         int offset = 1;
         double min = v;
         double max = v;
+        double sum=0, count=0, avg = 0;
         while(index-offset >=0) { // ultimately go no further back than first ever ride
 
                 // get value from items before me
@@ -631,6 +634,9 @@ Card::setData(RideItem *item)
                     else v = prior->getText(settings.symbol, "").toInt();
                 }
 
+                sum += v;
+                count++;
+
                 // new no zero value
                 if (v) {
                     points<<QPointF(SPARKDAYS-old, v);
@@ -639,6 +645,12 @@ Card::setData(RideItem *item)
                 }
                 offset++;
         }
+
+        if (count) avg = sum / count;
+        else avg = 0;
+
+        // which way up should the arrow be?
+        up = v > avg ? true : false;
 
         // add some space, if only one value +/- 10%
         double diff = (max-min)/10.0f;
@@ -658,9 +670,17 @@ Card::setData(RideItem *item)
         if (units == tr("seconds")) {
             upper = time_to_string(max, true);
             lower = time_to_string(min, true);
+            mean = time_to_string(avg, true);
         } else {
             upper = QString("%1").arg(max);
             lower = QString("%1").arg(min);
+
+            // we need the same precision
+            const RideMetricFactory &factory = RideMetricFactory::instance();
+            const RideMetric *m = factory.rideMetric(settings.symbol);
+
+            if (m) mean = m->toString(parent->context->athlete->useMetricUnits, avg);
+            else mean = QString("%1").arg(avg, 0, 'f', 0);
         }
     }
 
@@ -897,6 +917,52 @@ Card::geometryChanged() {
     }
 }
 
+bool
+Card::sceneEvent(QEvent *event)
+{
+    // repaint when mouse enters and leaves
+    if (event->type() == QEvent::GraphicsSceneHoverLeave ||
+        event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        // force repaint
+        update();
+        scene()->update();
+
+    // repaint when in the corner
+    } else if (event->type() == QEvent::GraphicsSceneHoverMove && inCorner() != incorner) {
+
+        incorner = inCorner();
+        update();
+        scene()->update();
+    }
+    return false;
+}
+
+bool
+Card::inCorner()
+{
+    QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+    QPointF spos = parent->view->mapToScene(vpos);
+
+    if (geometry().contains(spos.x(), spos.y())) {
+        if (spos.y() - geometry().top() < (ROWHEIGHT+40) &&
+            geometry().width() - (spos.x() - geometry().x()) < (ROWHEIGHT+40))
+            return true;
+    }
+    return false;
+
+}
+
+bool
+Card::underMouse()
+{
+    QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+    QPointF spos = parent->view->mapToScene(vpos);
+
+    if (geometry().contains(spos.x(), spos.y())) return true;
+    return false;
+}
+
 // cards need to show they are in config mode
 void
 Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -942,6 +1008,35 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     // only paint contents if not dragging
     if (drag) return;
+
+    // not dragging so we can get to work painting the rest
+    if (parent->state != OverviewWindow::DRAG && underMouse()) {
+
+        if (inCorner()) {
+
+            // if hovering over the button show a background to indicate
+            // that pressing a button is good
+            QPainterPath path;
+            path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
+                                ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
+            painter->setPen(Qt::NoPen);
+            QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
+            painter->setBrush(darkgray);
+            painter->drawPath(path);
+            painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
+            painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, ROWHEIGHT/5, ROWHEIGHT+40, ROWHEIGHT+40-(ROWHEIGHT/5)), QBrush(darkgray));
+
+            // draw the config button and make it more obvious
+            // when hovering over the card
+            painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+
+        } else {
+
+            // hover on card - make it more obvious there is a config button
+            painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+        }
+
+    } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
 
     if (!sparkline && type == META && fieldtype >= 0) {
 
@@ -1000,6 +1095,8 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         painter->setFont(bigfont);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                                  mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
 
         // now units
         if (units != "" && addy > 0) {
@@ -1010,9 +1107,10 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
                                   mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
         }
 
-        // paint the range if the chart is shown
-        if (showrange && sparkline && sparkline->isVisible()) {
+        // paint the range and mean if the chart is shown
+        if (showrange && sparkline) {
 
+            if (sparkline->isVisible()) {
             //sparkline->paint(painter, option, widget);
 
             // in small font max min at top bottom right of chart
@@ -1027,6 +1125,32 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
                                   top - 40 + (fm.ascent() / 2.0f)), upper);
             painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 80,
                                   bottom -40), lower);
+
+
+            painter->setPen(QColor(50,50,50));
+            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(mean) - 80,
+                                  ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
+            }
+
+            // regardless we always show up/down/same
+            QPointF bl = QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f));
+            QRectF trect = fm.tightBoundingRect(value);
+            QRectF trirect(bl.x() + trect.width() + ROWHEIGHT,
+                           bl.y() - trect.height(), trect.height()*0.66f, trect.height());
+
+
+            // trend triangle
+            QPainterPath triangle;
+            painter->setBrush(QBrush(QColor(up ? Qt::darkGreen : Qt::darkRed)));
+            painter->setPen(Qt::NoPen);
+
+            triangle.moveTo(trirect.left(), (trirect.top()+trirect.bottom())/2.0f);
+            triangle.lineTo((trirect.left() + trirect.right()) / 2.0f, up ? trirect.top() : trirect.bottom());
+            triangle.lineTo(trirect.right(), (trirect.top()+trirect.bottom())/2.0f);
+            triangle.lineTo(trirect.left(), (trirect.top()+trirect.bottom())/2.0f);
+
+            painter->drawPath(triangle);
+
         }
     }
 
@@ -1469,9 +1593,9 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     //DIAG painter->drawRect(ylabelspace);
 
     // y-axis title
-    QRectF ytitlespace = QRectF(plotarea.x()-20-(ROWHEIGHT*2), plotarea.y(), ROWHEIGHT, plotarea.height());
-    painter->setPen(Qt::yellow);
-    //DIAG painter->drawRect(ytitlespace);
+    //DIAGQRectF ytitlespace = QRectF(plotarea.x()-20-(ROWHEIGHT*2), plotarea.y(), ROWHEIGHT, plotarea.height());
+    //DIAGpainter->setPen(Qt::yellow);
+    //DIAGpainter->drawRect(ytitlespace);
 
     painter->setPen(QColor(150,150,150));
     painter->setFont(smallfont);
@@ -1814,6 +1938,10 @@ OverviewWindow::updateGeometry()
 void
 OverviewWindow::configChanged(qint32)
 {
+    grayConfig = colouredIconFromPNG(":images/configure.png", GColor(CCARDBACKGROUND).lighter(75));
+    whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
+    accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
+
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
     scene->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
@@ -2067,7 +2195,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
             // ignore other scene elements (e.g. charts)
             if (!cards.contains(card)) card=NULL;
 
-            if (card) {
+            // only respond to clicks not in config corner button
+            if (card && ! card->inCorner()) {
 
                // are we on the boundary of the card?
                double offx = pos.x()-card->geometry().x();
