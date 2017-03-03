@@ -112,6 +112,8 @@ public:
 
     // The actual value of this ride metric, in the units above.
     virtual double value(bool metric) const { return metric ? value_ : (value_ * conversion_ + conversionSum_); }
+    virtual double value(double v, bool metric) const { return metric ? v : (v * conversion_ + conversionSum_); }
+
     // The internal value of this ride metric, useful to cache and then setValue.
     double value() const { return value_; }
 
@@ -141,6 +143,7 @@ public:
 
     // Convert value to string, taking into account metric pref
     virtual QString toString(bool useMetricUnits) const;
+    virtual QString toString(bool useMetricUnits, double value) const;
 
     // Criterium to compare values, overridden by Pace metrics
     // Default just see if it is a RideMetric::Low
