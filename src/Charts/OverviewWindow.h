@@ -191,6 +191,7 @@ class Card : public QGraphicsWidget
 struct BPointF {
     double x,y,z;
     QColor fill;
+    QString label;
 };
 
 // bubble chart, very very basic just a visualisation
@@ -223,10 +224,17 @@ class BubbleViz : public QGraphicsItem
                                                     geom.width(), geom.height());
         }
 
+        // watch hovering
+        bool sceneEvent(QEvent *event);
+
     private:
         Card *parent;
         QRectF geom;
         QString name;
+
+        // where is the cursor?
+        bool hover;
+        QPointF plotpos;
 
         // chart settings
         QList <BPointF> points;
