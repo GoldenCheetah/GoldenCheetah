@@ -829,6 +829,7 @@ Card::setData(RideItem *item)
             add.y = y;
             add.z = z;
             add.fill = interval->color;
+            add.label = interval->name;
             points << add;
 
             if (x<minx) minx=x;
@@ -1466,10 +1467,11 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     }
 }
 
-BubbleViz::BubbleViz(Card *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name)
+BubbleViz::BubbleViz(Card *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name), hover(false)
 {
     setGeometry(20,20,100,100);
     setZValue(11);
+    setAcceptHoverEvents(true);
 }
 
 QVariant BubbleViz::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -1490,6 +1492,34 @@ BubbleViz::setGeometry(double x, double y, double width, double height)
     prepareGeometryChange();
 }
 
+bool
+BubbleViz::sceneEvent(QEvent *event)
+{
+    // skip whilst dragging and resizing
+    if (parent->parent->state != OverviewWindow::NONE) return false;
+
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+       // set value based upon the location of the mouse
+       QPoint vpos = parent->parent->view->mapFromGlobal(QCursor::pos());
+       QPointF pos = parent->parent->view->mapToScene(vpos);
+
+        QRectF canvas= QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height());
+        QRectF plotarea = QRectF(canvas.x() + ROWHEIGHT * 2 + 20, canvas.y()+ROWHEIGHT,
+                             canvas.width() - ROWHEIGHT * 2 - 20 - ROWHEIGHT,
+                             canvas.height() - ROWHEIGHT * 2 - 20 - ROWHEIGHT);
+       if (plotarea.contains(pos)) {
+            plotpos = QPointF(pos.x()-plotarea.x(), pos.y()-plotarea.y());
+            hover=true;
+            update();
+       } else if (hover == true) {
+            hover=false;
+            update();
+       }
+    }
+    return false;
+}
+
 void
 BubbleViz::setPoints(QList<BPointF> points)
 {
@@ -1505,6 +1535,12 @@ BubbleViz::setPoints(QList<BPointF> points)
         count++;
     }
     mean = sum/count;
+}
+
+static double pointDistance(QPointF a, QPointF b)
+{
+    double distance = sqrt(pow(b.x()-a.x(),2) + pow(b.y()-a.y(),2));
+    return distance;
 }
 
 // just draw a rect for now
@@ -1545,11 +1581,16 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->setClipRect(plotarea);
 
     // scale values to plot area
-    double xratio = plotarea.width() / maxx;
-    double yratio = plotarea.height() / maxy;
+    double xratio = plotarea.width() / (maxx*1.03);
+    double yratio = plotarea.height() / (maxy*1.03); // boundary space
 
     // run through each point
     double area = 10000; // max size
+
+    // remember the one we are nearest
+    BPointF nearest;
+    double near=-1;
+
     foreach(BPointF point, points) {
 
         if (point.x < minx || point.x > maxx ||
@@ -1569,6 +1610,18 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         if (size < 600) size=600;
         double radius = sqrt(size/3.1415927f);
         painter->drawEllipse(center, radius, radius);
+
+        // is the cursor hovering over me?
+        double distance;
+        if (hover && (distance=pointDistance(center, plotarea.topLeft()+plotpos)) <= radius) {
+
+            // is this the nearest ?
+            if (near == -1 || distance < near) {
+                nearest = point;
+                near = distance;
+            }
+
+        }
     }
     painter->setBrush(Qt::NoBrush);
 
@@ -1632,6 +1685,52 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->drawText(ylabelspace.right() - bmaxy.width(),  ylabelspace.bottom()-(maxy*yratio) + (bmaxy.height()/2), QString("%1").arg(maxy));
     painter->drawText(ylabelspace.right() - bminy.width(),  ylabelspace.bottom()-(miny*yratio) + (bminy.height()/2), QString("%1").arg(miny));
 
+    // hover point?
+    painter->setPen(GColor(CPLOTMARKER));
+
+    if (hover && near >= 0) {
+
+        painter->setFont(titlefont);
+        QFontMetrics tfm(titlefont);
+
+        // where is it?
+        QPointF center(plotarea.left() + (xratio * nearest.x), plotarea.bottom() - (yratio * nearest.y));
+
+        // xlabel
+        QString xlab = QString("%1").arg(nearest.x, 0, 'f', 0);
+        bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
+        bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
+        painter->fillRect(bminx, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
+        painter->drawText(center.x() - (bminx.width()/2),  xlabelspace.bottom(), xlab);
+
+        // ylabel
+        QString ylab = QString("%1").arg(nearest.y, 0, 'f', 0);
+        bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
+        bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
+        painter->fillRect(bminy, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
+        painter->drawText(ylabelspace.right() - bminy.width(),  center.y() + (bminy.height()/2), ylab);
+
+        // plot marker
+        QPen pen(Qt::NoPen);
+        painter->setPen(pen);
+        painter->setBrush(GColor(CPLOTMARKER));
+
+        // draw  the one we are near with no alpha
+        double size = (nearest.z/mean) * area;
+        if (size > area * 2) size=area*2;
+        if (size < 600) size=600;
+        double radius = sqrt(size/3.1415927f) + 20;
+        painter->drawEllipse(center, radius, radius);
+
+        // clip to card, but happily write all over the title!
+        painter->setClipping(false);
+
+        // now put the label at the top of the canvas
+        painter->setPen(QPen(GColor(CPLOTMARKER)));
+        bminx = tfm.tightBoundingRect(nearest.label);
+        painter->drawText(canvas.center().x()-(bminx.width()/2.0f),
+                          canvas.top()+bminx.height()-10, nearest.label);
+    }
 
     painter->restore();
 }
