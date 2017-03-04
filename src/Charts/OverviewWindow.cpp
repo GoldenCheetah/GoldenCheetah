@@ -634,11 +634,11 @@ Card::setData(RideItem *item)
                     else v = prior->getText(settings.symbol, "").toInt();
                 }
 
-                sum += v;
-                count++;
-
                 // new no zero value
                 if (v) {
+                    sum += v;
+                    count++;
+
                     points<<QPointF(SPARKDAYS-old, v);
                     if (v < min) min = v;
                     if (v > max) max = v;
