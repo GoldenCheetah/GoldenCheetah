@@ -56,61 +56,64 @@ void FilterHrv(XDataSeries *rr, double rr_min, double rr_max, double filt, int h
                 }
         }
 
-    // Initialize R-R sum for the value in the window around
-    // current value.
-    for (int idx=0; idx < hwin; idx++)
+    if (n>2*hwin)
         {
-            if (rr->datapoints[idx]->number[1] == 1)
+            // Initialize R-R sum for the value in the window around
+            // current value.
+            for (int idx=0; idx < hwin; idx++)
                 {
-                    sum += rr->datapoints[idx]->number[0];
-                    win++;
-                }
-        }
-    win--;
-
-    for (int idx=0; idx < n; idx++)
-        {
-
-            // Append new values to the window
-            if (idx_lead < n && rr->datapoints[idx_lead]->number[1] == 1)
-                {
-                    sum += rr->datapoints[idx_lead]->number[0];
-                    win++;
-                }
-            // Remove trailing values from the window
-            if (idx_lag >= 0 && rr->datapoints[idx_lag]->number[1] >= 0)
-                {
-                    sum -= rr->datapoints[idx_lag]->number[0];
-                    win--;
-                }
-
-            // Flag values which are outside +- (filt * 100) percent
-            // of the average value in a window around current value
-            // with 0.
-            if (rr->datapoints[idx]->number[1] == 1)
-                {
-                    // Don't include current when calculating average.
-                    sum -= rr->datapoints[idx]->number[0];
-
-                    average = sum / win;
-                    filtlim = filt * average;
-
-                    if (rr->datapoints[idx]->number[0] <= average + filtlim &&
-                        rr->datapoints[idx]->number[0] >= average - filtlim)
+                    if (rr->datapoints[idx]->number[1] == 1)
                         {
-                            rr->datapoints[idx]->number[1] = 1;
+                            sum += rr->datapoints[idx]->number[0];
+                            win++;
                         }
-                    else
+                }
+            win--;
+
+            for (int idx=0; idx < n; idx++)
+                {
+
+                    // Append new values to the window
+                    if (idx_lead < n && rr->datapoints[idx_lead]->number[1] == 1)
                         {
-                            rr->datapoints[idx]->number[1] = 0;
+                            sum += rr->datapoints[idx_lead]->number[0];
+                            win++;
+                        }
+                    // Remove trailing values from the window
+                    if (idx_lag >= 0 && rr->datapoints[idx_lag]->number[1] >= 0)
+                        {
+                            sum -= rr->datapoints[idx_lag]->number[0];
+                            win--;
                         }
 
-                    // Add current value to the window
-                    sum += rr->datapoints[idx]->number[0];
-                }
+                    // Flag values which are outside +- (filt * 100) percent
+                    // of the average value in a window around current value
+                    // with 0.
+                    if (rr->datapoints[idx]->number[1] == 1)
+                        {
+                            // Don't include current when calculating average.
+                            sum -= rr->datapoints[idx]->number[0];
 
-            idx_lead++;
-            idx_lag++;
+                            average = sum / win;
+                            filtlim = filt * average;
+
+                            if (rr->datapoints[idx]->number[0] <= average + filtlim &&
+                                rr->datapoints[idx]->number[0] >= average - filtlim)
+                                {
+                                    rr->datapoints[idx]->number[1] = 1;
+                                }
+                            else
+                                {
+                                    rr->datapoints[idx]->number[1] = 0;
+                                }
+
+                            // Add current value to the window
+                            sum += rr->datapoints[idx]->number[0];
+                        }
+
+                    idx_lead++;
+                    idx_lag++;
+                }
         }
 }
 
