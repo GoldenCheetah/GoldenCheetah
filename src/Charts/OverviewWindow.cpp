@@ -920,6 +920,9 @@ Card::geometryChanged() {
 bool
 Card::sceneEvent(QEvent *event)
 {
+    // skip whilst dragging and resizing
+    if (parent->state != OverviewWindow::NONE) return false;
+
     // repaint when mouse enters and leaves
     if (event->type() == QEvent::GraphicsSceneHoverLeave ||
         event->type() == QEvent::GraphicsSceneHoverEnter) {
@@ -1327,6 +1330,9 @@ RPErating::setGeometry(double x, double y, double width, double height)
 bool
 RPErating::sceneEvent(QEvent *event)
 {
+    // skip whilst dragging and resizing
+    if (parent->parent->state != OverviewWindow::NONE) return false;
+
     if (event->type() == QEvent::GraphicsSceneHoverMove) {
 
         if (hover) {
@@ -2341,6 +2347,9 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
         } else if (mode == CONFIG && state == DRAG && !scrolling) {          // dragging?
 
+            // whilst mouse moves, only update geom when changed
+            bool changed = false;
+
             // move the card being dragged
             stateData.drag.card->setPos(pos.x()-stateData.drag.offx, pos.y()-stateData.drag.offy);
 
@@ -2360,8 +2369,10 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.drag.card->column = over->column;
                     stateData.drag.card->order = over->order+1;
                     for(int i=cards.indexOf(over); i< cards.count(); i++) {
-                        if (i>=0 && cards[i]->column == over->column && cards[i]->order > over->order && cards[i] != stateData.drag.card)
+                        if (i>=0 && cards[i]->column == over->column && cards[i]->order > over->order && cards[i] != stateData.drag.card) {
                             cards[i]->order += 1;
+                            changed = true;
+                        }
                     }
 
                 } else {
@@ -2370,11 +2381,13 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                     stateData.drag.card->column = over->column;
                     stateData.drag.card->order = over->order;
                     for(int i=0; i< cards.count(); i++) {
-                        if (i>=0 && cards[i]->column == over->column && cards[i]->order >= (over->order) && cards[i] != stateData.drag.card)
+                        if (i>=0 && cards[i]->column == over->column && cards[i]->order >= (over->order) && cards[i] != stateData.drag.card) {
                             cards[i]->order += 1;
+                            changed = true;
+                        }
                     }
-
                 }
+
             } else {
 
                 // columns are now variable width
@@ -2402,6 +2415,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                         // shift columns widths to the right
                         for(int i=9; i>0; i--) columns[i] = columns[i-1];
                         columns[0] = stateData.drag.width;
+
+                        changed = true;
                     }
 
                 } else if (cards.last()->column < 9 && cards.last() && cards.last()->column < targetcol) {
@@ -2412,6 +2427,8 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
                     // make column width same as source width
                     columns[stateData.drag.card->column] = stateData.drag.width;
+
+                    changed = true;
 
                 } else {
 
@@ -2426,12 +2443,17 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
                         stateData.drag.card->column = targetcol;
                         stateData.drag.card->order = cards[last]->order+1;
                     }
+
+                    changed = true;
                 }
+
             }
 
-            // drop it down
-            updateGeometry();
-            updateView();
+            if (changed) {
+                // drop it down
+                updateGeometry();
+                updateView();
+            }
 
         } else if (mode == CONFIG && state == YRESIZE) {
 
