@@ -168,37 +168,37 @@ OverviewWindow::setConfiguration(QString config)
         // XXX lets hack in some tiles to start (will load from config later) XXX
 
         // column 0
-        newCard("PMC", 0, 0, 9, Card::PMC, "coggan_tss");
-        newCard("Sport", 0, 1, 5, Card::META, "Sport");
-        newCard("Workout Code", 0, 2, 5, Card::META, "Workout Code");
-        newCard("Duration", 0, 3, 9, Card::METRIC, "workout_time");
-        newCard("Notes", 0, 4, 13, Card::META, "Notes");
+        newCard(tr("PMC"), 0, 0, 9, Card::PMC, "coggan_tss");
+        newCard(tr("Sport"), 0, 1, 5, Card::META, "Sport");
+        newCard(tr("Workout Code"), 0, 2, 5, Card::META, "Workout Code");
+        newCard(tr("Duration"), 0, 3, 9, Card::METRIC, "workout_time");
+        newCard(tr("Notes"), 0, 4, 13, Card::META, "Notes");
 
         // column 1
-        newCard("HRV", 1, 0, 9, Card::METRIC, "rMSSD");
-        newCard("Heartrate", 1, 1, 5, Card::METRIC, "average_hr");
-        newCard("Heartrate Zones", 1, 2, 11, Card::ZONE, RideFile::hr);
-        newCard("Climbing", 1, 3, 5, Card::METRIC, "elevation_gain");
-        newCard("Cadence", 1, 4, 5, Card::METRIC, "average_cad");
-        newCard("Equivalent Power", 1, 5, 5, Card::METRIC, "coggan_np");
+        newCard(tr("HRV"), 1, 0, 9, Card::METRIC, "rMSSD");
+        newCard(tr("Heartrate"), 1, 1, 5, Card::METRIC, "average_hr");
+        newCard(tr("Heartrate Zones"), 1, 2, 11, Card::ZONE, RideFile::hr);
+        newCard(tr("Climbing"), 1, 3, 5, Card::METRIC, "elevation_gain");
+        newCard(tr("Cadence"), 1, 4, 5, Card::METRIC, "average_cad");
+        newCard(tr("Equivalent Power"), 1, 5, 5, Card::METRIC, "coggan_np");
 
         // column 2
-        newCard("RPE", 2, 0, 9, Card::RPE);
-        newCard("Stress", 2, 1, 5, Card::METRIC, "coggan_tss");
-        newCard("Fatigue Zones", 2, 2, 11, Card::ZONE, RideFile::wbal);
-        newCard("Intervals", 2, 3, 17, Card::INTERVAL, "elapsed_time", "average_power", "workout_time");
+        newCard(tr("RPE"), 2, 0, 9, Card::RPE);
+        newCard(tr("Stress"), 2, 1, 5, Card::METRIC, "coggan_tss");
+        newCard(tr("Fatigue Zones"), 2, 2, 11, Card::ZONE, RideFile::wbal);
+        newCard(tr("Intervals"), 2, 3, 17, Card::INTERVAL, "elapsed_time", "average_power", "workout_time");
 
         // column 3
-        newCard("Intensity", 3, 0, 9, Card::METRIC, "coggan_if");
-        newCard("Power", 3, 1, 5, Card::METRIC, "average_power");
-        newCard("Power Zones", 3, 2, 11, Card::ZONE, RideFile::watts);
-        newCard("Power Model", 3, 3, 17);
+        newCard(tr("Intensity"), 3, 0, 9, Card::METRIC, "coggan_if");
+        newCard(tr("Power"), 3, 1, 5, Card::METRIC, "average_power");
+        newCard(tr("Power Zones"), 3, 2, 11, Card::ZONE, RideFile::watts);
+        newCard(tr("Power Model"), 3, 3, 17);
 
         // column 4
-        newCard("Distance", 4, 0, 9, Card::METRIC, "total_distance");
-        newCard("Speed", 4, 1, 5, Card::METRIC, "average_speed");
-        newCard("Pace Zones", 4, 2, 11, Card::ZONE, RideFile::kph);
-        newCard("Route", 4, 3, 17, Card::ROUTE);
+        newCard(tr("Distance"), 4, 0, 9, Card::METRIC, "total_distance");
+        newCard(tr("Speed"), 4, 1, 5, Card::METRIC, "average_speed");
+        newCard(tr("Pace Zones"), 4, 2, 11, Card::ZONE, RideFile::kph);
+        newCard(tr("Route"), 4, 3, 17, Card::ROUTE);
 
         updateGeometry();
         return;
@@ -1176,9 +1176,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         //
         painter->setPen(QColor(200,200,200));
         painter->setFont(titlefont);
-        QString string = QString("Form");
+        QString string = QString(tr("Form"));
         QRectF rect = tfm.boundingRect(string);
-        painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+        painter->drawText(QPointF(ROWHEIGHT / 2.0f,
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
@@ -1197,9 +1197,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
             painter->setPen(QColor(200,200,200));
             painter->setFont(titlefont);
-            QString string = QString("Fitness");
+            QString string = QString(tr("Fitness"));
             QRectF rect = tfm.boundingRect(string);
-            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+            painter->drawText(QPointF(ROWHEIGHT / 2.0f,
                                       nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
             nexty += rect.height() + 30;
 
@@ -1220,9 +1220,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
             painter->setPen(QColor(200,200,200));
             painter->setFont(titlefont);
-            QString string = QString("Fatigue");
+            QString string = QString(tr("Fatigue"));
             QRectF rect = tfm.boundingRect(string);
-            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+            painter->drawText(QPointF(ROWHEIGHT / 2.0f,
                                       nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
             nexty += rect.height() + 30;
 
@@ -1243,9 +1243,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
             painter->setPen(QColor(200,200,200));
             painter->setFont(titlefont);
-            QString string = QString("Risk");
+            QString string = QString(tr("Risk"));
             QRectF rect = tfm.boundingRect(string);
-            painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+            painter->drawText(QPointF(ROWHEIGHT / 2.0f,
                                       nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
             nexty += rect.height() + 30;
 
@@ -1269,17 +1269,17 @@ RPErating::RPErating(Card *parent, QString name) : QGraphicsItem(NULL), parent(p
 }
 
 static QString FosterDesc[11]={
-    "Rest", // 0
-    "Very, very easy", // 1
-    "Easy", // 2
-    "Moderate", // 3
-    "Somewhat hard", // 4
-    "Hard", // 5
-    "Hard+", // 6
-    "Very hard", // 7
-    "Very hard+", // 8
-    "Very hard++", // 9
-    "Maximum"// 10
+    QObject::tr("Rest"), // 0
+    QObject::tr("Very, very easy"), // 1
+    QObject::tr("Easy"), // 2
+    QObject::tr("Moderate"), // 3
+    QObject::tr("Somewhat hard"), // 4
+    QObject::tr("Hard"), // 5
+    QObject::tr("Hard+"), // 6
+    QObject::tr("Very hard"), // 7
+    QObject::tr("Very hard+"), // 8
+    QObject::tr("Very hard++"), // 9
+    QObject::tr("Maximum")// 10
 };
 
 static QColor FosterColors[11]={
@@ -1303,7 +1303,7 @@ RPErating::setValue(QString value)
     int v = value.toInt();
     if (v <0 || v>10) {
         color = GColor(CPLOTMARKER);
-        description = "Invalid";
+        description = QObject::tr("Invalid");
     } else {
         description = FosterDesc[v];
         color = FosterColors[v];
