@@ -32,16 +32,34 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
 {
   QString section = NULL;
   bool haveExercise=false;
+  bool useISO8859;
 
   int lineno = 1;
+  int nrows = 12;
+  int ntextrows = 5;
 
   // file.open(QFile::ReadOnly)
-  if (!file.open(QFile::ReadOnly)) {
-    errors << ("Could not open pdd file: \""
-	       + file.fileName() + "\"");
-    return false;
+  if (file.open(QFile::ReadOnly)) {
+      // Read the entire file into a QString -- we avoid using fopen since it
+      // doesn't handle foreign characters well. Instead we use QFile and parse
+      // from a QString
+      QString contents;
+      QTextStream in(&file);
+      in.setCodec("UTF-8");
+      contents = in.readAll();
+      file.close();
+      // check if the text string contains the replacement character for UTF-8 encoding
+      // if yes, try to read with Latin1/ISO 8859-1
+      useISO8859 = contents.contains(QChar::ReplacementCharacter);
+  } else {
+      errors << ("Could not open pdd file: \""
+                 + file.fileName() + "\"");
+      return false;
   }
+  file.open(QFile::ReadOnly);
   QTextStream is(&file);
+  if (useISO8859)
+      is.setCodec ("ISO 8859-1");
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
@@ -70,7 +88,12 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
 
         if (haveExercise)
             {
-                if (lineno > 25 && lineno <= 27)
+                if (lineno == 1)
+                    {
+                        nrows = line.section('\t', 2, 2).toInt();
+                        ntextrows = line.section('\t', 4, 4).toInt();
+                    }
+                else if (lineno > (nrows+1) && lineno <= (nrows+3))
                     {
                         comment += QString(line + "\n");
                     }
@@ -92,19 +115,19 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
                                 break;
                             }
                     }
-                else if (lineno == 28)
+                else if (lineno == (nrows+4))
                     {
                         hrmFile.replace(0, hrmFile.length(), line);
                     }
-                else if (lineno == 31)
+                else if (lineno == (nrows+7))
                     {
                         gpxFile.replace(0, gpxFile.length(), line);
                     }
-                else if (lineno == 32)
+                else if (lineno == (nrows+8))
                     {
                         hrvFile.replace(0, hrvFile.length(), line);
                     }
-                if (lineno > 32 && (hrmFile == hrmFileCompare || hrvFile == hrmFileCompare))
+                if (lineno == (nrows+ntextrows) && (hrmFile == hrmFileCompare || hrvFile == hrmFileCompare))
                     {
                         file.close();
                         return true;
@@ -128,6 +151,7 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
   QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
   bool metric = true;
+  bool useISO8859;
 
   QDate date;
 
@@ -159,12 +183,28 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   double hrv_time=0;
   QList<double> intervals;
 
-  if (!file.open(QFile::ReadOnly)) {
+  if (file.open(QFile::ReadOnly)) {
+      // Read the entire file into a QString -- we avoid using fopen since it
+      // doesn't handle foreign characters well. Instead we use QFile and parse
+      // from a QString
+      QString contents;
+      QTextStream in(&file);
+      in.setCodec("UTF-8");
+      contents = in.readAll();
+      file.close();
+      // check if the text string contains the replacement character for UTF-8 encoding
+      // if yes, try to read with Latin1/ISO 8859-1
+      useISO8859 = contents.contains(QChar::ReplacementCharacter);
+  } else {
+
     errors << ("Could not open ride file: \""
 	       + file.fileName() + "\"");
     return;
   }
+  file.open(QFile::ReadOnly);
   QTextStream is(&file);
+  if (useISO8859)
+      is.setCodec ("ISO 8859-1");
   QString section = NULL;
 
   if (haveGPX)
