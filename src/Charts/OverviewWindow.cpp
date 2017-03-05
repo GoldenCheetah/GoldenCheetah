@@ -1589,7 +1589,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     // remember the one we are nearest
     BPointF nearest;
-    double near=-1;
+    double nearvalue = -1;
 
     foreach(BPointF point, points) {
 
@@ -1616,9 +1616,9 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         if (hover && (distance=pointDistance(center, plotarea.topLeft()+plotpos)) <= radius) {
 
             // is this the nearest ?
-            if (near == -1 || distance < near) {
+            if (nearvalue == -1 || distance < nearvalue) {
                 nearest = point;
-                near = distance;
+                nearvalue = distance;
             }
 
         }
@@ -1688,7 +1688,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     // hover point?
     painter->setPen(GColor(CPLOTMARKER));
 
-    if (hover && near >= 0) {
+    if (hover && nearvalue >= 0) {
 
         painter->setFont(titlefont);
         QFontMetrics tfm(titlefont);
