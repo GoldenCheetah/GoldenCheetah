@@ -1467,11 +1467,38 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     }
 }
 
+double BPointF::score(BPointF &other)
+{
+    // match score
+    // 100 * n characters that match in label
+    // +1000 if color same (class)
+    // -(10 * sizediff) size important
+    double score = 0;
+
+    // must be the same class
+    if (fill != other.fill) return 0;
+    else score += 1000;
+
+    for(int i=0; i<label.length() && i<other.label.length(); i++) {
+        if (label[i] == other.label[i]) score += 100;
+        else break;
+    }
+
+    // size?
+    double diff = fabs(z-other.z);
+    if (diff == 0) score += 1000;
+    else score += (z/fabs(z - other.z));
+
+    // for now ..
+    return score;
+}
+
 BubbleViz::BubbleViz(Card *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name), hover(false)
 {
     setGeometry(20,20,100,100);
     setZValue(11);
     setAcceptHoverEvents(true);
+    animator=new QPropertyAnimation(this, "transition");
 }
 
 QVariant BubbleViz::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -1523,6 +1550,9 @@ BubbleViz::sceneEvent(QEvent *event)
 void
 BubbleViz::setPoints(QList<BPointF> points)
 {
+    oldpoints = this->points;
+    oldmean = mean;
+
     this->points=points;
     double sum=0, count=0;
     foreach(BPointF point, points) {
@@ -1535,6 +1565,39 @@ BubbleViz::setPoints(QList<BPointF> points)
         count++;
     }
     mean = sum/count;
+
+    // so now we need to setup a transition
+    // we match the oldpoints to the new points by scoring
+    QList<BPointF> matches;
+    int matched=0;
+
+    // for each of the new points find a match in old points
+    foreach(BPointF newpoint, points) {
+        double best = 0;
+        int index=-1;
+        for(int i=0; i<oldpoints.count(); i++) {
+            double score = newpoint.score(oldpoints[i]);
+            if (score > best) {
+                best = score;
+                index = i;
+            }
+        }
+        // take best match, slowly swindling them down
+        if (index >=0) { matched++; matches << oldpoints.takeAt(index); }
+        else matches << BPointF(); // no decent match found
+    }
+
+    // clean up
+    if (oldpoints.count()) matches << oldpoints;
+    oldpoints = matches;
+
+    // stop any transition animation currently running
+    animator->stop();
+    animator->setStartValue(0);
+    animator->setEndValue(256);
+    animator->setEasingCurve(QEasingCurve::OutQuad);
+    animator->setDuration(1000);
+    animator->start();
 }
 
 static double pointDistance(QPointF a, QPointF b)
@@ -1584,6 +1647,10 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     double xratio = plotarea.width() / (maxx*1.03);
     double yratio = plotarea.height() / (maxy*1.03); // boundary space
 
+    // old values when transitioning
+    double oxratio = plotarea.width() / (oldmaxx*1.03);
+    double oyratio = plotarea.height() / (oldmaxy*1.03); // boundary space
+
     // run through each point
     double area = 10000; // max size
 
@@ -1591,21 +1658,47 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     BPointF nearest;
     double nearvalue = -1;
 
+    int index=0;
     foreach(BPointF point, points) {
 
         if (point.x < minx || point.x > maxx ||
             point.y < miny || point.y > maxy ||
-            !std::isfinite(point.z) || std::isnan(point.z)) continue;
+            !std::isfinite(point.z) || std::isnan(point.z)) {
+            index++;
+            continue;
+        }
 
-        QPointF center(plotarea.left() + (xratio * point.x),
-                       plotarea.bottom() - (yratio * point.y));
+        // resize if transitioning
+        QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
+        double z = point.z;
+        int alpha = 200;
+
+        if (transition < 256 && oldpoints.count()) {
+            if (oldpoints[index].x != 0 || oldpoints[index].y != 0) {
+                // where it was
+                QPointF oldcenter = QPointF(plotarea.left() + (oxratio * oldpoints[index].x),
+                                            plotarea.bottom() - (oyratio * oldpoints[index].y));
+
+                // transition to new point
+                center.setX(center.x() - (double(255-transition) * ((center.x()-oldcenter.x())/255.0f)));
+                center.setY(center.y() - (double(255-transition) * ((center.y()-oldcenter.y())/255.0f)));
+                z = z - (double(255-transition) * ((z-oldpoints[index].z)/255.0f));
+
+            } else {
+                // just make it appear
+                alpha = (200.0f/255.0f) * transition;
+            }
+        }
+
+        // once transitioned clear them away
+        if (transition == 256 && oldpoints.count()) oldpoints.clear();
 
         QColor color = point.fill;
-        color.setAlpha(200);
+        color.setAlpha(alpha);
         painter->setBrush(color);
         painter->setPen(QColor(150,150,150));
 
-        double size = (point.z/mean) * area;
+        double size = (z/mean) * area;
         if (size > area * 2) size=area*2;
         if (size < 600) size=600;
         double radius = sqrt(size/3.1415927f);
@@ -1613,7 +1706,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         // is the cursor hovering over me?
         double distance;
-        if (hover && (distance=pointDistance(center, plotarea.topLeft()+plotpos)) <= radius) {
+        if (transition == 256 && hover && (distance=pointDistance(center, plotarea.topLeft()+plotpos)) <= radius) {
 
             // is this the nearest ?
             if (nearvalue == -1 || distance < nearvalue) {
@@ -1622,7 +1715,30 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
             }
 
         }
+        index++;
     }
+
+    // if we're transitioning
+    while (transition < 256 && index < oldpoints.count()) {
+       QPointF oldcenter = QPointF(plotarea.left() + (oxratio * oldpoints[index].x),
+                                   plotarea.bottom() - (oyratio * oldpoints[index].y));
+
+        // fade out
+        QColor color = oldpoints[index].fill;
+        color.setAlpha(200 - (200.0f/255.0f) * double(transition));
+        painter->setBrush(color);
+        painter->setPen(Qt::NoPen);
+
+        double size = (oldpoints[index].z/oldmean) * area;
+        if (size > area * 2) size=area*2;
+        if (size < 600) size=600;
+        double radius = sqrt(size/3.1415927f);
+        painter->drawEllipse(oldcenter, radius, radius);
+
+        // hide the old ones
+        index++;
+    }
+
     painter->setBrush(Qt::NoBrush);
 
     // clip to canvas

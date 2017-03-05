@@ -188,15 +188,28 @@ class Card : public QGraphicsWidget
 };
 
 // for now the basics are x and y and a radius z, color fill
-struct BPointF {
+class BPointF {
+public:
+
+    BPointF() : x(0), y(0), z(0), fill(GColor(Qt::gray)) {}
+
+    double score(BPointF &other);
+
     double x,y,z;
     QColor fill;
     QString label;
 };
 
+
 // bubble chart, very very basic just a visualisation
-class BubbleViz : public QGraphicsItem
+class BubbleViz : public QObject, public QGraphicsItem
 {
+    // need to be a qobject for metaproperties
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
+    // want a meta property for property animation
+    Q_PROPERTY(int transition READ getTransition WRITE setTransition)
 
     public:
         BubbleViz(Card *parent, QString name=""); // create and say how many days
@@ -205,10 +218,18 @@ class BubbleViz : public QGraphicsItem
         void setGeometry(double x, double y, double width, double height);
         QRectF geometry() { return geom; }
 
+        // transition animation 0-255
+        int getTransition() const {return transition;}
+        void setTransition(int x) { transition=x; update(); }
+
         // null members for now just get hooked up
         void setPoints(QList<BPointF>points);
 
         void setRange(double minx, double maxx, double miny, double maxy) {
+            oldminx = this->minx;
+            oldminy = this->miny;
+            oldmaxx = this->maxx;
+            oldmaxy = this->maxy;
             this->minx=minx;
             this->maxx=maxx;
             this->miny=miny;
@@ -235,6 +256,13 @@ class BubbleViz : public QGraphicsItem
         // where is the cursor?
         bool hover;
         QPointF plotpos;
+
+        // for animated transition
+        QList <BPointF> oldpoints; // for animation
+        int transition;
+        double oldmean;
+        double oldminx,oldmaxx,oldminy,oldmaxy;
+        QPropertyAnimation *animator;
 
         // chart settings
         QList <BPointF> points;
