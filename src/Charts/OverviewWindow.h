@@ -220,7 +220,7 @@ class BubbleViz : public QObject, public QGraphicsItem
 
         // transition animation 0-255
         int getTransition() const {return transition;}
-        void setTransition(int x) { transition=x; update(); }
+        void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
         // null members for now just get hooked up
         void setPoints(QList<BPointF>points);
