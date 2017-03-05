@@ -1479,6 +1479,9 @@ double BPointF::score(BPointF &other)
     if (fill != other.fill) return 0;
     else score += 1000;
 
+    // oh, this is a peach
+    if (label == other.label) return 10000;
+
     for(int i=0; i<label.length() && i<other.label.length(); i++) {
         if (label[i] == other.label[i]) score += 100;
         else break;
