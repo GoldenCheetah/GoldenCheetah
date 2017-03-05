@@ -1554,7 +1554,7 @@ void
 BubbleViz::setPoints(QList<BPointF> points)
 {
     oldpoints = this->points;
-    oldmean = mean;
+    oldmean = this->mean;
 
     this->points=points;
     double sum=0, count=0;
@@ -1673,8 +1673,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         // resize if transitioning
         QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
-        double z = point.z;
         int alpha = 200;
+
+        double size = (point.z / mean) * area;
+        if (size > area * 6) size=area*6;
+        if (size < 600) size=600;
 
         if (transition < 256 && oldpoints.count()) {
             if (oldpoints[index].x != 0 || oldpoints[index].y != 0) {
@@ -1685,7 +1688,12 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
                 // transition to new point
                 center.setX(center.x() - (double(255-transition) * ((center.x()-oldcenter.x())/255.0f)));
                 center.setY(center.y() - (double(255-transition) * ((center.y()-oldcenter.y())/255.0f)));
-                z = z - (double(255-transition) * ((z-oldpoints[index].z)/255.0f));
+
+                // transition bubble size
+                double oldsize = (oldpoints[index].z / oldmean) * area;
+                if (oldsize > area * 6) oldsize=area*6;
+                if (oldsize < 600) oldsize=600;
+                size = size - (double(255-transition) * ((size-oldsize)/255.0f));
 
             } else {
                 // just make it appear
@@ -1701,9 +1709,6 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->setBrush(color);
         painter->setPen(QColor(150,150,150));
 
-        double size = (z/mean) * area;
-        if (size > area * 2) size=area*2;
-        if (size < 600) size=600;
         double radius = sqrt(size/3.1415927f);
         painter->drawEllipse(center, radius, radius);
 
@@ -1733,7 +1738,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->setPen(Qt::NoPen);
 
         double size = (oldpoints[index].z/oldmean) * area;
-        if (size > area * 2) size=area*2;
+        if (size > area * 6) size=area*6;
         if (size < 600) size=600;
         double radius = sqrt(size/3.1415927f);
         painter->drawEllipse(oldcenter, radius, radius);
