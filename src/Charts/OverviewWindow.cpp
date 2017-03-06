@@ -1551,19 +1551,20 @@ BubbleViz::sceneEvent(QEvent *event)
 }
 
 void
-BubbleViz::setPoints(QList<BPointF> points)
+BubbleViz::setPoints(QList<BPointF> p)
 {
     oldpoints = this->points;
     oldmean = this->mean;
 
-    this->points=points;
     double sum=0, count=0;
-    foreach(BPointF point, points) {
+    this->points.clear();
+    foreach(BPointF point, p) {
 
-        if (point.x < minx || point.x > maxx ||
-            point.y < miny || point.y > maxy ||
-            !std::isfinite(point.z) || std::isnan(point.z)) continue;
+        if (point.x < minx || point.x > maxx || !std::isfinite(point.x) || std::isnan(point.x) || point.x == 0 ||
+            point.y < miny || point.y > maxy || !std::isfinite(point.y) || std::isnan(point.y) || point.y == 0 ||
+            point.z == 0 || !std::isfinite(point.z) || std::isnan(point.z)) continue;
 
+        this->points << point;
         sum += point.z;
         count++;
     }
