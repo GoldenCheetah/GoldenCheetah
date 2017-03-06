@@ -1842,7 +1842,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         // draw  the one we are near with no alpha
         double size = (nearest.z/mean) * area;
-        if (size > area * 2) size=area*2;
+        if (size > area * 6) size=area*6;
         if (size < 600) size=600;
         double radius = sqrt(size/3.1415927f) + 20;
         painter->drawEllipse(center, radius, radius);
