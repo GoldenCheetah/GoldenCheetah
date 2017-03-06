@@ -1941,6 +1941,7 @@ Routeline::Routeline(QGraphicsWidget *parent, QString name) : QGraphicsItem(NULL
 {
     setGeometry(20,20,100,100);
     setZValue(11);
+    animator=new QPropertyAnimation(this, "transition");
 }
 
 void
@@ -1951,6 +1952,9 @@ Routeline::setData(RideItem *item)
         path = QPainterPath();
         return;
     }
+    oldpath = path;
+    owidth = width;
+    oheight = height;
 
     // step 1 normalise the points
 
@@ -1988,6 +1992,7 @@ Routeline::setData(RideItem *item)
 
     // create a painterpath that uses a 1x1 aspect ratio
     // based upon the GPS co-ords
+    int div = item->ride()->dataPoints().count() / ROUTEPOINTS;
     int count=0;
     height = geom.width() * aspectratio;
     int lines=0;
@@ -1998,7 +2003,7 @@ Routeline::setData(RideItem *item)
             p->lon < -180 || p->lon > 180 ||
             p->lat < -90 || p->lat > 90) continue;
 
-        // filter out most of the points, one per minute
+        // filter out most of the points so we end up with ROUTEPOINTS points
         if (--count < 0) { // first
 
             //path.moveTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
@@ -2006,7 +2011,7 @@ Routeline::setData(RideItem *item)
 
             path.moveTo((geom.width() / (xdiff / (p->lon - minlon))),
                         (height-(height / (ydiff / (p->lat - minlat)))));
-            count=60;
+            count=div;
 
         } else if (count == 0) {
 
@@ -2014,10 +2019,22 @@ Routeline::setData(RideItem *item)
             //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
             path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
                         (height-(height / (ydiff / (p->lat - minlat)))));
-            count=60;
+            count=div;
             lines++;
 
         }
+    }
+
+    // if we have a transition
+    animator->stop();
+    if (oldpath.elementCount()) {
+        animator->setStartValue(0);
+        animator->setEndValue(256);
+        animator->setEasingCurve(QEasingCurve::OutQuad);
+        animator->setDuration(1000);
+        animator->start();
+    } else {
+        transition = 256;
     }
 }
 
@@ -2042,24 +2059,62 @@ Routeline::setGeometry(double x, double y, double width, double height)
 void
 Routeline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
+    painter->save();
+
     QPen pen(QColor(150,150,150));
     painter->setPen(pen);
 
     // draw the route, but scale it to fit what we have
     double scale = geom.width() / width;
+    double oscale = geom.width() / width;
     if (height * scale > geom.height())  scale = geom.height() / height;
+    if (oheight * oscale > geom.height())  oscale = geom.height() / oheight;
+
+    // set clipping before we translate!
+    painter->setClipRect(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(), geom.height());
 
     // and center it too
     double midx=scale*width/2;
     double midy=scale*height/2;
-    painter->translate(QPointF(boundingRect().x() + ((geom.width()/2)-midx),
-                               boundingRect().y()+((geom.height()/2)-midy)));
+    double omidx=oscale*owidth/2;
+    double omidy=oscale*oheight/2;
+    QPointF translate(boundingRect().x() + ((geom.width()/2)-midx),
+                               boundingRect().y()+((geom.height()/2)-midy));
+
+    QPointF otranslate(boundingRect().x() + ((geom.width()/2)-omidx),
+                       boundingRect().y()+((geom.height()/2)-omidy));
+    painter->translate(translate);
 
     // set painter scale - and keep original aspect ratio
     painter->scale(scale,scale);
     pen.setWidth(20.0f);
     painter->setPen(pen);
-    painter->drawPath(path);
+
+
+    // silly little animated morph from old to new
+    if(transition < 256) {
+        // transition!
+        QPainterPath tpath;
+        for(int i=0; i<path.elementCount(); i++) {
+
+            // get co-ords - use last over and over if different sizes
+            int n=0;
+            if (i < oldpath.elementCount()) n=i;
+            else n = oldpath.elementCount()-1;
+
+            double x1=((oldpath.elementAt(n).x - translate.x() + otranslate.x()) / scale) * oscale;
+            double y1=((oldpath.elementAt(n).y - translate.y() + otranslate.y()) / scale) * oscale;
+            double x2=path.elementAt(i).x;
+            double y2=path.elementAt(i).y;
+
+            if (!i) tpath.moveTo(x1 + ((x2-x1)/255.0f) * double(transition), y1 + ((y2-y1)/255.0f) * double(transition));
+            else tpath.lineTo(x1 + ((x2-x1)/255.0f) * double(transition), y1 + ((y2-y1)/255.0f) * double(transition));
+        }
+        painter->drawPath(tpath);
+    } else {
+        painter->drawPath(path);
+    }
+    painter->restore();
     return;
 }
 

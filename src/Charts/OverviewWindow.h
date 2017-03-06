@@ -58,6 +58,9 @@
 // sparklines number of points - look back 6 weeks
 #define SPARKDAYS 42
 
+// number of points in a route viz - trial and error gets 250 being reasonable
+#define ROUTEPOINTS 250
+
 class OverviewWindow;
 class Sparkline;
 class Routeline;
@@ -341,10 +344,19 @@ class Sparkline : public QGraphicsItem
 };
 
 // visualisation of a GPS route as a shape
-class Routeline : public QGraphicsItem
+class Routeline : public QObject, public QGraphicsItem
 {
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
+    Q_PROPERTY(int transition READ getTransition WRITE setTransition)
+
     public:
         Routeline(QGraphicsWidget *parent, QString name=""); // create and say how many days
+
+        // transition animation 0-255
+        int getTransition() const {return transition;}
+        void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
         // we monkey around with this *A LOT*
         void setGeometry(double x, double y, double width, double height);
@@ -364,8 +376,13 @@ class Routeline : public QGraphicsItem
         QGraphicsWidget *parent;
         QRectF geom;
         QString name;
-        QPainterPath path;
+        QPainterPath path, oldpath;
         double width, height; // size of painterpath, so we scale to fit on paint
+
+        // animating
+        int transition;
+        QPropertyAnimation *animator;
+        double owidth, oheight; // size of painterpath, so we scale to fit on paint
 };
 
 class OverviewWindow : public GcChartWindow
