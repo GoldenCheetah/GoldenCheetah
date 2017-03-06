@@ -34,7 +34,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG               false // debug traces
+#define FIT_DEBUG               true // debug traces
 #define FIT_DEBUG_LEVEL         3    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
@@ -2888,12 +2888,16 @@ void write_file_id(QByteArray *array, const RideFile *ride) {
     // 5	number
     // 8	product_name
 
-    write_message_definition(array, FILE_ID_MSG_NUM, 4); // global_msg_num, num_fields
+    write_message_definition(array, FILE_ID_MSG_NUM, 6); // global_msg_num, num_fields
 
     write_field_definition(array, 0, 1, 0); // 1. type (0)
     write_field_definition(array, 1, 2, 132); // 2. manufacturer (1)
     write_field_definition(array, 2, 2, 132); // 3. product (2)
     write_field_definition(array, 4, 4, 134); // 4. time_created (4)
+
+    write_field_definition(array, 3, 4, 134); // 5. serial_number (3)
+    write_field_definition(array, 5, 2, 132); // 6. number (5)
+
 
     // Record ------
     int record_header = 0;
@@ -2914,15 +2918,25 @@ void write_file_id(QByteArray *array, const RideFile *ride) {
     // 4. time_created
     value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     write_int32(array, value, true);
+
+    // 5. serial
+    value = 0;
+    write_int32(array, value, true);
+
+    // 6. number
+    value = 65535; //NA
+    write_int16(array, value, true);
 }
 
 void write_file_creator(QByteArray *array) {
     // 0	software_version	uint16
     // 1	hardware_version	uint8
 
-    write_message_definition(array, FILE_CREATOR_MSG_NUM, 1); // global_msg_num, num_fields
+    write_message_definition(array, FILE_CREATOR_MSG_NUM, 2); // global_msg_num, num_fields
 
     write_field_definition(array, 0, 2, 132); // 1. software_version (0)
+    write_field_definition(array, 2, 1, 2); // 1. hardware_version (0)
+
 
     // Record ------
     int record_header = 0;
@@ -2931,6 +2945,10 @@ void write_file_creator(QByteArray *array) {
     // 1. software_version
     int value = 100;
     write_int16(array, value, true);
+
+    // 1. hardware_version
+    value = 255; // NA
+    write_int8(array, value);
 
 }
 
@@ -3031,11 +3049,12 @@ void write_lap(QByteArray *array, const RideFile *ride) {
 
 void write_start_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, EVENT_MSG_NUM, 4); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 5); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
     write_field_definition(array, 1, 1, 2); // event_type (1)
+    write_field_definition(array, 3, 4, 134); // data (3)
     write_field_definition(array, 4, 1, 2); // event_group (4)
 
 
@@ -3055,18 +3074,22 @@ void write_start_event(QByteArray *array, const RideFile *ride) {
     value = 0;
     write_int8(array, value);
 
-    // 4. event_group
+    // 4. data
+    write_int32(array, 0, true);
+
+    // 5. event_group
     write_int8(array, 0);
 
 }
 
 void write_stop_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, EVENT_MSG_NUM, 4); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 5); // global_msg_num, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
     write_field_definition(array, 1, 1, 2); // event_type (1)
+    write_field_definition(array, 3, 4, 134); // data (3)
     write_field_definition(array, 4, 1, 2); // event_group (4)
 
 
@@ -3079,15 +3102,18 @@ void write_stop_event(QByteArray *array, const RideFile *ride) {
     write_int32(array, value, true);
 
     // 2. event
-    value = 0; // timer
+    value = 8; // timer=0
     write_int8(array, value);
 
     // 3. event_type
-    value = 4; // stop_all
+    value = 9; // stop_all=4
     write_int8(array, value);
 
-    // 4. event_group
-    write_int8(array, 0);
+    // 4. data
+    write_int32(array, 1, true);
+
+    // 5. event_group
+    write_int8(array, 1);
 
 }
 
@@ -3273,7 +3299,7 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     // All data messages in an activity file (other than hrv) are related by a timestamp.
 
     write_file_id(&data, ride); // file_id 0
-    //write_file_creator(&data); // file_creator 49
+    write_file_creator(&data); // file_creator 49
     write_start_event(&data, ride); // event 21 (x15)
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)
     write_stop_event(&data, ride); // event 21 (x15)
