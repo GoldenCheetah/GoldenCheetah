@@ -28,18 +28,38 @@ static int polarFileReaderRegistered =
   RideFileFactory::instance().registerReader("hrm", "Polar Precision", new PolarFileReader());
 
 bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFile,
-		 QString &hrmFileCompare, QStringList &errors, QString &comment)
+		 QString &hrmFileCompare, QStringList &errors, QString &comment, QString &sport)
 {
   QString section = NULL;
+  bool haveExercise=false;
+  bool useISO8859;
+
   int lineno = 1;
+  int nrows = 12;
+  int ntextrows = 5;
 
   // file.open(QFile::ReadOnly)
-  if (!file.open(QFile::ReadOnly)) {
-    errors << ("Could not open pdd file: \""
-	       + file.fileName() + "\"");
-    return false;
+  if (file.open(QFile::ReadOnly)) {
+      // Read the entire file into a QString -- we avoid using fopen since it
+      // doesn't handle foreign characters well. Instead we use QFile and parse
+      // from a QString
+      QString contents;
+      QTextStream in(&file);
+      in.setCodec("UTF-8");
+      contents = in.readAll();
+      file.close();
+      // check if the text string contains the replacement character for UTF-8 encoding
+      // if yes, try to read with Latin1/ISO 8859-1
+      useISO8859 = contents.contains(QChar::ReplacementCharacter);
+  } else {
+      errors << ("Could not open pdd file: \""
+                 + file.fileName() + "\"");
+      return false;
   }
+  file.open(QFile::ReadOnly);
   QTextStream is(&file);
+  if (useISO8859)
+      is.setCodec ("ISO 8859-1");
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
@@ -49,43 +69,70 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
     // each line as expected.
     QString linesIn = is.readLine();
     QStringList lines = linesIn.split('\r');
-
     for (int li = 0; li < lines.size(); ++li) {
-      QString line = lines[li];
+        QString line = lines[li];
 
-      // workaround for empty lines
-      if(lines.size() == 0) {
-	lineno++;
-	continue;
-      }
-      else if (line.startsWith("[ExerciseInfo")) {
-	//fprintf(stderr, "section : %s\n", line.toAscii().constData());
-	lineno = 0;
-      }
-      else
-	lineno ++;
+        // workaround for empty lines
+        if (lines.size() == 0) {
+            lineno++;
+            continue;
+        }
+        else if (line.startsWith("[ExerciseInfo")) {
+            lineno = 0;
+            comment = QString("");
+            sport = QString("");
+            haveExercise = true;
+        }
+        else
+            lineno ++;
 
-      if (lineno > 25 && lineno <= 27)
-	{
-          comment = QString(line + "\n");
-	}
-      else if (lineno == 28)
-	{
-	  hrmFile.replace(0, hrmFile.length(), line);
-	}
-      else if (lineno == 31)
-	{
-	  gpxFile.replace(0, gpxFile.length(), line);
-	}
-      else if (lineno == 32)
-	{
-	  hrvFile.replace(0, hrvFile.length(), line);
-	}
-      if (lineno > 32 && (hrmFile == hrmFileCompare || hrvFile == hrmFileCompare))
-	{
-	  file.close();
-	  return true;
-	}
+        if (haveExercise)
+            {
+                if (lineno == 1)
+                    {
+                        nrows = line.section('\t', 2, 2).toInt();
+                        ntextrows = line.section('\t', 4, 4).toInt();
+                    }
+                else if (lineno > (nrows+1) && lineno <= (nrows+3))
+                    {
+                        comment += QString(line + "\n");
+                    }
+                else if (lineno == 3)
+                    {
+                        switch (line.section('\t', 0, 0).toInt())
+                            {
+                            case 1:
+                                sport=QString("Run");
+                                break;
+                            case 2:
+                                sport=QString("Bike");
+                                break;
+                            case 3:
+                                sport=QString("Swim");
+                                break;
+                            default:
+                                sport=QString("Bike");
+                                break;
+                            }
+                    }
+                else if (lineno == (nrows+4))
+                    {
+                        hrmFile.replace(0, hrmFile.length(), line);
+                    }
+                else if (lineno == (nrows+7))
+                    {
+                        gpxFile.replace(0, gpxFile.length(), line);
+                    }
+                else if (lineno == (nrows+8))
+                    {
+                        hrvFile.replace(0, hrvFile.length(), line);
+                    }
+                if (lineno == (nrows+ntextrows) && (hrmFile == hrmFileCompare || hrvFile == hrmFileCompare))
+                    {
+                        file.close();
+                        return true;
+                    }
+            }
     }
   }
   file.close();
@@ -104,6 +151,7 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
   QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
   bool metric = true;
+  bool useISO8859;
 
   QDate date;
 
@@ -135,12 +183,28 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   double hrv_time=0;
   QList<double> intervals;
 
-  if (!file.open(QFile::ReadOnly)) {
+  if (file.open(QFile::ReadOnly)) {
+      // Read the entire file into a QString -- we avoid using fopen since it
+      // doesn't handle foreign characters well. Instead we use QFile and parse
+      // from a QString
+      QString contents;
+      QTextStream in(&file);
+      in.setCodec("UTF-8");
+      contents = in.readAll();
+      file.close();
+      // check if the text string contains the replacement character for UTF-8 encoding
+      // if yes, try to read with Latin1/ISO 8859-1
+      useISO8859 = contents.contains(QChar::ReplacementCharacter);
+  } else {
+
     errors << ("Could not open ride file: \""
 	       + file.fileName() + "\"");
     return;
   }
+  file.open(QFile::ReadOnly);
   QTextStream is(&file);
+  if (useISO8859)
+      is.setCodec ("ISO 8859-1");
   QString section = NULL;
 
   if (haveGPX)
@@ -460,6 +524,8 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
   QString hrmFileDate;
   QString hrmFile_orig;
   QFile pddfile;
+  QString sport="";
+
   if (n_s > 12)
     {
       location = suffix.midRef(0, n_s - 12).toString();
@@ -473,7 +539,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
           /* Scan .pdd file for main hrm, R-R version and gpx. Can use
 	     either or both if exist */
           QString pddComment;
-	  if (!ScanPddFile(pddfile, hrmFile, hrvFile, gpxFile, hrmFile_orig, errors, pddComment))
+	  if (!ScanPddFile(pddfile, hrmFile, hrvFile, gpxFile, hrmFile_orig, errors, pddComment, sport))
               {
                   // Pdd file exist but it does not contain
                   // hrmFile_orig (probably been deleted)
@@ -588,5 +654,6 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
   else
     delete hrvXdata;
 
+  rideFile->setTag("Sport", sport);
   return rideFile;
 }
