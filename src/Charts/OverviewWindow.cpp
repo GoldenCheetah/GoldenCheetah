@@ -37,7 +37,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
-#include <QGLWidget>
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
