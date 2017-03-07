@@ -167,19 +167,13 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // Routes
     routes = new Routes(context, home->config());
 
-    // get withings in if there is a cache
-    QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
-    if (withingsJSON.exists() && withingsJSON.open(QFile::ReadOnly)) {
-
-        QString text;
-        QStringList errors;
-        QTextStream stream(&withingsJSON);
-        text = stream.readAll();
-        withingsJSON.close();
-
-        WithingsParser parser;
-        parser.parse(text, errors);
-        if (errors.count() == 0) setWithings(parser.readings());
+    // get body measures if the file exists
+    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->activities().canonicalPath()));
+    if (bmFile.exists()) {
+        QList<BodyMeasure> bmData;
+        if (BodyMeasureParser::unserialize(bmFile, bmData)){
+            setBodyMeasures(bmData);
+        }
     }
 
     // now most dependencies are in get cache
@@ -190,7 +184,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     loadCharts();
 
     // Downloaders
-    withingsDownload = new WithingsDownload(context);
     calendarDownload = new CalendarDownload(context);
 
     // Calendar
@@ -239,7 +232,6 @@ Athlete::~Athlete()
                                                // all the changes to LTM settings and chart config
                                                // have not been reflected in the charts.xml file
 
-    delete withingsDownload;
     delete calendarDownload;
 
 #ifdef GC_HAVE_ICAL
@@ -482,16 +474,16 @@ Athlete::getPDEstimates()
 }
 
 
-// working with withings data
+// working with weight data
 void 
-Athlete::setWithings(QList<WithingsReading>&x)
+Athlete::setBodyMeasures(QList<BodyMeasure>&x)
 {
-    withings_ = x;
-    qSort(withings_); // date order
+    bodyMeasures_ = x;
+    qSort(bodyMeasures_); // date order
 }
 
 void 
-Athlete::getWithings(QDate date, WithingsReading &here)
+Athlete::getBodyMeasure(QDate date, BodyMeasure &here)
 {
     // the optimisation below is not thread safe and should be encapsulated
     // by a mutex, but this kind of defeats to purpose of the optimisation!
@@ -500,10 +492,10 @@ Athlete::getWithings(QDate date, WithingsReading &here)
     //if (!withings_.count() || withings_.first().when.date() > date) here = WithingsReading();
 
     // always set to not found before searching
-    here = WithingsReading();
+    here = BodyMeasure();
 
     // loop
-    foreach(WithingsReading x, withings_) {
+    foreach(BodyMeasure x, bodyMeasures_) {
 
         // we only look for weight readings at present
         // some readings may not include this so skip them
@@ -518,20 +510,21 @@ Athlete::getWithings(QDate date, WithingsReading &here)
 }
 
 double 
-Athlete::getWithingsWeight(QDate date, int type)
+Athlete::getBodyMeasure(QDate date, int type)
 {
-    WithingsReading withings;
-    getWithings(date, withings);
+    BodyMeasure weight;
+    getBodyMeasure(date, weight);
 
     // return what was asked for!
     switch(type) {
 
         default:
-        case WITHINGS_WEIGHT : return withings.weightkg;
-        case WITHINGS_FATKG : return withings.fatkg;
-        case WITHINGS_FATPERCENT : return withings.fatpercent;
-        case WITHINGS_LEANKG : return withings.leankg;
-        case WITHINGS_HEIGHT : return withings.sizemeter;
+        case BODY_WEIGHT_KG : return weight.weightkg;
+        case BODY_WEIGHT_FAT_KG : return weight.fatkg;
+        case BODY_WEIGHT_MUSCLE_KG : return weight.musclekg;
+        case BODY_WEIGHT_BONES_KG : return weight.boneskg;
+        case BODY_WEIGHT_LEAN_KG : return weight.leankg;
+        case BODY_WEIGHT_FAT_PERCENT : return weight.fatpercent;
     }
 }
 
@@ -541,7 +534,7 @@ Athlete::getWeight(QDate date, RideFile *ride)
     double weight;
 
     // withings first
-    weight = getWithingsWeight(date);
+    weight = getBodyMeasure(date);
 
     // ride (if available)
     if (!weight && ride)

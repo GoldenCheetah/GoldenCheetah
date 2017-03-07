@@ -521,13 +521,13 @@ class AthleteWeight : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default"));
+        setDescription(tr("Weight in kg or lbs: first from downloaded Body Measure data, then from Activity metadata and last from Athlete configuration with 75kg default"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        // withings first
-        double weight = item->context->athlete->getWithingsWeight(item->dateTime.date());
+        // body measures first
+        double weight = item->context->athlete->getBodyMeasure(item->dateTime.date());
 
         // from metadata
         if (!weight) weight = item->getText("Weight", "0.0").toDouble();
@@ -570,15 +570,15 @@ class AthleteFat : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Bodyfat in kg or lbs from Withings data"));
+        setDescription(tr("Bodyfat in kg or lbs from downloaded Body Measure data"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        WithingsReading here;
+        BodyMeasure here;
 
-        // withings first
-        item->context->athlete->getWithings(item->dateTime.date(), here);
+        // body measures first
+        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
         setValue(here.fatkg);
     }
 
@@ -611,15 +611,15 @@ class AthleteLean : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Lean Weight in kg or lbs from Withings data"));
+        setDescription(tr("Lean Weight in kg or lbs from downloaded Body Measure data"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        WithingsReading here;
+        BodyMeasure here;
 
-        // withings first
-        item->context->athlete->getWithings(item->dateTime.date(), here);
+        // body measures first
+        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
         setValue(here.leankg);
     }
 
@@ -651,15 +651,15 @@ class AthleteFatP : public RideMetric {
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
         setPrecision(1);
-        setDescription(tr("Bodyfat Percent from Withings data"));
+        setDescription(tr("Bodyfat Percent from downloaded Body Measure data"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        WithingsReading here;
+        BodyMeasure here;
 
-        // withings first
-        item->context->athlete->getWithings(item->dateTime.date(), here);
+        // body measures first
+        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
         setValue(here.fatpercent);
     }
 
@@ -671,7 +671,6 @@ class AthleteFatP : public RideMetric {
 static bool athleteFatPAdded =
     RideMetricFactory::instance().addMetric(AthleteFatP());
 
-//        case WITHINGS_LEANKG : return withings.leankg;
 //////////////////////////////////////////////////////////////////////////////
 
 class ElevationGain : public RideMetric {

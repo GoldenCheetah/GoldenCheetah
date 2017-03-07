@@ -19,6 +19,8 @@
 #ifndef _GC_Athlete_h
 #define _GC_Athlete_h 1
 
+#include "BodyMeasures.h"
+
 #include <QDir>
 #include <QSqlDatabase>
 #include <QTreeWidget>
@@ -27,8 +29,6 @@
 #include <QNetworkReply>
 #include <QHeaderView>
 
-// for WithingsReading
-#include "WithingsParser.h"
 
 class Zones;
 class HrZones;
@@ -36,7 +36,6 @@ class PaceZones;
 class RideFile;
 class ErgFile;
 class RideMetadata;
-class WithingsDownload;
 class CalendarDownload;
 class ICalendar;
 class CalDAV;
@@ -99,7 +98,7 @@ class Athlete : public QObject
         Routes *routes;
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;
-        QList<WithingsReading> withings_;
+        QList<BodyMeasure> bodyMeasures_;
 
         // Estimates
         PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);
@@ -117,7 +116,6 @@ class Athlete : public QObject
 
         // athlete's calendar
         CalendarDownload *calendarDownload;
-        WithingsDownload *withingsDownload;
 #ifdef GC_HAVE_ICAL
         ICalendar *rideCalendar;
         CalDAV *davCalendar;
@@ -140,11 +138,12 @@ class Athlete : public QObject
 
         Context *context;
 
-        // work with withings data
-        void setWithings(QList<WithingsReading>&x);
-        QList<WithingsReading>& withings() { return withings_; }
-        double getWithingsWeight(QDate date, int type=WITHINGS_WEIGHT);
-        void getWithings(QDate date, WithingsReading&);
+        // work with weight data from Withings, and other sources
+        void setBodyMeasures(QList<BodyMeasure>&x);
+
+        QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
+        double getBodyMeasure(QDate date, int type=BODY_WEIGHT_KG);
+        void getBodyMeasure(QDate date,BodyMeasure&);
 
         // ride collection
         void selectRideFile(QString);
