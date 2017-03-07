@@ -37,6 +37,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QGLWidget>
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
@@ -1550,6 +1551,16 @@ BubbleViz::sceneEvent(QEvent *event)
     return false;
 }
 
+class BubbleVizTuple {
+public:
+    double score;
+    int newindex, oldindex;
+
+};
+bool scoresBiggerThan(const BubbleVizTuple i1, const BubbleVizTuple i2)
+{
+    return i1.score > i2.score;
+}
 void
 BubbleViz::setPoints(QList<BPointF> p)
 {
@@ -1573,26 +1584,40 @@ BubbleViz::setPoints(QList<BPointF> p)
     // so now we need to setup a transition
     // we match the oldpoints to the new points by scoring
     QList<BPointF> matches;
-    int matched=0;
+    for(int i=0; i<points.count(); i++) matches << BPointF(); // fill with no matches
 
-    // for each of the new points find a match in old points
-    foreach(BPointF newpoint, points) {
-        double best = 0;
-        int index=-1;
-        for(int i=0; i<oldpoints.count(); i++) {
-            double score = newpoint.score(oldpoints[i]);
-            if (score > best) {
-                best = score;
-                index = i;
-            }
+    QList<BubbleVizTuple> scores;
+    QVector<bool> available(oldpoints.count());
+    available.fill(true);
+
+    // get all the scores
+    for(int newindex =0; newindex < points.count(); newindex++) {
+        for (int oldindex =0; oldindex < oldpoints.count(); oldindex++) {
+            BubbleVizTuple add;
+            add.newindex = newindex;
+            add.oldindex = oldindex;
+            add.score = points[newindex].score(oldpoints[oldindex]);
+            if (add.score > 0) scores << add;
         }
-        // take best match, slowly swindling them down
-        if (index >=0) { matched++; matches << oldpoints.takeAt(index); }
-        else matches << BPointF(); // no decent match found
     }
 
-    // clean up
-    if (oldpoints.count()) matches << oldpoints;
+    // sort scores high to low
+    qSort(scores.begin(), scores.end(), scoresBiggerThan);
+
+    // now assign - from best match to worst
+    foreach(BubbleVizTuple score, scores){
+        if (available[score.oldindex]) {
+            available[score.oldindex]=false; // its now taken
+            matches[score.newindex]=oldpoints[score.oldindex];
+        }
+    }
+
+    // add non-matches to the end
+    for(int i=0; i<available.count(); i++) {
+        if (available[i]) {
+            matches << oldpoints[i];
+        }
+    }
     oldpoints = matches;
 
     // stop any transition animation currently running
