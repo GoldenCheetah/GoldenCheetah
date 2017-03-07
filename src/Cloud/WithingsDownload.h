@@ -23,9 +23,11 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+
 #include "Context.h"
 #include "Settings.h"
 #include "WithingsParser.h"
+#include "BodyMeasures.h"
 
 #ifdef GC_HAVE_KQOAUTH
 #include <kqoauthmanager.h>
@@ -39,27 +41,30 @@ class WithingsDownload : public QObject
 
 public:
     WithingsDownload(Context *context);
-    bool download();
+    bool getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data);
 
-public slots:
-    void downloadFinished(QNetworkReply *reply);
+signals:
+    void downloadStarted(int);
+    void downloadProgress(int);
+    void downloadEnded(int);
 
 private:
     Context *context;
     QNetworkAccessManager *nam;
     WithingsParser *parser;
-
-    int allMeasures;
-    int newMeasures;
+    QString response;
 
     #ifdef GC_HAVE_KQOAUTH
     KQOAuthManager *oauthManager;
     KQOAuthRequest *oauthRequest;
+    QEventLoop loop;
     #endif
 
-    void parse(QString text);
+    void parse(QString text, QStringList &errors, QList<BodyMeasure> &bodyMeasures);
 
 private slots:
+
+    void downloadFinished(QNetworkReply *reply);
     #ifdef GC_HAVE_KQOAUTH
     void onRequestReady(QByteArray);
     void onAuthorizedRequestDone();

@@ -22,7 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideMetric.h"
-#include "WithingsParser.h"
+#include "BodyMeasures.h"
 
 #include <QString>
 #include <QMap>
@@ -154,7 +154,7 @@ class RideItem : public QObject
         double weight; // what weight was used ?
 
         // access to the cached data !
-        WithingsReading withings;
+        BodyMeasure weightData;
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }

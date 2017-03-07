@@ -70,7 +70,7 @@
 #endif
 #include "ShareDialog.h"
 #include "TodaysPlan.h"
-#include "WithingsDownload.h"
+#include "BodyMeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
@@ -486,8 +486,8 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Get &Withings Data..."), this,
-                        SLOT (downloadMeasures()));
+    optionsMenu->addAction(tr("Get &Body Measures..."), this,
+                        SLOT (downloadBodyMeasures()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
@@ -2244,9 +2244,12 @@ MainWindow::configChanged(qint32)
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::downloadMeasures()
+MainWindow::downloadBodyMeasures()
 {
-    currentTab->context->athlete->withingsDownload->download();
+
+    BodyMeasuresDownload dialog(currentTab->context);
+    dialog.exec();
+
 }
 
 void
