@@ -722,12 +722,12 @@ Card::setData(RideItem *item)
 
                 } else {
 
-                    for(int i=0; i<5; i++) barset->replace(i, 0);
+                    for(int i=0; i<categories.count(); i++) barset->replace(i, 0);
                 }
 
             } else {
 
-                for(int i=0; i<5; i++) barset->replace(i, 0);
+                for(int i=0; i<categories.count(); i++) barset->replace(i, 0);
             }
         }
         break;
@@ -752,12 +752,12 @@ Card::setData(RideItem *item)
 
                 } else {
 
-                    for(int i=0; i<5; i++) barset->replace(i, 0);
+                    for(int i=0; i<categories.count(); i++) barset->replace(i, 0);
                 }
 
             } else {
 
-                for(int i=0; i<5; i++) barset->replace(i, 0);
+                for(int i=0; i<categories.count(); i++) barset->replace(i, 0);
             }
         }
         break;
@@ -781,12 +781,12 @@ Card::setData(RideItem *item)
 
                 } else {
 
-                    for(int i=0; i<5; i++) barset->replace(i, 0);
+                    for(int i=0; i<categories.count(); i++) barset->replace(i, 0);
                 }
 
             } else {
 
-                for(int i=0; i<5; i++) barset->replace(i, 0);
+                for(int i=0; i<categories.count(); i++) barset->replace(i, 0);
             }
         }
         break;
