@@ -741,7 +741,7 @@ Card::setData(RideItem *item)
             if (parent->context->athlete->zones(item->isRun)) {
 
                 int numzones;
-                int range = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
+                int range = parent->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
 
                 if (range > -1) {
 
