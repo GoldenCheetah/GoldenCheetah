@@ -614,13 +614,15 @@ Card::setData(RideItem *item)
         double sum=0, count=0, avg = 0;
         while(index-offset >=0) { // ultimately go no further back than first ever ride
 
-                // get value from items before me
-                RideItem *prior = parent->context->athlete->rideCache->rides().at(index-offset);
+            // get value from items before me
+            RideItem *prior = parent->context->athlete->rideCache->rides().at(index-offset);
 
-                // are we still in range ?
-                int old= prior->dateTime.daysTo(item->dateTime);
-                if (old > SPARKDAYS) break;
+            // are we still in range ?
+            int old= prior->dateTime.daysTo(item->dateTime);
+            if (old > SPARKDAYS) break;
 
+            // only activities with matching sport flags
+            if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
 
                 double v;
 
@@ -643,7 +645,8 @@ Card::setData(RideItem *item)
                     if (v < min) min = v;
                     if (v > max) max = v;
                 }
-                offset++;
+            }
+            offset++;
         }
 
         if (count) avg = sum / count;
