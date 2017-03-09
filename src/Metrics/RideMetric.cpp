@@ -146,7 +146,8 @@
 // 136 17  Oct 2016 Ale Martinez       Changed Best Times units to minutes
 // 137 16  Feb 2017 Leif Warland       Added HrvMetrics
 // 138 01  Mar 2017 Mark Liversedge	   Added elapsed_time metric for intervals
-int DBSchemaVersion = 138;
+// 139 88  Mar 2017 Leif Warland       Added SDANN and SDNNIDX to HRV metrics
+int DBSchemaVersion = 139;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

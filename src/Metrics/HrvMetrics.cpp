@@ -48,6 +48,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
         double total, count;
+
         bool this_state;
         bool last_state = false;
 
@@ -128,7 +129,6 @@ public:
                         }
                     last_state = this_state;
                 }
-
             setValue(count > 0 ? total/count: total);
             setCount(count);
         }
@@ -223,6 +223,183 @@ static bool sdnnAdded =
     RideMetricFactory::instance().addMetric(sdnn());
 
 
+class sdann : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(sdann)
+
+private:
+
+    double stdmean_;
+
+public:
+
+    sdann()
+    {
+        setSymbol("SDANN");
+        setInternalName("SDANN_HRV");
+        stdmean_ = 0.0f;
+    }
+
+    void initialize()
+    {
+        setName(tr("SDANN"));
+        setMetricUnits(tr("msec"));
+        setImperialUnits(tr("msec"));
+        setType(RideMetric::StdDev);
+        setDescription(tr("Standard deviation of all NN intervals in all 5-minute segments of a 24-hour recording"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+        double sum, sum2, total, count, n;
+        bool last_state = false;
+        bool this_state;
+
+        XDataSeries *series = item->ride()->xdata("HRV");
+        double tlim = 300.0;
+
+        if (series) {
+
+            sum = sum2 = total = count = n = 0;
+
+            foreach(XDataPoint *p, series->datapoints)
+                {
+                    if (p->secs >= tlim)
+                        {
+                            tlim += 300.0;
+                            if (n>0)
+                                {
+                                    total /= n;
+                                    sum += total;
+                                    sum2 += pow(total, 2);
+                                    count++;
+                                    total = 0.0;
+                                    n = 0;
+                                }
+                        }
+
+                    this_state = p->number[1] > 0;
+                    if (this_state && last_state)
+                        {
+                            total += p->number[0];
+                            n++;
+                        }
+                    last_state = this_state;
+                }
+
+            if (n>0)
+                {
+                    total /= n;
+                    sum += total;
+                    sum2 += pow(total, 2);
+                    count++;
+                }
+            if (count>1)
+                {
+                    stdmean_ = sum/count;
+                    setValue(count > 1 ? sqrt((sum2 - sum*stdmean_)/(count - 1)): 0.0f);
+                }
+            else
+                {
+                    setValue(0.0f);
+                }
+            setCount(count);
+        }
+        else {
+            setValue(RideFile::NIL);
+            setCount(0);
+        }
+    }
+
+    double stdmean(){ return stdmean_; }
+
+    bool isRelevantForRide(RideItem) const { return true; }
+
+    RideMetric *clone() const { return new sdann(*this); }
+};
+
+static bool sdannAdded =
+    RideMetricFactory::instance().addMetric(sdann());
+
+
+class sdnnidx : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(sdnnidx)
+
+public:
+
+    sdnnidx()
+    {
+        setSymbol("SDNNIDX");
+        setInternalName("SDNNIDX_HRV");
+    }
+
+    void initialize()
+    {
+        setName(tr("SDNNIDX"));
+        setMetricUnits(tr("msec"));
+        setImperialUnits(tr("msec"));
+        setType(RideMetric::Average);
+        setDescription(tr("Average of the standard deviations of NN intervals in all 5-minute segments of a 24-hour recording"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        double sum, sum2, total, count, n;
+        bool last_state = false;
+        bool this_state;
+        double tlim = 300.0;
+
+        XDataSeries *series = item->ride()->xdata("HRV");
+
+        if (series) {
+
+            sum = sum2 = total = count = n = 0;
+
+            foreach(XDataPoint *p, series->datapoints)
+                {
+                    if (p->secs >= tlim)
+                        {
+                            tlim += 300.0;
+                            if (n>0)
+                                {
+                                    total += sqrt((sum2 - sum*sum/n)/(n-1));
+                                    count++;
+                                    // Reset
+                                    sum = sum2 = 0.0;
+                                    n = 0;
+                                }
+                        }
+
+                    this_state = p->number[1]>0;
+                    if (this_state && last_state)
+                        {
+                            sum += p->number[0];
+                            sum2 += pow(p->number[0], 2);
+                            n++;
+                        }
+                    last_state = this_state;
+                }
+            if (n>0)
+                {
+                    total += sqrt((sum2 - sum*sum/n)/(n-1));
+                    count++;
+                }
+            setValue(count > 0 ? total/count: total);
+            setCount(count);
+        }
+        else {
+            setValue(RideFile::NIL);
+            setCount(0);
+        }
+    }
+
+    bool isRelevantForRide(RideItem) const { return true; }
+
+    RideMetric *clone() const { return new sdnnidx(*this); }
+};
+
+static bool sdnnidxAdded =
+    RideMetricFactory::instance().addMetric(sdnnidx());
+
+
 class rmssd : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(rmssd)
 
@@ -294,8 +471,7 @@ public:
     };
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        double nnx , count;
-
+        int nnx, count;
         XDataSeries *series = item->ride()->xdata("HRV");
 
         if (series && series->datapoints.count() > 2 )
