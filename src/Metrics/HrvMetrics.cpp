@@ -47,8 +47,8 @@ public:
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        double total;
-        int count;
+        double total, count;
+
         bool this_state;
         bool last_state = false;
 
@@ -109,8 +109,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        double total;
-        int count;
+        double total, count;
         bool last_state = false;
         bool this_state;
 
@@ -174,8 +173,7 @@ public:
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        double sum, sum2;
-        int count;
+        double sum, sum2, count;
         bool last_state = false;
         bool this_state;
 
@@ -251,8 +249,7 @@ public:
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        double sum, sum2, total;
-        int count, n;
+        double sum, sum2, total, count, n;
         bool last_state = false;
         bool this_state;
 
@@ -345,8 +342,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        double sum, sum2, total;
-        int count, n;
+        double sum, sum2, total, count, n;
         bool last_state = false;
         bool this_state;
         double tlim = 300.0;
