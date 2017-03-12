@@ -410,7 +410,7 @@ GCColor::css(bool ridesummary)
     return QString("<style> "
                    "html { overflow: auto; }"
                    "body { position: absolute; "
-                   "       top: 5px; left: 5px; bottom: 5px; right: 5px; padding: 0px; "
+                   "       top: %4px; left: %4px; bottom: %4px; right: %4px; padding: 0px; "
                    "       overflow-y: hidden; overflow-x: hidden; color: %3; background-color: %2; }"
                    "body:hover { overflow-y: scroll; }"
                    "h1 { color: %1; background-color: %2; } "
@@ -426,11 +426,13 @@ GCColor::css(bool ridesummary)
 #else
                    "::-webkit-scrollbar-thumb { background: darkGray; } "
                    "::-webkit-scrollbar-thumb:hover { background: lightGray; } "
-                   "::-webkit-scrollbar { width: 6px; background: %2; } "
+                   "::-webkit-scrollbar { width: %5px; background: %2; } "
 #endif
                    "</style> ").arg(GColor(CPLOTMARKER).name())
                                .arg(bgColor.name())
-                               .arg(fgColor.name());
+                               .arg(fgColor.name())
+                               .arg(5 * dpiXFactor)
+                               .arg(6 * dpiXFactor);
 }
 QPalette 
 GCColor::palette()
