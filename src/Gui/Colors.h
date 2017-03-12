@@ -33,6 +33,10 @@ extern QIcon colouredIconFromPNG(QString filename, QColor color);
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;
 
+// get the pixel size for a font that is no taller
+// than height in pixels (let QT adapt for device ratios)
+int pixelSizeForFont(QFont &font, int height);
+
 class Context;
 
 // set appearace defaults based upon screen size

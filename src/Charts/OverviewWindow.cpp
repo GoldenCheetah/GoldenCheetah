@@ -349,19 +349,13 @@ Card::setType(CardType type, RideFile::SeriesType series)
     chart->setAnimationOptions(QChart::NoAnimation);
 
     // we have a mid sized font for chart labels etc
-    QFont mid;
-#ifdef Q_OS_MAC
-    mid.setPointSize(double(ROWHEIGHT) * 0.75f);
-#else
-    mid.setPointSize(ROWHEIGHT/2);
-#endif
-    chart->setFont(mid);
+    chart->setFont(parent->midfont);
 
     if (type == Card::ZONE) {
 
         // needs a set of bars
         barset = new QBarSet(tr("Time In Zone"), this);
-        barset->setLabelFont(mid);
+        barset->setLabelFont(parent->midfont);
 
         if (settings.series == RideFile::hr) {
             barset->setLabelColor(GColor(CHEARTRATE));
@@ -434,7 +428,7 @@ Card::setType(CardType type, RideFile::SeriesType series)
 
         // x-axis labels etc
         barcategoryaxis = new QBarCategoryAxis(this);
-        barcategoryaxis->setLabelsFont(mid);
+        barcategoryaxis->setLabelsFont(parent->midfont);
         barcategoryaxis->setLabelsColor(QColor(100,100,100));
         barcategoryaxis->setGridLineVisible(false);
         barcategoryaxis->setCategories(categories);
@@ -974,21 +968,6 @@ Card::underMouse()
 void
 Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
-    // fonts
-    QFont titlefont;
-    QFont bigfont;
-    QFont smallfont;
-#ifdef Q_OS_MAC
-    titlefont.setPointSize(ROWHEIGHT); // need a bit of space
-    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
-    smallfont.setPointSize(ROWHEIGHT*0.8f);
-#else
-    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
-    bigfont.setPointSize(ROWHEIGHT*2);
-    smallfont.setPointSize(ROWHEIGHT*0.6f);
-#endif
-
-
     if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
     else {
 
@@ -1010,8 +989,8 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
     painter->setPen(QColor(200,200,200));
-    painter->setFont(titlefont);
-    if (type != PMC || drag) painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(titlefont, parent->device()).height()), name);
+    painter->setFont(parent->titlefont);
+    if (type != PMC || drag) painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(parent->titlefont, parent->device()).height()), name);
 
     // only paint contents if not dragging
     if (drag) return;
@@ -1051,13 +1030,13 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f);
 
         // we align centre and mid
-        QFontMetrics fm(bigfont);
-        QRectF rect = QFontMetrics(bigfont, parent->device()).boundingRect(value);
+        QFontMetrics fm(parent->bigfont);
+        QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
         if (fieldtype == FIELD_TEXTBOX) {
             // long texts need to be formatted into a smaller font an word wrapped
             painter->setPen(QColor(150,150,150));
-            painter->setFont(smallfont);
+            painter->setFont(parent->smallfont);
 
             // draw text and wrap / truncate to bounding rectangle
             painter->drawText(QRectF(ROWHEIGHT, ROWHEIGHT*2.5, geometry().width()-(ROWHEIGHT*2),
@@ -1066,7 +1045,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
             // any other kind of metadata just paint it
             painter->setPen(GColor(CPLOTMARKER));
-            painter->setFont(bigfont);
+            painter->setFont(parent->bigfont);
             painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
         }
@@ -1086,7 +1065,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
         double addy = 0;
         if (type == RPE && rperating->isVisible()) addy=ROWHEIGHT*2; // shift up for rperating
-        if (units != "" && units != tr("seconds")) addy = QFontMetrics(smallfont).height();
+        if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
 
         // mid is slightly higher to account for space around title, move mid up
         double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
@@ -1095,11 +1074,11 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
 
         // we align centre and mid
-        QFontMetrics fm(bigfont);
-        QRectF rect = QFontMetrics(bigfont, parent->device()).boundingRect(value);
+        QFontMetrics fm(parent->bigfont);
+        QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
         painter->setPen(GColor(CPLOTMARKER));
-        painter->setFont(bigfont);
+        painter->setFont(parent->bigfont);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
@@ -1108,9 +1087,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         // now units
         if (units != "" && addy > 0) {
             painter->setPen(QColor(100,100,100));
-            painter->setFont(smallfont);
+            painter->setFont(parent->smallfont);
 
-            painter->drawText(QPointF((geometry().width() - QFontMetrics(smallfont).width(units)) / 2.0f,
+            painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).width(units)) / 2.0f,
                                   mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
         }
 
@@ -1126,16 +1105,16 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             double right = sparkline->geometry().right();
 
             painter->setPen(QColor(100,100,100));
-            painter->setFont(smallfont);
+            painter->setFont(parent->smallfont);
 
-            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(upper) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
                                   top - 40 + (fm.ascent() / 2.0f)), upper);
-            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(lower) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
                                   bottom -40), lower);
 
 
             painter->setPen(QColor(50,50,50));
-            painter->drawText(QPointF(right - QFontMetrics(smallfont).width(mean) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
                                   ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
             }
 
@@ -1167,8 +1146,8 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         // here: http://home.trainingpeaks.com/blog/article/4-new-mobile-features-you-should-know-about
         // as written by Ben Pryhoda their Senior Director of Product, Device and API Integrations
         // we will make this configurable later anyway, as calling SB 'Form' is rather dodgy.
-        QFontMetrics tfm(titlefont, parent->device());
-        QFontMetrics bfm(bigfont, parent->device());
+        QFontMetrics tfm(parent->titlefont, parent->device());
+        QFontMetrics bfm(parent->bigfont, parent->device());
 
         // 4 measures to show, depending upon how much space
         // so prioritise - SB then LTS, STS, RR
@@ -1178,7 +1157,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         // Stress Balance
         //
         painter->setPen(QColor(200,200,200));
-        painter->setFont(titlefont);
+        painter->setFont(parent->titlefont);
         QString string = QString(tr("Form"));
         QRectF rect = tfm.boundingRect(string);
         painter->drawText(QPointF(ROWHEIGHT / 2.0f,
@@ -1186,7 +1165,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         nexty += rect.height() + 30;
 
         painter->setPen(PMCData::sbColor(sb, GColor(CPLOTMARKER)));
-        painter->setFont(bigfont);
+        painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(sb));
         rect = bfm.boundingRect(string);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
@@ -1199,7 +1178,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         if (deep > 7) {
 
             painter->setPen(QColor(200,200,200));
-            painter->setFont(titlefont);
+            painter->setFont(parent->titlefont);
             QString string = QString(tr("Fitness"));
             QRectF rect = tfm.boundingRect(string);
             painter->drawText(QPointF(ROWHEIGHT / 2.0f,
@@ -1207,7 +1186,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             nexty += rect.height() + 30;
 
             painter->setPen(PMCData::ltsColor(lts, GColor(CPLOTMARKER)));
-            painter->setFont(bigfont);
+            painter->setFont(parent->bigfont);
             string = QString("%1").arg(round(lts));
             rect = bfm.boundingRect(string);
             painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
@@ -1222,7 +1201,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         if (deep > 11) {
 
             painter->setPen(QColor(200,200,200));
-            painter->setFont(titlefont);
+            painter->setFont(parent->titlefont);
             QString string = QString(tr("Fatigue"));
             QRectF rect = tfm.boundingRect(string);
             painter->drawText(QPointF(ROWHEIGHT / 2.0f,
@@ -1230,7 +1209,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             nexty += rect.height() + 30;
 
             painter->setPen(PMCData::stsColor(sts, GColor(CPLOTMARKER)));
-            painter->setFont(bigfont);
+            painter->setFont(parent->bigfont);
             string = QString("%1").arg(round(sts));
             rect = bfm.boundingRect(string);
             painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
@@ -1245,7 +1224,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
         if (deep > 14) {
 
             painter->setPen(QColor(200,200,200));
-            painter->setFont(titlefont);
+            painter->setFont(parent->titlefont);
             QString string = QString(tr("Risk"));
             QRectF rect = tfm.boundingRect(string);
             painter->drawText(QPointF(ROWHEIGHT / 2.0f,
@@ -1253,7 +1232,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
             nexty += rect.height() + 30;
 
             painter->setPen(PMCData::rrColor(rr, GColor(CPLOTMARKER)));
-            painter->setFont(bigfont);
+            painter->setFont(parent->bigfont);
             string = QString("%1").arg(round(rr));
             rect = bfm.boundingRect(string);
             painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
@@ -1422,20 +1401,6 @@ RPErating::applyEdit()
 void
 RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
-    // fonts
-    QFont titlefont;
-    QFont bigfont;
-    QFont smallfont;
-#ifdef Q_OS_MAC
-    titlefont.setPointSize(ROWHEIGHT); // need a bit of space
-    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
-    smallfont.setPointSize(ROWHEIGHT*0.8f);
-#else
-    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
-    bigfont.setPointSize(ROWHEIGHT*2);
-    smallfont.setPointSize(ROWHEIGHT*0.6f);
-#endif
-
     painter->setPen(Qt::NoPen);
 
     // hover?
@@ -1445,9 +1410,9 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     }
 
     painter->setPen(QPen(color));
-    QFontMetrics tfm(titlefont);
+    QFontMetrics tfm(parent->parent->titlefont);
     QRectF rect = tfm.boundingRect(description);
-    painter->setFont(titlefont);
+    painter->setFont(parent->parent->titlefont);
     painter->drawText(QPointF(parent->x()+geom.x()+((geometry().width() - rect.width()) / 2.0f),
                               parent->y()+geom.y()+geom.height()-ROWHEIGHT), description); // divided by 3 to account for "gap" at top of font
 
@@ -1644,20 +1609,6 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     // blank when no points
     if (points.count() == 0 || miny==maxy || minx==maxx) return;
 
-    // fonts
-    QFont titlefont;
-    QFont bigfont;
-    QFont smallfont;
-#ifdef Q_OS_MAC
-    titlefont.setPointSize(ROWHEIGHT); // need a bit of space
-    bigfont.setPointSize(double(ROWHEIGHT)*2.5f);
-    smallfont.setPointSize(ROWHEIGHT*0.8f);
-#else
-    titlefont.setPointSize(ROWHEIGHT-18); // need a bit of space
-    bigfont.setPointSize(ROWHEIGHT*2);
-    smallfont.setPointSize(ROWHEIGHT*0.6f);
-#endif
-
     painter->setPen(GColor(CPLOTMARKER));
 
     // chart canvas
@@ -1794,7 +1745,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     midcenter.setAlignment(Qt::AlignVCenter|Qt::AlignCenter);
 
     painter->setPen(QColor(150,150,150));
-    painter->setFont(smallfont);
+    painter->setFont(parent->parent->smallfont);
     painter->drawText(xtitlespace, xlabel, midcenter);
 
 
@@ -1809,7 +1760,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     //DIAGpainter->drawRect(ytitlespace);
 
     painter->setPen(QColor(150,150,150));
-    painter->setFont(smallfont);
+    painter->setFont(parent->parent->smallfont);
     //XXX FIXME XXX painter->drawText(xtitlespace, xlabel, midcenter);
 
     // draw axis, from minx, to maxx (see tufte for 'range' axis on scatter plots
@@ -1822,7 +1773,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
                       QPointF(plotarea.left() + (maxx * xratio), plotarea.bottom()));
 
     // x-axis range
-    QFontMetrics sfm(smallfont);
+    QFontMetrics sfm(parent->parent->smallfont);
     QRectF bminx = sfm.tightBoundingRect(QString("%1").arg(minx));
     QRectF bmaxx = sfm.tightBoundingRect(QString("%1").arg(maxx));
     painter->drawText(xlabelspace.left() + (minx*xratio) - (bminx.width()/2),  xlabelspace.bottom(), QString("%1").arg(minx));
@@ -1842,8 +1793,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     if (hover && nearvalue >= 0) {
 
-        painter->setFont(titlefont);
-        QFontMetrics tfm(titlefont);
+        painter->setFont(parent->parent->titlefont);
+        QFontMetrics tfm(parent->parent->titlefont);
 
         // where is it?
         QPointF center(plotarea.left() + (xratio * nearest.x), plotarea.bottom() - (yratio * nearest.y));
@@ -2253,6 +2204,12 @@ OverviewWindow::configChanged(qint32)
     grayConfig = colouredIconFromPNG(":images/configure.png", GColor(CCARDBACKGROUND).lighter(75));
     whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
     accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
+
+    // set fonts
+    bigfont.setPixelSize(pixelSizeForFont(bigfont, ROWHEIGHT *2.5f));
+    titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
+    midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
+    smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));

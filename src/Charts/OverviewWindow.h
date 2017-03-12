@@ -406,6 +406,7 @@ class OverviewWindow : public GcChartWindow
         // used by children
         Context *context;
         QGraphicsView *view;
+        QFont titlefont, bigfont, midfont, smallfont;
 
         // to get paint device
         QGraphicsView *device() { return view; }
