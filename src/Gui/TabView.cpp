@@ -167,7 +167,7 @@ TabView::ourStyleSheet()
            "QScrollBar:vertical {"
            "    border: 0px solid darkGray; "
            "    background:%1;"
-           "    width: 8px;    "
+           "    width: %4px;    "
            "    margin: 1px 1px 1px 1px;"
            "}"
            "QScrollBar::handle:vertical:enabled:hover {"
@@ -204,7 +204,7 @@ TabView::ourStyleSheet()
            "QScrollBar:horizontal {"
            "    border: 0px solid darkGray; "
            "    background-color:%1;"
-           "    height: 8px;    "
+           "    height: %4px;    "
            "    margin: 1px 1px 1px 1px;"
            "}"
            "QScrollBar::handle:horizontal {"
@@ -231,10 +231,9 @@ TabView::ourStyleSheet()
            "QTableWidget::item:hover { color: black; background: lightGray; }"
            "QTreeView::item:hover { color: black; background: lightGray; }"
            "").arg(GColor(CPLOTBACKGROUND).name())
-#ifndef Q_OS_MAC
             .arg(GColor(CPLOTGRID).name())
             .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
-#endif
+            .arg(8 * dpiXFactor)
             ;
 }
 
