@@ -30,6 +30,9 @@
 extern QList<QColor> standardColors;
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
 
+// dialog scaling
+extern double dpiXFactor, dpiYFactor;
+
 class Context;
 
 // set appearace defaults based upon screen size

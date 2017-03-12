@@ -34,6 +34,11 @@
 #endif
 
 //
+// Dialog scaling
+//
+double dpiXFactor, dpiYFactor;
+
+//
 // A selection of distinct colours, user can adjust also
 //
 QList<QColor> standardColors;
