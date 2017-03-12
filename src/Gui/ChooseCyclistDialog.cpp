@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "Colors.h"
 #include <QtGui>
 
 static void recursiveDelete(QDir dir)
@@ -50,11 +51,12 @@ static void recursiveDelete(QDir dir)
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
 {
     setWindowTitle(tr("Choose an Athlete"));
-    setMinimumHeight(300);
+    setMinimumHeight(300 * dpiYFactor);
+    setMinimumWidth(350 * dpiXFactor);
 
     listWidget = new QListWidget(this);
     listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    listWidget->setIconSize(QSize(64, 64));
+    listWidget->setIconSize(QSize(64 *dpiXFactor, 64 *dpiYFactor));
     listWidget->setSpacing(0);
     listWidget->setContentsMargins(0,0,0,0);
 
@@ -104,11 +106,11 @@ ChooseCyclistDialog::getList()
         QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
         if (QFile(iconpath).exists()) {
             QPixmap px(iconpath);
-            newone->setIcon(QIcon(px.scaled(64,64)));
+            newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
         }
 
         // taller less spacing
-        newone->setSizeHint(QSize(newone->sizeHint().width(), 64));
+        newone->setSizeHint(QSize(newone->sizeHint().width(), 64 *dpiYFactor));
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
@@ -203,11 +205,11 @@ ChooseCyclistDialog::newClicked()
         QString iconpath = home.absolutePath() + "/" + name + "/config/avatar.png";
         if (QFile(iconpath).exists()) {
             QPixmap px(iconpath);
-            newone->setIcon(QIcon(px.scaled(64,64)));
+            newone->setIcon(QIcon(px.scaled(64 *dpiXFactor,64 *dpiYFactor)));
         }
 
         // taller less spacing
-        newone->setSizeHint(QSize(newone->sizeHint().width(), 64));
+        newone->setSizeHint(QSize(newone->sizeHint().width(), 64 *dpiYFactor));
     }
 }
 

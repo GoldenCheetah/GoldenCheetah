@@ -699,7 +699,7 @@ MainWindow::setSplash(bool first)
     l->addWidget(progress);
 
     // lets go
-    splash->setFixedSize(100,80);
+    splash->setFixedSize(100 *dpiXFactor, 80 *dpiYFactor);
 
     if (first) {
         // middle of screen
