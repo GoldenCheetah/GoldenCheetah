@@ -200,6 +200,7 @@ WithingsDownload::parse(QString text)
     return;
 }
 
+#ifdef GC_HAVE_KQOAUTH
 void
 WithingsDownload::onAuthorizedRequestDone() {
     // qDebug() << "Request sent to Withings!";
@@ -224,3 +225,4 @@ WithingsDownload::onRequestReady(QByteArray response) {
 
 
 }
+#endif
