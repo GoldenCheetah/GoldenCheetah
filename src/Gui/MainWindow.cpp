@@ -236,25 +236,6 @@ MainWindow::MainWindow(const QDir &home)
     QAction *myHelper = QWhatsThis::createAction (this);
     this->addAction(myHelper);
 
-#if 0
-    // Add chart is on the scope bar
-    chartMenu = new QMenu(this);
-    QStyle *styler = QStyleFactory::create("fusion");
-    QPushButton *newchart = new QPushButton("+", this);
-    scopebar->addWidget(newchart);
-    newchart->setStyle(styler);
-    newchart->setFixedHeight(20);
-    newchart->setFixedWidth(24);
-    newchart->setFlat(true);
-    newchart->setFocusPolicy(Qt::NoFocus);
-    newchart->setToolTip(tr("Add Chart"));
-    newchart->setAutoFillBackground(false);
-    newchart->setAutoDefault(false);
-    newchart->setMenu(chartMenu);
-    connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
-    connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
-#endif
-
 
     /*----------------------------------------------------------------------
      *  Toolbar
@@ -2237,11 +2218,12 @@ MainWindow::configChanged(qint32)
         tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
 
-    // set the default fontsize
-    QFont font;
-    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
-    font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
-    QApplication::setFont(font); // set default font
+    // set the default fontsize -- NEED TO HONOR APPLICATION WIDE SETTING
+    //                             OVERRIDEN IN MAIN.CPP -- PENDING CONFIG UPDATE
+    //XXXXQFont font;
+    //XXXXfont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
+    //XXXXfont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
+    //XXXXQApplication::setFont(font); // set default font
 
     head->updateGeometry();
     repaint();
