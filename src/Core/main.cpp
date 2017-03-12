@@ -360,9 +360,9 @@ main(int argc, char *argv[])
 
        font.setPointSizeF(pointsize);
 
-       qDebug()<<"default font point size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor;
+       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font point size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     } else {
-       qDebug()<<"no need for hidpi scaling";
+       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     }
 #endif
 
