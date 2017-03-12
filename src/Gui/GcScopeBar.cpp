@@ -25,15 +25,15 @@
 GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
 
-    setFixedHeight(23);
+    setFixedHeight(23 *dpiYFactor);
     setContentsMargins(10,0,10,0);
     layout = new QHBoxLayout(this);
-    layout->setSpacing(2);
+    layout->setSpacing(2 *dpiYFactor);
     layout->setContentsMargins(0,0,0,0);
 
     searchLabel = new GcLabel(tr("Search/Filter:"));
     searchLabel->setYOff(1);
-    searchLabel->setFixedHeight(20);
+    searchLabel->setFixedHeight(20 *dpiYFactor);
     searchLabel->setHighlighted(true);
     QFont font;
     layout->addWidget(searchLabel);
@@ -97,39 +97,39 @@ GcScopeBar::configChanged(qint32 reason)
     QFontMetrics fm(font);
 
     // we need to be the right height
-    setFixedHeight(fm.height() + 7);
+    setFixedHeight(fm.height() + (7 * dpiYFactor));
 
     // set font sizes
 #ifndef Q_OS_MAC
     font.setWeight(QFont::Bold);
 #endif
     searchLabel->setFont(font);
-    searchLabel->setFixedHeight(fm.height() + 7);
+    searchLabel->setFixedHeight(fm.height() + (7*dpiYFactor));
 
     // Windows / Linux uses GcScopeButton - pushbutton
-    home->setFixedHeight(fm.height() + 7);
+    home->setFixedHeight(fm.height() + (7*dpiYFactor));
     home->setFont(font);
 #ifdef GC_HAVE_ICAL
-    diary->setFixedHeight(fm.height() + 7);
+    diary->setFixedHeight(fm.height() + (7*dpiYFactor));
     diary->setFont(font);
 #endif
-    anal->setFixedHeight(fm.height() + 7);
+    anal->setFixedHeight(fm.height() + (7*dpiYFactor));
     anal->setFont(font);
-    train->setFixedHeight(fm.height() + 7);
+    train->setFixedHeight(fm.height() + (7*dpiYFactor));
     train->setFont(font);
 
     int width = fm.width(tr("Trends"));
-    home->setWidth(width+30);
+    home->setWidth(width+(30*dpiXFactor));
 
     width = fm.width(tr("Activities"));
-    anal->setWidth(width+30);
+    anal->setWidth(width+(30*dpiXFactor));
 
     width = fm.width(tr("Train"));
-    train->setWidth(width+30);
+    train->setWidth(width+(30*dpiXFactor));
 
 #ifdef GC_HAVE_ICAL
     width = fm.width(tr("Diary"));
-    diary->setWidth(width+30);
+    diary->setWidth(width+(30*dpiXFactor));
 #endif
 }
 
@@ -190,7 +190,7 @@ GcScopeBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
-    QLinearGradient linearGradient = GCColor::linearGradient(23, isActiveWindow());
+    QLinearGradient linearGradient = GCColor::linearGradient(23*dpiYFactor, isActiveWindow());
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, linearGradient);
 
