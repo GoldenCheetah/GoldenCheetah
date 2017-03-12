@@ -347,9 +347,9 @@ GcSplitterHandle::addActions(QList<QAction*> actions)
         QToolButton *p = new QToolButton(this);
         p->setStyleSheet("QToolButton { border: none; padding: 0px; }");
         p->setAutoFillBackground(false);
-        p->setFixedSize(20,20);
+        p->setFixedSize(20*dpiXFactor,20*dpiYFactor);
         p->setIcon(action->icon());
-        p->setIconSize(QSize(10,10));
+        p->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
         p->setFocusPolicy(Qt::NoFocus);
         titleLayout->addWidget(p);
         connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
@@ -402,8 +402,8 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
 GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
-    setFixedHeight(20);
-    setIconSize(QSize(14,14));
+    setFixedHeight(20 *dpiYFactor);
+    setIconSize(QSize(14 *dpiXFactor,14 *dpiYFactor));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
 
@@ -429,8 +429,8 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     // setup a painter and the area to paint
     QPainter painter(this);
 
-    QLinearGradient active = GCColor::linearGradient(20, true);
-    QLinearGradient inactive = GCColor::linearGradient(20, false);
+    QLinearGradient active = GCColor::linearGradient(20 *dpiYFactor, true);
+    QLinearGradient inactive = GCColor::linearGradient(20 *dpiYFactor, false);
 
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
