@@ -345,7 +345,7 @@ main(int argc, char *argv[])
        // choose a font size that would allow 80 lines of text on screen
        // we can include the option for the user to set a scaling factor
        // in settings before we release this in v3.5
-       double height = screenSize.height() / 50;
+       double height = screenSize.height() / 60;
 
        // find a font that is under height -- by looping
        int pixelsize=6;
