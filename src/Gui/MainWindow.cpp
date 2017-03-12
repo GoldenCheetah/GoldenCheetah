@@ -122,7 +122,7 @@
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
-QDesktopWidget *desktop = NULL;
+extern QDesktopWidget *desktop;
 
 MainWindow::MainWindow(const QDir &home)
 {
@@ -132,7 +132,6 @@ MainWindow::MainWindow(const QDir &home)
     setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
     init = false;
-    if (desktop == NULL) desktop = QApplication::desktop();
 
     // create a splash to keep user informed on first load
     // first one in middle of display, not middle of window
@@ -192,9 +191,9 @@ MainWindow::MainWindow(const QDir &home)
          restoreGeometry(appsettings->value(this, GC_SETTINGS_MAIN_GEOM).toByteArray());
          restoreState(appsettings->value(this, GC_SETTINGS_MAIN_STATE).toByteArray());
      } else {
-         QRect screenSize = desktop->availableGeometry();
          // first run -- lets set some sensible defaults...
          // lets put it in the middle of screen 1
+        QRect screenSize = desktop->availableGeometry();
          struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
 
          // center on the available screen (minus toolbar/sidebar)

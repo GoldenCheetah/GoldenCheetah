@@ -26,6 +26,7 @@
 #include "IdleTimer.h"
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
 #ifndef NOWEBKIT
@@ -63,6 +64,8 @@ static int gc_opened=0;
 //
 QString gcroot;
 QApplication *application;
+QDesktopWidget *desktop = NULL;
+
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
 HttpListener *listener = NULL;
@@ -301,12 +304,69 @@ main(int argc, char *argv[])
     appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
     GCColor::readConfig();
 
-    // set defaultfont
+    // set defaultfont - may be adjusted below
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
-    application->setFont(font); // set default font
 
+    // hidpi ratios -- single desktop for now
+    desktop = QApplication::desktop();
+
+    // We will set screen ratio factor for sizing when a screen
+    // is greater than the Surface Pro 3 2160x1440, since its a break
+    // point with resolutions above that being devices like the
+    // 2560x1700 chromebook pixel before we get to truly hi-dpi
+    // resolutions like apples MBP retina 2880x1800 up through
+    // UHD, 4k and 5k displays at 3840x2160, 4096x2304 and 5120 x 2160.
+    QRect screenSize = desktop->availableGeometry();
+
+    // since almost all dialogs are sized for a screen resolution
+    // of 1280x1024, to save issues we will scale DIALOGS to the
+    // overall screen estate when supporting HI-DPI. For widgetry
+    // all code needs to be changed to set height based upon font
+    // sizing instead.
+    dpiXFactor = 1.0;
+    dpiYFactor = 1.0;
+
+#ifndef Q_OS_MAC // not needed on a Mac
+    // if we're running with dpiawareness of 0 the screen resolution
+    // will be expressed taking into account the scaling applied
+    // so for example a 3840x2160 screen will likely be expressed as
+    // being xxx x xxx rather than the native resolution
+    if (desktop->screen()->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
+       // we're on a hidpi screen - lets create a multiplier - always use smallest
+       dpiXFactor = screenSize.width() / 1280;
+       dpiYFactor = screenSize.height() / 1024;
+
+       if (dpiYFactor < dpiXFactor) dpiXFactor = dpiYFactor;
+       else if (dpiXFactor < dpiYFactor) dpiYFactor = dpiXFactor;
+
+       // set default font size -- all others will scale off this
+       // choose a font size that would allow 60 lines of text on screen
+       // we can include the option for the user to set a scaling factor
+       // in settings before we release this in v3.5
+       double height = screenSize.height() / 60;
+
+       // find a font that is under height -- by looping
+       double pointsize=12;
+       do {
+            QFont f;
+            f.setPointSize(pointsize);
+            QFontMetrics fm(f);
+            if (fm.height() > height) break;
+            else pointsize += 0.5f;
+
+       } while (true);
+
+       font.setPointSizeF(pointsize);
+
+       qDebug()<<"default font point size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor;
+    } else {
+       qDebug()<<"no need for hidpi scaling";
+    }
+#endif
+
+    application->setFont(font); // set default font
 
     //
     // OPEN FIRST MAINWINDOW
