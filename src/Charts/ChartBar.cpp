@@ -66,9 +66,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+spacing_);
-    scrollArea->setFixedHeight(fs.height()+spacing_);
-    buttonBar->setFixedHeight(fs.height()+spacing_);
+    setFixedHeight(fs.height()+(spacing_*dpiXFactor));
+    scrollArea->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
+    buttonBar->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
 
     scrollArea->setWidget(buttonBar);
 
@@ -79,9 +79,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     left = new QToolButton(this);
     left->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     left->setAutoFillBackground(false);
-    left->setFixedSize(20,20);
+    left->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     left->setIcon(leftIcon);
-    left->setIconSize(QSize(20,20));
+    left->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     left->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(left);
     connect(left, SIGNAL(clicked()), this, SLOT(scrollLeft()));
@@ -92,9 +92,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     right = new QToolButton(this);
     right->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     right->setAutoFillBackground(false);
-    right->setFixedSize(20,20);
+    right->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     right->setIcon(rightIcon);
-    right->setIconSize(QSize(20,20));
+    right->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     right->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(right);
     connect(right, SIGNAL(clicked()), this, SLOT(scrollRight()));
@@ -102,16 +102,16 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     // spacer to make the menuButton on the right
     QLabel *spacer = new QLabel("", this);
     spacer->setAutoFillBackground(false);
-    spacer->setFixedHeight(20);
+    spacer->setFixedHeight(20*dpiYFactor);
     spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     mlayout->addWidget(spacer);
 
     menuButton = new QToolButton(this);
     menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     menuButton->setAutoFillBackground(false);
-    menuButton->setFixedSize(20,20);
+    menuButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     menuButton->setIcon(iconFromPNG(":images/sidebar/extra.png"));
-    menuButton->setIconSize(QSize(10,10));
+    menuButton->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
@@ -143,14 +143,14 @@ ChartBar::configChanged(qint32)
 {
     buttonFont = QFont();
     QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+spacing_);
-    scrollArea->setFixedHeight(fs.height()+spacing_);
-    buttonBar->setFixedHeight(fs.height()+spacing_);
+    setFixedHeight(fs.height()+(spacing_*dpiXFactor));
+    scrollArea->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
+    buttonBar->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
     foreach(GcScopeButton *b, buttons) {
     	int width = fs.width(b->text);
     	b->setFont(buttonFont);
-    	b->setFixedWidth(width+20);
-    	b->setFixedHeight(fs.height()+2);
+        b->setFixedWidth(width+(20*dpiXFactor));
+        b->setFixedHeight(fs.height()+(2*dpiYFactor));
     }
 }
 
@@ -164,8 +164,8 @@ ChartBar::addWidget(QString title)
     // make the right size
     QFontMetrics fontMetric(buttonFont);
     int width = fontMetric.width(title);
-    newbutton->setFixedWidth(width+20);
-    newbutton->setFixedHeight(fontMetric.height()+2);
+    newbutton->setFixedWidth(width+(20*dpiXFactor));
+    newbutton->setFixedHeight(fontMetric.height()+(2*dpiYFactor));
 
     // add to layout
     layout->addWidget(newbutton);
@@ -200,7 +200,7 @@ ChartBar::setText(int index, QString text)
     buttons[index]->setText(text);
     QFontMetrics fontMetric(buttonFont);
     int width = fontMetric.width(text);
-    buttons[index]->setWidth(width+20);
+    buttons[index]->setWidth(width+(20*dpiXFactor));
 
     tidy(); // still fit ?
 }
@@ -210,9 +210,9 @@ void
 ChartBar::tidy()
 {
     // resize to button widths + 2px spacing
-    int width = 2;
+    int width = 2*dpiXFactor;
     foreach (GcScopeButton *button, buttons) {
-        width += button->geometry().width() + 2;
+        width += button->geometry().width() + (2*dpiXFactor);
     }
     buttonBar->setMinimumWidth(width);
 
@@ -257,14 +257,14 @@ ChartBar::scrollRight()
 {
     // scroll to the right...
     int w = buttonBar->width();
-    scrollArea->ensureVisible(w-10,0,10,10);
+    scrollArea->ensureVisible(w-(10*dpiXFactor),0,10*dpiXFactor,10*dpiYFactor);
 }
 
 void
 ChartBar::scrollLeft()
 {
     // scroll to the left
-    scrollArea->ensureVisible(0,0,10,10);
+    scrollArea->ensureVisible(0,0,10*dpiXFactor,10*dpiYFactor);
 }
 
 void
@@ -359,8 +359,8 @@ ChartBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23, true); 
-    QLinearGradient inactive = GCColor::linearGradient(23, false); 
+    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
+    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
 
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
@@ -399,8 +399,8 @@ ButtonBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23, true); 
-    QLinearGradient inactive = GCColor::linearGradient(23, false); 
+    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
+    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
 
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
