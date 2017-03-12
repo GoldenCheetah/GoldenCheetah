@@ -33,7 +33,7 @@
 
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
-    _sidebar(true), _tiled(false), _selected(false), lastHeight(130), sidewidth(0),
+    _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
@@ -47,8 +47,8 @@ TabView::TabView(Context *context, int type) :
     stack = new QStackedWidget(this);
     stack->setContentsMargins(0,0,0,0);
     stack->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    stack->setMinimumWidth(500);
-    stack->setMinimumHeight(500);
+    stack->setMinimumWidth(500*dpiXFactor);
+    stack->setMinimumHeight(500*dpiYFactor);
 
     layout->addWidget(stack);
 
@@ -66,7 +66,7 @@ TabView::TabView(Context *context, int type) :
     else if (type == VIEW_TRAIN) heading = tr("Intensity Adjustments and Workout Control");
 
     mainSplitter = new ViewSplitter(Qt::Vertical, heading, this);
-    mainSplitter->setHandleWidth(23);
+    mainSplitter->setHandleWidth(23 *dpiXFactor);
     mainSplitter->setFrameStyle(QFrame::NoFrame);
     mainSplitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
     mainSplitter->setOpaqueResize(true); // redraw when released, snappier UI

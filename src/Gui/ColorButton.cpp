@@ -17,6 +17,7 @@
  */
 
 #include "ColorButton.h"
+#include "Colors.h"
 
 #include <QPainter>
 #include <QColorDialog>
@@ -33,21 +34,21 @@ ColorButton::setColor(QColor ncolor)
 {
     color = ncolor;
 
-    QPixmap pix(24, 24);
+    QPixmap pix(24*dpiXFactor, 24*dpiYFactor);
     QPainter painter(&pix);
     if (color.isValid()) {
         painter.setPen(Qt::gray);
         painter.setBrush(QBrush(color));
-        painter.drawRect(0, 0, 24, 24);
+        painter.drawRect(0, 0, 24*dpiXFactor, 24*dpiYFactor);
     }
     QIcon icon;
     icon.addPixmap(pix);
     setIcon(icon);
-    setContentsMargins(2,2,2,2);
+    setContentsMargins(2*dpiXFactor,2*dpiYFactor,2*dpiXFactor,2*dpiYFactor);
     setFlat(true);
-    setFixedWidth(34);
-    setMinimumWidth(34);
-    setMaximumWidth(34);
+    setFixedWidth(34 * dpiXFactor);
+    setMinimumWidth(34 *dpiXFactor);
+    setMaximumWidth(34 *dpiXFactor);
 }
 
 void

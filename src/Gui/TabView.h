@@ -26,6 +26,7 @@
 #include <QStackedWidget>
 
 #include "HomeWindow.h"
+#include "Colors.h"
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
 
@@ -176,13 +177,13 @@ protected:
         }
         return new GcSplitterHandle(name, orientation, NULL, newclear(), newtoggle(), this);
     }
-    int handleWidth() { return 23; };
+    int handleWidth() { return 23 *dpiXFactor; };
 
     QPushButton *newclear() {
         if (clearbutton) delete clearbutton; // we only need one!
         clearbutton = new QPushButton(tr("Clear"), this);
 //      clearbutton->setFixedWidth(60); // no fixed length to allow translation
-        clearbutton->setFixedHeight(20);
+        clearbutton->setFixedHeight(20 *dpiYFactor);
         clearbutton->setFocusPolicy(Qt::NoFocus);
         connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
 
@@ -195,7 +196,7 @@ protected:
         toggle->setCheckable(true);
         toggle->setChecked(false);
 //      toggle->setFixedWidth(40);   // no fixed length to allow translation
-        toggle->setFixedHeight(20);
+        toggle->setFixedHeight(20 *dpiYFactor);
         toggle->setFocusPolicy(Qt::NoFocus);
         connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
 

@@ -251,6 +251,7 @@ ComparePane::refreshTable()
             // Checkbox
             QCheckBox *check = new QCheckBox(this);
             check->setChecked(x.checked);
+            check->setFixedHeight(23 * dpiYFactor);
             if (!counter) check->setEnabled(false);
             table->setCellWidget(counter, 0, check);
             connect(check, SIGNAL(stateChanged(int)), this, SLOT(intervalButtonsChanged()));
@@ -314,7 +315,7 @@ ComparePane::refreshTable()
             for (int i=3; i<(worklist.count()+5); i++)
                 table->item(counter,i)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
-            table->setRowHeight(counter, 23);
+            table->setRowHeight(counter, 23 *dpiYFactor);
             counter++;
         }
 
@@ -414,6 +415,7 @@ ComparePane::refreshTable()
             // Checkbox
             QCheckBox *check = new QCheckBox(this);
             check->setChecked(x.checked);
+            check->setFixedHeight(23 * dpiYFactor);
             if (!counter) check->setEnabled(false);
             table->setCellWidget(counter, 0, check);
             connect(check, SIGNAL(stateChanged(int)), this, SLOT(daterangeButtonsChanged()));
@@ -470,7 +472,7 @@ ComparePane::refreshTable()
             for (int i=3; i<(worklist.count()+5); i++)
                 table->item(counter,i)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
-            table->setRowHeight(counter, 23);
+            table->setRowHeight(counter, 23 *dpiYFactor);
             counter++;
         }
 
