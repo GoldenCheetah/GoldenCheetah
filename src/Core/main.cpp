@@ -342,25 +342,25 @@ main(int argc, char *argv[])
        else if (dpiXFactor < dpiYFactor) dpiYFactor = dpiXFactor;
 
        // set default font size -- all others will scale off this
-       // choose a font size that would allow 60 lines of text on screen
+       // choose a font size that would allow 80 lines of text on screen
        // we can include the option for the user to set a scaling factor
        // in settings before we release this in v3.5
-       double height = screenSize.height() / 60;
+       double height = screenSize.height() / 50;
 
        // find a font that is under height -- by looping
-       double pointsize=12;
+       int pixelsize=6;
        do {
             QFont f;
-            f.setPointSize(pointsize);
+            f.setPixelSize(pixelsize);
             QFontMetrics fm(f);
             if (fm.height() > height) break;
-            else pointsize += 0.5f;
+            else pixelsize++;
 
        } while (true);
 
-       font.setPointSizeF(pointsize);
+       font.setPixelSize(pixelsize);
 
-       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font point size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
+       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font pixel size:"<<pixelsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     } else {
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     }
