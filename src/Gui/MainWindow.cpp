@@ -255,12 +255,12 @@ MainWindow::MainWindow(const QDir &home)
     lowbarIcon = iconFromPNG(":images/mac/lowbar.png");
     tabbedIcon = iconFromPNG(":images/mac/tabbed.png");
     tiledIcon = iconFromPNG(":images/mac/tiled.png");
-    QSize isize(19,19);
+    QSize isize(19 *dpiXFactor,19 *dpiYFactor);
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
+    lowbar->setFixedHeight(24 *dpiYFactor);
     lowbar->setIconSize(isize);
-    lowbar->setFixedHeight(24);
     lowbar->setStyle(toolStyle);
     lowbar->setToolTip(tr("Toggle Compare Pane"));
     lowbar->setPalette(metal);
@@ -270,8 +270,8 @@ MainWindow::MainWindow(const QDir &home)
 
     sidebar = new QPushButton(this);
     sidebar->setIcon(sidebarIcon);
+    sidebar->setFixedHeight(24 * dpiYFactor);
     sidebar->setIconSize(isize);
-    sidebar->setFixedHeight(24);
     sidebar->setStyle(toolStyle);
     sidebar->setToolTip(tr("Toggle Sidebar"));
     sidebar->setPalette(metal);
@@ -281,14 +281,14 @@ MainWindow::MainWindow(const QDir &home)
 
     styleSelector = new QtSegmentControl(this);
     styleSelector->setStyle(toolStyle);
-    styleSelector->setIconSize(isize);
     styleSelector->setCount(2);
     styleSelector->setSegmentIcon(0, tabbedIcon);
     styleSelector->setSegmentIcon(1, tiledIcon);
     styleSelector->setSegmentToolTip(0, tr("Tabbed View"));
     styleSelector->setSegmentToolTip(1, tr("Tiled View"));
     styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
-    styleSelector->setFixedHeight(24);
+    styleSelector->setFixedHeight(24 * dpiXFactor);
+    styleSelector->setIconSize(isize);
     styleSelector->setPalette(metal);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
 
@@ -306,7 +306,7 @@ MainWindow::MainWindow(const QDir &home)
     anim = new QPropertyAnimation(searchBox, "xwidth", this);
 
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(150);
+    searchBox->setFixedWidth(150 * dpiYFactor);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
@@ -316,7 +316,7 @@ MainWindow::MainWindow(const QDir &home)
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
     Spacer *spacer = new Spacer(this);
-    spacer->setFixedWidth(5);
+    spacer->setFixedWidth(5 *dpiYFactor);
     head->addWidget(spacer);
 
 
@@ -2302,7 +2302,7 @@ MainWindow::searchFocusIn()
         anim->setDuration(300);
         anim->setEasingCurve(QEasingCurve::InOutQuad);
         anim->setStartValue(searchBox->width());
-        anim->setEndValue(500);
+        anim->setEndValue(500 * dpiYFactor);
         anim->start();
     }
 }
@@ -2311,7 +2311,7 @@ void
 MainWindow::searchFocusOut()
 {
     anim->stop();
-    searchBox->setFixedWidth(150);
+    searchBox->setFixedWidth(150 *dpiYFactor);
 }
 
 #ifdef GC_HAS_CLOUD_DB

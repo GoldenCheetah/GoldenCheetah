@@ -35,13 +35,13 @@
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false)
 {
-    setFixedHeight(21);
+    setFixedHeight(21 *dpiYFactor);
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     QIcon pixmap(":images/toolbar/popbutton.png");
     clearButton->setIcon(QIcon(pixmap));
-    clearButton->setIconSize(QSize(12,12));
+    clearButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
     clearButton->setCursor(Qt::ArrowCursor);
     clearButton->hide();
     //connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
@@ -50,7 +50,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // make sure its underneath the toggle button
     toolButton = new QToolButton(this);
-    toolButton->setFixedSize(QSize(16,16));
+    toolButton->setFixedSize(QSize(16 *dpiXFactor,16 *dpiYFactor));
     toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     toolButton->setCursor(Qt::ArrowCursor);
     toolButton->setPopupMode(QToolButton::InstantPopup);
@@ -65,7 +65,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
     searchButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     searchButton->setIcon(search);
-    searchButton->setIconSize(QSize(11,11));
+    searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
     searchButton->setCursor(Qt::ArrowCursor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
@@ -255,7 +255,7 @@ void SearchBox::resizeEvent(QResizeEvent *)
     QSize sz = clearButton->sizeHint();
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
-    searchButton->move(5, 3);
+    searchButton->move(5 *dpiXFactor, 3 *dpiYFactor);
 #ifndef Q_OS_MAC
     toolButton->move(15, 0);
 #else
@@ -281,7 +281,7 @@ void SearchBox::setMode(SearchBoxMode mode)
         {
             QIcon filter = iconFromPNG(":images/toolbar/filter3.png", false);
             searchButton->setIcon(filter);
-            searchButton->setIconSize(QSize(11,11));
+            searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
             setPlaceholderText(tr("Filter..."));
         }
         break;
@@ -291,7 +291,7 @@ void SearchBox::setMode(SearchBoxMode mode)
         {
             QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
             searchButton->setIcon(search);
-            searchButton->setIconSize(QSize(11,11));
+            searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
             setPlaceholderText(tr("Search..."));
         }
         break;
