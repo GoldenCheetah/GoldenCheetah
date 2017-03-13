@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "Units.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 #include <QtGui>
 #include <sstream>

@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 
 #include "Library.h"
@@ -784,6 +785,7 @@ WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CreateWorkout));
+    setMinimumSize(QSize(600*dpiXFactor, 500 *dpiYFactor));
 
     hackContext = context;
     setPage(WW_WorkoutTypePage, new WorkoutTypePage());

@@ -32,8 +32,8 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_ERGDB));
 
     // make the dialog a resonable size
-    setMinimumWidth(650);
-    setMinimumHeight(400);
+    setMinimumWidth(650 * dpiXFactor);
+    setMinimumHeight(400 *dpiYFactor);
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);

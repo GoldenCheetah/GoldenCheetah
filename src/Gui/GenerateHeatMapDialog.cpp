@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "Colors.h"
 #include "HelpWhatsThis.h"
 
 GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context->mainWindow), context(context)
@@ -33,8 +34,8 @@ GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CreateHeatMap));
 
     // make the dialog a resonable size
-    setMinimumWidth(550);
-    setMinimumHeight(400);
+    setMinimumWidth(550 *dpiXFactor);
+    setMinimumHeight(400 *dpiYFactor);
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);

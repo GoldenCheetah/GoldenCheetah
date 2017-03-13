@@ -19,6 +19,7 @@
 #include "SolveCPDialog.h"
 #include "HelpWhatsThis.h"
 #include "Settings.h"
+#include "Colors.h"
 
 #include "Context.h"
 #include "Athlete.h"
@@ -36,7 +37,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
 {
     setWindowTitle(tr("Critical Power Solver"));
     setAttribute(Qt::WA_DeleteOnClose);
-    setMinimumSize(QSize(800, 400));
+    setMinimumSize(QSize(800 *dpiXFactor, 400 *dpiYFactor));
 
     // are we integral or differential ?
     integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");

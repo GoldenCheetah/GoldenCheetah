@@ -23,6 +23,7 @@
 #include "RideItem.h"
 #include "MainWindow.h"
 #include "JsonRideFile.h"
+#include "Colors.h"
 #include "Units.h"
 
 #include <QIcon>
@@ -632,7 +633,7 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     : QDialog(context->mainWindow, Qt::Dialog), context(context), store(store), downloading(false), aborted(false)
 {
     setWindowTitle(tr("Synchronise ") + store->name());
-    setMinimumSize(850,450);
+    setMinimumSize(850 *dpiXFactor,450 *dpiYFactor);
 
     QStringList errors;
     if (store->open(errors) == false) {

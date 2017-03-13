@@ -253,7 +253,7 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     setWindowTitle(tr("Search for Workouts, Syncs and Media"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_ScanDisk_WorkoutVideo));
-    setMinimumWidth(600);
+    setMinimumWidth(600 *dpiXFactor);
 
     searcher = NULL;
 
@@ -320,12 +320,12 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     workoutCount = new QLabel(this);
     videosyncCountTitle = new QLabel(tr("VideoSyncs"), this);
     videosyncCount = new QLabel(this);
-    mediaCount->setFixedWidth(80);
-    mediaCountTitle->setFixedWidth(80);
-    workoutCount->setFixedWidth(80);
-    workoutCountTitle->setFixedWidth(80);
-    videosyncCount->setFixedWidth(80);
-    videosyncCountTitle->setFixedWidth(80);
+    mediaCount->setFixedWidth(80 *dpiXFactor);
+    mediaCountTitle->setFixedWidth(80 *dpiXFactor);
+    workoutCount->setFixedWidth(80 *dpiXFactor);
+    workoutCountTitle->setFixedWidth(80 *dpiXFactor);
+    videosyncCount->setFixedWidth(80 *dpiXFactor);
+    videosyncCountTitle->setFixedWidth(80 *dpiXFactor);
 
     cancelButton = new QPushButton(tr("Cancel"), this);
     cancelButton->setDefault(false);
@@ -393,7 +393,7 @@ void
 LibrarySearchDialog::setWidgets()
 {
     if (searching) {
-        setFixedHeight(250);
+        setFixedHeight(250 *dpiYFactor);
         searchButton->hide();
         cancelButton->setText(tr("Abort Search"));
         searchPathTable->hide();
@@ -412,7 +412,7 @@ LibrarySearchDialog::setWidgets()
         videosyncCount->show();
 
     } else {
-        setFixedHeight(400);
+        setFixedHeight(400 *dpiYFactor);
         searchButton->show();
         cancelButton->setText(tr("Cancel"));
         searchPathTable->show();
@@ -730,7 +730,7 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     setWindowTitle(tr("Import to Library"));
-    setFixedSize(450, 450);
+    setFixedSize(450 *dpiXFactor, 450 *dpiYFactor);
 
     MediaHelper helper;
 

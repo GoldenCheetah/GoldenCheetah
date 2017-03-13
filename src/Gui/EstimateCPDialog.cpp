@@ -19,6 +19,7 @@
 #include "EstimateCPDialog.h"
 #include "HelpWhatsThis.h"
 #include "Settings.h"
+#include "Colors.h"
 
 QHBoxLayout*
 EstimateCPDialog::setupMinsSecs(QDoubleSpinBoxPtr &minsSpinBox,
@@ -64,7 +65,7 @@ EstimateCPDialog::EstimateCPDialog(QWidget *parent) : QDialog(parent)
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    setFixedSize(300, 300);
+    setMinimumSize(300 *dpiXFactor, 300 *dpiYFactor);
 
     QVBoxLayout *mainVBox = new QVBoxLayout(this);
 

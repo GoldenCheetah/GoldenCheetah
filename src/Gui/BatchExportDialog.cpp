@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "Colors.h"
 #include "RideCache.h"
 #include "HelpWhatsThis.h"
 #include "CsvRideFile.h"
@@ -34,8 +35,8 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_BatchExport));
 
     // make the dialog a resonable size
-    setMinimumWidth(550);
-    setMinimumHeight(400);
+    setMinimumWidth(550 *dpiXFactor);
+    setMinimumHeight(400 *dpiYFactor);
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -48,10 +49,10 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
     files->headerItem()->setText(4, tr("Action"));
 
     files->setColumnCount(5);
-    files->setColumnWidth(0, 30); // selector
-    files->setColumnWidth(1, 190); // filename
-    files->setColumnWidth(2, 95); // date
-    files->setColumnWidth(3, 90); // time
+    files->setColumnWidth(0, 30 *dpiXFactor); // selector
+    files->setColumnWidth(1, 190 *dpiXFactor); // filename
+    files->setColumnWidth(2, 95 *dpiXFactor); // date
+    files->setColumnWidth(3, 90 *dpiXFactor); // time
     files->setSelectionMode(QAbstractItemView::SingleSelection);
     files->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     files->setUniformRowHeights(true);
