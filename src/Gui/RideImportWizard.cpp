@@ -28,6 +28,7 @@
 #include "RideAutoImportConfig.h"
 #include "HelpWhatsThis.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
 
 #include "GcRideFile.h"
@@ -217,9 +218,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
         }
     }
 
-    directoryWidget->setColumnWidth(0, 400);
-    directoryWidget->setColumnWidth(1, 250);
-    directoryWidget->setColumnWidth(2, 230);
+    directoryWidget->setColumnWidth(0, 400 *dpiXFactor);
+    directoryWidget->setColumnWidth(1, 250 *dpiXFactor);
+    directoryWidget->setColumnWidth(2, 230 *dpiXFactor);
 
     init(files, context);
 
@@ -241,7 +242,7 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     tableWidget = new QTableWidget(files.count(), 6, this);
 
     tableWidget->setItemDelegate(new RideDelegate(1)); // use a delegate for column 1 date
-    tableWidget->verticalHeader()->setDefaultSectionSize(20);
+    tableWidget->verticalHeader()->setDefaultSectionSize(20 *dpiXFactor);
     phaseLabel = new QLabel;
     progressBar = new QProgressBar();
     todayButton = new QComboBox();
@@ -380,12 +381,12 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     setLayout(contents);
 
     // adjust all the sizes to look tidy
-    tableWidget->setColumnWidth(0, 200); // filename
-    tableWidget->setColumnWidth(1, 120); // date
-    tableWidget->setColumnWidth(2, 120); // time
-    tableWidget->setColumnWidth(3, 100); // duration
-    tableWidget->setColumnWidth(4, 70); // distance
-    tableWidget->setColumnWidth(5, 250); // status
+    tableWidget->setColumnWidth(0, 200*dpiXFactor); // filename
+    tableWidget->setColumnWidth(1, 120*dpiXFactor); // date
+    tableWidget->setColumnWidth(2, 120*dpiXFactor); // time
+    tableWidget->setColumnWidth(3, 100*dpiXFactor); // duration
+    tableWidget->setColumnWidth(4, 70*dpiXFactor); // distance
+    tableWidget->setColumnWidth(5, 250*dpiXFactor); // status
 
     // max height for 16 items and a scrollbar on right if > 16 items
     // for some reason the window is wider for 10-16 items too.
@@ -393,11 +394,11 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     // than me should clean up the logic here, no doubt using a
     // single call to geometry/hint. But for now it looks good
     // on Leopard, no doubt not so good on Windows
-    resize(920 +
+    resize((920 +
            ((files.count() > 16 ? 24 : 0) +
-           ((files.count() > 9 && files.count() < 17) ? 8 : 0)),
-           118 + ((files.count() > 16 ? 17*20 : (files.count()+1) * 20)
-           + ((autoImportMode) ? 100 : 0))); // assume not more the 5 directory in average
+           ((files.count() > 9 && files.count() < 17) ? 8 : 0)))*dpiXFactor,
+           (118 + ((files.count() > 16 ? 17*20 : (files.count()+1) * 20)
+           + ((autoImportMode) ? 100 : 0)))*dpiYFactor); // assume not more the 5 directory in average
 
     if (autoImportMode) directoryWidget->adjustSize();
     tableWidget->adjustSize();
@@ -504,9 +505,9 @@ RideImportWizard::process()
 
                  // resize dialog according to the number of rows we expect
                  int willhave = filenames.count() + rides.count();
-                 resize(920 + ((willhave > 16 ? 24 : 0) +
-                     ((willhave > 9 && willhave < 17) ? 8 : 0)),
-                     118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)));
+                 resize((920 + ((willhave > 16 ? 24 : 0) +
+                     ((willhave > 9 && willhave < 17) ? 8 : 0)))*dpiXFactor,
+                     (118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)))*dpiYFactor);
 
 
                  // ok so create a temporary file and add to the tableWidget
