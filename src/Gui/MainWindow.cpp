@@ -292,6 +292,16 @@ MainWindow::MainWindow(const QDir &home)
     styleSelector->setPalette(metal);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
 
+ #if defined(WIN32) || defined (Q_OS_LINUX)
+    // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
+    if (dpiXFactor > 1) {
+        QString nopad = QString("QPushButton { padding-left: 0px; padding-right: 0px; "
+                                "              padding-top:  0px; padding-bottom: 0px; }");
+        sidebar->setStyleSheet(nopad);
+        lowbar->setStyleSheet(nopad);
+    }
+#endif
+
     head->addWidget(new Spacer(this));
     head->addStretch();
     head->addWidget(scopebar);
@@ -2206,7 +2216,6 @@ MainWindow::configChanged(qint32)
 #endif
 
 // Mac and Linux
-
     QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
