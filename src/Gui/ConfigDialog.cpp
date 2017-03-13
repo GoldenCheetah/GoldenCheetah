@@ -48,7 +48,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     head->setMovable(false); // oops!
 
     QFont defaultFont;
-    setMinimumSize(600 *dpiXFactor,580 *dpiYFactor);   //Change for 53 to 60 - To be decided if also Size for Q_OS_MAC need change
+    setMinimumSize(640 *dpiXFactor,580 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
     // center
