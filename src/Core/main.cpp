@@ -328,11 +328,12 @@ main(int argc, char *argv[])
     dpiXFactor = 1.0;
     dpiYFactor = 1.0;
 
+#if QT_VERSION_MAJOR >= 5
 #ifndef Q_OS_MAC // not needed on a Mac
     // if we're running with dpiawareness of 0 the screen resolution
     // will be expressed taking into account the scaling applied
     // so for example a 3840x2160 screen will likely be expressed as
-    // being xxx x xxx rather than the native resolution
+    // being 1920 x 1080 rather than the native resolution
     if (desktop->screen()->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
        // we're on a hidpi screen - lets create a multiplier - always use smallest
        dpiXFactor = screenSize.width() / 1280;
@@ -342,7 +343,7 @@ main(int argc, char *argv[])
        else if (dpiXFactor < dpiYFactor) dpiYFactor = dpiXFactor;
 
        // set default font size -- all others will scale off this
-       // choose a font size that would allow 80 lines of text on screen
+       // choose a font size that would allow 60 lines of text on screen
        // we can include the option for the user to set a scaling factor
        // in settings before we release this in v3.5
        double height = screenSize.height() / 60;
@@ -364,6 +365,9 @@ main(int argc, char *argv[])
     } else {
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     }
+#endif
+#else
+       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no hidpi support available";
 #endif
 
     application->setFont(font); // set default font
