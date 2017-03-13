@@ -58,7 +58,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
-    configLayout->setSpacing(10);
+    configLayout->setSpacing(10 *dpiXFactor);
 
     //
     // Language Selection
@@ -1201,8 +1201,8 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     QGridLayout *grid = new QGridLayout;
 #ifdef Q_OS_MAX
     setContentsMargins(10,10,10,10);
-    grid->setSpacing(5);
-    all->setSpacing(5);
+    grid->setSpacing(5 *dpiXFactor);
+    all->setSpacing(5 *dpiXFactor);
 #endif
 
     QLabel *nicklabel = new QLabel(tr("Nickname"));
@@ -1459,8 +1459,8 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     QGridLayout *grid = new QGridLayout;
 #ifdef Q_OS_MAX
     setContentsMargins(10,10,10,10);
-    grid->setSpacing(5);
-    all->setSpacing(5);
+    grid->setSpacing(5 *dpiXFactor);
+    all->setSpacing(5 *dpiXFactor);
 #endif
 
     QString weighttext = QString(tr("Weight (%1)")).arg(context->athlete->useMetricUnits ? tr("kg") : tr("lb"));
@@ -1618,7 +1618,7 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     mainLayout->addWidget(deviceList);
     QHBoxLayout *bottom = new QHBoxLayout;
-    bottom->setSpacing(2);
+    bottom->setSpacing(2 *dpiXFactor);
     bottom->addStretch();
     bottom->addWidget(addButton);
     bottom->addWidget(delButton);
@@ -2144,7 +2144,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #endif
 
     QGridLayout *grid = new QGridLayout;
-    grid->setSpacing(5);
+    grid->setSpacing(5 *dpiXFactor);
 
     grid->addWidget(defaultLabel, 0,0);
     grid->addWidget(titlesLabel, 1,0);
@@ -3301,7 +3301,7 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
 #endif
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
@@ -3516,7 +3516,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     downButton = new QPushButton(tr("Down"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
@@ -3821,7 +3821,7 @@ DefaultsPage::DefaultsPage(QWidget *parent, QList<DefaultDefinition>defaultDefin
     downButton = new QPushButton(tr("Down"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
@@ -4053,7 +4053,7 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
     deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
@@ -4207,7 +4207,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     active = false;
 
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setSpacing(10);
+    mainLayout->setSpacing(10 *dpiXFactor);
 
     updateButton = new QPushButton(tr("Update"));
     updateButton->hide();
@@ -4284,7 +4284,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     pmaxEdit->setDecimals(0);
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(cpLabel);
     actionButtons->addWidget(cpEdit);
 
@@ -4862,7 +4862,7 @@ HrZonePage::saveClicked()
 HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5);
+    mainLayout->setSpacing(5 *dpiXFactor);
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
@@ -4874,7 +4874,7 @@ HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
     deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
@@ -5043,7 +5043,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     active = false;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5);
+    mainLayout->setSpacing(5 *dpiXFactor);
 
     updateButton = new QPushButton(tr("Update"));
     updateButton->hide();
@@ -5072,7 +5072,7 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
 #endif
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addStretch();
     actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
@@ -5611,7 +5611,7 @@ PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
     deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
@@ -5764,7 +5764,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     active = false;
 
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setSpacing(10);
+    mainLayout->setSpacing(10 *dpiXFactor);
 
     updateButton = new QPushButton(tr("Update"));
     updateButton->hide();
@@ -5819,7 +5819,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     if (!metric->isChecked()) metricChanged(); // default is metric
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(cpLabel);
     actionButtons->addWidget(cvEdit);
     actionButtons->addWidget(per);
@@ -6253,7 +6253,7 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
 #endif
 
     QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(deleteButton);
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
@@ -6469,7 +6469,7 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     downButton = new QPushButton(tr("Down"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
+    actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();

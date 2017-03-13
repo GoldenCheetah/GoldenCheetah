@@ -207,7 +207,7 @@ LTMWindow::LTMWindow(Context *context) :
     rData = new QCheckBox(tr("Data Table"), this);
     rStack = new QCheckBox(tr("Stacked"), this);
     QVBoxLayout *checks = new QVBoxLayout;
-    checks->setSpacing(2);
+    checks->setSpacing(2 *dpiXFactor);
     checks->setContentsMargins(0,0,0,0);
     checks->addWidget(rData);
     checks->addWidget(rStack);

@@ -76,7 +76,7 @@ ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context, Ride
     connect(deleteRefButton, SIGNAL(clicked()), this, SLOT(deleteRef()));
 
     QHBoxLayout *refButtons = new QHBoxLayout;
-    refButtons->setSpacing(2);
+    refButtons->setSpacing(2 *dpiXFactor);
     refButtons->addStretch();
     refButtons->addWidget(deleteRefButton);
     mainLayout->addLayout(refButtons);

@@ -894,7 +894,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     // Plot files
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
-    layout->setSpacing(5);
+    layout->setSpacing(5 *dpiXFactor);
     layout->setContentsMargins(5,5,5,5);
 
     spanSlider = new QxtSpanSlider(Qt::Horizontal, this);

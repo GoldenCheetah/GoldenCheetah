@@ -57,7 +57,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     else c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Histogram));
     QFormLayout *cl = new QFormLayout(c);
     cl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
-    cl->setSpacing(5);
+    cl->setSpacing(5 *dpiXFactor);
     setControls(c);
 
     //
@@ -93,7 +93,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
-    vlayout->setSpacing(10);
+    vlayout->setSpacing(10 *dpiXFactor);
     powerHist = new PowerHist(context, rangemode);
     vlayout->addWidget(powerHist);
 

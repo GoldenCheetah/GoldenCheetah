@@ -137,7 +137,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     presets->setWhatsThis(presetHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Preset));
     QVBoxLayout *presetLayout = new QVBoxLayout(presets);
     presetLayout->setContentsMargins(0,0,0,0);
-    presetLayout->setSpacing(5);
+    presetLayout->setSpacing(5 *dpiXFactor);
 
     charts = new QTreeWidget;
 #ifdef Q_OS_MAC
@@ -243,7 +243,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     custom->setWhatsThis(curvesHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Curves));
     QVBoxLayout *customLayout = new QVBoxLayout(custom);
     customLayout->setContentsMargins(0,0,0,0);
-    customLayout->setSpacing(5);
+    customLayout->setSpacing(5 *dpiXFactor);
 
     // custom table
     customTable = new QTableWidget(this);
@@ -288,7 +288,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
 
     QHBoxLayout *customButtons = new QHBoxLayout;
-    customButtons->setSpacing(2);
+    customButtons->setSpacing(2 *dpiXFactor);
     customButtons->addWidget(upCustomButton);
     customButtons->addWidget(downCustomButton);
     customButtons->addStretch();
@@ -1876,7 +1876,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     stressWidget->setContentsMargins(0,0,0,0);
     QHBoxLayout *stressLayout = new QHBoxLayout(stressWidget);
     stressLayout->setContentsMargins(0,0,0,0);
-    stressLayout->setSpacing(5);
+    stressLayout->setSpacing(5 *dpiXFactor);
     stressLayout->addWidget(new QLabel(tr("Stress Type"), this));
     stressLayout->addWidget(stressTypeSelect);
 

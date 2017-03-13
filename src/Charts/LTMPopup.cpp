@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "RideFileCache.h" // for RideBest
 #include "Utils.h"
+#include "Colors.h"
 
 LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -33,7 +34,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(10); // some space between the vertical Scroll bars
+    mainLayout->setSpacing(10 *dpiXFactor); // some space between the vertical Scroll bars
     setStyleSheet(QString::fromUtf8(
         "border-width: 0px; \
          border-color: rgba(255,255,255,0); \

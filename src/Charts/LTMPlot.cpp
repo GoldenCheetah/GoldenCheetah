@@ -1039,7 +1039,7 @@ LTMPlot::setData(LTMSettings *set)
                         label->setLabel(text);
                         label->setValue(hxdata[i], hydata[i]);
                         label->setYAxis(axisid);
-                        label->setSpacing(6); // not px but by yaxis value !? mad.
+                        label->setSpacing(6 *dpiXFactor); // not px but by yaxis value !? mad.
                         label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
 
                         // and attach
@@ -1207,7 +1207,7 @@ LTMPlot::setData(LTMSettings *set)
                     label->setLabel(text);
                     label->setValue(xdata[i], ydata[i]);
                     label->setYAxis(axisid);
-                    label->setSpacing(3); // not px but by yaxis value !? mad.
+                    label->setSpacing(3 *dpiXFactor); // not px but by yaxis value !? mad.
 
                     // Bars(steps) / sticks / dots: label above centered
                     // but bars have multiple points offset from their actual
@@ -2151,7 +2151,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                             label->setLabel(text);
                             label->setValue(hxdata[i], hydata[i]);
                             label->setYAxis(axisid);
-                            label->setSpacing(6); // not px but by yaxis value !? mad.
+                            label->setSpacing(6 *dpiXFactor); // not px but by yaxis value !? mad.
                             label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
 
                             // and attach
@@ -2318,7 +2318,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                         label->setLabel(text);
                         label->setValue(xdata[i], ydata[i]);
                         label->setYAxis(axisid);
-                        label->setSpacing(3); // not px but by yaxis value !? mad.
+                        label->setSpacing(3 *dpiXFactor); // not px but by yaxis value !? mad.
 
                         // Bars(steps) / sticks / dots: label above centered
                         // but bars have multiple points offset from their actual

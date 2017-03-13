@@ -88,7 +88,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 
     // Summary level selector
     QHBoxLayout *h = new QHBoxLayout();
-    h->setSpacing(5);
+    h->setSpacing(5 *dpiXFactor);
     summarySelect = new QComboBox(this);
     summarySelect->setFixedWidth(150); // is it impossible to size constrain qcombos?
     summarySelect->addItem(tr("Day Summary"));
@@ -509,7 +509,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     monthWidget->setFixedHeight(180);
     monthWidget->setAutoFillBackground(true);
     QGridLayout *dayLayout = new QGridLayout(monthWidget);
-    dayLayout->setSpacing(1);
+    dayLayout->setSpacing(1 *dpiXFactor);
     dayLayout->setContentsMargins(0,0,0,0);
     dayLayout->addLayout(line, 0,0,1,7);
     layout->addWidget(monthWidget, Qt::AlignCenter);
