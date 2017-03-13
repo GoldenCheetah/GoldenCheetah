@@ -22,6 +22,7 @@
 #include "AllPlot.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
@@ -71,6 +72,8 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(name);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    setMinimumSize(QSize(300 *dpiXFactor, 300 *dpiYFactor));
 
     // find our processor
     const DataProcessorFactory &factory = DataProcessorFactory::instance();

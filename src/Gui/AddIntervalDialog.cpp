@@ -24,6 +24,7 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideItem.h"
+#include "Colors.h"
 #include "WPrime.h"
 #include "HelpWhatsThis.h"
 #include <QMap>
@@ -37,6 +38,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Find Intervals"));
+    setMinimumWidth(400 *dpiXFactor);
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::FindIntervals));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);

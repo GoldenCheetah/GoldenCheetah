@@ -19,6 +19,7 @@
 
 #include "MergeActivityWizard.h"
 #include "Context.h"
+#include "Colors.h"
 #include "RideCache.h"
 #include "MainWindow.h"
 #include "HelpWhatsThis.h"
@@ -64,8 +65,8 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_CombineRides));
 
-    setFixedHeight(530);
-    setFixedWidth(550);
+    setFixedHeight(530 *dpiXFactor);
+    setFixedWidth(550 *dpiYFactor);
 
     // initialise before setRide since it checks
     // to see if memory needs to be freed first

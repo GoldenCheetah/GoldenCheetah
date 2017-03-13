@@ -42,7 +42,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     : QDialog(parent, Qt::Dialog), context(context), settings(here)
 {
     setWindowTitle(tr("User Defined Metric"));
-    setMinimumHeight(680);
+    setMinimumHeight(680 *dpiYFactor);
 
     //HelpWhatsThis *help = new HelpWhatsThis(this);
     //this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Curves_Settings));

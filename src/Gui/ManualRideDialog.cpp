@@ -19,6 +19,7 @@
 
 #include "ManualRideDialog.h"
 #include "Context.h"
+#include "Colors.h"
 #include "Athlete.h"
 #include "RideCache.h"
 #include "RideItem.h"
@@ -123,7 +124,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 #ifdef Q_OS_MAC
     setMinimumSize(610,415);
 #else
-    setMinimumSize(615,360);
+    setMinimumSize(615 *dpiXFactor,360 *dpiYFactor);
 #endif
 
     // we haven't derived factors yet

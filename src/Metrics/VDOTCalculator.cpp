@@ -23,6 +23,7 @@
 #include "VDOTCalculator.h"
 #include "HelpWhatsThis.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
 
 #include <QHeaderView>
@@ -75,7 +76,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    setFixedSize(300, 480);
+    setFixedSize(300 *dpiXFactor, 480 *dpiYFactor);
 
     QVBoxLayout *mainVBox = new QVBoxLayout(this);
 

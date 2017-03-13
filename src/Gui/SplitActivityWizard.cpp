@@ -39,8 +39,8 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
     setAttribute(Qt::WA_DeleteOnClose);
 
     // Minimum 600x500 for when selecting intervals
-    setMinimumHeight(500);
-    setMinimumWidth(600);
+    setMinimumHeight(500 *dpiXFactor);
+    setMinimumWidth(600 *dpiYFactor);
 
     // title
     setWindowTitle(tr("Split Activity"));
