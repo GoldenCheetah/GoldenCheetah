@@ -2087,6 +2087,7 @@ FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
     setWindowTitle("Search");
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setMinimumSize(QSize(450*dpiXFactor, 600*dpiYFactor));
 
     // create UI components
     QLabel *look = new QLabel(tr("Find values"), this);
@@ -2960,6 +2961,7 @@ AnomalyDialog::AnomalyDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
     setWindowTitle(tr("Anomalies"));
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setMinimumSize(QSize(200*dpiXFactor, 300*dpiYFactor));
     QVBoxLayout *main = new QVBoxLayout(this);
     main->setContentsMargins(0,0,0,0);
     main->setSpacing(0);
