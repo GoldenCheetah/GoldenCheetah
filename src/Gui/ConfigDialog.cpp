@@ -48,7 +48,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     head->setMovable(false); // oops!
 
     QFont defaultFont;
-    setMinimumSize(60 * defaultFont.pointSize(),580);   //Change for 53 to 60 - To be decided if also Size for Q_OS_MAC need change
+    setMinimumSize(600 *dpiXFactor,580 *dpiYFactor);   //Change for 53 to 60 - To be decided if also Size for Q_OS_MAC need change
 #endif
 
     // center
@@ -72,6 +72,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     QSignalMapper *iconMapper = new QSignalMapper(this); // maps each option
     connect(iconMapper, SIGNAL(mapped(int)), this, SLOT(changePage(int)));
     head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    head->setIconSize(QSize(32*dpiXFactor,32*dpiXFactor)); // use XFactor for both to ensure aspect ratio maintained
 
     QAction *added;
 
@@ -170,7 +171,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addStretch();
-    buttonsLayout->setSpacing(5);
+    buttonsLayout->setSpacing(5 *dpiXFactor);
     buttonsLayout->addWidget(closeButton);
     buttonsLayout->addWidget(saveButton);
 
