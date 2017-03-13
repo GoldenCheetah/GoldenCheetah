@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "Colors.h"
 #include "ConfigDialog.h"
 
 // WIZARD FLOW
@@ -42,6 +43,8 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     // delete when done
     setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
+    setMinimumWidth(600 *dpiXFactor);
+    setMinimumHeight(500 *dpiYFactor);
 
     // title
     setWindowTitle(tr("Add Device Wizard"));
@@ -81,6 +84,7 @@ AddType::AddType(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
     foreach(DeviceType t, wizard->deviceTypes.Supported) {
         if (t.type) {
             QCommandLinkButton *p = new QCommandLinkButton(t.name, t.description, this);
+            p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
             connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
             mapper->setMapping(p, QString("%1").arg(t.type));
             layout->addWidget(p);
