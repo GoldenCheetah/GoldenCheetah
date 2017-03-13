@@ -22,6 +22,7 @@
 
 #include "LTMChartParser.h"
 #include "GcUpgrade.h"
+#include "Colors.h"
 
 #ifdef GC_WANT_R
 #include <RTool.h>
@@ -491,7 +492,7 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    }
 
    textFilterApply = new QPushButton(tr("Search Keyword"));
-   textFilterApply->setFixedWidth(180); // To allow proper translation
+   textFilterApply->setFixedWidth(180 *dpiXFactor); // To allow proper translation
    textFilter = new QLineEdit;
    g_textFilterActive = false;
 
@@ -584,8 +585,8 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    mainLayout->addLayout(buttonUserEditLayout);
    mainLayout->addLayout(buttonCuratorEditLayout);
 
-   setMinimumHeight(500);
-   setMinimumWidth(700);
+   setMinimumHeight(500 *dpiYFactor);
+   setMinimumWidth(700 *dpiXFactor);
    setLayout(mainLayout);
 
 }
@@ -1192,7 +1193,7 @@ CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageDat
 
     QRect rec = QApplication::desktop()->screenGeometry();
     imageLabel = new QLabel();
-    imageLabel->setMinimumSize(150,100);
+    imageLabel->setMinimumSize(150,100); // not scaled to hi-dpi screens (cloud db constraint not device)
     chartImage.loadFromData(imageData);
     QSize size = chartImage.size();
     int w = rec.width()/2;
