@@ -45,7 +45,7 @@ ExhaustionDialog::ExhaustionDialog(AllPlot *parent, Context *context, double sec
 
     addButton = new QPushButton(tr(" + "));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #endif
     referenceValueLayout->addStretch();
     referenceValueLayout->addWidget(addButton);
@@ -69,7 +69,7 @@ ExhaustionDialog::ExhaustionDialog(AllPlot *parent, Context *context, double sec
 
     deleteRefButton = new QPushButton(" - ");
 #ifndef Q_OS_MAC
-    deleteRefButton->setFixedSize(20,20);
+    deleteRefButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #endif
     connect(deleteRefButton, SIGNAL(clicked()), this, SLOT(deleteRef()));
 

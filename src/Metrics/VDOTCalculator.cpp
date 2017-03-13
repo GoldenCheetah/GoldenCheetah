@@ -150,7 +150,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
     labelTPACE = new QLabel(tr("Your Training Paces:"));
     tableLayout->addWidget(labelTPACE);
     tableWidgetTPACE = new QTableWidget(5, 3, this);
-    for (int j = 0; j< 3; j++) tableWidgetTPACE->setColumnWidth(j, 60);
+    for (int j = 0; j< 3; j++) tableWidgetTPACE->setColumnWidth(j, 60*dpiXFactor);
     QStringList vLabels;
     vLabels<<tr("E-Pace")<<tr("M-Pace")<< tr("T-Pace")<<tr("I-Pace")<<tr("R-Pace");
     tableWidgetTPACE->setVerticalHeaderLabels(vLabels);

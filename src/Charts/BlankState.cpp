@@ -19,6 +19,7 @@
 #include <QtGui>
 #include "MainWindow.h"
 #include "Context.h"
+#include "Colors.h"
 #include "Athlete.h"
 
 //
@@ -129,7 +130,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
     //importButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     //importButton->setStyleSheet("QToolButton {text-align: left;color : blue;background: transparent}");
     shortCutButton->setStyleSheet("QPushButton {border-radius: 10px;border-style: outset; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #DDDDDD, stop: 1 #BBBBBB); border-width: 1px; border-color: #555555;} QPushButton:pressed {background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBBBBB, stop: 1 #999999);}");
-    shortCutButton->setFixedSize(200, 60);
+    shortCutButton->setFixedSize(200*dpiXFactor, 60*dpiYFactor);
     leftLayout->addWidget(shortCutButton);
 
     return shortCutButton;

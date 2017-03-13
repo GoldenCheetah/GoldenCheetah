@@ -104,9 +104,9 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     QHBoxLayout *toprow = new QHBoxLayout;
 
     QPushButton *critical = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxCritical), "", this); 
-    critical->setFixedSize(128,128);
+    critical->setFixedSize(128*dpiXFactor,128*dpiYFactor);
     critical->setFlat(true);
-    critical->setIconSize(QSize(120,120));
+    critical->setIconSize(QSize(120*dpiXFactor,120*dpiYFactor));
     critical->setAutoFillBackground(false);
     critical->setFocusPolicy(Qt::NoFocus);
 

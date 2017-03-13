@@ -803,16 +803,16 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QDir athleteHomeDir) : QDialog(NU
     const QString athlete = athleteHomeDir.dirName();
 
     setWindowTitle(QString(tr("Athlete %1").arg(athlete)));
-    this->setMinimumWidth(550);
+    this->setMinimumWidth(550*dpiXFactor);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QHBoxLayout *toprow = new QHBoxLayout;
 
     QPushButton *critical = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxWarning), "", this);
-    critical->setFixedSize(80,80);
+    critical->setFixedSize(80*dpiXFactor,80*dpiYFactor);
     critical->setFlat(true);
-    critical->setIconSize(QSize(80,80));
+    critical->setIconSize(QSize(80*dpiXFactor,80*dpiYFactor));
     critical->setAutoFillBackground(false);
     critical->setFocusPolicy(Qt::NoFocus);
 
@@ -908,9 +908,9 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
     QHBoxLayout *toprow = new QHBoxLayout;
 
     QPushButton *information = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxInformation), "", this);
-    information->setFixedSize(60,60);
+    information->setFixedSize(60*dpiXFactor,60*dpiYFactor);
     information->setFlat(true);
-    information->setIconSize(QSize(60,60));
+    information->setIconSize(QSize(60*dpiXFactor,60*dpiYFactor));
     information->setAutoFillBackground(false);
     information->setFocusPolicy(Qt::NoFocus);
 

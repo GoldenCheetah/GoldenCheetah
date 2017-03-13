@@ -50,11 +50,11 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
     files->headerItem()->setText(5, tr("Action"));
 
     files->setColumnCount(6);
-    files->setColumnWidth(0, 30); // selector
-    files->setColumnWidth(1, 140); // filename
-    files->setColumnWidth(2, 100); // Type
-    files->setColumnWidth(3, 120); // Author
-    files->setColumnWidth(4, 90); // dated
+    files->setColumnWidth(0, 30*dpiXFactor); // selector
+    files->setColumnWidth(1, 140*dpiXFactor); // filename
+    files->setColumnWidth(2, 100*dpiXFactor); // Type
+    files->setColumnWidth(3, 120*dpiXFactor); // Author
+    files->setColumnWidth(4, 90*dpiXFactor); // dated
     files->setSelectionMode(QAbstractItemView::SingleSelection);
     files->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     files->setUniformRowHeights(true);

@@ -25,6 +25,7 @@
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
+#include "Colors.h"
 
 GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(parent), context(context)
 {
@@ -38,9 +39,9 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
 #ifdef GC_HAVE_MUMODEL
-    setMinimumSize(400,200); //XX temp for MU model...
+    setMinimumSize(40(dpiXFactor,200*dpiYFactor); //XX temp for MU model...
 #else
-    setMinimumSize(250,200);
+    setMinimumSize(250*dpiXFactor,200*dpiYFactor);
 #endif
     setFocus();
     mode = none;
@@ -60,9 +61,9 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     left = new QToolButton(this);
     left->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     left->setAutoFillBackground(false);
-    left->setFixedSize(23,23);
+    left->setFixedSize(23*dpiXFactor,23*dpiYFactor);
     left->setIcon(leftIcon);
-    left->setIconSize(QSize(23,23));
+    left->setIconSize(QSize(23*dpiXFactor,23*dpiYFactor));
     left->setFocusPolicy(Qt::NoFocus);
     left->hide(); // don't show until we have >1 widgets
     titleLayout->addWidget(left);
@@ -70,7 +71,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
 
     titleLabel = new GcLabel("No Title Set");
     titleLabel->setAutoFillBackground(false);
-    titleLabel->setFixedHeight(23);
+    titleLabel->setFixedHeight(23*dpiYFactor);
 
     // menu bar in the middle of the buttons
     titleLayout->addStretch();
@@ -80,7 +81,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     right = new QToolButton(this);
     right->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     right->setAutoFillBackground(false);
-    right->setFixedSize(20,20);
+    right->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     right->setIcon(rightIcon);
     right->setIconSize(QSize(20,20));
     right->setFocusPolicy(Qt::NoFocus);

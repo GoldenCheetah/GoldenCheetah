@@ -709,11 +709,11 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     rideListDown->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     rideListDown->setUniformRowHeights(true);
     rideListDown->setIndentation(0);
-    rideListDown->header()->resizeSection(0,20);
-    rideListDown->header()->resizeSection(1,90);
-    rideListDown->header()->resizeSection(2,100);
-    rideListDown->header()->resizeSection(3,100);
-    rideListDown->header()->resizeSection(6,50);
+    rideListDown->header()->resizeSection(0,20*dpiXFactor);
+    rideListDown->header()->resizeSection(1,90*dpiXFactor);
+    rideListDown->header()->resizeSection(2,100*dpiXFactor);
+    rideListDown->header()->resizeSection(3,100*dpiXFactor);
+    rideListDown->header()->resizeSection(6,50*dpiXFactor);
     rideListDown->setSortingEnabled(true);
 
     downloadLayout->addWidget(selectAll);
@@ -737,13 +737,13 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     rideListUp->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     rideListUp->setUniformRowHeights(true);
     rideListUp->setIndentation(0);
-    rideListUp->header()->resizeSection(0,20);
-    rideListUp->header()->resizeSection(1,200);
-    rideListUp->header()->resizeSection(2,100);
-    rideListUp->header()->resizeSection(3,100);
-    rideListUp->header()->resizeSection(4,100);
-    rideListUp->header()->resizeSection(5,70);
-    rideListUp->header()->resizeSection(6,50);
+    rideListUp->header()->resizeSection(0,20*dpiXFactor);
+    rideListUp->header()->resizeSection(1,200*dpiXFactor);
+    rideListUp->header()->resizeSection(2,100*dpiXFactor);
+    rideListUp->header()->resizeSection(3,100*dpiXFactor);
+    rideListUp->header()->resizeSection(4,100*dpiXFactor);
+    rideListUp->header()->resizeSection(5,70*dpiXFactor);
+    rideListUp->header()->resizeSection(6,50*dpiXFactor);
     rideListUp->setSortingEnabled(true);
 
     uploadLayout->addWidget(selectAllUp);
@@ -777,13 +777,13 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
     rideListSync->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     rideListSync->setUniformRowHeights(true);
     rideListSync->setIndentation(0);
-    rideListSync->header()->resizeSection(0,20);
-    rideListSync->header()->resizeSection(1,200);
-    rideListSync->header()->resizeSection(2,100);
-    rideListSync->header()->resizeSection(3,100);
-    rideListSync->header()->resizeSection(4,100);
-    rideListSync->header()->resizeSection(5,70);
-    rideListSync->header()->resizeSection(6,100);
+    rideListSync->header()->resizeSection(0,20*dpiXFactor);
+    rideListSync->header()->resizeSection(1,200*dpiXFactor);
+    rideListSync->header()->resizeSection(2,100*dpiXFactor);
+    rideListSync->header()->resizeSection(3,100*dpiXFactor);
+    rideListSync->header()->resizeSection(4,100*dpiXFactor);
+    rideListSync->header()->resizeSection(5,70*dpiXFactor);
+    rideListSync->header()->resizeSection(6,100*dpiXFactor);
     rideListSync->setSortingEnabled(true);
 
     syncLayout->addLayout(syncList);

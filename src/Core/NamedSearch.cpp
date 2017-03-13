@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "GcSideBarItem.h" // for iconFromPNG
+#include "Colors.h" // for iconFromPNG
 
 #include <QMessageBox>
 
@@ -239,7 +240,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
 #ifdef Q_OS_MAC
     setFixedSize(350,400);
 #else
-    setFixedSize(450,400);
+    setFixedSize(450*dpiXFactor,400*dpiYFactor);
 #endif
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -281,12 +282,12 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     headings<<tr("Name");
     headings<<tr("Query");
     searchList->setHeaderLabels(headings);
-    searchList->header()->setMinimumSectionSize(30);
-    searchList->header()->resizeSection(0, 30);
+    searchList->header()->setMinimumSectionSize(30*dpiXFactor);
+    searchList->header()->resizeSection(0, 30*dpiXFactor);
 #ifdef Q_OS_MAC
     searchList->header()->resizeSection(1, 120);
 #else
-    searchList->header()->resizeSection(1, 150);
+    searchList->header()->resizeSection(1, 150*dpiXFactor);
 #endif
     searchList->header()->setStretchLastSection(true);
 

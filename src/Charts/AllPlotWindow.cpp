@@ -155,10 +155,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     downCustomButton = new QToolButton(this);
     upCustomButton->setArrowType(Qt::UpArrow);
     downCustomButton->setArrowType(Qt::DownArrow);
-    upCustomButton->setFixedSize(20,20);
-    downCustomButton->setFixedSize(20,20);
-    addCustomButton->setFixedSize(20,20);
-    deleteCustomButton->setFixedSize(20,20);
+    upCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteCustomButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     upCustomButton = new QPushButton(tr("Up"));
     downCustomButton = new QPushButton(tr("Down"));

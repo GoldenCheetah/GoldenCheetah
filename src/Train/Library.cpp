@@ -267,9 +267,9 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     removePath = new QPushButton("-", this);
     removeRef = new QPushButton("-", this);
 #ifndef Q_OS_MAC
-    addPath->setFixedSize(20,20);
-    removePath->setFixedSize(20,20);
-    removeRef->setFixedSize(20,20);
+    addPath->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removePath->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removeRef->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #endif
 
     searchPathTable = new QTreeWidget(this);

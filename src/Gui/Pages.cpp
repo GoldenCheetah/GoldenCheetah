@@ -1599,8 +1599,8 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     delButton->setText(tr("Delete"));
     deviceList->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #else
-    addButton->setFixedSize(20,20);
-    delButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    delButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #endif
     deviceListModel = new deviceModel(this);
 
@@ -1901,8 +1901,8 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Action"));
     fields->headerItem()->setText(1, tr("ANT+ Command"));
-    fields->setColumnWidth(0,100);
-    fields->setColumnWidth(1,200);
+    fields->setColumnWidth(0,100 *dpiXFactor);
+    fields->setColumnWidth(1,200 *dpiXFactor);
     fields->setColumnCount(2);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setIndentation(0);
@@ -2040,7 +2040,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->headerItem()->setText(0, tr("Swatch"));
     themes->headerItem()->setText(1, tr("Name"));
     themes->setColumnCount(2);
-    themes->setColumnWidth(0,240);
+    themes->setColumnWidth(0,240 *dpiXFactor);
     themes->setSelectionMode(QAbstractItemView::SingleSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     themes->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -2051,7 +2051,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     colors->headerItem()->setText(0, tr("Color"));
     colors->headerItem()->setText(1, tr("Select"));
     colors->setColumnCount(2);
-    colors->setColumnWidth(0,350);
+    colors->setColumnWidth(0,350 *dpiXFactor);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -2436,10 +2436,10 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     downButton->setArrowType(Qt::DownArrow);
     leftButton->setArrowType(Qt::LeftArrow);
     rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    leftButton->setFixedSize(20,20);
-    rightButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
@@ -2633,10 +2633,10 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
     downButton->setArrowType(Qt::DownArrow);
     leftButton->setArrowType(Qt::LeftArrow);
     rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    leftButton->setFixedSize(20,20);
-    rightButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
@@ -2815,7 +2815,7 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     table->headerItem()->setText(0, tr("Symbol"));
     table->headerItem()->setText(1, tr("Name"));
     table->setColumnCount(2);
-    table->setColumnWidth(0,200);
+    table->setColumnWidth(0,200 *dpiXFactor);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
     table->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     table->setIndentation(0);
@@ -2830,8 +2830,8 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -3015,10 +3015,10 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     downButton->setArrowType(Qt::DownArrow);
     leftButton->setArrowType(Qt::LeftArrow);
     rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    leftButton->setFixedSize(20,20);
-    rightButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
@@ -3289,10 +3289,10 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -3505,10 +3505,10 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -3529,11 +3529,11 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(2, tr("Type"));
     fields->headerItem()->setText(3, tr("Values"));
     fields->headerItem()->setText(4, tr("Diary"));
-    fields->setColumnWidth(0,80);
-    fields->setColumnWidth(1,100);
-    fields->setColumnWidth(2,100);
-    fields->setColumnWidth(3,80);
-    fields->setColumnWidth(4,20);
+    fields->setColumnWidth(0,80 *dpiXFactor);
+    fields->setColumnWidth(1,100 *dpiXFactor);
+    fields->setColumnWidth(2,100 *dpiXFactor);
+    fields->setColumnWidth(3,80 *dpiXFactor);
+    fields->setColumnWidth(4,20 *dpiXFactor);
     fields->setColumnCount(5);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -3810,10 +3810,10 @@ DefaultsPage::DefaultsPage(QWidget *parent, QList<DefaultDefinition>defaultDefin
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -3833,10 +3833,10 @@ DefaultsPage::DefaultsPage(QWidget *parent, QList<DefaultDefinition>defaultDefin
     defaults->headerItem()->setText(1, tr("Value"));
     defaults->headerItem()->setText(2, tr("Linked field"));
     defaults->headerItem()->setText(3, tr("Default Value"));
-    defaults->setColumnWidth(0,80);
-    defaults->setColumnWidth(1,100);
-    defaults->setColumnWidth(2,80);
-    defaults->setColumnWidth(3,100);
+    defaults->setColumnWidth(0,80 *dpiXFactor);
+    defaults->setColumnWidth(1,100 *dpiXFactor);
+    defaults->setColumnWidth(2,80 *dpiXFactor);
+    defaults->setColumnWidth(3,100 *dpiXFactor);
     defaults->setColumnCount(4);
     defaults->setSelectionMode(QAbstractItemView::SingleSelection);
     defaults->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -4046,8 +4046,8 @@ SchemePage::SchemePage(Zones* zones) : zones(zones)
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -4214,8 +4214,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     updateButton->setText(tr("Update"));
@@ -4227,8 +4227,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     addZoneButton = new QPushButton(tr("+"));
     deleteZoneButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addZoneButton->setFixedSize(20,20);
-    deleteZoneButton->setFixedSize(20,20);
+    addZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addZoneButton->setText(tr("Add"));
     deleteZoneButton->setText(tr("Delete"));
@@ -4378,7 +4378,7 @@ CPPage::initializeRanges() {
     ranges->headerItem()->setText(column++, tr("Pmax"));
 
     if (resize)
-        ranges->setColumnWidth(3, ranges->columnWidth(3)/2);
+        ranges->setColumnWidth(3, (ranges->columnWidth(3)/2) *dpiXFactor);
 
     ranges->setColumnCount(column);
 
@@ -4867,8 +4867,8 @@ HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -5050,9 +5050,9 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     updateButton->setFixedSize(60,20);
-    deleteButton->setFixedSize(20,20);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     updateButton->setText(tr("Update"));
     addButton->setText(tr("Add"));
@@ -5064,8 +5064,8 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     addZoneButton = new QPushButton(tr("+"));
     deleteZoneButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addZoneButton->setFixedSize(20,20);
-    deleteZoneButton->setFixedSize(20,20);
+    addZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addZoneButton->setText(tr("Add"));
     deleteZoneButton->setText(tr("Delete"));
@@ -5604,8 +5604,8 @@ PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -5772,8 +5772,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     updateButton->setFixedSize(60,20);
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     updateButton->setText(tr("Update"));
     addButton->setText(tr("Add"));
@@ -5785,8 +5785,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     addZoneButton = new QPushButton(tr("+"));
     deleteZoneButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
-    addZoneButton->setFixedSize(20,20);
-    deleteZoneButton->setFixedSize(20,20);
+    addZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addZoneButton->setText(tr("Add"));
     deleteZoneButton->setText(tr("Delete"));
@@ -6241,10 +6241,10 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -6458,10 +6458,10 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20,20);
-    downButton->setFixedSize(20,20);
-    addButton->setFixedSize(20,20);
-    deleteButton->setFixedSize(20,20);
+    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     addButton->setText(tr("Add"));
     deleteButton->setText(tr("Delete"));
@@ -6481,8 +6481,8 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Directory"));
     fields->headerItem()->setText(1, tr("Import Rule"));
-    fields->setColumnWidth(0,400);
-    fields->setColumnWidth(1,100);
+    fields->setColumnWidth(0,400 *dpiXFactor);
+    fields->setColumnWidth(1,100 *dpiXFactor);
     fields->setColumnCount(2);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     //fields->setUniformRowHeights(true);

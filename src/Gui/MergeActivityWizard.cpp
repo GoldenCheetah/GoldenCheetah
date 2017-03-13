@@ -665,9 +665,9 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     files->headerItem()->setText(2, tr("Time"));
 
     files->setColumnCount(3);
-    files->setColumnWidth(0, 190); // filename
-    files->setColumnWidth(1, 95); // date
-    files->setColumnWidth(2, 90); // time
+    files->setColumnWidth(0, 190 *dpiXFactor); // filename
+    files->setColumnWidth(1, 95 *dpiXFactor); // date
+    files->setColumnWidth(2, 90 *dpiXFactor); // time
     files->setSelectionMode(QAbstractItemView::SingleSelection);
     files->setUniformRowHeights(true);
     files->setIndentation(0);
