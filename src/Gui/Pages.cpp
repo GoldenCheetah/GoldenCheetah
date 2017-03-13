@@ -192,7 +192,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
     athleteWAS = athleteDirectory->text(); // remember what we started with ...
     athleteBrowseButton = new QPushButton(tr("Browse"));
-    athleteBrowseButton->setFixedWidth(120);
+    //XXathleteBrowseButton->setFixedWidth(120);
 
     configLayout->addWidget(athleteLabel, 7 + offset,0, Qt::AlignRight);
     configLayout->addWidget(athleteDirectory, 7 + offset,1);
@@ -210,7 +210,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutDirectory = new QLineEdit;
     workoutDirectory->setText(workoutDir.toString());
     workoutBrowseButton = new QPushButton(tr("Browse"));
-    workoutBrowseButton->setFixedWidth(120);
+    //XXworkoutBrowseButton->setFixedWidth(120);
 
     configLayout->addWidget(workoutLabel, 8 + offset,0, Qt::AlignRight);
     configLayout->addWidget(workoutDirectory, 8 + offset,1);
@@ -230,7 +230,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     rDirectory = new QLineEdit;
     rDirectory->setText(rDir.toString());
     rBrowseButton = new QPushButton(tr("Browse"));
-    rBrowseButton->setFixedWidth(120);
+    //XXrBrowseButton->setFixedWidth(120);
 
     configLayout->addWidget(rLabel, 8 + offset,0, Qt::AlignRight);
     configLayout->addWidget(rDirectory, 8 + offset,1);

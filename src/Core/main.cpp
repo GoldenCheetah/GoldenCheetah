@@ -361,6 +361,14 @@ main(int argc, char *argv[])
 
        font.setPixelSize(pixelsize);
 
+       // fixup some style issues from QT not adjusting defaults on hidpi displays
+       // initially just pushbutton and combobox spacing...
+       application->setStyleSheet(QString("QPushButton { padding-left: %1px; padding-right: %1px; "
+                                          "              padding-top: %2px; padding-bottom: %2px; }"
+                                          "QComboBox   { padding-left: %1px; padding-right: %1px; }")
+                                          .arg(9*dpiXFactor)
+                                          .arg(3*dpiYFactor));
+
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font pixel size:"<<pixelsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     } else {
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
