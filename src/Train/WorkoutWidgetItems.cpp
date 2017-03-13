@@ -24,10 +24,10 @@
 
 #include <QDebug>
 
-static int POWERSCALEWIDTH = 5;
-static int WBALSCALEWIDTH = 5;
+#define POWERSCALEWIDTH (5 *dpiXFactor)
+#define WBALSCALEWIDTH (5 *dpiXFactor)
 static bool GRIDLINES = true;
-static int SPACING = 4;
+#define SPACING (4 *dpiXFactor)
 
 static int MINTOOLHEIGHT = 350; // don't do lots of decoration on "mini" view
 
@@ -291,7 +291,7 @@ WWPoint::paint(QPainter *painter)
     // highlight hovered
     if (hover) {
         painter->setBrush(Qt::gray);
-        painter->drawEllipse(QPointF(center.x(), center.y()), 10.0f, 10.0f);
+        painter->drawEllipse(QPointF(center.x(), center.y()), 10.0f*dpiXFactor, 10.0f*dpiXFactor);
     }
 
     // selected!
@@ -299,17 +299,17 @@ WWPoint::paint(QPainter *painter)
 
         // selected change color
         painter->setBrush(Qt::red);
-        painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
+        painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f*dpiXFactor, 3.0f*dpiXFactor);
 
     } else {
 
         // draw point
         painter->setBrush(GColor(CPOWER));
-        painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f, 3.0f);
+        painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f*dpiXFactor, 3.0f*dpiXFactor);
     }
 
     // set bound so we can be moused over etc
-    bound = QRectF(QPointF(center.x()-3.0f, center.y()-3.0f),QPointF(center.x()+3.0f, center.y()+3.0f));
+    bound = QRectF(QPointF(center.x()-(3.0f*dpiXFactor), center.y()-(3.0f*dpiXFactor)),QPointF(center.x()+(3.0f*dpiXFactor), center.y()+(3.0f*dpiXFactor)));
 }
 
 void
@@ -317,7 +317,7 @@ WWLine::paint(QPainter *painter)
 {
     // thin ?
     QPen linePen(workoutWidget()->recording() ? GColor(CTPOWER) : GColor(CPOWER));
-    linePen.setWidth(1);
+    linePen.setWidth(1 *dpiXFactor);
     painter->setPen(linePen);
 
     QPoint origin = workoutWidget()->transform(0,0);
@@ -396,7 +396,7 @@ WWTelemetry::paint(QPainter *painter)
     // full color
     QColor color = GColor(CWBAL);
     QPen wlinePen(color);
-    wlinePen.setWidth(1);
+    wlinePen.setWidth(1 *dpiXFactor);
     painter->setPen(wlinePen);
 
     // top left origin
@@ -442,7 +442,7 @@ WWRect::paint(QPainter *painter)
 
         // thin ?
         QPen linePen(GColor(CPLOTMARKER));
-        linePen.setWidth(1);
+        linePen.setWidth(1 *dpiXFactor);
         painter->setPen(linePen);
 
         painter->drawRect(QRectF(onRect,atRect));
@@ -551,7 +551,7 @@ WWWBLine::paint(QPainter *painter)
 
     // set pen
     QPen linePen(color);
-    linePen.setWidth(1);
+    linePen.setWidth(1 *dpiXFactor);
     painter->setPen(linePen);
 
     // top left origin
@@ -830,7 +830,7 @@ WWNow::paint(QPainter *painter)
     int px = workoutWidget()->transform(context->getNow()/1000.0f,0).x();
 
     QPen linePen(GColor(CPLOTMARKER));
-    linePen.setWidthF(2);
+    linePen.setWidthF(2 *dpiXFactor);
     painter->setPen(linePen);
 
     // horizontal bar

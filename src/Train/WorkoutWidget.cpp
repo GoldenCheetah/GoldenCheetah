@@ -36,6 +36,8 @@
 #include <cmath>
 #include <float.h> // DBL_EPSILON
 
+#include "Colors.h"
+
 static int MINTOOLHEIGHT = 350; // minimum size for a full editor
 
 static double MAXZOOM = 3.0f;
@@ -48,16 +50,16 @@ void WorkoutWidget::adjustLayout()
     if (height() > MINTOOLHEIGHT) {
 
         // big, can edit and all widgets shown
-        IHEIGHT = 10;
-        THEIGHT = 35;
-        BHEIGHT = 35;
-        LWIDTH = 65;
-        RWIDTH = 35;
-        XTICLENGTH = 3;
+        IHEIGHT = 10 *dpiYFactor;
+        THEIGHT = 35 *dpiYFactor;
+        BHEIGHT = 35 *dpiYFactor;
+        LWIDTH = 65 *dpiXFactor;
+        RWIDTH = 35 *dpiXFactor;
+        XTICLENGTH = 3 *dpiYFactor;
         YTICLENGTH = 0;
         XTICS = 20;
         YTICS = 10;
-        SPACING = 2; // between labels and tics (if there are tics)
+        SPACING = 2 *dpiYFactor; // between labels and tics (if there are tics)
         XMOVE = 5; // how many to move X when cursoring
         YMOVE = 1; // how many to move Y when cursoring
         GRIDLINES = true;
@@ -68,14 +70,14 @@ void WorkoutWidget::adjustLayout()
         // mini mode
         IHEIGHT = 0;
         THEIGHT = 0;
-        BHEIGHT = 20;
-        LWIDTH = 10;
-        RWIDTH = 10;
-        XTICLENGTH = 3;
+        BHEIGHT = 20 *dpiYFactor;
+        LWIDTH = 10 *dpiXFactor;
+        RWIDTH = 10 *dpiXFactor;
+        XTICLENGTH = 3 *dpiYFactor;
         YTICLENGTH = 0;
         XTICS = 20;
         YTICS = 5;
-        SPACING = 2; // between labels and tics (if there are tics)
+        SPACING = 2 * dpiXFactor; // between labels and tics (if there are tics)
         XMOVE = 5; // how many to move X when cursoring
         YMOVE = 1; // how many to move Y when cursoring
         GRIDLINES = false;
@@ -2190,7 +2192,7 @@ WorkoutWidget::configChanged(qint32)
     markerFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
     bigFont = markerFont;
-    bigFont.setPointSize(markerFont.pointSize() * 2);
+    bigFont.setPixelSize(pixelSizeForFont(bigFont, 24 * dpiYFactor));
     bigFont.setWeight(QFont::Bold);
 
     repaint();
