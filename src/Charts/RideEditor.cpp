@@ -136,7 +136,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolbar->setFloatable(true);
-    toolbar->setIconSize(QSize(18,18));
+    toolbar->setIconSize(QSize(18 *dpiXFactor,18 *dpiYFactor));
 
     QIcon saveIcon(":images/toolbar/save.png");
     saveAct = new QAction(saveIcon, tr("Save"), this);
@@ -203,7 +203,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     table->horizontalScrollBar()->setStyle(cde);
 #endif
     table->setItemDelegate(new CellDelegate(this));
-    table->verticalHeader()->setDefaultSectionSize(20);
+    table->verticalHeader()->setDefaultSectionSize(20 *dpiYFactor);
     table->setModel(model);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     table->setSelectionMode(QAbstractItemView::ContiguousSelection);
@@ -274,7 +274,8 @@ RideEditor::configChanged(qint32)
                     .arg(faded.red()).arg(faded.green()).arg(faded.blue())
                     .arg(GColor(CPLOTMARKER).name()));
     table->setPalette(palette);
-    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
+    table->setStyleSheet(QString("QTableView { background-color: %1; color: %2; border: %1 }"
+                                 "QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                  "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
@@ -797,7 +798,7 @@ RideEditor::cellMenu(const QPoint &pos)
 
     currentCell.row = row < 0 ? 0 : row;
     currentCell.column = column < 0 ? 0 : column;
-    menu.exec(table->mapToGlobal(QPoint(pos.x(), pos.y()+20)));
+    menu.exec(table->mapToGlobal(QPoint(pos.x(), pos.y()+(20*dpiYFactor))));
 }
 
 
@@ -1091,7 +1092,7 @@ RideEditor::pasteSpecial()
     // center the dialog
     QDesktopWidget *desktop = QApplication::desktop();
     int x = (desktop->width() - paster->size().width()) / 2;
-    int y = ((desktop->height() - paster->size().height()) / 2) -50;
+    int y = ((desktop->height() - paster->size().height()) / 2) -(50*dpiYFactor);
 
     // move window to desired coordinates
     paster->move(x,y);
@@ -2421,7 +2422,7 @@ FindDialog::dataChanged()
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         resultsTable->setItem(counter, 3, t);
 
-        resultsTable->setRowHeight(counter, 20);
+        resultsTable->setRowHeight(counter, 20*dpiYFactor);
 
         counter++;
     }
@@ -2603,8 +2604,8 @@ PasteSpecialDialog::PasteSpecialDialog(RideEditor *rideEditor, QWidget *parent) 
     mainLayout->addLayout(buttons);
 
     // set size hint
-    setMinimumHeight(300);
-    setMinimumWidth(500);
+    setMinimumHeight(300*dpiYFactor);
+    setMinimumWidth(500*dpiXFactor);
 
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
@@ -2999,7 +3000,7 @@ AnomalyDialog::reject()
 QSize EditorTabBar::tabSizeHint(int index) const
 {
     QSize def = QTabBar::tabSizeHint(index);
-    def.setWidth(20); // totally ignored, I hate QT sometimes
+    def.setWidth(20 *dpiXFactor); // totally ignored, I hate QT sometimes
     return def;
 }
 
@@ -3016,7 +3017,7 @@ XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QTableView(parent), x
     verticalScrollBar()->setStyle(cde);
     horizontalScrollBar()->setStyle(cde);
 #endif
-    verticalHeader()->setDefaultSectionSize(20);
+    verticalHeader()->setDefaultSectionSize(20 *dpiYFactor);
     setModel(_model);
     setContextMenuPolicy(Qt::CustomContextMenu);
     setSelectionMode(QAbstractItemView::ContiguousSelection);
@@ -3072,7 +3073,7 @@ void XDataEditor::setRideItem(RideItem *item)
     // but time is xx:xx:xx:xxx
     QFontMetrics fm(font());
     int cwidth=fm.charWidth("X",0);
-    setColumnWidth(0, 15 * cwidth);
+    setColumnWidth(0, 15 * cwidth * dpiXFactor);
 }
 
 void
