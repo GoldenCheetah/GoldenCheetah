@@ -281,7 +281,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
 
     titleLayout = new QHBoxLayout(this);
     titleLayout->setContentsMargins(0,0,0,0);
-    titleLayout->setSpacing(2);
+    titleLayout->setSpacing(2 *dpiXFactor);
 
     titleLabel = new GcLabel(title, this);
     titleLabel->setXOff(0);

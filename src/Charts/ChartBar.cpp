@@ -51,7 +51,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     vlayout->setContentsMargins(0,0,0,0);
 
     layout = new QHBoxLayout;
-    layout->setSpacing(2);
+    layout->setSpacing(2 *dpiXFactor);
     layout->setContentsMargins(0,0,0,0);
     vlayout->addLayout(layout);
     vlayout->addStretch();

@@ -101,9 +101,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     QHBoxLayout *seriesControls = new QHBoxLayout(series);
     QFormLayout *seriesLeft = new QFormLayout(); // ride side series
     QFormLayout *seriesRight = new QFormLayout(); // ride side series
-    seriesControls->setSpacing(2);
-    seriesLeft->setSpacing(2);
-    seriesRight->setSpacing(2);
+    seriesControls->setSpacing(2 *dpiXFactor);
+    seriesLeft->setSpacing(2 *dpiXFactor);
+    seriesRight->setSpacing(2 *dpiXFactor);
     seriesControls->addLayout(seriesLeft);
     seriesControls->addLayout(seriesRight); // ack I swapped them around !
     st->addTab(series, tr("Curves"));
@@ -119,7 +119,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     //custom->setWhatsThis(curvesHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Curves));
     QVBoxLayout *customLayout = new QVBoxLayout(custom);
     customLayout->setContentsMargins(0,0,0,0);
-    customLayout->setSpacing(5);
+    customLayout->setSpacing(5 *dpiXFactor);
 
     // custom table
     customTable = new QTableWidget(this);
@@ -168,7 +168,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
 
     QHBoxLayout *customButtons = new QHBoxLayout;
-    customButtons->setSpacing(2);
+    customButtons->setSpacing(2 *dpiXFactor);
     customButtons->addWidget(upCustomButton);
     customButtons->addWidget(downCustomButton);
     customButtons->addStretch();
@@ -726,7 +726,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     controlsLayout->setContentsMargins(0,0,0,0);
 #ifdef Q_OS_MAC
     // macs  dpscing is weird
-    //controlsLayout->setSpacing(5);
+    //controlsLayout->setSpacing(5 *dpiXFactor);
 #else
     controlsLayout->setSpacing(0);
 #endif
@@ -739,7 +739,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     vlayout->setSpacing(0);
     vlayout->addWidget(allPlotFrame);
     vlayout->addWidget(stackFrame);
-    vlayout->setSpacing(1);
+    vlayout->setSpacing(1 *dpiXFactor);
 
     // put a helper on the screen for mouse over intervals...
     overlayIntervals = new IntervalSummaryWindow(context);

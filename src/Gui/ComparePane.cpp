@@ -1048,7 +1048,7 @@ RouteDropDialog::RouteDropDialog(QWidget *parent, Context *context, QString segm
 {
     setWindowTitle(QString(tr("\"%1\"")).arg(segmentName));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5);
+    mainLayout->setSpacing(5 *dpiXFactor);
 
     // Grid
     QLabel *season = new QLabel("Season");

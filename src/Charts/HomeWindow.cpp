@@ -61,7 +61,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     QLabel *titleLabel = new QLabel(tr("Title"), this);
     QHBoxLayout *hl = new QHBoxLayout;
-    hl->setSpacing(5);
+    hl->setSpacing(5 *dpiXFactor);
     hl->setContentsMargins(0,0,0,0);
 
     titleEdit = new QLineEdit(this);

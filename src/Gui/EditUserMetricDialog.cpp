@@ -246,7 +246,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     head->addWidget(cancelButton, 17,3);
     head->addWidget(okButton, 17,4);
 
-    head->setSpacing(5);
+    head->setSpacing(5 *dpiXFactor);
     head->setColumnStretch(0, 15);
     head->setColumnStretch(1, 20);
     head->setColumnStretch(2, 15);

@@ -1713,7 +1713,7 @@ AllPlot::setMatchLabels(AllPlotObject *objects)
             label->setLabel(text);
             label->setValue(objects->mCurve->data()->sample(i).x(), objects->mCurve->data()->sample(i).y());
             label->setYAxis(objects->mCurve->yAxis());
-            label->setSpacing(6); // not px but by yaxis value !? mad.
+            label->setSpacing(6 *dpiXFactor); // not px but by yaxis value !? mad.
             label->setLabelAlignment(below ? (Qt::AlignBottom | Qt::AlignCenter) :
                                              (Qt::AlignTop | Qt::AlignCenter));
 

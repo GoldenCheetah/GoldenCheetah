@@ -853,7 +853,7 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
     label->setLabel(text);
     label->setValue(xtrend[1]*0.8, ytrend[1]*0.9);
     label->setYAxis(yLeft);
-    label->setSpacing(6); // not px but by yaxis value !? mad.
+    label->setSpacing(6 *dpiXFactor); // not px but by yaxis value !? mad.
     label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
 
     // and attach

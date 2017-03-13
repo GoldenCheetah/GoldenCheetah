@@ -29,7 +29,7 @@ MUWidget::MUWidget(CriticalPowerWindow *parent, Context *context)
     setAutoFillBackground(true);
 
     QHBoxLayout *main = new QHBoxLayout(this);
-    main->setSpacing(5);
+    main->setSpacing(5 *dpiXFactor);
     main->setContentsMargins(2,2,2,2);
 
     // mass

@@ -21,6 +21,7 @@
 #include "RideFile.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "Colors.h"
 #include "ColorButton.h"
 
 IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, double stop, 
@@ -176,7 +177,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
 {
     setWindowTitle(tr("Edit Interval"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5);
+    mainLayout->setSpacing(5 *dpiXFactor);
 
     // Grid
     QGridLayout *grid = new QGridLayout;

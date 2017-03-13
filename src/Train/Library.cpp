@@ -346,8 +346,8 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     editButtons->addWidget(addPath);
     editButtons->addWidget(removePath);
     editButtons->addStretch();
-    editButtons->setSpacing(2);
-    tableLayout->setSpacing(2);
+    editButtons->setSpacing(2 *dpiXFactor);
+    tableLayout->setSpacing(2 *dpiXFactor);
     tableLayout->addWidget(searchPathTable);
     tableLayout->addLayout(editButtons);
     QHBoxLayout *editButtons2 = new QHBoxLayout;

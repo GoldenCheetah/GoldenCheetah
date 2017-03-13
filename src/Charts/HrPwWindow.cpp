@@ -66,7 +66,7 @@ HrPwWindow::HrPwWindow(Context *context) :
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
-    r->setSpacing(4);
+    r->setSpacing(4 *dpiXFactor);
     r->setContentsMargins(0,0,0,0);
     r->addStretch();
     r->addWidget(rDelay);

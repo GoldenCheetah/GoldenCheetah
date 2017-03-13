@@ -654,7 +654,7 @@ PowerHist::recalcCompare()
                         label->setLabel(text);
                         label->setValue(x+jump+(width/2.00f), yval);
                         label->setYAxis(QwtPlot::yLeft);
-                        label->setSpacing(5); // not px but by yaxis value !? mad.
+                        label->setSpacing(5 *dpiXFactor); // not px but by yaxis value !? mad.
                         label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
             
                         // and attach
@@ -897,7 +897,7 @@ PowerHist::recalc(bool force)
                 label->setLabel(text);
                 label->setValue(xval+0.312f, yval);
                 label->setYAxis(QwtPlot::yLeft);
-                label->setSpacing(5); // not px but by yaxis value !? mad.
+                label->setSpacing(5 *dpiXFactor); // not px but by yaxis value !? mad.
                 label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
             
                 // and attach
