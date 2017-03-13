@@ -294,7 +294,8 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 	  // this differently
 	  //
 
-	  metric = smode.length()>6 && smode.at(7)=='1';
+          if (smode.length()>6 && smode.at(7)=='1')
+              metric = false;
 
 	} else if (line.contains("Interval=")) {
 
