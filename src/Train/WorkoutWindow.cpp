@@ -87,7 +87,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolbar->setFloatable(true);
-    toolbar->setIconSize(QSize(18,18));
+    toolbar->setIconSize(QSize(18 *dpiXFactor,18 *dpiYFactor));
 
     QIcon newIcon(":images/toolbar/new doc.png");
     newAct = new QAction(newIcon, tr("New"), this);
@@ -271,7 +271,7 @@ WorkoutWindow::configChanged(qint32)
     // maximum of 20 characters per line ?
     QFont f;
     QFontMetrics ff(f);
-    code->setFixedWidth(ff.boundingRect("99x999s@999-999r999s@999-999").width()+20);
+    code->setFixedWidth(ff.boundingRect("99x999s@999-999r999s@999-999").width()+(20* dpiXFactor));
 
     // text edit colors
     QPalette palette;
