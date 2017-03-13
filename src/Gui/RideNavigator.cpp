@@ -1215,7 +1215,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
             myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
-            myOption.font.setPointSize(myOption.font.pointSize());
+            //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 
             if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray)); 
