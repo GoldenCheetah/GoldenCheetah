@@ -106,7 +106,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     tableView->setMouseTracking(true);
     tableView->setFrameStyle(QFrame::NoFrame);
     tableView->setAcceptDrops(true);
-    tableView->setColumnWidth(1, 100);
+    tableView->setColumnWidth(1, 100 *dpiXFactor);
 
     HelpWhatsThis *helpTableView = new HelpWhatsThis(tableView);
     if (mainwindow)

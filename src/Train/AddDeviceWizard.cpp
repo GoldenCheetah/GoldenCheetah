@@ -670,10 +670,10 @@ AddPair::initializePage()
     channelWidget->setUniformRowHeights(true);
     channelWidget->setIndentation(0);
 
-    channelWidget->header()->resizeSection(0,175); // type 
-    channelWidget->header()->resizeSection(1,75); // id
-    channelWidget->header()->resizeSection(2,120); // value
-    channelWidget->header()->resizeSection(3,110); // status
+    channelWidget->header()->resizeSection(0,175*dpiXFactor); // type
+    channelWidget->header()->resizeSection(1,75*dpiXFactor); // id
+    channelWidget->header()->resizeSection(2,120*dpiXFactor); // value
+    channelWidget->header()->resizeSection(3,110*dpiXFactor); // status
 
     // defaults
     static const int index4[4] = { 1,2,3,5 };
@@ -912,10 +912,10 @@ AddPairBTLE::initializePage()
     channelWidget->setUniformRowHeights(true);
     channelWidget->setIndentation(0);
 
-    channelWidget->header()->resizeSection(0,175); // type 
-    channelWidget->header()->resizeSection(1,75); // id
-    channelWidget->header()->resizeSection(2,120); // value
-    channelWidget->header()->resizeSection(3,110); // status
+    channelWidget->header()->resizeSection(0,175*dpiXFactor); // type
+    channelWidget->header()->resizeSection(1,75*dpiXFactor); // id
+    channelWidget->header()->resizeSection(2,120*dpiXFactor); // value
+    channelWidget->header()->resizeSection(3,110*dpiXFactor); // status
 
     // defaults
     static const int index4[4] = { 1,2,3,5 };

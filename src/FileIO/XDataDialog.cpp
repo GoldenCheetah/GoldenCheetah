@@ -20,6 +20,7 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideFileCommand.h"
+#include "Colors.h"
 
 #include <QFormLayout>
 #include <QLabel>
@@ -76,10 +77,10 @@ XDataDialog::XDataDialog(QWidget *parent) : QDialog(parent), item(NULL)
     addXDataSeries->setText(tr("Add"));
     removeXDataSeries->setText(tr("Delete"));
 #else
-    addXData->setFixedSize(20,20);
-    addXDataSeries->setFixedSize(20,20);
-    removeXData->setFixedSize(20,20);
-    removeXDataSeries->setFixedSize(20,20);
+    addXData->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addXDataSeries->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removeXData->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removeXDataSeries->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #endif
 
     // lay it out

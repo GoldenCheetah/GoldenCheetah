@@ -647,8 +647,8 @@ GcWindow::enterEvent(QEvent *)
     if (_noevents) return;
 
     if (property("nomenu") == false && property("isManager").toBool() == false) {
-        if (contentsMargins().top() > 20) menuButton->setFixedSize(80,30);
-        else menuButton->setFixedSize(80, 15);
+        if (contentsMargins().top() > 20) menuButton->setFixedSize(80*dpiXFactor,30*dpiYFactor);
+        else menuButton->setFixedSize(80*dpiXFactor, 15*dpiYFactor);
         menuButton->show();
     }
 }

@@ -19,6 +19,7 @@
 #include "CloudDBCommon.h"
 #include "CloudDBStatus.h"
 #include "Settings.h"
+#include "Colors.h"
 
 #include <QLabel>
 #include <QMessageBox>
@@ -33,9 +34,9 @@ CloudDBAcceptConditionsDialog::CloudDBAcceptConditionsDialog(QString athlete) : 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QPushButton *important = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxInformation), "", this);
-    important->setFixedSize(80,80);
+    important->setFixedSize(80*dpiXFactor,80*dpiYFactor);
     important->setFlat(true);
-    important->setIconSize(QSize(80,80));
+    important->setIconSize(QSize(80*dpiXFactor,80*dpiYFactor));
     important->setAutoFillBackground(false);
     important->setFocusPolicy(Qt::NoFocus);
 

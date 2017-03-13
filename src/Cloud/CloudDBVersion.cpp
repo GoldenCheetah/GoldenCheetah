@@ -20,6 +20,7 @@
 #include "CloudDBCommon.h"
 #include "Secrets.h"
 #include "GcUpgrade.h"
+#include "Colors.h"
 
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -144,14 +145,14 @@ CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1
 {
 
     setWindowTitle(QString(tr("GoldenCheetah - Check for new versions")));
-    setMinimumWidth(750);
+    setMinimumWidth(750*dpiXFactor);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QPushButton *important = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxInformation), "", this);
-    important->setFixedSize(80,80);
+    important->setFixedSize(80*dpiXFactor,80*dpiYFactor);
     important->setFlat(true);
-    important->setIconSize(QSize(80,80));
+    important->setIconSize(QSize(80*dpiXFactor,80*dpiYFactor));
     important->setAutoFillBackground(false);
     important->setFocusPolicy(Qt::NoFocus);
 

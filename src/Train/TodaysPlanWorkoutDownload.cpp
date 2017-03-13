@@ -83,11 +83,11 @@ TodaysPlanWorkoutDownload::TodaysPlanWorkoutDownload(Context *context) : QDialog
     files->headerItem()->setText(5, tr("Action"));
 
     files->setColumnCount(6);
-    files->setColumnWidth(0, 30); // selector
-    files->setColumnWidth(1, 100); // date
-    files->setColumnWidth(2, 220); // workout description
-    files->setColumnWidth(3, 70); // T-Score
-    files->setColumnWidth(4, 70); // duration
+    files->setColumnWidth(0, 30*dpiXFactor); // selector
+    files->setColumnWidth(1, 100*dpiXFactor); // date
+    files->setColumnWidth(2, 220*dpiXFactor); // workout description
+    files->setColumnWidth(3, 70*dpiXFactor); // T-Score
+    files->setColumnWidth(4, 70*dpiXFactor); // duration
     files->setSelectionMode(QAbstractItemView::SingleSelection);
     files->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     files->setUniformRowHeights(true);

@@ -19,6 +19,7 @@
 #include "LapsEditor.h"
 #include "RideItem.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
 
@@ -48,7 +49,7 @@ LapsEditor::LapsEditor(bool isSwim) : isSwim(isSwim)
 #ifdef Q_OS_MAC
     setFixedSize(625,415);
 #else
-    setFixedSize(630,420);
+    setFixedSize(630 *dpiXFactor,420 *dpiYFactor);
 #endif
 
     //
@@ -61,7 +62,7 @@ LapsEditor::LapsEditor(bool isSwim) : isSwim(isSwim)
     tableWidget = new QTableWidget(nRows, nCols, this);
     QStringList hLabels;
     tableWidget->setColumnWidth(0,  48);
-    for (int j = 1; j < nCols; j++) tableWidget->setColumnWidth(j, 88);
+    for (int j = 1; j < nCols; j++) tableWidget->setColumnWidth(j, 88*dpiXFactor);
     hLabels<<tr("reps")<<tr("work dist")<< tr("work min")<<tr("work sec")<<tr("rest dist")<<tr("rest min")<<tr("rest sec");
     tableWidget->setHorizontalHeaderLabels(hLabels);
     tableWidget->verticalHeader()->setVisible(false);

@@ -37,7 +37,7 @@ GProgressDialog::GProgressDialog(QString title, int min, int max, bool modal, QW
     setAttribute(Qt::WA_TranslucentBackground, true);
 
     // not too big dude
-    setFixedSize(200, 130);
+    setFixedSize(200*dpiXFactor, 130*dpiYFactor);
 
     // trap mouse events
     setMouseTracking(true);

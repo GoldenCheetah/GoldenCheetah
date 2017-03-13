@@ -336,7 +336,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
         dataTable->setItemWidget(t, 0, check);
     }
 
-    dataTable->setColumnWidth(0,50);
+    dataTable->setColumnWidth(0,50*dpiXFactor);
     dataTable->resizeColumnToContents(1);
     dataTable->resizeColumnToContents(2);
 #ifdef Q_OS_MAC
