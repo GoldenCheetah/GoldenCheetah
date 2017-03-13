@@ -438,6 +438,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
                                 tr("Import and combine from a file on your hard disk"
                                    " or device mounted as a USB disk to combine with "
                                    "the current activity."), this);
+    p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, "import");
     layout->addWidget(p);
@@ -446,6 +447,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     p = new QCommandLinkButton(tr("Download from Device"), 
                                 tr("Download data from a serial port device such as a Moxy Muscle Oxygen Monitor or"
                                    " bike computer to combine with the current activity."), this);
+    p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, "download");
     layout->addWidget(p);
@@ -454,6 +456,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     p = new QCommandLinkButton(tr("Existing Activity"), 
                                 tr("Combine data from an activity that has already been imported or downloaded into"
                                    " GoldenCheetah. Selecting from a list of all available activities. "), this);
+    p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, "choose");
     layout->addWidget(p);
