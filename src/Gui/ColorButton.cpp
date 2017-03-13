@@ -24,6 +24,14 @@
 
 ColorButton::ColorButton(QWidget *parent, QString name, QColor color) : QPushButton("", parent), color(color), name(name)
 {
+#if defined(WIN32) || defined (Q_OS_LINUX)
+    // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
+    if (dpiXFactor > 1) {
+        QString nopad = QString("QPushButton { padding-left: 0px; padding-right: 0px; "
+                                "              padding-top:  0px; padding-bottom: 0px; }");
+        setStyleSheet(nopad);
+    }
+#endif
     setColor(color);
     connect(this, SIGNAL(clicked()), this, SLOT(clicked()));
 
@@ -34,21 +42,20 @@ ColorButton::setColor(QColor ncolor)
 {
     color = ncolor;
 
-    QPixmap pix(24*dpiXFactor, 24*dpiYFactor);
+    setFlat(true);
+    QPixmap pix(20*dpiXFactor, 20*dpiYFactor);
     QPainter painter(&pix);
     if (color.isValid()) {
         painter.setPen(Qt::gray);
         painter.setBrush(QBrush(color));
-        painter.drawRect(0, 0, 24*dpiXFactor, 24*dpiYFactor);
+        painter.drawRect(0, 0, 20*dpiXFactor, 20*dpiYFactor);
     }
     QIcon icon;
     icon.addPixmap(pix);
     setIcon(icon);
+    setIconSize(QSize(20*dpiXFactor, 20*dpiYFactor));
     setContentsMargins(2*dpiXFactor,2*dpiYFactor,2*dpiXFactor,2*dpiYFactor);
-    setFlat(true);
-    setFixedWidth(34 * dpiXFactor);
-    setMinimumWidth(34 *dpiXFactor);
-    setMaximumWidth(34 *dpiXFactor);
+    setFixedSize(24 * dpiXFactor, 24 * dpiYFactor);
 }
 
 void
