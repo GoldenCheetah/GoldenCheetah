@@ -2210,7 +2210,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
         QTreeWidgetItem *add;
         ColorLabel *swatch = new ColorLabel(theme);
-        swatch->setFixedHeight(30);
+        swatch->setFixedHeight(30*dpiYFactor);
         add = new QTreeWidgetItem(themes->invisibleRootItem());
         themes->setItemWidget(add, 0, swatch);
         add->setText(1, theme.name);

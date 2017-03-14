@@ -76,7 +76,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    setFixedSize(300 *dpiXFactor, 480 *dpiYFactor);
+    setMinimumSize(300 *dpiXFactor, 300 *dpiYFactor);
 
     QVBoxLayout *mainVBox = new QVBoxLayout(this);
 
@@ -150,6 +150,7 @@ VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
     labelTPACE = new QLabel(tr("Your Training Paces:"));
     tableLayout->addWidget(labelTPACE);
     tableWidgetTPACE = new QTableWidget(5, 3, this);
+    tableWidgetTPACE->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     for (int j = 0; j< 3; j++) tableWidgetTPACE->setColumnWidth(j, 60*dpiXFactor);
     QStringList vLabels;
     vLabels<<tr("E-Pace")<<tr("M-Pace")<< tr("T-Pace")<<tr("I-Pace")<<tr("R-Pace");
