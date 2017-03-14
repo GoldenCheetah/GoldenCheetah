@@ -34,6 +34,7 @@
 
 #ifdef NOWEBKIT
 #include <QWebEngineSettings>
+#include <QDesktopWidget>
 #endif
 
 #include <QtGui>
@@ -142,7 +143,13 @@ LTMWindow::LTMWindow(Context *context) :
 #ifdef NOWEBKIT
     dataSummary = new QWebEngineView(this);
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
-    dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    if (dpiXFactor > 1) {
+    // 80 lines per page on hidpi screens (?)
+        int pixelsize = pixelSizeForFont(defaultFont, QApplication::desktop()->geometry().height()/80);
+        dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, pixelsize);
+    } else {
+        dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
 #else
     dataSummary = new QWebView(this);
