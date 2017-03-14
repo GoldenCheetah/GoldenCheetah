@@ -497,13 +497,22 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
 void DialWindow::resizeEvent(QResizeEvent * )
 {
-    // set point size
-    int size = geometry().height()-24;
-    if (size <= 0) size = 4;
-    if (size >= 64) size = 64;
-
     QFont font;
-    font.setPointSize(size);
+
+    // hidpi is a bit more complex
+    if (dpiXFactor > 1) {
+
+        font.setPixelSize(pixelSizeForFont(font, geometry().height()-(24*dpiYFactor)));
+
+    } else {
+        // set point size within reasonable limits for low dpi screens
+        int size = geometry().height()-24;
+        if (size <= 0) size = 4;
+        if (size >= 64) size = 64;
+
+        font.setPointSize(size);
+    }
+
     font.setWeight(QFont::Bold);
     valueLabel->setFont(font);
 }
