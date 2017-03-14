@@ -42,6 +42,7 @@
 #include "HelpWhatsThis.h"
 
 #include <QtGui>
+#include <QDesktopWidget>
 #include <QLabel>
 
 #include <QtXml/QtXml>
@@ -164,7 +165,13 @@ RideSummaryWindow::configChanged(qint32)
 #ifdef Q_OS_MAC
     rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
 #else
-    rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+2);
+    if (dpiXFactor > 1) {
+        // to avoid upsetting existing code, we only do this for hidpi screens
+        rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, font().pointSize()+2);
+
+    } else {
+        rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+2);
+    }
 #endif
     rideSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
 #else
