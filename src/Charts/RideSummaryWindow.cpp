@@ -165,9 +165,13 @@ RideSummaryWindow::configChanged(qint32)
 #ifdef Q_OS_MAC
     rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
 #else
+    // font size is in pixels, if not hidpi leave as before
     if (dpiXFactor > 1) {
-        // to avoid upsetting existing code, we only do this for hidpi screens
-        rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, font().pointSize()+2);
+
+        // 60 lines per page on hidpi screens (?)
+        QFont p;
+        int pixelsize = pixelSizeForFont(p, QApplication::desktop()->geometry().height()/80);
+        rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, pixelsize);
 
     } else {
         rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+2);
