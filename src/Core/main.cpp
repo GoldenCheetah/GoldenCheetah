@@ -348,18 +348,14 @@ main(int argc, char *argv[])
        // in settings before we release this in v3.5
        double height = screenSize.height() / 60;
 
-       // find a font that is under height -- by looping
-       int pixelsize=6;
-       do {
-            QFont f;
-            f.setPixelSize(pixelsize);
-            QFontMetrics fm(f);
-            if (fm.height() > height) break;
-            else pixelsize++;
-
-       } while (true);
-
-       font.setPixelSize(pixelsize);
+ #ifdef WIN32
+       static float DPI = 72;
+ #else
+       static float DPI = 96;
+ #endif
+       // points = height in inches * dpi
+       double pointsize = (height / QApplication::desktop()->physicalDpiY()) * DPI;
+       font.setPointSize(pointsize);
 
        // fixup some style issues from QT not adjusting defaults on hidpi displays
        // initially just pushbutton and combobox spacing...
@@ -369,7 +365,7 @@ main(int argc, char *argv[])
                                           .arg(9*dpiXFactor)
                                           .arg(3*dpiYFactor));
 
-       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font pixel size:"<<pixelsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
+       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     } else {
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     }
