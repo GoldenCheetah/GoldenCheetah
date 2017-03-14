@@ -346,15 +346,10 @@ main(int argc, char *argv[])
        // choose a font size that would allow 60 lines of text on screen
        // we can include the option for the user to set a scaling factor
        // in settings before we release this in v3.5
-       double height = screenSize.height() / 60;
+       double height = screenSize.height() / 70;
 
- #ifdef WIN32
-       static float DPI = 72;
- #else
-       static float DPI = 96;
- #endif
        // points = height in inches * dpi
-       double pointsize = (height / QApplication::desktop()->physicalDpiY()) * DPI;
+       double pointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
        font.setPointSize(pointsize);
 
        // fixup some style issues from QT not adjusting defaults on hidpi displays
