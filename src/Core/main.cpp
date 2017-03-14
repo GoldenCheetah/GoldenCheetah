@@ -362,7 +362,7 @@ main(int argc, char *argv[])
        application->setStyleSheet(QString("QPushButton { padding-left: %1px; padding-right: %1px; "
                                           "              padding-top: %2px; padding-bottom: %2px; }"
                                           "QComboBox   { padding-left: %1px; padding-right: %1px; }")
-                                          .arg(9*dpiXFactor)
+                                          .arg(15*dpiXFactor)
                                           .arg(3*dpiYFactor));
 
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();

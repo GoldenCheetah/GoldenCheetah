@@ -387,6 +387,7 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     tableWidget->setColumnWidth(3, 100*dpiXFactor); // duration
     tableWidget->setColumnWidth(4, 70*dpiXFactor); // distance
     tableWidget->setColumnWidth(5, 250*dpiXFactor); // status
+    tableWidget->horizontalHeader()->setStretchLastSection(true);
 
     // max height for 16 items and a scrollbar on right if > 16 items
     // for some reason the window is wider for 10-16 items too.
