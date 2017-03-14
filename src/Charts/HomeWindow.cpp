@@ -80,10 +80,6 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QFont bigandbold;
-    bigandbold.setPointSize(bigandbold.pointSize() + 2);
-    bigandbold.setWeight(QFont::Bold);
-
     style = new QStackedWidget(this);
     style->setAutoFillBackground(false);
     layout->setSpacing(0);
@@ -307,9 +303,9 @@ HomeWindow::selected()
     resizeEvent(NULL); // force a relayout
     rideSelected();
     dateRangeChanged(DateRange());
-
     setUpdatesEnabled(true);
     update();
+
 }
 
 void
@@ -383,6 +379,13 @@ HomeWindow::tabSelected(int index)
     active = true;
 
     if (index >= 0) {
+
+        // HACK XXX Fixup contents margins that are being wiped out "somewhere" but
+        //          only manifested when QT_SCALE_FACTOR > 1 and a tabbed view.
+        if (currentStyle == 0) {
+            if(charts[index]->showTitle() == true) charts[index]->setContentsMargins(0,25*dpiYFactor,0,0);
+            else charts[index]->setContentsMargins(0,0,0,0);
+        }
 
         // show
         charts[index]->show();
@@ -476,15 +479,16 @@ HomeWindow::styleChanged(int id)
         case 0 : // they are tabs in a TabWidget
             tabbed->addWidget(charts[i]);
             chartbar->addWidget(charts[i]->property("title").toString());
-            if(charts[i]->showTitle() == true) charts[i]->setContentsMargins(0,25,0,0);
-            else charts[i]->setContentsMargins(0,0,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->hide(); // we need to show on tab selection!
+            // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
+            if(charts[i]->showTitle() == true) charts[i]->setContentsMargins(0,25*dpiYFactor,0,0);
+            else charts[i]->setContentsMargins(0,0,0,0);
             break;
         case 1 : // they are lists in a GridLayout
             tileGrid->addWidget(charts[i], i,0);
-            charts[i]->setContentsMargins(0,25,0,0);
+            charts[i]->setContentsMargins(0,25*dpiYFactor,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->show();
             charts[i]->setProperty("dateRange", property("dateRange"));
@@ -492,7 +496,7 @@ HomeWindow::styleChanged(int id)
             break;
         case 2 : // thet are in a FlowLayout
             winFlow->addWidget(charts[i]);
-            charts[i]->setContentsMargins(0,15,0,0);
+            charts[i]->setContentsMargins(0,15*dpiYFactor,0,0);
             charts[i]->setResizable(true); // we need to show on tab selection!
             charts[i]->show();
             charts[i]->setProperty("dateRange", property("dateRange"));
@@ -627,12 +631,14 @@ HomeWindow::addChart(GcChartWindow* newone)
         switch (currentStyle) {
 
         case 0 :
-            if (newone->showTitle()) newone->setContentsMargins(0,25,0,0);
-            else newone->setContentsMargins(0,0,0,0);
             newone->setResizable(false); // we need to show on tab selection!
             //tabbed->addTab(newone, newone->property("title").toString());
             tabbed->addWidget(newone);
             chartbar->addWidget(newone->property("title").toString());
+
+            // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
+            if (newone->showTitle())  newone->setContentsMargins(0,25*dpiYFactor,0,0);
+            else newone->setContentsMargins(0,0,0,0);
             break;
         case 1 :
             {
@@ -643,7 +649,7 @@ HomeWindow::addChart(GcChartWindow* newone)
             newone->setResizable(false); // we need to show on tab selection!
             int row = chartnum; // / 2;
             int column = 0; //chartnum % 2;
-            newone->setContentsMargins(0,25,0,0);
+            newone->setContentsMargins(0,25*dpiYFactor,0,0);
             tileGrid->addWidget(newone, row, column);
             }
             break;
@@ -671,7 +677,7 @@ HomeWindow::addChart(GcChartWindow* newone)
                 newone->setFixedWidth(newwidth);
                 if (newheight < minHeight) newheight = minHeight;
                 else newone->setFixedHeight(newheight);
-                newone->setContentsMargins(0,15,0,0);
+                newone->setContentsMargins(0,15*dpiYFactor,0,0);
                 newone->setResizable(true); // we need to show on tab selection!
 
                 if (currentStyle == 2 && chartCursor >= 0) winFlow->insert(chartCursor, newone);
@@ -1416,8 +1422,10 @@ HomeWindow::restoreState(bool useDefault)
         if (currentStyle != 0) charts[i]->show();
         
     }
+
     setUpdatesEnabled(true);
     if (currentStyle == 0 && charts.count()) tabSelected(0);
+
 }
 
 //

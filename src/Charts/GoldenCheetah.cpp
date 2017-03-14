@@ -271,7 +271,9 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // heading
         QFont font;
-        font.setPointSize((contentsMargins().top()/2)+2);
+        // font too large on hidpi scaling
+        int pixelsize =pixelSizeForFont(font, ((contentsMargins().top()/2)+2));
+        font.setPixelSize(pixelsize);
         font.setWeight(QFont::Bold);
         painter.setFont(font);
         QString subtitle = property("subtitle").toString();
@@ -647,8 +649,9 @@ GcWindow::enterEvent(QEvent *)
     if (_noevents) return;
 
     if (property("nomenu") == false && property("isManager").toBool() == false) {
-        if (contentsMargins().top() > 20) menuButton->setFixedSize(80*dpiXFactor,30*dpiYFactor);
+        if (contentsMargins().top() > (20*dpiYFactor)) menuButton->setFixedSize(80*dpiXFactor,30*dpiYFactor);
         else menuButton->setFixedSize(80*dpiXFactor, 15*dpiYFactor);
+        menuButton->raise();
         menuButton->show();
     }
 }
@@ -693,12 +696,12 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     // Main layout
     _mainLayout = new QStackedLayout(_mainWidget);
     _mainLayout->setStackingMode(QStackedLayout::StackAll);
-    _mainLayout->setContentsMargins(2,2,2,2);
+    _mainLayout->setContentsMargins(2 *dpiXFactor,2 *dpiYFactor,2 *dpiXFactor,2 *dpiYFactor);
 
     // reveal widget
     _revealControls = new QWidget(this);
     _revealControls->hide();
-    _revealControls->setFixedHeight(50);
+    _revealControls->setFixedHeight(50 *dpiYFactor);
     _revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 80%)");
     _revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
