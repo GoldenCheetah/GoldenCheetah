@@ -44,7 +44,11 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
     setMinimumWidth(600 *dpiXFactor);
+#ifdef GC_WANT_ROBOT
+    setMinimumHeight(600 *dpiYFactor);
+#else
     setMinimumHeight(500 *dpiYFactor);
+#endif
 
     // title
     setWindowTitle(tr("Add Device Wizard"));
