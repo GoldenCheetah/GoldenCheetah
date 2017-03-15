@@ -384,7 +384,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
                     QwtSymbol *sym = new QwtSymbol;
                     sym->setStyle(QwtSymbol::Ellipse);
-                    sym->setSize(4);
+                    sym->setSize(4*dpiXFactor);
                     sym->setBrush(QBrush(intervalColor));
                     sym->setPen(QPen(intervalColor));
 
@@ -420,7 +420,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
                     QwtSymbol *sym = new QwtSymbol;
                     sym->setStyle(QwtSymbol::Ellipse);
-                    sym->setSize(4);
+                    sym->setSize(4*dpiXFactor);
                     sym->setPen(QPen(Qt::cyan));
                     sym->setBrush(QBrush(Qt::cyan));
 
@@ -440,7 +440,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
                     QwtSymbol *sym = new QwtSymbol;
                     sym->setStyle(QwtSymbol::Ellipse);
-                    sym->setSize(4);
+                    sym->setSize(4*dpiXFactor);
                     sym->setPen(QPen(Qt::red));
                     sym->setBrush(QBrush(Qt::red));
 
@@ -523,7 +523,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
                     QwtSymbol *sym = new QwtSymbol;
                     sym->setStyle(QwtSymbol::Ellipse);
-                    sym->setSize(4);
+                    sym->setSize(4*dpiXFactor);
                     sym->setBrush(QBrush(intervalColor));
                     sym->setPen(QPen(intervalColor));
 
@@ -675,7 +675,7 @@ ScatterPlot::intervalHover(IntervalItem *ri)
         if (xArray.size()) {
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(4);
+            sym->setSize(4*dpiXFactor);
             QColor color;
             color.setHsv(ours * 255/count, 255,255);
             color.setAlpha(128);
@@ -766,7 +766,7 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Diamond);
-            sym->setSize(8);
+            sym->setSize(8*dpiXFactor);
             sym->setPen(QPen(GColor(CPLOTMARKER)));
             sym->setBrush(QBrush(color));
 

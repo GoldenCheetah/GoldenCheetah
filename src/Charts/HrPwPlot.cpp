@@ -530,7 +530,7 @@ HrPwPlot::setJoinLine(bool value)
         } else {
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(5);
+            sym->setSize(5*dpiXFactor);
             sym->setPen(QPen(color));
             sym->setBrush(QBrush(color));
             hrCurves[i]->setPen(QPen(Qt::NoPen));
