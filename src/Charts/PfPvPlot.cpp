@@ -223,7 +223,7 @@ PfPvPlot::configChanged(qint32)
     // frame with inverse of background
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
-    sym->setSize(4);
+    sym->setSize(4*dpiXFactor);
     sym->setPen(QPen(Qt::red));
     sym->setBrush(QBrush(Qt::red));
     curve->setSymbol(sym);
@@ -478,7 +478,7 @@ PfPvPlot::refreshIntervalMarkers()
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Diamond);
-            sym->setSize(8);
+            sym->setSize(8*dpiXFactor);
             sym->setPen(QPen(GColor(CPLOTMARKER)));
             sym->setBrush(QBrush(color));
 
@@ -624,7 +624,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(4);
+            sym->setSize(4*dpiXFactor);
             sym->setPen(QPen(Qt::red));
             sym->setBrush(QBrush(Qt::red));
             curve->setSymbol(sym);
@@ -670,7 +670,7 @@ PfPvPlot::setData(RideItem *_rideItem)
                 gearCurve = new QwtPlotCurve();
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Diamond);
-                sym->setSize(3);
+                sym->setSize(3*dpiXFactor);
                 sym->setBrush(QBrush(Qt::NoBrush));
                 sym->setPen(QPen(Qt::red));
                 switch (i) {
@@ -749,7 +749,7 @@ PfPvPlot::intervalHover(IntervalItem *x)
         if (aepfArray.size()) {
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(4);
+            sym->setSize(4*dpiXFactor);
             QColor color;
             color.setHsv(ours * 255/count, 255,255);
             color.setAlpha(128);
@@ -897,7 +897,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4);
+                sym->setSize(4*dpiXFactor);
                 sym->setBrush(QBrush(Qt::NoBrush));
 
                 QPen pen;
@@ -1413,7 +1413,7 @@ PfPvPlot::showCompareIntervals()
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(4);
+            sym->setSize(4*dpiXFactor);
             sym->setBrush(QBrush(Qt::NoBrush));
 
             QPen pen;

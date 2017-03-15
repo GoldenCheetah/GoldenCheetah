@@ -879,10 +879,10 @@ LTMPlot::setData(LTMSettings *set)
             QwtSymbol *sym = new QwtSymbol;
             if (metricDetail.symbolStyle == QwtSymbol::NoSymbol) {
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(10);
+                sym->setSize(10*dpiXFactor);
             } else {
                 sym->setStyle(metricDetail.symbolStyle);
-                sym->setSize(20);
+                sym->setSize(20*dpiXFactor);
             }
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(50);
@@ -971,10 +971,10 @@ LTMPlot::setData(LTMSettings *set)
             QwtSymbol *sym = new QwtSymbol;
             if (metricDetail.symbolStyle == QwtSymbol::NoSymbol) {
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(6);
+                sym->setSize(6*dpiXFactor);
             } else {
                 sym->setStyle(metricDetail.symbolStyle);
-                sym->setSize(12);
+                sym->setSize(12*dpiXFactor);
             }
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(200);
@@ -1115,7 +1115,7 @@ LTMPlot::setData(LTMSettings *set)
             QPen cpen = QPen(metricDetail.penColor);
             cpen.setWidth(width);
             QwtSymbol *sym = new QwtSymbol;
-            sym->setSize(6);
+            sym->setSize(6*dpiXFactor);
             sym->setStyle(metricDetail.symbolStyle);
             sym->setPen(QPen(metricDetail.penColor));
             sym->setBrush(QBrush(metricDetail.penColor));
@@ -1134,7 +1134,7 @@ LTMPlot::setData(LTMSettings *set)
 
             if (metricDetail.symbolStyle != QwtSymbol::NoSymbol) {
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setSize(6);
+                sym->setSize(6*dpiXFactor);
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setPen(QPen(metricDetail.penColor));
                 sym->setBrush(QBrush(metricDetail.penColor));
@@ -1146,7 +1146,7 @@ LTMPlot::setData(LTMSettings *set)
         } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
             QwtSymbol *sym = new QwtSymbol;
-            sym->setSize(4);
+            sym->setSize(4*dpiXFactor);
             sym->setStyle(metricDetail.symbolStyle);
             sym->setPen(QPen(metricDetail.penColor));
             sym->setBrush(QBrush(Qt::white));
@@ -1997,10 +1997,10 @@ LTMPlot::setCompareData(LTMSettings *set)
                 QwtSymbol *sym = new QwtSymbol;
                 if (metricDetail.symbolStyle == QwtSymbol::NoSymbol) {
                     sym->setStyle(QwtSymbol::Ellipse);
-                    sym->setSize(10);
+                    sym->setSize(10*dpiXFactor);
                 } else {
                     sym->setStyle(metricDetail.symbolStyle);
-                    sym->setSize(20);
+                    sym->setSize(20*dpiXFactor);
                 }
                 QColor lighter = cd.color;
                 lighter.setAlpha(50);
@@ -2083,10 +2083,10 @@ LTMPlot::setCompareData(LTMSettings *set)
                 QwtSymbol *sym = new QwtSymbol;
                 if (metricDetail.symbolStyle == QwtSymbol::NoSymbol) {
                     sym->setStyle(QwtSymbol::Ellipse);
-                    sym->setSize(6);
+                    sym->setSize(6*dpiXFactor);
                 } else {
                     sym->setStyle(metricDetail.symbolStyle);
-                    sym->setSize(12);
+                    sym->setSize(12*dpiXFactor);
                 }
                 QColor lighter = cd.color;
                 lighter.setAlpha(200);
@@ -2227,7 +2227,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 QPen cpen = QPen(cd.color);
                 cpen.setWidth(width);
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setSize(6);
+                sym->setSize(6*dpiXFactor);
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setPen(QPen(cd.color));
                 sym->setBrush(QBrush(cd.color));
@@ -2246,7 +2246,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                 if (metricDetail.symbolStyle != QwtSymbol::NoSymbol) {
                     QwtSymbol *sym = new QwtSymbol;
-                    sym->setSize(6);
+                    sym->setSize(6*dpiXFactor);
                     sym->setStyle(metricDetail.symbolStyle);
                     sym->setPen(QPen(cd.color));
                     sym->setBrush(QBrush(cd.color));
@@ -2258,7 +2258,7 @@ LTMPlot::setCompareData(LTMSettings *set)
             } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setSize(4);
+                sym->setSize(4*dpiXFactor);
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setPen(QPen(cd.color));
                 sym->setBrush(QBrush(Qt::white));
