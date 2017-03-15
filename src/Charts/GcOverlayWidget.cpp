@@ -33,7 +33,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
 
-    setContentsMargins(4,0,4,4);
+    setContentsMargins(4*dpiXFactor,0,4*dpiXFactor,4*dpiYFactor);
     setAutoFillBackground(false);
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
@@ -50,7 +50,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     // main layout
     QVBoxLayout *mlayout = new QVBoxLayout(this);
     mlayout->setSpacing(0);
-    mlayout->setContentsMargins(1,0,1,1);
+    mlayout->setContentsMargins(1*dpiXFactor,0,1*dpiXFactor,1*dpiXFactor);
 
     QHBoxLayout *titleLayout = new QHBoxLayout;
     titleLayout->setSpacing(0);
@@ -83,7 +83,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     right->setAutoFillBackground(false);
     right->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     right->setIcon(rightIcon);
-    right->setIconSize(QSize(20,20));
+    right->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     right->setFocusPolicy(Qt::NoFocus);
     right->hide();
     titleLayout->addWidget(right);
@@ -211,18 +211,18 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     painter.drawRect(boundary);
 
     // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23, true); 
-    QLinearGradient inactive = GCColor::linearGradient(23, false); 
+    QLinearGradient active = GCColor::linearGradient(23*dpiXFactor, true);
+    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
 
     // title
-    QRect title(1,1,width()-2,22);
+    QRect title(1*dpiXFactor,1*dpiYFactor,width()-(2*dpiXFactor),22*dpiYFactor);
     painter.fillRect(title, QColor(Qt::white));
     painter.fillRect(title, isActiveWindow() ? active : inactive);
 
     if (!GCColor::isFlat()) {
         QPen black(QColor(100,100,100,200));
         painter.setPen(black);
-        painter.drawLine(0,22, width()-1, 22);
+        painter.drawLine(0,22*dpiYFactor, width()-(1*dpiXFactor), 22*dpiYFactor);
 
         //QPen gray(QColor(230,230,230));
         //painter.setPen(gray);
@@ -317,7 +317,7 @@ void GcOverlayWidget::keyPressEvent(QKeyEvent *e)
  
 void GcOverlayWidget::setCursorShape(const QPoint &e_pos) 
 {
-    const int diff = 6;
+    const int diff = 6*dpiXFactor;
     if (
             //Left-Bottom
             ((e_pos.y() > y() + height() - diff) &&          //Bottom
@@ -379,7 +379,7 @@ void GcOverlayWidget::setCursorShape(const QPoint &e_pos)
             setCursor(QCursor(Qt::SizeVerCursor));
             mode = resizeb;
         }
-    } else if (e_pos.y() <= y() + 23 ) {
+    } else if (e_pos.y() <= y() + (23*dpiYFactor) ) {
         setCursor(QCursor(Qt::ArrowCursor));
         mode = moving;
     }

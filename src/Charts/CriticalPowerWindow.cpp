@@ -655,6 +655,10 @@ CriticalPowerWindow::configChanged(qint32)
     CPEdit->setStyleSheet(style);
     //CPLabel->setStyleSheet(style);
     //CPSlider->setStyleSheet(style);
+    if (dpiXFactor > 1) {
+        helper->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
+                                                                      .arg(GColor(CPLOTMARKER).name()));
+    }
 #endif
 
     QPen gridPen(GColor(CPLOTGRID));
