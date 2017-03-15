@@ -238,7 +238,7 @@ AllPlotInterval::placeIntervals()
          }
     }
 
-    setFixedHeight((1+intervalLigns.count())*10);
+    setFixedHeight((1+intervalLigns.count())*(10*dpiYFactor));
     setAxisScale(yLeft, 0, 3000*intervalLigns.count());
 }
 
@@ -382,7 +382,7 @@ QwtIntervalSample AllPlotIntervalData::sample(size_t i) const {
 QRectF
 AllPlotIntervalData::boundingRect() const
 {
-    return QRectF(0, 5000, 5100, 5100);
+    return QRectF(0, 5000*dpiYFactor, 5100*dpiXFactor, 5100*dpiYFactor);
 }
 
 AllPlotIntervalCanvasPicker::AllPlotIntervalCanvasPicker(QwtPlot *plot):

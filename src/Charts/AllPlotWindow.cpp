@@ -114,7 +114,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // user data widget
     custom = new QWidget(this);
     st->addTab(custom, tr("User Data"));
-    custom->setContentsMargins(20,20,20,20);
+    custom->setContentsMargins(20 *dpiXFactor,20 *dpiYFactor,20 *dpiXFactor,20 *dpiYFactor);
     //HelpWhatsThis *curvesHelp = new HelpWhatsThis(custom);
     //custom->setWhatsThis(curvesHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Curves));
     QVBoxLayout *customLayout = new QVBoxLayout(custom);
@@ -189,7 +189,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // reveal controls
     rSmooth = new QLabel(tr("Smooth"));
     rSmoothEdit = new QLineEdit();
-    rSmoothEdit->setFixedWidth(30);
+    rSmoothEdit->setFixedWidth(30 *dpiXFactor);
     rSmoothSlider = new QSlider(Qt::Horizontal);
     rSmoothSlider->setTickPosition(QSlider::TicksBelow);
     rSmoothSlider->setTickInterval(10);
@@ -216,7 +216,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     t->addWidget(rFull);
     t->addWidget(rHelp);
     v->addLayout(t);
-    r->addSpacing(20);
+    r->addSpacing(20 *dpiYFactor);
     r->addLayout(v);
     r->addStretch();
     setRevealLayout(r);
@@ -237,7 +237,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     guiControls->addRow(new QLabel("", this), showBySeries);
     guiControls->addRow(new QLabel("", this), new QLabel("",this)); // spacer
 
-    stackWidth = 20;
+    stackWidth = 20 *dpiXFactor;
     stackZoomSlider = new QSlider(Qt::Horizontal,this);
     stackZoomSlider->setMinimum(0);
     stackZoomSlider->setMaximum(7);
@@ -442,7 +442,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     QLabel *smoothLabel = new QLabel(tr("Smooth"), this);
     smoothLineEdit = new QLineEdit(this);
-    smoothLineEdit->setFixedWidth(40);
+    smoothLineEdit->setFixedWidth(40 *dpiXFactor);
 
     smoothSlider = new QSlider(Qt::Horizontal, this);
     smoothSlider->setTickPosition(QSlider::TicksBelow);
@@ -638,15 +638,15 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     scrollLeft = new QPushButton("<", this);
     scrollLeft->setFont(smallFont);
     scrollLeft->setAutoRepeat(true);
-    scrollLeft->setFixedHeight(16);
-    scrollLeft->setFixedWidth(16);
+    scrollLeft->setFixedHeight(16*dpiYFactor);
+    scrollLeft->setFixedWidth(16*dpiXFactor);
     scrollLeft->setContentsMargins(0,0,0,0);
 
     scrollRight = new QPushButton(">", this);
     scrollRight->setFont(smallFont);
     scrollRight->setAutoRepeat(true);
-    scrollRight->setFixedHeight(16);
-    scrollRight->setFixedWidth(16);
+    scrollRight->setFixedHeight(16*dpiYFactor);
+    scrollRight->setFixedWidth(16*dpiXFactor);
     scrollRight->setContentsMargins(0,0,0,0);
 
 #ifdef Q_OS_MAC
@@ -665,7 +665,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     fullPlot = new AllPlot(this, this, context);
     fullPlot->standard->grid->enableY(false);
-    fullPlot->setFixedHeight(100);
+    fullPlot->setFixedHeight(100 *dpiYFactor);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     fullPlot->setHighlightIntervals(false);
     fullPlot->setPaintBrush(0);
@@ -677,7 +677,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->setWhatsThis(helpFull->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
 
     intervalPlot = new AllPlotInterval(this, context);
-    intervalPlot->setFixedHeight(100);
+    intervalPlot->setFixedHeight(100 *dpiYFactor);
     intervalPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(intervalPlot->canvas())->setBorderRadius(0);
     intervalPlot->setContentsMargins(0,0,0,0);
@@ -716,7 +716,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // controls...
     controlsLayout = new QGridLayout;
     controlsLayout->setSpacing(0);
-    controlsLayout->setContentsMargins(5,5,5,5);
+    controlsLayout->setContentsMargins(5 *dpiXFactor,5 *dpiYFactor,5 *dpiXFactor,5 *dpiYFactor);
     controlsLayout->addWidget(fullPlot, 0,1);
     controlsLayout->addWidget(spanSlider, 1,1);
     controlsLayout->addWidget(scrollLeft,1,0);
@@ -735,7 +735,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlotLayout->setStretch(1,20);
 
     QVBoxLayout *vlayout = new QVBoxLayout;
-    vlayout->setContentsMargins(2,0,2,2);
+    vlayout->setContentsMargins(2 *dpiXFactor,0,2 *dpiXFactor,2 *dpiXFactor);
     vlayout->setSpacing(0);
     vlayout->addWidget(allPlotFrame);
     vlayout->addWidget(stackFrame);
@@ -1216,7 +1216,7 @@ AllPlotWindow::event(QEvent *event)
         // put somewhere nice on first show
         if (firstShow) {
             firstShow = false;
-            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+            helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
             helperWidget()->raise();
 
             if (isShowHelp()) helperWidget()->show();
@@ -1225,7 +1225,7 @@ AllPlotWindow::event(QEvent *event)
 
         // if off the screen move on screen
         if (helperWidget()->geometry().x() > geometry().width()) {
-            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+            helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
     }
     return QWidget::event(event);
@@ -1385,7 +1385,7 @@ AllPlotWindow::compareChanged()
             // format it for our purposes
             if (fullPlot->bydist) ap->setAxisScale(QwtPlot::xBottom, 0, maxKM);
             else ap->setAxisScale(QwtPlot::xBottom, 0, maxSECS/60.00f);
-            ap->setFixedHeight(120 + (stackWidth *4));
+            ap->setFixedHeight((120*dpiXFactor) + (stackWidth *4));
 
             // add to layout
             comparePlotLayout->addWidget(ap);
@@ -1481,7 +1481,7 @@ AllPlotWindow::compareChanged()
             AllPlot *plot = new AllPlot(this, this, context, x.one, x.two, false);
             plot->setPalette(palette);
             plot->setAutoFillBackground(false);
-            plot->setFixedHeight(120+(stackWidth*4));
+            plot->setFixedHeight((120*dpiYFactor)+(stackWidth*4));
 
             // tooltip on hover over point -- consider moving this to AllPlot (!)
             plot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
@@ -2259,7 +2259,7 @@ AllPlotWindow::plotPickerMoved(const QPoint &pos)
     AllPlot* plot = qobject_cast<AllPlot *>(pick->plot());
 
     int posX = pos.x();
-    int posY = plot->y()+pos.y()+50;
+    int posY = plot->y()+pos.y()+(50*dpiYFactor);
 
     if (showStack->isChecked()) {
 
@@ -3611,7 +3611,7 @@ AllPlotWindow::resizeSeriesPlots()
 
     if (update) seriesstackFrame->setUpdatesEnabled(false);
     foreach (AllPlot *plot, seriesPlots)
-        plot->setFixedHeight(120 + (stackWidth *4));
+        plot->setFixedHeight((120*dpiYFactor) + (stackWidth *4));
     if (update) seriesstackFrame->setUpdatesEnabled(true);
 }
 
@@ -3620,7 +3620,7 @@ AllPlotWindow::resizeComparePlots()
 {
     comparePlotFrame->setUpdatesEnabled(false);
     foreach (AllPlot *plot, allComparePlots)
-        plot->setFixedHeight(120 + (stackWidth *4));
+        plot->setFixedHeight((120*dpiYFactor) + (stackWidth *4));
     comparePlotFrame->setUpdatesEnabled(true);
 }
 
@@ -3719,7 +3719,7 @@ AllPlotWindow::setupSeriesStackPlots()
         seriesPlots.append(_allPlot);
         addPickers(_allPlot);
         newLayout->addWidget(_allPlot);
-        _allPlot->setFixedHeight(120+(stackWidth*4));
+        _allPlot->setFixedHeight((120*dpiYFactor)+(stackWidth*4));
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtPlot::xBottom, true);
@@ -3849,7 +3849,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setDataFromPlot(fullPlot, startIndex, stopIndex);
         _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
 
-        _allPlot->setFixedHeight(120+stackWidth*4);
+        _allPlot->setFixedHeight((120*dpiYFactor)+stackWidth*4);
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtPlot::xBottom, true);
