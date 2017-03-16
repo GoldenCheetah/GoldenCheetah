@@ -1408,12 +1408,12 @@ RideMapWindow::event(QEvent *event)
         // put somewhere nice on first show
         if (firstShow) {
             firstShow = false;
-            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+            helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
 
         // if off the screen move on screen
         if (helperWidget()->geometry().x() > geometry().width()) {
-            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+            helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
     }
     return QWidget::event(event);
