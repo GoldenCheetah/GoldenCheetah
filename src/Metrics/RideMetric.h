@@ -112,9 +112,9 @@ public:
     virtual QString name() const { return name_; }
 
     // classification, to help browse and find metrics
-    virtual MetricClass classification() const { return MetricClass::Undefined; }
-    virtual MetricValidity validity() const { return MetricValidity::Unknown; }
-    virtual int sport() const { return MetricSport::Bike; }
+    virtual MetricClass classification() const { return Undefined; }
+    virtual MetricValidity validity() const { return Unknown; }
+    virtual int sport() const { return Bike; }
 
     // English name used in metadata.xml for compatibility
     virtual QString internalName() const { return internalName_; }
