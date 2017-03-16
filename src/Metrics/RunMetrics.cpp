@@ -80,8 +80,8 @@ struct AvgRunCadence : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("C") && ride->isRun); }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new AvgRunCadence(*this); }
 };
 
@@ -131,8 +131,8 @@ class MaxRunCadence : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && ride->isRun; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new MaxRunCadence(*this); }
 };
 
@@ -188,8 +188,8 @@ struct AvgRunGroundContactTime : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("R") && ride->isRun); }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new AvgRunGroundContactTime(*this); }
 };
 
@@ -247,8 +247,8 @@ struct AvgRunVerticalOscillation  : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("R") && ride->isRun); }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new AvgRunVerticalOscillation(*this); }
 };
 
@@ -311,8 +311,8 @@ class Pace : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new Pace(*this); }
 };
 
@@ -364,8 +364,8 @@ class EfficiencyIndex : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun && ride->present.contains("P") && ride->present.contains("S"); }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new EfficiencyIndex(*this); }
 };
 
@@ -432,8 +432,8 @@ struct AvgStrideLength  : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("S") && ride->present.contains("C") && ride->isRun); }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new AvgStrideLength(*this); }
 };
 

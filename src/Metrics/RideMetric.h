@@ -53,16 +53,27 @@ class RideMetric {
 
 public:
 
+    // Which Sport(s) does this metric apply to (not OR'ed together, Tri/Any shorthands) ?
+    enum metricsport { Bike=0x01, Run=0x02, Swim=0x04, Triathlon=0x07, Other=0x08, Any=0xff };
+    typedef enum metricsport MetricSport;
+
     // Type of metric for aggregation
     enum metrictype { Total, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev};
     typedef enum metrictype MetricType;
 
     // Class of metric to help browse
-    enum metricclass { Unknown, Stress, Volume, Intensity, Distribution, ModelEstimate };
+    enum metricclass { Undefined, Stress, Volume, Intensity, Distribution, ModelEstimate };
     typedef enum metricclass MetricClass;
 
-    // Validity of metric from a scientific standpoint
-    enum metricvalidity { None, Unclear, Published, Established };
+    // Validity of metric from a scientific standpoint - to guide users
+    //
+    // 0 - UNRELIABLE - its known to be problematic (e.g. Estimated Vo2max from 5 min power)
+    // 1 - UNKNOWN - we just don't know, there is no data (e.g. TISS)
+    // 2 - UNCLEAR - lack of sufficient proof or concerns exist (e.g. TSS and BikeScore)
+    // 3 - USEFUL - published and peer reviewed, or results known to be much better than unclear (e.g. NP, TRIMP, W'bal)
+    // 4 - RELIABLE - Adopted and/or verified by the scientific community (e.g. HRV rmSSD)
+    // 5 - HIGH - Known to be highly reliable, assuming sufficient device accuracy (e.g. Average HR, Average Power, Work kJ)
+    enum metricvalidity { Unreliable, Unknown, Unclear, Useful, Reliable, High };
     typedef enum metricvalidity MetricValidity;
 
     int index_;
@@ -101,8 +112,9 @@ public:
     virtual QString name() const { return name_; }
 
     // classification, to help browse and find metrics
-    virtual MetricClass classification() const { return MetricClass::Unknown; }
-    virtual MetricValidity validity() const { return MetricValidity::None; }
+    virtual MetricClass classification() const { return MetricClass::Undefined; }
+    virtual MetricValidity validity() const { return MetricValidity::Unknown; }
+    virtual int sport() const { return MetricSport::Bike; }
 
     // English name used in metadata.xml for compatibility
     virtual QString internalName() const { return internalName_; }

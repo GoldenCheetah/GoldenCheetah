@@ -53,8 +53,8 @@ class L1Sustain : public RideMetric {
         setValue(0);
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L1Sustain(*this); }
 };
 
@@ -80,8 +80,8 @@ class L2Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L2Sustain(*this); }
 };
 
@@ -106,8 +106,8 @@ class L3Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L3Sustain(*this); }
 };
 
@@ -132,8 +132,8 @@ class L4Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L4Sustain(*this); }
 };
 
@@ -158,8 +158,8 @@ class L5Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L5Sustain(*this); }
 };
 
@@ -184,8 +184,8 @@ class L6Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L6Sustain(*this); }
 };
 
@@ -210,8 +210,8 @@ class L7Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L7Sustain(*this); }
 };
 
@@ -236,8 +236,8 @@ class L8Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L8Sustain(*this); }
 };
 
@@ -262,8 +262,8 @@ class L9Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L9Sustain(*this); }
 };
 
@@ -288,8 +288,8 @@ class L10Sustain : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &) {
         setValue(0);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new L10Sustain(*this); }
 };
 

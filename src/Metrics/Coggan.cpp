@@ -103,8 +103,8 @@ class NP : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new NP(*this); }
 };
 
@@ -144,8 +144,8 @@ class VI : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new VI(*this); }
 };
 
@@ -202,8 +202,8 @@ class IntensityFactor : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new IntensityFactor(*this); }
 };
 
@@ -262,8 +262,8 @@ class TSS : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new TSS(*this); }
 };
 
@@ -316,8 +316,8 @@ class TSSPerHour : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new TSSPerHour(*this); }
 };
 
@@ -364,8 +364,8 @@ class EfficiencyFactor : public RideMetric {
         setValue(ef);
     }
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("H") && (ride->present.contains("P") || (ride->isRun && ride->present.contains("S"))); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new EfficiencyFactor(*this); }
 };
 
