@@ -73,6 +73,8 @@ class VDOT : public RideMetric {
         setCount(1);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new VDOT(*this); }
 };
 
@@ -134,6 +136,8 @@ class TPace : public RideMetric {
         setCount(1);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new TPace(*this); }
 };
 

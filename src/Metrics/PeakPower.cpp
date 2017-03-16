@@ -90,6 +90,8 @@ class PeakPercent : public RideMetric {
         }
     }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PeakPercent(*this); }
 };
 
@@ -161,6 +163,8 @@ class PowerZone : public RideMetric {
         // we want 4.1 as zone, for 10% into zone 4
         setValue(double(zone) + percent);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PowerZone(*this); }
 };
 
@@ -214,6 +218,8 @@ class FatigueIndex : public RideMetric {
         if (minp > maxp) setValue(0.00); // minp wasn't changed, all zeroes?
         else setValue(100 * ((maxp-minp)/maxp)); // as a percentage
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new FatigueIndex(*this); }
 };
 
@@ -262,6 +268,8 @@ class PacingIndex : public RideMetric {
         if (!count || !total) setValue(0.00); // minp wasn't changed, all zeroes?
         else setValue(((total/count) / maxp) * 100.00f);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PacingIndex(*this); }
 };
 
@@ -294,6 +302,8 @@ class PeakPower : public RideMetric {
 
         setValue(watts);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PeakPower(*this); }
 };
 
@@ -311,6 +321,8 @@ class PeakPower60m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower60m(*this); }
 };
 
@@ -328,6 +340,8 @@ class PeakPower1s : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower1s(*this); }
 };
 
@@ -345,6 +359,8 @@ class PeakPower5s : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower5s(*this); }
 };
 
@@ -362,6 +378,8 @@ class PeakPower10s : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower10s(*this); }
 };
 
@@ -379,6 +397,8 @@ class PeakPower15s : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower15s(*this); }
 };
 
@@ -396,6 +416,8 @@ class PeakPower20s : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower20s(*this); }
 };
 
@@ -413,6 +435,8 @@ class PeakPower30s : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower30s(*this); }
 };
 
@@ -430,6 +454,8 @@ class PeakPower1m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower1m(*this); }
 };
 
@@ -447,6 +473,8 @@ class PeakPower2m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower2m(*this); }
 };
 
@@ -464,6 +492,8 @@ class PeakPower3m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower3m(*this); }
 };
 
@@ -481,6 +511,8 @@ class PeakPower5m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower5m(*this); }
 };
 
@@ -498,6 +530,8 @@ class PeakPower8m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower8m(*this); }
 };
 
@@ -515,6 +549,8 @@ class PeakPower10m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower10m(*this); }
 };
 
@@ -532,6 +568,8 @@ class PeakPower20m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower20m(*this); }
 };
 
@@ -549,6 +587,8 @@ class PeakPower30m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower30m(*this); }
 };
 
@@ -566,6 +606,8 @@ class PeakPower90m : public PeakPower {
             setMetricUnits(tr("watts"));
             setImperialUnits(tr("watts"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPower90m(*this); }
 };
 
@@ -616,6 +658,8 @@ class PeakPowerHr : public RideMetric {
 
         setValue(hr);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PeakPowerHr(*this); }
 };
 
@@ -635,6 +679,8 @@ class PeakPowerHr1m : public PeakPowerHr {
             setImperialUnits(tr("bpm"));
             setDescription(tr("Average Heart Rate for 1 min Peak Power interval"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPowerHr1m(*this); }
 };
 
@@ -654,6 +700,8 @@ class PeakPowerHr5m : public PeakPowerHr {
             setImperialUnits(tr("bpm"));
             setDescription(tr("Average Heart Rate for 5 min Peak Power interval"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPowerHr5m(*this); }
 };
 
@@ -673,6 +721,8 @@ class PeakPowerHr10m : public PeakPowerHr {
             setImperialUnits(tr("bpm"));
             setDescription(tr("Average Heart Rate for 10 min Peak Power interval"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPowerHr10m(*this); }
 };
 
@@ -692,6 +742,8 @@ class PeakPowerHr20m : public PeakPowerHr {
             setImperialUnits(tr("bpm"));
             setDescription(tr("Average Heart Rate for 20 min Peak Power interval"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPowerHr20m(*this); }
 };
 
@@ -711,6 +763,8 @@ class PeakPowerHr30m : public PeakPowerHr {
             setImperialUnits(tr("bpm"));
             setDescription(tr("Average Heart Rate for 30 min Peak Power interval"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPowerHr30m(*this); }
 };
 
@@ -731,6 +785,8 @@ class PeakPowerHr60m : public PeakPowerHr {
             setImperialUnits(tr("bpm"));
             setDescription(tr("Average Heart Rate for 60 min Peak Power interval"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPowerHr60m(*this); }
 };
 

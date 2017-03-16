@@ -98,6 +98,8 @@ class TRIMPPoints : public RideMetric {
         setValue(score);
     }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new TRIMPPoints(*this); }
 };
 
@@ -157,6 +159,8 @@ public:
 
         setValue(score);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new TRIMP100Points(*this); }
 };
 
@@ -296,6 +300,8 @@ public:
         setValue(value/60);
         return;
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new TRIMPZonalPoints(*this); }
 };
 
@@ -354,6 +360,8 @@ class SessionRPE : public RideMetric {
         setValue(score);
     }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new SessionRPE(*this); }
 };
 

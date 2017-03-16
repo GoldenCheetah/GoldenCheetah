@@ -104,6 +104,8 @@ class XPower : public RideMetric {
         setCount(secs);
     }
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new XPower(*this); }
 };
 
@@ -143,6 +145,8 @@ class VariabilityIndex : public RideMetric {
         setValue(vi);
     }
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new VariabilityIndex(*this); }
 };
 
@@ -183,6 +187,8 @@ class RelativeIntensity : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new RelativeIntensity(*this); }
 };
 
@@ -220,6 +226,8 @@ class CriticalPower : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new CriticalPower(*this); }
 };
 
@@ -275,6 +283,8 @@ class aTISS : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new aTISS(*this); }
 };
 
@@ -331,6 +341,8 @@ class anTISS : public RideMetric {
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new anTISS(*this); }
 };
 
@@ -368,6 +380,8 @@ class dTISS : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new dTISS(*this); }
 };
 
@@ -414,6 +428,8 @@ class BikeScore : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new BikeScore(*this); }
 };
 
@@ -451,6 +467,8 @@ class ResponseIndex : public RideMetric {
         setValue(ri);
     }
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new ResponseIndex(*this); }
 };
 

@@ -357,6 +357,8 @@ class BestR : public RideMetric {
     bool isRelevantForRide(const RideItem *ride) const {
         return ride->present.contains("P");
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new BestR(*this); }
 };
 

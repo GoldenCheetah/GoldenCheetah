@@ -76,6 +76,8 @@ public:
 
     bool canAggregate() { return false; }
     void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime(*this); }
 };
 
@@ -96,6 +98,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 1."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime1(*this); }
 };
 
@@ -116,6 +120,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 2."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime2(*this); }
 };
 
@@ -136,6 +142,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 3."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime3(*this); }
 };
 
@@ -156,6 +164,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 4."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime4(*this); }
 };
 
@@ -176,6 +186,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 5."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime5(*this); }
 };
 
@@ -196,6 +208,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 6."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime6(*this); }
 };
 
@@ -216,6 +230,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 7."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime7(*this); }
 };
 
@@ -236,6 +252,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 8."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime8(*this); }
 };
 
@@ -256,6 +274,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 9."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime9(*this); }
 };
 class HrZoneTime10 : public HrZoneTime {
@@ -275,6 +295,8 @@ public:
         setImperialUnits(tr("seconds"));
         setDescription(tr("Time in Heart Rate Zone 10."));
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new HrZoneTime10(*this); }
 };
 
@@ -318,6 +340,8 @@ class HrZonePTime1 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime1(*this); }
 };
 
@@ -360,6 +384,8 @@ class HrZonePTime2 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime2(*this); }
 };
 
@@ -402,6 +428,8 @@ class HrZonePTime3 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime3(*this); }
 };
 
@@ -444,6 +472,8 @@ class HrZonePTime4 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime4(*this); }
 };
 
@@ -486,6 +516,8 @@ class HrZonePTime5 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime5(*this); }
 };
 
@@ -528,6 +560,8 @@ class HrZonePTime6 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime6(*this); }
 };
 
@@ -570,6 +604,8 @@ class HrZonePTime7 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime7(*this); }
 };
 
@@ -612,6 +648,8 @@ class HrZonePTime8 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime8(*this); }
 };
 class HrZonePTime9 : public RideMetric {
@@ -653,6 +691,8 @@ class HrZonePTime9 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime9(*this); }
 };
 class HrZonePTime10 : public RideMetric {
@@ -694,6 +734,8 @@ class HrZonePTime10 : public RideMetric {
 
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new HrZonePTime10(*this); }
 };
 static bool addAllHrZones() {

@@ -72,6 +72,8 @@ class ZoneTime : public RideMetric {
         setValue(seconds);
     }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new ZoneTime(*this); }
 };
 
@@ -92,6 +94,8 @@ class ZoneTime1 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 1."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime1(*this); }
 };
 
@@ -112,6 +116,8 @@ class ZoneTime2 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 2."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime2(*this); }
 };
 
@@ -132,6 +138,8 @@ class ZoneTime3 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 3."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime3(*this); }
 };
 
@@ -154,6 +162,8 @@ class ZoneTime4 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 4."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime4(*this); }
 };
 
@@ -174,6 +184,8 @@ class ZoneTime5 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 5."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime5(*this); }
 };
 
@@ -194,6 +206,8 @@ class ZoneTime6 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 6."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime6(*this); }
 };
 
@@ -214,6 +228,8 @@ class ZoneTime7 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 7."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime7(*this); }
 };
 
@@ -234,6 +250,8 @@ class ZoneTime8 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 8."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime8(*this); }
 };
 
@@ -254,6 +272,8 @@ class ZoneTime9 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 9."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime9(*this); }
 };
 
@@ -274,6 +294,8 @@ class ZoneTime10 : public ZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time in Power Zone 10."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZoneTime10(*this); }
 };
 
@@ -315,6 +337,8 @@ class ZonePTime1 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime1(*this); }
 };
 
@@ -355,6 +379,8 @@ class ZonePTime2 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime2(*this); }
 };
 
@@ -395,6 +421,8 @@ class ZonePTime3 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime3(*this); }
 };
 
@@ -435,6 +463,8 @@ class ZonePTime4 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime4(*this); }
 };
 
@@ -475,6 +505,8 @@ class ZonePTime5 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime5(*this); }
 };
 
@@ -515,6 +547,8 @@ class ZonePTime6 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime6(*this); }
 };
 
@@ -555,6 +589,8 @@ class ZonePTime7 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime7(*this); }
 };
 
@@ -595,6 +631,8 @@ class ZonePTime8 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime8(*this); }
 };
 
@@ -635,6 +673,8 @@ class ZonePTime9 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime9(*this); }
 };
 
@@ -675,6 +715,8 @@ class ZonePTime10 : public RideMetric {
             setCount(time);
         }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new ZonePTime10(*this); }
 };
 
