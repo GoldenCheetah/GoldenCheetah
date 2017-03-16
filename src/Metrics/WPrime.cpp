@@ -761,8 +761,8 @@ class MinWPrime : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new MinWPrime(*this); }
 };
 
@@ -793,8 +793,8 @@ class MaxWPrime : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new MaxWPrime(*this); }
 };
 
@@ -825,8 +825,8 @@ class MaxMatch : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new MaxMatch(*this); }
 };
 
@@ -859,8 +859,8 @@ class Matches : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new Matches(*this); }
 };
 
@@ -893,8 +893,8 @@ class WPrimeTau : public RideMetric {
 
     bool canAggregate() { return false; }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new WPrimeTau(*this); }
 };
 
@@ -939,8 +939,8 @@ class WPrimeExp : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new WPrimeExp(*this); }
 };
 
@@ -985,8 +985,8 @@ class WPrimeWatts : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new WPrimeWatts(*this); }
 };
 
@@ -1040,8 +1040,8 @@ class CPExp : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new CPExp(*this); }
 };
 
@@ -1093,8 +1093,8 @@ class WZoneTime : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new WZoneTime(*this); }
 };
 
@@ -1115,8 +1115,8 @@ class WZoneTime1 : public WZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when W' bal is below 25% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneTime1(*this); }
 };
 class WZoneTime2 : public WZoneTime {
@@ -1136,8 +1136,8 @@ class WZoneTime2 : public WZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when W' bal is between 25% and 50% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneTime2(*this); }
 };
 class WZoneTime3 : public WZoneTime {
@@ -1157,8 +1157,8 @@ class WZoneTime3 : public WZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when W' bal is between 50% and 75% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneTime3(*this); }
 };
 class WZoneTime4 : public WZoneTime {
@@ -1178,8 +1178,8 @@ class WZoneTime4 : public WZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when W' bal is above 75% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneTime4(*this); }
 };
 
@@ -1243,8 +1243,8 @@ class WCPZoneTime : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new WCPZoneTime(*this); }
 };
 
@@ -1265,8 +1265,8 @@ class WCPZoneTime1 : public WCPZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when Power is above CP and W' bal is below 25% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WCPZoneTime1(*this); }
 };
 class WCPZoneTime2 : public WCPZoneTime {
@@ -1286,8 +1286,8 @@ class WCPZoneTime2 : public WCPZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when Power is above CP and W' bal is between 25% and 50% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WCPZoneTime2(*this); }
 };
 class WCPZoneTime3 : public WCPZoneTime {
@@ -1307,8 +1307,8 @@ class WCPZoneTime3 : public WCPZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when Power is above CP and W' bal is between 50% and 75% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WCPZoneTime3(*this); }
 };
 class WCPZoneTime4 : public WCPZoneTime {
@@ -1328,8 +1328,8 @@ class WCPZoneTime4 : public WCPZoneTime {
             setImperialUnits(tr("seconds"));
             setDescription(tr("Time expended when Power is above CP and W' bal is above 75% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WCPZoneTime4(*this); }
 };
 
@@ -1384,8 +1384,8 @@ class WZoneWork : public RideMetric {
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("P") || (!ride->isSwim && !ride->isRun); }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new WZoneWork(*this); }
 };
 
@@ -1406,8 +1406,8 @@ class WZoneWork1 : public WZoneWork {
             setImperialUnits(tr("kJ"));
             setDescription(tr("Work produced when W' bal is below 25% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneWork1(*this); }
 };
 class WZoneWork2 : public WZoneWork {
@@ -1427,8 +1427,8 @@ class WZoneWork2 : public WZoneWork {
             setImperialUnits(tr("kJ"));
             setDescription(tr("Work produced when W' bal is between 25% and 50% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneWork2(*this); }
 };
 class WZoneWork3 : public WZoneWork {
@@ -1448,8 +1448,8 @@ class WZoneWork3 : public WZoneWork {
             setImperialUnits(tr("kJ"));
             setDescription(tr("Work produced when W' bal is between 50% and 75% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneWork3(*this); }
 };
 class WZoneWork4 : public WZoneWork {
@@ -1469,8 +1469,8 @@ class WZoneWork4 : public WZoneWork {
             setImperialUnits(tr("kJ"));
             setDescription(tr("Work produced when Power is above CP and W' bal is above 75% of W'."));
         }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new WZoneWork4(*this); }
 };
 

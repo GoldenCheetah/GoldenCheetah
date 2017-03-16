@@ -103,8 +103,8 @@ class aNP : public RideMetric {
         return item->present.contains("P") || (!item->isRun && !item->isSwim);
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new aNP(*this); }
 };
 
@@ -145,8 +145,8 @@ class aVI : public RideMetric {
     bool isRelevantForRide(const RideItem *item) const { 
         return item->present.contains("P") || (!item->isRun && !item->isSwim);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new aVI(*this); }
 };
 
@@ -193,8 +193,8 @@ class aIntensityFactor : public RideMetric {
         return item->present.contains("P") || (!item->isRun && !item->isSwim);
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new aIntensityFactor(*this); }
 };
 
@@ -242,8 +242,8 @@ class aTSS : public RideMetric {
         return item->present.contains("P") || (!item->isRun && !item->isSwim);
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new aTSS(*this); }
 };
 
@@ -292,8 +292,8 @@ class aTSSPerHour : public RideMetric {
         return item->present.contains("P") || (!item->isRun && !item->isSwim);
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new aTSSPerHour(*this); }
 };
 
@@ -334,8 +334,8 @@ class aEfficiencyFactor : public RideMetric {
         return item->present.contains("P") || (!item->isRun && !item->isSwim);
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new aEfficiencyFactor(*this); }
 };
 

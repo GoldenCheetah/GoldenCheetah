@@ -80,8 +80,8 @@ public:
 
     bool isRelevantForRide(RideItem) const { return true; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new RRNormalFraction(*this); }
 };
 
@@ -142,8 +142,8 @@ public:
 
     bool isRelevantForRide(RideItem) const { return true; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new avnn(*this); }
 };
 
@@ -220,8 +220,8 @@ public:
 
     bool isRelevantForRide(RideItem) const { return true; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new sdnn(*this); }
 };
 
@@ -319,8 +319,8 @@ public:
 
     bool isRelevantForRide(RideItem) const { return true; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new sdann(*this); }
 };
 
@@ -401,8 +401,8 @@ public:
 
     bool isRelevantForRide(RideItem) const { return true; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new sdnnidx(*this); }
 };
 
@@ -460,8 +460,8 @@ public:
 
     bool isRelevantForRide(RideItem) const { return true; }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new rmssd(*this); }
 };
 
@@ -524,8 +524,8 @@ public:
         setDescription(QString(tr("Percentage of differences between adjacent NN intervals that are greater than %1 ms").arg(QString::number(msec, 'f', 0))));
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new pnnx(*this); }
     bool isRelevantForRide(RideItem) const { return true; }
 };

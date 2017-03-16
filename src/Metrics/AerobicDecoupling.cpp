@@ -136,8 +136,8 @@ class AerobicDecoupling : public RideMetric {
         return ride->present.contains("H") && (ride->present.contains("P") || (ride->isRun && ride->present.contains("S"))); 
     }
 
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new AerobicDecoupling(*this); }
 };
 

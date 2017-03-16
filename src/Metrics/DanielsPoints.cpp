@@ -110,8 +110,8 @@ class DanielsPoints : public RideMetric {
         }
         setValue(score);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new DanielsPoints(*this); }
 };
 
@@ -165,8 +165,8 @@ class DanielsEquivalentPower : public RideMetric {
 
         setValue(watts);
     }
-    MetricClass classification() const { return Unknown; }
-    MetricValidity validity() const { return None; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new DanielsEquivalentPower(*this); }
 };
 
