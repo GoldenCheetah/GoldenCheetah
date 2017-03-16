@@ -71,6 +71,8 @@ class DistanceSwim : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new DistanceSwim(*this); }
 };
 
@@ -138,6 +140,8 @@ class PaceSwim : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PaceSwim(*this); }
 };
 
@@ -217,6 +221,8 @@ class SwimPace : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new SwimPace(*this); }
 };
 
@@ -274,6 +280,8 @@ class StrokeRate : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new StrokeRate(*this); }
 };
 
@@ -341,6 +349,8 @@ class StrokesPerLength : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new StrokesPerLength(*this); }
 };
 
@@ -409,6 +419,8 @@ class SWolf : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("C") && ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new SWolf(*this); }
 };
 
@@ -509,6 +521,8 @@ class SwimPaceStroke : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new SwimPaceStroke(*this); }
 
     private:
@@ -533,6 +547,8 @@ class SwimPaceFree : public SwimPaceStroke {
             setName(tr("Swim Pace Free"));
             setDescription(tr("Average Swim Pace for freestyle lengths"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new SwimPaceFree(*this); }
 };
 
@@ -552,6 +568,8 @@ class SwimPaceBack : public SwimPaceStroke {
             setName(tr("Swim Pace Back"));
             setDescription(tr("Average Swim Pace for backstroke lengths"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new SwimPaceBack(*this); }
 };
 
@@ -571,6 +589,8 @@ class SwimPaceBreast : public SwimPaceStroke {
             setName(tr("Swim Pace Breast"));
             setDescription(tr("Average Swim Pace for breaststroke lengths"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new SwimPaceBreast(*this); }
 };
 
@@ -590,6 +610,8 @@ class SwimPaceFly : public SwimPaceStroke {
             setName(tr("Swim Pace Fly"));
             setDescription(tr("Average Swim Pace for freestyle lengths"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new SwimPaceFly(*this); }
 };
 

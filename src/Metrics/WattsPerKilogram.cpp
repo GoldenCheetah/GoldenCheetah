@@ -58,6 +58,8 @@ class AverageWPK : public RideMetric {
         setCount(secs);
         setValue((secs && ap && weight) ? ap/weight : 0);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new AverageWPK(*this); }
 };
 
@@ -94,6 +96,8 @@ class PeakWPK : public RideMetric {
         else wpk = 0.0;
         setValue(wpk);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PeakWPK(*this); }
 };
 
@@ -110,6 +114,8 @@ class CPWPK : public PeakWPK {
             setName(tr("60 min Peak WPK"));
             setDescription(tr("60 min Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new CPWPK(*this); }
 };
 
@@ -126,6 +132,8 @@ class PeakWPK1s : public PeakWPK {
             setName(tr("1 sec Peak WPK"));
             setDescription(tr("1 sec Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK1s(*this); }
 };
 
@@ -142,6 +150,8 @@ class PeakWPK5s : public PeakWPK {
             setName(tr("5 sec Peak WPK"));
             setDescription(tr("5 sec Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK5s(*this); }
 };
 
@@ -158,6 +168,8 @@ class PeakWPK10s : public PeakWPK {
             setName(tr("10 sec Peak WPK"));
             setDescription(tr("10 sec Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK10s(*this); }
 };
 
@@ -174,6 +186,8 @@ class PeakWPK15s : public PeakWPK {
             setName(tr("15 sec Peak WPK"));
             setDescription(tr("15 sec Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK15s(*this); }
 };
 
@@ -190,6 +204,8 @@ class PeakWPK20s : public PeakWPK {
             setName(tr("20 sec Peak WPK"));
             setDescription(tr("20 sec Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK20s(*this); }
 };
 
@@ -206,6 +222,8 @@ class PeakWPK30s : public PeakWPK {
             setName(tr("30 sec Peak WPK"));
             setDescription(tr("30 sec Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK30s(*this); }
 };
 
@@ -222,6 +240,8 @@ class PeakWPK1m : public PeakWPK {
             setName(tr("1 min Peak WPK"));
             setDescription(tr("1 min Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK1m(*this); }
 };
 
@@ -238,6 +258,8 @@ class PeakWPK5m : public PeakWPK {
             setName(tr("5 min Peak WPK"));
             setDescription(tr("5 min Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK5m(*this); }
 };
 
@@ -254,6 +276,8 @@ class PeakWPK10m : public PeakWPK {
             setName(tr("10 min Peak WPK"));
             setDescription(tr("10 min Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK10m(*this); }
 };
 
@@ -270,6 +294,8 @@ class PeakWPK20m : public PeakWPK {
             setName(tr("20 min Peak WPK"));
             setDescription(tr("20 min Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK20m(*this); }
 };
 
@@ -286,6 +312,8 @@ class PeakWPK30m : public PeakWPK {
             setName(tr("30 min Peak WPK"));
             setDescription(tr("30 min Peak Power relative to Athlete Weight."));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakWPK30m(*this); }
 };
 
@@ -321,6 +349,8 @@ class Vo2max : public RideMetric {
         }
     }
     bool isRelevantForRide(const RideItem *ride) const {return ride->present.contains("P"); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new Vo2max(*this); }
 };
 
@@ -359,6 +389,8 @@ class EtimatedAverageWPK_DrF : public RideMetric {
 
     bool isRelevantForRide(const RideItem *ride) const {return ride->present.contains("P"); }
 
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new EtimatedAverageWPK_DrF(*this); }
 };
 

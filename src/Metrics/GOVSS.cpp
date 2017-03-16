@@ -159,6 +159,8 @@ class LNP : public RideMetric {
         setCount(secs);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new LNP(*this); }
 };
 
@@ -242,6 +244,8 @@ class XPace : public RideMetric {
         setCount(lnp->count());
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new XPace(*this); }
 };
 
@@ -295,6 +299,8 @@ class RTP : public RideMetric {
         setValue(watts);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new RTP(*this); }
 };
 
@@ -343,6 +349,8 @@ class IWF : public RideMetric {
         setCount(secs);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new IWF(*this); }
 };
 
@@ -402,6 +410,8 @@ class GOVSS : public RideMetric {
         setValue(score);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new GOVSS(*this); }
 };
 

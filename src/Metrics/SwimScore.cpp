@@ -123,6 +123,8 @@ class XPowerSwim : public RideMetric {
         setCount(secs);
     }
     bool isRelevantForRide(const RideItem*ride) const { return ride->isSwim; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new XPowerSwim(*this); }
 };
 
@@ -187,6 +189,8 @@ class XPaceSwim : public RideMetric {
         setCount(xPowerSwim->count());
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new XPaceSwim(*this); }
 };
 
@@ -238,6 +242,8 @@ class STP : public RideMetric {
         setValue(watts);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new STP(*this); }
 };
 
@@ -285,6 +291,8 @@ class SRI : public RideMetric {
         setCount(secs);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new SRI(*this); }
 };
 
@@ -342,6 +350,8 @@ class SwimScore : public RideMetric {
         setValue(score);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new SwimScore(*this); }
 };
 
@@ -394,6 +404,8 @@ class TriScore : public RideMetric {
 
         setValue(score);
     }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new TriScore(*this); }
 };
 

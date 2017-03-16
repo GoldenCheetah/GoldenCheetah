@@ -72,6 +72,8 @@ class PeakPace : public RideMetric {
         setValue(pace);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PeakPace(*this); }
 };
 
@@ -91,6 +93,8 @@ class PeakPace10s : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace10s(*this); }
 };
 
@@ -110,6 +114,8 @@ class PeakPace15s : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace15s(*this); }
 };
 
@@ -129,6 +135,8 @@ class PeakPace20s : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace20s(*this); }
 };
 
@@ -148,6 +156,8 @@ class PeakPace30s : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace30s(*this); }
 };
 
@@ -167,6 +177,8 @@ class PeakPace1m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace1m(*this); }
 };
 
@@ -186,6 +198,8 @@ class PeakPace2m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace2m(*this); }
 };
 
@@ -205,6 +219,8 @@ class PeakPace3m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace3m(*this); }
 };
 
@@ -224,6 +240,8 @@ class PeakPace5m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace5m(*this); }
 };
 
@@ -243,6 +261,8 @@ class PeakPace8m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace8m(*this); }
 };
 
@@ -262,6 +282,8 @@ class PeakPace10m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace10m(*this); }
 };
 
@@ -281,6 +303,8 @@ class PeakPace20m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace20m(*this); }
 };
 
@@ -300,6 +324,8 @@ class PeakPace30m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace30m(*this); }
 };
 
@@ -319,6 +345,8 @@ class PeakPace60m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace60m(*this); }
 };
 
@@ -338,6 +366,8 @@ class PeakPace90m : public PeakPace {
             setPrecision(1);
             setConversion(KM_PER_MILE);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPace90m(*this); }
 };
 
@@ -384,6 +414,8 @@ class PeakPaceSwim : public RideMetric {
         setValue(pace);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->isSwim; }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new PeakPaceSwim(*this); }
 };
 
@@ -403,6 +435,8 @@ class PeakPaceSwim10s : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim10s(*this); }
 };
 
@@ -422,6 +456,8 @@ class PeakPaceSwim15s : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim15s(*this); }
 };
 
@@ -441,6 +477,8 @@ class PeakPaceSwim20s : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim20s(*this); }
 };
 
@@ -460,6 +498,8 @@ class PeakPaceSwim30s : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim30s(*this); }
 };
 
@@ -479,6 +519,8 @@ class PeakPaceSwim1m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim1m(*this); }
 };
 
@@ -498,6 +540,8 @@ class PeakPaceSwim2m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim2m(*this); }
 };
 
@@ -517,6 +561,8 @@ class PeakPaceSwim3m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim3m(*this); }
 };
 
@@ -536,6 +582,8 @@ class PeakPaceSwim5m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim5m(*this); }
 };
 
@@ -555,6 +603,8 @@ class PeakPaceSwim8m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim8m(*this); }
 };
 
@@ -574,6 +624,8 @@ class PeakPaceSwim10m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim10m(*this); }
 };
 
@@ -593,6 +645,8 @@ class PeakPaceSwim20m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim20m(*this); }
 };
 
@@ -612,6 +666,8 @@ class PeakPaceSwim30m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim30m(*this); }
 };
 
@@ -631,6 +687,8 @@ class PeakPaceSwim60m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim60m(*this); }
 };
 
@@ -650,6 +708,8 @@ class PeakPaceSwim90m : public PeakPaceSwim {
             setPrecision(1);
             setConversion(METERS_PER_YARD);
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new PeakPaceSwim90m(*this); }
 };
 
@@ -688,6 +748,8 @@ class BestTime : public RideMetric {
         setValue(secs / 60.0);
     }
     bool isRelevantForRide(const RideItem *ride) const { return ride->present.contains("S"); }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
     RideMetric *clone() const { return new BestTime(*this); }
 };
 
@@ -705,6 +767,8 @@ class BestTime50m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime50m(*this); }
 };
 
@@ -722,6 +786,8 @@ class BestTime100m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime100m(*this); }
 };
 
@@ -739,6 +805,8 @@ class BestTime200m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime200m(*this); }
 };
 
@@ -756,6 +824,8 @@ class BestTime400m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime400m(*this); }
 };
 
@@ -773,6 +843,8 @@ class BestTime500m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime500m(*this); }
 };
 
@@ -790,6 +862,8 @@ class BestTime800m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime800m(*this); }
 };
 
@@ -807,6 +881,8 @@ class BestTime1000m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime1000m(*this); }
 };
 
@@ -824,6 +900,8 @@ class BestTime1500m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime1500m(*this); }
 };
 
@@ -841,6 +919,8 @@ class BestTime2000m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime2000m(*this); }
 };
 
@@ -858,6 +938,8 @@ class BestTime3000m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime3000m(*this); }
 };
 
@@ -875,6 +957,8 @@ class BestTime4000m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime4000m(*this); }
 };
 
@@ -892,6 +976,8 @@ class BestTime5000m : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime5000m(*this); }
 };
 
@@ -909,6 +995,8 @@ class BestTime10km : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime10km(*this); }
 };
 
@@ -926,6 +1014,8 @@ class BestTime15km : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime15km(*this); }
 };
 
@@ -943,6 +1033,8 @@ class BestTime20km : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime20km(*this); }
 };
 
@@ -960,6 +1052,8 @@ class BestTimeHalfMarathon : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTimeHalfMarathon(*this); }
 };
 
@@ -977,6 +1071,8 @@ class BestTime30km : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime30km(*this); }
 };
 
@@ -994,6 +1090,8 @@ class BestTime40km : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTime40km(*this); }
 };
 
@@ -1011,6 +1109,8 @@ class BestTimeMarathon : public BestTime {
             setMetricUnits(tr("minutes"));
             setImperialUnits(tr("minutes"));
         }
+    MetricClass classification() const { return Unknown; }
+    MetricValidity validity() const { return None; }
         RideMetric *clone() const { return new BestTimeMarathon(*this); }
 };
 

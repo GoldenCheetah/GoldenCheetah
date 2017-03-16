@@ -53,8 +53,18 @@ class RideMetric {
 
 public:
 
-    enum metrictype { Total, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev} types;
+    // Type of metric for aggregation
+    enum metrictype { Total, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev};
     typedef enum metrictype MetricType;
+
+    // Class of metric to help browse
+    enum metricclass { Unknown, Stress, Volume, Intensity, Distribution, ModelEstimate };
+    typedef enum metricclass MetricClass;
+
+    // Validity of metric from a scientific standpoint
+    enum metricvalidity { None, Unclear, Published, Established };
+    typedef enum metricvalidity MetricValidity;
+
     int index_;
 
     RideMetric() {
@@ -89,6 +99,10 @@ public:
     // summaries, configuration dialogs, etc.  It should be translated
     // using tr().
     virtual QString name() const { return name_; }
+
+    // classification, to help browse and find metrics
+    virtual MetricClass classification() const { return MetricClass::Unknown; }
+    virtual MetricValidity validity() const { return MetricValidity::None; }
 
     // English name used in metadata.xml for compatibility
     virtual QString internalName() const { return internalName_; }
