@@ -362,7 +362,7 @@ FileStoreDialog::FileStoreDialog(QWidget *parent, FileStore *store, QString titl
     QDialog(parent), store(store), title(title), pathname(pathname), dironly(dironly)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
-    setMinimumSize(350, 400);
+    setMinimumSize(350*dpiXFactor, 400*dpiYFactor);
     setWindowTitle(title + " (" + store->name() + ")");
     QVBoxLayout *layout = new QVBoxLayout(this);
 
