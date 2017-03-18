@@ -26,6 +26,7 @@
 #include <QSharedPointer>
 #include <cmath>
 #include <QDebug>
+#include <QMutex>
 #include <QList>
 
 #include "RideFile.h"
@@ -371,6 +372,8 @@ class RideMetricFactory {
     }
 
     public:
+
+    QMutex mutex;
 
     static RideMetricFactory &instance() {
         if (!_instance)
