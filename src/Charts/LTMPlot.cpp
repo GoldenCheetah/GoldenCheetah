@@ -2678,7 +2678,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
         }
 
         if (value || wantZero) {
-            unsigned long seconds = ride->getCountForSymbol(metricDetail.metric->symbol());
+            unsigned long seconds = metricDetail.metric ? ride->getCountForSymbol(metricDetail.metric->symbol()) : 1;
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
                     while (lastDay<currentDay && n<=maxdays) {

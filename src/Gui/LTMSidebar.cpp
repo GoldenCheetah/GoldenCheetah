@@ -1635,7 +1635,7 @@ LTMSidebar::addPreset()
 
         // now wipe it
         f->hide();
-        f->deleteLater();
+        //XXX memory leak XXX causes crash on QT5.8 XXX f->deleteLater();
 
         // tell the world
         context->notifyPresetsChanged();
@@ -1670,7 +1670,7 @@ LTMSidebar::editPreset()
 
         // now wipe it
         f->hide();
-        f->deleteLater();
+        //XXX memory leak XXX causes crash on QT5.8 XXX f->deleteLater();
 
         // tell the world
         context->notifyPresetsChanged();
