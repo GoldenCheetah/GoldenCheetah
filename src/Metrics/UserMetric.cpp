@@ -44,6 +44,7 @@ UserMetric::UserMetric(Context *context, UserMetricSettings settings)
 
 UserMetric::UserMetric(const UserMetric *from) : RideMetric()
 {
+    RideMetricFactory::instance().mutex.lock();
     this->settings = from->settings;
     this->program = from->program;
     this->program->refcount++;
@@ -66,6 +67,7 @@ UserMetric::UserMetric(const UserMetric *from) : RideMetric()
 
     // we are being cloned
     clone_ = true;
+    RideMetricFactory::instance().mutex.unlock();
 }
 
 UserMetric::~UserMetric()
