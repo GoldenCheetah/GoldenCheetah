@@ -71,11 +71,13 @@ UserMetric::UserMetric(const UserMetric *from) : RideMetric()
 UserMetric::~UserMetric()
 {
     // program is shared, only delete when last is destroyed
+    RideMetricFactory::instance().mutex.lock();
     if (program) {
         program->refcount--;
         if (!program->refcount) delete program;
     }
     if (clone_) delete rt;
+    RideMetricFactory::instance().mutex.unlock();
 }
 
 RideMetric *
