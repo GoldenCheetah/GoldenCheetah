@@ -47,7 +47,7 @@ BodyMeasureParser::serialize(QString filename, QList<BodyMeasure> &data) {
     for (int i = 0; i < data.count(); i++) {
         BodyMeasure m = data.at(i);
         QJsonObject measure;
-        measure.insert("when", m.when.toSecsSinceEpoch());
+        measure.insert("when", m.when.toMSecsSinceEpoch()/1000);
         measure.insert("comment", m.comment);
         measure.insert("weightkg", m.weightkg);
         measure.insert("fatkg", m.fatkg);
@@ -107,7 +107,7 @@ BodyMeasureParser::unserialize(QFile &file, QList<BodyMeasure> &data) {
     for (int i = 0; i < measures.count(); i++) {
         QJsonObject measure = measures.at(i).toObject();
         BodyMeasure m;
-        m.when = QDateTime::fromSecsSinceEpoch(measure["when"].toDouble());
+        m.when = QDateTime::fromMSecsSinceEpoch(measure["when"].toDouble()*1000);
         m.comment = measure["comment"].toString();
         m.weightkg = measure["weightkg"].toDouble();
         m.fatkg = measure["fatkg"].toDouble();

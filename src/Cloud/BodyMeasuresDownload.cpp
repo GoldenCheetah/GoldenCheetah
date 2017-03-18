@@ -170,7 +170,7 @@ BodyMeasuresDownload::download() {
    if (rideDates.count() > 0) {
        firstRideDate = rideDates.at(0);
    }  else {
-       firstRideDate = QDateTime::fromSecsSinceEpoch(0);
+       firstRideDate = QDateTime::fromMSecsSinceEpoch(0);
    };
 
    // determine the date range
