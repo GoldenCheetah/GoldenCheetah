@@ -119,7 +119,26 @@ void BT40Device::serviceScanDone()
 		this, SLOT(confirmedDescriptorWrite(QLowEnergyDescriptor,QByteArray)));
 	connect(service, SIGNAL(error(QLowEnergyService::ServiceError)),
 		this, SLOT(serviceError(QLowEnergyService::ServiceError)));
-	service->discoverDetails();
+	if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
+	    has_power = true;
+	    service->discoverDetails();
+	}
+	else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
+	    has_csc = true;
+	    csc_service = service;
+	}
+	else {
+	    service->discoverDetails();
+	}
+    }
+    if (has_csc && !has_power) {
+	// Only connect to CSC service if the same device doesn't provide a power service
+	// since the power service also provides the same readings.
+	qDebug() << "Connecting to the CSC service for device" << m_currentDevice.name();
+	csc_service->discoverDetails();
+    }
+    else {
+	qDebug() << "Ignoring the CSC service for device" << m_currentDevice.name();
     }
 }
 
