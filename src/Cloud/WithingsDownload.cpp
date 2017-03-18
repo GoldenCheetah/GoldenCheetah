@@ -21,6 +21,7 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Secrets.h"
+#include "BodyMeasures.h"
 #include <QMessageBox>
 
 #ifdef GC_HAVE_KQOAUTH
@@ -38,16 +39,18 @@ WithingsDownload::WithingsDownload(Context *context) : context(context)
     oauthRequest = new KQOAuthRequest();
     oauthManager = new KQOAuthManager();
 
-    connect(oauthManager, SIGNAL(requestReady(QByteArray)),
-            this, SLOT(onRequestReady(QByteArray)));
     connect(oauthManager, SIGNAL(authorizedRequestDone()),
             this, SLOT(onAuthorizedRequestDone()));
+    connect(oauthManager, SIGNAL(requestReady(QByteArray)),
+            this, SLOT(onRequestReady(QByteArray)));
+
     #endif
 }
 
 bool
-WithingsDownload::download()
+WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data)
 {
+    response = "";
     // New API (OAuth)
     QString strToken = "";
     QString strSecret = "";
@@ -93,6 +96,8 @@ WithingsDownload::download()
         KQOAuthParameters params;
         params.insert("action", "getmeas");
         params.insert("userid", appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString());
+        params.insert("startdate", QString::number(from.toMSecsSinceEpoch()/1000));
+        params.insert("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
 
         // Hack...
         // Why should we add params manually (GET) ????
@@ -115,8 +120,14 @@ WithingsDownload::download()
 
         oauthRequest->setAdditionalParameters(params);
 
+        emit downloadStarted(100);
         oauthManager->executeRequest(oauthRequest);
+        emit downloadProgress(50);
 
+        // blocking request
+        loop.exec(); // we go on after receiving the data in SLOT(onRequestReady(QByteArray))
+
+        emit downloadEnded(100);
         #endif
     } else  {
 
@@ -124,81 +135,81 @@ WithingsDownload::download()
         QString server = appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString();
         if (server.endsWith("/")) server=server.mid(0, server.length()-1);
 
-        QString request = QString("%1/measure?action=getmeas&userid=%2&publickey=%3")
+        QString request = QString("%1/measure?action=getmeas&userid=%2&publickey=%3&startdate=%4&enddate=%5")
                                  .arg(server)
                                  .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString())
-                                 .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString());
+                                 .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString())
+                                 .arg(QString::number(from.toMSecsSinceEpoch()/1000))
+                                 .arg(QString::number(to.toMSecsSinceEpoch()/1000));
 
-
+        emit downloadStarted(100);
         QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(request)));
 
+        emit downloadProgress(50);
+        // blocking request
+        loop.exec(); // we go on after receiving the data in SLOT(downloadFinished(QNetworkReply))
+
+        emit downloadEnded(100);
         if (reply->error() != QNetworkReply::NoError) {
             QMessageBox::warning(context->mainWindow, tr("Withings Data Download"), reply->errorString());
             return false;
         }
-        return true;
     }
-    return false;
+
+    QStringList errors;
+    if (response.contains("\"status\":0", Qt::CaseInsensitive))
+    {
+        parse(response, errors, data);
+    } else {
+        QMessageBox oautherr(QMessageBox::Critical, tr("Error"),
+                             tr("There was an error during fetching. Please check the error description."));
+        oautherr.setDetailedText(response); // probably blank
+        oautherr.exec();
+        return false;
+
+    }
+    if (errors.count() > 0) {
+        error = errors.join(", ");
+        return false;
+    };
+    return true;
 }
+
+
+void
+WithingsDownload::parse(QString text, QStringList &errors, QList<BodyMeasure> &bodyMeasures)
+{
+
+    // parse it
+    parser->parse(text, errors);
+    if (errors.count() > 0) return;
+
+    // convert from Withings to general format
+    foreach(WithingsReading r, parser->readings()) {
+        BodyMeasure w;
+        // we just take
+        if (r.weightkg > 0 && r.when.isValid()) {
+            w.when =  r.when;
+            w.comment = r.comment;
+            w.weightkg = r.weightkg;
+            w.fatkg = r.fatkg;
+            w.leankg = r.leankg;
+            w.fatpercent = r.fatpercent;
+            bodyMeasures.append(w);
+        }
+    }
+
+}
+
+// SLOTs for asynchronous calls
 
 void
 WithingsDownload::downloadFinished(QNetworkReply *reply)
 {
-
-    if (reply->error() != QNetworkReply::NoError) {
-       QMessageBox::warning(context->mainWindow, tr("Network Problem"), tr("No Withings Data downloaded"));
-       return;
-    }
-    parse(reply->readAll());
+    response = reply->readAll();
+    loop.exit(0);
 }
 
-void
-WithingsDownload::parse(QString text)
-{
-    QStringList errors;
-
-    // parse it
-    parser->parse(text, errors);
-
-    int allMeasures = context->athlete->withings().count();
-    int receivedMeasures = parser->readings().count();
-    int newMeasures = receivedMeasures - allMeasures;
-
-    if (receivedMeasures == 0) {
-        newMeasures = 0;
-    }
-
-    QString status = tr("No new measurements");
-    if (newMeasures > 0) status = QString(tr("%1 new measurements received.")).arg(newMeasures);
-
-    QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
-
-    // hacky for now, just refresh for all dates where we have withings data
-    // will go with SQL shortly.
-    if (newMeasures) {
-
-        // if refresh is running cancel it !
-        context->athlete->rideCache->cancel();
-
-        // store in athlete
-        context->athlete->setWithings(parser->readings());
-
-        // now save data away if we actually got something !
-        // doing it here means we don't overwrite previous responses
-        // when we fail to get any data (e.g. errors / network problems)
-        QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
-        if (withingsJSON.open(QFile::WriteOnly)) {
-
-            QTextStream stream(&withingsJSON);
-            stream << text;
-            withingsJSON.close();
-        }
-
-        // do a refresh, it will check if needed
-        context->athlete->rideCache->refresh();
-    }
-    return;
-}
 
 #ifdef GC_HAVE_KQOAUTH
 void
@@ -207,22 +218,11 @@ WithingsDownload::onAuthorizedRequestDone() {
 }
 
 void
-WithingsDownload::onRequestReady(QByteArray response) {
+WithingsDownload::onRequestReady(QByteArray r) {
     //qDebug() << "Response from the Withings's service: " << response;
 
-    QString r = response;
-
-    if (r.contains("\"status\":0", Qt::CaseInsensitive))
-    {
-        parse(response);
-    } else {
-        QMessageBox oautherr(QMessageBox::Critical, tr("Error"),
-                     tr("There was an error during fetching. Please check the error description."));
-                     oautherr.setDetailedText(r); // probably blank
-                 oautherr.exec();
-    }
-
-
+    response = r;
+    loop.exit(0);
 
 }
 #endif

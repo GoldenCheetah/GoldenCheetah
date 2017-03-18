@@ -203,7 +203,7 @@ class MainWindow : public QMainWindow
 #endif
 
         // Measures View
-        void downloadMeasures();
+        void downloadBodyMeasures();
 
         // Activity Collection
         void addIntervals(); // pass thru to tab
