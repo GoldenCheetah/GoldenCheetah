@@ -20,11 +20,12 @@
 #include "BodyMeasures.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "HelpWhatsThis.h"
 
 #include <QList>
 #include <QMutableListIterator>
 #include <QGroupBox>
-#include <HelpWhatsThis.h>
+#include <QMessageBox>
 
 
 BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) {
