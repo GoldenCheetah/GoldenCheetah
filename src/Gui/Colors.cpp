@@ -301,7 +301,7 @@ QColor GCColor::alternateColor(QColor bgColor)
 {
     //QColor color = QColor::fromHsv(bgColor.hue(), bgColor.saturation() * 2, bgColor.value());
     if (bgColor.value() < 128)
-        return QColor(Qt::darkGray);
+        return QColor(75,75,75); // avoid darkGray as clashes with text cursor on hidpi displays (!)
     else
         return QColor(Qt::lightGray);
 }
