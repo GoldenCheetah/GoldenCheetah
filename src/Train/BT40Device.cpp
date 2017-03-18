@@ -97,8 +97,20 @@ void BT40Device::deviceDisconnected() {
 
 void BT40Device::serviceDiscovered(QBluetoothUuid uuid) {
     if (supportedServiceUuids.contains(uuid)) {
-	qDebug() << "Discovering details for service" << uuid << "for device" << m_currentDevice.name();
 	QLowEnergyService *service = m_control->createServiceObject(uuid, this);
+	m_services.append(service);
+    }
+}
+
+void BT40Device::serviceScanDone()
+{
+    qDebug() << "Service scan done for device" << m_currentDevice.name();
+    bool has_power = false;
+    bool has_csc = false;
+    QLowEnergyService* csc_service;
+    foreach (QLowEnergyService* const &service, m_services) {
+	qDebug() << "Discovering details for service" << service->serviceUuid() <<
+	    "for device" << m_currentDevice.name();
 	connect(service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
 		this, SLOT(serviceStateChanged(QLowEnergyService::ServiceState)));
 	connect(service, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),
@@ -108,13 +120,7 @@ void BT40Device::serviceDiscovered(QBluetoothUuid uuid) {
 	connect(service, SIGNAL(error(QLowEnergyService::ServiceError)),
 		this, SLOT(serviceError(QLowEnergyService::ServiceError)));
 	service->discoverDetails();
-	m_services.append(service);
     }
-}
-
-void BT40Device::serviceScanDone()
-{
-    qDebug() << "Service scan done" << "for device" << m_currentDevice.name();
 }
 
 void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
