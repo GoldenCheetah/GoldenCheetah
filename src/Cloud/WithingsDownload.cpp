@@ -96,8 +96,8 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         KQOAuthParameters params;
         params.insert("action", "getmeas");
         params.insert("userid", appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString());
-        params.insert("startdate", QString::number(from.toSecsSinceEpoch()));
-        params.insert("enddate", QString::number(to.toSecsSinceEpoch()));
+        params.insert("startdate", QString::number(from.toMSecsSinceEpoch()/1000));
+        params.insert("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
 
         // Hack...
         // Why should we add params manually (GET) ????
@@ -139,8 +139,8 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                                  .arg(server)
                                  .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString())
                                  .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString())
-                                 .arg(QString::number(from.toSecsSinceEpoch()))
-                                 .arg(QString::number(to.toSecsSinceEpoch()));
+                                 .arg(QString::number(from.toMSecsSinceEpoch()/1000))
+                                 .arg(QString::number(to.toMSecsSinceEpoch()/1000));
 
         emit downloadStarted(100);
         QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(request)));
