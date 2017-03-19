@@ -1,0 +1,45 @@
+Description of File-Format for "Body Measures - .CSV Import" function
+---------------------------------------------------------------------
+
+Example is provided here:
+
+----
+ts,weightkg,fatkg,boneskg,musclekg,leankg,fatpercent,comment
+1,2,3,4,5,6,7,Is a technically valid entry, but the timestamp is 1 second of Epoch
+1479632565,80.15,12.10,5.4,0,32.5,1157,Test Value
+----
+
+a) Header Line
+First Line of a valid file has to contain header information. This has to be a comma-separated 
+list of the measures provided in the data lines. You do not need to provide all possible measures,
+but at least "ts" and "weightkg".
+
+The mandatory measures are:
+- "ts" 			- Unix timestamp (in seconds) since Epoch. The value can be calcuated in XLS - just Google how-to.
+- "weightkg" 	- Athlete weight in kilograms
+
+The optional measures are:
+- "fatkg" 		- Fat mass in kg
+- "boneskg" 	- Bone mass in kg
+- "musclekg"	- Muscle mass in kg
+- "leankg"		- Lean mass in kg
+- "fatpercent"	- Fat percentage
+- "comment"		- A description of the measures
+
+Data formats:
+
+- "ts" 		is a 64Bit Integer - any other time will be rejected
+- "comment"	is a String
+- all other measures are float/double in format <xxxxxxx.yyy> 
+
+There are very strict format checks when importing. Only if the whole
+file is correct the data is imported. Any error (even in a single entry)
+will block the complete import.
+
+The following error will stop the import.
+- Unknown measures in header
+- Number of measures in header is different to number in an item
+- Item measure in wrong format
+- "ts" or "weightkg" is missing
+
+

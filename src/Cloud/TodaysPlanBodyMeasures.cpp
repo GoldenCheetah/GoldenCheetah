@@ -20,9 +20,6 @@
 #include "Settings.h"
 #include "Athlete.h"
 
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QBitArray>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
