@@ -20,8 +20,10 @@
 #define _Gc_BodyMeasuresDownload_h
 
 #include "Context.h"
+
 #include "WithingsDownload.h"
 #include "TodaysPlanBodyMeasures.h"
+#include "BodyMeasuresCsvImport.h"
 
 #include <QDialog>
 #include <QCheckBox>
@@ -45,6 +47,7 @@ private:
 
      WithingsDownload *withingsDownload;
      TodaysPlanBodyMeasures *todaysPlanBodyMeasureDownload;
+     BodyMeasuresCsvImport *csvFileImport;
 
      QPushButton *downloadButton;
      QPushButton *closeButton;
