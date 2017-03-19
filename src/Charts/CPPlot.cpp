@@ -553,16 +553,10 @@ CPPlot::plotModel()
                 //CP
                 cpw->cpTitle->setText(tr("CP"));
                 cpw->cpValue->setText(QString(tr("%1 w")).arg(pdModel->CP(), 0, 'f', 0));
-
-                // Reference 6.25W/kg -> untrained 2.5W/kg
-                int _ftpLevel = 15 * (pdModel->CP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
-                if (_ftpLevel > 0 && _ftpLevel < 16) // check bounds
-                    cpw->cpRank->setText(QString("%1").arg(_ftpLevel));
-                else
-                    cpw->cpRank->setText(tr("n/a"));
+                cpw->cpRank->setText(tr("n/a"));
 
                 //FTP and FTP ranking
-                /*cpw->titleRank->setText(tr("Rank"));
+                cpw->titleRank->setText(tr("Rank"));
                 cpw->ftpTitle->setText(tr("FTP"));
                 if (pdModel->hasFTP()) {
                     cpw->ftpValue->setText(QString(tr("%1 w")).arg(pdModel->FTP(), 0, 'f', 0));
@@ -578,7 +572,7 @@ CPPlot::plotModel()
 
                     cpw->ftpValue->setText(tr("n/a"));
                     cpw->ftpRank->setText(tr("n/a"));
-                }*/
+                }
 
                 // P-MAX and P-MAX ranking
                 cpw->pmaxTitle->setText(tr("Pmax"));
