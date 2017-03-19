@@ -125,7 +125,8 @@ TodaysPlan::open(QStringList &errors)
                 bool found = false;
                 for (int i=0;i<document.array().count();i++) {
                     if (document.array()[i].toObject()["id"].toInt() == userId.toInt()) {
-                        if (document.array()[i].toObject()["relationship"].toString() == "coach" ||
+                        if (document.array()[i].toObject()["relationship"].toString() == "" ||
+                            document.array()[i].toObject()["relationship"].toString() == "coach" ||
                             document.array()[i].toObject()["relationship"].toString() == "manager")
                             found = true;
                     }
