@@ -336,14 +336,14 @@ UserData::setRideItem(RideItem*m)
 {
     rideItem = m;
 
-    // parse formula
-    DataFilter parser(this, rideItem->context, formula);
-
     // clear what we got
     vector.clear();
 
     // if real ..
     if (rideItem) {
+
+        // parse formula
+        DataFilter parser(this, rideItem->context, formula);
 
         // is it cached ?
         vector = rideItem->userCache.value(parser.signature(), QVector<double>());

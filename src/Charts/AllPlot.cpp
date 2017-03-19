@@ -2775,7 +2775,7 @@ AllPlot::setYMax()
                               standard->apCurve->isVisible());
 
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), standard->hrCurve->isVisible() || standard->tcoreCurve->isVisible() ||
-                                                     standard->cadCurve->isVisible() || standard->smo2Curve->isVisible() || standard->hrCurve->isVisible());
+                                                     standard->cadCurve->isVisible() || standard->smo2Curve->isVisible() || standard->hrvCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false);
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 3), standard->balanceLCurve->isVisible() ||
                                                      standard->lteCurve->isVisible() ||

@@ -30,6 +30,9 @@ FitlogParser::FitlogParser (RideFile* rideFile, QList<RideFile*> *rides)
    : rideFile(rideFile), rides(rides)
 {
   first = true;
+  lap = 0;
+  track_offset = 0;
+
 }
 
 bool

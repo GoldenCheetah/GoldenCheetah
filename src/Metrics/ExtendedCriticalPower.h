@@ -47,7 +47,7 @@ class TestModel // : public PDModel
         double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del, paa_pow;
 
         // Parameters dan
-        double p1, t1, p2, t2, a2;
+        // double p1, t1, p2, t2, a2;
 
         int pMax, mmp60;
 };

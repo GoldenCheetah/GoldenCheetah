@@ -1017,7 +1017,7 @@ GcChartWindow::chartPropertiesFromString(QString contents) {
             m.insert("VIEW", view);
 
             // run through the properties
-            bool hadproperties;
+            bool hadproperties = false;
             if (c->hasField("PROPERTIES") && c->getField("PROPERTIES")->valueType == MVJSON_TYPE_OBJECT) {
                 MVJSONNode *p = c->getField("PROPERTIES")->objValue;
 

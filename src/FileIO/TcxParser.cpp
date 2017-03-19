@@ -297,8 +297,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     double kph = (swim == Swim) ? speed : prevPoint->kph + (deltaSpeed *weight);
                     // need to make sure speed goes to zero
                     kph = kph > 0.35 ? kph : 0;
-                    double cad = prevPoint->cad + (deltaCad * weight);
-                    cad = cad > 0.35 ? cad : 0;
+                    //double cad = prevPoint->cad + (deltaCad * weight);
+                    //cad = cad > 0.35 ? cad : 0;
                     //double lat = prevPoint->lat + (deltaLat * weight);
                     //double lon = prevPoint->lon + (deltaLon * weight);
 

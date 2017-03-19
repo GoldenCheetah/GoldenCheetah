@@ -1505,7 +1505,7 @@ void RideFileCache::fastSearch(QVector<int>&input, QVector<int>&ride_bests, QVec
         else i += 300;
     }
 #ifdef Q_CC_MSVC
-    delete dataseries_i;
+    delete[] dataseries_i;
 #endif
 
     // since we minimise the search space over

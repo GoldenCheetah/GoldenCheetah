@@ -158,13 +158,13 @@ CloudDBStatusClient::displayCloudDBStatus() {
 
     StatusAPIGetV1 status = getCurrentStatus();
     if (status.Status == CloudDBStatusClient::CloudDBStatus_Ok) {
-        QMessageBox::information(0, tr("CloudDB Status"), QString(tr("<b><big>Ok</b></big><br><br>All Services should be operational - no problems known.")));
+        QMessageBox::information(0, tr("CloudDB Status"), QString(tr("<b><big>Ok</big></b><br><br>All Services should be operational - no problems known.")));
     } else if (status.Status == CloudDBStatusClient::CloudDBStatus_PartialFailure) {
         QString text = getCurrentStatusText(status.Id);
-        QMessageBox::warning(0, tr("CloudDB Status"), QString(tr("<b><big>Limited Service</b></big><br>Sorry - some CloudDB services are not operational.<br><br><b>More information:</b><br>%1")).arg(text));
+        QMessageBox::warning(0, tr("CloudDB Status"), QString(tr("<b><big>Limited Service</big></b><br>Sorry - some CloudDB services are not operational.<br><br><b>More information:</b><br>%1")).arg(text));
     } else {
         QString text = getCurrentStatusText(status.Id);
-        QMessageBox::critical(0, tr("CloudDB Status"), QString(tr("<b><big>Service outage</b></big><br>Sorry - CloudDB services are not operational.<br><br><b>More information:</b><br>%1")).arg(text));
+        QMessageBox::critical(0, tr("CloudDB Status"), QString(tr("<b><big>Service outage</big></b><br>Sorry - CloudDB services are not operational.<br><br><b>More information:</b><br>%1")).arg(text));
     }
 
 

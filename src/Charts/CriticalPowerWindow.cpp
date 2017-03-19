@@ -129,7 +129,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     // controls widget and layout
     QTabWidget *settingsTabs = new QTabWidget(this);
     HelpWhatsThis *helpTabs = new HelpWhatsThis(settingsTabs);
-    if (rangemode) settingsTabs->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM));
+    if (rangemode) settingsTabs->setWhatsThis(helpTabs->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM));
     else settingsTabs->setWhatsThis(helpTabs->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM));
 
 
@@ -872,7 +872,7 @@ CriticalPowerWindow::refreshRideSaved(RideItem *item)
 
     if (!rangemode) {
         // reset date range for bests and model
-        if (!rangemode) seasonSelected(cComboSeason->currentIndex());
+        seasonSelected(cComboSeason->currentIndex());
     }
 }
 

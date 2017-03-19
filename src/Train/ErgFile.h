@@ -152,8 +152,6 @@ class ErgFile
 
         Context *context;
 
-    private:
-        int nomode;
 };
 
 #endif
