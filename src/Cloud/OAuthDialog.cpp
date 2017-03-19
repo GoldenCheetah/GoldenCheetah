@@ -634,7 +634,9 @@ OAuthDialog::listUsers()
                     QList<QCheckBox*> users;
 
                     for (int i=0;i<document.array().count();i++) {
-                        if (document.array()[i].toObject()["relationship"].toString() == "coach" ||
+                        //qDebug() << document.array()[i].toObject()["_name"].toString() << document.array()[i].toObject()["relationship"].toString();
+                        if (document.array()[i].toObject()["relationship"].toString() == "" ||
+                            document.array()[i].toObject()["relationship"].toString() == "coach" ||
                             document.array()[i].toObject()["relationship"].toString() == "manager") {
                             QCheckBox *ck = new QCheckBox(document.array()[i].toObject()["_name"].toString());
                             ck->setFont(QFont("Helvetica", 15));
