@@ -37,6 +37,7 @@ DeviceConfiguration::DeviceConfiguration()
     wheelSize=2100;
     postProcess=0;
     controller=NULL;
+    stridelength=80;
 }
 
 

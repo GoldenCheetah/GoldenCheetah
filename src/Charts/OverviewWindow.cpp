@@ -435,7 +435,7 @@ Card::setType(CardType type, RideFile::SeriesType series)
 
         // config axes
         QPen axisPen(GColor(CCARDBACKGROUND));
-        axisPen.setWidth(0.5); // almost invisibke
+        axisPen.setWidth(1); // almost invisible
         chart->createDefaultAxes();
         chart->setAxisX(barcategoryaxis, barseries);
         barcategoryaxis->setLinePen(axisPen);

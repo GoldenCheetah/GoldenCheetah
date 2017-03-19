@@ -476,7 +476,11 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
         reply = nam->get(request);
 
         // wait for reply (synchronously) and process error codes as necessary
-        if (!CloudDBCommon::replyReceivedAndOk(reply)) return false;
+        if (!CloudDBCommon::replyReceivedAndOk(reply)) { 
+		    delete retrievedHeader;
+			delete newHeader;
+            return false;
+		};
 
         QByteArray result = reply->readAll();
         retrievedHeader->clear();

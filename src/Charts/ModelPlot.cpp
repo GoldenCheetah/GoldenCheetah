@@ -702,7 +702,7 @@ ModelDataProvider::ModelDataProvider (ModelPlot &plot, ModelSettings *settings) 
         xscale = 1;
         yscale = (maxbinx-minbinx)/(maxbiny-minbiny);
         zscale = (maxbinx-minbinx)/(maxz-minz);
-    } else if ((maxbiny-minbiny) >= (maxbinx-minbinx) && (maxbiny >= minbiny) >= (maxz-minz)) {
+    } else if ((maxbiny-minbiny) >= (maxbinx-minbinx) && (maxbiny-minbiny) >= (maxz-minz)) {
         // scale is set off the y-axis
         xscale = (maxbiny-minbiny)/(maxbinx-minbinx);
         yscale = 1;

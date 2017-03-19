@@ -815,7 +815,6 @@ void ANTMessage::init()
     wheelRevolutions = crankRevolutions = 0;
     slope = period = torque = 0;
     sync = length = type = 0;
-    pedalPower = 0;
     srmOffset = srmSlope = srmSerial = 0;
     calibrationID = ctfID = 0;
     autoZeroStatus = autoZeroEnable = 0;
