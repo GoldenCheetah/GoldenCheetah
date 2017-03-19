@@ -57,8 +57,8 @@ private:
     #ifdef GC_HAVE_KQOAUTH
     KQOAuthManager *oauthManager;
     KQOAuthRequest *oauthRequest;
-    QEventLoop loop;
     #endif
+    QEventLoop loop;
 
     void parse(QString text, QStringList &errors, QList<BodyMeasure> &bodyMeasures);
 
