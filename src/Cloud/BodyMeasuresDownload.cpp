@@ -128,6 +128,7 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     // initialize the downloader
     withingsDownload = new WithingsDownload(context);
     todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
+    csvFileImport = new BodyMeasuresCsvImport(context);
 
     // connect the progress bar
     connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
@@ -137,12 +138,17 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     connect(withingsDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
     connect(withingsDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
     connect(withingsDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+
+    connect(csvFileImport, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
+    connect(csvFileImport, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
+    connect(csvFileImport, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
 }
 
 BodyMeasuresDownload::~BodyMeasuresDownload() {
 
     delete withingsDownload;
     delete todaysPlanBodyMeasureDownload;
+    delete csvFileImport;
 
 }
 
@@ -206,8 +212,7 @@ BodyMeasuresDownload::download() {
    } else if (downloadTP->isChecked()) {
      downloadOk = todaysPlanBodyMeasureDownload->getBodyMeasures(err, fromDate, toDate, bodyMeasures);
    } else if (downloadCSV->isChecked()) {
-        QMessageBox::information(this, tr("Body Measures"), tr("CSV Import is currently in development and will be added with a later version"));
-        err = tr("Import from CSV not yet implemented");
+       downloadOk = csvFileImport->getBodyMeasures(err, fromDate, toDate, bodyMeasures);
    } else return;
 
    if (downloadOk) {
