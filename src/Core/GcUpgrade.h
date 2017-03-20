@@ -93,13 +93,14 @@
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
+#define VERSION35_BUILD   3960 // development release
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3959
-#define VERSION_STRING "DEV-V3.5 1703"
+#define VERSION_LATEST 3960
+#define VERSION_STRING "DEV-V3.5 1704"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"

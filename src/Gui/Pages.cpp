@@ -2023,19 +2023,6 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    // chrome style -- metal or flat currently offered
-    QLabel *chromeLabel = new QLabel(tr("Styling" ));
-    chromeCombo = new QComboBox(this);
-    chromeCombo->addItem(tr("Metallic (Mac)"));
-    chromeCombo->addItem(tr("Flat Color (Windows)"));
-#ifdef Q_OS_MAC // gets reset on yosemite anyway
-    QString chrome = appsettings->value(this, GC_CHROME, "Mac").toString();
-#else
-    QString chrome = appsettings->value(this, GC_CHROME, "Flat").toString();
-#endif
-    if (chrome == "Mac") chromeCombo->setCurrentIndex(0);
-    if (chrome == "Flat") chromeCombo->setCurrentIndex(1);
-
     themes = new QTreeWidget;
     themes->headerItem()->setText(0, tr("Swatch"));
     themes->headerItem()->setText(1, tr("Name"));
@@ -2132,9 +2119,6 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(defaultSize, 0,2, Qt::AlignVCenter|Qt::AlignLeft);
     grid->addWidget(chartlabelsSize, 1,2, Qt::AlignVCenter|Qt::AlignLeft);
 
-    grid->addWidget(chromeLabel, 5, 0);
-    grid->addWidget(chromeCombo, 5, 1, Qt::AlignVCenter|Qt::AlignLeft);
-
     grid->setColumnStretch(0,1);
     grid->setColumnStretch(1,4);
     grid->setColumnStretch(2,1);
@@ -2181,7 +2165,6 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     b4.head = rideHead->isChecked();
 #endif
     b4.line = lineWidth->value();
-    b4.chrome = chromeCombo->currentIndex();
     b4.fingerprint = Colors::fingerprint(colorSet);
 }
 
@@ -2291,23 +2274,6 @@ ColorsPage::applyThemeClicked()
 qint32
 ColorsPage::saveClicked()
 {
-    // chrome style only has 2 types for now
-    switch(chromeCombo->currentIndex()) {
-    default:
-    case 0:
-        appsettings->setValue(GC_CHROME, "Mac");
-#ifdef Q_OS_MAC
-        // if on yosemite set ALWAYS do flat chrome
-        if (QSysInfo::MacintoshVersion == 12) {
-            appsettings->setValue(GC_CHROME, "Flat");
-        }
-#endif
-        break;
-    case 1:
-        appsettings->setValue(GC_CHROME, "Flat");
-        break;
-    }
-
     appsettings->setValue(GC_LINEWIDTH, lineWidth->value());
     appsettings->setValue(GC_ANTIALIAS, antiAliased->isChecked());
 #ifndef Q_OS_MAC
@@ -2350,7 +2316,6 @@ ColorsPage::saveClicked()
        b4.head != rideHead->isChecked() ||
 #endif
        b4.line != lineWidth->value() ||
-       b4.chrome != chromeCombo->currentIndex() ||
        b4.fingerprint != Colors::fingerprint(colorSet))
         return CONFIG_APPEARANCE;
     else
