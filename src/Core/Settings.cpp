@@ -540,15 +540,15 @@ GSettings::upgradeSystem() {
     migrateValue(GC_BE_LASTDIR);
     migrateValue(GC_BE_LASTFMT);
     migrateValue(GC_FONT_DEFAULT);
-    migrateValue(GC_FONT_TITLES);
-    migrateValue(GC_FONT_CHARTMARKERS);
-    migrateValue(GC_FONT_CHARTLABELS);
-    migrateValue(GC_FONT_CALENDAR);
     migrateValue(GC_FONT_DEFAULT_SIZE);
-    migrateValue(GC_FONT_TITLES_SIZE);
-    migrateValue(GC_FONT_CHARTMARKERS_SIZE);
+    migrateValue(GC_FONT_CHARTLABELS);
     migrateValue(GC_FONT_CHARTLABELS_SIZE);
-    migrateValue(GC_FONT_CALENDAR_SIZE);
+    //DEPRECATED IN V3.5 migrateValue(GC_FONT_TITLES);
+    //DEPRECATED IN V3.5 migrateValue(GC_FONT_CHARTMARKERS);
+    //DEPRECATED IN V3.5 migrateValue(GC_FONT_CALENDAR);
+    //DEPRECATED IN V3.5 migrateValue(GC_FONT_TITLES_SIZE);
+    //DEPRECATED IN V3.5 migrateValue(GC_FONT_CHARTMARKERS_SIZE);
+    //DEPRECATED IN V3.5 migrateValue(GC_FONT_CALENDAR_SIZE);
 
     QStringList colorProperties = GCColor::getConfigKeys();
     QStringListIterator colorIterator(colorProperties);

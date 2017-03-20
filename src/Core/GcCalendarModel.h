@@ -296,8 +296,8 @@ public:
                                  // XXX within the cell
             {
                 QFont font;
-                font.fromString(appsettings->value(this, GC_FONT_CALENDAR, QFont().toString()).toString());
-                font.setPointSize(appsettings->value(this, GC_FONT_CALENDAR_SIZE, 12).toInt());
+                font.fromString(appsettings->value(this, GC_FONT_DEFAULT, QFont().toString()).toString());
+                font.setPointSize(appsettings->value(this, GC_FONT_DEFAULT_SIZE, 12).toInt());
                 return font;
             }
             break;

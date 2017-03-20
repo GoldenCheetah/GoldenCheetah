@@ -618,17 +618,9 @@ class ColorsPage : public QWidget
         QComboBox *chromeCombo;
 
         // Fonts
-        QFontComboBox *def,
-                      *titles,
-                      *chartmarkers,
-                      *chartlabels,
-                      *calendar;
+        QFontComboBox *def, *chartlabels;
 
-        QComboBox *defaultSize,
-                  *titlesSize,
-                  *chartmarkersSize,
-                  *chartlabelsSize,
-                  *calendarSize;
+        QComboBox *defaultSize, *chartlabelsSize;
 
         // tabbed view between colors and themes
         QTabWidget *colorTab;

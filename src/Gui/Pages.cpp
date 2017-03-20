@@ -2078,76 +2078,42 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
     QLabel *defaultLabel = new QLabel(tr("Default"));
-    QLabel *titlesLabel = new QLabel(tr("Title" ));
-    QLabel *markerLabel = new QLabel(tr("Chart Markers" ));
     QLabel *chartLabel = new QLabel(tr("Chart Labels" ));
-    QLabel *calendarLabel = new QLabel(tr("Calendar Text" ));
 
     def = new QFontComboBox(this);
-    titles = new QFontComboBox(this);
-    chartmarkers = new QFontComboBox(this);
     chartlabels = new QFontComboBox(this);
-    calendar = new QFontComboBox(this);
-
     defaultSize = new QComboBox(this); setSizes(defaultSize);
-    titlesSize = new QComboBox(this); setSizes(titlesSize);
-    chartmarkersSize = new QComboBox(this); setSizes(chartmarkersSize);
     chartlabelsSize = new QComboBox(this); setSizes(chartlabelsSize);
-    calendarSize = new QComboBox(this); setSizes(calendarSize);
 
     // get round QTBUG
     def->setCurrentIndex(0);
     def->setCurrentIndex(1);
     def->setCurrentFont(QFont());
-    titles->setCurrentIndex(0);
-    titles->setCurrentIndex(1);
-    titles->setCurrentFont(QFont());
-    chartmarkers->setCurrentIndex(0);
-    chartmarkers->setCurrentIndex(1);
-    chartmarkers->setCurrentFont(QFont());
     chartlabels->setCurrentIndex(0);
     chartlabels->setCurrentIndex(1);
     chartlabels->setCurrentFont(QFont());
-    calendar->setCurrentIndex(0);
-    calendar->setCurrentIndex(1);
-    calendar->setCurrentFont(QFont());
 
     QFont font;
 
     font.fromString(appsettings->value(this, GC_FONT_DEFAULT, QFont().toString()).toString());
     def->setCurrentFont(font);
 
-    font.fromString(appsettings->value(this, GC_FONT_TITLES, QFont().toString()).toString());
-    titles->setCurrentFont(font);
-
-    font.fromString(appsettings->value(this, GC_FONT_CHARTMARKERS, QFont().toString()).toString());
-    chartmarkers->setCurrentFont(font);
-
     font.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
     chartlabels->setCurrentFont(font);
 
-    font.fromString(appsettings->value(this, GC_FONT_CALENDAR, QFont().toString()).toString());
-    calendar->setCurrentFont(font);
-
 #ifdef Q_OS_MAC
     defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 10).toInt() -7) / 2);
-    titlesSize->setCurrentIndex((appsettings->value(this, GC_FONT_TITLES_SIZE, 10).toInt() -7) / 2);
-    chartmarkersSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTMARKERS_SIZE, 8).toInt() -7) / 2);
     chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 8).toInt() -7) / 2);
-    calendarSize->setCurrentIndex((appsettings->value(this, GC_FONT_CALENDAR_SIZE, 8).toInt() -7) / 2);
 #else
     defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 10).toInt() -6) / 2);
-    titlesSize->setCurrentIndex((appsettings->value(this, GC_FONT_TITLES_SIZE, 10).toInt() -6) / 2);
-    chartmarkersSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTMARKERS_SIZE, 8).toInt() -6) / 2);
     chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 8).toInt() -6) / 2);
-    calendarSize->setCurrentIndex((appsettings->value(this, GC_FONT_CALENDAR_SIZE, 8).toInt() -6) / 2);
 #endif
 
     QGridLayout *grid = new QGridLayout;
     grid->setSpacing(5 *dpiXFactor);
 
     grid->addWidget(defaultLabel, 0,0);
-    grid->addWidget(titlesLabel, 1,0);
+    grid->addWidget(chartLabel, 1,0);
 
     grid->addWidget(lineWidthLabel, 0,3);
     grid->addWidget(lineWidth, 0,4);
@@ -2160,21 +2126,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(rideHead, 3,4);
 #endif
 
-    grid->addWidget(markerLabel, 2,0);
-    grid->addWidget(chartLabel, 3,0);
-    grid->addWidget(calendarLabel, 4,0);
-
     grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(titles, 1,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(chartmarkers, 2,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(chartlabels, 3,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(calendar, 4,1, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget(chartlabels, 1,1, Qt::AlignVCenter|Qt::AlignLeft);
 
     grid->addWidget(defaultSize, 0,2, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(titlesSize, 1,2, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(chartmarkersSize, 2,2, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(chartlabelsSize, 3,2, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(calendarSize, 4,2, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget(chartlabelsSize, 1,2, Qt::AlignVCenter|Qt::AlignLeft);
 
     grid->addWidget(chromeLabel, 5, 0);
     grid->addWidget(chromeCombo, 5, 1, Qt::AlignVCenter|Qt::AlignLeft);
@@ -2370,22 +2326,13 @@ ColorsPage::saveClicked()
     }
     // Font
     appsettings->setValue(GC_FONT_DEFAULT, def->currentFont().toString());
-    appsettings->setValue(GC_FONT_TITLES, titles->currentFont().toString());
-    appsettings->setValue(GC_FONT_CHARTMARKERS, chartmarkers->currentFont().toString());
     appsettings->setValue(GC_FONT_CHARTLABELS, chartlabels->currentFont().toString());
-    appsettings->setValue(GC_FONT_CALENDAR, calendar->currentFont().toString());
 #ifdef Q_OS_MAC
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, 7+(defaultSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_TITLES_SIZE, 7+(titlesSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, 7+(chartmarkersSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, 7+(chartlabelsSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_CALENDAR_SIZE, 7+(calendarSize->currentIndex()*2));
 #else
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, 6+(defaultSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_TITLES_SIZE, 6+(titlesSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, 6+(chartmarkersSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, 6+(chartlabelsSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_CALENDAR_SIZE, 6+(calendarSize->currentIndex()*2));
 #endif
 
     QFont font;
