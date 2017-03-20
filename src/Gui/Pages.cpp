@@ -2092,9 +2092,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
         }
     }
 
+    QFont font=baseFont;
+    font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
     fonttext->setText("The quick brown fox jumped over the lazy dog");
-    fonttext->setFont(baseFont);
+    fonttext->setFont(font);
     fonttext->setFixedHeight(30 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
 
@@ -2157,7 +2159,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     }
     connect(colorTab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
-    connect(def, SIGNAL(currentFontChanged(QFont&)), this, SLOT(scaleFont()));
+    connect(def, SIGNAL(currentFontChanged(QFont)), this, SLOT(scaleFont()));
     connect(fontscale, SIGNAL(valueChanged(int)), this, SLOT(scaleFont()));
 
     // save initial values
