@@ -614,9 +614,6 @@ class ColorsPage : public QWidget
 #endif
         QDoubleSpinBox *lineWidth;
 
-        // theme
-        QComboBox *chromeCombo;
-
         // Fonts
         QFontComboBox *def, *chartlabels;
 
@@ -634,7 +631,6 @@ class ColorsPage : public QWidget
         struct {
             bool alias, scroll, head;
             double line;
-            int chrome;
             unsigned long fingerprint;
         } b4;
 };

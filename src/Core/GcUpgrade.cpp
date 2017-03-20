@@ -360,6 +360,16 @@ GcUpgrade::upgrade(const QDir &home)
 
 
     //----------------------------------------------------------------------
+    // 3.5 upgrade processing
+    //----------------------------------------------------------------------
+    if (last < VERSION35_BUILD) {
+
+        // metallic style deprecated
+        appsettings->setValue(GC_CHROME, "Flat");
+    }
+
+
+    //----------------------------------------------------------------------
     // ... here any further Release Number dependent Upgrade Process is to be added ...
     //----------------------------------------------------------------------
 
