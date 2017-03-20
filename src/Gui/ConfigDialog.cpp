@@ -130,6 +130,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     pagesWidget->addWidget(athlete);
 
     // units change on general affects units used on entry in athlete pages
+    connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePage, SLOT(unitChanged(int)));
     connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePhysPage, SLOT(unitChanged(int)));
 
     password = new PasswordConfig(_home, context);
