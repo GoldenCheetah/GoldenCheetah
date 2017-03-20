@@ -108,15 +108,9 @@
 #define GC_BE_LASTFMT                   "<system>batchexport/lastfmt"
 // Fonts
 #define GC_FONT_DEFAULT                 "<system>font/default"
-#define GC_FONT_TITLES                  "<system>font/titles"
-#define GC_FONT_CHARTMARKERS            "<system>font/chartmarkers"
 #define GC_FONT_CHARTLABELS             "<system>font/chartlabels"
-#define GC_FONT_CALENDAR                "<system>font/calendar"
 #define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
-#define GC_FONT_TITLES_SIZE             "<system>font/titlessize"
-#define GC_FONT_CHARTMARKERS_SIZE       "<system>font/chartmarkerssize"
 #define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
-#define GC_FONT_CALENDAR_SIZE           "<system>font/calendarsize"
 
 // Colors/Chrome - see special treatment sections (also stored in <system>)
 #define GC_CHROME                       "<system>chrome" // mac or flat only so far

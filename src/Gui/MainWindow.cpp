@@ -205,10 +205,7 @@ MainWindow::MainWindow(const QDir &home)
 
          // set all the default font sizes
          appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
-         appsettings->setValue(GC_FONT_TITLES_SIZE, app.titleFont);
-         appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, app.markerFont);
          appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
-         appsettings->setValue(GC_FONT_CALENDAR_SIZE, app.calendarFont);
 
      }
 
