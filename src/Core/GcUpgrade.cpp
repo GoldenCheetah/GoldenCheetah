@@ -366,6 +366,9 @@ GcUpgrade::upgrade(const QDir &home)
 
         // metallic style deprecated
         appsettings->setValue(GC_CHROME, "Flat");
+
+        // set the default scale factor to 1.0
+        appsettings->setValue(GC_FONT_SCALE, QVariant::fromValue(1.0f));
     }
 
 

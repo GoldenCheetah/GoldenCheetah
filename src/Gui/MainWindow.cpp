@@ -2224,13 +2224,6 @@ MainWindow::configChanged(qint32)
         tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
 
-    // set the default fontsize -- NEED TO HONOR APPLICATION WIDE SETTING
-    //                             OVERRIDEN IN MAIN.CPP -- PENDING CONFIG UPDATE
-    //XXXXQFont font;
-    //XXXXfont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
-    //XXXXfont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
-    //XXXXQApplication::setFont(font); // set default font
-
     head->updateGeometry();
     repaint();
 
