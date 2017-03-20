@@ -36,7 +36,8 @@
 //
 // Dialog scaling
 //
-double dpiXFactor, dpiYFactor;
+double dpiXFactor, dpiYFactor;  // scale factor to apply to display
+QFont baseFont;                 // base font scaled to display (before user scaling applied)
 
 // find the right pixelSize for font and height
 int pixelSizeForFont(QFont &font, int height)

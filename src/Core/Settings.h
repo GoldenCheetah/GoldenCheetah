@@ -111,6 +111,7 @@
 #define GC_FONT_CHARTLABELS             "<system>font/chartlabels"
 #define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
 #define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
+#define GC_FONT_SCALE                   "<system>font/scale"
 
 // Colors/Chrome - see special treatment sections (also stored in <system>)
 #define GC_CHROME                       "<system>chrome" // mac or flat only so far

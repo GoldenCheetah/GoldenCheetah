@@ -307,7 +307,10 @@ main(int argc, char *argv[])
     // set defaultfont - may be adjusted below
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
-    font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
+    font.setPointSize(11);
+
+    // use the default before taking into account screen size
+    baseFont = font;
 
     // hidpi ratios -- single desktop for now
     desktop = QApplication::desktop();
@@ -350,7 +353,7 @@ main(int argc, char *argv[])
 
        // points = height in inches * dpi
        double pointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
-       font.setPointSize(pointsize);
+       baseFont.setPointSizeF(pointsize);
 
        // fixup some style issues from QT not adjusting defaults on hidpi displays
        // initially just pushbutton and combobox spacing...
@@ -369,7 +372,18 @@ main(int argc, char *argv[])
        qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no hidpi support available";
 #endif
 
+    // scale up to user scale factor
+    double fontscale = appsettings->value(NULL, GC_FONT_SCALE, 1.0).toDouble();
+    font.setPointSizeF(baseFont.pointSizeF() * fontscale);
+
+    // now apply !
     application->setFont(font); // set default font
+
+    // set application wide
+    appsettings->setValue(GC_FONT_DEFAULT, font.toString());
+    appsettings->setValue(GC_FONT_CHARTLABELS, font.toString());
+    appsettings->setValue(GC_FONT_DEFAULT_SIZE, font.pointSizeF());
+    appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
 
     //
     // OPEN FIRST MAINWINDOW

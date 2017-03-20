@@ -604,6 +604,8 @@ class ColorsPage : public QWidget
         void applyThemeClicked();
         void tabChanged();
 
+        void scaleFont();
+
     private:
 
         // General stuff
@@ -615,9 +617,9 @@ class ColorsPage : public QWidget
         QDoubleSpinBox *lineWidth;
 
         // Fonts
-        QFontComboBox *def, *chartlabels;
-
-        QComboBox *defaultSize, *chartlabelsSize;
+        QFontComboBox *def;
+        QSlider *fontscale;
+        QLabel *fonttext;
 
         // tabbed view between colors and themes
         QTabWidget *colorTab;
@@ -631,6 +633,7 @@ class ColorsPage : public QWidget
         struct {
             bool alias, scroll, head;
             double line;
+            double fontscale;
             unsigned long fingerprint;
         } b4;
 };

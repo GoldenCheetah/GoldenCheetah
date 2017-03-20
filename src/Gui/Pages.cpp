@@ -2016,6 +2016,8 @@ static void setSizes(QComboBox *p)
 #endif
 }
 
+static double scalefactors[7] = { 0.5f, 0.6f, 0.8, 1.0f, 1.25f, 1.5f, 2.0f };
+
 //
 // Appearances page
 //
@@ -2064,43 +2066,43 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     lineWidth->setValue(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
 
     QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
-    QLabel *defaultLabel = new QLabel(tr("Default"));
-    QLabel *chartLabel = new QLabel(tr("Chart Labels" ));
+    QLabel *defaultLabel = new QLabel(tr("Font"));
+    QLabel *scaleLabel = new QLabel(tr("Font Scaling" ));
 
     def = new QFontComboBox(this);
-    chartlabels = new QFontComboBox(this);
-    defaultSize = new QComboBox(this); setSizes(defaultSize);
-    chartlabelsSize = new QComboBox(this); setSizes(chartlabelsSize);
 
     // get round QTBUG
     def->setCurrentIndex(0);
     def->setCurrentIndex(1);
-    def->setCurrentFont(QFont());
-    chartlabels->setCurrentIndex(0);
-    chartlabels->setCurrentIndex(1);
-    chartlabels->setCurrentFont(QFont());
+    def->setCurrentFont(baseFont);
+    def->setCurrentFont(baseFont);
 
-    QFont font;
+    // font scaling
+    double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
+    fontscale = new QSlider(this);
+    fontscale->setMinimum(0);
+    fontscale->setMaximum(6);
+    fontscale->setTickInterval(1);
+    fontscale->setValue(3);
+    fontscale->setOrientation(Qt::Horizontal);
+    for(int i=0; i<7; i++) {
+        if (scalefactors[i] == scale) {
+            fontscale->setValue(i);
+            break;
+        }
+    }
 
-    font.fromString(appsettings->value(this, GC_FONT_DEFAULT, QFont().toString()).toString());
-    def->setCurrentFont(font);
-
-    font.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-    chartlabels->setCurrentFont(font);
-
-#ifdef Q_OS_MAC
-    defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 10).toInt() -7) / 2);
-    chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 8).toInt() -7) / 2);
-#else
-    defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 10).toInt() -6) / 2);
-    chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 8).toInt() -6) / 2);
-#endif
+    fonttext = new QLabel(this);
+    fonttext->setText("The quick brown fox jumped over the lazy dog");
+    fonttext->setFont(baseFont);
+    fonttext->setFixedHeight(30 * dpiYFactor);
+    fonttext->setFixedWidth(330 * dpiXFactor);
 
     QGridLayout *grid = new QGridLayout;
     grid->setSpacing(5 *dpiXFactor);
 
     grid->addWidget(defaultLabel, 0,0);
-    grid->addWidget(chartLabel, 1,0);
+    grid->addWidget(scaleLabel, 1,0);
 
     grid->addWidget(lineWidthLabel, 0,3);
     grid->addWidget(lineWidth, 0,4);
@@ -2114,10 +2116,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #endif
 
     grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(chartlabels, 1,1, Qt::AlignVCenter|Qt::AlignLeft);
-
-    grid->addWidget(defaultSize, 0,2, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(chartlabelsSize, 1,2, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget(fontscale, 1,1);
+    grid->addWidget(fonttext, 2,0,1,2);
 
     grid->setColumnStretch(0,1);
     grid->setColumnStretch(1,4);
@@ -2157,6 +2157,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     }
     connect(colorTab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
+    connect(def, SIGNAL(currentFontChanged(QFont&)), this, SLOT(scaleFont()));
+    connect(fontscale, SIGNAL(valueChanged(int)), this, SLOT(scaleFont()));
 
     // save initial values
     b4.alias = antiAliased->isChecked();
@@ -2166,6 +2168,15 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #endif
     b4.line = lineWidth->value();
     b4.fingerprint = Colors::fingerprint(colorSet);
+}
+
+void
+ColorsPage::scaleFont()
+{
+    QFont font=baseFont;
+    font.setFamily(def->currentFont().family());
+    font.setPointSizeF(baseFont.pointSizeF()*scalefactors[fontscale->value()]);
+    fonttext->setFont(font);
 }
 
 void
@@ -2276,6 +2287,8 @@ ColorsPage::saveClicked()
 {
     appsettings->setValue(GC_LINEWIDTH, lineWidth->value());
     appsettings->setValue(GC_ANTIALIAS, antiAliased->isChecked());
+    appsettings->setValue(GC_FONT_SCALE, scalefactors[fontscale->value()]);
+    appsettings->setValue(GC_FONT_DEFAULT, def->font().family());
 #ifndef Q_OS_MAC
     appsettings->setValue(GC_RIDESCROLL, rideScroll->isChecked());
     appsettings->setValue(GC_RIDEHEAD, rideHead->isChecked());
@@ -2290,21 +2303,20 @@ ColorsPage::saveClicked()
                                                  .arg(newColor.blue());
         appsettings->setValue(colorSet[i].setting, colorstring);
     }
-    // Font
-    appsettings->setValue(GC_FONT_DEFAULT, def->currentFont().toString());
-    appsettings->setValue(GC_FONT_CHARTLABELS, chartlabels->currentFont().toString());
-#ifdef Q_OS_MAC
-    appsettings->setValue(GC_FONT_DEFAULT_SIZE, 7+(defaultSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, 7+(chartlabelsSize->currentIndex()*2));
-#else
-    appsettings->setValue(GC_FONT_DEFAULT_SIZE, 6+(defaultSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, 6+(chartlabelsSize->currentIndex()*2));
-#endif
 
-    QFont font;
-    font.fromString(appsettings->value(this, GC_FONT_DEFAULT, QFont().toString()).toString());
-    font.setPointSize(appsettings->value(this, GC_FONT_DEFAULT_SIZE, 13).toInt());
+    // update basefont family
+    baseFont.setFamily(def->currentFont().family());
+
+    // application font needs to adapt to scale
+    QFont font = baseFont;
+    font.setPointSizeF(baseFont.pointSizeF() * scalefactors[fontscale->value()]);
     QApplication::setFont(font);
+
+    // set the "old" user settings to ensure charts adopt etc
+    appsettings->setValue(GC_FONT_DEFAULT, def->currentFont().toString());
+    appsettings->setValue(GC_FONT_CHARTLABELS, def->currentFont().toString());
+    appsettings->setValue(GC_FONT_DEFAULT_SIZE, font.pointSizeF());
+    appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
 
     // reread into colorset so we can check for changes
     GCColor::readConfig();
@@ -2316,6 +2328,7 @@ ColorsPage::saveClicked()
        b4.head != rideHead->isChecked() ||
 #endif
        b4.line != lineWidth->value() ||
+       b4.fontscale != scalefactors[fontscale->value()] ||
        b4.fingerprint != Colors::fingerprint(colorSet))
         return CONFIG_APPEARANCE;
     else

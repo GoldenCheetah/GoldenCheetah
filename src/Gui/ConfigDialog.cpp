@@ -47,7 +47,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
 
-    QFont defaultFont;
     setMinimumSize(640 *dpiXFactor,580 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
