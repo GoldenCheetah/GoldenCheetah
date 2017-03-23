@@ -277,7 +277,7 @@ class RideTreeView : public QTreeView
     Q_OBJECT;
 
     public:
-        RideTreeView();
+        RideTreeView(QWidget *);
 
     signals:
         void rowSelected(QItemSelection);

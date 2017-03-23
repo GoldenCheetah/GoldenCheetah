@@ -78,7 +78,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     }
 
     // get setup
-    tableView = new RideTreeView;
+    tableView = new RideTreeView(this);
     delegate = new NavigatorCellDelegate(this);
     tableView->setAnimated(true);
     tableView->setItemDelegate(delegate);
@@ -1366,7 +1366,7 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
     emit customContextMenuRequested(tableView->mapToGlobal(pos+QPoint(0,tableView->header()->geometry().height())));
 }
 
-RideTreeView::RideTreeView()
+RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
 #if (defined WIN32) && (QT_VERSION > 0x050000) && (QT_VERSION < 0x050301) 
     // don't allow ride drop on Windows with QT5 until 5.3.1 when they fixed the bug
@@ -1383,7 +1383,8 @@ RideTreeView::RideTreeView()
 
 
 RideNavigatorSortProxyModel::RideNavigatorSortProxyModel(QObject *parent) : QSortFilterProxyModel (parent)
-{}
+{
+}
 
 bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
                                            const QModelIndex &right) const
