@@ -186,7 +186,7 @@ BodyMeasuresDownload::download() {
        toDate = QDateTime::currentDateTimeUtc();
    } else if (dateRangeLastMeasure->isChecked()) {
        if (current.count() > 0) {
-           fromDate = current.last().when.addSecs(3600);
+           fromDate = current.last().when.addSecs(1);
        } else {
            // use a reasonable default
            fromDate = firstRideDate;
@@ -200,11 +200,12 @@ BodyMeasuresDownload::download() {
            closeButton->setEnabled(true);
            return;
        }
-       fromDate = manualFromDate->dateTime();
-       toDate = manualToDate->dateTime();
+       fromDate.setDate(manualFromDate->date());
        fromDate.setTime(QTime(0,0));
-       toDate.setTime(QTime(23, 59));
+       toDate.setDate(manualToDate->date());
    } else return;
+   // to Time is always "end of the day"
+   toDate.setTime(QTime(23,59));
 
    // do the download
    if (downloadWithings->isChecked()) {
@@ -217,8 +218,23 @@ BodyMeasuresDownload::download() {
 
    if (downloadOk) {
 
+       // selection from various source may not be 100% accurate w.r.t. the from/to date filtering
+       // e.g. on TodaysPlan the measureDate and selectionDate can deviate
+       // so remove all measures which do not fit the selection from/to interval
+       QMutableListIterator<BodyMeasure> i(bodyMeasures);
+       BodyMeasure c;
+       while (i.hasNext()) {
+           c = i.next();
+           if (c.when <= fromDate || c.when >= toDate) {
+               i.remove();
+           }
+       }
+
        // we discard only if we have new data loaded - otherwise keep what is there
-       if (discardExistingMeasures->isChecked()) current.clear();
+       if (discardExistingMeasures->isChecked()) {
+           // now the new measures do not contain any "ts" of the current data any more
+           current.clear();
+       };
 
        // if exists, merge current data with new data - new data has preferences
        // no merging of weight data which has the same time stamp - new wins
