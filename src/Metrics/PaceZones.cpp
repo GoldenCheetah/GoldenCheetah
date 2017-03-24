@@ -30,6 +30,7 @@
 #include <qcolor.h>
 #include <assert.h>
 #include <cmath>
+#include <float.h>
 
 
 // the infinity endpoints are indicated with extreme date ranges
