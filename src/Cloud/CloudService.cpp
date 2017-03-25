@@ -1404,11 +1404,12 @@ CloudServiceSyncDialog::completedRead(QByteArray *data, QString name, QString /*
             curr->setText(col, errors.join(" "));
         }
 
-	// delete once saved
-	delete ride;
+        // delete once saved
+        delete ride;
     } else {
         curr->setText(col, errors.join(" "));
     }
+
     QApplication::processEvents();
 
     if (sync)
