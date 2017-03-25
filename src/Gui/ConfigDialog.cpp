@@ -39,7 +39,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
 #ifdef Q_OS_MAC
     QToolBar *head = addToolBar(tr("Preferences"));
-    setMinimumSize(600,540);
+    setMinimumSize(650,540);
     setUnifiedTitleAndToolBarOnMac(true);
     head->setFloatable(false);
     head->setMovable(false);
@@ -47,7 +47,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
 
-    setMinimumSize(640 *dpiXFactor,580 *dpiYFactor);   //changed for hidpi sizing
+    setMinimumSize(700 *dpiXFactor,580 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
     // center
@@ -304,6 +304,10 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     HelpWhatsThis *athleteHelp = new HelpWhatsThis(athletePage);
     athletePage->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
 
+    modelPage = new AboutModelPage(context);
+    HelpWhatsThis *athleteModelHelp = new HelpWhatsThis(modelPage);
+    modelPage->setWhatsThis(athleteModelHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Model));
+
     athletePhysPage = new RiderPhysPage(this, context);
     HelpWhatsThis *athletePhysHelp = new HelpWhatsThis(athletePhysPage);
     athletePhysPage->setWhatsThis(athletePhysHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Phys));
@@ -335,6 +339,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));
+    tabs->addTab(modelPage, tr("Model"));
     tabs->addTab(athletePhysPage, tr("Measures"));
     tabs->addTab(zonePage, tr("Power Zones"));
     tabs->addTab(hrZonePage, tr("Heartrate Zones"));
@@ -350,6 +355,7 @@ qint32 AthleteConfig::saveClicked()
     qint32 state = 0;
 
     state |= athletePage->saveClicked();
+    state |= modelPage->saveClicked();
     state |= athletePhysPage->saveClicked();
     state |= zonePage->saveClicked();
     state |= hrZonePage->saveClicked();

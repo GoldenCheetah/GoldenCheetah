@@ -215,6 +215,32 @@ class AboutRiderPage : public QWidget
         QComboBox *rimSizeCombo;
         QComboBox *tireSizeCombo;
         QLineEdit *wheelSizeEdit;
+
+
+    struct {
+        double height;
+        int wheel;
+        int crank;
+    } b4;
+
+    private slots:
+        void calcWheelSize();
+        void resetWheelSize();
+};
+
+class AboutModelPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        AboutModelPage(Context *context);
+        qint32 saveClicked();
+
+    private:
+        Context *context;
+
         QLabel *wbaltaulabel;
         QSpinBox *wbaltau;
         QLabel *perfManSTSLabel;
@@ -225,17 +251,10 @@ class AboutRiderPage : public QWidget
         QIntValidator *perfManLTSavgValidator;
         QCheckBox *showSBToday;
 
-
     struct {
-        double height;
-        int wheel;
-        int crank;
         int lts,sts;
     } b4;
 
-    private slots:
-        void calcWheelSize();
-        void resetWheelSize();
 };
 
 class BackupPage : public QWidget

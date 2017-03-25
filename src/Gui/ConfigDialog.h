@@ -61,6 +61,7 @@ class AthleteConfig : public QWidget
     public:
         AthleteConfig(QDir home, Context *context);
         AboutRiderPage *athletePage;
+        AboutModelPage *modelPage;
         RiderPhysPage *athletePhysPage;
 
     public slots:

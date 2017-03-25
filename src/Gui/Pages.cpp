@@ -1310,39 +1310,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
     connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
 
-    //
-    // W'bal Tau
-    //
-    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
-    wbaltau = new QSpinBox(this);
-    wbaltau->setMinimum(30);
-    wbaltau->setMaximum(1200);
-    wbaltau->setSingleStep(10);
-    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
-
-    //
-    // Performance manager
-    //
-
-    perfManSTSLabel = new QLabel(tr("STS average (days)"));
-    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
-    perfManSTSavgValidator = new QIntValidator(1,21,this);
-    perfManLTSavgValidator = new QIntValidator(7,56,this);
-
-    // get config or set to defaults
-    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
-    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
-    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
-
-    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
-    perfManSTSavg->setValidator(perfManSTSavgValidator);
-    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
-    perfManLTSavg->setValidator(perfManLTSavgValidator);
-
-    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
-
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
@@ -1360,15 +1327,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     grid->addWidget(wheelSizeLabel, 5, 0, alignment);
     grid->addLayout(wheelSizeLayout, 5, 1, 1, 2, alignment);
 
-    grid->addWidget(wbaltaulabel, 9, 0, alignment);
-    grid->addWidget(wbaltau, 9, 1, alignment);
-
-    grid->addWidget(perfManSTSLabel, 10, 0, alignment);
-    grid->addWidget(perfManSTSavg, 10, 1, alignment);
-    grid->addWidget(perfManLTSLabel, 11, 0, alignment);
-    grid->addWidget(perfManLTSavg, 11, 1, alignment);
-    grid->addWidget(showSBToday, 12, 1, alignment);
-
     grid->addWidget(avatarButton, 0, 1, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
     all->addStretch();
@@ -1381,8 +1339,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
     b4.wheel = wheelSize;
     b4.crank = crankLengthCombo->currentIndex();
-    b4.lts = perfManLTSVal.toInt();
-    b4.sts = perfManSTSVal.toInt();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
 }
@@ -1445,14 +1401,6 @@ AboutRiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
     appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
 
-    // W'bal Tau
-    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
-
-    // Performance Manager
-    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
-
     qint32 state=0;
 
     // default height changed ?
@@ -1465,9 +1413,90 @@ AboutRiderPage::saveClicked()
         b4.crank != crankLengthCombo->currentIndex() )
         state += CONFIG_GENERAL;
 
+    return state;
+}
+
+AboutModelPage::AboutModelPage(Context *context) : context(context)
+{
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+#ifdef Q_OS_MAX
+    setContentsMargins(10,10,10,10);
+    grid->setSpacing(5 *dpiXFactor);
+    all->setSpacing(5 *dpiXFactor);
+#endif
+
+    //
+    // W'bal Tau
+    //
+    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
+    wbaltau = new QSpinBox(this);
+    wbaltau->setMinimum(30);
+    wbaltau->setMaximum(1200);
+    wbaltau->setSingleStep(10);
+    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
+
+    //
+    // Performance manager
+    //
+
+    perfManSTSLabel = new QLabel(tr("STS average (days)"));
+    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
+    perfManSTSavgValidator = new QIntValidator(1,21,this);
+    perfManLTSavgValidator = new QIntValidator(7,56,this);
+
+    // get config or set to defaults
+    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
+    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
+    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
+    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
+
+    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
+    perfManSTSavg->setValidator(perfManSTSavgValidator);
+    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
+    perfManLTSavg->setValidator(perfManLTSavgValidator);
+
+    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
+    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
+
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
+    grid->addWidget(wbaltaulabel, 9, 0, alignment);
+    grid->addWidget(wbaltau, 9, 1, alignment);
+
+    grid->addWidget(perfManSTSLabel, 10, 0, alignment);
+    grid->addWidget(perfManSTSavg, 10, 1, alignment);
+    grid->addWidget(perfManLTSLabel, 11, 0, alignment);
+    grid->addWidget(perfManLTSavg, 11, 1, alignment);
+    grid->addWidget(showSBToday, 12, 1, alignment);
+
+    all->addLayout(grid);
+    all->addStretch();
+
+    // save initial values for things we care about
+    // note we don't worry about age or sex at this point
+    // since they are not used, nor the W'bal tau used in
+    // the realtime code. This is limited to stuff we
+    // care about tracking as it is used by metrics
+    b4.lts = perfManLTSVal.toInt();
+    b4.sts = perfManSTSVal.toInt();
+}
+
+qint32
+AboutModelPage::saveClicked()
+{
+    // W'bal Tau
+    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
+
+    // Performance Manager
+    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+
+    qint32 state=0;
+
     // PMC constants changed ?
-    if(b4.lts != perfManLTSavg->text().toInt() ||
-        b4.sts != perfManSTSavg->text().toInt())
+    if(b4.lts != perfManLTSavg->text().toInt() || b4.sts != perfManSTSavg->text().toInt())
         state += CONFIG_PMC;
 
     return state;
