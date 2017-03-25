@@ -51,6 +51,7 @@
 #include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
+#include "BodyMeasures.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -146,28 +147,39 @@ class RiderPhysPage : public QWidget
 
     public slots:
         void unitChanged(int currentIndex);
+        void addOReditClicked();
+        void deleteClicked();
+        void rangeEdited();
+        void rangeSelectionChanged();
 
     private:
         Context *context;
+        bool metricUnits;
+        QList<BodyMeasure> bodyMeasures;
 
-        QLabel *wbaltaulabel;
+        QLabel *dateLabel;
+        QDateEdit *dateEdit;
         QLabel *weightlabel;
-        QLabel *heightlabel;
         QDoubleSpinBox *weight;
-        QDoubleSpinBox *height;
-        QSpinBox *wbaltau;
-        QLabel *perfManSTSLabel;
-        QLabel *perfManLTSLabel;
-        QLineEdit *perfManSTSavg;
-        QLineEdit *perfManLTSavg;
-        QIntValidator *perfManSTSavgValidator;
-        QIntValidator *perfManLTSavgValidator;
-        QCheckBox *showSBToday;
+        QLabel *fatkglabel;
+        QDoubleSpinBox *fatkg;
+        QLabel *musclekglabel;
+        QDoubleSpinBox *musclekg;
+        QLabel *boneskglabel;
+        QDoubleSpinBox *boneskg;
+        QLabel *leankglabel;
+        QDoubleSpinBox *leankg;
+        QLabel *fatpercentlabel;
+        QDoubleSpinBox *fatpercent;
+        QLabel *commentlabel;
+        QLineEdit *comment;
+
+        QTreeWidget *bmTree;
+        QPushButton *addButton, *updateButton, *deleteButton;
 
     struct {
         double weight;
-        double height;
-        int lts,sts;
+        unsigned long fingerprint;
     } b4;
 
     private slots:
@@ -185,13 +197,17 @@ class AboutRiderPage : public QWidget
 
     public slots:
         void chooseAvatar();
+        void unitChanged(int currentIndex);
 
     private:
         Context *context;
+        bool metricUnits;
 
         QLineEdit *nickname;
         QDateEdit *dob;
         QComboBox *sex;
+        QLabel *heightlabel;
+        QDoubleSpinBox *height;
         QPushButton *avatarButton;
         QPixmap     avatar;
         QComboBox *crankLengthCombo;
@@ -201,11 +217,22 @@ class AboutRiderPage : public QWidget
         QSpinBox *autoBackupPeriod;
         QLineEdit *autoBackupFolder;
         QPushButton *autoBackupFolderBrowse;
+        QLabel *wbaltaulabel;
+        QSpinBox *wbaltau;
+        QLabel *perfManSTSLabel;
+        QLabel *perfManLTSLabel;
+        QLineEdit *perfManSTSavg;
+        QLineEdit *perfManLTSavg;
+        QIntValidator *perfManSTSavgValidator;
+        QIntValidator *perfManLTSavgValidator;
+        QCheckBox *showSBToday;
 
 
     struct {
+        double height;
         int wheel;
         int crank;
+        int lts,sts;
     } b4;
 
     private slots:
