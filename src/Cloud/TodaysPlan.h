@@ -19,11 +19,11 @@
 #ifndef GC_TodaysPlan_h
 #define GC_TodaysPlan_h
 
-#include "FileStore.h"
+#include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 
-class TodaysPlan : public FileStore {
+class TodaysPlan : public CloudService {
 
     Q_OBJECT
 
@@ -51,8 +51,8 @@ class TodaysPlan : public FileStore {
         bool createFolder(QString);
 
         // dirent style api
-        FileStoreEntry *root() { return root_; }
-        QList<FileStoreEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
+        CloudServiceEntry *root() { return root_; }
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
     public slots:
 
@@ -67,7 +67,7 @@ class TodaysPlan : public FileStore {
         Context *context;
         QNetworkAccessManager *nam;
         QNetworkReply *reply;
-        FileStoreEntry *root_;
+        CloudServiceEntry *root_;
 
         QMap<QNetworkReply*, QByteArray*> buffers;
 

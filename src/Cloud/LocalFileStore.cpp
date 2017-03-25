@@ -20,10 +20,10 @@
 #include "Athlete.h"
 #include "Settings.h"
 
-LocalFileStore::LocalFileStore(Context *context) : FileStore(context), context(context) {
+LocalFileStore::LocalFileStore(Context *context) : CloudService(context), context(context) {
 
     // we have a root
-    root_ = newFileStoreEntry();
+    root_ = newCloudServiceEntry();
 
     // root is always root on a local file store
     root_->name = "/";
@@ -83,10 +83,10 @@ LocalFileStore::createFolder(QString path)
     return false;
 }
 
-QList<FileStoreEntry*> 
+QList<CloudServiceEntry*> 
 LocalFileStore::readdir(QString path, QStringList &errors)
 {
-    QList<FileStoreEntry*> returning;
+    QList<CloudServiceEntry*> returning;
 
     QDir current_path = QDir(path);
     if (!current_path.exists()) {
@@ -100,7 +100,7 @@ LocalFileStore::readdir(QString path, QStringList &errors)
         // skip . and ..
         if (info.fileName() == "." || info.fileName() == "..") continue;
 
-        FileStoreEntry *add = newFileStoreEntry();
+        CloudServiceEntry *add = newCloudServiceEntry();
 
         //QFileInfo has full path, we just want the file name
         add->name = info.fileName();

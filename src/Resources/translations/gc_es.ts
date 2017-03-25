@@ -8377,7 +8377,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
         <translation>se esperaba un archivo de actividad comprimido.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>Clase Base</translation>
     </message>
@@ -15398,7 +15398,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Falló la escritura a la carpeta %1</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>Almacenamiento Local </translation>
     </message>

@@ -8378,7 +8378,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
         <translation>FIle attivita&apos; compressa attesa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>Miglio classe</translation>
     </message>
@@ -15380,7 +15380,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>Fallito il tentativo di scrittura alla cartella %1</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>Archivio Locale</translation>
     </message>

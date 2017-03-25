@@ -8840,7 +8840,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation>应为压缩的活动文件</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>基本类</translation>
     </message>
@@ -16037,7 +16037,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>写入文件夹%1失败</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>本地存储</translation>
     </message>

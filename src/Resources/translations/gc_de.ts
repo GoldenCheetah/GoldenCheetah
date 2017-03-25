@@ -8555,7 +8555,7 @@ an den Computer anschließen und
         <translation>Komprimierte Aktivitätsdatei erwartet.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>Basis Klasse</translation>
     </message>
@@ -15783,7 +15783,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>Schreiben in Verzeichnis %1 gescheitert</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>Lokales Verzeichnis </translation>
     </message>

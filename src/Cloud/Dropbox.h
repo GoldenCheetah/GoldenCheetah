@@ -19,10 +19,10 @@
 #ifndef GC_Dropbox_h
 #define GC_Dropbox_h
 
-#include "FileStore.h"
+#include "CloudService.h"
 #include <QNetworkAccessManager>
 
-class Dropbox : public FileStore {
+class Dropbox : public CloudService {
 
     Q_OBJECT
 
@@ -50,8 +50,8 @@ class Dropbox : public FileStore {
         bool createFolder(QString path);
 
         // dirent style api
-        FileStoreEntry *root() { return root_; }
-        QList<FileStoreEntry*> readdir(QString path, QStringList &errors);
+        CloudServiceEntry *root() { return root_; }
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors);
 
     public slots:
 
@@ -66,7 +66,7 @@ class Dropbox : public FileStore {
         Context *context;
         QNetworkAccessManager *nam;
         QNetworkReply *reply;
-        FileStoreEntry *root_;
+        CloudServiceEntry *root_;
 
         QMap<QNetworkReply*, QByteArray*> buffers;
 };

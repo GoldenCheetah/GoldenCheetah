@@ -81,7 +81,7 @@ struct GoogleDrive::FileInfo {
 };
 
 GoogleDrive::GoogleDrive(Context *context)
-    : FileStore(context), context_(context), root_(NULL) {
+    : CloudService(context), context_(context), root_(NULL) {
     printd("GoogleDrive::GoogleDrive\n");
     nam_ = new QNetworkAccessManager(this);
     connect(nam_, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
@@ -110,7 +110,7 @@ bool GoogleDrive::open(QStringList &errors) {
         return false;
     }
 
-    root_ = newFileStoreEntry();
+    root_ = newCloudServiceEntry();
     root_->name = "GoldenCheetah";
     root_->isDir = true;
     root_->size = 0;
@@ -250,7 +250,7 @@ GoogleDrive::FileInfo* GoogleDrive::WalkFileInfo(const QString& path,
     return target;
 }
 
-QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
+QList<CloudServiceEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     // Ugh. Listing files in Google Drive is "different".
     // There can be many files with the same name, directories are just metadata
     // so we just list everything and then we turn it into a normal structure
@@ -263,7 +263,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     // First we need to find out the folder id.
     // Then we can list the actual folder.
 
-    QList<FileStoreEntry*> returning;
+    QList<CloudServiceEntry*> returning;
     // Trim some / if necssary.
     while (*path.end() == '/' && path.size() > 1) {
         path = path.remove(path.size() - 1, 1);
@@ -411,7 +411,7 @@ QList<FileStoreEntry*> GoogleDrive::readdir(QString path, QStringList &errors) {
     for (std::map<QString, QSharedPointer<FileInfo> >::iterator it =
              target->children.begin();
          it != target->children.end(); ++it) {
-        FileStoreEntry *add = newFileStoreEntry();
+        CloudServiceEntry *add = newCloudServiceEntry();
         // Google Drive just stores the file name.
         add->name = it->second->name;
         add->id = add->name;

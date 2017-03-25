@@ -84,7 +84,7 @@
 #include "SixCycle.h"
 #endif
 #include "LocalFileStore.h"
-#include "FileStore.h"
+#include "CloudService.h"
 
 // GUI Widgets
 #include "Tab.h"
@@ -2090,7 +2090,7 @@ MainWindow::uploadDropbox()
     // upload current ride, if we have one
     if (currentTab->context->ride) {
         Dropbox db(currentTab->context);
-        FileStore::upload(this, &db, currentTab->context->ride);
+        CloudService::upload(this, &db, currentTab->context->ride);
     }
 }
 
@@ -2098,7 +2098,7 @@ void
 MainWindow::syncDropbox()
 {
     Dropbox db(currentTab->context);
-    FileStoreSyncDialog upload(currentTab->context, &db);
+    CloudServiceSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 
@@ -2114,7 +2114,7 @@ MainWindow::uploadGoogleDrive()
             // the directory before we can upload to it. It's just how it is..
             gd.readdir(gd.home(), errors);
             if (errors.empty()) {
-                FileStore::upload(this, &gd, currentTab->context->ride);
+                CloudService::upload(this, &gd, currentTab->context->ride);
             }
         } // TODO(gille): How to bail properly?
     }
@@ -2124,7 +2124,7 @@ void
 MainWindow::syncGoogleDrive()
 {
     GoogleDrive gd(currentTab->context);
-    FileStoreSyncDialog upload(currentTab->context, &gd);
+    CloudServiceSyncDialog upload(currentTab->context, &gd);
     upload.exec();
 }
 
@@ -2136,7 +2136,7 @@ MainWindow::uploadSixCycle()
     // upload current ride, if we have one
     if (currentTab->context->ride) {
         SixCycle tp(currentTab->context);
-        FileStore::upload(this, &tp, currentTab->context->ride);
+        CloudService::upload(this, &tp, currentTab->context->ride);
     }
 }
 
@@ -2144,7 +2144,7 @@ void
 MainWindow::syncSixCycle()
 {
     SixCycle db(currentTab->context);
-    FileStoreSyncDialog upload(currentTab->context, &db);
+    CloudServiceSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 
@@ -2154,7 +2154,7 @@ MainWindow::uploadTodaysPlan()
     // upload current ride, if we have one
     if (currentTab->context->ride) {
         TodaysPlan tp(currentTab->context);
-        FileStore::upload(this, &tp, currentTab->context->ride);
+        CloudService::upload(this, &tp, currentTab->context->ride);
     }
 }
 
@@ -2162,7 +2162,7 @@ void
 MainWindow::syncTodaysPlan()
 {
     TodaysPlan db(currentTab->context);
-    FileStoreSyncDialog upload(currentTab->context, &db);
+    CloudServiceSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 #endif
@@ -2176,7 +2176,7 @@ MainWindow::uploadLocalFileStore()
     // upload current ride, if we have one
     if (currentTab->context->ride) {
         LocalFileStore db(currentTab->context);
-        FileStore::upload(this, &db, currentTab->context->ride);
+        CloudService::upload(this, &db, currentTab->context->ride);
     }
 }
 
@@ -2185,7 +2185,7 @@ MainWindow::syncLocalFileStore()
 {
     // upload current ride, if we have one
     LocalFileStore db(currentTab->context);
-    FileStoreSyncDialog upload(currentTab->context, &db);
+    CloudServiceSyncDialog upload(currentTab->context, &db);
     upload.exec();
 }
 

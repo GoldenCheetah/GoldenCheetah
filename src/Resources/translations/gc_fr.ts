@@ -9738,7 +9738,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <translation>fichier d&apos;activité compressé souhaité.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>Classe de base</translation>
     </message>
@@ -17595,7 +17595,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <translation>L&apos;écriture dans le dossier %1 à échouée</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>Stockage local </translation>
     </message>
