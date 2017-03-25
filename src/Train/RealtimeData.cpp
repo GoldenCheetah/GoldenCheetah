@@ -24,7 +24,7 @@
 RealtimeData::RealtimeData()
 {
     name[0] = '\0';
-	hr= watts= altWatts= speed= wheelRpm= load= slope = 0.0;
+    hr= watts= altWatts= speed= wheelRpm= load= slope= torque= 0.0;
 	cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
 	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;

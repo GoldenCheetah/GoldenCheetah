@@ -546,7 +546,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 
         // what kind if interval are we looking at ?
         RideFileInterval::IntervalType type = trees.key(root, static_cast<RideFileInterval::IntervalType>(-1));
-        bool isUser = interval->rideInterval != NULL;
+        //bool isUser = interval->rideInterval != NULL;
 
         activeInterval = interval;
         QMenu menu(intervalTree);

@@ -24,11 +24,11 @@
 #include <QColor>
 
 CompareInterval::CompareInterval(Context *context, QString name, RideFile *data, QColor color, Context *sourceContext, bool checked) :
-    context(context), name(name), data(data), color(color), sourceContext(sourceContext), checked(checked), cache(NULL)
+    context(context), name(name), rideItem(NULL), data(data), color(color), sourceContext(sourceContext), checked(checked),  cache(NULL)
 {
 }
 
-CompareInterval::CompareInterval() : context(NULL), data(NULL), sourceContext(NULL), checked(false), cache(NULL)
+CompareInterval::CompareInterval() : context(NULL), rideItem(NULL), data(NULL), sourceContext(NULL), checked(false),  cache(NULL)
 {
 }
 

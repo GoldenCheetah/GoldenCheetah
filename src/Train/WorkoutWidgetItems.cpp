@@ -592,7 +592,7 @@ WWMMPCurve::paint(QPainter *painter)
 
     // thin ?
     QPen linePen(GColor(CCP));
-    linePen.setWidth(0.5);
+    linePen.setWidth(1);
     painter->setPen(linePen);
 
     // join the dots

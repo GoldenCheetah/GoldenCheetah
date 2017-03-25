@@ -237,7 +237,7 @@ class TimeCarrying : public RideMetric {
 
     public:
 
-    TimeCarrying() : secsCarrying(0.0)
+    TimeCarrying() : secsCarrying(0.0), prevalt(0.0)
     {
         setSymbol("time_carrying");
         setInternalName("Time Carrying");

@@ -325,11 +325,6 @@ MUPlot::setModel(int model)
         fastCurve->setPen(pen);
         fastCurve->setBrush(brush);
 
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(QwtSymbol::Ellipse);
-        sym->setSize(4);
-        sym->setPen(QPen(Qt::yellow)); // customise ?
-        sym->setBrush(QBrush(Qt::yellow));
     }
 
     if (slowCurve) {

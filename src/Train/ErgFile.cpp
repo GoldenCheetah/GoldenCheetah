@@ -59,7 +59,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(nomode), context(context)
+ErgFile::ErgFile(Context *context) : mode(0), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());

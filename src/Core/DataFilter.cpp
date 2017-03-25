@@ -2948,5 +2948,5 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     default: // we don't need to evaluate any lower - they are leaf nodes handled above
         break;
     }
-    return Result(false);
+    return Result(0); // false
 }

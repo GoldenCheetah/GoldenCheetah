@@ -900,8 +900,7 @@ CPPlot::clearCurves()
 
     // rainbow labels
     if (allZoneLabels.size()) {
-        foreach (QwtPlotMarker *label, allZoneLabels)
-        delete label;
+        foreach (QwtPlotMarker *label, allZoneLabels) delete label;
         allZoneLabels.clear();
     }
 
@@ -1142,7 +1141,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // set samples
                 if (criticalSeries == CriticalPowerWindow::work) { // this is Energy mode
                     curve->setSamples(time.data() + low, work.data() + low, high - low + 1);
-                } if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+                } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
                     curve->setSamples(values + low, wprime.data() + low, high - low + 1);
                 } else {
                     curve->setSamples(time.data() + low, values + low, high - low + 1);
@@ -1923,7 +1922,8 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
     }
     referenceLines.clear();
 
-    if (!rideItem && !rideItem->ride()) return;
+    if (!rideItem) return;
+    if (!rideItem->ride()) return;
 
     // horizontal lines at reference points
     if (rideSeries == RideFile::aPower || rideSeries == RideFile::xPower || rideSeries == RideFile::NP || rideSeries == RideFile::watts  || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
@@ -2057,10 +2057,8 @@ CPPlot::plotCentile(RideItem *rideItem)
                 count++;
             }
             if (sum > 0) {
-                if (sum > 0) {
-                    double avg = sum / count;
-                    ride_centiles[i-1][slice]=avg;
-                }
+                double avg = sum / count;
+                ride_centiles[i-1][slice]=avg;
             } else {
                 ride_centiles[i-1][slice]=ride_centiles[i][slice];
             }

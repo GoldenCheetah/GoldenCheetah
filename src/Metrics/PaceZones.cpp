@@ -30,6 +30,7 @@
 #include <qcolor.h>
 #include <assert.h>
 #include <cmath>
+#include <float.h>
 
 
 // the infinity endpoints are indicated with extreme date ranges
@@ -720,16 +721,20 @@ QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor col
             double lo, hi;
             zoneInfo(rnum, zone, name, desc, lo, hi);
             if (zone % 2 == 0)
-                summary += "<tr bgcolor='" + color.name() + "'>"; else
-                summary += "<tr>"; summary += QString("<td align=\"center\">%1</td>").arg(name);
+                summary += "<tr bgcolor='" + color.name() + "'>";
+            else
+                summary += "<tr>";
+            summary += QString("<td align=\"center\">%1</td>").arg(name);
             summary += QString("<td align=\"center\">%1</td>").arg(desc);
             summary += QString("<td align=\"center\">%1</td>").arg(this->kphToPaceString(lo, metric));
-            if (hi == INT_MAX)
-                summary += "<td align=\"center\">MAX</td>"; else
+            if (hi == DBL_MAX)
+                summary += "<td align=\"center\">MAX</td>";
+            else
                 summary += QString("<td align=\"center\">%1</td>").arg(this->kphToPaceString(hi, metric));
-                summary += QString("<td align=\"center\">%1</td>").arg(time_to_string((unsigned) round(time_in_zone[zone])));
             summary += QString("<td align=\"center\">%1</td>")
-                       .arg((double)time_in_zone[zone]/duration * 100, 0, 'f', 0);
+                    .arg(time_to_string((unsigned) round(time_in_zone[zone])));
+            summary += QString("<td align=\"center\">%1</td>")
+                    .arg((double)time_in_zone[zone]/duration * 100, 0, 'f', 0);
             summary += "</tr>";
         }
     }
