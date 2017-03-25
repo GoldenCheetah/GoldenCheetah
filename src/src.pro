@@ -689,7 +689,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 }
 
 # cloud services
-HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/FileStore.h Cloud/LocalFileStore.h \
+HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h Cloud/LocalFileStore.h \
            Cloud/OAuthDialog.h Cloud/ShareDialog.h Cloud/SportPlusHealthUploader.h Cloud/TodaysPlanBodyMeasures.h \
            Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h
 
@@ -778,7 +778,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 }
 
 ## Cloud Services / Web resources
-SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/FileStore.cpp Cloud/LocalFileStore.cpp \
+SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp Cloud/LocalFileStore.cpp \
            Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp Cloud/SportPlusHealthUploader.cpp Cloud\TodaysPlanBodyMeasures.cpp \
            Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp
 

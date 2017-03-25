@@ -49,7 +49,7 @@
     } while(0)
 #endif
 
-TodaysPlan::TodaysPlan(Context *context) : FileStore(context), context(context), root_(NULL) {
+TodaysPlan::TodaysPlan(Context *context) : CloudService(context), context(context), root_(NULL) {
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
@@ -136,7 +136,7 @@ TodaysPlan::open(QStringList &errors)
             }
         }
         // we have a root
-        root_ = newFileStoreEntry();
+        root_ = newCloudServiceEntry();
 
         // path name
         root_->name = "/";
@@ -174,12 +174,12 @@ TodaysPlan::createFolder(QString)
     return false;
 }
 
-QList<FileStoreEntry*>
+QList<CloudServiceEntry*>
 TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
     printd("TodaysPlan::readdir(%s)\n", path.toStdString().c_str());
 
-    QList<FileStoreEntry*> returning;
+    QList<CloudServiceEntry*> returning;
 
     // do we have a token
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
@@ -272,7 +272,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             // lets look at that then
             for(int i=0; i<results.size(); i++) {
                 QJsonObject each = results.at(i).toObject();
-                FileStoreEntry *add = newFileStoreEntry();
+                CloudServiceEntry *add = newCloudServiceEntry();
 
                 // file details
                 QJsonObject fileindex = each["fileindex"].toObject();

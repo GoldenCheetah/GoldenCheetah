@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "FileStore.h"
+#include "CloudService.h"
 
 #include "Athlete.h"
 #include "RideCache.h"
@@ -45,35 +45,35 @@
 //
 
 // nothing doing in base class, for now
-FileStore::FileStore(Context *context) :
+CloudService::CloudService(Context *context) :
     uploadCompression(zip), downloadCompression(zip),
     filetype(JSON), useMetric(false), useEndDate(false), context(context)
 {
 }
 
 // clean up on delete
-FileStore::~FileStore()
+CloudService::~CloudService()
 {
-    foreach(FileStoreEntry *p, list_) delete p;
+    foreach(CloudServiceEntry *p, list_) delete p;
     list_.clear();
 }
 
 // get a new filestore entry
-FileStoreEntry *
-FileStore::newFileStoreEntry()
+CloudServiceEntry *
+CloudService::newCloudServiceEntry()
 {
-    FileStoreEntry *p = new FileStoreEntry();
+    CloudServiceEntry *p = new CloudServiceEntry();
     p->initial = true;
     list_ << p;
     return p;
 }
 
 bool
-FileStore::upload(QWidget *parent, FileStore *store, RideItem *item)
+CloudService::upload(QWidget *parent, CloudService *store, RideItem *item)
 {
 
     // open a dialog to do it
-    FileStoreUploadDialog uploader(parent, store, item);
+    CloudServiceUploadDialog uploader(parent, store, item);
     int ret = uploader.exec();
 
     // was it successfull ?
@@ -168,7 +168,7 @@ static QByteArray gUncompress(const QByteArray &data)
 }
 
 void
-FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
+CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
 {
     // compress via a temporary file
     QTemporaryFile tempfile;
@@ -222,7 +222,7 @@ FileStore::compressRide(RideFile*ride, QByteArray &data, QString name)
 
 // name is the source name (i.e. what it is called on the file store (xxxxx.json.zip)
 RideFile *
-FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
+CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 {
     // make sure its named as we expect
     if ((downloadCompression== zip && !name.endsWith(".json.zip")) ||
@@ -274,7 +274,7 @@ FileStore::uncompressRide(QByteArray *data, QString name, QStringList &errors)
 }
 
 QString
-FileStore::uploadExtension() {
+CloudService::uploadExtension() {
     QString spec;
     switch (filetype) {
         default:
@@ -293,7 +293,7 @@ FileStore::uploadExtension() {
     return spec;
 }
 
-FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item) : QDialog(parent), store(store), item(item)
+CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
 {
     // get a compressed version
     store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
@@ -339,7 +339,7 @@ FileStoreUploadDialog::FileStoreUploadDialog(QWidget *parent, FileStore *store, 
 }
 
 int
-FileStoreUploadDialog::exec()
+CloudServiceUploadDialog::exec()
 {
     if (status) return QDialog::exec();
     else {
@@ -349,7 +349,7 @@ FileStoreUploadDialog::exec()
 }
 
 void
-FileStoreUploadDialog::completed(QString file, QString message)
+CloudServiceUploadDialog::completed(QString file, QString message)
 {
     info->setText(file + "\n" + message);
     progress->setMaximum(1);
@@ -358,7 +358,7 @@ FileStoreUploadDialog::completed(QString file, QString message)
     connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-FileStoreDialog::FileStoreDialog(QWidget *parent, FileStore *store, QString title, QString pathname, bool dironly) :
+CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QString title, QString pathname, bool dironly) :
     QDialog(parent), store(store), title(title), pathname(pathname), dironly(dironly)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
@@ -424,20 +424,20 @@ FileStoreDialog::FileStoreDialog(QWidget *parent, FileStore *store, QString titl
 }
 
 void
-FileStoreDialog::returnPressed()
+CloudServiceDialog::returnPressed()
 {
     setPath(pathEdit->text());
 }
 
 // set path
 void 
-FileStoreDialog::setPath(QString path, bool refresh)
+CloudServiceDialog::setPath(QString path, bool refresh)
 {
     QStringList errors; // keep a track of errors
     QString pathing; // keeping a track of the path we have followed
 
     // get root
-    FileStoreEntry *fse = store->root();
+    CloudServiceEntry *fse = store->root();
 
     // is it NULL!?
     if (fse == NULL) return;
@@ -489,7 +489,7 @@ FileStoreDialog::setPath(QString path, bool refresh)
     setFiles(fse);
 }
 
-bool FileStoreDialog::eventFilter(QObject *obj, QEvent *evt)
+bool CloudServiceDialog::eventFilter(QObject *obj, QEvent *evt)
 {
     if (obj != this) return false;
 
@@ -507,14 +507,14 @@ bool FileStoreDialog::eventFilter(QObject *obj, QEvent *evt)
 }
 
 void 
-FileStoreDialog::folderSelectionChanged()
+CloudServiceDialog::folderSelectionChanged()
 {
     // is there a selected item?
     if (folders->selectedItems().count()) folderClicked(folders->selectedItems().first(), 0);
 }
 
 void
-FileStoreDialog::folderClicked(QTreeWidgetItem *item, int)
+CloudServiceDialog::folderClicked(QTreeWidgetItem *item, int)
 {
     // user clicked on a folder so set path
     int index = folders->invisibleRootItem()->indexOfChild(item);
@@ -525,7 +525,7 @@ FileStoreDialog::folderClicked(QTreeWidgetItem *item, int)
 }
 
 void 
-FileStoreDialog::fileDoubleClicked(QTreeWidgetItem*item, int)
+CloudServiceDialog::fileDoubleClicked(QTreeWidgetItem*item, int)
 {
     // try and set the path to the item double clicked
     if (pathname.endsWith("/")) setPath(pathname + item->text(0));
@@ -533,7 +533,7 @@ FileStoreDialog::fileDoubleClicked(QTreeWidgetItem*item, int)
 }
 
 void
-FileStoreDialog::setFolders(FileStoreEntry *fse)
+CloudServiceDialog::setFolders(CloudServiceEntry *fse)
 {
     // icons
     QFileIconProvider provider;
@@ -547,7 +547,7 @@ FileStoreDialog::setFolders(FileStoreEntry *fse)
     rootitem->setIcon(0, provider.icon(QFileIconProvider::Folder));
 
     // add each FOLDER from the list
-    foreach(FileStoreEntry *p, fse->children) {
+    foreach(CloudServiceEntry *p, fse->children) {
         if (p->isDir) {
             QTreeWidgetItem *item = new QTreeWidgetItem(folders);
             item->setText(0, p->name);
@@ -557,7 +557,7 @@ FileStoreDialog::setFolders(FileStoreEntry *fse)
 }
 
 void
-FileStoreDialog::setFiles(FileStoreEntry *fse)
+CloudServiceDialog::setFiles(CloudServiceEntry *fse)
 {
     // icons
     QFileIconProvider provider;
@@ -566,7 +566,7 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
     files->clear();
 
     // add each FOLDER from the list
-    foreach(FileStoreEntry *p, fse->children) {
+    foreach(CloudServiceEntry *p, fse->children) {
 
         QTreeWidgetItem *item = new QTreeWidgetItem(files);
 
@@ -594,7 +594,7 @@ FileStoreDialog::setFiles(FileStoreEntry *fse)
 }
 
 void
-FileStoreDialog::createFolderClicked()
+CloudServiceDialog::createFolderClicked()
 {
     FolderNameDialog dialog(this);
     int ret = dialog.exec();
@@ -629,7 +629,7 @@ FolderNameDialog::FolderNameDialog(QWidget *parent) : QDialog(parent)
     connect(create, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
-FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store) 
+CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *store)
     : QDialog(context->mainWindow, Qt::Dialog), context(context), store(store), downloading(false), aborted(false)
 {
     setWindowTitle(tr("Synchronise ") + store->name());
@@ -836,13 +836,13 @@ FileStoreSyncDialog::FileStoreSyncDialog(Context *context, FileStore *store)
 }
 
 void
-FileStoreSyncDialog::cancelClicked()
+CloudServiceSyncDialog::cancelClicked()
 {
     reject();
 }
 
 void
-FileStoreSyncDialog::refreshClicked()
+CloudServiceSyncDialog::refreshClicked()
 {
     progressLabel->setText(tr(""));
     progressBar->setMinimum(0);
@@ -1051,7 +1051,7 @@ FileStoreSyncDialog::refreshClicked()
                            .arg ( ride->dateTime.time().minute(), 2, 10, zero )
                            .arg ( ride->dateTime.time().second(), 2, 10, zero );
 
-        // check if on <FileStore> already
+        // check if on <CloudService> already
         if (uploadFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(true);
         else {
             exists->setChecked(Qt::Unchecked);
@@ -1085,7 +1085,7 @@ FileStoreSyncDialog::refreshClicked()
 }
 
 void
-FileStoreSyncDialog::tabChanged(int idx)
+CloudServiceSyncDialog::tabChanged(int idx)
 {
     if (downloadButton->text() == tr("Abort")) return;
 
@@ -1108,7 +1108,7 @@ FileStoreSyncDialog::tabChanged(int idx)
 
 
 void
-FileStoreSyncDialog::selectAllChanged(int state)
+CloudServiceSyncDialog::selectAllChanged(int state)
 {
     for (int i=0; i<rideListDown->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *curr = rideListDown->invisibleRootItem()->child(i);
@@ -1118,7 +1118,7 @@ FileStoreSyncDialog::selectAllChanged(int state)
 }
 
 void
-FileStoreSyncDialog::selectAllUpChanged(int state)
+CloudServiceSyncDialog::selectAllUpChanged(int state)
 {
     for (int i=0; i<rideListUp->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *curr = rideListUp->invisibleRootItem()->child(i);
@@ -1128,7 +1128,7 @@ FileStoreSyncDialog::selectAllUpChanged(int state)
 }
 
 void
-FileStoreSyncDialog::selectAllSyncChanged(int state)
+CloudServiceSyncDialog::selectAllSyncChanged(int state)
 {
     for (int i=0; i<rideListSync->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *curr = rideListSync->invisibleRootItem()->child(i);
@@ -1138,7 +1138,7 @@ FileStoreSyncDialog::selectAllSyncChanged(int state)
 }
 
 void
-FileStoreSyncDialog::refreshUpCount()
+CloudServiceSyncDialog::refreshUpCount()
 {
     int selected = 0;
 
@@ -1152,7 +1152,7 @@ FileStoreSyncDialog::refreshUpCount()
 }
 
 void
-FileStoreSyncDialog::refreshSyncCount()
+CloudServiceSyncDialog::refreshSyncCount()
 {
     int selected = 0;
 
@@ -1166,7 +1166,7 @@ FileStoreSyncDialog::refreshSyncCount()
 }
 
 void
-FileStoreSyncDialog::refreshCount()
+CloudServiceSyncDialog::refreshCount()
 {
     int selected = 0;
 
@@ -1180,7 +1180,7 @@ FileStoreSyncDialog::refreshCount()
 }
 
 void
-FileStoreSyncDialog::downloadClicked()
+CloudServiceSyncDialog::downloadClicked()
 {
     if (downloading == true) {
         rideListDown->setSortingEnabled(true);
@@ -1239,7 +1239,7 @@ FileStoreSyncDialog::downloadClicked()
 }
 
 bool
-FileStoreSyncDialog::syncNext()
+CloudServiceSyncDialog::syncNext()
 {
     // the actual download/upload is kicked off using the uploader / downloader
     // if in sync mode the completedRead / completedWrite functions
@@ -1318,7 +1318,7 @@ FileStoreSyncDialog::syncNext()
 }
 
 bool
-FileStoreSyncDialog::downloadNext()
+CloudServiceSyncDialog::downloadNext()
 {
     for (int i=listindex; i<rideListDown->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *curr = rideListDown->invisibleRootItem()->child(i);
@@ -1371,7 +1371,7 @@ FileStoreSyncDialog::downloadNext()
 }
 
 void
-FileStoreSyncDialog::completedRead(QByteArray *data, QString name, QString /*message*/)
+CloudServiceSyncDialog::completedRead(QByteArray *data, QString name, QString /*message*/)
 {
     QTreeWidget *which = sync ? rideListSync : rideListDown;
     int col = sync ? 7 : 5;
@@ -1415,7 +1415,7 @@ FileStoreSyncDialog::completedRead(QByteArray *data, QString name, QString /*mes
 }
 
 bool
-FileStoreSyncDialog::uploadNext()
+CloudServiceSyncDialog::uploadNext()
 {
     for (int i=listindex; i<rideListUp->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *curr = rideListUp->invisibleRootItem()->child(i);
@@ -1480,7 +1480,7 @@ FileStoreSyncDialog::uploadNext()
 }
 
 void
-FileStoreSyncDialog::completedWrite(QString, QString result)
+CloudServiceSyncDialog::completedWrite(QString, QString result)
 {
     QTreeWidget *which = sync ? rideListSync : rideListUp;
 
@@ -1505,7 +1505,7 @@ FileStoreSyncDialog::completedWrite(QString, QString result)
 }
 
 bool
-FileStoreSyncDialog::saveRide(RideFile *ride, QStringList &errors)
+CloudServiceSyncDialog::saveRide(RideFile *ride, QStringList &errors)
 {
     QDateTime ridedatetime = ride->startTime();
 

@@ -19,9 +19,9 @@
 #ifndef GC_LocalFileStore_h
 #define GC_LocalFileStore_h
 
-#include "FileStore.h"
+#include "CloudService.h"
 
-class LocalFileStore : public FileStore {
+class LocalFileStore : public CloudService {
 
     Q_OBJECT
 
@@ -49,12 +49,12 @@ class LocalFileStore : public FileStore {
         bool createFolder(QString path);
 
         // dirent style api
-        FileStoreEntry *root() { return root_; }
-        QList<FileStoreEntry*> readdir(QString path, QStringList &errors);
+        CloudServiceEntry *root() { return root_; }
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors);
 
     private:
         Context *context;
-        FileStoreEntry *root_;
+        CloudServiceEntry *root_;
 
 };
 #endif

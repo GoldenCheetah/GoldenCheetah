@@ -23,7 +23,7 @@
 #include <QJsonObject>
 #include <QByteArray>
 
-Dropbox::Dropbox(Context *context) : FileStore(context), context(context), root_(NULL) {
+Dropbox::Dropbox(Context *context) : CloudService(context), context(context), root_(NULL) {
     nam = new QNetworkAccessManager(this);
 }
 
@@ -68,7 +68,7 @@ Dropbox::open(QStringList &errors)
     if (parseError.error == QJsonParseError::NoError) {
 
         // we have a root
-        root_ = newFileStoreEntry();
+        root_ = newCloudServiceEntry();
 
         // path name
         root_->name = document.object()["path"].toString();
@@ -125,10 +125,10 @@ bool Dropbox::createFolder(QString path)
     return (reply->error() == QNetworkReply::NoError);
 }
 
-QList<FileStoreEntry*> 
+QList<CloudServiceEntry*> 
 Dropbox::readdir(QString path, QStringList &errors)
 {
-    QList<FileStoreEntry*> returning;
+    QList<CloudServiceEntry*> returning;
 
     // do we have a token
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
@@ -166,7 +166,7 @@ Dropbox::readdir(QString path, QStringList &errors)
         for(int i=0; i<contents.size(); i++) {
 
             QJsonValue each = contents.at(i);
-            FileStoreEntry *add = newFileStoreEntry();
+            CloudServiceEntry *add = newCloudServiceEntry();
 
             //dropbox has full path, we just want the file name
             add->name = QFileInfo(each.toObject()["path"].toString()).fileName();

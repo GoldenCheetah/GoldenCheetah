@@ -516,7 +516,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 #endif
 
     //////////////////////////////////////////////////
-    // Local FileStore
+    // Local CloudService
 
 
     QLabel *nfs = new QLabel(tr("Shared Local Folder"));
@@ -528,7 +528,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     networkFileStoreFolder = new QLineEdit(this);
     networkFileStoreFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString());
     networkFileStoreFolderBrowse = new QPushButton(tr("Browse"));
-    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseLocalFileStoreFolder()));
+    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseLocalCloudServiceFolder()));
     QHBoxLayout *nwfsfchoose = new QHBoxLayout;
     nwfsfchoose->addWidget(networkFileStoreFolder);
     nwfsfchoose->addWidget(networkFileStoreFolderBrowse);
@@ -965,7 +965,7 @@ void CredentialsPage::chooseDropboxFolder()
         path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER,
                                    "/").toString();
     }
-    FileStoreDialog dialog(this, &dropbox, tr("Choose Athlete Directory"), path, true);
+    CloudServiceDialog dialog(this, &dropbox, tr("Choose Athlete Directory"), path, true);
     int ret = dialog.exec();
 
     // did we actually select something?
@@ -993,7 +993,7 @@ void CredentialsPage::chooseGoogleDriveFolder()
             context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "/").toString();
         // At this point there just might be a google drive instance around?
     }
-    FileStoreDialog dialog(this, &google_drive, tr("Choose Athlete Directory"),
+    CloudServiceDialog dialog(this, &google_drive, tr("Choose Athlete Directory"),
                            path, true);
     int ret = dialog.exec();
 

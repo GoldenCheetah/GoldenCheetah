@@ -8367,7 +8367,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
         <translation>Verwachtte een gecomprimeerd activiteit bestand.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>Basis class</translation>
     </message>
@@ -15378,7 +15378,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Schrijven naar Map %1 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>Lokale Opslag</translation>
     </message>

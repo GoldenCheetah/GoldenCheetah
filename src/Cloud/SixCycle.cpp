@@ -49,14 +49,14 @@
     } while(0)
 #endif
 
-SixCycle::SixCycle(Context *context) : FileStore(context), context(context), root_(NULL) {
+SixCycle::SixCycle(Context *context) : CloudService(context), context(context), root_(NULL) {
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     // how is data uploaded and downloaded?
     uploadCompression = gzip;
     downloadCompression = none;
-    filetype = FileStore::uploadType::TCX;
+    filetype = CloudService::uploadType::TCX;
 
     session_token = ""; // not authenticated yet
 
@@ -138,7 +138,7 @@ SixCycle::open(QStringList &errors)
         printd("session user: %s\n", session_user.toStdString().c_str());
 
         // set root (there is no directory concept for SixCycle)
-        root_ = newFileStoreEntry();
+        root_ = newCloudServiceEntry();
 
         // path name
         root_->name = "/";
@@ -182,12 +182,12 @@ SixCycle::createFolder(QString)
     return false;
 }
 
-QList<FileStoreEntry*>
+QList<CloudServiceEntry*>
 SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
     printd("Sixcycle::readdir(%s)\n", path.toStdString().c_str());
 
-    QList<FileStoreEntry*> returning;
+    QList<CloudServiceEntry*> returning;
     if (session_token == "") {
         errors << tr("You must authenticate with Sixcycle first");
         return returning;
@@ -253,7 +253,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
         for(int i=0; i<results.size(); i++) {
 
             QJsonObject each = results.at(i).toObject();
-            FileStoreEntry *add = newFileStoreEntry();
+            CloudServiceEntry *add = newCloudServiceEntry();
 
             //SixCycle has full path, we just want the file name
             add->id = each["url"].toString();

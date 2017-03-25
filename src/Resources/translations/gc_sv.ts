@@ -8588,7 +8588,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
         <translation>komprimerad träningspassfil förväntades.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/FileStore.h" line="63"/>
+        <location filename="../../Cloud/CloudService.h" line="63"/>
         <source>Base class</source>
         <translation>Bas klass</translation>
     </message>
@@ -15760,7 +15760,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
         <translation>Skrivning i mappen %1 gick fel</translation>
     </message>
     <message>
-        <location filename="../../Cloud/LocalFileStore.h" line="33"/>
+        <location filename="../../Cloud/LocalCloudService.h" line="33"/>
         <source>Local Store </source>
         <translation>Lokal Lagring </translation>
     </message>

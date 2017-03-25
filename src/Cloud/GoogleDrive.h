@@ -19,7 +19,7 @@
 #ifndef GC_GOOGLE_DRIVE_H
 #define GC_GOOGLE_DRIVE_H
 
-#include "FileStore.h"
+#include "CloudService.h"
 
 #include <QBuffer>
 #include <QMap>
@@ -30,7 +30,7 @@
 #include <QSharedPointer>
 #include <QString>
 
-class GoogleDrive : public FileStore {
+class GoogleDrive : public CloudService {
 
     Q_OBJECT
 
@@ -57,11 +57,11 @@ class GoogleDrive : public FileStore {
         virtual bool createFolder(QString path);
 
         // dirent style api
-        virtual FileStoreEntry *root() { return root_; }
+        virtual CloudServiceEntry *root() { return root_; }
         // Readdir reads the files from the remote side and updates root_dir_
         // with a local cache. readdir will read ALL files and refresh
         // everything.
-        virtual QList<FileStoreEntry*> readdir(
+        virtual QList<CloudServiceEntry*> readdir(
             QString path, QStringList &errors);
 
         static QString GetScope(Context* context);
@@ -105,7 +105,7 @@ class GoogleDrive : public FileStore {
 
         Context *context_;
         QNetworkAccessManager *nam_;
-        FileStoreEntry *root_;
+        CloudServiceEntry *root_;
         QString root_directory_id_;
         QScopedPointer<FileInfo> root_dir_;
 

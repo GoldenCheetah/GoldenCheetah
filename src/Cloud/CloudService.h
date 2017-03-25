@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GC_FileStore_h
-#define GC_FileStore_h
+#ifndef GC_CloudService_h
+#define GC_CloudService_h
 
 #include <QList>
 #include <QMap>
@@ -38,15 +38,16 @@
 
 #include "Context.h"
 
-// A filestore is a base class for working with data stores
+// A CloudService is a base class for working with cloud services
+// and for historic reasons local file stores too
 // we want to sync or backup to. The initial version is to support
 // working with Dropbox but could be extended to support other
 // stores including Google, Microsoft "cloud" storage or even
 // to sync / backup to a pen drive or similar
 
-class FileStoreEntry;
 class RideItem;
-class FileStore : public QObject {
+class CloudServiceEntry;
+class CloudService : public QObject {
 
     Q_OBJECT
 
@@ -56,8 +57,8 @@ class FileStore : public QObject {
         // TYPE OF FILESTORE. SEE Dropbox.{h,cpp}
         // FOR A REFERENCE IMPLEMENTATION THE
 
-        FileStore(Context *context);
-        virtual ~FileStore();
+        CloudService(Context *context);
+        virtual ~CloudService();
 
         // The following must be reimplemented
         virtual QString name() { return (tr("Base class")); }
@@ -87,11 +88,11 @@ class FileStore : public QObject {
         // we use a dirent style API for traversing
         // root - get me the root of the store
         // readdir - get me the contents of a path
-        virtual FileStoreEntry *root() { return NULL; }
-        virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors) { 
-            Q_UNUSED(path); errors << "not implemented."; return QList<FileStoreEntry*>(); 
+        virtual CloudServiceEntry *root() { return NULL; }
+        virtual QList<CloudServiceEntry*> readdir(QString path, QStringList &errors) {
+            Q_UNUSED(path); errors << "not implemented."; return QList<CloudServiceEntry*>();
         }
-        virtual QList<FileStoreEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to) {
+        virtual QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to) {
             Q_UNUSED(from);
             Q_UNUSED(to);
             return readdir(path, errors);
@@ -105,7 +106,7 @@ class FileStore : public QObject {
         QString uploadExtension();
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
-        static bool upload(QWidget *parent, FileStore *store, RideItem*);
+        static bool upload(QWidget *parent, CloudService *store, RideItem*);
 
         enum compression { none, zip, gzip };
         typedef enum compression CompressionType;
@@ -114,7 +115,7 @@ class FileStore : public QObject {
         CompressionType downloadCompression;
         enum uploadType { JSON, TCX, PWX, FIT } filetype;
 
-        bool useMetric; // FileStore know distance or duration metadata (eg Today's Plan)
+        bool useMetric; // CloudService know distance or duration metadata (eg Today's Plan)
         bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)
 
     signals:
@@ -127,9 +128,9 @@ class FileStore : public QObject {
         // we manage them in the file store so you
         // don't have to. When the filestore is deleted
         // these entries are deleted too
-        FileStoreEntry *newFileStoreEntry();
+        CloudServiceEntry *newCloudServiceEntry();
         QMap<QNetworkReply*,QString> replymap_;
-        QList<FileStoreEntry*> list_;
+        QList<CloudServiceEntry*> list_;
 
     private:
         Context *context;
@@ -139,13 +140,13 @@ class FileStore : public QObject {
 // UPLOADER dialog to upload a single rideitem to the file
 //          store. Typically as a quick ^U type operation or
 //          via a MainWindow menu option
-class FileStoreUploadDialog : public QDialog
+class CloudServiceUploadDialog : public QDialog
 {
 
     Q_OBJECT
 
     public:
-        FileStoreUploadDialog(QWidget *parent, FileStore *store, RideItem *item);
+        CloudServiceUploadDialog(QWidget *parent, CloudService *store, RideItem *item);
 
         QLabel *info;               // how much being uploaded / status
         QProgressBar *progress;     // whilst we wait
@@ -156,20 +157,20 @@ class FileStoreUploadDialog : public QDialog
         void completed(QString name, QString message);
 
     private:
-        FileStore *store;
+        CloudService *store;
         RideItem *item;
         QByteArray data;            // compressed data to upload
         bool status;                // did upload get kicked off ok?
 };
 
 // XXX a better approach might be to reimplement QFileSystemModel on 
-// a FileStore and use the standard file dialogs instead. XXX
-class FileStoreDialog : public QDialog
+// a CloudService and use the standard file dialogs instead. XXX
+class CloudServiceDialog : public QDialog
 {
     Q_OBJECT
 
     public:
-        FileStoreDialog(QWidget *parent, FileStore *store, QString title, QString pathname, bool dironly=false);
+        CloudServiceDialog(QWidget *parent, CloudService *store, QString title, QString pathname, bool dironly=false);
         QString pathnameSelected() { return pathname; }
 
     public slots:
@@ -189,8 +190,8 @@ class FileStoreDialog : public QDialog
         void setPath(QString path, bool refresh=false);
 
         // set the folder or files list
-        void setFolders(FileStoreEntry *fse);
-        void setFiles(FileStoreEntry *fse);
+        void setFolders(CloudServiceEntry *fse);
+        void setFiles(CloudServiceEntry *fse);
 
         // create a folder
         void createFolderClicked();
@@ -205,7 +206,7 @@ class FileStoreDialog : public QDialog
         QPushButton *open;     // open the selected "file"
         QPushButton *create;   // create a folder
 
-        FileStore *store;
+        CloudService *store;
         QString title;
         QString pathname;
         bool dironly;
@@ -227,14 +228,14 @@ class FolderNameDialog : public QDialog
 //
 // The Sync Dialog
 //
-class FileStoreSyncDialog : public QDialog
+class CloudServiceSyncDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT
 
 
     public:
-        FileStoreSyncDialog(Context *context, FileStore *store);
+        CloudServiceSyncDialog(Context *context, CloudService *store);
 	
     public slots:
 
@@ -253,8 +254,8 @@ class FileStoreSyncDialog : public QDialog
         void completedWrite(QString name,QString message);
     private:
         Context *context;
-        FileStore *store;
-        QList<FileStoreEntry*> workouts;
+        CloudService *store;
+        QList<CloudServiceEntry*> workouts;
 
         bool downloading;
         bool sync;
@@ -313,7 +314,7 @@ class FileStoreSyncDialog : public QDialog
 };
 
 // Representing a File or Folder
-class FileStoreEntry
+class CloudServiceEntry
 {
     public:
 
@@ -332,8 +333,8 @@ class FileStoreEntry
         //QMap<QString, QString> metadata;
         // THESE MEMBERS ARE MAINTAINED BY THE 
         // FILESTORE BASE IMPLEMENTATION
-        FileStoreEntry *parent;             // parent directory, NULL for root.
-        QList<FileStoreEntry *> children;   // parent directory, NULL for root.
+        CloudServiceEntry *parent;             // parent directory, NULL for root.
+        QList<CloudServiceEntry *> children;   // parent directory, NULL for root.
         bool initial;                       // haven't scanned for children yet.
 
         // find the index of a child, return -1 if not found
