@@ -20,6 +20,7 @@
 #include "Athlete.h"
 #include "MainWindow.h"
 #include "Settings.h"
+#include "CloudService.h"
 #include "TrainDB.h"
 #include "Colors.h"
 #include "GcUpgrade.h"
@@ -384,6 +385,9 @@ main(int argc, char *argv[])
     appsettings->setValue(GC_FONT_CHARTLABELS, font.toString());
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, font.pointSizeF());
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
+
+    // what filestores are registered (whilst we refactor)
+    qDebug()<<"Cloud services registered:"<<CloudServiceFactory::instance().serviceNames();
 
     //
     // OPEN FIRST MAINWINDOW

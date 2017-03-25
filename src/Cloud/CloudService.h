@@ -61,7 +61,25 @@ class CloudService : public QObject {
         virtual ~CloudService();
 
         // The following must be reimplemented
-        virtual QString name() { return (tr("Base class")); }
+        virtual bool initialize() { return true; }
+
+        // factory only has services for a NULL context, so we always
+        // clone for the context its used in before doing anything - including config
+        virtual CloudService *clone(Context *) = 0;
+
+        // name of service, but should NOT be translated - it is the symbol
+        // that represents the website, so likely to just be the URL simplified
+        // e.g. https://www.strava.com => "Strava"
+        virtual QString name() { return "NONE"; }
+
+        // register with capabilities of the service - emerging standard
+        // is a service that allows oauth, query and upload as well as download
+        enum { OAuth=0x01, UserPass=0x02, Upload=0x04, Download=0x08, Query=0x10} capa_;
+        virtual int capabilities() { return OAuth | Upload | Download | Query; }
+
+        // register with type of service
+        enum { Activities=0x01, Measures=0x02, Calendar=0x04 } type_;
+        virtual int type() { return Activities; }
 
         // open/connect and close/disconnect
         virtual bool open(QStringList &errors) { Q_UNUSED(errors); return false; }
@@ -132,7 +150,6 @@ class CloudService : public QObject {
         QMap<QNetworkReply*,QString> replymap_;
         QList<CloudServiceEntry*> list_;
 
-    private:
         Context *context;
         
 };
@@ -351,4 +368,51 @@ class CloudServiceEntry
             else return -1;
         }
 };
+
+// all cloud services register at startup and can be accessed by name
+// which is typically the website name e.g. "Todays Plan"
+class CloudServiceFactory {
+
+    static CloudServiceFactory *instance_;
+    QHash<QString,CloudService*> services_;
+    QStringList names_;
+
+    public:
+
+    // get the instance
+    static CloudServiceFactory &instance() {
+        if (!instance_) instance_ = new CloudServiceFactory();
+        return *instance_;
+    }
+
+    // how many services
+    int serviceCount() const { return names_.size(); }
+    QHash<QString,CloudService*> serviceHash() const { return services_; }
+
+    void initialize() {
+        foreach(const QString &service, services_.keys())
+            services_[service]->initialize();
+    }
+
+    const QStringList &serviceNames() const { return names_; }
+    const CloudService *service(QString name) const { return services_.value(name, NULL); }
+
+    CloudService *newService(const QString &name, Context *context) const {
+        return services_.value(name)->clone(context);
+    }
+
+    bool addService(CloudService *service) {
+
+        // duplicates not welcome
+        if(names_.contains(service->name())) return false;
+
+        // register - but must never use, since it has a NULL context
+        services_.insert(service->name(), service);
+        names_.append(service->name());
+
+        return true;
+    }
+
+};
+
 #endif

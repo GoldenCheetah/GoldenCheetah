@@ -36,6 +36,7 @@ class GoogleDrive : public CloudService {
 
     public:
         GoogleDrive(Context *context);
+        CloudService *clone(Context *context) { return new GoogleDrive(context); }
         virtual ~GoogleDrive();
 
         virtual QString name() { return (tr("Google Drive Cloud Storage")); }

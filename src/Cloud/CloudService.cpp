@@ -41,8 +41,10 @@
 #endif
 
 //
-// FILESTORE BASE CLASS
+// CLOUDSERVICE BASE CLASS
 //
+
+CloudServiceFactory *CloudServiceFactory::instance_;
 
 // nothing doing in base class, for now
 CloudService::CloudService(Context *context) :

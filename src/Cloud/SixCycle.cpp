@@ -49,9 +49,12 @@
     } while(0)
 #endif
 
-SixCycle::SixCycle(Context *context) : CloudService(context), context(context), root_(NULL) {
-    nam = new QNetworkAccessManager(this);
-    connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+SixCycle::SixCycle(Context *context) : CloudService(context), context(context), root_(NULL)
+{
+    if (context) {
+        nam = new QNetworkAccessManager(this);
+        connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    }
 
     // how is data uploaded and downloaded?
     uploadCompression = gzip;
@@ -65,7 +68,7 @@ SixCycle::SixCycle(Context *context) : CloudService(context), context(context), 
 }
 
 SixCycle::~SixCycle() {
-    delete nam;
+    if (context) delete nam;
 }
 
 void
@@ -456,3 +459,10 @@ SixCycle::readFileCompleted()
     // process it then ........
     notifyReadComplete(buffers.value(reply), name, tr("Completed."));
 }
+
+static bool addSixCycle() {
+    CloudServiceFactory::instance().addService(new SixCycle(NULL));
+    return true;
+}
+
+static bool add = addSixCycle();

@@ -30,6 +30,7 @@ class TodaysPlan : public CloudService {
     public:
 
         TodaysPlan(Context *context);
+        CloudService *clone(Context *context) { return new TodaysPlan(context); }
         ~TodaysPlan();
 
         QString name() { return (tr("Today's Plan")); }
