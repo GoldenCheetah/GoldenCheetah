@@ -148,7 +148,7 @@ public:
         setIndexes();
 
         connect(model, SIGNAL(modelReset()), this, SLOT(sourceModelChanged()));
-        connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(sourceDataChanged(QModelIndex, QModelIndex)));
+        connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SIGNAL(dataChanged(QModelIndex, QModelIndex)));
         connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(sourceModelChanged()));
         connect(model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(sourceModelChanged()));
         connect(model, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(sourceModelChanged()));
@@ -583,10 +583,6 @@ public:
     }
 
 public slots:
-
-    void sourceDataChanged(QModelIndex x, QModelIndex y) {
-        emit dataChanged(x,y,QVector<int>());
-    }
 
     void sourceModelChanged() {
 
