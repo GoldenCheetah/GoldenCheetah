@@ -53,6 +53,9 @@ public:
     bool operator< (BodyMeasure right) const {
         return (when < right.when);
     }
+    // calculate a CRC for the BodyMeasure data - used to see if
+    // data is changed in Configuration pages
+    quint16 getFingerprint() const;
 };
 
 class BodyMeasureParser  {

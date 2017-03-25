@@ -26,6 +26,25 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+quint16
+BodyMeasure::getFingerprint() const
+{
+    quint64 x = 0;
+
+    x += when.date().toJulianDay();
+    x += weightkg;
+    x += fatkg;
+    x += musclekg;
+    x += boneskg;
+    x += leankg;
+    x += fatpercent;
+
+    QByteArray ba = QByteArray::number(x);
+    ba.append(comment);
+
+    return qChecksum(ba, ba.length());
+}
+
 bool
 BodyMeasureParser::serialize(QString filename, QList<BodyMeasure> &data) {
 
