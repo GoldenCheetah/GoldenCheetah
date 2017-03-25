@@ -183,7 +183,7 @@ RideFile::updateDataTag()
     else flags += '-';
     if (areDataPresent()->rcontact ||
         areDataPresent()->rvert ||
-        areDataPresent()->rcontact) flags += 'R'; // R is for running dynamics
+        areDataPresent()->rcad) flags += 'R'; // R is for running dynamics
     else flags += '-';
     setTag("Data", flags);
 }

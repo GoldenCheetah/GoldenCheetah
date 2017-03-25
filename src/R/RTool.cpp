@@ -2996,9 +2996,6 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
     pAll = Rf_coerceVector(pAll, LGLSXP);
     bool all = LOGICAL(pAll)[0];
 
-    // get the currently selected date range
-    DateRange range(rtool->context->currentDateRange());
-
     // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
     pMetric = Rf_coerceVector(pMetric, STRSXP);
     QString metric (CHAR(STRING_ELT(pMetric,0)));
@@ -3006,6 +3003,9 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
     // return a dataframe with PMC data for all or the current season
     // XXX uses the default half-life
     if (rtool->context) {
+
+        // get the currently selected date range
+        DateRange range(rtool->context->currentDateRange());
 
         // convert the name to a symbol, if not found just leave as it is
         const RideMetricFactory &factory = RideMetricFactory::instance();

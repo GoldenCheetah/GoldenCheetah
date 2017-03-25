@@ -225,6 +225,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     // fail early to tell devs whats wrong with file
     if( in.status() != QDataStream::Ok ){
         errorStrings << QString("failed to read block headers" );
+        delete[] blockhdrs;
         return NULL;
     }
 
@@ -236,6 +237,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     // fail early to tell devs whats wrong with file
     if( in.status() != QDataStream::Ok ){
         errorStrings << QString("failed to read calibration data" );
+        delete[] blockhdrs;
         return NULL;
     }
 
@@ -353,6 +355,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
     if( result->dataPoints().size() < 1 ){
         errorStrings << QString("file contains no data points");
+        delete[] blockhdrs;
         return NULL;
     }
 
@@ -378,6 +381,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     }
 
     file.close();
+    delete[] blockhdrs;
     return result;
 }
 

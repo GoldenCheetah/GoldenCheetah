@@ -6522,8 +6522,8 @@ AutoImportPage::saveClicked()
 void
 AutoImportPage::addRuleTypes(QComboBox *p) {
 
-    RideAutoImportRule* config = new RideAutoImportRule();
-    QList<QString> descriptions = config->getRuleDescriptions();
+    RideAutoImportRule config;
+    QList<QString> descriptions = config.getRuleDescriptions();
 
     foreach(QString description, descriptions) {
            p->addItem(description);

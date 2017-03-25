@@ -676,7 +676,7 @@ HomeWindow::addChart(GcChartWindow* newone)
                 if (newwidth < minWidth) newwidth = minWidth;
                 newone->setFixedWidth(newwidth);
                 if (newheight < minHeight) newheight = minHeight;
-                else newone->setFixedHeight(newheight);
+                newone->setFixedHeight(newheight);
                 newone->setContentsMargins(0,15*dpiYFactor,0,0);
                 newone->setResizable(true); // we need to show on tab selection!
 
@@ -815,7 +815,7 @@ HomeWindow::resizeEvent(QResizeEvent * /* e */)
             if (newwidth < minWidth) newwidth = minWidth;
             x->setFixedWidth(newwidth);
             if (newheight < minHeight) newheight = minHeight;
-            else x->setFixedHeight(newheight);
+            x->setFixedHeight(newheight);
             }
             break;
 
