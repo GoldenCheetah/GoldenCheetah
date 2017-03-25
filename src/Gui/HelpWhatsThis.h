@@ -151,6 +151,7 @@ Q_OBJECT
                  Preferences_Athlete_TrainingZones_HR,
                  Preferences_Athlete_TrainingZones_Pace,
                  Preferences_Athlete_Autoimport,
+                 Preferences_Athlete_Backup,
                  Preferences_Passwords,
                  Preferences_Appearance,
                  Preferences_Intervals,
