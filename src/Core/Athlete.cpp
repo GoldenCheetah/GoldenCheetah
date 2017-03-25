@@ -168,7 +168,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     routes = new Routes(context, home->config());
 
     // get body measures if the file exists
-    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->activities().canonicalPath()));
+    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()));
     if (bmFile.exists()) {
         QList<BodyMeasure> bmData;
         if (BodyMeasureParser::unserialize(bmFile, bmData)){
@@ -519,12 +519,12 @@ Athlete::getBodyMeasure(QDate date, int type)
     switch(type) {
 
         default:
-        case BODY_WEIGHT_KG : return weight.weightkg;
-        case BODY_WEIGHT_FAT_KG : return weight.fatkg;
-        case BODY_WEIGHT_MUSCLE_KG : return weight.musclekg;
-        case BODY_WEIGHT_BONES_KG : return weight.boneskg;
-        case BODY_WEIGHT_LEAN_KG : return weight.leankg;
-        case BODY_WEIGHT_FAT_PERCENT : return weight.fatpercent;
+        case BodyMeasure::WeightKg : return weight.weightkg;
+        case BodyMeasure::FatKg : return weight.fatkg;
+        case BodyMeasure::MuscleKg : return weight.musclekg;
+        case BodyMeasure::BonesKg : return weight.boneskg;
+        case BodyMeasure::LeanKg : return weight.leankg;
+        case BodyMeasure::FatPercent : return weight.fatpercent;
     }
 }
 

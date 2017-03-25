@@ -195,6 +195,7 @@ WithingsDownload::parse(QString text, QStringList &errors, QList<BodyMeasure> &b
             w.fatkg = r.fatkg;
             w.leankg = r.leankg;
             w.fatpercent = r.fatpercent;
+            w.source = BodyMeasure::Withings;
             bodyMeasures.append(w);
         }
     }
