@@ -68,6 +68,8 @@ class TodaysPlan : public CloudService {
         void readyRead(); // a readFile operation has work to do
         void readFileCompleted();
 
+        void rideSaved(RideItem* ride);
+
         // sending data
         void writeFileCompleted();
 
@@ -80,6 +82,12 @@ class TodaysPlan : public CloudService {
         QMap<QNetworkReply*, QByteArray*> buffers;
 
         QString userId;
+
+        QMap<QString, QJsonObject> replyActivity;
+
+        RideFile *sendedRide;
+
+        void rideSend(QString remotename);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
