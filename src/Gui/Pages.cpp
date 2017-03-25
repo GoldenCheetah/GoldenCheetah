@@ -528,7 +528,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     networkFileStoreFolder = new QLineEdit(this);
     networkFileStoreFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString());
     networkFileStoreFolderBrowse = new QPushButton(tr("Browse"));
-    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseLocalCloudServiceFolder()));
+    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseLocalFileStoreFolder()));
     QHBoxLayout *nwfsfchoose = new QHBoxLayout;
     nwfsfchoose->addWidget(networkFileStoreFolder);
     nwfsfchoose->addWidget(networkFileStoreFolderBrowse);
@@ -1310,28 +1310,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
     connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
 
-
-    //
-    // Auto Backup
-    //
-    // Selecting the storage folder folder of the Local File Store
-    QLabel *autoBackupFolderLabel = new QLabel(tr("Auto Backup Folder"));
-    autoBackupFolder = new QLineEdit(this);
-    autoBackupFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString());
-    autoBackupFolderBrowse = new QPushButton(tr("Browse"));
-    connect(autoBackupFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseAutoBackupFolder()));
-    autoBackupPeriod = new QSpinBox(this);
-    autoBackupPeriod->setMinimum(0);
-    autoBackupPeriod->setMaximum(9999);
-    autoBackupPeriod->setSingleStep(1);
-    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup execution every"));
-    autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
-    QLabel *autoBackupUnitLabel = new QLabel(tr("times the athlete is closed - 0 means never"));
-    QHBoxLayout *backupInput = new QHBoxLayout();
-    backupInput->addWidget(autoBackupPeriod);
-    //backupInput->addStretch();
-    backupInput->addWidget(autoBackupUnitLabel);
-
     //
     // W'bal Tau
     //
@@ -1381,11 +1359,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     grid->addWidget(crankLengthCombo, 4, 1, alignment);
     grid->addWidget(wheelSizeLabel, 5, 0, alignment);
     grid->addLayout(wheelSizeLayout, 5, 1, 1, 2, alignment);
-    grid->addWidget(autoBackupFolderLabel, 7,0, alignment);
-    grid->addWidget(autoBackupFolder, 7, 1, alignment);
-    grid->addWidget(autoBackupFolderBrowse, 7, 2, alignment);
-    grid->addWidget(autoBackupPeriodLabel, 8, 0,alignment);
-    grid->addLayout(backupInput, 8, 1, alignment);
 
     grid->addWidget(wbaltaulabel, 9, 0, alignment);
     grid->addWidget(wbaltau, 9, 1, alignment);
@@ -1443,17 +1416,6 @@ AboutRiderPage::chooseAvatar()
     }
 }
 
-void AboutRiderPage::chooseAutoBackupFolder()
-{
-    // did the user type something ? if not, get it from the Settings
-    QString path = autoBackupFolder->text();
-    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString();
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Directory"),
-                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") autoBackupFolder->setText(dir);  //only overwrite current dir, if a new was selected
-
-}
-
 void
 AboutRiderPage::calcWheelSize()
 {
@@ -1483,10 +1445,6 @@ AboutRiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
     appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
 
-    // Auto Backup
-    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, autoBackupPeriod->value());
-
     // W'bal Tau
     appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
@@ -1513,6 +1471,69 @@ AboutRiderPage::saveClicked()
         state += CONFIG_PMC;
 
     return state;
+}
+
+BackupPage::BackupPage(Context *context) : context(context)
+{
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+#ifdef Q_OS_MAX
+    setContentsMargins(10,10,10,10);
+    grid->setSpacing(5 *dpiXFactor);
+    all->setSpacing(5 *dpiXFactor);
+#endif
+
+    //
+    // Auto Backup
+    //
+    // Selecting the storage folder folder of the Local File Store
+    QLabel *autoBackupFolderLabel = new QLabel(tr("Auto Backup Folder"));
+    autoBackupFolder = new QLineEdit(this);
+    autoBackupFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString());
+    autoBackupFolderBrowse = new QPushButton(tr("Browse"));
+    connect(autoBackupFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseAutoBackupFolder()));
+    autoBackupPeriod = new QSpinBox(this);
+    autoBackupPeriod->setMinimum(0);
+    autoBackupPeriod->setMaximum(9999);
+    autoBackupPeriod->setSingleStep(1);
+    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup execution every"));
+    autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
+    QLabel *autoBackupUnitLabel = new QLabel(tr("times the athlete is closed - 0 means never"));
+    QHBoxLayout *backupInput = new QHBoxLayout();
+    backupInput->addWidget(autoBackupPeriod);
+    //backupInput->addStretch();
+    backupInput->addWidget(autoBackupUnitLabel);
+
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
+    grid->addWidget(autoBackupFolderLabel, 7,0, alignment);
+    grid->addWidget(autoBackupFolder, 7, 1, alignment);
+    grid->addWidget(autoBackupFolderBrowse, 7, 2, alignment);
+    grid->addWidget(autoBackupPeriodLabel, 8, 0,alignment);
+    grid->addLayout(backupInput, 8, 1, alignment);
+
+    all->addLayout(grid);
+    all->addStretch();
+}
+
+void BackupPage::chooseAutoBackupFolder()
+{
+    // did the user type something ? if not, get it from the Settings
+    QString path = autoBackupFolder->text();
+    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString();
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Directory"),
+                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") autoBackupFolder->setText(dir);  //only overwrite current dir, if a new was selected
+
+}
+
+qint32
+BackupPage::saveClicked()
+{
+    // Auto Backup
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, autoBackupPeriod->value());
+    return 0;
 }
 
 //

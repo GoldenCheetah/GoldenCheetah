@@ -67,6 +67,7 @@ class KeywordsPage;
 class FieldsPage;
 class Colors;
 class AboutRiderPage;
+class BackupPage;
 class SeasonsPage;
 class DevicePage;
 class RemotePage;
@@ -214,9 +215,6 @@ class AboutRiderPage : public QWidget
         QComboBox *rimSizeCombo;
         QComboBox *tireSizeCombo;
         QLineEdit *wheelSizeEdit;
-        QSpinBox *autoBackupPeriod;
-        QLineEdit *autoBackupFolder;
-        QPushButton *autoBackupFolderBrowse;
         QLabel *wbaltaulabel;
         QSpinBox *wbaltau;
         QLabel *perfManSTSLabel;
@@ -238,6 +236,27 @@ class AboutRiderPage : public QWidget
     private slots:
         void calcWheelSize();
         void resetWheelSize();
+};
+
+class BackupPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        BackupPage(Context *context);
+        qint32 saveClicked();
+
+    private:
+        Context *context;
+
+        QSpinBox *autoBackupPeriod;
+        QLineEdit *autoBackupFolder;
+        QPushButton *autoBackupFolderBrowse;
+
+    private slots:
+
         void chooseAutoBackupFolder();
 };
 

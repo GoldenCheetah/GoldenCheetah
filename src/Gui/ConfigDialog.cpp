@@ -324,6 +324,10 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     HelpWhatsThis *autoImportHelp = new HelpWhatsThis(autoImportPage);
     autoImportPage->setWhatsThis(autoImportHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Autoimport));
 
+    backupPage = new BackupPage(context);
+    HelpWhatsThis *backupPageHelp = new HelpWhatsThis(backupPage);
+    autoImportPage->setWhatsThis(backupPageHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Backup));
+
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setSpacing(0);
@@ -336,6 +340,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     tabs->addTab(hrZonePage, tr("Heartrate Zones"));
     tabs->addTab(paceZonePage, tr("Pace Zones"));
     tabs->addTab(autoImportPage, tr("Auto Import"));
+    tabs->addTab(backupPage, tr("Backup"));
 
     mainLayout->addWidget(tabs);
 }
@@ -350,6 +355,7 @@ qint32 AthleteConfig::saveClicked()
     state |= hrZonePage->saveClicked();
     state |= paceZonePage->saveClicked();
     state |= autoImportPage->saveClicked();
+    state |= backupPage->saveClicked();
 
     return state;
 }
