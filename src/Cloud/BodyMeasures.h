@@ -25,16 +25,16 @@
 #include <QStringList>
 #include <QDateTime>
 
-#define BODY_WEIGHT_KG           0
-#define BODY_WEIGHT_FAT_KG       1
-#define BODY_WEIGHT_MUSCLE_KG    2
-#define BODY_WEIGHT_BONES_KG     3
-#define BODY_WEIGHT_LEAN_KG      4
-#define BODY_WEIGHT_FAT_PERCENT  5
-
 class BodyMeasure {
 
 public:
+
+    enum bodymeasuretype { WeightKg = 0, FatKg = 1, MuscleKg = 2, BonesKg = 3, LeanKg = 4, FatPercent = 5 };
+    typedef enum bodymeasuretype BodyMeasureType;
+
+    enum bodymeasuresource { Manual, Withings, TodaysPlan, CSV };
+    typedef enum bodymeasuresource BodyMeasureSource;
+
     BodyMeasure() : when(QDateTime()), comment(""), weightkg(0), fatkg(0), musclekg(0), boneskg(0), leankg(0), fatpercent(0) {}
 
     // depending on datasource not all fields may be filled with actual values
@@ -49,6 +49,9 @@ public:
             leankg,         // lean mass in Kilograms
             fatpercent;     // body fat as a percentage of weight
 
+    BodyMeasureSource source;
+    QString originalSource; // if delivered from the cloud service
+
     // used by qSort()
     bool operator< (BodyMeasure right) const {
         return (when < right.when);
@@ -56,6 +59,9 @@ public:
     // calculate a CRC for the BodyMeasure data - used to see if
     // data is changed in Configuration pages
     quint16 getFingerprint() const;
+
+    // getdescription text for source
+    QString getSourceDescription() const;
 };
 
 class BodyMeasureParser  {
