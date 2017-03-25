@@ -29,6 +29,7 @@ class Dropbox : public CloudService {
     public:
 
         Dropbox(Context *context);
+        CloudService *clone(Context *context) { return new Dropbox(context); }
         ~Dropbox();
 
         QString name() { return (tr("Dropbox Cloud Storage")); }

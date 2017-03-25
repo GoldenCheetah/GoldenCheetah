@@ -22,14 +22,15 @@
 
 LocalFileStore::LocalFileStore(Context *context) : CloudService(context), context(context) {
 
-    // we have a root
-    root_ = newCloudServiceEntry();
+    if (context) {
+        // we have a root
+        root_ = newCloudServiceEntry();
 
-    // root is always root on a local file store
-    root_->name = "/";
-    root_->isDir = true;
-    root_->size = 1;
-
+        // root is always root on a local file store
+        root_->name = "/";
+        root_->isDir = true;
+        root_->size = 1;
+    }
 }
 
 LocalFileStore::~LocalFileStore() {
@@ -69,7 +70,8 @@ LocalFileStore::close()
 QString
 LocalFileStore::home()
 {
-    return appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    if (context) return appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    else return "";
 }
 
 bool
@@ -181,4 +183,9 @@ LocalFileStore::writeFile(QByteArray &data, QString remotename)
     return true;
 }
 
+static bool addLocalFileStore() {
+    CloudServiceFactory::instance().addService(new LocalFileStore(NULL));
+    return true;
+}
 
+static bool add = addLocalFileStore();

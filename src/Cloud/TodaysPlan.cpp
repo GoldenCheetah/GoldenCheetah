@@ -50,8 +50,11 @@
 #endif
 
 TodaysPlan::TodaysPlan(Context *context) : CloudService(context), context(context), root_(NULL) {
-    nam = new QNetworkAccessManager(this);
-    connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+
+    if (context) {
+        nam = new QNetworkAccessManager(this);
+        connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    }
 
     uploadCompression = gzip; // gzip
     downloadCompression = none;
@@ -60,7 +63,7 @@ TodaysPlan::TodaysPlan(Context *context) : CloudService(context), context(contex
 }
 
 TodaysPlan::~TodaysPlan() {
-    delete nam;
+    if (context) delete nam;
 }
 
 void
@@ -447,3 +450,10 @@ TodaysPlan::readFileCompleted()
 
     notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
+
+static bool addTodaysPlan() {
+    CloudServiceFactory::instance().addService(new TodaysPlan(NULL));
+    return true;
+}
+
+static bool add = addTodaysPlan();

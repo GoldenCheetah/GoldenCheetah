@@ -24,11 +24,13 @@
 #include <QByteArray>
 
 Dropbox::Dropbox(Context *context) : CloudService(context), context(context), root_(NULL) {
-    nam = new QNetworkAccessManager(this);
+    if (context) {
+        nam = new QNetworkAccessManager(this);
+    }
 }
 
 Dropbox::~Dropbox() {
-    delete nam;
+    if (context) {delete nam;}
 }
 
 // open by connecting and getting a basic list of folders available
@@ -281,3 +283,10 @@ Dropbox::readFileCompleted()
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
     notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
+
+static bool addDropbox() {
+    CloudServiceFactory::instance().addService(new Dropbox(NULL));
+    return true;
+}
+
+static bool add = addDropbox();

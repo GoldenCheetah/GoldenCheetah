@@ -30,6 +30,7 @@ class SixCycle : public CloudService {
     public:
 
         SixCycle(Context *context);
+        CloudService *clone(Context *context) { return new SixCycle(context); }
         ~SixCycle();
 
         QString name() { return (tr("Sixcycle")); }

@@ -1993,29 +1993,6 @@ RemotePage::saveClicked()
     return 0;
 }
 
-static void setSizes(QComboBox *p)
-{
-#ifdef Q_OS_MAC
-    p->addItem("7");
-    p->addItem("9");
-    p->addItem("11");
-    p->addItem("13");
-    p->addItem("15");
-    p->addItem("17");
-    p->addItem("19");
-    p->addItem("21");
-#else
-    p->addItem("6");
-    p->addItem("8");
-    p->addItem("10");
-    p->addItem("12");
-    p->addItem("14");
-    p->addItem("16");
-    p->addItem("18");
-    p->addItem("20");
-#endif
-}
-
 static double scalefactors[7] = { 0.5f, 0.6f, 0.8, 1.0f, 1.25f, 1.5f, 2.0f };
 
 //

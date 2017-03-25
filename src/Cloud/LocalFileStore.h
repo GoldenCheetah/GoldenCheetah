@@ -28,9 +28,11 @@ class LocalFileStore : public CloudService {
     public:
 
         LocalFileStore(Context *context);
+        CloudService *clone(Context *context) { return new LocalFileStore(context); }
         ~LocalFileStore();
 
         QString name() { return (tr("Local Store ") + home()); }
+
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

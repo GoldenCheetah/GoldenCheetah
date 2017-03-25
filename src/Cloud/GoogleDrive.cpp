@@ -82,14 +82,16 @@ struct GoogleDrive::FileInfo {
 
 GoogleDrive::GoogleDrive(Context *context)
     : CloudService(context), context_(context), root_(NULL) {
-    printd("GoogleDrive::GoogleDrive\n");
-    nam_ = new QNetworkAccessManager(this);
-    connect(nam_, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    if (context) {
+        printd("GoogleDrive::GoogleDrive\n");
+        nam_ = new QNetworkAccessManager(this);
+        connect(nam_, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
+    }
     root_ = NULL;
 }
 
 GoogleDrive::~GoogleDrive() {
-    delete nam_;
+    if (context) delete nam_;
 }
 
 void GoogleDrive::onSslErrors(QNetworkReply*reply, const QList<QSslError> & )
@@ -763,3 +765,11 @@ GoogleDrive::FileInfo* GoogleDrive::BuildDirectoriesForAthleteDirectory(
     fi->id = id;
     return fi;
 }
+
+
+static bool addGoogleDrive() {
+    CloudServiceFactory::instance().addService(new GoogleDrive(NULL));
+    return true;
+}
+
+static bool add = addGoogleDrive();
