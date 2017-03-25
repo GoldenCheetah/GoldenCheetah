@@ -954,7 +954,7 @@ RideMetadata::setLinkedDefaults(RideFile* ride)
 
         foreach (DefaultDefinition adefault, getDefaults())
             if (ride->getTag(adefault.field, "") == adefault.value)
-                if (ride->getTag(adefault.linkedField, "") == "") {
+                if (ride->getTag(adefault.linkedField, "") == "" && adefault.linkedValue != "") {
                     ride->setTag(adefault.linkedField, adefault.linkedValue);
                     changed = true;
                 }
