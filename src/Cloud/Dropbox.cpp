@@ -224,8 +224,10 @@ Dropbox::readFile(QByteArray *data, QString remotename, QString)
 }
 
 bool 
-Dropbox::writeFile(QByteArray &data, QString remotename)
+Dropbox::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
+    Q_UNUSED(ride);
+
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
 

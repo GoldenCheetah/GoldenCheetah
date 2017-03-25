@@ -49,7 +49,7 @@ class GoogleDrive : public CloudService {
         virtual QString home();
 
         // write a file
-        virtual bool writeFile(QByteArray &data, QString remotename);
+        virtual bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
         // read a file
         virtual bool readFile(QByteArray *data, QString remotename, QString);

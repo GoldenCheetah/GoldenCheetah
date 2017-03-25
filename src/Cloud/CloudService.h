@@ -92,8 +92,8 @@ class CloudService : public QObject {
         virtual bool createFolder(QString path) { Q_UNUSED(path); return false; }
 
         // write a file - call notify when done
-        virtual bool writeFile(QByteArray &data, QString remotename) {
-            Q_UNUSED(data); Q_UNUSED(remotename); return false;
+        virtual bool writeFile(QByteArray &data, QString remotename, RideFile *ride) {
+            Q_UNUSED(data); Q_UNUSED(remotename); Q_UNUSED(ride); return false;
         }
         void notifyWriteComplete(QString name,QString message) { emit writeComplete(name,message); }
 

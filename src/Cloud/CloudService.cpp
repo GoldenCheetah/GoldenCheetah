@@ -317,7 +317,7 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService
     layout->addLayout(buttons);
 
     // ok, so now we can kickoff the upload
-    status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension());
+    status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
 
     if (status == false) {
 
@@ -1277,10 +1277,10 @@ CloudServiceSyncDialog::syncNext()
                     // get a compressed version
                     QByteArray data;
                     store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
-                    delete ride; // clean up!
 
-                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + store->uploadExtension());
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + store->uploadExtension(), ride);
                     QApplication::processEvents();
+                    delete ride; // clean up!
                     return true;
 
                 } else {
@@ -1438,7 +1438,7 @@ CloudServiceSyncDialog::uploadNext()
             rideListUp->setCurrentItem(curr);
             progressLabel->setText(QString(tr("Uploaded %1 of %2")).arg(downloadcounter).arg(downloadtotal));
 
-            // read in the file
+            // read in the file - TEMPORARILY *** WE DON'T USE IN MEMORY VERSION ***
             QStringList errors;
             QFile file(context->athlete->home->activities().canonicalPath() + "/" + curr->text(1));
             RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
@@ -1448,10 +1448,9 @@ CloudServiceSyncDialog::uploadNext()
                     // get a compressed version
                     QByteArray data;
                     store->compressRide(ride, data, QFileInfo(curr->text(1)).baseName() + ".json");
-                    delete ride; // clean up!
-
-                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + store->uploadExtension());
+                    store->writeFile(data, QFileInfo(curr->text(1)).baseName() + store->uploadExtension(), ride);
                     QApplication::processEvents();
+                    delete ride; // clean up!
                     return true;
 
             } else {

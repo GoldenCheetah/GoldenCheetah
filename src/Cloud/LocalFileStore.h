@@ -42,7 +42,7 @@ class LocalFileStore : public CloudService {
         QString home();
 
         // write a file 
-        bool writeFile(QByteArray &data, QString remotename);
+        bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
         // read a file
         bool readFile(QByteArray *data, QString remotename, QString);
