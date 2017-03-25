@@ -507,7 +507,10 @@ QJsonDocument GoogleDrive::FetchNextLink(
     return document;
 }
 
-bool GoogleDrive::writeFile(QByteArray &data, QString remote_name) {
+bool GoogleDrive::writeFile(QByteArray &data, QString remote_name, RideFile *ride) {
+
+    Q_UNUSED(ride);
+
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
 

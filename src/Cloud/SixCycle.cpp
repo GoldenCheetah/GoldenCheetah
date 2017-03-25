@@ -329,8 +329,10 @@ SixCycle::readFile(QByteArray *data, QString remotename, QString remoteid)
 }
 
 bool
-SixCycle::writeFile(QByteArray &data, QString remotename)
+SixCycle::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
+    Q_UNUSED(ride);
+
     printd("Sixcycle::writeFile(%s)\n", remotename.toStdString().c_str());
 
     // if we are called to upload a single ride we will not have been

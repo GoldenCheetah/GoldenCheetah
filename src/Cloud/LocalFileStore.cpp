@@ -151,8 +151,9 @@ LocalFileStore::readFile(QByteArray *data, QString remotename, QString)
 }
 
 bool 
-LocalFileStore::writeFile(QByteArray &data, QString remotename)
+LocalFileStore::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
+    Q_UNUSED(ride);
 
     // is the path set ?
     QString path = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();

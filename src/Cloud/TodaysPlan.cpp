@@ -351,8 +351,10 @@ TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
 }
 
 bool
-TodaysPlan::writeFile(QByteArray &data, QString remotename)
+TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
+    Q_UNUSED(ride);
+
     printd("TodaysPlan::writeFile(%s)\n", remotename.toStdString().c_str());
 
     // this must be performed asyncronously and call made
