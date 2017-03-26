@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2015 Luca Rasina <luca.rasina@sphtechnology.ch>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
