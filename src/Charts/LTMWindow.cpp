@@ -29,6 +29,7 @@
 #include "RideFileCache.h"
 #include "Settings.h"
 #include "cmath"
+#include "float.h"
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 
@@ -37,6 +38,7 @@
 #include <QDesktopWidget>
 #endif
 
+#include <QtGlobal>
 #include <QtGui>
 #include <QString>
 #include <QDebug>
@@ -1120,6 +1122,9 @@ LTMWindow::dataTable(bool html)
     QList<TableCurveData> columns;
     bool first=true;
     int rows = 0;
+    bool firstXvalue=true;
+    double lowestFirstXvalue = DBL_MAX;
+    double highestFirstXvalue = 0.0;
 
     // create curve data for each metric detail to iterate over
     foreach(MetricDetail metricDetail, settings.metrics) {
@@ -1130,12 +1135,45 @@ LTMWindow::dataTable(bool html)
 
         columns << add;
 
+        // check if "x" value of all metrics is the same for all colums and find
+        // the lowest "x" value and highest "x" value to which all columns need to be aligned
+        if (add.n > 0) {
+            if (firstXvalue) {
+                lowestFirstXvalue = highestFirstXvalue = add.x[0];
+                firstXvalue = false;
+            } else {
+                if (add.x[0] < lowestFirstXvalue) {
+                    lowestFirstXvalue = add.x[0];
+                }
+                if (add.x[0] > highestFirstXvalue) {
+                    highestFirstXvalue = add.x[0];
+                }
+            }
+        }
+
         // truncate to shortest set of rows available as 
         // we dont pad with zeroes in the data table
         if (first) rows=add.n;
         else if (add.n < rows) rows=add.n;
         first=false;
     }
+
+    // align the starting X values of all columns using the
+    // lowest xValue and highest xValue as borders
+    if (lowestFirstXvalue != highestFirstXvalue) {
+        for (int i = 0; i< columns.count(); i++) {
+            double xValue = highestFirstXvalue;
+            while (columns[i].x[0] > lowestFirstXvalue) {
+                xValue--;
+                columns[i].x.prepend(xValue);
+                columns[i].y.prepend(0.0);
+                columns[i].n++;
+            }
+        }
+        // adjust number of visible rows in table
+        rows += qRound(highestFirstXvalue-lowestFirstXvalue);
+    }
+
 
     //
     // STEP 2: PREPARE HTML TABLE FROM AGGREGATED DATA
