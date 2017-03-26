@@ -45,6 +45,24 @@ BodyMeasure::getFingerprint() const
     return qChecksum(ba, ba.length());
 }
 
+QString
+BodyMeasure::getSourceDescription() const {
+
+    switch(source) {
+    case BodyMeasure::Manual:
+        return QObject::tr("Manual entry");
+    case BodyMeasure::Withings:
+        return QObject::tr("Withings");
+    case BodyMeasure::TodaysPlan:
+        return QObject::tr("Today's Plan");
+    case BodyMeasure::CSV:
+        return QObject::tr("CSV Upload");
+    default:
+        return QObject::tr("Unknown");
+    }
+}
+
+
 bool
 BodyMeasureParser::serialize(QString filename, QList<BodyMeasure> &data) {
 
@@ -62,18 +80,21 @@ BodyMeasureParser::serialize(QString filename, QList<BodyMeasure> &data) {
     QTextStream out(&file);
     out.setCodec("UTF-8");
 
+    BodyMeasure *m = NULL;
     QJsonArray measures;
     for (int i = 0; i < data.count(); i++) {
-        BodyMeasure m = data.at(i);
+        m = &data[i];
         QJsonObject measure;
-        measure.insert("when", m.when.toMSecsSinceEpoch()/1000);
-        measure.insert("comment", m.comment);
-        measure.insert("weightkg", m.weightkg);
-        measure.insert("fatkg", m.fatkg);
-        measure.insert("boneskg", m.boneskg);
-        measure.insert("musclekg", m.musclekg);
-        measure.insert("leankg", m.leankg);
-        measure.insert("fatpercent", m.fatpercent);
+        measure.insert("when", m->when.toMSecsSinceEpoch()/1000);
+        measure.insert("comment", m->comment);
+        measure.insert("weightkg", m->weightkg);
+        measure.insert("fatkg", m->fatkg);
+        measure.insert("boneskg", m->boneskg);
+        measure.insert("musclekg", m->musclekg);
+        measure.insert("leankg", m->leankg);
+        measure.insert("fatpercent", m->fatpercent);
+        measure.insert("source", m->source);
+        measure.insert("originalsource", m->originalSource);
         measures.append(measure);
     }
 
@@ -134,6 +155,8 @@ BodyMeasureParser::unserialize(QFile &file, QList<BodyMeasure> &data) {
         m.musclekg = measure["musclekg"].toDouble();
         m.leankg = measure["leankg"].toDouble();
         m.fatpercent = measure["fatpercent"].toDouble();
+        m.source = static_cast<BodyMeasure::BodyMeasureSource>(measure["source"].toInt());
+        m.originalSource = measure["originalsource"].toString();
         data.append(m);
     }
 

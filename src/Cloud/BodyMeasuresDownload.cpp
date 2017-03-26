@@ -263,7 +263,7 @@ BodyMeasuresDownload::download() {
        // now save data away if we actually got something !
        // doing it here means we don't overwrite previous responses
        // when we fail to get any data (e.g. errors / network problems)
-       BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(context->athlete->home->activities().canonicalPath()), context->athlete->bodyMeasures());
+       BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()), context->athlete->bodyMeasures());
 
        // do a refresh, it will check if needed
        context->athlete->rideCache->refresh();

@@ -1702,27 +1702,34 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     // Body Measures
     bmTree = new QTreeWidget;
     bmTree->headerItem()->setText(0, datetext);
-    bmTree->headerItem()->setText(1, weighttext);
+    bmTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    bmTree->headerItem()->setText(1, tr("Time"));
     bmTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(2, fatkgtext);
+    bmTree->headerItem()->setText(2, weighttext);
     bmTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(3, musclekgtext);
+    bmTree->headerItem()->setText(3, fatkgtext);
     bmTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(4, boneskgtext);
+    bmTree->headerItem()->setText(4, musclekgtext);
     bmTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(5, leankgtext);
+    bmTree->headerItem()->setText(5, boneskgtext);
     bmTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(6, fatpercenttext);
+    bmTree->headerItem()->setText(6, leankgtext);
     bmTree->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(7, commenttext);
-    bmTree->setColumnCount(8);
+    bmTree->headerItem()->setText(7, fatpercenttext);
+    bmTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+    bmTree->headerItem()->setText(8, commenttext);
+    bmTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
+    bmTree->headerItem()->setText(9, tr("Source"));
+    bmTree->header()->setSectionResizeMode(9, QHeaderView::ResizeToContents);
+    bmTree->headerItem()->setText(10, tr("Original Source"));
+    bmTree->setColumnCount(11);
     bmTree->setSelectionMode(QAbstractItemView::SingleSelection);
     bmTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     bmTree->setUniformRowHeights(true);
     bmTree->setIndentation(0);
 
     // get body measures if the file exists
-    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->activities().canonicalPath()));
+    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()));
     if (bmFile.exists()) {
         BodyMeasureParser::unserialize(bmFile, bodyMeasures);
     }
@@ -1734,14 +1741,21 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
         // date
         add->setText(0, bodyMeasures[i].when.date().toString(tr("MMM d, yyyy")));
+        // time
+        if (bodyMeasures[i].source != BodyMeasure::Manual) {
+            add->setText(1, bodyMeasures[i].when.time().toString("hh:mm:ss"));
+        }
         // weight
-        add->setText(1, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
-        add->setText(2, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
-        add->setText(3, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
-        add->setText(4, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
-        add->setText(5, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
-        add->setText(6, QString("%1").arg(bodyMeasures[i].fatpercent));
-        add->setText(7, bodyMeasures[i].comment);
+        add->setText(2, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
+        add->setText(3, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
+        add->setText(4, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
+        add->setText(5, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
+        add->setText(6, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
+        add->setText(7, QString("%1").arg(bodyMeasures[i].fatpercent));
+        add->setText(8, bodyMeasures[i].comment);
+        // source
+        add->setText(9, bodyMeasures[i].getSourceDescription());
+        add->setText(10, bodyMeasures[i].originalSource);
     }
 
     all->addWidget(bmTree);
@@ -1804,11 +1818,11 @@ RiderPhysPage::unitChanged(int currentIndex)
     for (int i=0; i<bmTree->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *edit = bmTree->invisibleRootItem()->child(i);
         // weight
-        edit->setText(1, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
-        edit->setText(2, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
-        edit->setText(3, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
-        edit->setText(4, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
-        edit->setText(5, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
+        edit->setText(2, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
+        edit->setText(3, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
+        edit->setText(4, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
+        edit->setText(5, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
+        edit->setText(6, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
     }
 }
 
@@ -1833,7 +1847,7 @@ RiderPhysPage::saveClicked()
         // date order
         qSort(bodyMeasures);
         // now save data away if we actually got something !
-        BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(context->athlete->home->activities().canonicalPath()), bodyMeasures);
+        BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()), bodyMeasures);
         // store in athlete
         context->athlete->setBodyMeasures(bodyMeasures);
         state += CONFIG_ATHLETE;
@@ -1867,7 +1881,7 @@ RiderPhysPage::addOReditClicked()
         bmTree->invisibleRootItem()->insertChild(index, add);
     }
 
-    addBM.when = dateEdit->dateTime();
+    addBM.when = dateEdit->dateTime().toUTC();
     addBM.weightkg = weight->value() / weightFactor;
     addBM.fatkg = fatkg->value() / weightFactor;
     addBM.musclekg = musclekg->value() / weightFactor;
@@ -1875,18 +1889,24 @@ RiderPhysPage::addOReditClicked()
     addBM.leankg = leankg->value() / weightFactor;
     addBM.fatpercent = fatpercent->value();
     addBM.comment = comment->text();
+    addBM.source = BodyMeasure::Manual;
+    addBM.originalSource = "";
     bodyMeasures.insert(index, addBM);
 
     // date
     add->setText(0, dateTxt);
+    // time
+    add->setText(2, "");
     // Weight
-    add->setText(1, QString("%1").arg(weight->value()));
-    add->setText(2, QString("%1").arg(fatkg->value()));
-    add->setText(3, QString("%1").arg(musclekg->value()));
-    add->setText(4, QString("%1").arg(boneskg->value()));
-    add->setText(5, QString("%1").arg(leankg->value()));
-    add->setText(6, QString("%1").arg(fatpercent->value()));
-    add->setText(7, QString("%1").arg(comment->text()));
+    add->setText(2, QString("%1").arg(weight->value()));
+    add->setText(3, QString("%1").arg(fatkg->value()));
+    add->setText(4, QString("%1").arg(musclekg->value()));
+    add->setText(5, QString("%1").arg(boneskg->value()));
+    add->setText(6, QString("%1").arg(leankg->value()));
+    add->setText(7, QString("%1").arg(fatpercent->value()));
+    add->setText(8, QString("%1").arg(comment->text()));
+    add->setText(9, QString("%1").arg(tr("Manual entry")));
+    add->setText(10, ""); // Original Source
 
     updateButton->hide();
 }
