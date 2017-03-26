@@ -19,6 +19,7 @@
 #include "SportsPlusHealth.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -48,6 +49,9 @@
     } while(0)
 #endif
 
+// api endpoint
+const QString SPH_URL("http://www.sportplushealth.com/sport/en/api/1");
+
 SportsPlusHealth::SportsPlusHealth(Context *context) : CloudService(context), context(context), root_(NULL) {
 
     if (context) {
@@ -56,6 +60,7 @@ SportsPlusHealth::SportsPlusHealth(Context *context) : CloudService(context), co
     }
 
     uploadCompression = none; // gzip
+    filetype = CloudService::uploadType::TCX;
     useMetric = true; // distance and duration metadata
 }
 
@@ -72,6 +77,8 @@ SportsPlusHealth::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 bool
 SportsPlusHealth::open(QStringList &errors)
 {
+    Q_UNUSED(errors);
+
     printd("SportsPlusHealth::open\n");
     return true;
 }
@@ -91,8 +98,40 @@ SportsPlusHealth::writeFile(QByteArray &data, QString remotename, RideFile *ride
 
     printd("SportsPlusHealth::writeFile(%s)\n", remotename.toStdString().c_str());
 
+    // get credentials
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS).toString();
+
+    //Building the message content
+    QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType);
+
+    //Including the optional session name
+    QHttpPart textPart;
+    textPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"session_name\""));
+    textPart.setBody(QByteArray(remotename.toLatin1()));
+    body->append(textPart);
+
+    //Including the content data type
+    QHttpPart dataTypePart;
+    dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"format\""));
+    dataTypePart.setBody("tcx");
+    body->append(dataTypePart);
+
+    //Including file in the request
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"datafile\"; filename=\"sph_file.tcx\"; type=\"text/xml\""));
+    filePart.setBody(data);
+    body->append(filePart);
+
+    //Sending the authenticated post request to the API
+    QUrl url(SPH_URL + "/" + username + "/importGC");
+    QNetworkRequest request;
+    request.setUrl(url);
+    request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(username).arg(password).toLatin1()).toBase64());
+
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
+    reply = nam->post(request, body);
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
@@ -109,16 +148,27 @@ SportsPlusHealth::writeFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    bool success=false;
+    int errorcode=-1;
 
-    if (reply->error() == QNetworkReply::NoError) {
+    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    MVJSONReader jsonResponse(reply->readAll().toStdString().c_str());
+    if(jsonResponse.root && jsonResponse.root->hasField("success") && jsonResponse.root->hasField("error_code")) {
+        success = jsonResponse.root->getFieldBool("success");
+        errorcode = jsonResponse.root->getFieldInt("error_code");
+    } else {
+        success = false;
+        errorcode = -1;
+    }
+
+    if (success) {
         notifyWriteComplete(
             replyName(static_cast<QNetworkReply*>(QObject::sender())),
             tr("Completed."));
     } else {
         notifyWriteComplete(
             replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Network Error - Upload failed."));
+            QString(tr("Upload failed. (%1)")).arg(errorcode));
     }
 }
 
