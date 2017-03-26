@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2012 Rainer Clasen <bj@zuto.de>
+ * Copyright (c) 2014 Nils Knieling copied from TtbDialog.cpp
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -48,6 +50,8 @@
     } while(0)
 #endif
 
+static const QString VELOHERO_URL( "http://app.velohero.com" );
+
 Velohero::Velohero(Context *context) : CloudService(context), context(context), root_(NULL) {
 
     if (context) {
@@ -56,6 +60,7 @@ Velohero::Velohero(Context *context) : CloudService(context), context(context), 
     }
 
     uploadCompression = none; // gzip
+    filetype = CloudService::uploadType::PWX;
     useMetric = true; // distance and duration metadata
 }
 
@@ -73,6 +78,61 @@ bool
 Velohero::open(QStringList &errors)
 {
     printd("Velohero::open\n");
+
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS).toString();
+
+#if QT_VERSION > 0x050000
+    QUrlQuery urlquery;
+#else
+    QUrl urlquery( VELOHERO_URL + "/sso" );
+#endif
+    urlquery.addQueryItem("view", "xml");
+    urlquery.addQueryItem("user", username);
+    urlquery.addQueryItem("pass", password);
+
+#if QT_VERSION > 0x050000
+    QUrl url (VELOHERO_URL + "/sso");
+    url.setQuery(urlquery.query());
+    QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
+
+    request.setRawHeader("Accept-Encoding", "identity");
+    request.setRawHeader("Accept", "application/xml");
+    request.setRawHeader("Accept-Charset", "utf-8");
+
+    QEventLoop loop;
+    reply = nam->get(request);
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    VeloHeroSessionParser handler;
+    QXmlInputSource source(reply);
+
+    QXmlSimpleReader reader;
+    reader.setContentHandler(&handler);
+
+    if(!reader.parse(source)) {
+        errors << tr("Failed to parse sessionID response.");
+        return false;
+    }
+
+    if(handler.error.length() > 0) {
+        errors << tr("failed to get new session: ") + handler.error;
+        return false;
+    }
+
+    sessionId = handler.session;
+
+    if(sessionId.length() == 0) {
+        errors << tr("got empty session");
+        return false;
+    }
+
+    // have a sessionid
+    printd("Velohere:: open session id=%s\n", sessionId.toStdString().c_str());
     return true;
 }
 
@@ -90,9 +150,50 @@ Velohero::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     Q_UNUSED(ride);
 
     printd("Velohero::writeFile(%s)\n", remotename.toStdString().c_str());
+    QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType );
+
+    QHttpPart textPart;
+    textPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+    QVariant("form-data; name=\"upload_submit\""));
+    textPart.setBody("hrm");
+    body->append( textPart );
+
+    int limit = 16777216; // 16MB
+    if( data.size() >= limit ){
+        return false;
+    }
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader,
+    QVariant("application/octet-stream"));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+    QVariant("form-data; name=\"file\"; filename=\"gc-upload-velohero.pwx\""));
+    filePart.setBody(data);
+    body->append(filePart);
+
+#if QT_VERSION > 0x050000
+    QUrlQuery urlquery;
+#else
+    QUrl urlquery( VELOHERO_URL + "/upload/file" );
+#endif
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "sso", sessionId );
+
+#if QT_VERSION > 0x050000
+    QUrl url (VELOHERO_URL + "/upload/file");
+    url.setQuery(urlquery.query());
+    QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
+
+    request.setRawHeader( "Accept-Encoding", "identity" );
+    request.setRawHeader( "Accept", "application/xml" );
+    request.setRawHeader( "Accept-Charset", "utf-8" );
 
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
+    reply = nam->post(request, body);
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
@@ -106,19 +207,30 @@ void
 Velohero::writeFileCompleted()
 {
     printd("Velohero::writeFileCompleted()\n");
+    printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
+    VeloHeroPostParser handler;
+    QXmlInputSource source(reply);
 
-    if (reply->error() == QNetworkReply::NoError) {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Completed."));
+    QXmlSimpleReader reader;
+    reader.setContentHandler(&handler);
+
+    bool success=true;
+    if(!reader.parse(source)){ success=false; }
+
+    if(handler.error.length() > 0) { success=false; }
+
+    QString exerciseId = handler.id;
+
+    if(exerciseId.length() == 0){ success=false; }
+
+
+    if (success == true && reply->error() == QNetworkReply::NoError) {
+        notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
     } else {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Network Error - Upload failed."));
+        notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Network Error - Upload failed."));
     }
 }
 
