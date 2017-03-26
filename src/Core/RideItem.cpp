@@ -681,16 +681,16 @@ RideItem::getWeight(int type)
     switch(type) {
 
     default: // just get weight in kilos
-    case BODY_WEIGHT_KG:
+    case BodyMeasure::WeightKg:
     {
         // get weight from whatever we got
         weight = weightData.weightkg;
 
         // from metadata
-        if (!weight) weight = metadata_.value("Weight", "0.0").toDouble();
+        if (weight <= 0.00) weight = metadata_.value("Weight", "0.0").toDouble();
 
         // global options and if not set default to 75 kg.
-        if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble();
+        if (weight <= 0.00) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble();
 
         // No weight default is weird, we'll set to 80kg
         if (weight <= 0.00) weight = 80.00;
@@ -699,11 +699,11 @@ RideItem::getWeight(int type)
     }
 
     // all the other weight measures supported by BodyMetrics
-    case BODY_WEIGHT_FAT_KG : return weightData.fatkg;
-    case BODY_WEIGHT_MUSCLE_KG : return weightData.musclekg;
-    case BODY_WEIGHT_BONES_KG : return weightData.boneskg;
-    case BODY_WEIGHT_LEAN_KG : return weightData.leankg;
-    case BODY_WEIGHT_FAT_PERCENT : return weightData.fatpercent;
+    case BodyMeasure::FatKg : return weightData.fatkg;
+    case BodyMeasure::MuscleKg : return weightData.musclekg;
+    case BodyMeasure::BonesKg : return weightData.boneskg;
+    case BodyMeasure::LeanKg : return weightData.leankg;
+    case BodyMeasure::FatPercent : return weightData.fatpercent;
 
     }
     return weight;

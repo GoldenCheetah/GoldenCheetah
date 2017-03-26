@@ -96,7 +96,7 @@ TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTim
             jsonString += "\"floorTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
             jsonString += "\"ceilTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) +"\"";
             jsonString += "} ] }, ";
-            jsonString += "\"fields\": [\"att.ts\",\"att.weight\", \"att.fat\",\"att.muscleMass\",\"att.boneMass\",\"att.fatMass\", \"att.height\" ] ";
+            jsonString += "\"fields\": [\"att.ts\",\"att.weight\", \"att.fat\",\"att.muscleMass\",\"att.boneMass\",\"att.fatMass\", \"att.height\" , \"att.source\"] ";
             jsonString += "}";
 
             QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
@@ -150,6 +150,8 @@ TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTim
                         add.fatkg = record["fatMass"].toDouble();
                         add.musclekg = record["muscleMass"].toDouble();
                         add.fatpercent = record["fat"].toDouble();
+                        add.originalSource = record["source"].toString();
+                        add.source = BodyMeasure::TodaysPlan;
                         data.append(add);
                     }
 

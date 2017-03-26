@@ -166,7 +166,10 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
           }
       }
       // only append if we have a good date
-      if (m.when > QDateTime::fromMSecsSinceEpoch(0)) data.append(m);
+      if (m.when > QDateTime::fromMSecsSinceEpoch(0)) {
+          m.source = BodyMeasure::CSV;
+          data.append(m);
+      }
   }
   // all fine
   file.close();

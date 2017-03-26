@@ -142,7 +142,7 @@ class Athlete : public QObject
         void setBodyMeasures(QList<BodyMeasure>&x);
 
         QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
-        double getBodyMeasure(QDate date, int type=BODY_WEIGHT_KG);
+        double getBodyMeasure(QDate date, int type=BodyMeasure::WeightKg);
         void getBodyMeasure(QDate date,BodyMeasure&);
 
         // ride collection
