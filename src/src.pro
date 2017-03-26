@@ -691,7 +691,9 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 # cloud services
 HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h Cloud/LocalFileStore.h \
            Cloud/OAuthDialog.h Cloud/ShareDialog.h Cloud/SportPlusHealthUploader.h Cloud/TodaysPlanBodyMeasures.h \
-           Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h
+           Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h \
+           Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h Cloud/TrainingStageBuch.h \
+           Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h
 
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
@@ -780,7 +782,9 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 ## Cloud Services / Web resources
 SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp Cloud/LocalFileStore.cpp \
            Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp Cloud/SportPlusHealthUploader.cpp Cloud\TodaysPlanBodyMeasures.cpp \
-           Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp
+           Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp \
+           Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp Cloud/TrainingStageBuch.cpp \
+           Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
