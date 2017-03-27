@@ -19,6 +19,7 @@
 #include "Selfloops.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -55,7 +56,8 @@ Selfloops::Selfloops(Context *context) : CloudService(context), context(context)
         connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     }
 
-    uploadCompression = none; // gzip
+    uploadCompression = gzip; // gzip
+    filetype = CloudService::uploadType::TCX;
     useMetric = true; // distance and duration metadata
 }
 
@@ -73,6 +75,11 @@ bool
 Selfloops::open(QStringList &errors)
 {
     printd("Selfloops::open\n");
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SELUSER).toString();
+    if (username == "") {
+        errors << tr("Account is not configured,");
+        return false;
+    }
     return true;
 }
 
@@ -91,8 +98,39 @@ Selfloops::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     printd("Selfloops::writeFile(%s)\n", remotename.toStdString().c_str());
 
+    QUrl url = QUrl( "https://www.selfloops.com/restapi/public/activities/upload.json" );
+    QNetworkRequest request = QNetworkRequest(url);
+
+    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SELUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SELPASS).toString();
+
+    // MULTIPART *****************
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::MixedType);
+    multiPart->setBoundary(boundary.toLatin1());
+
+    QHttpPart emailPart;
+    emailPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"email\""));
+    emailPart.setBody(username.toLatin1());
+
+    QHttpPart passwordPart;
+    passwordPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"pw\""));
+    passwordPart.setBody(password.toLatin1());
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"tcxfile\"; filename=\"myfile.tcx.gz\"; type=\"application/x-gzip\""));
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-gzip");
+    filePart.setBody(data);
+
+    multiPart->append(emailPart);
+    multiPart->append(passwordPart);
+    multiPart->append(filePart);
+
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
+    reply = nam->post(request, multiPart);
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
@@ -111,14 +149,44 @@ Selfloops::writeFileCompleted()
 
     printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
-    if (reply->error() == QNetworkReply::NoError) {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Completed."));
+    bool uploadSuccessful = false;
+    int error;
+    QString uploadError;
+
+    try {
+
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
+
+        // get values
+        error = jsonResponse.root->getFieldInt("error_code");
+        uploadError = jsonResponse.root->getFieldString("message").c_str();
+        //XXX selfloopsActivityId = jsonResponse.root->getFieldInt("activity_id");
+
+    } catch(...) {
+
+        // problem!
+        error = 500;
+        uploadError = "bad response or parser exception.";
+        //XXX selfloopsActivityId = 0;
+    }
+
+    // set tag for upload id
+    if (error>0 || reply->error() != QNetworkReply::NoError) uploadSuccessful=false;
+    else {
+
+        //qDebug() << "activity: " << selfloopsActivityId;
+
+        //XXX ride->ride()->setTag("Selfloops activityId", QString("%1").arg(selfloopsActivityId));
+        //XXX ride->setDirty(true);
+        uploadSuccessful = true;
+    }
+
+    if (uploadSuccessful && reply->error() == QNetworkReply::NoError) {
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
     } else {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Network Error - Upload failed."));
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Network Error - Upload failed."));
     }
 }
 
