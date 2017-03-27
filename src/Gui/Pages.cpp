@@ -1296,7 +1296,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
 
     wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
     wheelSizeEdit->setInputMask("0000");
-    wheelSizeEdit->setFixedWidth(40);
+    wheelSizeEdit->setFixedWidth(40 *dpiXFactor);
 
     QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
 
