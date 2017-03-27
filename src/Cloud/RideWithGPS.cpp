@@ -19,6 +19,8 @@
 #include "RideWithGPS.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "Units.h"
+#include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -73,6 +75,11 @@ bool
 RideWithGPS::open(QStringList &errors)
 {
     printd("RideWithGPS::open\n");
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER).toString();
+    if (username == "") {
+        errors << tr("RideWithGPS account not configured.");
+        return false;
+    }
     return true;
 }
 
@@ -85,14 +92,73 @@ RideWithGPS::close()
 }
 
 bool
-RideWithGPS::writeFile(QByteArray &data, QString remotename, RideFile *ride)
+RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
 {
     Q_UNUSED(ride);
 
     printd("RideWithGPS::writeFile(%s)\n", remotename.toStdString().c_str());
 
+    // RIDE WITH GPS USES ITS OWN FORMAT, WE CONSTRUCT FROM THE RIDE
+    int prevSecs = 0;
+    long diffSecs = 0;
+
+
+    int size = 0;
+    int totalSize = ride->dataPoints().size();
+    QDateTime rideDateTime = ride->startTime();
+    QString out, data;
+
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSPASS).toString();
+
+    // application/json
+    out += "{\"apikey\": \"p24n3a9e\", ";
+    out += "\"email\": \""+username+"\", ";
+    out += "\"password\": \""+password+"\", ";
+    out += "\"track_points\": \"";
+
+    data += "\[";
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        size++;
+
+        if (point->secs == 0.0)
+            continue;
+
+        diffSecs = point->secs - prevSecs;
+        prevSecs = point->secs;
+        rideDateTime = rideDateTime.addSecs(diffSecs);
+
+        data += "{\"x\": ";
+        data += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
+        data += ", \"y\": ";
+        data += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
+        data += ", \"t\": ";
+        data += QString("%1").arg(rideDateTime.toTime_t());
+        data += ", \"e\": ";
+        data += QString("%1").arg(point->alt);
+        data += ", \"p\": ";
+        data += QString("%1").arg(point->watts);
+        data += ", \"c\": ";
+        data += QString("%1").arg(point->cad);
+        data += ", \"h\": ";
+        data += QString("%1").arg(point->hr);
+
+        data += "}";
+
+        if(size < totalSize)
+           data += ",";
+    }
+    data += "]";
+    out += data.replace("\"","\\\"");
+    out += "\"}";
+
+    QUrl url = QUrl("http://ridewithgps.com/trips.json");
+    QNetworkRequest request = QNetworkRequest(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
+    reply = nam->post(request, out.toLatin1());
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
@@ -111,14 +177,44 @@ RideWithGPS::writeFileCompleted()
 
     printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
-    if (reply->error() == QNetworkReply::NoError) {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Completed."));
+    bool uploadSuccessful = false;
+    QString uploadError;
+    int tripid = 0;
+
+    try {
+
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
+
+        // get values
+        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        if (jsonResponse.root->hasField("trip")) {
+            tripid = jsonResponse.root->getField("trip")->getFieldInt("id");
+        }
+
+    } catch(...) {
+
+        // problem!
+        uploadError = "bad response or parser exception.";
+    }
+
+    // no error so clear
+    if (uploadError.toLower() == "none" || uploadError.toLower() == "null") uploadError = "";
+
+    // set tags if uploaded (XXX not supported after refactor)
+    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError) uploadSuccessful = false;
+    else {
+        //XXX ride->ride()->setTag("RideWithGPS tripid", QString("%1").arg(tripid));
+        //XXX ride->setDirty(true);
+
+        uploadSuccessful = true;
+    }
+
+    if (uploadSuccessful && reply->error() == QNetworkReply::NoError) {
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
     } else {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Network Error - Upload failed."));
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Network Error - Upload failed."));
     }
 }
 
