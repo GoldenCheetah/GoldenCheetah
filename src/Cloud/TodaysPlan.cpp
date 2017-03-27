@@ -63,6 +63,7 @@ TodaysPlan::TodaysPlan(Context *context) : CloudService(context), context(contex
     // config
     settings.insert(OAuthToken, GC_TODAYSPLAN_TOKEN);
     settings.insert(URL, GC_TODAYSPLAN_URL);
+    settings.insert(DefaultURL, "https://whats.todaysplan.com.au");
     settings.insert(Key, GC_TODAYSPLAN_USERKEY);
 }
 
