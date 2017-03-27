@@ -20,6 +20,7 @@
 #define GC_LocalFileStore_h
 
 #include "CloudService.h"
+#include <QImage>
 
 class LocalFileStore : public CloudService {
 
@@ -32,6 +33,7 @@ class LocalFileStore : public CloudService {
         ~LocalFileStore();
 
         QString name() { return (tr("Local Store ") + home()); }
+        QImage logo() { return QImage(":images/services/localstore.png"); }
 
 
         // open/connect and close/disconnect

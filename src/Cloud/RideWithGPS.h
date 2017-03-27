@@ -22,6 +22,7 @@
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QImage>
 
 class RideWithGPS : public CloudService {
 
@@ -30,6 +31,7 @@ class RideWithGPS : public CloudService {
     public:
 
         QString name() { return (tr("RideWithGPS")); }
+        QImage logo() { return QImage(":images/services/ridewithgps.png"); }
 
         RideWithGPS(Context *context);
         CloudService *clone(Context *context) { return new RideWithGPS(context); }

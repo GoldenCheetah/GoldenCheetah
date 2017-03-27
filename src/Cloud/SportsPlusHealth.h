@@ -18,6 +18,7 @@
 
 #ifndef GC_SportsPlusHealth_h
 #define GC_SportsPlusHealth_h
+#include <QImage>
 
 #include "CloudService.h"
 #include <QNetworkAccessManager>
@@ -30,6 +31,7 @@ class SportsPlusHealth : public CloudService {
     public:
 
         QString name() { return (tr("SportsPlusHealth")); }
+        QImage logo() { return QImage(":images/services/sportplushealth.png"); }
 
         SportsPlusHealth(Context *context);
         CloudService *clone(Context *context) { return new SportsPlusHealth(context); }

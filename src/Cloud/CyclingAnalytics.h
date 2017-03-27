@@ -22,6 +22,7 @@
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QImage>
 
 class CyclingAnalytics : public CloudService {
 
@@ -30,6 +31,7 @@ class CyclingAnalytics : public CloudService {
     public:
 
         QString name() { return (tr("Cycling Analytics")); }
+        QImage logo() { return QImage(":images/services/cyclinganalytics.png"); }
 
         CyclingAnalytics(Context *context);
         CloudService *clone(Context *context) { return new CyclingAnalytics(context); }

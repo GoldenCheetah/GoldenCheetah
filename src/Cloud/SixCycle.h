@@ -22,6 +22,7 @@
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QImage>
 
 class SixCycle : public CloudService {
 
@@ -34,6 +35,7 @@ class SixCycle : public CloudService {
         ~SixCycle();
 
         QString name() { return (tr("Sixcycle")); }
+        QImage logo() { return QImage(":images/services/sixcycle.png"); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

@@ -22,6 +22,7 @@
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QImage>
 
 class TodaysPlan : public CloudService {
 
@@ -34,6 +35,7 @@ class TodaysPlan : public CloudService {
         ~TodaysPlan();
 
         QString name() { return (tr("Today's Plan")); }
+        QImage logo() { return QImage(":images/services/todaysplan.png"); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
