@@ -22,6 +22,7 @@
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QImage>
 
 class Selfloops : public CloudService {
 
@@ -30,6 +31,7 @@ class Selfloops : public CloudService {
     public:
 
         QString name() { return (tr("Selfloops")); }
+        QImage logo() { return QImage(":images/services/selfloops.png"); }
 
         Selfloops(Context *context);
         CloudService *clone(Context *context) { return new Selfloops(context); }

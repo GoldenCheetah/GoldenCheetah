@@ -22,6 +22,7 @@
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QImage>
 
 // parsing xml responses
 #include <QXmlInputSource>
@@ -35,6 +36,7 @@ class Velohero : public CloudService {
     public:
 
         QString name() { return (tr("Velohero")); }
+        QImage logo() { return QImage(":images/services/velohero.png"); }
 
         Velohero(Context *context);
         CloudService *clone(Context *context) { return new Velohero(context); }

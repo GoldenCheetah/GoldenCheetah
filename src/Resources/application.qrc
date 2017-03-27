@@ -164,5 +164,17 @@
         <file>images/configure.png</file>
         <file>web/googlemap/dark.css</file>
         <file>images/toolbar/cloud.png</file>
+        <file>images/services/cyclinganalytics.png</file>
+        <file>images/services/dropbox.png</file>
+        <file>images/services/googledrive.png</file>
+        <file>images/services/localstore.png</file>
+        <file>images/services/ridewithgps.png</file>
+        <file>images/services/selfloops.png</file>
+        <file>images/services/sixcycle.png</file>
+        <file>images/services/sportplushealth.png</file>
+        <file>images/services/strava.png</file>
+        <file>images/services/todaysplan.png</file>
+        <file>images/services/trainingstagebuch.png</file>
+        <file>images/services/velohero.png</file>
     </qresource>
 </RCC>

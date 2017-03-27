@@ -18,6 +18,7 @@
 
 #ifndef GC_TrainingStageBuch_h
 #define GC_TrainingStageBuch_h
+#include <QImage>
 
 // Cloud Services and HTTP
 #include "CloudService.h"
@@ -42,6 +43,7 @@ class TrainingStageBuch : public CloudService {
     public:
 
         QString name() { return (tr("TrainingStageBuch")); }
+        QImage logo() { return QImage(":images/services/trainingstagebuch.png"); }
 
         TrainingStageBuch(Context *context);
         CloudService *clone(Context *context) { return new TrainingStageBuch(context); }

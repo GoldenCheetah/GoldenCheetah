@@ -21,6 +21,7 @@
 
 #include "CloudService.h"
 #include <QNetworkAccessManager>
+#include <QImage>
 
 class Dropbox : public CloudService {
 
@@ -33,6 +34,7 @@ class Dropbox : public CloudService {
         ~Dropbox();
 
         QString name() { return (tr("Dropbox Cloud Storage")); }
+        QImage logo() { return QImage(":images/services/dropbox.png"); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

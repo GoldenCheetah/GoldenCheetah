@@ -29,6 +29,7 @@
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QString>
+#include <QImage>
 
 class GoogleDrive : public CloudService {
 
@@ -40,6 +41,7 @@ class GoogleDrive : public CloudService {
         virtual ~GoogleDrive();
 
         virtual QString name() { return (tr("Google Drive Cloud Storage")); }
+        QImage logo() { return QImage(":images/services/googledrive.png"); }
 
         // open/connect and close/disconnect
         virtual bool open(QStringList &errors);
