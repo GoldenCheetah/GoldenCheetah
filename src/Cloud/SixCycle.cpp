@@ -69,6 +69,7 @@ SixCycle::SixCycle(Context *context) : CloudService(context), context(context), 
     settings.insert(Username, GC_SIXCYCLE_USER);
     settings.insert(Password, GC_SIXCYCLE_PASS);
     settings.insert(URL, GC_SIXCYCLE_URL);
+    settings.insert(DefaultURL, "https://live.sixcycle.com");
 }
 
 SixCycle::~SixCycle() {

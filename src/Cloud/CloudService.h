@@ -109,7 +109,7 @@ class CloudService : public QObject {
         // with the settings applied back into the service when it is cloned -- this would
         // then allow multiple accounts for the same service, but for now its strictly
         // one account for one service.
-        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, Folder } setting_;
+        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
         // we use a dirent style API for traversing
