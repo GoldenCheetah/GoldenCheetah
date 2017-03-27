@@ -19,9 +19,21 @@
 #ifndef GC_TrainingStageBuch_h
 #define GC_TrainingStageBuch_h
 
+// Cloud Services and HTTP
 #include "CloudService.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+
+// XML parsing
+#include <QUrl>
+#include <QHttpMultiPart>
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+#include <QXmlDefaultHandler>
+#include <QNetworkReply>
+#if QT_VERSION > 0x050000
+#include <QUrlQuery>
+#endif
 
 class TrainingStageBuch : public CloudService {
 
@@ -56,9 +68,118 @@ class TrainingStageBuch : public CloudService {
         QNetworkReply *reply;
         CloudServiceEntry *root_;
 
+        QString sessionId;
+        bool proMember;
+
         QMap<QNetworkReply*, QByteArray*> buffers;
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
+};
+
+class TTBParser : public QXmlDefaultHandler
+{
+public:
+    friend class TrainingStageBuch;
+
+    bool startElement( const QString&, const QString&, const QString&,
+        const QXmlAttributes& )
+    {
+        cdata = "";
+        return true;
+    };
+
+    bool endElement( const QString&, const QString&, const QString& qName )
+    {
+        if( qName == "error" ){
+            error = cdata;
+            return true;
+        }
+        return true;
+    }
+
+    bool characters( const QString& str)
+    {
+        cdata += str;
+        return true;
+    };
+
+protected:
+    QString cdata;
+    QString error;
+};
+
+class TTBSettingsParser : public TTBParser
+{
+public:
+    friend class TrainingStageBuch;
+
+    TTBSettingsParser() :
+        pro(false),
+        reFalse("\\s*(0|false|no|)\\s*",Qt::CaseInsensitive )
+    {};
+
+    bool endElement( const QString& a, const QString&b, const QString& qName )
+    {
+        if( qName == "pro" ){
+            pro = ! reFalse.exactMatch(cdata);
+            return true;
+
+        } else if( qName == "session" ){
+            session = cdata;
+            return true;
+
+        }
+
+        return TTBParser::endElement( a, b, qName );
+    };
+
+protected:
+    bool    pro;
+    QString session;
+
+    QRegExp reFalse;
+};
+
+class TTBSessionParser : public TTBParser
+{
+public:
+    friend class TrainingStageBuch;
+
+    bool endElement( const QString& a, const QString&b, const QString& qName )
+    {
+        if( qName == "session" ){
+            session = cdata;
+            return true;
+
+        }
+
+        return TTBParser::endElement( a, b, qName );
+    };
+
+protected:
+    QString session;
+
+};
+
+class TTBUploadParser : public TTBParser
+{
+public:
+    friend class TrainingStageBuch;
+
+    bool endElement( const QString& a, const QString&b, const QString& qName )
+    {
+        if( qName == "id" ){
+            id = cdata;
+            return true;
+
+        }
+
+        return TTBParser::endElement( a, b, qName );
+    };
+
+protected:
+    QString id;
+
 };
 #endif

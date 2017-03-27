@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2012 Rainer Clasen <bj@zuto.de>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -48,6 +49,8 @@
     } while(0)
 #endif
 
+const QString TTB_URL( "http://trainingstagebuch.org" );
+
 TrainingStageBuch::TrainingStageBuch(Context *context) : CloudService(context), context(context), root_(NULL) {
 
     if (context) {
@@ -56,6 +59,7 @@ TrainingStageBuch::TrainingStageBuch(Context *context) : CloudService(context), 
     }
 
     uploadCompression = none; // gzip
+    filetype = CloudService::uploadType::PWX;
     useMetric = true; // distance and duration metadata
 }
 
@@ -72,7 +76,113 @@ TrainingStageBuch::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 bool
 TrainingStageBuch::open(QStringList &errors)
 {
+    // get a session token, then get the settings for the account
     printd("TrainingStageBuch::open\n");
+
+    // GET ACCOUNT SETTINGS
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
+
+#if QT_VERSION > 0x050000
+    QUrlQuery urlquery;
+#else
+    QUrl urlquery( TTB_URL + "/settings/list" );
+#endif
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "user", username );
+    urlquery.addQueryItem( "pass", password );
+
+#if QT_VERSION > 0x050000
+    QUrl url (TTB_URL + "/settings/list");
+    url.setQuery(urlquery.query());
+    QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
+
+    request.setRawHeader( "Accept-Encoding", "identity" );
+    request.setRawHeader( "Accept", "application/xml" );
+    request.setRawHeader( "Accept-Charset", "utf-8" );
+
+    // block waiting for response...
+    QEventLoop loop;
+    reply = nam->get(request);
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    TTBSettingsParser handler;
+    QXmlInputSource source(reply);
+
+    QXmlSimpleReader reader;
+    reader.setContentHandler(&handler);
+
+    if(! reader.parse(source) ){
+        errors << (tr("failed to parse Settings response: ")+handler.errorString());
+        return false;
+    }
+
+    if( handler.error.length() > 0 ){
+        errors << (tr("failed to get settings: ") +handler.error);
+        return false;
+    }
+
+    sessionId = handler.session;
+    proMember = handler.pro;
+
+    // if we got a session id, no need to go further.
+    if(sessionId.length() > 0) return true;
+
+    // GET SESSION TOKEN
+
+#if QT_VERSION > 0x050000
+    urlquery = QUrlQuery();
+#else
+    urlquery = QUrl(TTB_URL + "/login/sso");
+#endif
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "user", username );
+    urlquery.addQueryItem( "pass", password );
+
+#if QT_VERSION > 0x050000
+    url = QUrl(TTB_URL + "/login/sso");
+    url.setQuery(urlquery.query());
+    request = QNetworkRequest(url);
+#else
+    request = QNetworkRequest(urlquery);
+#endif
+
+    request.setRawHeader( "Accept-Encoding", "identity" );
+    request.setRawHeader( "Accept", "application/xml" );
+    request.setRawHeader( "Accept-Charset", "utf-8" );
+
+    // block waiting for response
+    reply = nam->get(request);
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    TTBSessionParser shandler;
+    QXmlInputSource ssource(reply);
+
+    reader.setContentHandler(&shandler);
+
+    if(! reader.parse(ssource)) {
+        errors << (tr("failed to parse Session response: ")+shandler.errorString());
+        return false;
+    }
+
+    if(handler.error.length() > 0){
+        errors << (tr("failed to get new session: ") +shandler.error );
+        return false;
+    }
+
+    sessionId = shandler.session;
+
+    if(sessionId.length() == 0){
+        errors << (tr("got empty session"));
+        return false;
+    }
+
+    // SUCCESS
     return true;
 }
 
@@ -91,8 +201,51 @@ TrainingStageBuch::writeFile(QByteArray &data, QString remotename, RideFile *rid
 
     printd("TrainingStageBuch::writeFile(%s)\n", remotename.toStdString().c_str());
 
+    QHttpMultiPart *body = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+    QHttpPart textPart;
+    textPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+    QVariant("form-data; name=\"upload_submit\""));
+    textPart.setBody("hrm");
+    body->append(textPart);
+
+    int limit = proMember ? 8 * 1024 * 1024 : 4 * 1024 * 1024;
+    if(data.size() >= limit ){
+        return false;
+    }
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader,
+    QVariant("application/octet-stream"));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+    QVariant("form-data; name=\"file\"; filename=\"gc-upload-ttb.pwx\""));
+    filePart.setBody(data);
+    body->append(filePart);
+
+#if QT_VERSION > 0x050000
+    QUrlQuery urlquery;
+#else
+    QUrl urlquery( TTB_URL + "/file/upload" );
+#endif
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "sso", sessionId );
+
+
+#if QT_VERSION > 0x050000
+    QUrl url (TTB_URL + "/file/upload");
+    url.setQuery(urlquery.query());
+    QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
+
+    request.setRawHeader( "Accept-Encoding", "identity" );
+    request.setRawHeader( "Accept", "application/xml" );
+    request.setRawHeader( "Accept-Charset", "utf-8" );
+
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
+    reply = nam->post(request, body);
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
@@ -111,14 +264,29 @@ TrainingStageBuch::writeFileCompleted()
 
     printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
-    if (reply->error() == QNetworkReply::NoError) {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Completed."));
+    TTBUploadParser handler;
+    QXmlInputSource source(reply);
+
+    QXmlSimpleReader reader;
+    reader.setContentHandler(&handler);
+
+    bool success = true;
+    if(! reader.parse(source)) {
+        success = false;
+    }
+
+    if(success && handler.error.length() > 0){
+        success = false;
+    }
+
+    if(success && handler.id.length() == 0 ){
+        success = false;
+    }
+
+    if (success && reply->error() == QNetworkReply::NoError) {
+        notifyWriteComplete(replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
     } else {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Network Error - Upload failed."));
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Error - Upload failed."));
     }
 }
 

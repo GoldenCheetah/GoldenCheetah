@@ -59,7 +59,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // icons
     static QIcon generalIcon(QPixmap(":images/toolbar/GeneralPreferences.png"));
     static QIcon athleteIcon(QPixmap(":/images/toolbar/user.png"));
-    static QIcon passwordIcon(QPixmap(":/images/toolbar/passwords.png"));
+    static QIcon passwordIcon(QPixmap(":/images/toolbar/cloud.png"));
     static QIcon appearanceIcon(QPixmap(":/images/toolbar/color.png"));
     static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
     static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
@@ -84,7 +84,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
-    added =head->addAction(passwordIcon, tr("Passwords"));
+    added =head->addAction(passwordIcon, tr("Accounts"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
