@@ -19,6 +19,7 @@
 #include "CyclingAnalytics.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -73,6 +74,11 @@ bool
 CyclingAnalytics::open(QStringList &errors)
 {
     printd("CyclingAnalytics::open\n");
+    QString token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    if (token == "") {
+        errors << tr("Account is not configured.");
+        return false;
+    }
     return true;
 }
 
@@ -91,6 +97,41 @@ CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride
 
     printd("CyclingAnalytics::writeFile(%s)\n", remotename.toStdString().c_str());
 
+    QString token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
+    QNetworkRequest request = QNetworkRequest(url);
+
+    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+
+    // MULTIPART *****************
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    multiPart->setBoundary(boundary.toLatin1());
+
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    QHttpPart activityNamePart;
+    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"title\""));
+    activityNamePart.setBody(remotename.toLatin1());
+
+    QHttpPart dataTypePart;
+    dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"format\""));
+    dataTypePart.setBody("tcx");
+
+    QHttpPart filenamePart;
+    filenamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"filename\""));
+    filenamePart.setBody(remotename.toLatin1());
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"file.tcx\"; type=\"text/xml\""));
+    filePart.setBody(data);
+
+    multiPart->append(activityNamePart);
+    multiPart->append(filenamePart);
+    multiPart->append(dataTypePart);
+    multiPart->append(filePart);
+
+    reply = nam->post(request, multiPart);
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
 
@@ -111,14 +152,44 @@ CyclingAnalytics::writeFileCompleted()
 
     printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
-    if (reply->error() == QNetworkReply::NoError) {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Completed."));
+    // remember why we errored
+    bool uploadSuccessful = false;
+    QString uploadError;
+
+    try {
+
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
+
+        // get values
+        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        //XXXcyclingAnalyticsUploadId = jsonResponse.root->getFieldInt("upload_id");
+
+    } catch(...) {
+
+        // problem!
+        uploadError = "bad response or parser exception.";
+        //XXXcyclingAnalyticsUploadId = 0;
+    }
+
+    // if not there clean out
+    if (uploadError.toLower() == "none" || uploadError.toLower() == "null") uploadError = "";
+
+    // update id if uploaded successfully
+    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError)  uploadSuccessful = false;
+    else {
+
+        // Success
+        //XXX ride->ride()->setTag("CyclingAnalytics uploadId", QString("%1").arg(cyclingAnalyticsUploadId));
+        //XXX ride->setDirty(true);
+        uploadSuccessful = true;
+    }
+
+    if (uploadSuccessful && reply->error() == QNetworkReply::NoError) {
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Completed."));
     } else {
-        notifyWriteComplete(
-            replyName(static_cast<QNetworkReply*>(QObject::sender())),
-            tr("Network Error - Upload failed."));
+        notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Network Error - Upload failed."));
     }
 }
 
