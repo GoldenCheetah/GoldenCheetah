@@ -59,6 +59,10 @@ RideWithGPS::RideWithGPS(Context *context) : CloudService(context), context(cont
 
     uploadCompression = none; // gzip
     useMetric = true; // distance and duration metadata
+
+    // config
+    settings.insert(Username, GC_RWGPSUSER);
+    settings.insert(Password, GC_RWGPSPASS);
 }
 
 RideWithGPS::~RideWithGPS() {

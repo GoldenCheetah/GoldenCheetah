@@ -60,11 +60,15 @@ SixCycle::SixCycle(Context *context) : CloudService(context), context(context), 
     uploadCompression = gzip;
     downloadCompression = none;
     filetype = CloudService::uploadType::TCX;
-
     session_token = ""; // not authenticated yet
 
     useMetric = true; // distance and duration metadata
     useEndDate = false; // startDateTime added, so no longer need this
+
+    // config
+    settings.insert(Username, GC_SIXCYCLE_USER);
+    settings.insert(Password, GC_SIXCYCLE_PASS);
+    settings.insert(URL, GC_SIXCYCLE_URL);
 }
 
 SixCycle::~SixCycle() {

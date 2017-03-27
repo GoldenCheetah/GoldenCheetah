@@ -62,6 +62,10 @@ TrainingStageBuch::TrainingStageBuch(Context *context) : CloudService(context), 
     uploadCompression = none; // gzip
     filetype = CloudService::uploadType::PWX;
     useMetric = true; // distance and duration metadata
+
+    //config
+    settings.insert(Username, GC_TTBUSER);
+    settings.insert(Password, GC_TTBPASS);
 }
 
 TrainingStageBuch::~TrainingStageBuch() {

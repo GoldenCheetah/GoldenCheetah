@@ -64,6 +64,10 @@ SportsPlusHealth::SportsPlusHealth(Context *context) : CloudService(context), co
     uploadCompression = none; // gzip
     filetype = CloudService::uploadType::TCX;
     useMetric = true; // distance and duration metadata
+
+    //config
+    settings.insert(Username, GC_SPORTPLUSHEALTHUSER);
+    settings.insert(Password, GC_SPORTPLUSHEALTHPASS);
 }
 
 SportsPlusHealth::~SportsPlusHealth() {

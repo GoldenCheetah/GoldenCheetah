@@ -88,6 +88,10 @@ GoogleDrive::GoogleDrive(Context *context)
         connect(nam_, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     }
     root_ = NULL;
+
+    // config
+    settings.insert(OAuthToken,  GC_GOOGLE_DRIVE_ACCESS_TOKEN);
+    settings.insert(Folder,  GC_GOOGLE_DRIVE_FOLDER);
 }
 
 GoogleDrive::~GoogleDrive() {

@@ -103,6 +103,15 @@ class CloudService : public QObject {
         }
         void notifyReadComplete(QByteArray *data, QString name, QString message) { emit readComplete(data,name,message); }
 
+        // settings are configured in settings by the service to tell the preferences
+        // pane what settings we need and where to store them, we then access them
+        // via the normal appsettings-> methods. In future we might abstract this firther
+        // with the settings applied back into the service when it is cloned -- this would
+        // then allow multiple accounts for the same service, but for now its strictly
+        // one account for one service.
+        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, Folder } setting_;
+        QHash<CloudServiceSetting, QString> settings;
+
         // we use a dirent style API for traversing
         // root - get me the root of the store
         // readdir - get me the contents of a path

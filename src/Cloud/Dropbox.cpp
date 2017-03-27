@@ -27,6 +27,10 @@ Dropbox::Dropbox(Context *context) : CloudService(context), context(context), ro
     if (context) {
         nam = new QNetworkAccessManager(this);
     }
+
+    // config
+    settings.insert(OAuthToken, GC_DROPBOX_TOKEN);
+    settings.insert(Folder, GC_DROPBOX_FOLDER);
 }
 
 Dropbox::~Dropbox() {

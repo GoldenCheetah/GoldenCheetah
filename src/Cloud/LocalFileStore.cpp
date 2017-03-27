@@ -31,6 +31,9 @@ LocalFileStore::LocalFileStore(Context *context) : CloudService(context), contex
         root_->isDir = true;
         root_->size = 1;
     }
+
+    // settings
+    settings.insert(Folder, GC_NETWORKFILESTORE_FOLDER);
 }
 
 LocalFileStore::~LocalFileStore() {
