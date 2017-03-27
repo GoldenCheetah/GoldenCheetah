@@ -51,6 +51,9 @@ public:
 
     // calibration
     uint8_t  getCalibrationType() { return CALIBRATION_TYPE_COMPUTRAINER; }
+
+private:
+    bool f3Depressed;
 };
 
 #endif // _GC_ComputrainerController_h
