@@ -7,7 +7,7 @@ compiler:
 - gcc
 env:
   matrix:
-#  - BRANCH=master QT=qt5 QT_PATH=qt5 QT_VER=5.5.1 WEBKIT=1
+  - BRANCH=master QT=qt5 QT_PATH=qt5 QT_VER=5.5.1 WEBKIT=1
   - BRANCH=master QT=qt5 QT_PATH=qt5 WEBKIT=0
   global:
   - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
@@ -37,7 +37,6 @@ before_install:
 - brew tap homebrew/science
 - brew install r
 - brew install lmfit
-- brew install --with-static https://raw.githubusercontent.com/gcoco/CI-for-GoldenCheetah/master/libkml.rb
 ## Disable KML for now
 ##- brew install --HEAD travis/libkml.rb
 - sudo chmod -R +w /usr/local
@@ -82,8 +81,8 @@ before_script:
   src/gcconfig.pri
 - sed -i "" "s|#\(QWT3D_INSTALL =.*\)|\1 ../qwtplot3d|" src/gcconfig.pri
 ## Disable KML for now
-- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom -lkmlconvenience -lkmlengine -lkmlbase -lexpect|" src/gcconfig.pri
+#- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
+#- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom -lkmlconvenience -lkmlengine -lkmlbase -lexpect|" src/gcconfig.pri
 - sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
 - sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
