@@ -59,6 +59,10 @@ Selfloops::Selfloops(Context *context) : CloudService(context), context(context)
     uploadCompression = gzip; // gzip
     filetype = CloudService::uploadType::TCX;
     useMetric = true; // distance and duration metadata
+
+    //config
+    settings.insert(Username, GC_SELUSER);
+    settings.insert(Password, GC_SELPASS);
 }
 
 Selfloops::~Selfloops() {

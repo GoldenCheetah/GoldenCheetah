@@ -58,8 +58,12 @@ TodaysPlan::TodaysPlan(Context *context) : CloudService(context), context(contex
 
     uploadCompression = gzip; // gzip
     downloadCompression = none;
-
     useMetric = true; // distance and duration metadata
+
+    // config
+    settings.insert(OAuthToken, GC_TODAYSPLAN_TOKEN);
+    settings.insert(URL, GC_TODAYSPLAN_URL);
+    settings.insert(Key, GC_TODAYSPLAN_USERKEY);
 }
 
 TodaysPlan::~TodaysPlan() {

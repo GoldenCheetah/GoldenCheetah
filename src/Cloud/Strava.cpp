@@ -60,6 +60,9 @@ Strava::Strava(Context *context) : CloudService(context), context(context), root
     uploadCompression = gzip; // gzip
     filetype = CloudService::uploadType::TCX;
     useMetric = true; // distance and duration metadata
+
+    // config
+    settings.insert(OAuthToken, GC_STRAVA_TOKEN);
 }
 
 Strava::~Strava() {

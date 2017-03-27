@@ -63,6 +63,10 @@ Velohero::Velohero(Context *context) : CloudService(context), context(context), 
     uploadCompression = none; // gzip
     filetype = CloudService::uploadType::PWX;
     useMetric = true; // distance and duration metadata
+
+    //config
+    settings.insert(Username, GC_VELOHEROUSER);
+    settings.insert(Password, GC_VELOHEROPASS);
 }
 
 Velohero::~Velohero() {

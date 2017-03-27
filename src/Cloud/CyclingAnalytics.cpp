@@ -59,6 +59,9 @@ CyclingAnalytics::CyclingAnalytics(Context *context) : CloudService(context), co
     uploadCompression = none; // gzip
     filetype = CloudService::uploadType::TCX;
     useMetric = true; // distance and duration metadata
+
+    // config
+    settings.insert(OAuthToken, GC_CYCLINGANALYTICS_TOKEN);
 }
 
 CyclingAnalytics::~CyclingAnalytics() {
