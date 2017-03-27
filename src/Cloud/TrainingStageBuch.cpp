@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2013 Damien.Grauser (damien.grauser@pev-geneve.ch)
  * Copyright (c) 2012 Rainer Clasen <bj@zuto.de>
  *
  * This program is free software; you can redistribute it and/or modify it
