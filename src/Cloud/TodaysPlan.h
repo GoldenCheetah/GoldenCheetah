@@ -35,6 +35,7 @@ class TodaysPlan : public CloudService {
         ~TodaysPlan();
 
         QString name() { return (tr("Today's Plan")); }
+        QString description() { return (tr("Sync with the smarter training site.")); }
         QImage logo() { return QImage(":images/services/todaysplan.png"); }
 
         // open/connect and close/disconnect

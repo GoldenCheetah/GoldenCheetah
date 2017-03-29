@@ -30,7 +30,8 @@ class SportsPlusHealth : public CloudService {
 
     public:
 
-        QString name() { return (tr("SportsPlusHealth")); }
+        QString name() { return (tr("SportPlusHealth")); }
+        QString description() { return (tr("Upload to the cycling and running site.")); }
         QImage logo() { return QImage(":images/services/sportplushealth.png"); }
 
         SportsPlusHealth(Context *context);

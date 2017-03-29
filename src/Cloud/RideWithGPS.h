@@ -31,6 +31,8 @@ class RideWithGPS : public CloudService {
     public:
 
         QString name() { return (tr("RideWithGPS")); }
+        QString description() { return(tr("Upload rides and analyse them using Google Maps.")); }
+
         QImage logo() { return QImage(":images/services/ridewithgps.png"); }
 
         RideWithGPS(Context *context);

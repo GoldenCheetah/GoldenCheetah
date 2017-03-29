@@ -31,6 +31,7 @@ class CyclingAnalytics : public CloudService {
     public:
 
         QString name() { return (tr("Cycling Analytics")); }
+        QString description() { return (tr("Upload to the power focused cycling site.")); }
         QImage logo() { return QImage(":images/services/cyclinganalytics.png"); }
 
         CyclingAnalytics(Context *context);

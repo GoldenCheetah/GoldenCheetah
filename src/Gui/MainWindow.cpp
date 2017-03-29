@@ -83,6 +83,7 @@
 #include "GoogleDrive.h"
 #include "SixCycle.h"
 #endif
+#include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
 
@@ -429,6 +430,10 @@ MainWindow::MainWindow(const QDir &home)
 
     // SHARE MENU
     QMenu *shareMenu = menuBar()->addMenu(tr("Sha&re"));
+    shareAction = new QAction(tr("Add Cloud Account..."), this);
+    shareAction->setShortcut(tr("Ctrl+U"));
+    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
+    shareMenu->addAction(shareAction);
     shareAction = new QAction(tr("Share Online..."), this);
     shareAction->setShortcut(tr("Ctrl+U"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
@@ -1995,6 +2000,16 @@ MainWindow::share()
         ShareDialog d(currentTab->context, currentTab->context->ride);
         d.exec();
     }
+}
+
+void
+MainWindow::addAccount()
+{
+
+    // lets get a new cloud service account
+    AddCloudWizard *p = new AddCloudWizard(currentTab->context);
+    p->show();
+
 }
 
 /*----------------------------------------------------------------------

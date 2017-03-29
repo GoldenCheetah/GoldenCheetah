@@ -43,6 +43,7 @@ class TrainingStageBuch : public CloudService {
     public:
 
         QString name() { return (tr("TrainingStageBuch")); }
+        QString description() { return (tr("Upload to your online and mobile training log.")); }
         QImage logo() { return QImage(":images/services/trainingstagebuch.png"); }
 
         TrainingStageBuch(Context *context);

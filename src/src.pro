@@ -695,7 +695,7 @@ HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownl
            Cloud/OAuthDialog.h Cloud/ShareDialog.h Cloud/SportPlusHealthUploader.h Cloud/TodaysPlanBodyMeasures.h \
            Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h \
            Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h Cloud/TrainingStageBuch.h \
-           Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h
+           Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h Cloud/AddCloudWizard.h
 
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
@@ -786,7 +786,7 @@ SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarD
            Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp Cloud/SportPlusHealthUploader.cpp Cloud\TodaysPlanBodyMeasures.cpp \
            Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp \
            Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp Cloud/TrainingStageBuch.cpp \
-           Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp
+           Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp Cloud/AddCloudWizard.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
