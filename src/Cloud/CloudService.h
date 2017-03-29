@@ -71,6 +71,7 @@ class CloudService : public QObject {
         // that represents the website, so likely to just be the URL simplified
         // e.g. https://www.strava.com => "Strava"
         virtual QString name() { return "NONE"; }
+        virtual QString description() { return ""; }
 
         // need a logo, we may resize but will keep aspect ratio
         virtual QImage logo() = 0;
@@ -408,6 +409,16 @@ class CloudServiceFactory {
 
     const QStringList &serviceNames() const { return names_; }
     const CloudService *service(QString name) const { return services_.value(name, NULL); }
+    const QList<CloudService*> services() {
+        QList<CloudService*>returning;
+        QHashIterator<QString,CloudService*> i(services_);
+        i.toFront();
+        while(i.hasNext()) {
+            i.next();
+            returning << i.value();
+        }
+        return returning;
+    }
 
     CloudService *newService(const QString &name, Context *context) const {
         return services_.value(name)->clone(context);

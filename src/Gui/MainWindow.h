@@ -220,6 +220,7 @@ class MainWindow : public QMainWindow
         void tweetRide();
 #endif
         void share();
+        void addAccount();
         void manualProcess(QString);
 #if QT_VERSION > 0x050000
         void uploadDropbox();

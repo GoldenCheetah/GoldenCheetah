@@ -31,6 +31,7 @@ class Selfloops : public CloudService {
     public:
 
         QString name() { return (tr("Selfloops")); }
+        QString description() { return tr("Upload and track your training and progress."); }
         QImage logo() { return QImage(":images/services/selfloops.png"); }
 
         Selfloops(Context *context);

@@ -35,6 +35,7 @@ class SixCycle : public CloudService {
         ~SixCycle();
 
         QString name() { return (tr("Sixcycle")); }
+        QString description() { return (tr("Sync with the innovative training site.")); }
         QImage logo() { return QImage(":images/services/sixcycle.png"); }
 
         // open/connect and close/disconnect
