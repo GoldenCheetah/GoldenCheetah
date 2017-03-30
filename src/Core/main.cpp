@@ -364,13 +364,13 @@ main(int argc, char *argv[])
                                           .arg(15*dpiXFactor)
                                           .arg(3*dpiYFactor));
 
-       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
+       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     } else {
-       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
+       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     }
 #endif
 #else
-       qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no hidpi support available";
+       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no hidpi support available";
 #endif
 
     // scale up to user scale factor
@@ -387,7 +387,7 @@ main(int argc, char *argv[])
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
 
     // what filestores are registered (whilst we refactor)
-    qDebug()<<"Cloud services registered:"<<CloudServiceFactory::instance().serviceNames();
+    //qDebug()<<"Cloud services registered:"<<CloudServiceFactory::instance().serviceNames();
 
     //
     // OPEN FIRST MAINWINDOW
