@@ -31,6 +31,7 @@
 #include <QProgressBar>
 #include <QFileDialog>
 #include <QCommandLinkButton>
+#include <QScrollArea>
 
 class AddCloudWizard : public QWizard
 {
@@ -51,6 +52,11 @@ public:
 
     // this is cloned for our context
     CloudService *cloudService;
+
+    // settings we are currently updating - initially set
+    // from the current values, but modified by the user
+    // as they work through the wizard
+    QHash<QString, QString> settings;
 
 public slots:
 
@@ -110,12 +116,26 @@ class AddAuth : public QWizardPage
     public slots:
         void initializePage();
         bool validatePage();
-        int nextId() const { return 30; }
+        int nextId() const { return 30; } //XXX might go to end if no settings left to configure
 
         //void doAuth();
 
     private:
         AddCloudWizard *wizard;
+
+        // all laid out in a formlayout of rows
+        QLabel *urlLabel;
+        QLineEdit *url;
+        QLabel *keyLabel;
+        QLineEdit *key;
+        QLabel *userLabel;
+        QLineEdit *user;
+        QLabel *passLabel;
+        QLineEdit *pass;
+        QLabel *authLabel;
+        QPushButton *auth;
+        QLabel *tokenLabel;
+        QLabel *token;
 };
 
 class AddSettings : public QWizardPage
@@ -125,13 +145,17 @@ class AddSettings : public QWizardPage
     public:
         AddSettings(AddCloudWizard *);
         void initializePage();
-        bool validatePage();
+        bool validatePage(); //XXX needs to save away entered values
         int nextId() const { return 90; }
 
     public slots:
 
     private:
         AddCloudWizard *wizard;
+        QLabel *folderLabel;
+        QLineEdit *folder;
+        QPushButton *browse;
+        QCheckBox *syncStartup, *syncImport;
 };
 
 class AddFinish : public QWizardPage

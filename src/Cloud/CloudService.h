@@ -79,7 +79,7 @@ class CloudService : public QObject {
         // register with capabilities of the service - emerging standard
         // is a service that allows oauth, query and upload as well as download
         enum { OAuth=0x01, UserPass=0x02, Upload=0x04, Download=0x08, Query=0x10} capa_;
-        virtual int capabilities() { return OAuth | Upload | Download | Query; }
+        virtual int capabilities() const { return OAuth | Upload | Download | Query; }
 
         // register with type of service
         enum { Activities=0x01, Measures=0x02, Calendar=0x04 } type_;

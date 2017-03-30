@@ -162,7 +162,52 @@ AddService::clicked(QString p)
     // reset -- particularly since we might get here from
     //          other pages hitting 'Back'
     wizard->service = p;
-    wizard->next();
+    const CloudService *s = CloudServiceFactory::instance().service(wizard->service);
+
+    if (wizard->cloudService) delete wizard->cloudService;
+    wizard->cloudService = const_cast<CloudService*>(s)->clone(wizard->context);
+
+    if (wizard->cloudService) {
+
+        // clear the settings we previously edited
+        wizard->settings.clear();
+
+        // get default or whatever
+        QString cname;
+        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
+            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
+            if (value == "") {
+                // get the default value for the service
+                value = wizard->cloudService->settings.value(CloudService::CloudServiceSetting::DefaultURL, "");
+            }
+            wizard->settings.insert(cname, value);
+        }
+
+        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Key, "")) != "") {
+            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
+            wizard->settings.insert(cname, value);
+        }
+
+        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Username, "")) != "") {
+            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
+            wizard->settings.insert(cname, value);
+        }
+
+        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Password, "")) != "") {
+            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
+            wizard->settings.insert(cname, value);
+        }
+
+        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
+            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
+            wizard->settings.insert(cname, value);
+        }
+        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
+            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
+            wizard->settings.insert(cname, value);
+        }
+        wizard->next();
+    }
 }
 
 //Select Cloud type
@@ -171,7 +216,39 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     setTitle(tr("Service Credentials "));
     setSubTitle(tr("Credentials and authorisation"));
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    QFormLayout *layout = new QFormLayout;
+    //layout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+
+    // labels
+    urlLabel = new QLabel(tr("URL"));
+    keyLabel = new QLabel(tr("Key (optional)"));
+    userLabel = new QLabel(tr("Username"));
+    passLabel = new QLabel(tr("Password"));
+    authLabel = new QLabel(tr("Authorise"));
+    tokenLabel = new QLabel(tr("Token"));
+
+    // input boxes
+    url = new QLineEdit(this);
+    url->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    key = new QLineEdit(this);
+    key->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    user = new QLineEdit(this);
+    user->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pass = new QLineEdit(this);
+    pass->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    auth = new QPushButton(tr("Authorise"), this);
+    auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    token = new QLabel(this);
+    token->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    layout->addRow(urlLabel, url);
+    layout->addRow(keyLabel, key);
+    layout->addRow(userLabel, user);
+    layout->addRow(passLabel, pass);
+    layout->addRow(authLabel, auth);
+    layout->addRow(tokenLabel, token);
+
     setLayout(layout);
     setFinalPage(false);
 }
@@ -180,27 +257,71 @@ void
 AddAuth::initializePage()
 {
     setSubTitle(tr("Credentials and authorisation"));
-    const CloudService *s = CloudServiceFactory::instance().service(wizard->service);
 
     // hide all the widgets
-    // TODO
+    url->hide();
+    key->hide();
+    user->hide();
+    pass->hide();
+    auth->hide();
+    token->hide();
+    urlLabel->hide();
+    keyLabel->hide();
+    userLabel->hide();
+    passLabel->hide();
+    authLabel->hide();
+    tokenLabel->hide();
 
     // clone to do next few steps!
-    if (s) {
-        if (wizard->cloudService) delete wizard->cloudService;
-        wizard->cloudService = const_cast<CloudService*>(s)->clone(wizard->context);
-        setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->name()));
+    setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->name()));
 
-        // show  all the widgets relevant for this service
-        // TODO
+    // show  all the widgets relevant for this service and update the value from the
+    // settings we have collected (which will have been defaulted).
+    QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
+        url->show(); urlLabel->show();
+        url->setText(wizard->settings.value(cname, ""));
     }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Key, "")) != "") {
+        key->show(); keyLabel->show();
+        key->setText(wizard->settings.value(cname, ""));
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Username, "")) != "") {
+        user->show(); userLabel->show();
+        user->setText(wizard->settings.value(cname, ""));
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Password, "")) != "") {
+        pass->show(); passLabel->show();
+        pass->setText(wizard->settings.value(cname, ""));
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
+        auth->show(); authLabel->show();
+        token->show(); tokenLabel->show();
+        token->setText(wizard->settings.value(cname, ""));
+    }
+
 }
 
 bool
 AddAuth::validatePage()
 {
     // check the authorisation has been completed
-    // TODO
+    QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
+        wizard->settings.insert(cname, url->text());
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Key, "")) != "") {
+        wizard->settings.insert(cname, key->text());
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Username, "")) != "") {
+        wizard->settings.insert(cname, user->text());
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Password, "")) != "") {
+        wizard->settings.insert(cname, pass->text());
+    }
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
+        wizard->settings.insert(cname, token->text());
+    }
     return true;
 }
 
@@ -210,14 +331,53 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
 {
     setSubTitle(tr("Cloud Service Settings"));
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    QFormLayout *layout = new QFormLayout(this);
+    layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     setLayout(layout);
+
+    folderLabel = new QLabel(tr("Folder"));
+    folder = new QLineEdit(this);
+    folder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    browse = new QPushButton(tr("Browse"));
+    syncStartup = new QCheckBox(tr("Sync on startup"));
+    syncImport = new QCheckBox(tr("Sync on import"));
+
+    QHBoxLayout *flayout = new QHBoxLayout;
+    flayout->addWidget(folderLabel);
+    flayout->addWidget(folder);
+    flayout->addWidget(browse);
+    layout->addRow(flayout);
+
+    layout->addRow(syncStartup); // only makes sense if the service has a query api
+    layout->addRow(syncImport); // only makes sense if the service has an upload api
 }
 
 void
 AddSettings::initializePage()
 {
     setTitle(QString(tr("Service Settings")));
+
+    // hide everything first
+    folderLabel->hide();
+    folder->hide();
+    browse->hide();
+    syncStartup->hide();
+    syncImport->hide();
+
+    // if we need a folder then set that to show
+    QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
+        browse->show(); folder->show(); folderLabel->show();
+        folder->setText(wizard->settings.value(cname, ""));
+    }
+    if (wizard->cloudService->capabilities() & CloudService::Query) {
+        //syncStartup->setChecked(...) //XXX TODO
+        syncStartup->show();
+    }
+    if (wizard->cloudService->capabilities() & CloudService::Upload) {
+        //syncStartup->setChecked(...) //XXX TODO
+        syncImport->show();
+    }
 }
 
 bool
