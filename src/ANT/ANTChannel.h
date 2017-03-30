@@ -102,6 +102,8 @@ class ANTChannel : public QObject {
         char id[10]; // short identifier
         ANTChannelInitialisation mi;
 
+        bool sc_speed_active, sc_cadence_active; // for S&C sensor with single magnet
+
         int    messages_received; // for signal strength metric
         int    messages_dropped;
         qint64 lastMessageTimestamp; // for time comparisons
