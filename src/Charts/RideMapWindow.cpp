@@ -1077,7 +1077,6 @@ RideMapWindow::createMarkers()
                 view->page()->mainFrame()->evaluateJavaScript(code);
             #endif
 
-                stoptime=0;
             }
             stoplat=stoplon=stoptime=0;
         }
@@ -1232,7 +1231,7 @@ MapWebBridge::getLatLons(int i)
         }
         return latlons;
 
-    } else {
+    } else if (rideItem) {
 
         // get latlons for entire route
         foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {

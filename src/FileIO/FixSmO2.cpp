@@ -86,7 +86,9 @@ static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(QS
 bool
 FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
+    
     // does this ride have power?
     if (ride->areDataPresent()->watts == false) return false;
 

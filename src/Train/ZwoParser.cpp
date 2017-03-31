@@ -18,11 +18,6 @@
 
 #include "ZwoParser.h"
 
-static inline QString unquote(QString quoted)
-{
-    return quoted.mid(1,quoted.length()-2);
-}
-
 bool ZwoParser::startDocument()
 {
     buffer.clear();

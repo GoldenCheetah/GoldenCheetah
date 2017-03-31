@@ -316,13 +316,6 @@ main(int argc, char *argv[])
     // hidpi ratios -- single desktop for now
     desktop = QApplication::desktop();
 
-    // We will set screen ratio factor for sizing when a screen
-    // is greater than the Surface Pro 3 2160x1440, since its a break
-    // point with resolutions above that being devices like the
-    // 2560x1700 chromebook pixel before we get to truly hi-dpi
-    // resolutions like apples MBP retina 2880x1800 up through
-    // UHD, 4k and 5k displays at 3840x2160, 4096x2304 and 5120 x 2160.
-    QRect screenSize = desktop->availableGeometry();
 
     // since almost all dialogs are sized for a screen resolution
     // of 1280x1024, to save issues we will scale DIALOGS to the
@@ -334,6 +327,15 @@ main(int argc, char *argv[])
 
 #if QT_VERSION_MAJOR >= 5
 #ifndef Q_OS_MAC // not needed on a Mac
+
+    // We will set screen ratio factor for sizing when a screen
+    // is greater than the Surface Pro 3 2160x1440, since its a break
+    // point with resolutions above that being devices like the
+    // 2560x1700 chromebook pixel before we get to truly hi-dpi
+    // resolutions like apples MBP retina 2880x1800 up through
+    // UHD, 4k and 5k displays at 3840x2160, 4096x2304 and 5120 x 2160.
+    QRect screenSize = desktop->availableGeometry();
+
     // if we're running with dpiawareness of 0 the screen resolution
     // will be expressed taking into account the scaling applied
     // so for example a 3840x2160 screen will likely be expressed as

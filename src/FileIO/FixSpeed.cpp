@@ -112,6 +112,8 @@ static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(Q
 bool
 FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // get settings
     int ma;
     if (config == NULL) { // being called automatically

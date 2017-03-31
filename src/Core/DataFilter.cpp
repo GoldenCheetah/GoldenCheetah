@@ -2456,8 +2456,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                             if (xs && m->xdata().value(xdata,QStringList()).contains(series)) {
                                 int idx = m->xdata().value(xdata,QStringList()).indexOf(series);
                                 QString units;
-                                int count = m->ride()->xdata(xdata)->unitname.count();
-                                if (idx >= 0 && idx < xs->unitname.count())
+                                const int count = xs->unitname.count();
+                                if (idx >= 0 && idx < count)
                                     units = xs->unitname[idx];
                                 return Result(units);
                             }
