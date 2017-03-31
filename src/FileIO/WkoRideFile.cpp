@@ -638,8 +638,10 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     } else {
 
         // date not available from filename use WKO metadata
+        // Note: WKO format sure is special, tested with file 2008_06_25_20_59_49.wko renamed to 'my.wko'. 
         QDateTime datetime(QDate::fromJulianDay(julian),
-            QTime(sincemidnight/MS_IN_ONE_HOUR, (sincemidnight%MS_IN_ONE_HOUR)/6000, (sincemidnight%6000)/100));
+            QTime(sincemidnight/MS_IN_WKO_HOURS, (sincemidnight%MS_IN_WKO_HOURS)/6000, (sincemidnight%6000)/100));
+                
         results->setStartTime(datetime);
     }
 
