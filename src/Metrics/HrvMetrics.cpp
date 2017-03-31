@@ -140,7 +140,7 @@ public:
         }
     }
 
-    bool isRelevantForRide(RideItem) const { return true; }
+    bool isRelevantForRide(RideItem *) const { return true; }
 
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
