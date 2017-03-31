@@ -1838,8 +1838,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->restore();
 }
 
-Sparkline::Sparkline(QGraphicsWidget *parent, int count, QString name) : QGraphicsItem(NULL), parent(parent), count(count), name(name)
+Sparkline::Sparkline(QGraphicsWidget *parent, int count, QString name)
+    : QGraphicsItem(NULL), parent(parent), name(name)
 {
+    Q_UNUSED(count)
+    
     min = max = 0.0f;
     setGeometry(20,20,100,100);
     setZValue(11);

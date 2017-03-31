@@ -78,7 +78,7 @@ public:
         }
     }
 
-    bool isRelevantForRide(RideItem) const { return true; }
+    bool isRelevantForRide(const RideItem *) const { return true; }
 
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
@@ -218,7 +218,7 @@ public:
 
     double stdmean(){ return stdmean_; }
 
-    bool isRelevantForRide(RideItem) const { return true; }
+    bool isRelevantForRide(const RideItem *) const { return true; }
 
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
@@ -399,7 +399,7 @@ public:
         }
     }
 
-    bool isRelevantForRide(RideItem) const { return true; }
+    bool isRelevantForRide(const RideItem *) const { return true; }
 
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
@@ -458,7 +458,7 @@ public:
         }
     }
 
-    bool isRelevantForRide(RideItem) const { return true; }
+    bool isRelevantForRide(const RideItem *) const { return true; }
 
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
@@ -527,7 +527,7 @@ public:
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new pnnx(*this); }
-    bool isRelevantForRide(RideItem) const { return true; }
+    bool isRelevantForRide(const RideItem *) const { return true; }
 };
 
 static bool addPnnx()

@@ -337,7 +337,6 @@ class Sparkline : public QGraphicsItem
     private:
         QGraphicsWidget *parent;
         QRectF geom;
-        int count;
         QString name;
         double min, max;
         QList<QPointF> points;
