@@ -130,10 +130,13 @@ win32-msvc* {
     # gnu toolchain wants math libs
     LIBS += -lm
 
-    # Linux gcc 5 grumbles about unused static globals and leads
-    # to a gazillion warnings that are harmless so lets remove them
     unix:!macx {
+        # Linux gcc 5 grumbles about unused static globals and leads
+        # to a gazillion warnings that are harmless so lets remove them
         QMAKE_CXXFLAGS += -Wno-unused-variable
+
+        # Linux Flex compiler grumbles about unsigned comparisons
+        QMAKE_CXXFLAGS += -Wno-sign-compare
     }
 }
 

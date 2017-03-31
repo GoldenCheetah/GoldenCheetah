@@ -149,6 +149,7 @@ class AddSettings : public QWizardPage
         int nextId() const { return 90; }
 
     public slots:
+        void browseFolder();
 
     private:
         AddCloudWizard *wizard;
@@ -165,11 +166,12 @@ class AddFinish : public QWizardPage
     public:
         AddFinish(AddCloudWizard *);
         void initializePage();
-        //bool validatePage();
+        bool validatePage();
         bool isCommitPage() { return true; }
 
     private:
         AddCloudWizard *wizard;
+        QFormLayout *layout;
 
 };
 
