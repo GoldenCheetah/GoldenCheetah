@@ -638,11 +638,13 @@ ImportPage::ImportPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void ImportPage::initializePage()
 {
+        RideItem *rideItem = hackContext->rideItem();
+        if (NULL == rideItem)
+            return;
 
         setTitle(tr("Workout Wizard"));
         setSubTitle(tr("Import current activity as a Gradient ride (slope based)"));
         setFinalPage(true);
-        QVBoxLayout *layout = new QVBoxLayout();
         plot = new WorkoutPlot();
         metricUnits = hackContext->athlete->useMetricUnits;
         QString s = (metricUnits ? tr("KM") : tr("Miles"));
@@ -651,15 +653,13 @@ void ImportPage::initializePage()
         s = (metricUnits ? tr("Meters") : tr("Feet"));
         QString elevation = QString(tr("elevation (")) + s + QString(")");
         plot->setYAxisTitle(elevation);
-        RideItem *rideItem = hackContext->rideItem();
 
-        if(rideItem == NULL)
-            return;
 
         foreach(RideFilePoint *rfp,rideItem->ride()->dataPoints())
         {
             rideData.append(QPair<double,double>(rfp->km,rfp->alt));
         }
+        QVBoxLayout *layout = new QVBoxLayout();
         layout->addWidget(plot,1);
 
         QGroupBox *spinGroupBox = new QGroupBox();
@@ -672,7 +672,6 @@ void ImportPage::initializePage()
         gradeBox->setToolTip(tr("Maximum supported grade is 8"));
         connect(gradeBox,SIGNAL(valueChanged(int)),this,SLOT(updatePlot()));
 
-        QLabel *segmentLabel = new QLabel(tr("Segment Length"));
         segmentBox = new QSpinBox();
         segmentBox->setMinimum(0);
         segmentBox->setMaximum((metricUnits ? 1000 : 5120));
@@ -685,7 +684,7 @@ void ImportPage::initializePage()
         QGridLayout *spinBoxLayout = new QGridLayout();
         spinBoxLayout->addWidget(gradeLabel,0,0);
         spinBoxLayout->addWidget(gradeBox,0,1);
-        spinBoxLayout->addWidget(segmentLabel,1,0);
+        spinBoxLayout->addWidget(new QLabel(tr("Segment Length")),1,0);
         spinBoxLayout->addWidget(segmentBox,1,1);
         spinGroupBox->setLayout(spinBoxLayout);
         bottomLayout->addWidget(spinGroupBox);
