@@ -116,6 +116,8 @@ static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor
 bool
 FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // get settings
     double pl;
     if (config == NULL) { // being called automatically

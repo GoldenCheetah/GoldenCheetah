@@ -136,6 +136,8 @@ static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor(QS
 bool
 FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // get settings
     double tolerance, stop;
     if (config == NULL) { // being called automatically

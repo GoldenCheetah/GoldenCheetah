@@ -86,7 +86,8 @@ static bool FixFreewheelingAdded = DataProcessorFactory::instance().registerProc
 bool
 FixFreewheeling::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
 
     // does this ride have power and cadence ?
     if (ride->areDataPresent()->watts == false || ride->areDataPresent()->cad == false) return false;

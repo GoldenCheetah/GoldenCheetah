@@ -121,6 +121,8 @@ static bool fixHRSpikesAdded = DataProcessorFactory::instance().registerProcesso
 bool
 FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // does this ride have heart rate data?
     if (ride->areDataPresent()->hr == false) return false;
 

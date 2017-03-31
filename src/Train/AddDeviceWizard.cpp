@@ -223,7 +223,9 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     do {
 
         // can we find it automatically?
-        isfound = wizard->controller->find();
+        if (wizard->controller) {
+            isfound = wizard->controller->find();
+        }
 
         if (isfound == false && (wizard->deviceTypes.Supported[wizard->current].connector == DEV_LIBUSB ||
                             wizard->deviceTypes.Supported[wizard->current].connector == DEV_USB)) {

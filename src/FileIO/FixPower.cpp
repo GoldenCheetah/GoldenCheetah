@@ -112,6 +112,8 @@ static bool FixPowerAdded = DataProcessorFactory::instance().registerProcessor(Q
 bool
 FixPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // Lets do it then!
     QString tp;
     double percentageAdjust = 0;

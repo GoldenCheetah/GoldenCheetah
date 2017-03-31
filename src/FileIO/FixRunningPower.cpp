@@ -166,6 +166,9 @@ static bool FixRunningPowerAdded = DataProcessorFactory::instance().registerProc
 bool
 FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(config)
+    Q_UNUSED(op)
+
     // get settings
     double MEquip; // Equipment weight kg
     double DraftM;  // Drafting Multiplier

@@ -137,6 +137,8 @@ static bool fixSpikesAdded = DataProcessorFactory::instance().registerProcessor(
 bool
 FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // does this ride have power?
     if (ride->areDataPresent()->watts == false) return false;
 
