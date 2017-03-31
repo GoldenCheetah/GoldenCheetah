@@ -24,6 +24,8 @@
 #include "Colors.h"
 #include "CloudService.h"
 
+#include <QMessageBox>
+
 // WIZARD FLOW
 //
 // 01. Select Service Class (e.g. Activities, Measures, Calendar)
