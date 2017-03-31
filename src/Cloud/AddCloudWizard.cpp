@@ -451,7 +451,11 @@ void
 AddFinish::initializePage()
 {
     // clear previous
-    while(layout->rowCount() > 0) layout->removeRow(0);
+    while(layout->count() > 0) {
+       QLayoutItem *item = layout->takeAt(0);
+       if (item->widget()) delete item->widget();
+       delete item;
+    }
 
     // add from wizard settings -- this is what we
     // will now create.
