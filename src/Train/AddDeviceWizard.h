@@ -34,6 +34,7 @@
 #if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
+#include "KettlerRacerController.h"
 #endif
 #include "ANTlocalController.h"
 #include "ANTChannel.h"

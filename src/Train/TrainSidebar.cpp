@@ -45,6 +45,7 @@
 #if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
+#include "KettlerRacerController.h"
 #endif
 #include "ANTlocalController.h"
 #include "NullController.h"
@@ -639,6 +640,8 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new MonarkController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_KETTLER) {
             Devices[i].controller = new KettlerController(this, &Devices[i]);
+        } else if (Devices.at(i).type == DEV_KETTLER_RACER) {
+            Devices[i].controller = new KettlerRacerController(this, &Devices[i]);
 #endif
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
