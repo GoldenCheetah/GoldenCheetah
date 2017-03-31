@@ -51,9 +51,11 @@ struct Bin2FileReaderState
     QString deviceInfo;
 
     Bin2FileReaderState(QFile &file, QStringList &errors) :
-        file(file), errors(errors), rideFile(NULL), secs(0), km(0),
-        interval(0), last_interval_secs(0.0), interval_offset(0), jouleGPS(true), jouleGPS_GPSPlus(true),
-        stopped(true), data_version(0)
+        file(file), errors(errors), rideFile(NULL), data_version(0),
+        secs(0), km(0),
+        interval(0), last_interval_secs(0.0), interval_offset(0),
+        jouleGPS(true), jouleGPS_GPSPlus(true),
+        stopped(true)
     {
 
     }
