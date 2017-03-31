@@ -416,12 +416,12 @@ TodaysPlanWorkoutDownload::getFileList(QString &error, QDateTime from, QDateTime
             for(int i=0; i<results.size(); i++) {
                 QJsonObject each = results.at(i).toObject();
                 QJsonObject scheduled = each["scheduled"].toObject();
-                TodaysPlanWorkoutListEntry *add = new TodaysPlanWorkoutListEntry();
 
                 // skip "Rest" days
                 if (scheduled["workout"].toString() == "rest" && scheduled["tscorepwr"].toDouble() == 0.0) continue;
 
                 // workout details
+                TodaysPlanWorkoutListEntry *add = new TodaysPlanWorkoutListEntry();
                 add->workoutId = QString("%1").arg(each["workoutId"].toInt());
                 add->planDate = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).date();
                 add->duration = scheduled["durationSecs"].toDouble();

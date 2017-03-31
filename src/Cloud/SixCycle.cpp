@@ -193,6 +193,9 @@ SixCycle::createFolder(QString)
 QList<CloudServiceEntry*>
 SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 {
+    Q_UNUSED(from)
+    Q_UNUSED(to)
+    
     printd("Sixcycle::readdir(%s)\n", path.toStdString().c_str());
 
     QList<CloudServiceEntry*> returning;

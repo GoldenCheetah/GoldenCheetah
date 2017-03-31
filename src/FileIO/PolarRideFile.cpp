@@ -543,6 +543,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
               {
                   // Pdd file exist but it does not contain
                   // hrmFile_orig (probably been deleted)
+                  delete rideFile;
                   return NULL;
               }
           else if (hrmFile_orig == hrvFile && hrmFile != hrvFile)
@@ -584,6 +585,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
                     // If both exist only read when equal to ".hrm"
                     errors << ("This is a R-R file: \""
                                + file.fileName() + "\"");
+                    delete rideFile;
                     return NULL;
                 }
                 else {
@@ -605,6 +607,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
             {
                 errors << ("Can not find : \""
                            + file.fileName() + "\"");
+                delete rideFile;
                 return NULL;
             }
         haveGPX = gpxfile.exists();

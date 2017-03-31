@@ -69,11 +69,12 @@ class PeakPercent : public RideMetric {
             double CP = 250;
             double WPRIME = 22000;
 
-            if (item->context->athlete->zones(item->isRun)) {
+            const Zones* zones = item->context->athlete->zones(item->isRun);
+            if (zones) {
 
                 // if range is -1 we need to fall back to a default value
-                CP = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getCP(item->zoneRange) : 250;
-                WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange) : 22000;
+                CP = item->zoneRange >= 0 ? zones->getCP(item->zoneRange) : 250;
+                WPRIME = item->zoneRange >= 0 ? zones->getWprime(item->zoneRange) : 22000;
 
                 // did we override CP in metadata ?
                 int oCP = item->getText("CP","0").toInt();
@@ -128,7 +129,8 @@ class PowerZone : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (!item->context->athlete->zones(item->isRun) || !item->ride()->areDataPresent()->watts) {
+        const Zones* zones = item->context->athlete->zones(item->isRun);
+        if (!zones || !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -138,7 +140,7 @@ class PowerZone : public RideMetric {
         double percent=0;
 
         // if range is -1 we need to fall back to a default value
-        int zone = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->whichZone(item->zoneRange, ap) + 1 : 0;
+        int zone = item->zoneRange >= 0 ? zones->whichZone(item->zoneRange, ap) + 1 : 0;
 
         // ok, how far up  the zone was this?
         if (item->zoneRange >= 0 && zone) {
@@ -146,13 +148,13 @@ class PowerZone : public RideMetric {
             // get zone info
             QString name, description;
             int low, high;
-            item->context->athlete->zones(item->isRun)->zoneInfo(item->zoneRange, zone-1, name, description, low, high);
+            zones->zoneInfo(item->zoneRange, zone-1, name, description, low, high);
 
             // use Pmax as upper bound, this is used
             // for the limit of upper zone ALWAYS
-            if (high > item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange)) 
-                high = item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange);
-
+            const int pmax = zones->getPmax(item->zoneRange);
+            high = std::max(high, pmax);
+            
             // how far in?
             percent = double(ap-low) / double(high-low);
 
