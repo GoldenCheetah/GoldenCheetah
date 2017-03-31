@@ -37,6 +37,7 @@
 #include <QProgressBar>
 
 #include "Context.h"
+#include "Settings.h"
 
 // A CloudService is a base class for working with cloud services
 // and for historic reasons local file stores too
