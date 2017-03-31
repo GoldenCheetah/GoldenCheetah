@@ -314,6 +314,8 @@ WebPageWindow::downloadFinished()
 void
 WebPageWindow::downloadProgress(qint64 a, qint64 b)
 {
+    Q_UNUSED(a)
+    Q_UNUSED(b)
     //qDebug()<<"downloading..." << a<< b;
 }
 

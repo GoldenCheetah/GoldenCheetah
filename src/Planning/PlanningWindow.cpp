@@ -76,6 +76,7 @@ PlanningWindow::configChanged(qint32)
 bool
 PlanningWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    Q_UNUSED(obj)
     bool returning = false;
 
     // we only filter out keyboard shortcuts for undo redo etc
