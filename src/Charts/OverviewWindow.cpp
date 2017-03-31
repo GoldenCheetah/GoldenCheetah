@@ -696,7 +696,7 @@ Card::setData(RideItem *item)
     if (type == ZONE) {
 
         // enable animation when setting values (disabled at all other times)
-        chart->setAnimationOptions(QChart::SeriesAnimations);
+        if (chart) chart->setAnimationOptions(QChart::SeriesAnimations);
 
         switch(settings.series) {
 
@@ -841,8 +841,8 @@ Card::setData(RideItem *item)
         if (miny >= 0 && ydiff > miny) miny = ydiff;
         double xdiff = (maxx-minx) / 10.0f;
         if (minx >= 0 && xdiff > minx) minx = xdiff;
-        maxx=round(maxx); minx=round(minx); xdiff=round(xdiff);
-        maxy=round(maxy); miny=round(miny); ydiff=round(ydiff);
+        maxx=round(maxx); minx=round(minx);
+        maxy=round(maxy); miny=round(miny);
 
         // set range before points to filter
         bubble->setRange(minx,maxx,miny,maxy);
