@@ -136,6 +136,10 @@ class CloudService : public QObject {
         RideFile *uncompressRide(QByteArray *data, QString name, QStringList &errors);
         QString uploadExtension();
 
+        // APPSETTINGS SYMBOLS - SERVICE SPECIFIC
+        QString syncOnImportSettingName() { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+        QString syncOnStartupSettingName() { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, CloudService *store, RideItem*);
 

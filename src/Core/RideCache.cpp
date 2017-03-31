@@ -519,6 +519,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         case RideMetric::Total:
             rvalue += value;
             break;
+        default:
         case RideMetric::Average:
             {
             // average should be calculated taking into account
