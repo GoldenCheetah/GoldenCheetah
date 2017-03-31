@@ -33,8 +33,6 @@ struct WkoFileReader : public RideFileReader {
     bool hasWrite() const { return false; }
 };
 
-typedef std::auto_ptr<QDataStream> QDataStreamPtr;
-
 // Explicitly define types using unistd.h definitions to
 // ensure char IS 8 bits and short IS 16 bits and long IS 32 bits
 #define WKO_UCHAR   uint8_t
