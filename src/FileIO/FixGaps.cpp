@@ -136,6 +136,8 @@ static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor(QS
 bool
 FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // get settings
     double tolerance, stop;
     if (config == NULL) { // being called automatically
@@ -165,8 +167,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="
     for (int position = 0; position < ride->dataPoints().count(); position++) {
         RideFilePoint *point = ride->dataPoints()[position];
 
-        if (last == NULL) last = point;
-        else {
+        if (NULL != last) {
             double gap = point->secs - last->secs - ride->recIntSecs();
 
             // if we have gps and we moved, then this isn't a stop

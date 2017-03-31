@@ -99,8 +99,11 @@ class FixElevation : public DataProcessor {
 static bool fixElevationAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Elevation errors"), new FixElevation());
 
 bool
-FixElevation::postProcess(RideFile *ride, DataProcessorConfig *, QString op="")
+FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(config)
+    Q_UNUSED(op)
+
     // Cannot process without without GPS data
     if (!ride || ride->areDataPresent()->lat == false || ride->areDataPresent()->lon == false)
         return false;

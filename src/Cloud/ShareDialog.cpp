@@ -256,15 +256,17 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     commuteChk = new QCheckBox(tr("Commute"));
     trainerChk = new QCheckBox(tr("Trainer"));
 
-    const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
-    altitudeChk->setEnabled(dataPresent->alt);
-    altitudeChk->setChecked(dataPresent->alt);
-    powerChk->setEnabled(dataPresent->watts);
-    powerChk->setChecked(dataPresent->watts);
-    cadenceChk->setEnabled(dataPresent->cad);
-    cadenceChk->setChecked(dataPresent->cad);
-    heartrateChk->setEnabled(dataPresent->hr);
-    heartrateChk->setChecked(dataPresent->hr);
+    if (ride) {
+        const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
+        altitudeChk->setEnabled(dataPresent->alt);
+        altitudeChk->setChecked(dataPresent->alt);
+        powerChk->setEnabled(dataPresent->watts);
+        powerChk->setChecked(dataPresent->watts);
+        cadenceChk->setEnabled(dataPresent->cad);
+        cadenceChk->setChecked(dataPresent->cad);
+        heartrateChk->setEnabled(dataPresent->hr);
+        heartrateChk->setChecked(dataPresent->hr);
+    }
 
     QGridLayout *vbox3 = new QGridLayout();
     //vbox3->addWidget(gpsChk,0,0);

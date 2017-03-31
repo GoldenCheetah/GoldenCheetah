@@ -746,7 +746,7 @@ PfPvPlot::intervalHover(IntervalItem *x)
         }
 
         // any data ?
-        if (aepfArray.size()) {
+        if (count > 0 && aepfArray.size()) {
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
             sym->setSize(4*dpiXFactor);

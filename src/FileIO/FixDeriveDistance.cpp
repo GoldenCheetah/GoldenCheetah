@@ -107,7 +107,8 @@ double _deg2rad(double deg) {
 bool
 FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
 
     // if its already there do nothing !
     if (ride->areDataPresent()->km) return false;

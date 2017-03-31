@@ -343,8 +343,12 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
         if (response1.payload.length()>3) {
             int empty = qByteArray2Int(response1.payload.left(2));
             int total = qByteArray2Int(response1.payload.right(2));
-            int percentage = 100 * empty / total;
-            memory = QString("%1/%2 (%3%)").arg(empty).arg(total).arg(percentage);
+            if (total > 0) {
+                int percentage = 100 * empty / total;
+                memory = QString("%1/%2 (%3%)").arg(empty).arg(total).arg(percentage);
+            } else {
+                memory = QString("Joule reports zero free space.");
+            }
 
             return true;
         }

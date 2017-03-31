@@ -89,7 +89,8 @@ static bool FixDeriveHeadwindAdded = DataProcessorFactory::instance().registerPr
 bool
 FixDeriveHeadwind::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
 
     double bearing = 0; // used to compute headwind depending on wind/cyclist bearing difference
 

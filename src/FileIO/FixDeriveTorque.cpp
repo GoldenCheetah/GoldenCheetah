@@ -103,7 +103,9 @@ static bool FixDeriveTorqueAdded = DataProcessorFactory::instance().registerProc
 bool
 FixDeriveTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
+
     static const double PI = 3.1415927f;
 
     // if its already there do nothing !

@@ -237,7 +237,6 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                 }
             }
         }
-        stop = point->secs;
 
 
         if (!present) {
@@ -245,31 +244,33 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
 
             break;
 
-        } else {
-            if (n == this->getPoints().count()-1){
+        }
+        
+        stop = point->secs;
+        
+        if (n == this->getPoints().count()-1) {
 
-                // Add the interval and continue search
-                //qDebug() << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
+            // Add the interval and continue search
+            //qDebug() << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
 
-                IntervalItem *intervalItem = new IntervalItem(item, name,
-                                                              start, stop,
-                                                              ride->timeToDistance(start),
-                                                              ride->timeToDistance(stop),
-                                                              ++found,
-                                                              QColor(255,127,80),
-                                                              RideFileInterval::ROUTE);
-                intervalItem->route = id();
-                here << intervalItem;
+            IntervalItem *intervalItem = new IntervalItem(item, name,
+                                                          start, stop,
+                                                          ride->timeToDistance(start),
+                                                          ride->timeToDistance(stop),
+                                                          ++found,
+                                                          QColor(255,127,80),
+                                                          RideFileInterval::ROUTE);
+            intervalItem->route = id();
+            here << intervalItem;
 
-                // reset to restart find on next iteration
-                start = -1;
-                n=0;
+            // reset to restart find on next iteration
+            start = -1;
+            n=0;
 
-                // skip on a few samples to avoid finding the same
-                // segment again - this happens when a segment is very
-                // short and ends at lights or top of a hill.
-                lastpoint += 30;
-            }
+            // skip on a few samples to avoid finding the same
+            // segment again - this happens when a segment is very
+            // short and ends at lights or top of a hill.
+            lastpoint += 30;
         }
     }
 }

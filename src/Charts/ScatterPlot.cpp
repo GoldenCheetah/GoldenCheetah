@@ -672,7 +672,7 @@ ScatterPlot::intervalHover(IntervalItem *ri)
         }
 
         // any data ?
-        if (xArray.size()) {
+        if (count > 0 && xArray.size()) {
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
             sym->setSize(4*dpiXFactor);

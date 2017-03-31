@@ -963,7 +963,7 @@ void
 RideEditor::insColumn(QString name)
 {
     // update state data
-    RideFile::SeriesType series;
+    RideFile::SeriesType series = RideFile::secs;
 
     if (name == tr("Time")) series = RideFile::secs;
     if (name == tr("Distance")) series = RideFile::km;

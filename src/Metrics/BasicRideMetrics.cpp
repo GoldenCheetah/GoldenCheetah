@@ -111,6 +111,8 @@ class ElapsedTime : public RideMetric {
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+        Q_UNUSED(item)
+
         setValue(0);
         if (spec.interval()) setValue(spec.interval()->start);
     }

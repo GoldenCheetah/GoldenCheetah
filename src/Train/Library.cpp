@@ -830,7 +830,7 @@ WorkoutImportDialog::import()
     foreach(QString video, videos) {
 
         // if we don't already have it, add it
-        if (!l->refs.contains(video)) {
+        if (l && !l->refs.contains(video)) {
             l->refs.append(video);
             trainDB->importVideo(video);
         }
