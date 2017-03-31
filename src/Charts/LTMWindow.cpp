@@ -1162,7 +1162,7 @@ LTMWindow::dataTable(bool html)
     // lowest xValue and highest xValue as borders
     if (lowestFirstXvalue != highestFirstXvalue) {
         for (int i = 0; i< columns.count(); i++) {
-            double xValue = highestFirstXvalue;
+            double xValue = columns[i].x[0];
             while (columns[i].x[0] > lowestFirstXvalue) {
                 xValue--;
                 columns[i].x.prepend(xValue);

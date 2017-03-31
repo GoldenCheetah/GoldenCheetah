@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "Settings.h"
 #include "Colors.h"
 #include "CloudService.h"
 
@@ -206,6 +207,13 @@ AddService::clicked(QString p)
             QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
             wizard->settings.insert(cname, value);
         }
+
+        // generic settings
+        QString value = appsettings->cvalue(wizard->context->athlete->cyclist, wizard->cloudService->syncOnImportSettingName(), "false").toString();
+        wizard->settings.insert(wizard->cloudService->syncOnImportSettingName(), value);
+        value = appsettings->cvalue(wizard->context->athlete->cyclist, wizard->cloudService->syncOnStartupSettingName(), "false").toString();
+        wizard->settings.insert(wizard->cloudService->syncOnStartupSettingName(), value);
+
         wizard->next();
     }
 }
@@ -236,6 +244,7 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     user = new QLineEdit(this);
     user->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     pass = new QLineEdit(this);
+    pass->setEchoMode(QLineEdit::Password);
     pass->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     auth = new QPushButton(tr("Authorise"), this);
     auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -350,6 +359,8 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
 
     layout->addRow(syncStartup); // only makes sense if the service has a query api
     layout->addRow(syncImport); // only makes sense if the service has an upload api
+
+    connect(browse, SIGNAL(clicked()), this, SLOT(browseFolder()));
 }
 
 void
@@ -371,11 +382,13 @@ AddSettings::initializePage()
         folder->setText(wizard->settings.value(cname, ""));
     }
     if (wizard->cloudService->capabilities() & CloudService::Query) {
-        //syncStartup->setChecked(...) //XXX TODO
+        QString value = wizard->settings.value(wizard->cloudService->syncOnStartupSettingName(), "false");
+        syncStartup->setChecked(value == "true");
         syncStartup->show();
     }
     if (wizard->cloudService->capabilities() & CloudService::Upload) {
-        //syncStartup->setChecked(...) //XXX TODO
+        QString value = wizard->settings.value(wizard->cloudService->syncOnImportSettingName(), "false");
+        syncImport->setChecked(value == "true");
         syncImport->show();
     }
 }
@@ -383,7 +396,45 @@ AddSettings::initializePage()
 bool
 AddSettings::validatePage()
 {
+    // check the authorisation has been completed
+    QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
+        wizard->settings.insert(cname, folder->text());
+    }
+
+    // generic settings, but applied on a per service basis
+    wizard->settings.insert(wizard->cloudService->syncOnImportSettingName(), syncImport->isChecked() ? "true" : "false");
+    wizard->settings.insert(wizard->cloudService->syncOnStartupSettingName(), syncImport->isChecked() ? "true" : "false");
     return true;
+}
+
+void
+AddSettings::browseFolder()
+{
+    // get current edit..
+    QString path = folder->text();
+    QStringList errors;
+
+    // open the connection using the current token
+    if (!wizard->cloudService->open(errors)) {
+        QMessageBox err;
+        err.setText(tr("Connection Failed"));
+        err.setDetailedText(errors.join("\n\n"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+    }
+
+    // find the folder using the current settings
+    CloudServiceDialog dialog(this, wizard->cloudService, tr("Choose Athlete Directory"), path, true);
+    int ret = dialog.exec();
+
+    // did we actually select something?
+    if (ret == QDialog::Accepted) {
+        path = dialog.pathnameSelected();
+        folder->setText(path);
+        //XXX ack QString id = google_drive.GetFileId(path);
+        //XXX ack appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER_ID, id);
+    }
 }
 
 // Final confirmation
@@ -392,158 +443,76 @@ AddFinish::AddFinish(AddCloudWizard *parent) : QWizardPage(parent), wizard(paren
     setTitle(tr("Done"));
     setSubTitle(tr("Add Cloud Account"));
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    layout = new QFormLayout;
     setLayout(layout);
-#if 0
-    QLabel *label = new QLabel(tr("We will now add a new Cloud with the configuration shown "
-                               "below. Please take a moment to review and then click Finish "
-                               "to add the Cloud and complete this wizard, or press the Back "
-                               "button to make amendments.\n\n"));
-    label->setWordWrap(true);
-    layout->addWidget(label);
-
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    layout->addLayout(hlayout);
-
-    QFormLayout *formlayout = new QFormLayout;
-    formlayout->addRow(new QLabel(tr("Name*"), this), (name=new QLineEdit(this)));
-    formlayout->addRow(new QLabel(tr("Port"), this), (port=new QLineEdit(this)));
-    formlayout->addRow(new QLabel(tr("Profile"), this), (profile=new QLineEdit(this)));
-    formlayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    //profile->setFixedWidth(200);
-    port->setFixedWidth(150);
-    port->setEnabled(false); // no edit
-    //name->setFixedWidth(230);
-    hlayout->addLayout(formlayout);
-
-    QFormLayout *form2layout = new QFormLayout;
-    form2layout->addRow(new QLabel(tr("Virtual"), this), (virtualPower=new QComboBox(this)));
-
-    // NOTE: These must correspond to the code in RealtimeController.cpp that
-    //       post-processes inbound telemetry.
-    virtualPower->addItem(tr("None"));
-    virtualPower->addItem(tr("Power - Kurt Kinetic Cyclone"));                              // 1
-    virtualPower->addItem(tr("Power - Kurt Kinetic Road Machine"));                         // 2
-    virtualPower->addItem(tr("Power - Cyclops Fluid 2"));                                   // 3
-    virtualPower->addItem(tr("Power - BT Advanced Training System"));                       // 4
-    virtualPower->addItem(tr("Power - LeMond Revolution"));                                 // 5
-    virtualPower->addItem(tr("Power - 1UP USA Trainer"));                                   // 6
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (H)"));                          // 7
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (5)"));                          // 8
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (4)"));                          // 9
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (3)"));                          // 10
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (2)"));                          // 11
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (1)"));                          // 12
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (L)"));                          // 13
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (H)"));    // 14
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (5)"));    // 15
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (4)"));    // 16
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (3)"));    // 17
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (2)"));    // 18
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (1)"));    // 19
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (L)"));    // 20
-    virtualPower->addItem(tr("Power - Saris Powerbeam Pro"));                               // 21
-    virtualPower->addItem(tr("Power - Tacx Satori (2)"));                                   // 22
-    virtualPower->addItem(tr("Power - Tacx Satori (4)"));                                   // 23
-    virtualPower->addItem(tr("Power - Tacx Satori (6)"));                                   // 24
-    virtualPower->addItem(tr("Power - Tacx Satori (8)"));                                   // 25
-    virtualPower->addItem(tr("Power - Tacx Satori (10)"));                                  // 26
-    virtualPower->addItem(tr("Power - Tacx Flow (0)"));                                     // 27
-    virtualPower->addItem(tr("Power - Tacx Flow (2)"));                                     // 28
-    virtualPower->addItem(tr("Power - Tacx Flow (4)"));                                     // 29
-    virtualPower->addItem(tr("Power - Tacx Flow (6)"));                                     // 30
-    virtualPower->addItem(tr("Power - Tacx Flow (8)"));                                     // 31
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (1)"));                               // 32
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (3)"));                               // 33
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (5)"));                               // 34
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (7)"));                               // 35
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (2)"));                              // 36
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (4)"));                              // 37
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (6)"));                              // 38
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (8)"));                              // 39
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (10)"));                             // 40
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (1)"));                     // 41
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (2)"));                     // 42
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (3)"));                     // 43
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (4)"));                     // 44
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (5)"));                     // 45
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (6)"));                     // 46
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (7)"));                     // 47
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));                     // 48
-    virtualPower->addItem(tr("Power - Elite Turbo Muin (2013)"));                           // 49
-    virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));                            // 50
-    virtualPower->addItem(tr("Power - Cyclops Magneto Pro (Road)"));                        // 51
-    virtualPower->addItem(tr("Power - Elite Arion Mag (0)"));                               // 52
-    virtualPower->addItem(tr("Power - Elite Arion Mag (1)"));                               // 53
-    virtualPower->addItem(tr("Power - Elite Arion Mag (2)"));                               // 54
-    virtualPower->addItem(tr("Power - Blackburn Tech Fluid"));                              // 55
-    virtualPower->addItem(tr("Power - Tacx Sirius (1)"));                                   // 56
-    virtualPower->addItem(tr("Power - Tacx Sirius (2)"));                                   // 57
-    virtualPower->addItem(tr("Power - Tacx Sirius (3)"));                                   // 58
-    virtualPower->addItem(tr("Power - Tacx Sirius (4)"));                                   // 59
-    virtualPower->addItem(tr("Power - Tacx Sirius (5)"));                                   // 60
-    virtualPower->addItem(tr("Power - Tacx Sirius (6)"));                                   // 61
-    virtualPower->addItem(tr("Power - Tacx Sirius (7)"));                                   // 62
-    virtualPower->addItem(tr("Power - Tacx Sirius (8)"));                                   // 63
-    virtualPower->addItem(tr("Power - Tacx Sirius (9)"));                                   // 64
-    virtualPower->addItem(tr("Power - Tacx Sirius (10)"));                                  // 65
-
-    //
-    // Wheel size
-    //
-    int wheelSize = appsettings->cvalue(parent->context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
-
-    rimSizeCombo = new QComboBox();
-    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
-
-    tireSizeCombo = new QComboBox();
-    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
-
-
-    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
-    wheelSizeEdit->setInputMask("0000");
-    wheelSizeEdit->setFixedWidth(40);
-
-    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
-
-    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
-    wheelSizeLayout->addWidget(rimSizeCombo);
-    wheelSizeLayout->addWidget(tireSizeCombo);
-    wheelSizeLayout->addWidget(wheelSizeEdit);
-    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
-
-    stridelengthEdit = new QLineEdit(this);
-    stridelengthEdit->setText("115");
-    QHBoxLayout *stridelengthLayout = new QHBoxLayout;
-    stridelengthLayout->addWidget(stridelengthEdit);
-    stridelengthLayout->addStretch();
-
-    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
-
-    form2layout->addRow(new QLabel(tr("Wheel Size"), this), wheelSizeLayout);
-    form2layout->addRow(new QLabel(tr("Stride Length (cm)"), this), stridelengthLayout);
-
-    hlayout->addLayout(form2layout);
-    layout->addStretch();
-
-    selectDefault = new QGroupBox(tr("Selected by default"), this);
-    selectDefault->setCheckable(true);
-    selectDefault->setChecked(false);
-    layout->addWidget(selectDefault);
-
-    QGridLayout *grid = new QGridLayout;
-    selectDefault->setLayout(grid);
-    grid->addWidget((defWatts=new QCheckBox(tr("Power"))), 0,0, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defBPM=new QCheckBox(tr("Heartrate"))), 1,0, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defKPH=new QCheckBox(tr("Speed"))), 0,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defRPM=new QCheckBox(tr("Cadence"))), 1,1, Qt::AlignVCenter|Qt::AlignLeft);
-    layout->addStretch();
-#endif
 }
 
 void
 AddFinish::initializePage()
 {
+    // clear previous
+    while(layout->rowCount() > 0) layout->removeRow(0);
+
+    // add from wizard settings -- this is what we
+    // will now create.
+    QHashIterator<CloudService::CloudServiceSetting,QString> want(wizard->cloudService->settings);
+    want.toFront();
+    while(want.hasNext()) {
+        want.next();
+
+        QString label, value;
+        switch(want.key()) {
+            case CloudService::URL: label=tr("URL"); break;
+            case CloudService::Key: label=tr("Key"); break;
+            case CloudService::Username: label=tr("Username"); break;
+            case CloudService::Password: label=tr("Password"); break;
+            case CloudService::OAuthToken: label=tr("Token"); break;
+            case CloudService::Folder: label=tr("Folder"); break;
+            case CloudService::DefaultURL: break;
+        }
+        // no clue
+        if (label == "") continue;
+
+        // get value
+        value = wizard->settings.value(want.value(), "");
+        if (value == "") continue;
+
+        // ok, we have a setting
+        if (label==tr("Password")) layout->addRow(new QLabel(label), new QLabel (QString("*").repeated(value.length())));
+        else layout->addRow(new QLabel(label), new QLabel (value));
+    }
+    QString syncstartup = wizard->settings.value(wizard->cloudService->syncOnStartupSettingName(), "");
+    if (syncstartup != "") layout->addRow(new QLabel(tr("Sync on start")), new QLabel (syncstartup));
+    QString syncimport = wizard->settings.value(wizard->cloudService->syncOnImportSettingName(), "");
+    if (syncimport != "") layout->addRow(new QLabel(tr("Sync on import")), new QLabel (syncimport));
+}
+
+bool
+AddFinish::validatePage()
+{
+    // ok, last thing to do is write out the new settings
+    QHashIterator<CloudService::CloudServiceSetting,QString> want(wizard->cloudService->settings);
+    want.toFront();
+    while(want.hasNext()) {
+        want.next();
+
+        // get value
+        QString value = wizard->settings.value(want.value(), "");
+        if (value == "") continue;
+
+        // ok, we have a setting
+        appsettings->setCValue(wizard->context->athlete->cyclist, want.value(), value);
+    }
+
+    // generic settings
+    QString syncstartup = wizard->settings.value(wizard->cloudService->syncOnStartupSettingName(), "");
+    if (syncstartup != "")  appsettings->setCValue(wizard->context->athlete->cyclist,
+                                                   wizard->cloudService->syncOnStartupSettingName(),
+                                                   syncstartup);
+
+    QString syncimport = wizard->settings.value(wizard->cloudService->syncOnImportSettingName(), "");
+    if (syncimport != "")  appsettings->setCValue(wizard->context->athlete->cyclist,
+                                                   wizard->cloudService->syncOnImportSettingName(),
+                                                   syncimport);
+    return true;
 }

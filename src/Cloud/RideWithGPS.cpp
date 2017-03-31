@@ -183,7 +183,7 @@ RideWithGPS::writeFileCompleted()
 
     bool uploadSuccessful = false;
     QString uploadError;
-    int tripid = 0;
+    //XXXint tripid = 0;
 
     try {
 
@@ -193,9 +193,9 @@ RideWithGPS::writeFileCompleted()
 
         // get values
         uploadError = jsonResponse.root->getFieldString("error").c_str();
-        if (jsonResponse.root->hasField("trip")) {
-            tripid = jsonResponse.root->getField("trip")->getFieldInt("id");
-        }
+        //XXXif (jsonResponse.root->hasField("trip")) {
+        //XXX    tripid = jsonResponse.root->getField("trip")->getFieldInt("id");
+        //XXX}
 
     } catch(...) {
 
