@@ -4218,8 +4218,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         } else if (scope == RideFile::lpco || scope == RideFile::rpco) {
 
             // get the min/max values for both curves
-            double min = qMin(float(thereCurve->minYValue()), float(thereCurve2->minYValue()));
-            double max = qMax(float(thereCurve->maxYValue()), float(thereCurve2->maxYValue()));
+            double min = thereCurve->minYValue();
+            double max = thereCurve->maxYValue();
+            if (thereCurve2) {
+                min = qMin(min, thereCurve2->minYValue());
+                max = qMax(max, thereCurve2->maxYValue());
+            }
             setAxisScale(QwtPlot::yLeft, min, max); // not more than 15 degrees
 
         } else if (scope == RideFile::lppb || scope == RideFile::rppb) {
@@ -4968,6 +4972,9 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 }
         }
 
+        if (ourCurve) delete ourCurve;
+        if (ourICurve) delete ourICurve;
+        
         // move on -- this is used to reference into the compareIntervals
         //            array to get the colors predominantly!
         index++;
