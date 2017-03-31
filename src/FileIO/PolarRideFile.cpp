@@ -550,6 +550,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
               {
                   errors << ("This is a R-R file: \""
                              + file.fileName() + "\"");
+                  delete rideFile;
                   return NULL;
               }
 
