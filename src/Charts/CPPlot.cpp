@@ -832,9 +832,11 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
     }
 
     // set the model and load data
-    pdmodel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-    pdmodel->setMinutes(true); // we're minutes here ...
-    pdmodel->setData(vector);
+    if (pdmodel) {
+        pdmodel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+        pdmodel->setMinutes(true); // we're minutes here ...
+        pdmodel->setData(vector);
+    }
 
     // create curve
     QwtPlotCurve *curve = new QwtPlotCurve("Model");
@@ -1740,8 +1742,10 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         if (criticalSeries == CriticalPowerWindow::kph) {
             if (isRun || isSwim) {
                 const PaceZones *zones = context->athlete->paceZones(isSwim);
-                bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
-                paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
+                if (zones) {
+                    bool metricPace = appsettings->value(this, zones->paceSetting(), true).toBool();
+                    paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
+                }
             }
             double km = yvalue*xvalue/60.0; // distance in km
             if (isSwim) {
