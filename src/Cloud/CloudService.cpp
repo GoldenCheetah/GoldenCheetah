@@ -154,7 +154,6 @@ static QByteArray gUncompress(const QByteArray &data)
 
         switch (ret) {
         case Z_NEED_DICT:
-            ret = Z_DATA_ERROR;     // and fall through
         case Z_DATA_ERROR:
         case Z_MEM_ERROR:
             (void)inflateEnd(&strm);
@@ -1262,6 +1261,7 @@ CloudServiceSyncDialog::syncNext()
                 QByteArray *data = new QByteArray;
                 store->readFile(data, curr->text(1), curr->text(8)); // filename
                 QApplication::processEvents();
+                delete data;
 
             } else {
                 curr->setText(7, tr("Uploading"));
@@ -1344,6 +1344,7 @@ CloudServiceSyncDialog::downloadNext()
             QByteArray *data = new QByteArray; // gets deleted when read completes
             store->readFile(data, curr->text(1), curr->text(6));
             QApplication::processEvents();
+            delete data;
             return true;
         }
     }
