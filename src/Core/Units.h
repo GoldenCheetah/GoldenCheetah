@@ -27,7 +27,7 @@
 #define INCH_PER_MM 0.039370f
 #define INCH_PER_CM 0.39370f
 #define METERS_PER_FOOT 0.3047999f
-#define METERS_PER_YARD 0.9144
+#define METERS_PER_YARD 0.9144f
 #define LB_PER_KG 2.20462262f
 #define KG_PER_LB 0.45359237f
 #define FEET_LB_PER_NM 0.73756214837f
@@ -35,7 +35,8 @@
 #define FAHRENHEIT_ADD_CENTIGRADE 32.0f
 #define GPS_COORD_TO_STRING 8
 #define SECONDS_IN_A_WEEK 604800 // 7*24*60*60
-#define FOOT_POUNDS_PER_METER 0.73756215
+#define FOOT_POUNDS_PER_METER 0.73756215f
+#define KG_FORCE_PER_METER 9.80665f
 
 #include <QString>
 extern QString kphToPace(double kph, bool metric, bool isSwim=false);
