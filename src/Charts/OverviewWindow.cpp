@@ -612,7 +612,7 @@ Card::setData(RideItem *item)
             RideItem *prior = parent->context->athlete->rideCache->rides().at(index-offset);
 
             // are we still in range ?
-            int old= prior->dateTime.daysTo(item->dateTime);
+            const qint64 old = prior->dateTime.daysTo(item->dateTime);
             if (old > SPARKDAYS) break;
 
             // only activities with matching sport flags

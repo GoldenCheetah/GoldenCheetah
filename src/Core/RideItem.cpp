@@ -1077,7 +1077,7 @@ RideItem::updateIntervals()
 
         // now the data is integrated we can look at the 
         // accumulated energy for each ride
-        for (int i=0; i<secs; i++) {
+        for (long i=0; i<secs; i++) {
 
             // start out at 30 minutes and drop back to
             // 2 minutes, anything shorter and we are done
