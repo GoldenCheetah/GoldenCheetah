@@ -34,6 +34,8 @@
 #define FAHRENHEIT_PER_CENTIGRADE 1.8f
 #define FAHRENHEIT_ADD_CENTIGRADE 32.0f
 #define GPS_COORD_TO_STRING 8
+#define SECONDS_IN_A_WEEK 604800 // 7*24*60*60
+#define FOOT_POUNDS_PER_METER 0.73756215
 
 #include <QString>
 extern QString kphToPace(double kph, bool metric, bool isSwim=false);

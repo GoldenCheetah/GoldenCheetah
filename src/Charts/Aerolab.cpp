@@ -27,6 +27,7 @@
 #include "Units.h"
 #include "Colors.h"
 #include "TimeUtils.h"
+#include "Units.h"
 
 #include <cmath>
 #include <qwt_series_data.h>
@@ -451,7 +452,7 @@ Aerolab::recalc( bool new_zoom ) {
   int totalRideDistance = (int ) ceil(distanceArray[arrayLength - 1]);
 
   // If the ride is really long, then avoid it like the plague.
-  if (rideTimeSecs > 7*24*60*60) {
+  if (rideTimeSecs > SECONDS_IN_A_WEEK) {
     QVector<double> data;
 
     if (!veArray.empty()){
