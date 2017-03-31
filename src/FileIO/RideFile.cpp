@@ -3134,7 +3134,7 @@ RideFile::symbolForSeries(SeriesType series)
 
 // Iterator
 RideFileIterator::RideFileIterator(RideFile *f, Specification spec, IterationSpec mode)
-    : f(f), mode(mode)
+    : f(f)
 {
     // index, start and stop are set to -1
     // if they are out of bounds or f is NULL
