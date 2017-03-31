@@ -80,6 +80,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     if(strcmp(perfStr,"perf"))
     {
         errors << "File is encrypted.";
+        delete rideFile;
         return NULL;
     }
 
