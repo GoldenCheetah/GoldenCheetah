@@ -115,7 +115,9 @@ static bool FixMoxyAdded = DataProcessorFactory::instance().registerProcessor(QS
 bool
 FixMoxy::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
+
     bool isCad;
     bool isSpd;
 

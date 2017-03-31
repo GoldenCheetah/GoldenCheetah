@@ -164,6 +164,8 @@ static bool FixDerivePowerAdded = DataProcessorFactory::instance().registerProce
 bool
 FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // get settings
     double MBik; // Bike weight kg
     double CrV;  // Coefficient of Rolling Resistance

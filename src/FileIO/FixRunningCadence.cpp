@@ -82,7 +82,9 @@ static bool FixRunningCadenceAdded = DataProcessorFactory::instance().registerPr
 bool
 FixRunningCadence::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config);
+    Q_UNUSED(config)
+    Q_UNUSED(op)
+
     // does this ride have cadence?
     if (ride->areDataPresent()->cad == false && ride->areDataPresent()->rcad == false) return false;
 

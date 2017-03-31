@@ -1232,7 +1232,7 @@ MapWebBridge::getLatLons(int i)
         }
         return latlons;
 
-    } else {
+    } else if (rideItem) {
 
         // get latlons for entire route
         foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {

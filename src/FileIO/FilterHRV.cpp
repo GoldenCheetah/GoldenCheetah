@@ -238,6 +238,7 @@ static bool FilterHrvOutliersAdded = DataProcessorFactory::instance().registerPr
 bool
 FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
 
     if (ride->areDataPresent()->hrv) {
         XDataSeries *series = ride->xdata("HRV");

@@ -110,6 +110,8 @@ static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor(
 bool
 FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
+    Q_UNUSED(op)
+
     // does this ride have torque?
     if (ride->areDataPresent()->nm == false) return false;
 
