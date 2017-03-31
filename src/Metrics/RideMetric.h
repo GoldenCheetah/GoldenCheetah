@@ -298,9 +298,6 @@ public:
     // Get the value and apply conversion if needed
     double value(bool metric) const;
 
-    // The internal value of this ride metric, useful to cache and then setValue.
-    double value() const;
-
     // for averages the count of items included in the average
     double count() const; 
 
@@ -325,6 +322,8 @@ public:
     // virtual bool isLowerBetter() const { return type_ == Low ? true : false; }
 
     private:
+    
+        using RideMetric::value;
 
         // all attributes and methods are implemented in the
         // usermetric class (which uses a datafilter and has
