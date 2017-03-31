@@ -1742,7 +1742,7 @@ AllPlot::recalc(AllPlotObject *objects)
 
 
     int rideTimeSecs = (int) ceil(objects->timeArray[objects->timeArray.count()-1]);
-    if (rideTimeSecs > 7*24*60*60) {
+    if (rideTimeSecs > SECONDS_IN_A_WEEK) {
 
         // clear all the curves
         QwtArray<double> data;
