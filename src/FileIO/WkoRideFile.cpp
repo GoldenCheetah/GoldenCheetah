@@ -638,7 +638,6 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     } else {
 
         // date not available from filename use WKO metadata
-//< I think this was a bug, incorrectly used 6 minutes of ms as calucations.
         QDateTime datetime(QDate::fromJulianDay(julian),
             QTime(sincemidnight/MS_IN_ONE_HOUR, (sincemidnight%MS_IN_ONE_HOUR)/6000, (sincemidnight%6000)/100));
         results->setStartTime(datetime);
