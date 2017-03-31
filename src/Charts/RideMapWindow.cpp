@@ -1077,7 +1077,6 @@ RideMapWindow::createMarkers()
                 view->page()->mainFrame()->evaluateJavaScript(code);
             #endif
 
-                stoptime=0;
             }
             stoplat=stoplon=stoptime=0;
         }
