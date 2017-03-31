@@ -1151,10 +1151,12 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
             x[i] = high*delta;
             y[i]  = 1e-9;  // nonzero to accommodate log plot
             sy[i] = 1e-9;  // nonzero to accommodate log plot
-            while (low < high && low<arrayLength) {
-                if (selectedArray && (*selectedArray).size()>low)
-                    sy[i] += dt * (*selectedArray)[low];
-                y[i] += dt * (*array)[low++];
+            if (array) {
+                while (low < high && low<arrayLength) {
+                    if (selectedArray && (*selectedArray).size()>low)
+                        sy[i] += dt * (*selectedArray)[low];
+                    y[i] += dt * (*array)[low++];
+                }
             }
         }
         y[i] = 1e-9;       // nonzero to accommodate log plot
@@ -2402,7 +2404,7 @@ bool PowerHist::isSelected(const RideFilePoint *p, double sample)
 
 bool PowerHist::isSelected(const double t, double sample)
 {
-    if (!rideItem) {
+    if (rideItem) {
 
         foreach (IntervalItem *interval, rideItem->intervalsSelected()) {
             if (interval->selected && t+sample>interval->start && t<interval->stop) 

@@ -1437,6 +1437,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
             // as we goo these just increase to the last point
             if (add->x > maxWX_) maxVX_ = maxWX_ = add->x;
             if (add->y > maxY_) maxY_ = add->y;
+            delete add;
         }
 
         maxY_ *= 1.1f;
