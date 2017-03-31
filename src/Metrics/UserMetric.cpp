@@ -164,13 +164,6 @@ UserMetric::value(bool metric) const
     else return (value() * conversion()) + conversionSum();
 }
 
-// The internal value of this ride metric, useful to cache and then setValue.
-double
-UserMetric::value() const
-{
-    return value_;
-}
-
 // for averages the count of items included in the average
 double
 UserMetric::count() const
