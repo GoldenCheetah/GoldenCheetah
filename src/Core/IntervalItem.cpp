@@ -181,10 +181,6 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
 
     // Grid
     QGridLayout *grid = new QGridLayout;
-    QLabel *name = new QLabel("Name");
-    QLabel *from = new QLabel("From");
-    QLabel *to = new QLabel("To");
-    QLabel *color = new QLabel("Color");
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(interval.name);
@@ -203,15 +199,15 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     }
 
 
-    grid->addWidget(name, 0,0);
+    grid->addWidget(new QLabel("Name"), 0,0);
     grid->addWidget(nameEdit, 0,1);
 
     if (interval.type == RideFileInterval::USER) {
-        grid->addWidget(from, 1,0);
+        grid->addWidget(new QLabel("From"), 1,0);
         grid->addWidget(fromEdit, 1,1);
-        grid->addWidget(to, 2,0);
+        grid->addWidget(new QLabel("To"), 2,0);
         grid->addWidget(toEdit, 2,1);
-        grid->addWidget(color, 3,0);
+        grid->addWidget(new QLabel("Color"), 3,0);
         grid->addWidget(colorEdit, 3,1);
     }
 
