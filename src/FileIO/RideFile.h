@@ -536,7 +536,6 @@ class RideFileIterator {
 
     private:
         RideFile *f;
-        IterationSpec mode;
         int start, stop, index;
 };
 

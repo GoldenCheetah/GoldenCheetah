@@ -37,6 +37,7 @@
 #define SECONDS_IN_A_WEEK 604800 // 7*24*60*60
 #define FOOT_POUNDS_PER_METER 0.73756215f
 #define KG_FORCE_PER_METER 9.80665f
+#define MS_IN_ONE_HOUR 3600000
 
 #include <QString>
 extern QString kphToPace(double kph, bool metric, bool isSwim=false);

@@ -241,8 +241,8 @@ inline void MVJSONUtils::replace(string & target,           ///< text to be modi
 )
 {
     size_t pos = 0;
-    unsigned int oldLen = oldStr.length();
-    unsigned int newLen = newStr.length();
+    const size_t oldLen = oldStr.length();
+    const size_t newLen = newStr.length();
 
     for (;;)
     {

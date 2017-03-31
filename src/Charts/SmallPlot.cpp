@@ -102,7 +102,7 @@ SmallPlot::recalc()
 {
     if (!timeArray.size()) return;
 
-    int rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
+    long rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs < 0 || rideTimeSecs > SECONDS_IN_A_WEEK) {
         QwtArray<double> data;
         wattsCurve->setSamples(data, data);
