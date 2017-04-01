@@ -121,16 +121,7 @@ bool LibUsb::find()
     usb_find_busses();
     usb_find_devices();
 
-    switch (type) {
-
-    // Search USB busses for USB2 ANT+ stick host controllers
-    default:
-    case TYPE_ANT: return findAntStick();
-              break;
-
-    case TYPE_FORTIUS: return findFortius();
-              break;
-    }
+    return getDevice();
 }
 
 void LibUsb::close()
@@ -138,15 +129,15 @@ void LibUsb::close()
 #ifdef WIN32
     if (libNotInstalled) return;
 #endif
-    if (device) {
-        // stop any further write attempts whilst we close down
-        usb_dev_handle *p = device;
-        device = NULL;
-
-        usb_release_interface(p, interface);
-        //usb_reset(p);
-        usb_close(p);
+    if (!device)
+    {
+        return;
     }
+
+    usb_release_interface(device, intf->bInterfaceNumber);
+    //usb_reset(device);
+    usb_close(device);
+    device = NULL;
 }
 
 int LibUsb::read(char *buf, int bytes)
@@ -253,37 +244,39 @@ int LibUsb::write(char *buf, int bytes, int timeout)
     return rc;
 }
 
-bool LibUsb::findFortius()
+struct usb_device* LibUsb::getDevice()
 {
-#ifdef WIN32
-    if (libNotInstalled) return false;
-#endif
-    struct usb_bus* bus;
-    struct usb_device* dev;
+    for (struct usb_bus *bus = usb_get_busses(); bus; bus = bus->next)
+    {
+        for (struct usb_device *dev = bus->devices; dev; dev = dev->next)
+        {
+            switch (type)
+            {
+            case TYPE_ANT:
+                if (dev->descriptor.idVendor == GARMIN_USB2_VID &&
+                        (dev->descriptor.idProduct == GARMIN_USB2_PID ||
+                         dev->descriptor.idProduct == GARMIN_OEM_PID))
+                {
+                    return dev;
+                }
 
-    bool found = false;
+                break;
 
-    //
-    // Search for an UN-INITIALISED Fortius device
-    //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+            case TYPE_FORTIUS:
+                if (dev->descriptor.idVendor == FORTIUS_VID &&
+                        (dev->descriptor.idProduct == FORTIUS_INIT_PID ||
+                         dev->descriptor.idProduct == FORTIUS_PID ||
+                         dev->descriptor.idProduct == FORTIUSVR_PID))
+                {
+                    return dev;
+                }
 
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
-                found = true;
-            }
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_PID) {
-                found = true;
-            }
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUSVR_PID) {
-                found = true;
+                break;
             }
         }
     }
-    return found;
+
+    return NULL;
 }
 
 // Open connection to a Tacx Fortius
@@ -320,48 +313,35 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
-    struct usb_bus* bus;
+
     struct usb_device* dev;
     struct usb_dev_handle* udev;
-
-    bool programmed = false;
 
     //
     // Search for an UN-INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
-
-                if ((udev = usb_open(dev))) {
-
-                    // LOAD THE FIRMWARE
-                    ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
-                }
-
-                // Now close the connection, our work here is done
-                usb_close(udev);
-                programmed = true;
-
-            }
+    dev = getDevice();
+    if (dev && dev->descriptor.idProduct == FORTIUS_INIT_PID)
+    {
+        if ((udev = usb_open(dev))) {
+            // LOAD THE FIRMWARE
+            ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
         }
-    }
 
-    // We need to rescan devices, since once the Fortius has
-    // been programmed it will present itself again with a
-    // different PID. But it takes its time, so we sleep for
-    // 3 seconds. This may be too short on some operating
-    // systems. We can fix if issues are reported.  On my Linux
-    // host running a v3 kernel on an AthlonXP 2 seconds is not
-    // long enough.
-    // 
-    // Given this is only required /the first time/ the Fortius
-    // is connected, it can't be that bad?
-    if (programmed == true) {
+        // Now close the connection, our work here is done
+        usb_close(udev);
+
+        // We need to rescan devices, since once the Fortius has
+        // been programmed it will present itself again with a
+        // different PID. But it takes its time, so we sleep for
+        // 3 seconds. This may be too short on some operating
+        // systems. We can fix if issues are reported.  On my Linux
+        // host running a v3 kernel on an AthlonXP 2 seconds is not
+        // long enough.
+        //
+        // Given this is only required /the first time/ the Fortius
+        // is connected, it can't be that bad?
+
 #ifdef WIN32
         Sleep(3000); // windows sleep is in milliseconds
 #else
@@ -374,75 +354,16 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     //
     // Now search for an INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    dev = getDevice();
+    if (dev && (dev->descriptor.idProduct == FORTIUS_PID || dev->descriptor.idProduct == FORTIUSVR_PID))
+    {
+        //Avoid noisy output
+        //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == FORTIUS_VID && 
-                (dev->descriptor.idProduct == FORTIUS_PID || dev->descriptor.idProduct == FORTIUSVR_PID)) {
-
-                //Avoid noisy output
-                //qDebug() << "Found a Garmin USB2 ANT+ stick";
-
-                if ((udev = usb_open(dev))) {
-
-                    if (dev->descriptor.bNumConfigurations) {
-
-                        if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
-
-                            int rc = usb_set_configuration(udev, 1);
-                            if (rc < 0) {
-                                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-
-                                if (OperatingSystem == LINUX) {
-                                    // looks like the udev rule has not been implemented
-                                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-                                    qDebug()<<"did you remember to setup a udev rule for this device?";
-                                }
-                            }
-
-                            rc = usb_claim_interface(udev, interface);
-                            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-
-                            if (OperatingSystem != OSX) {
-                                // fails on Mac OS X, we don't actually need it anyway
-                                rc = usb_set_altinterface(udev, alternate);
-                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                            }
-
-                            return udev;
-                        }
-                    }
-
-                    usb_close(udev);
-                }
-            }
-        }
+        return openUsb(dev, false);
     }
+
     return NULL;
-}
-
-bool LibUsb::findAntStick()
-{
-
-#ifdef WIN32
-    if (libNotInstalled) return false;
-#endif
-
-    struct usb_bus* bus;
-    struct usb_device* dev;
-    bool found = false;
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && 
-                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
-                found = true;
-            }
-        }
-    }
-    return found;
 }
 
 struct usb_dev_handle* LibUsb::OpenAntStick()
@@ -450,76 +371,71 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
-    struct usb_bus* bus;
+
     struct usb_device* dev;
     struct usb_dev_handle* udev;
 
 // for Mac and Linux we do a bus reset on it first...
 #ifndef WIN32
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
-
-        for (dev = bus->devices; dev; dev = dev->next) {
-
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID &&
-                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
-
-                if ((udev = usb_open(dev))) {
-                    usb_reset(udev);
-                    usb_close(udev);
-                }
-            }
-        }
+    dev = getDevice();
+    if (dev && (udev = usb_open(dev)))
+    {
+        usb_reset(udev);
+        usb_close(udev);
     }
 #endif
 
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    dev = getDevice();
+    if (dev)
+    {
+        //Avoid noisy output
+        //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-        for (dev = bus->devices; dev; dev = dev->next) {
+        return openUsb(dev, true);
+    }
 
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && 
-                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
+    return NULL;
+}
 
-                //Avoid noisy output
-                //qDebug() << "Found a Garmin USB2 ANT+ stick";
+struct usb_dev_handle *LibUsb::openUsb(struct usb_device *dev, bool detachKernelDriver)
+{
+    struct usb_dev_handle* udev;
+    if ((udev = usb_open(dev))) {
 
-                if ((udev = usb_open(dev))) {
+        if (dev->descriptor.bNumConfigurations) {
 
-                    if (dev->descriptor.bNumConfigurations) {
-
-                        if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
+            if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
 
 #ifdef Q_OS_LINUX
-                            usb_detach_kernel_driver_np(udev, interface);
+                if (detachKernelDriver) usb_detach_kernel_driver_np(udev, intf->bInterfaceNumber);
 #endif
 
-                            int rc = usb_set_configuration(udev, 1);
-                            if (rc < 0) {
-                                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-                                if (OperatingSystem == LINUX) {
-                                    // looks like the udev rule has not been implemented
-                                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-                                    qDebug()<<"did you remember to setup a udev rule for this device?";
-                                }
-                            }
-
-                            rc = usb_claim_interface(udev, interface);
-                            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-
-                            if (OperatingSystem != OSX) {
-                                // fails on Mac OS X, we don't actually need it anyway
-                                rc = usb_set_altinterface(udev, alternate);
-                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                            }
-
-                            return udev;
-                        }
+                int rc = usb_set_configuration(udev, 1);
+                if (rc < 0) {
+                    qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
+                    if (OperatingSystem == LINUX) {
+                        // looks like the udev rule has not been implemented
+                        qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(dev->bus->dirname).arg(dev->filename);
+                        qDebug()<<"did you remember to setup a udev rule for this device?";
                     }
-
-                    usb_close(udev);
                 }
+
+                rc = usb_claim_interface(udev, intf->bInterfaceNumber);
+                if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+
+                if (OperatingSystem != OSX) {
+                    // fails on Mac OS X, we don't actually need it anyway
+                    rc = usb_set_altinterface(udev, intf->bAlternateSetting);
+                    if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                }
+
+                return udev;
             }
         }
+
+        usb_close(udev);
     }
+
     return NULL;
 }
 
@@ -533,8 +449,6 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
 
     readEndpoint = -1;
     writeEndpoint = -1;
-    interface = -1;
-    alternate = -1;
 
     if (!config_descriptor) return NULL;
 
@@ -545,9 +459,6 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
     intf = &config_descriptor->interface[0].altsetting[0];
 
     if (intf->bNumEndpoints != 2) return NULL;
-
-    interface = intf->bInterfaceNumber;
-    alternate = intf->bAlternateSetting;
 
     for (int i = 0 ; i < 2; i++)
     {
