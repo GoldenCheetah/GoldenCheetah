@@ -1185,9 +1185,9 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
             out << ",";
             out << point->alt;
             out << ",";
-            out << point->lon;
+            out << QString::number(point->lon, 'f', 8);
             out << ",";
-            out << point->lat;
+            out << QString::number(point->lat, 'f', 8);
             out << ",";
             out << point->headwind;
             out << ",";
