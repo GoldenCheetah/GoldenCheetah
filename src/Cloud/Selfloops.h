@@ -30,9 +30,9 @@ class Selfloops : public CloudService {
 
     public:
 
-        QString name() { return (tr("Selfloops")); }
-        QString description() { return tr("Upload and track your training and progress."); }
-        QImage logo() { return QImage(":images/services/selfloops.png"); }
+        QString name() const { return (tr("Selfloops")); }
+        QString description() const { return tr("Upload and track your training and progress."); }
+        QImage logo() const { return QImage(":images/services/selfloops.png"); }
 
         Selfloops(Context *context);
         CloudService *clone(Context *context) { return new Selfloops(context); }

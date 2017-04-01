@@ -35,9 +35,9 @@ class Velohero : public CloudService {
 
     public:
 
-        QString name() { return (tr("Velohero")); }
-        QString description() { return (tr("Upload your rides to the independent and free cycling training log")); }
-        QImage logo() { return QImage(":images/services/velohero.png"); }
+        QString name() const { return (tr("Velohero")); }
+        QString description() const { return (tr("Upload your rides to the independent and free cycling training log")); }
+        QImage logo() const { return QImage(":images/services/velohero.png"); }
 
         Velohero(Context *context);
         CloudService *clone(Context *context) { return new Velohero(context); }

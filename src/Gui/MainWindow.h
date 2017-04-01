@@ -167,6 +167,10 @@ class MainWindow : public QMainWindow
         void setChartMenu(QMenu *);
         void addChart(QAction*);
 
+        // menus to reflect cloud
+        void setUploadMenu();
+        void setSyncMenu();
+
         void showOptions();
 
         void toggleSidebar();
@@ -205,6 +209,10 @@ class MainWindow : public QMainWindow
         // Measures View
         void downloadBodyMeasures();
 
+        // cloud
+        void uploadCloud(QAction *);
+        void syncCloud(QAction *);
+
         // Activity Collection
         void addIntervals(); // pass thru to tab
         bool saveRideSingleDialog(Context *, RideItem *);
@@ -216,29 +224,8 @@ class MainWindow : public QMainWindow
         void exportBatch();
         void generateHeatMap();
         void exportMetrics();
-#ifdef GC_HAVE_KQOAUTH
-        void tweetRide();
-#endif
-        void share();
         void addAccount();
         void manualProcess(QString);
-#if QT_VERSION > 0x050000
-        void uploadDropbox();
-        void syncDropbox();
-
-        void uploadGoogleDrive();
-        void syncGoogleDrive();
-
-#endif
-#if QT_VERSION >= 0x050400
-        void uploadSixCycle();
-        void syncSixCycle();
-
-        void uploadTodaysPlan();
-        void syncTodaysPlan();
-#endif
-        void uploadLocalFileStore();
-        void syncLocalFileStore();
         void importFile();
         void splitRide();
         void mergeRide();
@@ -293,6 +280,9 @@ class MainWindow : public QMainWindow
         // window and tab menu
         QMenu *openWindowMenu, *openTabMenu;
         QSignalMapper *windowMapper, *tabMapper;
+
+        // upload and sync menu
+        QMenu *uploadMenu, *syncMenu;
 
         // backup
         QMenu *backupAthleteMenu;

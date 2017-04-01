@@ -1539,3 +1539,38 @@ CloudServiceSyncDialog::saveRide(RideFile *ride, QStringList &errors)
 
     return true;
 }
+
+
+//
+// Upgrade settings now we have migrated to a cloud service factory
+// and notion of setting up "accounts" etc
+//
+void
+CloudServiceFactory::upgrade(QString name)
+{
+    foreach(QString servicename, CloudServiceFactory::instance().serviceNames()) {
+
+        QString sname; // setting name
+        bool active = false;
+
+        const CloudService *s = CloudServiceFactory::instance().service(servicename);
+        if (s == NULL) continue;
+
+        // look at config and see if it has been configured
+        // if it needs a user, pass or token make sure its there
+        if ((sname=s->settings.value(CloudService::OAuthToken, "")) != "") {
+            if (appsettings->cvalue(name, sname, "").toString() != "") active = true;
+        }
+        if ((sname=s->settings.value(CloudService::Username, "")) != "") {
+            if (appsettings->cvalue(name, sname, "").toString() != "") active = true;
+            else active = false;
+        }
+        if ((sname=s->settings.value(CloudService::Password, "")) != "") {
+            if (appsettings->cvalue(name, sname, "").toString() != "") active = true;
+            else active = false;
+        }
+
+        // so now we can set it
+        appsettings->setCValue(name, s->activeSettingName(), active ? "true" : "false");
+    }
+}

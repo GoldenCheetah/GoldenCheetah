@@ -34,9 +34,9 @@ class TodaysPlan : public CloudService {
         CloudService *clone(Context *context) { return new TodaysPlan(context); }
         ~TodaysPlan();
 
-        QString name() { return (tr("Today's Plan")); }
-        QString description() { return (tr("Sync with the smarter training site.")); }
-        QImage logo() { return QImage(":images/services/todaysplan.png"); }
+        QString name() const { return (tr("Today's Plan")); }
+        QString description() const { return (tr("Sync with the smarter training site.")); }
+        QImage logo() const { return QImage(":images/services/todaysplan.png"); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

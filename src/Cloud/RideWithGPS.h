@@ -30,10 +30,10 @@ class RideWithGPS : public CloudService {
 
     public:
 
-        QString name() { return (tr("RideWithGPS")); }
-        QString description() { return(tr("Upload rides and analyse them using Google Maps.")); }
+        QString name() const { return (tr("RideWithGPS")); }
+        QString description() const { return(tr("Upload rides and analyse them using Google Maps.")); }
 
-        QImage logo() { return QImage(":images/services/ridewithgps.png"); }
+        QImage logo() const { return QImage(":images/services/ridewithgps.png"); }
 
         RideWithGPS(Context *context);
         CloudService *clone(Context *context) { return new RideWithGPS(context); }
