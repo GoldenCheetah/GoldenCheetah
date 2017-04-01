@@ -124,6 +124,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Antonius Riha");
     contributors.append("Arun Horne");
     contributors.append("Austin Roach");
+    contributors.append("Ben Walding");
     contributors.append("Berend De Schouwer");
     contributors.append("Bruno Assis");
     contributors.append("Chris Cleeland");
