@@ -138,18 +138,12 @@ class RideMapWindow : public GcChartWindow
         } MapType;
 
         RideMapWindow(Context *, int mapType);
-        ~RideMapWindow();
-        bool first;
-        QString styleoptions;
+        virtual ~RideMapWindow();
 
 #ifdef NOWEBKIT
         QWebEngineView *browser() { return view; }
 #endif
 
-        QComboBox *mapCombo, *tileCombo;
-        QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
-        QLabel *osmCustomTSTitle, *osmCustomTSLabel, *osmCustomTSUrlLabel;
-        QLineEdit *osmCustomTSUrl;
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
@@ -194,6 +188,15 @@ class RideMapWindow : public GcChartWindow
         void clearTempInterval();
 
     private:
+    
+        bool first;
+        QString styleoptions;
+
+        QComboBox *mapCombo, *tileCombo;
+        QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
+        QLabel *osmCustomTSTitle, *osmCustomTSLabel, *osmCustomTSUrlLabel;
+        QLineEdit *osmCustomTSUrl;
+
         Context *context;
         QVBoxLayout *layout;
 
