@@ -1252,7 +1252,7 @@ MapWebBridge::drawOverlays()
     mw->createMarkers();
 
     // overlay a shaded route
-    if (mw->styleoptions == "") mw->drawShadedRoute();
+    if (mw->getStyleOptions() == "") mw->drawShadedRoute();
 }
 
 // interval marker was clicked on the map, toggle its display
