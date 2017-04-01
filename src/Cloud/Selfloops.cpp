@@ -79,7 +79,7 @@ bool
 Selfloops::open(QStringList &errors)
 {
     printd("Selfloops::open\n");
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SELUSER).toString();
+    QString username = getSetting(GC_SELUSER).toString();
     if (username == "") {
         errors << tr("Account is not configured,");
         return false;
@@ -107,8 +107,8 @@ Selfloops::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
 
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SELUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SELPASS).toString();
+    QString username = getSetting(GC_SELUSER).toString();
+    QString password = getSetting(GC_SELPASS).toString();
 
     // MULTIPART *****************
 

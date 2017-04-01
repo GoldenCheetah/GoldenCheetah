@@ -79,7 +79,7 @@ bool
 Strava::open(QStringList &errors)
 {
     printd("Strava::open\n");
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
+    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
     if (token == "") {
         errors << tr("No authorisation token configured.");
         return false;
@@ -102,7 +102,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     printd("Strava::writeFile(%s)\n", remotename.toStdString().c_str());
 
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
+    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
 
     // access the original file for ride start
     QDateTime rideDateTime = ride->startTime();

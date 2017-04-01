@@ -37,6 +37,7 @@
 #include <QProgressBar>
 
 #include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 
 // A CloudService is a base class for working with cloud services
@@ -108,14 +109,20 @@ class CloudService : public QObject {
         }
         void notifyReadComplete(QByteArray *data, QString name, QString message) { emit readComplete(data,name,message); }
 
-        // settings are configured in settings by the service to tell the preferences
-        // pane what settings we need and where to store them, we then access them
-        // via the normal appsettings-> methods. In future we might abstract this firther
-        // with the settings applied back into the service when it is cloned -- this would
-        // then allow multiple accounts for the same service, but for now its strictly
-        // one account for one service.
-        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder } setting_;
+        // The service must define what settings it needs in the "settings" map.
+        // Each entry maps a setting type to the appsetting symbol name
+        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, Local } setting_;
         QHash<CloudServiceSetting, QString> settings;
+
+        // When a service is instantiated by the cloud service factory, the configuration
+        // is injected into the map below. The cloud service should read this to get user
+        // configuration rather than directly from appsettings. This is because the settings
+        // may be different for different accounts, and the settings might not yet be saved
+        // in appsettings (e.g. during configuration dialogs when getting an OAuth token
+        // or browsing for a folder.
+        QHash<QString, QVariant> configuration;
+        QVariant getSetting(QString name, QVariant def=QString("")) { return configuration.value(name, def); }
+        void setSetting(QString name, QVariant value) { configuration.insert(name, value); }
 
         // we use a dirent style API for traversing
         // root - get me the root of the store
@@ -431,7 +438,42 @@ class CloudServiceFactory {
     }
 
     CloudService *newService(const QString &name, Context *context) const {
-        return services_.value(name)->clone(context);
+
+        // INSTANTIATE FOR THIS CONTEXT
+        #ifdef GC_WANT_ALLDEBUG
+        qDebug()<<"factory instantiate:" << name;
+        #endif
+        CloudService *returning = services_.value(name)->clone(context);
+
+
+        // INJECT CONFIGURATION
+        QHashIterator<CloudService::CloudServiceSetting, QString> i(returning->settings);
+        i.toFront();
+        while (i.hasNext()) {
+            i.next();
+
+            // ignore default URL
+            if (i.key() == CloudService::DefaultURL) continue;
+
+            // populate from appsetting configuration
+            QVariant value = appsettings->cvalue(context->athlete->cyclist, i.value(), QVariant());
+            returning->configuration.insert(i.value(), value);
+
+            #ifdef GC_WANT_ALLDEBUG
+            qDebug()<<"set:"<<i.value()<<"="<<value;
+            #endif
+        }
+
+        // add sync on import, syncstartup and active
+        QVariant value = appsettings->cvalue(context->athlete->cyclist, returning->syncOnImportSettingName(), "false").toString();
+        returning->configuration.insert(returning->syncOnImportSettingName(), value);
+        value = appsettings->cvalue(context->athlete->cyclist, returning->syncOnStartupSettingName(), "false").toString();
+        returning->configuration.insert(returning->syncOnStartupSettingName(), value);
+        value = appsettings->cvalue(context->athlete->cyclist, returning->activeSettingName(), "false").toString();
+        returning->configuration.insert(returning->activeSettingName(), value);
+
+        // DONE
+        return returning;
     }
 
     bool addService(CloudService *service) {

@@ -475,7 +475,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     }
     QComboBox *google_drive_scope = new QComboBox;
     int item = 0;
-    const QString scope = GoogleDrive::GetScope(context);
+    const QString scope =  appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
     google_drive_scope->setEditable(false);
     google_drive_scope->insertItem(item++, "drive.appdata");
     google_drive_scope->insertItem(item++, "drive.file");

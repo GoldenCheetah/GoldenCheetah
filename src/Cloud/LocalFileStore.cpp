@@ -45,7 +45,7 @@ bool
 LocalFileStore::open(QStringList &errors)
 {
 
-    QString folder = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    QString folder = getSetting(GC_NETWORKFILESTORE_FOLDER, "").toString();
     if (folder == "") {
         errors << tr("You must define a network folder first");
         return false;
@@ -73,7 +73,7 @@ LocalFileStore::close()
 QString
 LocalFileStore::home()
 {
-    if (context) return appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    if (context) return getSetting(GC_NETWORKFILESTORE_FOLDER, "").toString();
     else return "";
 }
 
@@ -130,7 +130,7 @@ LocalFileStore::readFile(QByteArray *data, QString remotename, QString)
 {
 
     // is the path set ?
-    QString path = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    QString path = getSetting(GC_NETWORKFILESTORE_FOLDER, "").toString();
     if (path == "") return false;
 
     // open the path
@@ -159,7 +159,7 @@ LocalFileStore::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     Q_UNUSED(ride);
 
     // is the path set ?
-    QString path = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
+    QString path = getSetting(GC_NETWORKFILESTORE_FOLDER, "").toString();
     if (path == "") {
         emit writeComplete("", tr("You must define a network folder first"));  // required for single upload to get to an end
         return false;

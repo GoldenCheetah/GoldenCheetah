@@ -84,7 +84,7 @@ TodaysPlan::open(QStringList &errors)
     printd("TodaysPlan::open\n");
 
     // do we have a token
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
+    QString token = getSetting(GC_TODAYSPLAN_TOKEN, "").toString();
     if (token == "") {
         errors << "You must authorise with TodaysPlan first";
         return false;
@@ -92,7 +92,7 @@ TodaysPlan::open(QStringList &errors)
 
     // use the configed URL
     QString url = QString("%1/rest/users/delegates/users")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+          .arg(getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
     printd("URL used: %s\n", url.toStdString().c_str());
 
@@ -123,7 +123,7 @@ TodaysPlan::open(QStringList &errors)
     if (parseError.error == QJsonParseError::NoError) {
         printd("NoError");
 
-        userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+        userId = getSetting(GC_TODAYSPLAN_ATHLETE_ID, "").toString();
 
         if (document.array().count()>1) {
             if (userId.length()==0) {
@@ -190,7 +190,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
     QList<CloudServiceEntry*> returning;
 
     // do we have a token
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
+    QString token = getSetting(GC_TODAYSPLAN_TOKEN, "").toString();
     if (token == "") {
         errors << tr("You must authorise with Today's Plan first");
         return returning;
@@ -214,7 +214,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         }
 
         url = QString("%1/rest/users/activities/%2/%3/%4")
-                .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
+                .arg(getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
                 .arg(searchCommand)
                 .arg(QString::number(offset))
                 .arg(QString::number(pageSize));;
@@ -228,7 +228,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         if (offset == 0) {
 
             // Prepare the Search Payload for First Call to Search
-            QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+            QString userId = getSetting(GC_TODAYSPLAN_ATHLETE_ID, "").toString();
             // application/json
             QByteArray jsonString;
             jsonString += "{\"criteria\": {";
@@ -328,12 +328,12 @@ TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
     // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done
 
     // do we have a token ?
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
+    QString token = getSetting(GC_TODAYSPLAN_TOKEN, "").toString();
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
     QString url = QString("%1/rest/files/download/%2")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
+          .arg(getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
           .arg(remoteid);
 
     printd("url:%s\n", url.toStdString().c_str());
@@ -366,12 +366,12 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // to notifyWriteCompleted(QString remotename, QString message) when done
 
     // do we have a token ?
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
+    QString token = getSetting(GC_TODAYSPLAN_TOKEN, "").toString();
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
     QString url = QString("%1/rest/files/upload")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+          .arg(getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
 
     printd("URL used: %s\n", url.toStdString().c_str());
 
@@ -388,7 +388,7 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     QHttpPart jsonPart;
     jsonPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"json\""));
 
-    QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
+    QString userId = getSetting(GC_TODAYSPLAN_ATHLETE_ID, "").toString();
 
     QString json;
     if (userId.length()>0) {
