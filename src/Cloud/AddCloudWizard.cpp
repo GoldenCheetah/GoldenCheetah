@@ -167,57 +167,11 @@ AddService::clicked(QString p)
     wizard->service = p;
     const CloudService *s = CloudServiceFactory::instance().service(wizard->service);
 
+    // instatiate the cloudservice, complete with current configuration etc
     if (wizard->cloudService) delete wizard->cloudService;
-    wizard->cloudService = const_cast<CloudService*>(s)->clone(wizard->context);
+    wizard->cloudService = CloudServiceFactory::instance().newService(p, wizard->context);
 
-    if (wizard->cloudService) {
-
-        // clear the settings we previously edited
-        wizard->settings.clear();
-
-        // get default or whatever
-        QString cname;
-        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
-            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
-            if (value == "") {
-                // get the default value for the service
-                value = wizard->cloudService->settings.value(CloudService::CloudServiceSetting::DefaultURL, "");
-            }
-            wizard->settings.insert(cname, value);
-        }
-
-        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Key, "")) != "") {
-            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
-            wizard->settings.insert(cname, value);
-        }
-
-        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Username, "")) != "") {
-            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
-            wizard->settings.insert(cname, value);
-        }
-
-        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Password, "")) != "") {
-            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
-            wizard->settings.insert(cname, value);
-        }
-
-        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
-            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
-            wizard->settings.insert(cname, value);
-        }
-        if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
-            QString value = appsettings->cvalue(wizard->context->athlete->cyclist, cname, "").toString();
-            wizard->settings.insert(cname, value);
-        }
-
-        // generic settings
-        QString value = appsettings->cvalue(wizard->context->athlete->cyclist, wizard->cloudService->syncOnImportSettingName(), "false").toString();
-        wizard->settings.insert(wizard->cloudService->syncOnImportSettingName(), value);
-        value = appsettings->cvalue(wizard->context->athlete->cyclist, wizard->cloudService->syncOnStartupSettingName(), "false").toString();
-        wizard->settings.insert(wizard->cloudService->syncOnStartupSettingName(), value);
-
-        wizard->next();
-    }
+    wizard->next();
 }
 
 //Select Cloud type
@@ -291,24 +245,24 @@ AddAuth::initializePage()
     QString cname;
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
         url->show(); urlLabel->show();
-        url->setText(wizard->settings.value(cname, ""));
+        url->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Key, "")) != "") {
         key->show(); keyLabel->show();
-        key->setText(wizard->settings.value(cname, ""));
+        key->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Username, "")) != "") {
         user->show(); userLabel->show();
-        user->setText(wizard->settings.value(cname, ""));
+        user->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Password, "")) != "") {
         pass->show(); passLabel->show();
-        pass->setText(wizard->settings.value(cname, ""));
+        pass->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
         auth->show(); authLabel->show();
         token->show(); tokenLabel->show();
-        token->setText(wizard->settings.value(cname, ""));
+        token->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
 
 }
@@ -319,19 +273,19 @@ AddAuth::validatePage()
     // check the authorisation has been completed
     QString cname;
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
-        wizard->settings.insert(cname, url->text());
+        wizard->cloudService->setSetting(cname, url->text());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Key, "")) != "") {
-        wizard->settings.insert(cname, key->text());
+        wizard->cloudService->setSetting(cname, key->text());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Username, "")) != "") {
-        wizard->settings.insert(cname, user->text());
+        wizard->cloudService->setSetting(cname, user->text());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Password, "")) != "") {
-        wizard->settings.insert(cname, pass->text());
+        wizard->cloudService->setSetting(cname, pass->text());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
-        wizard->settings.insert(cname, token->text());
+        wizard->cloudService->setSetting(cname, token->text());
     }
     return true;
 }
@@ -381,15 +335,15 @@ AddSettings::initializePage()
     QString cname;
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
         browse->show(); folder->show(); folderLabel->show();
-        folder->setText(wizard->settings.value(cname, ""));
+        folder->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
     if (wizard->cloudService->capabilities() & CloudService::Query) {
-        QString value = wizard->settings.value(wizard->cloudService->syncOnStartupSettingName(), "false");
+        QString value = wizard->cloudService->getSetting(wizard->cloudService->syncOnStartupSettingName(), "false").toString();
         syncStartup->setChecked(value == "true");
         syncStartup->show();
     }
     if (wizard->cloudService->capabilities() & CloudService::Upload) {
-        QString value = wizard->settings.value(wizard->cloudService->syncOnImportSettingName(), "false");
+        QString value = wizard->cloudService->getSetting(wizard->cloudService->syncOnImportSettingName(), "false").toString();
         syncImport->setChecked(value == "true");
         syncImport->show();
     }
@@ -401,12 +355,12 @@ AddSettings::validatePage()
     // check the authorisation has been completed
     QString cname;
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
-        wizard->settings.insert(cname, folder->text());
+        wizard->cloudService->setSetting(cname, folder->text());
     }
 
     // generic settings, but applied on a per service basis
-    wizard->settings.insert(wizard->cloudService->syncOnImportSettingName(), syncImport->isChecked() ? "true" : "false");
-    wizard->settings.insert(wizard->cloudService->syncOnStartupSettingName(), syncImport->isChecked() ? "true" : "false");
+    wizard->cloudService->setSetting(wizard->cloudService->syncOnImportSettingName(), syncImport->isChecked() ? "true" : "false");
+    wizard->cloudService->setSetting(wizard->cloudService->syncOnStartupSettingName(), syncImport->isChecked() ? "true" : "false");
     return true;
 }
 
@@ -481,16 +435,16 @@ AddFinish::initializePage()
         if (label == "") continue;
 
         // get value
-        value = wizard->settings.value(want.value(), "");
+        value = wizard->cloudService->getSetting(want.value(), "").toString();
         if (value == "") continue;
 
         // ok, we have a setting
         if (label==tr("Password")) layout->addRow(new QLabel(label), new QLabel (QString("*").repeated(value.length())));
         else layout->addRow(new QLabel(label), new QLabel (value));
     }
-    QString syncstartup = wizard->settings.value(wizard->cloudService->syncOnStartupSettingName(), "");
+    QString syncstartup = wizard->cloudService->getSetting(wizard->cloudService->syncOnStartupSettingName(), "").toString();
     if (syncstartup != "") layout->addRow(new QLabel(tr("Sync on start")), new QLabel (syncstartup));
-    QString syncimport = wizard->settings.value(wizard->cloudService->syncOnImportSettingName(), "");
+    QString syncimport = wizard->cloudService->getSetting(wizard->cloudService->syncOnImportSettingName(), "").toString();
     if (syncimport != "") layout->addRow(new QLabel(tr("Sync on import")), new QLabel (syncimport));
 }
 
@@ -504,7 +458,7 @@ AddFinish::validatePage()
         want.next();
 
         // get value
-        QString value = wizard->settings.value(want.value(), "");
+        QString value = wizard->cloudService->getSetting(want.value(), "").toString();
         if (value == "") continue;
 
         // ok, we have a setting
@@ -512,12 +466,12 @@ AddFinish::validatePage()
     }
 
     // generic settings
-    QString syncstartup = wizard->settings.value(wizard->cloudService->syncOnStartupSettingName(), "");
+    QString syncstartup = wizard->cloudService->getSetting(wizard->cloudService->syncOnStartupSettingName(), "").toString();
     if (syncstartup != "")  appsettings->setCValue(wizard->context->athlete->cyclist,
                                                    wizard->cloudService->syncOnStartupSettingName(),
                                                    syncstartup);
 
-    QString syncimport = wizard->settings.value(wizard->cloudService->syncOnImportSettingName(), "");
+    QString syncimport = wizard->cloudService->getSetting(wizard->cloudService->syncOnImportSettingName(), "").toString();
     if (syncimport != "")  appsettings->setCValue(wizard->context->athlete->cyclist,
                                                    wizard->cloudService->syncOnImportSettingName(),
                                                    syncimport);
