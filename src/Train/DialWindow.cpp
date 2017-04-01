@@ -203,8 +203,8 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::LapTime:
         {
         long msecs = value;
-        valueLabel->setText(QString("%1:%2:%3.%4").arg(msecs/3600000)
-                                               .arg((msecs%3600000)/60000,2,10,QLatin1Char('0'))
+        valueLabel->setText(QString("%1:%2:%3.%4").arg(msecs/MS_IN_ONE_HOUR)
+                                               .arg((msecs%MS_IN_ONE_HOUR)/60000,2,10,QLatin1Char('0'))
                                                .arg((msecs%60000)/1000,2,10,QLatin1Char('0'))
                                                .arg((msecs%1000)/100));
         }
@@ -213,8 +213,8 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::LapTimeRemaining:
         {
         long msecs = value;
-        valueLabel->setText(QString("%1:%2:%3").arg(msecs/3600000)
-                                               .arg((msecs%3600000)/60000,2,10,QLatin1Char('0'))
+        valueLabel->setText(QString("%1:%2:%3").arg(msecs/MS_IN_ONE_HOUR)
+                                               .arg((msecs%MS_IN_ONE_HOUR)/60000,2,10,QLatin1Char('0'))
                                                .arg((msecs%60000)/1000,2,10,QLatin1Char('0')));
         }
     break;

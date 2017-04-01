@@ -30,6 +30,7 @@
 #include "Specification.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "Units.h"
 
 #include <assert.h>
 #include <qwt_plot.h>
@@ -613,7 +614,7 @@ public:
 	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
-    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
 
 	if (parent->shadePaceZones() && (zone_range >= 0)) {
 	    QList <double> zone_lows = zones->getZoneLows(zone_range);
@@ -666,7 +667,7 @@ public:
 	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
-    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
 
 	setZ(1.0 + zone_number / 100.0);
 
