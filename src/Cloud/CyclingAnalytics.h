@@ -38,8 +38,8 @@ class CyclingAnalytics : public CloudService {
         CloudService *clone(Context *context) { return new CyclingAnalytics(context); }
         ~CyclingAnalytics();
 
-        // upload only and authenticates with a user and password
-        int capabilities() const { return UserPass | Upload; }
+        // upload only and authenticates with OAuth tokens
+        int capabilities() const { return OAuthToken | Upload; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

@@ -524,7 +524,7 @@ AddFinish::validatePage()
     // this service is now active, only way to set to non active would be to delete it
     // in the athlete preferences
     appsettings->setCValue(wizard->context->athlete->cyclist,
-                                                   wizard->cloudService->syncOnImportSettingName(),
+                                                   wizard->cloudService->activeSettingName(),
                                                    "true");
     return true;
 }
