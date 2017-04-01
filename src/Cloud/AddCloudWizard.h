@@ -53,11 +53,6 @@ public:
     // this is cloned for our context
     CloudService *cloudService;
 
-    // settings we are currently updating - initially set
-    // from the current values, but modified by the user
-    // as they work through the wizard
-    QHash<QString, QString> settings;
-
 public slots:
 
 signals:

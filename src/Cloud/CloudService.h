@@ -457,6 +457,12 @@ class CloudServiceFactory {
 
             // populate from appsetting configuration
             QVariant value = appsettings->cvalue(context->athlete->cyclist, i.value(), QVariant());
+
+            // apply default url
+            if (i.key() == CloudService::URL && value == "") {
+                // get the default value for the service
+                value = returning->settings.value(CloudService::CloudServiceSetting::DefaultURL, "");
+            }
             returning->configuration.insert(i.value(), value);
 
             #ifdef GC_WANT_ALLDEBUG
