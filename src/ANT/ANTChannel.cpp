@@ -61,6 +61,7 @@ ANTChannel::init()
     fecCapabilities=0;
     lastMessageTimestamp = lastMessageTimestamp2 = parent->getElapsedTime();
     blacklisted=0;
+    sc_speed_active = sc_cadence_active = 0;
 }
 
 //
@@ -719,6 +720,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                    uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                    if (time) {
+                       sc_cadence_active = true;
                        rpm = 1024*60*revs / time;
                        last_measured_rpm = rpm;
 
@@ -732,7 +734,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                        // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                        if (rpm < last_measured_rpm / 2.0)
                            rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
-                       parent->setCadence(rpm);
+
+                       if (sc_cadence_active)
+                           parent->setCadence(rpm); // don't update if never received data on this channel (support S&C with single magnet)
                    }
                    value = rpm;
 
@@ -740,7 +744,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
                    revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
                    if (time) {
+                       sc_speed_active = true;
                        rpm = 1024*60*revs / time;
+
                        if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
                        else parent->setWheelRpm(rpm);
                        lastMessageTimestamp2 = parent->getElapsedTime();
@@ -751,7 +757,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                        // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
                        if (rpm < (float) 15.0)
                            rpm = 0.0; // if rpm is less than 15rpm (=4s) then we consider that we are stopped
-                       parent->setWheelRpm(rpm);
+
+                       if (sc_speed_active)
+                           parent->setWheelRpm(rpm); // don't update if never received data on this channel (support S&C with single magnet)
                    }
                    value2 = rpm;
                }
