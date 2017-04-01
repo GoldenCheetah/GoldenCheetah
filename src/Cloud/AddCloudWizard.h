@@ -113,7 +113,7 @@ class AddAuth : public QWizardPage
         bool validatePage();
         int nextId() const { return 30; } //XXX might go to end if no settings left to configure
 
-        //void doAuth();
+        void doAuth();
 
     private:
         AddCloudWizard *wizard;

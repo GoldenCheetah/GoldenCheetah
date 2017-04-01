@@ -23,6 +23,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "CloudService.h"
+#include "OAuthDialog.h"
 
 #include <QMessageBox>
 
@@ -214,8 +215,29 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     layout->addRow(authLabel, auth);
     layout->addRow(tokenLabel, token);
 
+    connect(auth, SIGNAL(clicked(bool)), this, SLOT(doAuth()));
+
     setLayout(layout);
     setFinalPage(false);
+}
+
+void
+AddAuth::doAuth()
+{
+    QString cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "");
+
+    // no config for token !?
+    if (cname == "") return;
+
+    OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        int ret = oauthDialog->exec();
+        token->setText(wizard->cloudService->getSetting(cname, "").toString());
+    }
+
 }
 
 void
@@ -428,7 +450,12 @@ AddFinish::initializePage()
             case CloudService::Password: label=tr("Password"); break;
             case CloudService::OAuthToken: label=tr("Token"); break;
             case CloudService::Folder: label=tr("Folder"); break;
-            case CloudService::Local: label=want.value(); break;
+            case CloudService::Local1:
+            case CloudService::Local2:
+            case CloudService::Local3:
+            case CloudService::Local4:
+            case CloudService::Local5:
+            case CloudService::Local6: label=want.value(); break;
             case CloudService::DefaultURL: break;
         }
         // no clue

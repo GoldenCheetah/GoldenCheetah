@@ -92,9 +92,10 @@ GoogleDrive::GoogleDrive(Context *context)
     // config
     settings.insert(OAuthToken, GC_GOOGLE_DRIVE_ACCESS_TOKEN);
     settings.insert(Folder, GC_GOOGLE_DRIVE_FOLDER);
-    settings.insert(Local, GC_GOOGLE_DRIVE_FOLDER_ID); // derived during config, no user action
-    settings.insert(Local, GC_GOOGLE_DRIVE_REFRESH_TOKEN); // derived during config, no user action
-    settings.insert(Local, GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH); // derived during config, no user action
+    settings.insert(Local1, GC_GOOGLE_DRIVE_FOLDER_ID); // derived during config, no user action
+    settings.insert(Local2, GC_GOOGLE_DRIVE_REFRESH_TOKEN); // derived during config, no user action
+    settings.insert(Local3, GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH); // derived during config, no user action
+    settings.insert(Local4, GC_GOOGLE_DRIVE_AUTH_SCOPE); // derived during config, no user action
 }
 
 GoogleDrive::~GoogleDrive() {
@@ -111,7 +112,7 @@ void GoogleDrive::onSslErrors(QNetworkReply*reply, const QList<QSslError> & )
 bool GoogleDrive::open(QStringList &errors) {
     printd("open\n");
     // do we have a token
-    QString token = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
+    QString token = getSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
     if (token == "") {
         errors << "You must authorise with GoogleDrive first";
         return false;
@@ -137,7 +138,7 @@ bool GoogleDrive::close() {
 
 // home dire
 QString GoogleDrive::home() {
-    return appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "").toString();
+    return getSetting(GC_GOOGLE_DRIVE_FOLDER, "").toString();
 }
 
 QNetworkRequest GoogleDrive::MakeRequestWithURL(
@@ -163,7 +164,7 @@ QNetworkRequest GoogleDrive::MakeRequest(
 bool GoogleDrive::createFolder(QString path) {
     printd("createFolder: %s\n", path.toStdString().c_str());
     MaybeRefreshCredentials();
-    QString token = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
+    QString token = getSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
     if (token == "") {
         return false;
     }
@@ -274,7 +275,7 @@ QList<CloudServiceEntry*> GoogleDrive::readdir(QString path, QStringList &errors
     }
     // do we have a token?
     MaybeRefreshCredentials();
-    QString token = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
+    QString token = getSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
     if (token == "") {
         errors << tr("You must authorise with GoogleDrive first");
         return returning;
@@ -436,7 +437,7 @@ bool GoogleDrive::readFile(QByteArray *data, QString remote_name, QString) {
     // QString message) when done
 
     MaybeRefreshCredentials();
-    QString token = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
+    QString token = getSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
     if (token == "") {
         return false;
     }
@@ -515,7 +516,7 @@ bool GoogleDrive::writeFile(QByteArray &data, QString remote_name, RideFile *rid
     MaybeRefreshCredentials();
 
     // do we have a token ?
-    QString token = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
+    QString token = getSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, "").toString();
     if (token == "") {
         return false;
     }
@@ -634,11 +635,11 @@ void GoogleDrive::readFileCompleted() {
 }
 
 void GoogleDrive::MaybeRefreshCredentials() {
-    QString last_refresh_str = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, "0").toString();
+    QString last_refresh_str = getSetting(GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, "0").toString();
     QDateTime last_refresh = QDateTime::fromString(last_refresh_str);
     // TODO(gille): remember when it expires.
     last_refresh = last_refresh.addSecs(45 * 60);
-    QString refresh_token = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_REFRESH_TOKEN, "").toString();
+    QString refresh_token = getSetting(GC_GOOGLE_DRIVE_REFRESH_TOKEN, "").toString();
     if (refresh_token == "") {
         return;
     }
@@ -721,7 +722,7 @@ GoogleDrive::FileInfo* GoogleDrive::BuildDirectoriesForAthleteDirectory(
     // Because Google Drive is a little bit "different" we can't just read
     // "/foo/bar/baz, we need to know the id's of both foo and bar to find
     // baz.
-    const QString id = appsettings->cvalue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER_ID, "").toString();
+    const QString id = getSetting(GC_GOOGLE_DRIVE_FOLDER_ID, "").toString();
     if (id == "") {
         // TODO(gille): Maybe we should actually find this dir if this happens
         // however this is a weird configuration error, that (tm)

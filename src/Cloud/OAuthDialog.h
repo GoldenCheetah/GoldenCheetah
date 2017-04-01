@@ -20,6 +20,7 @@
 #define OAUTHDIALOG_H
 #include "GoldenCheetah.h"
 #include "Pages.h"
+#include "CloudService.h"
 #ifdef GC_HAVE_KQOAUTH
 #include <kqoauthmanager.h>
 #endif
@@ -55,6 +56,7 @@ class OAuthDialog : public QDialog
 
 public:
     typedef enum {
+        NONE=0,
         STRAVA,
         TWITTER,
         DROPBOX,
@@ -65,7 +67,8 @@ public:
         WITHINGS
     } OAuthSite;
 
-    OAuthDialog(Context *context, OAuthSite site, QString baseURL="", QString clientsecret="");
+    // will work with old config via site and new via cloudservice (which is null for calendar and withings for now)
+    OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL="", QString clientsecret="");
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -91,6 +94,7 @@ private:
     Context *context;
     bool noSSLlib;
     OAuthSite site;
+    CloudService *service;
     QString baseURL; // can be passed, but typically is blank (used by Todays Plan)
     QString clientsecret; // can be passed, but typicall is blank (used by Todays Plan)
 
