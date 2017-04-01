@@ -57,6 +57,7 @@ private:
     quint16 prevCrankRevs;
     quint16 prevWheelTime;
     quint32 prevWheelRevs;
+    bool connected;
     void getCadence(QDataStream& ds);
     void getWheelRpm(QDataStream& ds);
 };
