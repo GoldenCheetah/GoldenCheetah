@@ -39,6 +39,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
 	    this, SLOT(serviceDiscovered(QBluetoothUuid)));
     connect(m_control, SIGNAL(discoveryFinished()),
 	    this, SLOT(serviceScanDone()));
+    connected = false;
     prevWheelTime = 0;
     prevWheelRevs = 0;
     prevCrankTime = 0;
@@ -55,10 +56,12 @@ void BT40Device::connectDevice() {
     qDebug() << "Connecting to device" << m_currentDevice.name();
     m_control->setRemoteAddressType(QLowEnergyController::RandomAddress);
     m_control->connectToDevice();
+    connected = true;
 }
 
 void BT40Device::disconnectDevice() {
     qDebug() << "Disconnecting from device" << m_currentDevice.name();
+    connected = false;
     m_control->disconnectFromDevice();
 }
 
@@ -74,6 +77,22 @@ void BT40Device::controllerError(QLowEnergyController::Error error)
 
 void BT40Device::deviceDisconnected() {
     qDebug() << "Lost connection to" << m_currentDevice.name();
+    // Zero any readings provided by this device
+    foreach (QLowEnergyService* const &service, m_services) {
+	if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::HeartRate)) {
+	    dynamic_cast<BT40Controller*>(parent)->setBPM(0.0);
+	}
+	else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
+	    dynamic_cast<BT40Controller*>(parent)->setWatts(0.0);
+	}
+	else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
+	    dynamic_cast<BT40Controller*>(parent)->setWheelRpm(0.0);
+	}
+    }
+    // Try to reconnect if the connection was lost inadvertently
+    if (connected) {
+        this->connectDevice();
+    }
 }
 
 void BT40Device::serviceDiscovered(QBluetoothUuid uuid) {
