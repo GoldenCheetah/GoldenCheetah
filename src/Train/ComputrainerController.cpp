@@ -25,6 +25,7 @@
 ComputrainerController::ComputrainerController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myComputrainer = new Computrainer (parent, dc ? dc->portSpec : ""); // we may get NULL passed when configuring
+    f3Depressed = false;
 }
 
 
@@ -97,7 +98,13 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
 
 	// Check CT if F3 has been pressed for Calibration mode FIRST before we do anything else
     if (Buttons&CT_F3) {
-        parent->Calibrate();
+        // We're only interested in the act of pressing the button, not it being held down
+        if (f3Depressed == false) {
+            f3Depressed = true;
+            parent->Calibrate();
+        }
+    } else {
+        f3Depressed = false; // It has been released
     }
 
     // ignore other buttons and anything else if calibrating
