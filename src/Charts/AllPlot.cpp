@@ -7018,18 +7018,19 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 
         // need to scale for W' bal
-        if (curve->title().text().contains("W'")) yvalue /= 1000.0f;
+        if (curve->title().text().contains("W'"))
+            yvalue /= 1000.0f;
 
         // output the tooltip
-    int precision;
-    if (curve->title().text().contains("Hb")){
-      precision = 2;
-    } else {
-      if (curve->title().text().contains("R-R")){
-          precision = 3;}
-      else
-        {precision = 1;}
-    }
+        int precision = 1; //< default to tens precision
+        if (curve->title().text() == tr("Hb")) {
+            precision = 2;
+        } else if (curve->title().text() == tr("R-R")) {
+            precision = 3;
+        } else if (curve->title().text() == tr("Gear Ratio")) {
+            precision = 2;
+        }
+        
         QString text = QString("%1 %2%5\n%3 %4")
                         .arg(yvalue, 0, 'f', precision)
                         .arg(this->axisTitle(curve->yAxis()).text())
