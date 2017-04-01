@@ -2382,23 +2382,10 @@ RideFile::recalculateDerivedSeries(bool force)
             // but only if ride point has power, cadence and speed > 0 otherwise calculation will give a random result
             if (p->watts > 0.0f && p->cad > 0.0f && p->kph > 0.0f) {
                 p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
-                // do the rounding
-                double rounding = 0.0f;
-                if (p->gear < 1.0f) {
-                  rounding = 0.05f;
-                }
-                else if (p->gear >= 1.0f && p->gear < 3.0f) {
-                    rounding = 0.1f;
-                } else {
-                    rounding = 0.5f;
-                }
-                double mod = fmod(p->gear, rounding);
-                double factor = trunc(p->gear / rounding);
-                if (mod < rounding) p->gear = factor * rounding;
-                else p->gear = (factor+1) * rounding;
 
+                // Round Gear ratio to the hundreths.
                 // final rounding to 2 decimals
-                p->gear = round(p->gear * 100.00f) / 100.00f;
+                p->gear = floor(p->gear * 100.00f +.5) / 100.00f;
             }
             else {
                 p->gear = 0.0f; // to be filled up with previous gear later
