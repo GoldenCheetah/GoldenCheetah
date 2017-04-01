@@ -85,8 +85,8 @@ TrainingStageBuch::open(QStringList &errors)
     printd("TrainingStageBuch::open\n");
 
     // GET ACCOUNT SETTINGS
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
+    QString username = getSetting(GC_TTBUSER).toString();
+    QString password = getSetting(GC_TTBPASS).toString();
 
 #if QT_VERSION > 0x050000
     QUrlQuery urlquery;

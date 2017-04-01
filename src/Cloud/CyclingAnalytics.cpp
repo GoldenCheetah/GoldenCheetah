@@ -78,7 +78,7 @@ bool
 CyclingAnalytics::open(QStringList &errors)
 {
     printd("CyclingAnalytics::open\n");
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    QString token = getSetting(GC_CYCLINGANALYTICS_TOKEN, "").toString();
     if (token == "") {
         errors << tr("Account is not configured.");
         return false;
@@ -101,7 +101,7 @@ CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride
 
     printd("CyclingAnalytics::writeFile(%s)\n", remotename.toStdString().c_str());
 
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    QString token = getSetting(GC_CYCLINGANALYTICS_TOKEN, "").toString();
     QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
     QNetworkRequest request = QNetworkRequest(url);
 

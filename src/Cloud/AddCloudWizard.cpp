@@ -474,6 +474,7 @@ AddFinish::initializePage()
             case CloudService::Password: label=tr("Password"); break;
             case CloudService::OAuthToken: label=tr("Token"); break;
             case CloudService::Folder: label=tr("Folder"); break;
+            case CloudService::Local: label=want.value(); break;
             case CloudService::DefaultURL: break;
         }
         // no clue

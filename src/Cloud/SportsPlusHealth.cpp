@@ -105,8 +105,8 @@ SportsPlusHealth::writeFile(QByteArray &data, QString remotename, RideFile *ride
     printd("SportsPlusHealth::writeFile(%s)\n", remotename.toStdString().c_str());
 
     // get credentials
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS).toString();
+    QString username = getSetting(GC_SPORTPLUSHEALTHUSER).toString();
+    QString password = getSetting(GC_SPORTPLUSHEALTHPASS).toString();
 
     //Building the message content
     QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType);

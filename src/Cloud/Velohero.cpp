@@ -84,8 +84,8 @@ Velohero::open(QStringList &errors)
 {
     printd("Velohero::open\n");
 
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS).toString();
+    QString username = getSetting(GC_VELOHEROUSER).toString();
+    QString password = getSetting(GC_VELOHEROPASS).toString();
 
 #if QT_VERSION > 0x050000
     QUrlQuery urlquery;

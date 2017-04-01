@@ -42,7 +42,7 @@ bool
 Dropbox::open(QStringList &errors)
 {
     // do we have a token
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") {
         errors << "You must authorise with Dropbox first";
         return false;
@@ -105,13 +105,13 @@ Dropbox::close()
 QString
 Dropbox::home()
 {
-    return appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString(); 
+    return getSetting(GC_DROPBOX_FOLDER, "").toString(); 
 }
 
 bool Dropbox::createFolder(QString path)
 {
     // do we have a token
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
@@ -137,7 +137,7 @@ Dropbox::readdir(QString path, QStringList &errors)
     QList<CloudServiceEntry*> returning;
 
     // do we have a token
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") {
         errors << tr("You must authorise with Dropbox first");
         return returning;
@@ -200,11 +200,11 @@ Dropbox::readFile(QByteArray *data, QString remotename, QString)
     // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done
 
     // do we have a token ?
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") return false;
 
     // is the path set ?
-    QString path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString();
+    QString path = getSetting(GC_DROPBOX_FOLDER, "").toString();
     if (path == "") return false;
 
     // lets connect and get basic info on the root directory
@@ -236,11 +236,11 @@ Dropbox::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // to notifyWriteCompleted(QString remotename, QString message) when done
 
     // do we have a token ?
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "").toString();
+    QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") return false;
 
     // is the path set ?
-    QString path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString();
+    QString path = getSetting(GC_DROPBOX_FOLDER, "").toString();
     if (path == "") return false;
 
     // lets connect and get basic info on the root directory

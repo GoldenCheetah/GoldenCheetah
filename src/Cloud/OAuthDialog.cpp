@@ -136,7 +136,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
 #if QT_VERSION >= 0x050000
     } else if (site == GOOGLE_DRIVE) {
-        const QString scope = GoogleDrive::GetScope(context);
+        const QString scope =  appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
         // OAUTH 2.0 - Google flow for installed applications
         urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
         // We only request access to the application data folder, not all files.

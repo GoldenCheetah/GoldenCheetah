@@ -79,7 +79,7 @@ bool
 RideWithGPS::open(QStringList &errors)
 {
     printd("RideWithGPS::open\n");
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER).toString();
+    QString username = getSetting(GC_RWGPSUSER).toString();
     if (username == "") {
         errors << tr("RideWithGPS account not configured.");
         return false;
@@ -112,8 +112,8 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
     QDateTime rideDateTime = ride->startTime();
     QString out, data;
 
-    QString username = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER).toString();
-    QString password = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSPASS).toString();
+    QString username = getSetting(GC_RWGPSUSER).toString();
+    QString password = getSetting(GC_RWGPSPASS).toString();
 
     // application/json
     out += "{\"apikey\": \"p24n3a9e\", ";

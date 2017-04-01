@@ -89,8 +89,8 @@ SixCycle::open(QStringList &errors)
     printd("Sixcycle::open\n");
 
     // do we have a token
-    QString user = appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_USER, "").toString();
-    QString pass = appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_PASS, "").toString();
+    QString user = getSetting(GC_SIXCYCLE_USER, "").toString();
+    QString pass = getSetting(GC_SIXCYCLE_PASS, "").toString();
 
     if (user == "") {
         errors << "You must setup Sixcycle login details first";
@@ -99,7 +99,7 @@ SixCycle::open(QStringList &errors)
 
     // use the configed URL
     QString url = QString("%1/rest-auth/login/")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
+          .arg(getSetting(GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
 
     // We need to POST a form with the user and password
     QUrlQuery postData(url);
@@ -218,7 +218,7 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
     //   "dataCheckSum":"6caf38aa1c0bb2101225680e05f5ece6","activityEndDateTime":"2015-09-10T15:44:54Z","id":35929}]
     //
     QString url = QString("%1/api/v1/activitysummaryfile/")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
+          .arg(getSetting(GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
 
     printd("endpoint: %s\n", url.toStdString().c_str());
 
@@ -376,7 +376,7 @@ SixCycle::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     // set the target url
     QString url = QString("%1/api/v1/activitysummarydata/")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
+          .arg(getSetting(GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
     //url = "http://requestb.in/1bakg1q1";
     printd("endpoint: '%s'\n", url.toStdString().c_str());
 

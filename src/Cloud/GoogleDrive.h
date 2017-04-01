@@ -68,8 +68,6 @@ class GoogleDrive : public CloudService {
         virtual QList<CloudServiceEntry*> readdir(
             QString path, QStringList &errors);
 
-        static QString GetScope(Context* context);
-
         // Returns the fild id or "" if no file was found, uses the local
         // cache to determine file id.
         QString GetFileId(const QString& path);
