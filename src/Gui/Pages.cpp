@@ -2397,7 +2397,7 @@ RemotePage::saveClicked()
     return 0;
 }
 
-static double scalefactors[7] = { 0.5f, 0.6f, 0.8, 1.0f, 1.25f, 1.5f, 2.0f };
+static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
 
 //
 // Appearances page
@@ -2462,7 +2462,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
     fontscale = new QSlider(this);
     fontscale->setMinimum(0);
-    fontscale->setMaximum(6);
+    fontscale->setMaximum(8);
     fontscale->setTickInterval(1);
     fontscale->setValue(3);
     fontscale->setOrientation(Qt::Horizontal);
