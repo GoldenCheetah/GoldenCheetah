@@ -682,8 +682,8 @@ struct Bin2FileReaderState
         }
         bool stop = false;
 
-        int data_size = file.size();
-        int bytes_read = 0;
+        qint64 data_size = file.size();
+        qint64 bytes_read = 0;
 
         bytes_read += read_version();
 

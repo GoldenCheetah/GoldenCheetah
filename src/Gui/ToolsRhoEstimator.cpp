@@ -25,6 +25,7 @@
 #include "Units.h"
 #include "Colors.h"
 #include "HelpWhatsThis.h"
+
 #include <QtGui>
 #include <sstream>
 #include <cmath>
@@ -242,7 +243,7 @@ double ToolsRhoEstimator::inchesmercury_to_hectopascals(double inhg) {
 }
 
 double ToolsRhoEstimator::rho_met_to_imp(double rho) {
-  return rho * ((0.30480061 * 0.30480061 * 0.30480061) / 0.45359237);
+  return rho * ((0.30480061 * 0.30480061 * 0.30480061) / KG_PER_LB);
 }
 
 double ToolsRhoEstimator::calculate_rho(double temp,

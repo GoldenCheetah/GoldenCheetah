@@ -65,6 +65,8 @@
 #include <CoreServices/CoreServices.h>
 #include <QStyle>
 #include <QStyleFactory>
+#import <IOKit/pwr_mgt/IOPMLib.h>
+
 #endif
 
 #ifdef WIN32
@@ -1446,17 +1448,23 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
     rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
     rtData.mode = mode;
 
-    // On a Mac prevent the screensaver from kicking in
-    // this is apparently the 'supported' mechanism for
-    // disabling the screen saver on a Mac instead of
-    // temporarily adjusting/disabling the user preferences
-    // for screen saving and power management. Makes sense.
-#ifdef Q_OS_MAC
-    UpdateSystemActivity(OverallAct);
-#endif
+
 
     // get latest telemetry from devices
     if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
+
+#ifdef Q_OS_MAC
+        // On a Mac prevent the screensaver from kicking in
+        // this is apparently the 'supported' mechanism for
+        // disabling the screen saver on a Mac instead of
+        // temporarily adjusting/disabling the user preferences
+        // for screen saving and power management. Makes sense.
+        
+        CFStringRef reasonForActivity = CFSTR("TrainSidebar::guiUpdate");
+        IOPMAssertionID assertionID;
+        IOReturn suspendSreensaverSuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
+#endif
+        
         if(calibrating) {
             foreach(int dev, activeDevices) { // Do for selected device only
                 RealtimeData local = rtData;
@@ -1685,6 +1693,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 context->notifySetNow(rtData.getMsecs());
             }
         }
+        
+#ifdef Q_OS_MAC
+        if (suspendSreensaverSuccess == kIOReturnSuccess)
+        {
+            // Re-enable screen saver
+            suspendSreensaverSuccess = IOPMAssertionRelease(assertionID);
+            //The system will be able to sleep again.
+        }
+#endif
     }
 }
 

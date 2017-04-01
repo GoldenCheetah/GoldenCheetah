@@ -229,8 +229,8 @@ struct SyncFileReaderState
         }
         bool stop = false;
 
-        int data_size = file.size();
-        int bytes_read = 0;
+        qint64 data_size = file.size();
+        qint64 bytes_read = 0;
 
         while (!stop && (bytes_read < data_size)) {
             bytes_read += read_page(); // read_page(stop, errors);

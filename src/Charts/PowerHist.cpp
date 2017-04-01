@@ -1356,8 +1356,8 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(standard.wbalArray, cache->distributionArray(RideFile::wbal));
 
     if (!context->athlete->useMetricUnits) {
-        double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
-        double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+        double torque_factor = (context->athlete->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
+        double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
 
         for(int i=0; i<standard.nmArray.size(); i++) standard.nmArray[i] = standard.nmArray[i] * torque_factor;
         for(int i=0; i<standard.kphArray.size(); i++) standard.kphArray[i] = standard.kphArray[i] * speed_factor;
@@ -1496,8 +1496,8 @@ PowerHist::setDataFromCompare()
 
         // convert for metric imperial types
         if (!context->athlete->useMetricUnits) {
-            double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
-            double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+            double torque_factor = (context->athlete->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
+            double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
 
             for(int i=0; i<add.nmArray.size(); i++) add.nmArray[i] = add.nmArray[i] * torque_factor;
             for(int i=0; i<add.kphArray.size(); i++) add.kphArray[i] = add.kphArray[i] * speed_factor;
@@ -1916,8 +1916,8 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.wbalZoneSelectedArray.resize(0);
 
     // unit conversion factor for imperial units for selected parameters
-    double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
-    double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+    double torque_factor = (context->athlete->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
+    double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
 
     // cp and zones
     int zoneRange = zones ? zones->whichRange(ride->startTime().date()) : -1;

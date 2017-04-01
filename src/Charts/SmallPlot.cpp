@@ -21,6 +21,7 @@
 #include "RideItem.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "Units.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -32,8 +33,6 @@
 #include <qwt_compat.h>
 
 static double inline max(double a, double b) { if (a > b) return a; else return b; }
-
-#define MILES_PER_KM 0.62137119
 
 SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
 {
@@ -103,8 +102,8 @@ SmallPlot::recalc()
 {
     if (!timeArray.size()) return;
 
-    int rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
-    if (rideTimeSecs < 0 || rideTimeSecs > 7*24*60*60) {
+    long rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
+    if (rideTimeSecs < 0 || rideTimeSecs > SECONDS_IN_A_WEEK) {
         QwtArray<double> data;
         wattsCurve->setSamples(data, data);
         hrCurve->setSamples(data, data);

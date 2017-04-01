@@ -24,6 +24,7 @@
 #include "Zones.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "Units.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -165,7 +166,7 @@ HrPwPlot::recalc()
         return;
 
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
-    if (rideTimeSecs > 7*24*60*60) {
+    if (rideTimeSecs > SECONDS_IN_A_WEEK) {
         return;
     }
 

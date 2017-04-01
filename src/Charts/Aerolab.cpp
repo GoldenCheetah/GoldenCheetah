@@ -27,6 +27,7 @@
 #include "Units.h"
 #include "Colors.h"
 #include "TimeUtils.h"
+#include "Units.h"
 
 #include <cmath>
 #include <qwt_series_data.h>
@@ -451,7 +452,7 @@ Aerolab::recalc( bool new_zoom ) {
   int totalRideDistance = (int ) ceil(distanceArray[arrayLength - 1]);
 
   // If the ride is really long, then avoid it like the plague.
-  if (rideTimeSecs > 7*24*60*60) {
+  if (rideTimeSecs > SECONDS_IN_A_WEEK) {
     QVector<double> data;
 
     if (!veArray.empty()){
@@ -609,7 +610,7 @@ Aerolab::slope(
            double v
         )  {
 
-  double g = 9.80665;
+  double g = KG_FORCE_PER_METER;
 
   // Small angle version of slope calculation:
   double s = f/(m*g) - crr - cda*rho*v*v/(2.0*m*g) - a/g;
@@ -768,7 +769,7 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
 {
     // HARD-CODED DATA: p1->kph
     const double vfactor = 3.600;
-    const double g = 9.80665;
+    const double g = KG_FORCE_PER_METER;
     RideFile *ride = rideItem->ride();
     QString errMsg;
 

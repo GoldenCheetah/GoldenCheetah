@@ -1320,7 +1320,7 @@ CriticalPowerWindow::curve_to_point(double x, const QwtPlotCurve *curve, Critica
         if (data->size() > 0) {
             if (x < data->sample(0).x() || x > data->sample(data->size() - 1).x())
                 return 0;
-            unsigned min = 0, mid = 0, max = data->size();
+            size_t min = 0, mid = 0, max = data->size();
             while (min < max - 1) {
                 mid = (max - min) / 2 + min;
                 if (x < data->sample(mid).x()) {
