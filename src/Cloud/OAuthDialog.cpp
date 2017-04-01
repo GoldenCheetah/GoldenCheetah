@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Justin Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -29,12 +30,26 @@
 #include <QJsonParseError>
 #endif
 
-OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QString clientsecret) :
-    context(context), site(site), baseURL(baseURL), clientsecret(clientsecret)
+//
+// IN TRANSITION --- WILL WRITE TO APPSETTINGS *AND* SERVICE CONFIGURATION
+//                   THIS WILL SWITCH WHEN PREFERENCES>ACCOUNTS IS RETIRED
+//                   WE WILL REMOVE: site, baseURL and clientsecret since
+//                   they are stored in the service configuration.
+//
+OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL, QString clientsecret) :
+    context(context), site(site), service(service), baseURL(baseURL), clientsecret(clientsecret)
 {
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("OAuth"));
+
+    if (service) { // ultimately this will be the only way this works
+        if (service->name() == "Strava") site = this->site = STRAVA;
+        if (service->name() == "Dropbox") site = this->site = DROPBOX;
+        if (service->name() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
+        if (service->name() == "Google Drive") site = this->site = GOOGLE_DRIVE;
+        if (service->name() == "Today's Plan") site = this->site = TODAYSPLAN;
+    }
 
     // check if SSL is available - if not - message and end
     if (!QSslSocket::supportsSsl()) {
@@ -91,21 +106,11 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         oauthRequest = new KQOAuthRequest;
         oauthManager = new KQOAuthManager(this);
 
-        connect(oauthManager, SIGNAL(temporaryTokenReceived(QString,QString)),
-                this, SLOT(onTemporaryTokenReceived(QString, QString)));
-
-        connect(oauthManager, SIGNAL(authorizationReceived(QString,QString)),
-                this, SLOT( onAuthorizationReceived(QString, QString)));
-
-        connect(oauthManager, SIGNAL(accessTokenReceived(QString,QString)),
-                this, SLOT(onAccessTokenReceived(QString,QString)));
-
-        connect(oauthManager, SIGNAL(requestReady(QByteArray)),
-                this, SLOT(onRequestReady(QByteArray)));
-
-        connect(oauthManager, SIGNAL(authorizationPageRequested(QUrl)),
-                this, SLOT(onAuthorizationPageRequested(QUrl)));
-
+        connect(oauthManager, SIGNAL(temporaryTokenReceived(QString,QString)), this, SLOT(onTemporaryTokenReceived(QString, QString)));
+        connect(oauthManager, SIGNAL(authorizationReceived(QString,QString)), this, SLOT( onAuthorizationReceived(QString, QString)));
+        connect(oauthManager, SIGNAL(accessTokenReceived(QString,QString)), this, SLOT(onAccessTokenReceived(QString,QString)));
+        connect(oauthManager, SIGNAL(requestReady(QByteArray)), this, SLOT(onRequestReady(QByteArray)));
+        connect(oauthManager, SIGNAL(authorizationPageRequested(QUrl)), this, SLOT(onAuthorizationPageRequested(QUrl)));
 
         oauthRequest->initRequest(KQOAuthRequest::TemporaryCredentials, QUrl("https://api.twitter.com/oauth/request_token"));
 
@@ -136,7 +141,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
 #if QT_VERSION >= 0x050000
     } else if (site == GOOGLE_DRIVE) {
-        const QString scope =  appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
+        const QString scope =  service->getSetting(GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
         // OAUTH 2.0 - Google flow for installed applications
         urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
         // We only request access to the application data folder, not all files.
@@ -146,8 +151,8 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
 #endif
     } else if (site == TODAYSPLAN) {
-        //urlstr = QString("https://whats.todaysplan.com.au/en/authorize/");
-        if (baseURL=="") baseURL="https://whats.todaysplan.com.au";
+        //urlstr = QString("https://whats.todaysplan.com.au/en/authorize/"); //XXX fixup below when pages.cpp goes
+        if (baseURL=="") baseURL=service->getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString();
         urlstr = QString("%1/authorize/").arg(baseURL);
         urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
     } else if (site == WITHINGS) {
@@ -156,21 +161,11 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         oauthRequest = new KQOAuthRequest;
         oauthManager = new KQOAuthManager(this);
 
-        connect(oauthManager, SIGNAL(temporaryTokenReceived(QString,QString)),
-                this, SLOT(onTemporaryTokenReceived(QString, QString)));
-
-        connect(oauthManager, SIGNAL(authorizationReceived(QString,QString)),
-                this, SLOT( onAuthorizationReceived(QString, QString)));
-
-        connect(oauthManager, SIGNAL(accessTokenReceived(QString,QString)),
-                this, SLOT(onAccessTokenReceived(QString,QString)));
-
-        connect(oauthManager, SIGNAL(requestReady(QByteArray)),
-                this, SLOT(onRequestReady(QByteArray)));
-
-        connect(oauthManager, SIGNAL(authorizationPageRequested(QUrl)),
-                this, SLOT(onAuthorizationPageRequested(QUrl)));
-
+        connect(oauthManager, SIGNAL(temporaryTokenReceived(QString,QString)), this, SLOT(onTemporaryTokenReceived(QString, QString)));
+        connect(oauthManager, SIGNAL(authorizationReceived(QString,QString)), this, SLOT( onAuthorizationReceived(QString, QString)));
+        connect(oauthManager, SIGNAL(accessTokenReceived(QString,QString)), this, SLOT(onAccessTokenReceived(QString,QString)));
+        connect(oauthManager, SIGNAL(requestReady(QByteArray)), this, SLOT(onRequestReady(QByteArray)));
+        connect(oauthManager, SIGNAL(authorizationPageRequested(QUrl)), this, SLOT(onAuthorizationPageRequested(QUrl)));
 
         oauthRequest->initRequest(KQOAuthRequest::TemporaryCredentials, QUrl("https://oauth.withings.com/account/request_token"));
         //oauthRequest->setEnableDebugOutput(true);
@@ -195,10 +190,8 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, QString baseURL, QStr
         url = QUrl(urlstr);
         view->setUrl(url);
         // connects
-        connect(view, SIGNAL(urlChanged(const QUrl&)), this,
-                SLOT(urlChanged(const QUrl&)));
-        connect(view, SIGNAL(loadFinished(bool)), this,
-                SLOT(loadFinished(bool)));
+        connect(view, SIGNAL(urlChanged(const QUrl&)), this, SLOT(urlChanged(const QUrl&)));
+        connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
     }
 }
 
@@ -358,12 +351,14 @@ OAuthDialog::urlChanged(const QUrl &url)
             }
 
             else if (site == TODAYSPLAN) {
-                if (baseURL=="") baseURL="https://whats.todaysplan.com.au";
+                if (baseURL=="") baseURL=service->getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString();
                 urlstr = QString("%1/rest/oauth/access_token?").arg(baseURL);
                 params.addQueryItem("client_id", GC_TODAYSPLAN_CLIENT_ID);
 #ifdef GC_TODAYSPLAN_CLIENT_SECRET
-                if (clientsecret != "")
+                if (clientsecret != "") //XXX get rid when pages.cpp goes
                     params.addQueryItem("client_secret", clientsecret);
+                else if (service->getSetting(GC_TODAYSPLAN_USERKEY, "").toString() != "")
+                    params.addQueryItem("client_secret", service->getSetting(GC_TODAYSPLAN_USERKEY, "").toString());
                 else
                     params.addQueryItem("client_secret", GC_TODAYSPLAN_CLIENT_SECRET);
 
@@ -380,7 +375,6 @@ OAuthDialog::urlChanged(const QUrl &url)
 #else
             data=params.encodedQuery();
 #endif
-
             // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
             QUrl url = QUrl(urlstr);
             QNetworkRequest request = QNetworkRequest(url);
@@ -526,18 +520,20 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
         }
 
         if (site == DROPBOX) {
-            appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN,
-                                   access_token);
+            appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
+            service->setSetting(GC_DROPBOX_TOKEN, access_token);
             QString info = QString(tr("Dropbox authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         } else if (site == STRAVA) {
             appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
+            service->setSetting(GC_STRAVA_TOKEN, access_token);
             QString info = QString(tr("Strava authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         } else if (site == CYCLING_ANALYTICS) {
             appsettings->setCValue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, access_token);
+            service->setSetting(GC_CYCLINGANALYTICS_TOKEN, access_token);
             QString info = QString(tr("Cycling Analytics authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
@@ -545,35 +541,25 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
             // remove the Google Page first
             url = QUrl("http://www.goldencheetah.org");
             view->setUrl(url);
-            appsettings->setCValue(
-                context->athlete->cyclist,
-                GC_GOOGLE_CALENDAR_REFRESH_TOKEN, refresh_token);
-            QString info = QString(
-                tr("Google Calendar authorization was successful."));
+            appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, refresh_token);
+            QString info = QString(tr("Google Calendar authorization was successful."));
             QMessageBox information(QMessageBox::Information,
                                     tr("Information"), info);
             information.exec();
         } else if (site == GOOGLE_DRIVE) {
             // remove the Google Page first
-            appsettings->setCValue(
-                context->athlete->cyclist,
-                GC_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
-            appsettings->setCValue(
-                context->athlete->cyclist,
-                GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
-            appsettings->setCValue(
-                context->athlete->cyclist,
-                GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH,
-                QDateTime::currentDateTime());
-
-            QString info = QString(
-                tr("Google Drive authorization was successful."));
-            QMessageBox information(QMessageBox::Information,
-                                    tr("Information"), info);
+            appsettings->setCValue( context->athlete->cyclist, GC_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
+            appsettings->setCValue( context->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
+            appsettings->setCValue( context->athlete->cyclist, GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, QDateTime::currentDateTime());
+            service->setSetting(GC_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
+            service->setSetting(GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, QDateTime::currentDateTime());
+            QString info = QString(tr("Google Drive authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         } else if (site == TODAYSPLAN) {
             appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, access_token);
-
+            service->setSetting(GC_TODAYSPLAN_TOKEN, access_token);
             listUsers();
         }
     } else {
@@ -588,7 +574,7 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 }
 
 void
-OAuthDialog::listUsers()
+OAuthDialog::listUsers() //XXX NEEDS FIXUP FOR ADDCLOUDWIZARD
 {
     if (site == TODAYSPLAN) {
         // use the configed URL

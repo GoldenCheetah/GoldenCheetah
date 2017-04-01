@@ -946,11 +946,11 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
 void CredentialsPage::chooseDropboxFolder()
 {
-    Dropbox dropbox(context);
+    CloudService *dropbox = CloudServiceFactory::instance().newService("Dropbox", context);
 
     // open the connection
     QStringList errors;
-    if (dropbox.open(errors) == false) {
+    if (dropbox->open(errors) == false) {
         QMessageBox err;
         err.setText(tr("Dropbox Connection Failed"));
         err.setDetailedText(errors.join("\n\n"));
@@ -965,7 +965,7 @@ void CredentialsPage::chooseDropboxFolder()
         path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER,
                                    "/").toString();
     }
-    CloudServiceDialog dialog(this, &dropbox, tr("Choose Athlete Directory"), path, true);
+    CloudServiceDialog dialog(this, dropbox, tr("Choose Athlete Directory"), path, true);
     int ret = dialog.exec();
 
     // did we actually select something?
@@ -974,11 +974,11 @@ void CredentialsPage::chooseDropboxFolder()
 
 void CredentialsPage::chooseGoogleDriveFolder()
 {
-    GoogleDrive google_drive(context);
+    CloudService *google_drive = CloudServiceFactory::instance().newService("Google Drive", context);
 
     // open the connection
     QStringList errors;
-    if (google_drive.open(errors) == false) {
+    if (google_drive->open(errors) == false) {
         QMessageBox err;
         err.setText(tr("Google Drive Connection Failed"));
         err.setDetailedText(errors.join("\n\n"));
@@ -993,7 +993,7 @@ void CredentialsPage::chooseGoogleDriveFolder()
             context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "/").toString();
         // At this point there just might be a google drive instance around?
     }
-    CloudServiceDialog dialog(this, &google_drive, tr("Choose Athlete Directory"),
+    CloudServiceDialog dialog(this, google_drive, tr("Choose Athlete Directory"),
                            path, true);
     int ret = dialog.exec();
 
@@ -1001,9 +1001,8 @@ void CredentialsPage::chooseGoogleDriveFolder()
     if (ret == QDialog::Accepted) {
         path = dialog.pathnameSelected();
         googleDriveFolder->setText(path);
-        QString id = google_drive.GetFileId(path);
-        appsettings->setCValue(context->athlete->cyclist,
-                               GC_GOOGLE_DRIVE_FOLDER_ID, id);
+        QString id = static_cast<GoogleDrive*>(google_drive)->GetFileId(path); //XXX hack since will be deprecated shortly
+        appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER_ID, id);
     }
 }
 
@@ -1034,7 +1033,7 @@ void CredentialsPage::chooseLocalFileStoreFolder()
 #ifdef GC_HAVE_KQOAUTH
 void CredentialsPage::authoriseTwitter()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER, NULL);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1045,7 +1044,7 @@ void CredentialsPage::authoriseTwitter()
 
 void CredentialsPage::authoriseWithings()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::WITHINGS);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::WITHINGS, NULL);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1058,7 +1057,7 @@ void CredentialsPage::authoriseWithings()
 #if QT_VERSION >= 0x050000 // only in QT5 or higher
 void CredentialsPage::authoriseDropbox()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::DROPBOX);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::DROPBOX, CloudServiceFactory::instance().newService("Dropbox", context));
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1071,7 +1070,7 @@ void CredentialsPage::authoriseDropbox()
 
 void CredentialsPage::authoriseStrava()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA, CloudServiceFactory::instance().newService("Strava", context));
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1082,7 +1081,9 @@ void CredentialsPage::authoriseStrava()
 
 void CredentialsPage::authoriseTodaysPlan()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN, tdpURL->text(), tdpUserKey->text());
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN,
+                                               CloudServiceFactory::instance().newService("Today's Plan", context),
+                                               tdpURL->text(), tdpUserKey->text());
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1093,7 +1094,7 @@ void CredentialsPage::authoriseTodaysPlan()
 
 void CredentialsPage::authoriseCyclingAnalytics()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::CYCLING_ANALYTICS);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::CYCLING_ANALYTICS, CloudServiceFactory::instance().newService("Cycling Analytics", context));
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {
@@ -1115,9 +1116,9 @@ void CredentialsPage::authoriseGoogleDrive() {
 void CredentialsPage::authoriseGoogle(GoogleType type) {
     OAuthDialog *oauthDialog;
     if (type == CALENDAR) {
-        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR);
+        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR, NULL);
     } else if (type == DRIVE) {
-        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_DRIVE);
+        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_DRIVE, CloudServiceFactory::instance().newService("Google Drive", context));
     } else {
             return;
     }

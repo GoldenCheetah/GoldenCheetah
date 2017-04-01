@@ -111,7 +111,8 @@ class CloudService : public QObject {
 
         // The service must define what settings it needs in the "settings" map.
         // Each entry maps a setting type to the appsetting symbol name
-        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, Local } setting_;
+        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder,
+                                   Local1, Local2, Local3, Local4, Local5, Local6 } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
         // When a service is instantiated by the cloud service factory, the configuration
