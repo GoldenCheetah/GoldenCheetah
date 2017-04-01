@@ -39,7 +39,7 @@ class Strava : public CloudService {
         ~Strava();
 
         // upload only and authenticates with a user and password
-        int capabilities() const { return UserPass | Upload; }
+        int capabilities() const { return OAuthToken | Upload; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
