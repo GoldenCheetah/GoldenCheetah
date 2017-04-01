@@ -430,52 +430,28 @@ MainWindow::MainWindow(const QDir &home)
 
     // SHARE MENU
     QMenu *shareMenu = menuBar()->addMenu(tr("Sha&re"));
+
+    // default options
     shareAction = new QAction(tr("Add Cloud Account..."), this);
-    shareAction->setShortcut(tr("Ctrl+U"));
+    shareAction->setShortcut(tr("Ctrl+A"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
     shareMenu->addAction(shareAction);
-    shareAction = new QAction(tr("Share Online..."), this);
-    shareAction->setShortcut(tr("Ctrl+U"));
-    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
-    shareMenu->addAction(shareAction);
-#ifdef GC_HAVE_KQOAUTH
-    tweetAction = new QAction(tr("Tweet activity"), this);
-    connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
-    shareMenu->addAction(tweetAction);
-#endif
-#ifdef GC_HAVE_ICAL
-    shareMenu->addSeparator();
-    shareMenu->addAction(tr("Upload Activity to Calendar"), this, SLOT(uploadCalendar()), tr (""));
-    //optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr ("")); // planned for v3.1
-    //optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr ("")); // planned for v3.1
-    shareMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
-#endif
-    shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Write to Local Store"), this, SLOT(uploadLocalFileStore()));
-    shareMenu->addAction(tr("Synchronise Local Store..."), this, SLOT(syncLocalFileStore()));
-#if QT_VERSION > 0x050000
-    shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Upload to &Dropbox"), this, SLOT(uploadDropbox()), tr("Ctrl+R"));
-    shareMenu->addAction(tr("Synchronise Dropbox..."), this, SLOT(syncDropbox()), tr("Ctrl+O"));
-    shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Upload to &GoogleDrive"), this,
-                         SLOT(uploadGoogleDrive()), tr(""));
-    shareMenu->addAction(tr("Synchronise GoogleDrive..."), this,
-                         SLOT(syncGoogleDrive()), tr("Ctrl+P"));
-#endif
-#if QT_VERSION >= 0x050400
-    shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Upload to Today's Plan"), this,
-                         SLOT(uploadTodaysPlan()), tr(""));
-    shareMenu->addAction(tr("Synchronise Today's Plan..."), this,
-                         SLOT(syncTodaysPlan()), tr(""));
-    shareMenu->addSeparator ();
-    shareMenu->addAction(tr("Upload to Sixcycle"), this,
-                         SLOT(uploadSixCycle()), tr(""));
-    shareMenu->addAction(tr("Synchronise Sixcycle..."), this,
-                         SLOT(syncSixCycle()), tr(""));
-#endif
 
+    shareAction = new QAction(tr("Manage Cloud Accounts..."), this);
+    shareAction->setShortcut(tr("Ctrl+M"));
+    //connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
+    shareMenu->addAction(shareAction);
+    shareMenu->addSeparator();
+
+    uploadMenu = shareMenu->addMenu("Upload");
+    syncMenu = shareMenu->addMenu("Synchronise");
+
+    // set the menus to reflect the configured accounts
+    connect(uploadMenu, SIGNAL(aboutToShow()), this, SLOT(setUploadMenu()));
+    connect(syncMenu, SIGNAL(aboutToShow()), this, SLOT(setSyncMenu()));
+
+    connect(uploadMenu, SIGNAL(triggered(QAction*)), this, SLOT(uploadCloud(QAction*)));
+    connect(syncMenu, SIGNAL(triggered(QAction*)), this, SLOT(syncCloud(QAction*)));
 
     HelpWhatsThis *helpShare = new HelpWhatsThis(rideMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
@@ -1970,49 +1946,6 @@ MainWindow::exportMetrics()
 }
 
 /*----------------------------------------------------------------------
- * Twitter
- *--------------------------------------------------------------------*/
-#ifdef GC_HAVE_KQOAUTH
-void
-MainWindow::tweetRide()
-{
-    RideItem *_item = currentTab->context->ride;
-    if (_item==NULL) return;
-
-    RideItem *item = dynamic_cast<RideItem*>(_item);
-
-    if (item) { // menu is disabled anyway, but belt and braces
-        TwitterDialog *twitterDialog = new TwitterDialog(currentTab->context, item);
-        twitterDialog->setWindowModality(Qt::ApplicationModal);
-        twitterDialog->exec();
-    }
-}
-#endif
-
-/*----------------------------------------------------------------------
-* Share : Twitter, Strava, RideWithGPS
-*--------------------------------------------------------------------*/
-
-void
-MainWindow::share()
-{
-    if (currentTab->context->ride) { // menu is disabled anyway, but belt and braces
-        ShareDialog d(currentTab->context, currentTab->context->ride);
-        d.exec();
-    }
-}
-
-void
-MainWindow::addAccount()
-{
-
-    // lets get a new cloud service account
-    AddCloudWizard *p = new AddCloudWizard(currentTab->context);
-    p->show();
-
-}
-
-/*----------------------------------------------------------------------
  * Import Workout from Disk
  *--------------------------------------------------------------------*/
 void
@@ -2095,113 +2028,35 @@ MainWindow::manageLibrary()
     search->exec();
 }
 
-/*----------------------------------------------------------------------
- * Dropbox.com
- *--------------------------------------------------------------------*/
-#if QT_VERSION > 0x050000
+/*----------------------------------------------------------------------------
+ * Working with Cloud Services
+ * --------------------------------------------------------------------------*/
+
 void
-MainWindow::uploadDropbox()
+MainWindow::addAccount()
+{
+    // lets get a new cloud service account
+    AddCloudWizard *p = new AddCloudWizard(currentTab->context);
+    p->show();
+}
+
+void
+MainWindow::uploadCloud(QAction *name)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
-        Dropbox db(currentTab->context);
-        CloudService::upload(this, &db, currentTab->context->ride);
+        CloudService *db = CloudServiceFactory::instance().newService(name->text(), currentTab->context);
+        CloudService::upload(this, db, currentTab->context->ride);
     }
 }
 
 void
-MainWindow::syncDropbox()
+MainWindow::syncCloud(QAction *name)
 {
-    Dropbox db(currentTab->context);
-    CloudServiceSyncDialog upload(currentTab->context, &db);
-    upload.exec();
-}
-
-void
-MainWindow::uploadGoogleDrive()
-{
-    // upload current ride, if we have one
-    if (currentTab->context->ride) {
-        GoogleDrive gd(currentTab->context);
-        QStringList errors;        
-        if (gd.open(errors) && errors.empty()) {
-            // NOTE(gille): GoogleDrive is a little "wonky". We need to read
-            // the directory before we can upload to it. It's just how it is..
-            gd.readdir(gd.home(), errors);
-            if (errors.empty()) {
-                CloudService::upload(this, &gd, currentTab->context->ride);
-            }
-        } // TODO(gille): How to bail properly?
-    }
-}
-
-void
-MainWindow::syncGoogleDrive()
-{
-    GoogleDrive gd(currentTab->context);
-    CloudServiceSyncDialog upload(currentTab->context, &gd);
-    upload.exec();
-}
-
-#endif
-#if QT_VERSION >= 0x050400
-void
-MainWindow::uploadSixCycle()
-{
-    // upload current ride, if we have one
-    if (currentTab->context->ride) {
-        SixCycle tp(currentTab->context);
-        CloudService::upload(this, &tp, currentTab->context->ride);
-    }
-}
-
-void
-MainWindow::syncSixCycle()
-{
-    SixCycle db(currentTab->context);
-    CloudServiceSyncDialog upload(currentTab->context, &db);
-    upload.exec();
-}
-
-void
-MainWindow::uploadTodaysPlan()
-{
-    // upload current ride, if we have one
-    if (currentTab->context->ride) {
-        TodaysPlan tp(currentTab->context);
-        CloudService::upload(this, &tp, currentTab->context->ride);
-    }
-}
-
-void
-MainWindow::syncTodaysPlan()
-{
-    TodaysPlan db(currentTab->context);
-    CloudServiceSyncDialog upload(currentTab->context, &db);
-    upload.exec();
-}
-#endif
-
-/*----------------------------------------------------------------------
- * Network File Share (e.g. a mounted WebDAV folder)
- *--------------------------------------------------------------------*/
-void
-MainWindow::uploadLocalFileStore()
-{
-    // upload current ride, if we have one
-    if (currentTab->context->ride) {
-        LocalFileStore db(currentTab->context);
-        CloudService::upload(this, &db, currentTab->context->ride);
-    }
-}
-
-void
-MainWindow::syncLocalFileStore()
-{
-    // upload current ride, if we have one
-    LocalFileStore db(currentTab->context);
-    CloudServiceSyncDialog upload(currentTab->context, &db);
-    upload.exec();
+    // sync with cloud
+    CloudService *db = CloudServiceFactory::instance().newService(name->text(), currentTab->context);
+    CloudServiceSyncDialog sync(currentTab->context, db);
+    sync.exec();
 }
 
 
@@ -2382,4 +2237,31 @@ MainWindow::cloudDBshowStatus() {
 
 
 #endif
+
+void
+MainWindow::setUploadMenu()
+{
+    uploadMenu->clear();
+    foreach(QString name, CloudServiceFactory::instance().serviceNames()) {
+
+        const CloudService *s = CloudServiceFactory::instance().service(name);
+        if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
+
+        if (s->capabilities() & CloudService::Upload)  uploadMenu->addAction(name);
+    }
+}
+
+void
+MainWindow::setSyncMenu()
+{
+    syncMenu->clear();
+    foreach(QString name, CloudServiceFactory::instance().serviceNames()) {
+
+        const CloudService *s = CloudServiceFactory::instance().service(name);
+        if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
+
+        if (s->capabilities() & CloudService::Query)  syncMenu->addAction(name);
+    }
+}
+
 

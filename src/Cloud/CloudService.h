@@ -71,11 +71,11 @@ class CloudService : public QObject {
         // name of service, but should NOT be translated - it is the symbol
         // that represents the website, so likely to just be the URL simplified
         // e.g. https://www.strava.com => "Strava"
-        virtual QString name() { return "NONE"; }
-        virtual QString description() { return ""; }
+        virtual QString name() const { return "NONE"; }
+        virtual QString description() const { return ""; }
 
         // need a logo, we may resize but will keep aspect ratio
-        virtual QImage logo() = 0;
+        virtual QImage logo() const = 0;
 
         // register with capabilities of the service - emerging standard
         // is a service that allows oauth, query and upload as well as download
@@ -138,8 +138,9 @@ class CloudService : public QObject {
         QString uploadExtension();
 
         // APPSETTINGS SYMBOLS - SERVICE SPECIFIC
-        QString syncOnImportSettingName() { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
-        QString syncOnStartupSettingName() { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+        QString syncOnImportSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+        QString syncOnStartupSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+        QString activeSettingName() const { return QString("%1/%2/active").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, CloudService *store, RideItem*);
@@ -396,6 +397,10 @@ class CloudServiceFactory {
     QStringList names_;
 
     public:
+
+    // update settings to new scheme (try and guess which services have
+    // been configured and set them active so they are processed etc
+    static void upgrade(QString name);
 
     // get the instance
     static CloudServiceFactory &instance() {

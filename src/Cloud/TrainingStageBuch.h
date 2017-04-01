@@ -42,9 +42,9 @@ class TrainingStageBuch : public CloudService {
 
     public:
 
-        QString name() { return (tr("TrainingStageBuch")); }
-        QString description() { return (tr("Upload to your online and mobile training log.")); }
-        QImage logo() { return QImage(":images/services/trainingstagebuch.png"); }
+        QString name() const { return (tr("TrainingStageBuch")); }
+        QString description() const { return (tr("Upload to your online and mobile training log.")); }
+        QImage logo() const { return QImage(":images/services/trainingstagebuch.png"); }
 
         TrainingStageBuch(Context *context);
         CloudService *clone(Context *context) { return new TrainingStageBuch(context); }

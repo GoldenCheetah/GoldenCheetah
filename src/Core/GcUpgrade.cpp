@@ -29,6 +29,7 @@
 #include "DataProcessor.h"
 #include "MainWindow.h"
 #include "TrainDB.h"
+#include "CloudService.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -367,8 +368,12 @@ GcUpgrade::upgrade(const QDir &home)
         // metallic style deprecated
         appsettings->setValue(GC_CHROME, "Flat");
 
-        // set the default scale factor to 1.0
-        appsettings->setValue(GC_FONT_SCALE, QVariant::fromValue(1.0f));
+        // set the default scale factor to 1.0, if not already done
+        if (appsettings->value(NULL, GC_FONT_SCALE, "0").toDouble() == 0)
+            appsettings->setValue(GC_FONT_SCALE, QVariant::fromValue(1.0f));
+
+        // cloud services now need a setting to say if active or not
+        CloudServiceFactory::instance().upgrade(home.dirName());
     }
 
 

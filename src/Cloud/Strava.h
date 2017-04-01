@@ -30,9 +30,9 @@ class Strava : public CloudService {
 
     public:
 
-        QString name() { return (tr("Strava")); }
-        QString description() { return (tr("Upload to the social network for cyclists and runners.")); }
-        QImage logo() { return QImage(":images/services/strava.png"); }
+        QString name() const { return (tr("Strava")); }
+        QString description() const { return (tr("Upload to the social network for cyclists and runners.")); }
+        QImage logo() const { return QImage(":images/services/strava.png"); }
 
         Strava(Context *context);
         CloudService *clone(Context *context) { return new Strava(context); }
