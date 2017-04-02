@@ -49,6 +49,21 @@
 
 class RideItem;
 class CloudServiceEntry;
+
+// Representing an Athlete when the service allows for
+// a coach or manager relationship -- i.e. it lists athletes
+// so you can choose which one you want to sync with
+class CloudServiceAthlete
+{
+    public:
+        CloudServiceAthlete() : local(NULL) {}
+
+        QString id;
+        QString name;
+        QString desc;
+        void *local;        // available for the service to use
+};
+
 class CloudService : public QObject {
 
     Q_OBJECT
@@ -109,6 +124,10 @@ class CloudService : public QObject {
         }
         void notifyReadComplete(QByteArray *data, QString name, QString message) { emit readComplete(data,name,message); }
 
+        // list and select an athlete - list will need to block rather than notify asynchronously
+        virtual QList<CloudServiceAthlete> listAthletes() { return QList<CloudServiceAthlete>(); }
+        virtual bool selectAthlete(CloudServiceAthlete) { return false; }
+
         // The service must define what settings it needs in the "settings" map.
         // Each entry maps a setting type to the appsetting symbol name
         // Local - setting maintained internally by the cloud service which require no interation
@@ -119,7 +138,10 @@ class CloudService : public QObject {
         //         drive.file that are selected in order to set a combo to allow the user to
         //         select the setting for "<athlete-private>google_drive/drive_scope"
         //         Only 1 is supported at present, we can add more if needed later
-        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder,
+        //
+        // AthleteID can only be provided if the service implements the listAthletes and selectAthlete
+        // entry points -- to list and accept the choice of athlete by the user
+        enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, AthleteID,
                                    Local1, Local2, Local3, Local4, Local5, Local6,
                                    Combo1 } setting_;
         QHash<CloudServiceSetting, QString> settings;

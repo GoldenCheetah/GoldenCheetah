@@ -114,12 +114,13 @@ class AddAuth : public QWizardPage
     public slots:
         void initializePage();
         bool validatePage();
-        int nextId() const { return wizard->cloudService->type() & CloudService::Measures ? 90 : 30; }
+        int nextId() const { return wizard->cloudService->type() & CloudService::Measures ? 90 : (hasAthlete ? 25 : 30); }
         void updateServiceSettings();
         void doAuth();
 
     private:
         AddCloudWizard *wizard;
+        bool hasAthlete;
 
         // all laid out in a formlayout of rows
         QLabel *comboLabel;
@@ -136,6 +137,28 @@ class AddAuth : public QWizardPage
         QPushButton *auth;
         QLabel *tokenLabel;
         QLabel *token;
+};
+
+class AddAthlete : public QWizardPage
+{
+    Q_OBJECT
+
+    public:
+        AddAthlete(AddCloudWizard *);
+        void initializePage();
+        bool validate() const { return false; }
+        int nextId() const { return 30; }
+
+    public slots:
+        void clicked(int);
+
+    private:
+        AddCloudWizard *wizard;
+        QSignalMapper *mapper;
+        QWidget *buttons;
+        QVBoxLayout *buttonlayout;
+        QScrollArea *scrollarea;
+        QList<CloudServiceAthlete> athletes;
 };
 
 class AddSettings : public QWizardPage
