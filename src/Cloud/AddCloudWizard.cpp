@@ -26,10 +26,11 @@
 #include "OAuthDialog.h"
 
 #include <QMessageBox>
+#include <QRegExp>
 
 // WIZARD FLOW
 //
-// 01. Select Service Class (e.g. Activities, Measures, Calendar)
+// 01. Select Service Class (e.g. Activities, Measures)
 // 10. Select Cloud Service Type (via CloudServiceFactory)
 // 20. Authenticate Account (URL+Key, OAUTH or User/Pass)
 // 30. Settings (Folder,sync on startup, sync on import)
@@ -92,12 +93,14 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     mapper->setMapping(p, CloudService::Measures);
     layout->addWidget(p);
 
+#if 0 // DEPRECATING (?)
     // Activities
     p = new QCommandLinkButton(tr("Calendar"), tr("Sync planned workouts to WebDAV and CalDAV calendars."));
     p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Calendar);
     layout->addWidget(p);
+#endif
 
     setFinalPage(false);
 }
@@ -455,7 +458,7 @@ AddFinish::initializePage()
             case CloudService::Local3:
             case CloudService::Local4:
             case CloudService::Local5:
-            case CloudService::Local6: label=want.value(); break;
+            case CloudService::Local6: label=want.value().split(QRegExp("[<>/]")).last(); break;
             case CloudService::DefaultURL: break;
         }
         // no clue

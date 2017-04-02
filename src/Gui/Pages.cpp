@@ -1044,7 +1044,7 @@ void CredentialsPage::authoriseTwitter()
 
 void CredentialsPage::authoriseWithings()
 {
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::WITHINGS, NULL);
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::WITHINGS, CloudServiceFactory::instance().newService("Withings", context));
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
     } else {

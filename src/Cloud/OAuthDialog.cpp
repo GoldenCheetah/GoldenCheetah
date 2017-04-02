@@ -49,6 +49,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->name() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
         if (service->name() == "Google Drive") site = this->site = GOOGLE_DRIVE;
         if (service->name() == "Today's Plan") site = this->site = TODAYSPLAN;
+        if (service->name() == "Withings") site = this->site = WITHINGS;
     }
 
     // check if SSL is available - if not - message and end
@@ -245,6 +246,8 @@ void OAuthDialog::onAccessTokenReceived(QString token, QString tokenSecret) {
     } else if (site == WITHINGS) {
         appsettings->setCValue(context->athlete->cyclist, GC_WITHINGS_TOKEN, token);
         appsettings->setCValue(context->athlete->cyclist, GC_WITHINGS_SECRET,  tokenSecret);
+        service->setSetting(GC_WITHINGS_TOKEN, token);
+        service->setSetting(GC_WITHINGS_SECRET, tokenSecret);
 
         info = QString(tr("Withings authorization was successful."));
     }
@@ -284,6 +287,7 @@ void OAuthDialog::onRequestReady(QByteArray response) {
 
             if (userid.isEmpty() == false) {
                 appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, userid);
+                service->setSetting(GC_WIUSER, userid);
             }
         }
     }

@@ -111,7 +111,7 @@ class AddAuth : public QWizardPage
     public slots:
         void initializePage();
         bool validatePage();
-        int nextId() const { return 30; } //XXX might go to end if no settings left to configure
+        int nextId() const { return wizard->cloudService->type() & CloudService::Measures ? 90 : 30; }
 
         void doAuth();
 
@@ -140,7 +140,7 @@ class AddSettings : public QWizardPage
     public:
         AddSettings(AddCloudWizard *);
         void initializePage();
-        bool validatePage(); //XXX needs to save away entered values
+        bool validatePage();
         int nextId() const { return 90; }
 
     public slots:
