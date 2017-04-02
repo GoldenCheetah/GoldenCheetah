@@ -32,6 +32,9 @@
 #include <QFileDialog>
 #include <QCommandLinkButton>
 #include <QScrollArea>
+#include <QComboBox>
+
+class SettingCombo;
 
 class AddCloudWizard : public QWizard
 {
@@ -112,13 +115,15 @@ class AddAuth : public QWizardPage
         void initializePage();
         bool validatePage();
         int nextId() const { return wizard->cloudService->type() & CloudService::Measures ? 90 : 30; }
-
+        void updateServiceSettings();
         void doAuth();
 
     private:
         AddCloudWizard *wizard;
 
         // all laid out in a formlayout of rows
+        QLabel *comboLabel;
+        SettingCombo *combo;
         QLabel *urlLabel;
         QLineEdit *url;
         QLabel *keyLabel;
@@ -168,6 +173,40 @@ class AddFinish : public QWizardPage
         AddCloudWizard *wizard;
         QFormLayout *layout;
 
+};
+
+class SettingCombo : public QComboBox
+{
+    public:
+
+        SettingCombo(QWidget *parent) : QComboBox(parent) {}
+
+        void setup(QString setting)
+        {
+            // clear all contents
+            clear();
+
+            QStringList parts = setting.split("::");
+            sname = parts.at(0);
+            name = parts.at(1);
+
+            for (int i=2; i<parts.count(); i++) {
+                addItem(parts.at(i));
+            }
+        }
+
+        // set the current index to match term
+        void setText(QString string) {
+            int i=findText(string);
+            if (i>=0) setCurrentIndex(i);
+        }
+
+        // return current index text
+        QString text() {
+            return itemText(currentIndex());
+        }
+
+        QString name, sname;
 };
 
 #endif // _AddCloudWizard_h
