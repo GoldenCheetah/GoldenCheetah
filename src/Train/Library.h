@@ -31,6 +31,11 @@
 #include <QTreeWidgetItem>
 #include <QThread>
 
+
+// Pushbuttons smaller than this will change from rounded to square look and feel
+#define QPB_MINIMUM_WIDTH 50
+#define QPB_MINIMUM_HEIGHT 30
+
 class Library : QObject
 {
     Q_OBJECT

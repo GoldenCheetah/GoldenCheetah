@@ -263,13 +263,17 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     findMedia->setChecked(true);
     findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv)"), this);
     findVideoSyncs->setChecked(true);
-    addPath = new QPushButton("+", this);
-    removePath = new QPushButton("-", this);
-    removeRef = new QPushButton("-", this);
+    addPath = new QPushButton(tr("+"), this);
+    removePath = new QPushButton(tr("-"), this);
+    removeRef = new QPushButton(tr("-"), this);
 #ifndef Q_OS_MAC
     addPath->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     removePath->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     removeRef->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+#else
+    addPath->setMinimumSize(QPB_MINIMUM_WIDTH, QPB_MINIMUM_HEIGHT);
+    removePath->setMinimumSize(QPB_MINIMUM_WIDTH, QPB_MINIMUM_HEIGHT);
+    removeRef->setMinimumSize(QPB_MINIMUM_WIDTH, QPB_MINIMUM_HEIGHT);
 #endif
 
     searchPathTable = new QTreeWidget(this);
