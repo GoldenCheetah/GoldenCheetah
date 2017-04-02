@@ -188,15 +188,9 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     //layout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
-    // labels
-    urlLabel = new QLabel(tr("URL"));
-    keyLabel = new QLabel(tr("Key (optional)"));
-    userLabel = new QLabel(tr("Username"));
-    passLabel = new QLabel(tr("Password"));
-    authLabel = new QLabel(tr("Authorise"));
-    tokenLabel = new QLabel(tr("Token"));
-
     // input boxes
+    combo = new SettingCombo(this);
+
     url = new QLineEdit(this);
     url->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     key = new QLineEdit(this);
@@ -211,6 +205,16 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     token = new QLabel(this);
     token->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+    // labels
+    comboLabel = new QLabel("");
+    urlLabel = new QLabel(tr("URL"));
+    keyLabel = new QLabel(tr("Key (optional)"));
+    userLabel = new QLabel(tr("Username"));
+    passLabel = new QLabel(tr("Password"));
+    authLabel = new QLabel(tr("Authorise"));
+    tokenLabel = new QLabel(tr("Token"));
+
+    layout->addRow(comboLabel, combo);
     layout->addRow(urlLabel, url);
     layout->addRow(keyLabel, key);
     layout->addRow(userLabel, user);
@@ -232,6 +236,10 @@ AddAuth::doAuth()
     // no config for token !?
     if (cname == "") return;
 
+    // update the service values with what the user has edited
+    // so they are up-to-date before we perform an OAUTH process
+    updateServiceSettings();
+
     OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
     if (oauthDialog->sslLibMissing()) {
         delete oauthDialog;
@@ -249,12 +257,14 @@ AddAuth::initializePage()
     setSubTitle(tr("Credentials and authorisation"));
 
     // hide all the widgets
+    combo->hide();
     url->hide();
     key->hide();
     user->hide();
     pass->hide();
     auth->hide();
     token->hide();
+    comboLabel->hide();
     urlLabel->hide();
     keyLabel->hide();
     userLabel->hide();
@@ -268,6 +278,12 @@ AddAuth::initializePage()
     // show  all the widgets relevant for this service and update the value from the
     // settings we have collected (which will have been defaulted).
     QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Combo1, "")) != "") {
+        combo->show(); comboLabel->show();
+        combo->setup(cname);
+        combo->setText(wizard->cloudService->getSetting(cname.split("::").at(0), "").toString());
+        comboLabel->setText(combo->name);
+    }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
         url->show(); urlLabel->show();
         url->setText(wizard->cloudService->getSetting(cname, "").toString());
@@ -295,8 +311,20 @@ AddAuth::initializePage()
 bool
 AddAuth::validatePage()
 {
-    // check the authorisation has been completed
+    // just extract edited values
+    updateServiceSettings();
+
+    // always move on -- for now.
+    return true;
+}
+
+void
+AddAuth::updateServiceSettings()
+{
     QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Combo1, "")) != "") {
+        wizard->cloudService->setSetting(cname.split("::").at(0), combo->text());
+    }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
         wizard->cloudService->setSetting(cname, url->text());
     }
@@ -312,7 +340,6 @@ AddAuth::validatePage()
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::OAuthToken, "")) != "") {
         wizard->cloudService->setSetting(cname, token->text());
     }
-    return true;
 }
 
 
@@ -445,7 +472,7 @@ AddFinish::initializePage()
     while(want.hasNext()) {
         want.next();
 
-        QString label, value;
+        QString label, value, sname=want.value();
         switch(want.key()) {
             case CloudService::URL: label=tr("URL"); break;
             case CloudService::Key: label=tr("Key"); break;
@@ -453,6 +480,7 @@ AddFinish::initializePage()
             case CloudService::Password: label=tr("Password"); break;
             case CloudService::OAuthToken: label=tr("Token"); break;
             case CloudService::Folder: label=tr("Folder"); break;
+            case CloudService::Combo1: label=want.value().split("::").at(1); sname=want.value().split("::").at(0); break;
             case CloudService::Local1:
             case CloudService::Local2:
             case CloudService::Local3:
@@ -465,7 +493,7 @@ AddFinish::initializePage()
         if (label == "") continue;
 
         // get value
-        value = wizard->cloudService->getSetting(want.value(), "").toString();
+        value = wizard->cloudService->getSetting(sname, "").toString();
         if (value == "") continue;
 
         // ok, we have a setting

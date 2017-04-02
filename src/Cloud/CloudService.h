@@ -111,8 +111,17 @@ class CloudService : public QObject {
 
         // The service must define what settings it needs in the "settings" map.
         // Each entry maps a setting type to the appsetting symbol name
+        // Local - setting maintained internally by the cloud service which require no interation
+        // Combo - setttings selected from a predefined list with the setting name encoded
+        //         to include the values e.g:
+        //         "<athlete-private>google_drive/drive_scope::Scope::drive::drive.appdata::drive.file::drive"
+        //         would offer a combo called "Scope" with 3 values drive, drive.appdata and
+        //         drive.file that are selected in order to set a combo to allow the user to
+        //         select the setting for "<athlete-private>google_drive/drive_scope"
+        //         Only 1 is supported at present, we can add more if needed later
         enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder,
-                                   Local1, Local2, Local3, Local4, Local5, Local6 } setting_;
+                                   Local1, Local2, Local3, Local4, Local5, Local6,
+                                   Combo1 } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
         // When a service is instantiated by the cloud service factory, the configuration
@@ -456,18 +465,24 @@ class CloudServiceFactory {
             // ignore default URL
             if (i.key() == CloudService::DefaultURL) continue;
 
+            // the setting name
+            QString sname=i.value();
+
+            // Combos are tricky
+            if (i.key() == CloudService::Combo1) { sname = i.value().split("::").at(0); }
+
             // populate from appsetting configuration
-            QVariant value = appsettings->cvalue(context->athlete->cyclist, i.value(), QVariant());
+            QVariant value = appsettings->cvalue(context->athlete->cyclist, sname, QVariant());
 
             // apply default url
             if (i.key() == CloudService::URL && value == "") {
                 // get the default value for the service
                 value = returning->settings.value(CloudService::CloudServiceSetting::DefaultURL, "");
             }
-            returning->configuration.insert(i.value(), value);
+            returning->configuration.insert(sname, value);
 
             #ifdef GC_WANT_ALLDEBUG
-            qDebug()<<"set:"<<i.value()<<"="<<value;
+            qDebug()<<"set:"<<sname<<"="<<value;
             #endif
         }
 

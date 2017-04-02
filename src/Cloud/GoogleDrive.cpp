@@ -90,12 +90,12 @@ GoogleDrive::GoogleDrive(Context *context)
     root_ = NULL;
 
     // config
+    settings.insert(Combo1, QString("%1::Scope::drive::drive.appdata::drive.file").arg(GC_GOOGLE_DRIVE_AUTH_SCOPE));
     settings.insert(OAuthToken, GC_GOOGLE_DRIVE_ACCESS_TOKEN);
     settings.insert(Folder, GC_GOOGLE_DRIVE_FOLDER);
     settings.insert(Local1, GC_GOOGLE_DRIVE_FOLDER_ID); // derived during config, no user action
     settings.insert(Local2, GC_GOOGLE_DRIVE_REFRESH_TOKEN); // derived during config, no user action
     settings.insert(Local3, GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH); // derived during config, no user action
-    settings.insert(Local4, GC_GOOGLE_DRIVE_AUTH_SCOPE); // derived during config, no user action
 }
 
 GoogleDrive::~GoogleDrive() {
