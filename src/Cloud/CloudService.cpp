@@ -1261,7 +1261,7 @@ CloudServiceSyncDialog::syncNext()
                 QByteArray *data = new QByteArray;
                 store->readFile(data, curr->text(1), curr->text(8)); // filename
                 QApplication::processEvents();
-                delete data;
+                //delete data;
 
             } else {
                 curr->setText(7, tr("Uploading"));
