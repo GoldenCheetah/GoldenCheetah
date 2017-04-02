@@ -564,7 +564,9 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
         } else if (site == TODAYSPLAN) {
             appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, access_token);
             service->setSetting(GC_TODAYSPLAN_TOKEN, access_token);
-            listUsers();
+            QString info = QString(tr("Today's Plan authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
         }
     } else {
 
@@ -575,97 +577,4 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
     }
     // job done, dialog can be closed
     accept();
-}
-
-void
-OAuthDialog::listUsers() //XXX NEEDS FIXUP FOR ADDCLOUDWIZARD
-{
-    if (site == TODAYSPLAN) {
-        // use the configed URL
-        QString url = QString("%1/rest/users/delegates/users")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
-
-        // request using the bearer token
-        QNetworkRequest request(url);
-        QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
-        request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-
-        QNetworkAccessManager *man = new QNetworkAccessManager(this);
-        connect(man, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
-
-        QNetworkReply *reply = man->get(request);
-
-        // blocking request
-        QEventLoop loop;
-        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-        loop.exec();
-
-        // did we get a good response ?
-        QByteArray r = reply->readAll();
-
-        #if QT_VERSION > 0x050000
-            QJsonParseError parseError;
-            QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
-
-
-            if (parseError.error == QJsonParseError::NoError) {
-                //qDebug() << "response: " << r;
-                if (document.array().count()>1) {
-                    layout->removeWidget(view);
-                    delete view;
-
-                    layout->setMargin(10);
-                    QLabel *label = new QLabel(tr("Select an athlete"));
-                    label->setFont(QFont("Helvetica", 15, QFont::Bold));
-
-                    layout->addWidget(label);
-                    layout->addSpacing(5);
-
-                    QList<QCheckBox*> users;
-
-                    for (int i=0;i<document.array().count();i++) {
-                        //qDebug() << document.array()[i].toObject()["_name"].toString() << document.array()[i].toObject()["relationship"].toString();
-                        if (document.array()[i].toObject()["relationship"].toString() == "" ||
-                            document.array()[i].toObject()["relationship"].toString() == "coach" ||
-                            document.array()[i].toObject()["relationship"].toString() == "manager") {
-                            QCheckBox *ck = new QCheckBox(document.array()[i].toObject()["_name"].toString());
-                            ck->setFont(QFont("Helvetica", 15));
-                            ck->setProperty("id", document.array()[i].toObject()["id"].toInt());
-                            ck->setProperty("name", document.array()[i].toObject()["_name"].toString());
-                            users.append(ck);
-                            layout->addWidget(ck);
-                            //qDebug()<< document.array()[i].toObject()["id"].toInt() << document.array()[i].toObject()["_name"].toString();
-                        }
-                    }
-                    layout->addSpacing(5);
-                    QPushButton *btnSelect = new QPushButton(tr("Select"));
-                    btnSelect->setMaximumWidth(200);
-                    layout->addWidget(btnSelect);
-                    layout->addStretch();
-
-                    QEventLoop loop;
-                    connect(btnSelect, SIGNAL(clicked()), &loop, SLOT(quit()));
-                    loop.exec();
-
-                    for (int i=0;i<users.count();i++) {
-                        QCheckBox *ck = users.at(i);
-                        if (ck->isChecked()) {
-                            appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, ck->property("id"));
-                            appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_NAME, ck->property("name"));
-
-                            return;
-                        }
-
-                    }
-                }
-            } else {
-                //qDebug() << "response: " << r << "error:" << reply->errorString();
-            }
-        #endif
-
-        // Use default athlete
-        QString info = QString(tr("Today's Plan authorization was successful."));
-        QMessageBox information(QMessageBox::Information, tr("Information"), info);
-        information.exec();
-    }
 }

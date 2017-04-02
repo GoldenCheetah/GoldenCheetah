@@ -54,6 +54,10 @@ class TodaysPlan : public CloudService {
         // create a folder
         bool createFolder(QString);
 
+        // athlete selection
+        QList<CloudServiceAthlete> listAthletes();
+        bool selectAthlete(CloudServiceAthlete);
+
         // dirent style api
         CloudServiceEntry *root() { return root_; }
         QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);

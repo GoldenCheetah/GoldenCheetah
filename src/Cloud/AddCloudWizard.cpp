@@ -33,6 +33,7 @@
 // 01. Select Service Class (e.g. Activities, Measures)
 // 10. Select Cloud Service Type (via CloudServiceFactory)
 // 20. Authenticate Account (URL+Key, OAUTH or User/Pass)
+// 25. Select Athlete [optional]
 // 30. Settings (Folder,sync on startup, sync on import)
 // 90. Finalise (Confirm complete and add)
 //
@@ -56,6 +57,7 @@ AddCloudWizard::AddCloudWizard(Context *context) : QWizard(context->mainWindow),
     setPage(01, new AddClass(this));   // done
     setPage(10, new AddService(this));   // done
     setPage(20, new AddAuth(this)); // done
+    setPage(25, new AddAthlete(this)); // done
     setPage(30, new AddSettings(this)); // done
     setPage(90, new AddFinish(this));     // done
 
@@ -157,6 +159,7 @@ AddService::initializePage()
 
         QCommandLinkButton *p = new QCommandLinkButton(s->name(), s->description(), this);
         p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
+        p->setFixedHeight(50 *dpiYFactor);
         connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
         mapper->setMapping(p, s->name());
         buttonlayout->addWidget(p);
@@ -256,6 +259,8 @@ AddAuth::initializePage()
 {
     setSubTitle(tr("Credentials and authorisation"));
 
+    hasAthlete = (wizard->cloudService->settings.value(CloudService::AthleteID, "") != "");
+
     // hide all the widgets
     combo->hide();
     url->hide();
@@ -342,6 +347,63 @@ AddAuth::updateServiceSettings()
     }
 }
 
+//Select Athlete, if needed
+AddAthlete::AddAthlete(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
+{
+    setTitle(tr("Coached Athletes"));
+    setSubTitle(tr("Select Athlete for this account"));
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    buttons=new QWidget(this);
+    buttons->setContentsMargins(0,0,0,0);
+    buttonlayout= new  QVBoxLayout(buttons);
+    buttonlayout->setSpacing(0);
+    scrollarea=new QScrollArea(this);
+    scrollarea->setWidgetResizable(true);
+    scrollarea->setWidget(buttons);
+
+    mapper = new QSignalMapper(this);
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+
+    layout->addWidget(scrollarea);
+
+    setFinalPage(false);
+}
+
+void
+AddAthlete::initializePage()
+{
+    athletes = wizard->cloudService->listAthletes();
+
+    // clear whatever we have, if anything
+    QLayoutItem *item = NULL;
+    while((item = buttonlayout->takeAt(0)) != NULL) {
+        if (item->widget()) delete item->widget();
+        delete item;
+    }
+
+    int i=0;
+    foreach(CloudServiceAthlete a, athletes) {
+
+        // only ones with the capability we need.
+        QCommandLinkButton *p = new QCommandLinkButton(a.name, a.desc, this);
+        p->setFixedHeight(50 *dpiYFactor);
+        p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
+        connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+        mapper->setMapping(p, i++);
+        buttonlayout->addWidget(p);
+    }
+    buttonlayout->addStretch();
+}
+
+void
+AddAthlete::clicked(int i)
+{
+    // select it
+    wizard->cloudService->selectAthlete(athletes[i]);
+    wizard->next();
+}
 
 // Scan for Cloud port / usb etc
 AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
@@ -480,6 +542,7 @@ AddFinish::initializePage()
             case CloudService::Password: label=tr("Password"); break;
             case CloudService::OAuthToken: label=tr("Token"); break;
             case CloudService::Folder: label=tr("Folder"); break;
+            case CloudService::AthleteID: label=tr("Athlete ID"); break;
             case CloudService::Combo1: label=want.value().split("::").at(1); sname=want.value().split("::").at(0); break;
             case CloudService::Local1:
             case CloudService::Local2:

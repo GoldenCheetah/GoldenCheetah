@@ -65,6 +65,8 @@ TodaysPlan::TodaysPlan(Context *context) : CloudService(context), context(contex
     settings.insert(URL, GC_TODAYSPLAN_URL);
     settings.insert(DefaultURL, "https://whats.todaysplan.com.au");
     settings.insert(Key, GC_TODAYSPLAN_USERKEY);
+    settings.insert(AthleteID, GC_TODAYSPLAN_ATHLETE_ID);
+    settings.insert(Local1, GC_TODAYSPLAN_ATHLETE_NAME);
 }
 
 TodaysPlan::~TodaysPlan() {
@@ -456,6 +458,67 @@ TodaysPlan::readFileCompleted()
     printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
 
     notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
+}
+
+QList<CloudServiceAthlete>
+TodaysPlan::listAthletes()
+{
+    QList<CloudServiceAthlete> returning;
+
+    // use the configed URL
+    QString url = QString("%1/rest/users/delegates/users").arg(getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    QString token = getSetting(GC_TODAYSPLAN_TOKEN, "").toString();
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    // did we get a good response ?
+    QByteArray r = reply->readAll();
+
+#if QT_VERSION > 0x050000
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+
+    if (parseError.error == QJsonParseError::NoError) {
+        if (document.array().count()>0) {
+
+            for (int i=0;i<document.array().count();i++) {
+                //qDebug() << document.array()[i].toObject()["_name"].toString() << document.array()[i].toObject()["relationship"].toString();
+                if (document.array()[i].toObject()["relationship"].toString() == "" ||
+                    document.array()[i].toObject()["relationship"].toString() == "coach" ||
+                    document.array()[i].toObject()["relationship"].toString() == "manager") {
+
+                    CloudServiceAthlete add;
+                    add.id = QString("%1").arg(document.array()[i].toObject()["id"].toInt());
+                    add.name = document.array()[i].toObject()["_name"].toString();
+                    QString rel = document.array()[i].toObject()["relationship"].toString();
+                    if (rel=="") rel="athlete";
+                    add.desc = QString("relationship: %1").arg(rel);
+                    returning << add;
+                }
+            }
+        }
+    }
+ #endif
+    return returning;
+}
+
+bool
+TodaysPlan::selectAthlete(CloudServiceAthlete athlete)
+{
+    // extract athlete name and identifier from the selected athlete
+    // TODO
+    setSetting(GC_TODAYSPLAN_ATHLETE_ID, athlete.id.toInt());
+    setSetting(GC_TODAYSPLAN_ATHLETE_NAME, athlete.name);
+    return true;
 }
 
 static bool addTodaysPlan() {
