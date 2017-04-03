@@ -4971,9 +4971,6 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
                 }
         }
-
-        if (ourCurve) delete ourCurve;
-        if (ourICurve) delete ourICurve;
         
         // move on -- this is used to reference into the compareIntervals
         //            array to get the colors predominantly!
