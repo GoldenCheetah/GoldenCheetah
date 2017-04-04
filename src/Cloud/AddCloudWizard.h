@@ -41,7 +41,7 @@ class AddCloudWizard : public QWizard
     Q_OBJECT
 
 public:
-    AddCloudWizard(Context *context);
+    AddCloudWizard(Context *context, QString sname="");
     QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;

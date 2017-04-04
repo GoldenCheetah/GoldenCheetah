@@ -286,91 +286,23 @@ class CredentialsPage : public QScrollArea
 
 
     public:
-        CredentialsPage(QWidget *parent, Context *context);
+        CredentialsPage(Context *context);
+
         qint32 saveClicked();
+        void resetList();
 
     public slots:
-#ifdef GC_HAVE_KQOAUTH
-        void authoriseTwitter();
-        void authoriseWithings();
-#endif
-#if QT_VERSION >= 0x050000
-        void authoriseDropbox();
-        void chooseDropboxFolder();
-        void authoriseGoogleDrive();
-        void chooseGoogleDriveFolder();
-        void chooseGoogleDriveAuthScope(const QString& scope);
-#endif
-        void authoriseStrava();
-        void authoriseTodaysPlan();
-        void authoriseCyclingAnalytics();
-        void authoriseGoogleCalendar();
-        void dvCALDAVTypeChanged(int);
-        void chooseLocalFileStoreFolder();
+        void addClicked();
+        void deleteClicked();
+        void editClicked();
+
 
     private:
-        enum GoogleType {
-            CALENDAR = 1,
-            DRIVE,
-        };
-        void authoriseGoogle(GoogleType type);
 
         Context *context;
+        QTreeWidget *accounts;
+        QPushButton *addButton, *editButton, *deleteButton;
 
-#ifdef GC_HAVE_KQOAUTH
-        QPushButton *twitterAuthorise;
-        QPushButton *withingsAuthorise;
-#endif
-#if QT_VERSION >= 0x050000
-        QPushButton *dropboxAuthorise;
-        QPushButton *dropboxAuthorised, *dropboxBrowse;
-        QLineEdit *dropboxFolder;
-        QPushButton *googleDriveAuthorise;
-        QPushButton *googleDriveAuthorised;
-        QPushButton *googleDriveBrowse;
-        QLineEdit *googleDriveFolder;
-#endif
-
-        QComboBox *dvCALDAVType;
-        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised, *withingsAuthorised;
-        QPushButton *tdpAuthorise, *tdpAuthorised;
-        QPushButton *networkFileStoreFolderBrowse;
-        QLineEdit *networkFileStoreFolder;
-        QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
-        QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
-
-        QLineEdit *tdpURL;
-        QLineEdit *tdpUserKey;
-
-        QLineEdit *scURL;
-        QLineEdit *scUser;
-        QLineEdit *scPass;
-
-        QLineEdit *rideWithGPSUser;
-        QLineEdit *rideWithGPSPass;
-
-        QLineEdit *ttbUser;
-        QLineEdit *ttbPass;
-
-        QLineEdit *veloHeroUser;
-        QLineEdit *veloHeroPass;
-
-        QLineEdit *sphUser;
-        QLineEdit *sphPass;
-
-        QLineEdit *selUser;
-        QLineEdit *selPass;
-
-        QLineEdit *wiURL; // url for withings
-        QLineEdit *wiUser;
-        QLineEdit *wiPass;
-
-        QLineEdit *webcalURL; // url for webcal calendar (read only, TP.com, Google Calendar)
-
-        QLineEdit *dvURL; // url for calDAV calendar (read/write, e.g. Hotmail)
-        QLineEdit *dvUser;
-        QLineEdit *dvPass;
-        QLineEdit *dvGoogleCalid;
 };
 
 class deviceModel : public QAbstractTableModel
