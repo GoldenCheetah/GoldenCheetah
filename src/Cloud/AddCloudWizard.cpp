@@ -38,8 +38,8 @@
 // 90. Finalise (Confirm complete and add)
 //
 
-// Main wizard
-AddCloudWizard::AddCloudWizard(Context *context) : QWizard(context->mainWindow), context(context)
+// Main wizard - if passed a service name we are in edit mode, not add mode.
+AddCloudWizard::AddCloudWizard(Context *context, QString sname) : QWizard(context->mainWindow), context(context), service(sname)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
@@ -51,17 +51,27 @@ AddCloudWizard::AddCloudWizard(Context *context) : QWizard(context->mainWindow),
     setMinimumWidth(600 *dpiXFactor);
     setMinimumHeight(500 *dpiYFactor);
 
-    // title
-    setWindowTitle(tr("Add Cloud Wizard"));
+    // if we're passed the service, we're editing, otherwise
+    // we're adding a new one.
+    if (service == "") {
 
-    setPage(01, new AddClass(this));   // done
-    setPage(10, new AddService(this));   // done
+        setWindowTitle(tr("Add Cloud Wizard"));
+        setPage(01, new AddClass(this));   // done
+        setPage(10, new AddService(this));   // done
+        cloudService = NULL; // not cloned yet
+
+    } else {
+
+        setWindowTitle(tr("Edit Account Details"));
+        cloudService = CloudServiceFactory::instance().newService(service, context);
+    }
+
+
     setPage(20, new AddAuth(this)); // done
     setPage(25, new AddAthlete(this)); // done
     setPage(30, new AddSettings(this)); // done
     setPage(90, new AddFinish(this));     // done
 
-    cloudService = NULL; // not cloned yet
     done = false;
 }
 
@@ -172,7 +182,6 @@ AddService::clicked(QString p)
     // reset -- particularly since we might get here from
     //          other pages hitting 'Back'
     wizard->service = p;
-    const CloudService *s = CloudServiceFactory::instance().service(wizard->service);
 
     // instatiate the cloudservice, complete with current configuration etc
     if (wizard->cloudService) delete wizard->cloudService;
@@ -248,7 +257,7 @@ AddAuth::doAuth()
         delete oauthDialog;
     } else {
         oauthDialog->setWindowModality(Qt::ApplicationModal);
-        int ret = oauthDialog->exec();
+        oauthDialog->exec();
         token->setText(wizard->cloudService->getSetting(cname, "").toString());
     }
 
@@ -602,5 +611,8 @@ AddFinish::validatePage()
     appsettings->setCValue(wizard->context->athlete->cyclist,
                                                    wizard->cloudService->activeSettingName(),
                                                    "true");
+
+    // delete the instance
+    delete wizard->cloudService;
     return true;
 }

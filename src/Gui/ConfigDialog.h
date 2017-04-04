@@ -62,6 +62,7 @@ class AthleteConfig : public QWidget
         AthleteConfig(QDir home, Context *context);
         AboutRiderPage *athletePage;
         AboutModelPage *modelPage;
+        CredentialsPage *credentialsPage;
         RiderPhysPage *athletePhysPage;
 
     public slots:
@@ -95,24 +96,6 @@ class AppearanceConfig : public QWidget
         Context *context;
 
         ColorsPage *appearancePage;
-};
-
-// PASSWORDS PAGE
-class PasswordConfig : public QWidget
-{
-    Q_OBJECT
-
-    public:
-        PasswordConfig(QDir home, Context *context);
-
-    public slots:
-        qint32 saveClicked();
-    
-    private:
-        QDir home;
-        Context *context;
-
-        CredentialsPage *passwordPage;
 };
 
 // METADATA PAGE
@@ -218,7 +201,6 @@ class ConfigDialog : public QMainWindow
         GeneralConfig *general;
         AthleteConfig *athlete;
         AppearanceConfig *appearance;
-        PasswordConfig *password;
         DataConfig *data;
         MetricConfig *metric;
         IntervalConfig *interval;

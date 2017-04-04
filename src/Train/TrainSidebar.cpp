@@ -484,7 +484,7 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
 
     // only when we are recording !
     if (status & RT_RECORDING) {
-
+#if 0
         if (event->type() == QEvent::KeyPress) {
 
             // we care about cmd / ctrl
@@ -518,6 +518,7 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
             }
             return true; // we listen to 'em all
         }
+#endif
     }
     return false;
 }

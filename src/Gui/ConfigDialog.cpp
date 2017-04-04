@@ -47,7 +47,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
 
-    setMinimumSize(800 *dpiXFactor,600 *dpiYFactor);   //changed for hidpi sizing
+    setMinimumSize(700 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
     // center
@@ -59,7 +59,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // icons
     static QIcon generalIcon(QPixmap(":images/toolbar/GeneralPreferences.png"));
     static QIcon athleteIcon(QPixmap(":/images/toolbar/user.png"));
-    static QIcon passwordIcon(QPixmap(":/images/toolbar/cloud.png"));
     static QIcon appearanceIcon(QPixmap(":/images/toolbar/color.png"));
     static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
     static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
@@ -84,30 +83,26 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
-    added =head->addAction(passwordIcon, tr("Accounts"));
+    added =head->addAction(appearanceIcon, tr("Appearance"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
-    added =head->addAction(appearanceIcon, tr("Appearance"));
+    added =head->addAction(dataIcon, tr("Data Fields"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 3);
 
-    added =head->addAction(dataIcon, tr("Data Fields"));
+    added =head->addAction(metricsIcon, tr("Metrics"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 4);
 
-    added =head->addAction(metricsIcon, tr("Metrics"));
-    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 5);
-
     added =head->addAction(intervalIcon, tr("Intervals"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 6);
+    iconMapper->setMapping(added, 5);
 
 
     added =head->addAction(devicesIcon, tr("Training"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 7);
+    iconMapper->setMapping(added, 6);
 
     // more space
     spacer = new QWidget(this);
@@ -132,11 +127,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // units change on general affects units used on entry in athlete pages
     connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePage, SLOT(unitChanged(int)));
     connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePhysPage, SLOT(unitChanged(int)));
-
-    password = new PasswordConfig(_home, context);
-    HelpWhatsThis *passwordHelp = new HelpWhatsThis(password);
-    password->setWhatsThis(passwordHelp->getWhatsThisText(HelpWhatsThis::Preferences_Passwords));
-    pagesWidget->addWidget(password);
 
     appearance = new AppearanceConfig(_home, context);
     HelpWhatsThis *appearanceHelp = new HelpWhatsThis(appearance);
@@ -222,7 +212,6 @@ void ConfigDialog::saveClicked()
     changed |= general->saveClicked();
     changed |= athlete->saveClicked();
     changed |= appearance->saveClicked();
-    changed |= password->saveClicked();
     changed |= metric->saveClicked();
     changed |= data->saveClicked();
     changed |= train->saveClicked();
@@ -299,6 +288,8 @@ qint32 GeneralConfig::saveClicked()
 AthleteConfig::AthleteConfig(QDir home, Context *context) :
     home(home), context(context)
 {
+    //static QIcon passwordIcon(QPixmap(":/images/toolbar/cloud.png")); //Not used for now
+
     // the widgets
     athletePage = new AboutRiderPage(this, context);
     HelpWhatsThis *athleteHelp = new HelpWhatsThis(athletePage);
@@ -324,6 +315,10 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     HelpWhatsThis *paceZoneHelp = new HelpWhatsThis(paceZonePage);
     paceZonePage->setWhatsThis(paceZoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_Pace));
 
+    credentialsPage = new CredentialsPage(context);
+    HelpWhatsThis *credentialsHelp = new HelpWhatsThis(credentialsPage);
+    credentialsPage->setWhatsThis(credentialsHelp->getWhatsThisText(HelpWhatsThis::Preferences_Passwords));
+
     autoImportPage = new AutoImportPage(context);
     HelpWhatsThis *autoImportHelp = new HelpWhatsThis(autoImportPage);
     autoImportPage->setWhatsThis(autoImportHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Autoimport));
@@ -337,13 +332,17 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
+    QTabWidget *zonesTab = new QTabWidget(this);
+    zonesTab->addTab(zonePage, tr("Power Zones"));
+    zonesTab->addTab(hrZonePage, tr("Heartrate Zones"));
+    zonesTab->addTab(paceZonePage, tr("Pace Zones"));
+
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));
     tabs->addTab(modelPage, tr("Model"));
     tabs->addTab(athletePhysPage, tr("Measures"));
-    tabs->addTab(zonePage, tr("Power Zones"));
-    tabs->addTab(hrZonePage, tr("Heartrate Zones"));
-    tabs->addTab(paceZonePage, tr("Pace Zones"));
+    tabs->addTab(zonesTab, tr("Zones"));
+    tabs->addTab(credentialsPage, tr("Accounts"));
     tabs->addTab(autoImportPage, tr("Auto Import"));
     tabs->addTab(backupPage, tr("Backup"));
 
@@ -360,6 +359,7 @@ qint32 AthleteConfig::saveClicked()
     state |= zonePage->saveClicked();
     state |= hrZonePage->saveClicked();
     state |= paceZonePage->saveClicked();
+    state |= credentialsPage->saveClicked();
     state |= autoImportPage->saveClicked();
     state |= backupPage->saveClicked();
 
@@ -381,23 +381,6 @@ AppearanceConfig::AppearanceConfig(QDir home, Context *context) :
 qint32 AppearanceConfig::saveClicked()
 {
     return appearancePage->saveClicked();
-}
-
-// PASSWORD CONFIG
-PasswordConfig::PasswordConfig(QDir home, Context *context) :
-    home(home), context(context)
-{
-    passwordPage = new CredentialsPage(this, context);
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(passwordPage);
-
-    layout->setSpacing(0);
-    setContentsMargins(0,0,0,0);
-}
-
-qint32 PasswordConfig::saveClicked()
-{
-    return passwordPage->saveClicked();
 }
 
 // METADATA CONFIG

@@ -29,6 +29,7 @@
 #include "Units.h"
 #include "Colors.h"
 #include "AddDeviceWizard.h"
+#include "AddCloudWizard.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "ColorButton.h"
@@ -360,837 +361,125 @@ GeneralPage::browseAthleteDir()
 //
 // Passwords page
 //
-CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollArea(parent), context(context)
+CredentialsPage::CredentialsPage(Context *context) : context(context)
 {
-    QWidget *main = new QWidget(this);
-    main->setContentsMargins(0,0,0,0);
+    QGridLayout *mainLayout = new QGridLayout(this);
 
-    QGridLayout *grid = new QGridLayout;
-    unsigned int row = 0;
-
-    QFont current;
-    current.setWeight(QFont::Black);
-
-    QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
-
-    // Twitter
-
-#ifdef GC_HAVE_KQOAUTH
-    QLabel *twp = new QLabel(tr("Twitter"));
-    twp->setFont(current);
-
-    QLabel *twauthLabel = new QLabel(tr("Authorise"));
-
-    twitterAuthorise = new QPushButton(tr("Authorise"), this);
-    twitterAuthorised = new QPushButton(this);
-    twitterAuthorised->setContentsMargins(0,0,0,0);
-    twitterAuthorised->setIcon(passwords.scaled(16,16));
-    twitterAuthorised->setIconSize(QSize(16,16));
-    twitterAuthorised->setFixedHeight(16);
-    twitterAuthorised->setFixedWidth(16);
-
-    grid->addWidget(twp, ++row, 0);
-
-    grid->addWidget(twauthLabel, ++row, 0);
-    grid->addWidget(twitterAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_TOKEN, "")!="")
-        grid->addWidget(twitterAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        twitterAuthorised->hide(); // if no token no show
-
-    connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+    editButton = new QPushButton(tr("Edit"));
+#ifndef Q_OS_MAC
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
 #endif
-
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
-    //
-    // Authorising Dropbox via an OAuthDialog...
-    QLabel *dwp = new QLabel(tr("Dropbox"));
-    dwp->setFont(current);
-
-    QLabel *dropauthLabel = new QLabel(tr("Authorise"));
-
-    dropboxAuthorise = new QPushButton(tr("Authorise"), this);
-
-    dropboxAuthorised = new QPushButton(this);
-    dropboxAuthorised->setContentsMargins(0,0,0,0);
-    dropboxAuthorised->setIcon(passwords.scaled(16,16));
-    dropboxAuthorised->setIconSize(QSize(16,16));
-    dropboxAuthorised->setFixedHeight(16);
-    dropboxAuthorised->setFixedWidth(16);
-
-    grid->addWidget(dwp, ++row, 0);
-
-    grid->addWidget(dropauthLabel, ++row, 0);
-    grid->addWidget(dropboxAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_TOKEN, "")!="")
-        grid->addWidget(dropboxAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        dropboxAuthorised->hide(); // if no token no show
-
-    connect(dropboxAuthorise, SIGNAL(clicked()), this, SLOT(authoriseDropbox()));
-
-    //
-    // Selecting the athlete folder in dropbox
-    QLabel *dropfolderLabel = new QLabel(tr("Athlete Folder"));
-    dropboxFolder = new QLineEdit(this);
-    dropboxFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER, "").toString());
-    dropboxBrowse = new QPushButton(tr("Browse"));
-    connect(dropboxBrowse, SIGNAL(clicked()), this, SLOT(chooseDropboxFolder()));
-    QHBoxLayout *dfchoose = new QHBoxLayout;
-    dfchoose->addWidget(dropboxFolder);
-    dfchoose->addWidget(dropboxBrowse);
-    grid->addWidget(dropfolderLabel, ++row, 0);
-    grid->addLayout(dfchoose, row, 1);
-    //grid->addWidget(twpinLabel, ++row, 0);
-
-    QLabel *googleDriveLabel = new QLabel(tr("Google Drive"));
-    googleDriveLabel->setFont(current);
-    googleDriveFolder = new QLineEdit(this);
-    googleDriveFolder->setReadOnly(true);
-    googleDriveFolder->setText(
-        appsettings->cvalue(context->athlete->cyclist,
-                            GC_GOOGLE_DRIVE_FOLDER, "").toString());
-
-    googleDriveAuthorise = new QPushButton(tr("Authorise"), this);
-    googleDriveAuthorised = new QPushButton(this);
-    googleDriveAuthorised->setContentsMargins(0, 0, 0, 0);
-    googleDriveAuthorised->setIcon(passwords.scaled(16, 16));
-    googleDriveAuthorised->setIconSize(QSize(16, 16));
-    googleDriveAuthorised->setFixedHeight(16);
-    googleDriveAuthorised->setFixedWidth(16);
-
-    grid->addWidget(googleDriveLabel, ++row, 0);
-
-    QHBoxLayout *gdauthlayout = new QHBoxLayout;
-    //grid->addWidget(googleDriveAuthorise, row, 1,
-    //Qt::AlignLeft | Qt::AlignVCenter);
-    gdauthlayout->addWidget(googleDriveAuthorise);
-    if (appsettings->cvalue(context->athlete->cyclist,
-                            GC_GOOGLE_DRIVE_REFRESH_TOKEN, "") != "") {
-        //grid->addWidget(googleDriveAuthorised, row, 2,
-        //Qt::AlignLeft | Qt::AlignVCenter);
-        gdauthlayout->addWidget(googleDriveAuthorised);
-    } else {
-        googleDriveAuthorised->hide(); // if no token no show
-    }
-    QComboBox *google_drive_scope = new QComboBox;
-    int item = 0;
-    const QString scope =  appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
-    google_drive_scope->setEditable(false);
-    google_drive_scope->insertItem(item++, "drive.appdata");
-    google_drive_scope->insertItem(item++, "drive.file");
-    google_drive_scope->insertItem(item++, "drive");
-    if (scope == "drive.appdata") {
-        google_drive_scope->setCurrentIndex(0);
-    } else if (scope == "drive.file") {
-        google_drive_scope->setCurrentIndex(1);
-    } else if (scope == "drive") {
-        google_drive_scope->setCurrentIndex(2);
-    } else {
-        google_drive_scope->setCurrentIndex(0);
-        // re-write default.
-        appsettings->setCValue(
-            context->athlete->cyclist,
-            GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata");
-    }
-    connect(google_drive_scope, SIGNAL(currentIndexChanged(const QString&)),
-            this, SLOT(chooseGoogleDriveAuthScope(const QString&)));
-    gdauthlayout->addWidget(google_drive_scope);
-    connect(googleDriveAuthorise, SIGNAL(clicked()), this,
-            SLOT(authoriseGoogleDrive()));
-
-    QLabel *googleDriveAuthLabel = new QLabel(tr("Authorise"));
-    grid->addWidget(googleDriveAuthLabel, ++row, 0);
-    grid->addLayout(gdauthlayout, row, 1);  // No stretch.
-    // Selecting the athlete folder in GoogleDrive
-    googleDriveBrowse = new QPushButton(tr("Browse"));
-    connect(googleDriveBrowse, SIGNAL(clicked()), this,
-            SLOT(chooseGoogleDriveFolder()));
-    QHBoxLayout *gdfchoose = new QHBoxLayout;
-    gdfchoose->addWidget(googleDriveFolder);
-    gdfchoose->addWidget(googleDriveBrowse);
-
-    QLabel *googleDriveFolderLabel = new QLabel(tr("Athlete Folder"));
-    grid->addWidget(googleDriveFolderLabel, ++row, 0);
-    grid->addLayout(gdfchoose, row, 1);
-#endif
-
-    //////////////////////////////////////////////////
-    // Local CloudService
-
-
-    QLabel *nfs = new QLabel(tr("Shared Local Folder"));
-    nfs->setFont(current);
-    grid->addWidget(nfs, ++row, 0);
-
-    // Selecting the storage folder folder of the Local File Store
-    QLabel *networkFileStoreFolderLabel = new QLabel(tr("Shared Local Athlete Folder"));
-    networkFileStoreFolder = new QLineEdit(this);
-    networkFileStoreFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString());
-    networkFileStoreFolderBrowse = new QPushButton(tr("Browse"));
-    connect(networkFileStoreFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseLocalFileStoreFolder()));
-    QHBoxLayout *nwfsfchoose = new QHBoxLayout;
-    nwfsfchoose->addWidget(networkFileStoreFolder);
-    nwfsfchoose->addWidget(networkFileStoreFolderBrowse);
-    grid->addWidget(networkFileStoreFolderLabel, ++row, 0);
-    grid->addLayout(nwfsfchoose, row, 1);
-
-
-    //////////////////////////////////////////////////
-    // Strava
-
-    QLabel *str = new QLabel(tr("Strava"));
-    str->setFont(current);
-
-    QLabel *strauthLabel = new QLabel(tr("Authorise"));
-
-    stravaAuthorise = new QPushButton(tr("Authorise"), this);
-
-    stravaAuthorised = new QPushButton(this);
-    stravaAuthorised->setContentsMargins(0,0,0,0);
-    stravaAuthorised->setIcon(passwords.scaled(16,16));
-    stravaAuthorised->setIconSize(QSize(16,16));
-    stravaAuthorised->setFixedHeight(16);
-    stravaAuthorised->setFixedWidth(16);
-
-    grid->addWidget(str, ++row, 0);
-
-    grid->addWidget(strauthLabel, ++row, 0);
-    grid->addWidget(stravaAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "")!="")
-        grid->addWidget(stravaAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        stravaAuthorised->hide(); // if no token no show
-
-    connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
-
-    //////////////////////////////////////////////////
-    // Today's Plan
-
-    QLabel *tdp = new QLabel(tr("Today's Plan"));
-    tdp->setFont(current);
-
-    QLabel *tdpauthLabel = new QLabel(tr("Authorise"));
-
-    tdpAuthorise = new QPushButton(tr("Authorise"), this);
-
-    tdpAuthorised = new QPushButton(this);
-    tdpAuthorised->setContentsMargins(0,0,0,0);
-    tdpAuthorised->setIcon(passwords.scaled(16,16));
-    tdpAuthorised->setIconSize(QSize(16,16));
-    tdpAuthorised->setFixedHeight(16);
-    tdpAuthorised->setFixedWidth(16);
-
-    grid->addWidget(tdp, ++row, 0);
-
-    // Today's plan url can be on a private tenant
-    QLabel *tdpurllabel = new QLabel("URL"); // don't translate a technical term
-    tdpURL = new QLineEdit(this);
-    tdpURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString());
-    grid->addWidget(tdpurllabel, ++row, 0);
-    grid->addWidget(tdpURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
-
-    QLabel *tdpuserkeylabel = new QLabel("Key (optional)"); // don't translate a technical term
-    tdpUserKey = new QLineEdit(this);
-    tdpUserKey->setText(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_USERKEY, "").toString());
-    grid->addWidget(tdpuserkeylabel, ++row, 0);
-    grid->addWidget(tdpUserKey, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
-
-    grid->addWidget(tdpauthLabel, ++row, 0);
-
-    QGridLayout *tdplayout = new QGridLayout;
-    tdplayout->addWidget(tdpAuthorise, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addLayout(tdplayout, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    if (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "")!="")
-        tdplayout->addWidget(tdpAuthorised, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        tdpAuthorised->hide(); // if no token no show
-
-
-    QLabel *tdpathletenamelabel = new QLabel(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_NAME, "").toString());
-    tdplayout->addWidget(tdpathletenamelabel, 0, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    connect(tdpAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTodaysPlan()));
-
-    //////////////////////////////////////////////////
-    // Sixcycle
-
-#if QT_VERSION > 0x050000 // only supported on QT5 or higher
-    QLabel *sc = new QLabel(tr("Sixcycle"));
-    sc->setFont(current);
-
-    // SixCycle can be on a staging or private tenant
-    QLabel *scurllabel = new QLabel("URL"); // don't translate a technical term
-    scURL = new QLineEdit(this);
-    scURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_URL, "https://live.sixcycle.com").toString());
-
-    QLabel *scuserLabel = new QLabel(tr("Username"));
-    QLabel *scpassLabel = new QLabel(tr("Password"));
-
-    scUser = new QLineEdit(this);
-    scUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_USER, "").toString());
-
-    scPass = new QLineEdit(this);
-    scPass->setEchoMode(QLineEdit::Password);
-    scPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SIXCYCLE_PASS, "").toString());
-
-    // add widgets to layout
-    grid->addWidget(sc, ++row, 0);
-
-    grid->addWidget(scurllabel, ++row, 0);
-    grid->addWidget(scURL, row, 1, 0 /*Qt::AlignLeft | Qt::AlignVCenter*/);
-
-    grid->addWidget(scuserLabel, ++row, 0);
-    grid->addWidget(scUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(scpassLabel, ++row, 0);
-    grid->addWidget(scPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-#endif
-
-    //////////////////////////////////////////////////
-    // Cycling Analytics
-
-
-    QLabel *can = new QLabel(tr("Cycling Analytics"));
-    can->setFont(current);
-    QLabel *canauthLabel = new QLabel(tr("Authorise"));
-
-    cyclingAnalyticsAuthorise = new QPushButton(tr("Authorise"), this);
-#ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
-    cyclingAnalyticsAuthorise->setEnabled(false);
-#endif
-
-    cyclingAnalyticsAuthorised = new QPushButton(this);
-    cyclingAnalyticsAuthorised->setContentsMargins(0,0,0,0);
-    cyclingAnalyticsAuthorised->setIcon(passwords.scaled(16,16));
-    cyclingAnalyticsAuthorised->setIconSize(QSize(16,16));
-    cyclingAnalyticsAuthorised->setFixedHeight(16);
-    cyclingAnalyticsAuthorised->setFixedWidth(16);
-
-    grid->addWidget(can, ++row, 0);
-
-    grid->addWidget(canauthLabel, ++row, 0);
-    grid->addWidget(cyclingAnalyticsAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "")!="")
-        grid->addWidget(cyclingAnalyticsAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        cyclingAnalyticsAuthorised->hide();
-
-    connect(cyclingAnalyticsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseCyclingAnalytics()));
-
-
-    //////////////////////////////////////////////////
-    // RideWithGPS
-
-    QLabel *rwgps = new QLabel(tr("RideWithGPS"));
-    rwgps->setFont(current);
-
-    QLabel *rwgpsuserLabel = new QLabel(tr("Username"));
-    QLabel *rwgpspassLabel = new QLabel(tr("Password"));
-
-    rideWithGPSUser = new QLineEdit(this);
-    rideWithGPSUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER, "").toString());
-
-    rideWithGPSPass = new QLineEdit(this);
-    rideWithGPSPass->setEchoMode(QLineEdit::Password);
-    rideWithGPSPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_RWGPSPASS, "").toString());
-
-    grid->addWidget(rwgps, ++row, 0);
-
-    grid->addWidget(rwgpsuserLabel, ++row, 0);
-    grid->addWidget(rideWithGPSUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(rwgpspassLabel, ++row, 0);
-    grid->addWidget(rideWithGPSPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //////////////////////////////////////////////////
-    // Withings
-    //////////////////////////////////////////////////
-
-#ifdef GC_HAVE_KQOAUTH
-    QLabel *withingsLabel = new QLabel(tr("Withings"));
-    withingsLabel->setFont(current);
-
-    QLabel *wipauthLabel = new QLabel(tr("Authorise"));
-
-    withingsAuthorise = new QPushButton(tr("Authorise"), this);
-    withingsAuthorised = new QPushButton(this);
-    withingsAuthorised->setContentsMargins(0,0,0,0);
-    withingsAuthorised->setIcon(passwords.scaled(16,16));
-    withingsAuthorised->setIconSize(QSize(16,16));
-    withingsAuthorised->setFixedHeight(16);
-    withingsAuthorised->setFixedWidth(16);
-
-    grid->addWidget(withingsLabel, ++row, 0);
-
-    grid->addWidget(wipauthLabel, ++row, 0);
-    grid->addWidget(withingsAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN, "")!="")
-        grid->addWidget(withingsAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        withingsAuthorised->hide(); // if no token no show
-
-    connect(withingsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseWithings()));
-#endif
-
-
-    //////////////////////////////////////////////////
-    // Web Calendar
-
-    QLabel *webcal = new QLabel(tr("Web Calendar"));
-    webcal->setFont(current);
-    QLabel *wcurlLabel = new QLabel(tr("Webcal URL"));
-
-    webcalURL = new QLineEdit(this);
-    webcalURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_WEBCAL_URL, "").toString());
-
-    grid->addWidget(webcal, ++row, 0);
-
-    grid->addWidget(wcurlLabel, ++row, 0);
-    grid->addWidget(webcalURL, row, 1, 0);
-
-    //////////////////////////////////////////////////
-    // CalDAV Calendar
-
-    QLabel *dv = new QLabel(tr("CalDAV Calendar"));
-    dvCALDAVType = new QComboBox(this);
-    dvCALDAVType->addItem(tr("Generic CalDAV"));
-    dvCALDAVType->addItem(tr("Google Calendar"));
-
-    dvCALDAVType->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_DVCALDAVTYPE, "0").toInt());
-
-    // setup and fill all fields
-    dv->setFont(current);
-    QLabel *dvurlLabel = new QLabel(tr("CalDAV URL"));
-    QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
-    QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
-    QLabel *dvTypeLabel = new QLabel(tr("Calendar Type"));
-    QLabel *dvGoogleCalendarLabel = new QLabel(tr("Google CalID"));
-
-    dvURL = new QLineEdit(this);
-    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    url.replace("%40", "@"); // remove escape of @ character
-    dvURL->setText(url);
-
-    dvUser = new QLineEdit(this);
-    dvUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVUSER, "").toString());
-
-    dvPass = new QLineEdit(this);
-    dvPass->setEchoMode(QLineEdit::Password);
-    dvPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVPASS, "").toString());
-
-    dvGoogleCalid = new QLineEdit(this);
-    dvGoogleCalid->setText(
-        appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "")
-        .toString());
-
-    QLabel *googleCalendarAuthLabel = new QLabel(tr("Google Calendar"));
-
-    googleCalendarAuthorise = new QPushButton(tr("Authorise"), this);
-    googleCalendarAuthorised = new QPushButton(this);
-    googleCalendarAuthorised->setContentsMargins(0,0,0,0);
-    googleCalendarAuthorised->setIcon(passwords.scaled(16,16));
-    googleCalendarAuthorised->setIconSize(QSize(16,16));
-    googleCalendarAuthorised->setFixedHeight(16);
-    googleCalendarAuthorised->setFixedWidth(16);
-
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
-#endif
-
-    grid->addWidget(dv, ++row, 0);
-
-    grid->addWidget(dvTypeLabel, ++row, 0);
-    grid->addWidget(dvCALDAVType, row, 1, 0);
-
-    grid->addWidget(dvurlLabel, ++row, 0);
-    grid->addWidget(dvURL, row, 1, 0);
-
-    grid->addWidget(dvuserLabel, ++row, 0);
-    grid->addWidget(dvUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(dvpassLabel, ++row, 0);
-    grid->addWidget(dvPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(dvGoogleCalendarLabel, ++row, 0);
-    grid->addWidget(dvGoogleCalid, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(googleCalendarAuthLabel, ++row, 0);
-    grid->addWidget(googleCalendarAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist,
-                            GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "") != "") {
-        grid->addWidget(googleCalendarAuthorised, row, 1,
-                        Qt::AlignLeft | Qt::AlignVCenter);
-    } else {
-        googleCalendarAuthorised->hide(); // if no token no show
-    }
-    connect(googleCalendarAuthorise, SIGNAL(clicked()), this,
-                SLOT(authoriseGoogleCalendar()));
-
-    connect (dvCALDAVType, SIGNAL(currentIndexChanged(int)), this, SLOT(dvCALDAVTypeChanged(int)));
-
-    // activate/deactivate the input fields according to the type selected
-    dvCALDAVTypeChanged(dvCALDAVType->currentIndex());
-
-    //////////////////////////////////////////////////
-    // Trainingstagebuch
-
-    QLabel *ttb = new QLabel(tr("Trainingstagebuch"));
-    ttb->setFont(current);
-
-    QLabel *ttbuserLabel = new QLabel(tr("Username"));
-    QLabel *ttbpassLabel = new QLabel(tr("Password"));
-
-    ttbUser = new QLineEdit(this);
-    ttbUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER, "").toString());
-
-    ttbPass = new QLineEdit(this);
-    ttbPass->setEchoMode(QLineEdit::Password);
-    ttbPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS, "").toString());
-
-    grid->addWidget(ttb, ++row, 0);
-
-    grid->addWidget(ttbuserLabel, ++row, 0);
-    grid->addWidget(ttbUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(ttbpassLabel, ++row, 0);
-    grid->addWidget(ttbPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //////////////////////////////////////////////////
-    // Selfloops
-
-    QLabel *sel = new QLabel(tr("Selfloops"));
-    sel->setFont(current);
-
-    QLabel *seluserLabel = new QLabel(tr("Username"));
-    QLabel *selpassLabel = new QLabel(tr("Password"));
-
-    selUser = new QLineEdit(this);
-    selUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELUSER, "").toString());
-
-    selPass = new QLineEdit(this);
-    selPass->setEchoMode(QLineEdit::Password);
-    selPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELPASS, "").toString());
-
-    grid->addWidget(sel, ++row, 0);
-
-    grid->addWidget(seluserLabel, ++row, 0);
-    grid->addWidget(selUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(selpassLabel, ++row, 0);
-    grid->addWidget(selPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //////////////////////////////////////////////////
-    // Velo Hero
-
-    QLabel *velohero = new QLabel(tr("Velo Hero"));
-    velohero->setFont(current);
-
-    QLabel *veloherouserLabel = new QLabel(tr("Username"));
-    QLabel *veloheropassLabel = new QLabel(tr("Password"));
-
-    veloHeroUser = new QLineEdit(this);
-    veloHeroUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER, "").toString());
-
-    veloHeroPass = new QLineEdit(this);
-    veloHeroPass->setEchoMode(QLineEdit::Password);
-    veloHeroPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS, "").toString());
-
-    grid->addWidget(velohero, ++row, 0);
-
-    grid->addWidget(veloherouserLabel, ++row, 0);
-    grid->addWidget(veloHeroUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(veloheropassLabel, ++row, 0);
-    grid->addWidget(veloHeroPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-
-    //////////////////////////////////////////////////
-    // SportPlusHealth
-
-    QLabel *sph = new QLabel(tr("SportPlusHealth"));
-    sph->setFont(current);
-
-    QLabel *sphUserLabel = new QLabel(tr("Username"));
-    QLabel *sphPassLabel = new QLabel(tr("Password"));
-
-    sphUser = new QLineEdit(this);
-    sphUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER, "").toString());
-
-    sphPass = new QLineEdit(this);
-    sphPass->setEchoMode(QLineEdit::Password);
-    sphPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS, "").toString());
-
-    grid->addWidget(sph, ++row, 0);
-
-    grid->addWidget(sphUserLabel, ++row, 0);
-    grid->addWidget(sphUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(sphPassLabel, ++row, 0);
-    grid->addWidget(sphPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //////////////////////////////////////////////////
-    // End of grid
-
-    grid->setColumnStretch(0,0);
-    grid->setColumnStretch(1,3);
-
-    main->setLayout(grid);
-
-    setFrameStyle(QFrame::NoFrame);
-    setWidgetResizable(true);
-    setWidget(main);
-
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2 *dpiXFactor);
+    actionButtons->addStretch();
+    actionButtons->addWidget(editButton);
+    actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+
+    accounts = new QTreeWidget;
+    accounts->headerItem()->setText(0, tr("Service"));
+    accounts->headerItem()->setText(1, tr("Description"));
+    accounts->setColumnCount(2);
+    accounts->setSelectionMode(QAbstractItemView::SingleSelection);
+    //fields->setUniformRowHeights(true);
+    accounts->setIndentation(0);
+
+    mainLayout->addWidget(accounts, 0,0);
+    mainLayout->addLayout(actionButtons, 1,0);
+
+    // list accounts...
+    resetList();
+
+    // connect up slots
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 }
 
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
-void CredentialsPage::chooseDropboxFolder()
+void
+CredentialsPage::resetList()
 {
-    CloudService *dropbox = CloudServiceFactory::instance().newService("Dropbox", context);
-
-    // open the connection
-    QStringList errors;
-    if (dropbox->open(errors) == false) {
-        QMessageBox err;
-        err.setText(tr("Dropbox Connection Failed"));
-        err.setDetailedText(errors.join("\n\n"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
+    // clear whats there
+    while(accounts->invisibleRootItem()->childCount() > 0) {
+        QTreeWidgetItem *take = accounts->invisibleRootItem()->takeChild(0);
+        delete take;
     }
 
-    // did the user type something ?
-    QString path = dropboxFolder->text();
-    if (path == "") {
-        path = appsettings->cvalue(context->athlete->cyclist, GC_DROPBOX_FOLDER,
-                                   "/").toString();
+    // re-add
+    int index=0;
+    foreach (const QString name, CloudServiceFactory::instance().serviceNames()) {
+
+        const CloudService *s = CloudServiceFactory::instance().service(name);
+
+        // skip inactive accounts
+        if (appsettings->cvalue(context->athlete->cyclist, s->activeSettingName(), false).toBool() == false) continue;
+
+        QTreeWidgetItem *add = new QTreeWidgetItem;
+        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setText(0, s->name());
+        add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setText(1, s->description());
+
+        accounts->invisibleRootItem()->insertChild(index++, add);
     }
-    CloudServiceDialog dialog(this, dropbox, tr("Choose Athlete Directory"), path, true);
-    int ret = dialog.exec();
-
-    // did we actually select something?
-    if (ret == QDialog::Accepted) dropboxFolder->setText(dialog.pathnameSelected());
-}
-
-void CredentialsPage::chooseGoogleDriveFolder()
-{
-    CloudService *google_drive = CloudServiceFactory::instance().newService("Google Drive", context);
-
-    // open the connection
-    QStringList errors;
-    if (google_drive->open(errors) == false) {
-        QMessageBox err;
-        err.setText(tr("Google Drive Connection Failed"));
-        err.setDetailedText(errors.join("\n\n"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-    // did the user type something ?
-    QString path = googleDriveFolder->text();
-    if (path == "") {
-        path = appsettings->cvalue(
-            context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER, "/").toString();
-        // At this point there just might be a google drive instance around?
-    }
-    CloudServiceDialog dialog(this, google_drive, tr("Choose Athlete Directory"),
-                           path, true);
-    int ret = dialog.exec();
-
-    // did we actually select something?
-    if (ret == QDialog::Accepted) {
-        path = dialog.pathnameSelected();
-        googleDriveFolder->setText(path);
-        QString id = static_cast<GoogleDrive*>(google_drive)->GetFileId(path); //XXX hack since will be deprecated shortly
-        appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER_ID, id);
-    }
-}
-
-void CredentialsPage::chooseGoogleDriveAuthScope(const QString& scope) {
-    appsettings->setCValue(context->athlete->cyclist,
-                           GC_GOOGLE_DRIVE_AUTH_SCOPE, scope);
-    // Clear out now invalid access tokens.
-    appsettings->setCValue(context->athlete->cyclist,
-                           GC_GOOGLE_DRIVE_ACCESS_TOKEN, "");
-    appsettings->setCValue(context->athlete->cyclist,
-                           GC_GOOGLE_DRIVE_REFRESH_TOKEN, "");
-}
-#endif
-
-
-void CredentialsPage::chooseLocalFileStoreFolder()
-{
-    // did the user type something ? if not, get it from the Settings
-    QString path = networkFileStoreFolder->text();
-    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, "").toString();
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Shared Local Folder Athlete Directory"),
-                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") networkFileStoreFolder->setText(dir);  //only overwrite current dir, if a new was selected
-
-}
-
-
-#ifdef GC_HAVE_KQOAUTH
-void CredentialsPage::authoriseTwitter()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER, NULL);
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-
-void CredentialsPage::authoriseWithings()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::WITHINGS, CloudServiceFactory::instance().newService("Withings", context));
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-#endif
-
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
-void CredentialsPage::authoriseDropbox()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::DROPBOX, CloudServiceFactory::instance().newService("Dropbox", context));
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-#endif
-
-
-void CredentialsPage::authoriseStrava()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA, CloudServiceFactory::instance().newService("Strava", context));
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-
-void CredentialsPage::authoriseTodaysPlan()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TODAYSPLAN,
-                                               CloudServiceFactory::instance().newService("Today's Plan", context),
-                                               tdpURL->text(), tdpUserKey->text());
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-
-void CredentialsPage::authoriseCyclingAnalytics()
-{
-    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::CYCLING_ANALYTICS, CloudServiceFactory::instance().newService("Cycling Analytics", context));
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-
-void CredentialsPage::authoriseGoogleCalendar() {
-    authoriseGoogle(CALENDAR);
-}
-
-#if QT_VERSION >= 0x050000
-void CredentialsPage::authoriseGoogleDrive() {
-    authoriseGoogle(DRIVE);
-}
-#endif
-
-void CredentialsPage::authoriseGoogle(GoogleType type) {
-    OAuthDialog *oauthDialog;
-    if (type == CALENDAR) {
-        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR, NULL);
-    } else if (type == DRIVE) {
-        oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_DRIVE, CloudServiceFactory::instance().newService("Google Drive", context));
-    } else {
-            return;
-    }
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-    }
-}
-
-void CredentialsPage::dvCALDAVTypeChanged(int type)
-{
-    if (type == 0) {
-        // normal CALDAV selected
-        googleCalendarAuthorise->setEnabled(false);
-        dvGoogleCalid->setEnabled(false);
-        dvURL->setEnabled(true);
-        dvUser->setEnabled(true);
-        dvPass->setEnabled(true);
-    } else {
-        // Google Selected
-        googleCalendarAuthorise->setEnabled(true);
-        dvGoogleCalid->setEnabled(true);
-        dvURL->setEnabled(false);
-        dvUser->setEnabled(false);
-        dvPass->setEnabled(false);
-    }
-    // set always inactive if authorization process not feasible
-#ifndef GC_GOOGLE_CALENDAR_CLIENT_SECRET
-        googleCalendarAuthorise->setEnabled(false);
-#endif
-
 }
 
 qint32
 CredentialsPage::saveClicked()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_TTBUSER, ttbUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_TTBPASS, ttbPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_VELOHEROUSER, veloHeroUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_VELOHEROPASS, veloHeroPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SPORTPLUSHEALTHUSER, sphUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SPORTPLUSHEALTHPASS, sphPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SELUSER, selUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SELPASS, selPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_URL, tdpURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_TODAYSPLAN_USERKEY, tdpUserKey->text());
-#if QT_VERSION >= 0x050000 // only in QT5 or higher
-    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_USER, scUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_PASS, scPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SIXCYCLE_URL, scURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_FOLDER, dropboxFolder->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER,
-                           googleDriveFolder->text());
-#endif
-    appsettings->setCValue(context->athlete->cyclist, GC_NETWORKFILESTORE_FOLDER, networkFileStoreFolder->text());
-
-    // escape the at character
-    QString url = dvURL->text();
-    url.replace("@", "%40");
-    appsettings->setCValue(context->athlete->cyclist, GC_DVURL, url);
-    appsettings->setCValue(context->athlete->cyclist, GC_DVUSER, dvUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_DVPASS, dvPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_DVGOOGLE_CALID, dvGoogleCalid->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_DVCALDAVTYPE, dvCALDAVType->currentIndex());
 
     return 0;
+}
+
+void
+CredentialsPage::addClicked()
+{
+    // just run the add cloud wizard
+    AddCloudWizard *wizard = new AddCloudWizard(context);
+    wizard->exec();
+
+    // we need to raise, as wizard drops us
+    raise();
+
+    // update the account list
+    resetList();
+}
+
+void
+CredentialsPage::deleteClicked()
+{
+    // delete current
+    if (accounts->selectedItems().count() == 0) return;
+
+    // does it exist?
+    const CloudService *service = CloudServiceFactory::instance().service(accounts->selectedItems().first()->text(0));
+    if (service) {
+
+        // set it inactive
+        appsettings->setCValue(context->athlete->cyclist, service->activeSettingName(), false);
+
+        // reset
+        resetList();
+    }
+}
+
+void
+CredentialsPage::editClicked()
+{
+    // edit current
+    if (accounts->selectedItems().count() == 0) return;
+
+    // edit the details
+    AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(0));
+    edit->exec();
+
 }
 
 //
