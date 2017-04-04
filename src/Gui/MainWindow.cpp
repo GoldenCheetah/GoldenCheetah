@@ -436,11 +436,6 @@ MainWindow::MainWindow(const QDir &home)
     shareAction->setShortcut(tr("Ctrl+A"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
     shareMenu->addAction(shareAction);
-
-    shareAction = new QAction(tr("Manage Cloud Accounts..."), this);
-    shareAction->setShortcut(tr("Ctrl+M"));
-    //connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
-    shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
 
     uploadMenu = shareMenu->addMenu("Upload");
