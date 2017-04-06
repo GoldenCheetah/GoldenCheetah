@@ -174,6 +174,7 @@ AddService::initializePage()
         mapper->setMapping(p, s->name());
         buttonlayout->addWidget(p);
     }
+    buttonlayout->addStretch();
 }
 
 void
@@ -511,8 +512,6 @@ AddSettings::browseFolder()
     if (ret == QDialog::Accepted) {
         path = dialog.pathnameSelected();
         folder->setText(path);
-        //XXX ack QString id = google_drive.GetFileId(path);
-        //XXX ack appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_DRIVE_FOLDER_ID, id);
     }
 }
 
