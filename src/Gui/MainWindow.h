@@ -200,12 +200,6 @@ class MainWindow : public QMainWindow
         void showWorkoutWizard();
         void importWorkout();
 
-        // Diary View
-        void refreshCalendar();
-#ifdef GC_HAVE_ICAL
-        void uploadCalendar(); // upload ride to calendar
-#endif
-
         // Measures View
         void downloadBodyMeasures();
 

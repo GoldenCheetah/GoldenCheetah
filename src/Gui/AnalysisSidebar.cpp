@@ -400,11 +400,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 
         menu.addAction(actDeleteRide);
         menu.addAction(actSplitRide);
-#ifdef GC_HAVE_ICAL
-        QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), rideNavigator);
-        connect(actUploadCalendar, SIGNAL(triggered(void)), context->mainWindow, SLOT(uploadCalendar()));
-        menu.addAction(actUploadCalendar);
-#endif
+
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindBest);

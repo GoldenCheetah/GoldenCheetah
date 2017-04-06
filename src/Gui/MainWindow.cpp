@@ -74,10 +74,6 @@
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
-#ifdef GC_HAVE_ICAL
-#include "CalDAV.h"
-#endif
-#include "CalendarDownload.h"
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
@@ -2106,29 +2102,6 @@ MainWindow::downloadBodyMeasures()
     dialog.exec();
 
 }
-
-void
-MainWindow::refreshCalendar()
-{
-#ifdef GC_HAVE_ICAL
-    currentTab->context->athlete->davCalendar->download();
-    currentTab->context->athlete->calendarDownload->download();
-#endif
-}
-
-/*----------------------------------------------------------------------
- * Calendar
- *--------------------------------------------------------------------*/
-
-#ifdef GC_HAVE_ICAL
-void
-MainWindow::uploadCalendar()
-{
-    if (currentTab->context->currentRideItem())
-        currentTab->context->athlete->davCalendar->upload((RideItem*)currentTab->context->currentRideItem()); // remove const coz it updates the ride
-                                               // to set GID and upload date
-}
-#endif
 
 void
 MainWindow::actionClicked(int index)
