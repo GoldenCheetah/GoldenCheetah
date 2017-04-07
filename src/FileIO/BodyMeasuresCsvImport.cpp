@@ -55,8 +55,8 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
 
   emit downloadStarted(100);
   // get headers first / and check if this is a body measures file
-  QString headerLine= QString(file.readLine());
-  QStringList headers = headerLine.split(",");
+  CsvString headerLine= QString(file.readLine());
+  QStringList headers = headerLine.split();
   // remove whitespaces from strings
   QMutableStringListIterator iterator(headers);
   while (iterator.hasNext()) {
@@ -94,9 +94,9 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
   // all headers are valid, no duplicates and minimal "ts" and "weightkg" exist
   emit downloadProgress(50);
   while (!file.atEnd()) {
-      QString itemLine = QString(file.readLine());
+      CsvString itemLine = QString(file.readLine());
       lineNo ++;
-      QStringList items = itemLine.split(",");
+      QStringList items = itemLine.split();
       if (items.count() != headers.count()) {
           // we only process valid data - so stop here
           // independent if other items are ok

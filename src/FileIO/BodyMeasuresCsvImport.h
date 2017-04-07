@@ -46,4 +46,59 @@ class BodyMeasuresCsvImport : public QObject {
         QStringList allowedHeaders;
 
 };
+
+class CsvString : public QString
+{
+    public:
+    CsvString(QString other) : QString(other) {}
+
+    // we just reimplement split, to process "," in a string
+    QStringList split() {
+
+    enum State {Normal, Quote} state = Normal;
+    QStringList returning;
+    QString value;
+
+    for (int i = 0; i < size(); i++) {
+        QChar current = at(i);
+
+        if (state == Normal) { // Normal state
+
+            if (current == ',') {
+                // Save field
+                returning.append(value);
+                value.clear();
+
+            } else if (current == '"') state = Quote;
+            else value += current;
+
+
+        } else if (state == Quote) { // In-quote state
+
+            // Another double-quote
+            if (current == '"') {
+
+                if (i+1 < size()) {
+
+                    QChar next = at(i+1);
+
+                    // A double double-quote?
+                    if (next == '"') {
+                        value += '"';
+                        i++;
+                    }
+                    else state = Normal;
+                }
+            }
+
+            // Other character
+            else value += current;
+        }
+    }
+    if (!value.isEmpty()) returning.append(value);
+
+    return returning;
+}
+};
+
 #endif
