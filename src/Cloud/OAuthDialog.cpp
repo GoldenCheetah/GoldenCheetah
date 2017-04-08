@@ -26,6 +26,7 @@
 
 #if QT_VERSION > 0x050000
 #include "GoogleDrive.h"
+#include "PolarFlow.h"
 
 #include <QJsonParseError>
 #endif
@@ -50,6 +51,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->name() == "Google Drive") site = this->site = GOOGLE_DRIVE;
         if (service->name() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->name() == "Withings") site = this->site = WITHINGS;
+        if (service->name() == "PolarFlow") site = this->site = POLAR;
     }
 
     // check if SSL is available - if not - message and end
@@ -156,6 +158,14 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (baseURL=="") baseURL=service->getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString();
         urlstr = QString("%1/authorize/").arg(baseURL);
         urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
+    } else if (site == POLAR) {
+
+        // OAUTH 2.0 - Google flow for installed applications
+        urlstr = QString("https://flow.polar.com/oauth2/authorization?");
+        // We only request access to the application data folder, not all files.
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_POLARFLOW_CLIENT_ID);
+
     } else if (site == WITHINGS) {
 
 #ifdef GC_HAVE_KQOAUTH
@@ -186,7 +196,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
     // TWITTER or WITHINGS
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS ||
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR ||
         site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == TODAYSPLAN) {
         url = QUrl(urlstr);
         view->setUrl(url);
@@ -308,8 +318,11 @@ void OAuthDialog::onAuthorizationPageRequested(QUrl url) {
 void
 OAuthDialog::urlChanged(const QUrl &url)
 {
+    QString authheader;
+
     // STRAVA & CYCLINGANALYTICS work with Call-back URLs / change of URL indicates next step is required
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN ||
+        site == POLAR) {
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
@@ -332,6 +345,14 @@ OAuthDialog::urlChanged(const QUrl &url)
 #endif
 #ifdef GC_DROPBOX_CLIENT_SECRET
                 params.addQueryItem("client_secret", GC_DROPBOX_CLIENT_SECRET);
+#endif
+            }
+            else if (site == POLAR) {
+                urlstr = QString("https://polarremote.com/v2/oauth2/token?");
+                urlstr.append("redirect_uri=http://www.goldencheetah.org");
+                params.addQueryItem("grant_type", "authorization_code");
+#if (defined GC_POLARFLOW_CLIENT_ID) && (defined GC_POLARFLOW_CLIENT_SECRET)
+                authheader = QString("%1:%2").arg(GC_POLARFLOW_CLIENT_ID).arg(GC_POLARFLOW_CLIENT_SECRET);
 #endif
             }
 
@@ -381,8 +402,12 @@ OAuthDialog::urlChanged(const QUrl &url)
 #endif
             // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
             QUrl url = QUrl(urlstr);
+
             QNetworkRequest request = QNetworkRequest(url);
             request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+
+            // client id and secret are encoded and sent in the header for POLAR
+            if (site == POLAR)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
@@ -527,6 +552,12 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
             appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
             service->setSetting(GC_DROPBOX_TOKEN, access_token);
             QString info = QString(tr("Dropbox authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+        } else if (site == POLAR) {
+            appsettings->setCValue(context->athlete->cyclist, GC_POLARFLOW_TOKEN, access_token);
+            service->setSetting(GC_POLARFLOW_TOKEN, access_token);
+            QString info = QString(tr("PolarFlow authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         } else if (site == STRAVA) {
