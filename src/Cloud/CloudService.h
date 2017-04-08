@@ -178,7 +178,7 @@ class CloudService : public QObject {
 
         // APPSETTINGS SYMBOLS - SERVICE SPECIFIC
         QString syncOnImportSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
-        QString syncOnStartupSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+        QString syncOnStartupSettingName() const { return QString("%1/%2/syncstartup").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
         QString activeSettingName() const { return QString("%1/%2/active").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
