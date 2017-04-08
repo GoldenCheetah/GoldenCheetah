@@ -484,7 +484,7 @@ AddSettings::validatePage()
 
     // generic settings, but applied on a per service basis
     wizard->cloudService->setSetting(wizard->cloudService->syncOnImportSettingName(), syncImport->isChecked() ? "true" : "false");
-    wizard->cloudService->setSetting(wizard->cloudService->syncOnStartupSettingName(), syncImport->isChecked() ? "true" : "false");
+    wizard->cloudService->setSetting(wizard->cloudService->syncOnStartupSettingName(), syncStartup->isChecked() ? "true" : "false");
     return true;
 }
 
