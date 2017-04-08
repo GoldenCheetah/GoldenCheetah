@@ -1,0 +1,4 @@
+date,weightkg,fatkg,boneskg,musclekg,leankg,fatpercent,comment
+2017-01-01T12:00:00Z,2,3,4,5,6,7,Useless data - but valid format
+2017-01-02T12:00:00Z,80.15,12.10,5.4,0,32.5,11.57,Test Value
+2017-01-03T12:00:00Z,81.15,12.10,5.4,0,32.5,12.57,"Here the comment text contain commas itself, so it needs quotes"

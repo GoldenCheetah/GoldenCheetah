@@ -1,0 +1,4 @@
+ts,weightkg,fatkg,boneskg,musclekg,leankg,fatpercent,comment
+1,2,3,4,5,6,7,Is a technically valid entry but the timestamp is 1 second of Epoch so it will never be in the possible time range
+1479632565,80.15,12.10,5.4,0,32.5,11.57,Test Value
+1479632865,81.15,12.10,5.4,0,32.5,12.57,"Here the comment text contain commas itself, so it needs quotes"
