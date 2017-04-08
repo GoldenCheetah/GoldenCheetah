@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "TimeUtils.h"
 
 #if QT_VERSION > 0x050000
@@ -43,6 +44,9 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("OAuth"));
+
+    // we need to scale up, since we zoom the webview on hi-dpi screens
+    setMinimumSize(640 *dpiXFactor, 640 *dpiYFactor);
 
     if (service) { // ultimately this will be the only way this works
         if (service->name() == "Strava") site = this->site = STRAVA;
@@ -74,6 +78,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     #if defined(NOWEBKIT) || (QT_VERSION > 0x050000 && defined(Q_OS_MAC))
     view = new QWebEngineView();
+    view->setZoomFactor(dpiXFactor);
     #else
     view = new QWebView();
     #endif
