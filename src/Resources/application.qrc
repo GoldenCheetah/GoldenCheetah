@@ -176,5 +176,6 @@
         <file>images/services/todaysplan.png</file>
         <file>images/services/trainingstagebuch.png</file>
         <file>images/services/velohero.png</file>
+        <file>images/services/polarflow.png</file>
     </qresource>
 </RCC>

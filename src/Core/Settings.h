@@ -55,6 +55,11 @@
 #define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
 #endif
 
+// PolarFlow client ID
+#ifndef GC_POLARFLOW_CLIENT_ID
+#define GC_POLARFLOW_CLIENT_ID "Not defined"
+#endif
+
 /*
  *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
  *  <system>
@@ -314,6 +319,8 @@
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
+// Polar Flow
+#define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 
 // --------------------------------------------------------------------------------
 #include <QSettings>
