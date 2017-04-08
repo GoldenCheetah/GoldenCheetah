@@ -25,7 +25,7 @@
 
 BodyMeasuresCsvImport::BodyMeasuresCsvImport(Context *context) : context(context) {
 
-    allowedHeaders << "ts" << "weightkg" << "fatkg" << "boneskg" << "musclekg" << "leankg"
+    allowedHeaders << "ts" << "date" << "weightkg" << "fatkg" << "boneskg" << "musclekg" << "leankg"
                    << "fatpercent" << "comment";
 }
 
@@ -38,6 +38,7 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
 
   // all variables to be defined here (to allow :goto - for simplified error handling/less redundant code)
   bool tsExists = false;
+  bool dateExists = false;
   bool weightkgExists = false;
   int lineNo = 0;
 
@@ -72,6 +73,7 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
 
   foreach(QString h, headers) {
       if (h == "ts") tsExists = true;
+      if (h == "date") dateExists = true;
       if (h == "weightkg") weightkgExists = true;
       if (!allowedHeaders.contains(h)) {
           if (error.isEmpty()) error = tr("Unknown column header: ");
@@ -82,8 +84,12 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
   if (error.length() > 0) {
       goto error;
   }
-  if (!tsExists) {
-      error = tr("Column 'ts' - Timestamp - is missing");
+  if (!(tsExists || dateExists)) {
+      error = tr("Date and Timestamp are missing - Column 'ts' for timestamp - Colum 'date' for Date/Time.");
+      goto error;
+  }
+  if (tsExists && dateExists) {
+      error = tr("Both column 'ts' - Timestamp and 'date' - Date/Time are defined.");
       goto error;
   }
   if (!weightkgExists) {
@@ -124,6 +130,19 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
                  error = tr("Invalid 'ts' - Timestamp - in line %1").arg(lineNo);
                  goto error;
              }
+          } else if (h == "date") {
+            // parse date ISO 8601
+            m.when = QDateTime::fromString(i, Qt::ISODate);
+            if (m.when.isValid()) {
+                // skip line if not in date range
+                if (m.when < from || m.when > to) {
+                    m.when = QDateTime::fromMSecsSinceEpoch(0);
+                    break; // stop analysing the data items of the line
+                }
+            } else {
+                error = tr("Invalid 'date' - Date/Time not ISO 8601 format - in line %1").arg(lineNo);
+                goto error;
+            }
           } else if (h == "weightkg") {
               m.weightkg = i.toDouble(&ok);
               if (!ok) {
