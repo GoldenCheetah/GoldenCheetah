@@ -38,15 +38,16 @@ class Strava : public CloudService {
         CloudService *clone(Context *context) { return new Strava(context); }
         ~Strava();
 
-        // upload only and authenticates with a user and password
-        int capabilities() const { return OAuthToken | Upload; }
-
         // open/connect and close/disconnect
         bool open(QStringList &errors);
         bool close();
 
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
+
+        // dirent style api
+        CloudServiceEntry *root() { return root_; }
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
     public slots:
 

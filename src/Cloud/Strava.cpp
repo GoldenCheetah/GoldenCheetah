@@ -29,7 +29,7 @@
 #include <QJsonValue>
 
 #ifndef STRAVA_DEBUG
-#define STRAVA_DEBUG false
+#define STRAVA_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -93,6 +93,85 @@ Strava::close()
     printd("Strava::close\n");
     // nothing to do for now
     return true;
+}
+
+QList<CloudServiceEntry*>
+Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
+{
+    printd("Strava::readdir(%s)\n", path.toStdString().c_str());
+
+    QList<CloudServiceEntry*> returning;
+
+    // do we have a token
+    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
+    if (token == "") {
+        errors << tr("You must authorise with Strava first");
+        return returning;
+    }
+
+    QString urlstr = "https://www.strava.com/api/v3/athlete/activities?";
+
+#if QT_VERSION > 0x050000
+    QUrlQuery params;
+#else
+    QUrl params;
+#endif
+
+    params.addQueryItem("before", QString("%1").arg(to.toSecsSinceEpoch()));
+    params.addQueryItem("after", QString("%1").arg(from.toSecsSinceEpoch()));
+
+    QUrl url = QUrl( urlstr + "?" + params.toString() );
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "error" << reply->errorString();
+        errors << tr("Network Problem reading Strava data");
+        return returning;
+    }
+    // did we get a good response ?
+    QByteArray r = reply->readAll();
+    printd("response: %s\n", r.toStdString().c_str());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // if path was returned all is good, lets set root
+    if (parseError.error == QJsonParseError::NoError) {
+
+        // results ?
+        QJsonArray results = document.array();
+
+        // lets look at that then
+        for(int i=0; i<results.size(); i++) {
+            QJsonObject each = results.at(i).toObject();
+            CloudServiceEntry *add = newCloudServiceEntry();
+
+
+            //Strava has full path, we just want the file name
+            add->label = QFileInfo(each["name"].toString()).fileName();
+            add->id = QString("%1").arg(each["id"].toInt());
+            add->isDir = false;
+            add->distance = each["distance"].toDouble()/1000.0;
+            add->duration = each["elapsed_time"].toInt();
+            add->name = QDateTime::fromString(each["start_date"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+
+            printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
+
+            returning << add;
+        }
+    }
+    // all good ?
+    return returning;
 }
 
 bool
