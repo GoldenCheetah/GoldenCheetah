@@ -79,7 +79,9 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     #if defined(NOWEBKIT) || (QT_VERSION > 0x050000 && defined(Q_OS_MAC))
     view = new QWebEngineView();
     view->setZoomFactor(dpiXFactor);
+    #if (QT_VERSION >= 0x050600)
     view->page()->profile()->cookieStore()->deleteAllCookies();
+    #endif
     #else
     view = new QWebView();
     #endif
