@@ -47,7 +47,9 @@
 #include <QWebEnginePage>
 #include <QWebEngineView>
 #include <QWebEngineProfile>
+#if (QT_VERSION >= 0x050600)
 #include <QWebEngineCookieStore>
+#endif
 #endif
 
 
