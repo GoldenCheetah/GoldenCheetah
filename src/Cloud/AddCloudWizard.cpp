@@ -162,7 +162,12 @@ AddService::initializePage()
     }
 
     CloudServiceFactory &factory = CloudServiceFactory::instance();
-    foreach(CloudService *s, factory.services()) {
+
+    // iterate over names, as they are sorted alphabetically
+    foreach(QString name, factory.serviceNames()) {
+
+        // get the service
+        const CloudService *s = factory.service(name);
 
         // only ones with the capability we need.
         if (s->type() != wizard->type) continue;
