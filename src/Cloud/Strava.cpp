@@ -118,10 +118,11 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 #endif
 
     // use toMSecsSinceEpoch for compatibility with QT4
-    params.addQueryItem("before", QString("%1").arg(to.toMSecsSinceEpoch()/1000.0f));
-    params.addQueryItem("after", QString("%1").arg(from.toMSecsSinceEpoch()/1000.0f));
+    params.addQueryItem("before", QString::number(to.toMSecsSinceEpoch()/1000.0f, 'f', 0));
+    params.addQueryItem("after", QString::number(from.toMSecsSinceEpoch()/1000.0f, 'f', 0));
 
-    QUrl url = QUrl( urlstr + "?" + params.toString() );
+    QUrl url = QUrl( urlstr + params.toString() );
+    printd("URL used: %s\n", url.url().toStdString().c_str());
 
     // request using the bearer token
     QNetworkRequest request(url);
