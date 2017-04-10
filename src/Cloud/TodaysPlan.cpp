@@ -470,7 +470,11 @@ TodaysPlan::readFileCompleted()
 
     printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
 
-    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideSaved(RideItem*)));
+    //XXX action at a distance anti-pattern XXX
+    //XXX
+    //XXX connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideSaved(RideItem*)));
+    //XXX RPE update needs to happen here to the in-memory version before it is
+    //XXX imported and written, the file IO needs to be performed outside of this class
 
     notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
@@ -536,7 +540,7 @@ TodaysPlan::selectAthlete(CloudServiceAthlete athlete)
     return true;
 }
 
-void
+#if 0 // disabled so we can look at the core problem
 TodaysPlan::rideSaved(RideItem* ride)
 {
     printd("TodaysPlan::rideSaved()\n");
@@ -553,6 +557,7 @@ TodaysPlan::rideSaved(RideItem* ride)
         }
     }
 }
+#endif
 
 void
 TodaysPlan::rideSend(QString remotename)
