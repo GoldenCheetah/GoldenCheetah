@@ -38,7 +38,7 @@ class Withings : public CloudService {
         QImage logo() const { return QImage(":images/services/withings.png"); }
 
         // this is a stub only used to setup configuration !
-        int type() { return Measures; }
+        int type() const { return Measures; }
         int capabilities() const { return OAuthToken | Download; }
 
     public slots:

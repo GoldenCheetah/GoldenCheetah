@@ -100,7 +100,7 @@ class CloudService : public QObject {
 
         // register with type of service
         enum { Activities=0x01, Measures=0x02, Calendar=0x04 } type_;
-        virtual int type() { return Activities; }
+        virtual int type() const { return Activities; }
 
         // open/connect and close/disconnect
         virtual bool open(QStringList &errors) { Q_UNUSED(errors); return false; }
@@ -456,7 +456,11 @@ class CloudServiceFactory {
             services_[service]->initialize();
     }
 
-    const QStringList &serviceNames() const { return names_; }
+    // sorted list of service names
+    const QStringList serviceNames() const { QStringList returning = names_;
+                                              qSort(returning);
+                                              return returning; }
+
     const CloudService *service(QString name) const { return services_.value(name, NULL); }
     const QList<CloudService*> services() {
         QList<CloudService*>returning;
