@@ -321,6 +321,7 @@
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
+#define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
 
 // --------------------------------------------------------------------------------
 #include <QSettings>

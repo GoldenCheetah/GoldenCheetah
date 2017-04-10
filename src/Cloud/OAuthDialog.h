@@ -98,6 +98,7 @@ private slots:
 private:
     Context *context;
     bool noSSLlib;
+    bool ignore;
     OAuthSite site;
     CloudService *service;
     QString baseURL; // can be passed, but typically is blank (used by Todays Plan)

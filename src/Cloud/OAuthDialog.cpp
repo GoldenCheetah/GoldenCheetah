@@ -67,6 +67,9 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         return;
     }
 
+    // ignore responses to false, used by POLARFLOW when binding the user
+    ignore = false;
+
     // SSL is available - so authorisation can take place
     noSSLlib = false;
 
@@ -169,7 +172,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     } else if (site == POLAR) {
 
         // OAUTH 2.0 - Google flow for installed applications
-        urlstr = QString("https://flow.polar.com/oauth2/authorization?");
+        urlstr = QString("%1?").arg(GC_POLARFLOW_OAUTH_URL);
         // We only request access to the application data folder, not all files.
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_POLARFLOW_CLIENT_ID);
@@ -356,7 +359,7 @@ OAuthDialog::urlChanged(const QUrl &url)
 #endif
             }
             else if (site == POLAR) {
-                urlstr = QString("https://polarremote.com/v2/oauth2/token?");
+                urlstr = QString("%1?").arg(GC_POLARFLOW_TOKEN_URL);
                 urlstr.append("redirect_uri=http://www.goldencheetah.org");
                 params.addQueryItem("grant_type", "authorization_code");
 #if (defined GC_POLARFLOW_CLIENT_ID) && (defined GC_POLARFLOW_CLIENT_SECRET)
@@ -527,17 +530,22 @@ static QString RawJsonStringGrab(const QByteArray& payload,
 
 void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
 
+    // we've been told to ignore responses (used by POLAR, maybe others in future)
+    if (ignore) return;
+
     // we can handle SSL handshake errors, if we got here then some kind of protocol was agreed
     if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::SslHandshakeFailedError) {
         QByteArray payload = reply->readAll(); // JSON
         QString refresh_token;
         QString access_token;
+        double polar_userid=0;
 #if QT_VERSION > 0x050000
         QJsonParseError parseError;
         QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
         if (parseError.error == QJsonParseError::NoError) {
             refresh_token = document.object()["refresh_token"].toString();
             access_token = document.object()["access_token"].toString();
+            if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
         }
 #else
         refresh_token = RawJsonStringGrab(payload, "refresh_token");
@@ -563,11 +571,43 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         } else if (site == POLAR) {
+
             appsettings->setCValue(context->athlete->cyclist, GC_POLARFLOW_TOKEN, access_token);
             service->setSetting(GC_POLARFLOW_TOKEN, access_token);
+            service->setSetting(GC_POLARFLOW_USER_ID, polar_userid);
+
+            // we now need to bind the user, this is a one time deal.
+            QString url = QString("%1/v3/users").arg(GC_POLARFLOW_URL);
+
+            // request using the bearer token
+            QNetworkRequest request(url);
+            request.setRawHeader("Authorization", (QString("Bearer %1").arg(access_token)).toLatin1());
+            request.setRawHeader("Accept", "application/json");
+            request.setRawHeader("Content-Type", "application/json");
+
+            // data to post
+            QByteArray data;
+            data.append(QString("{\"member-id\":\"%1\"}").arg(context->athlete->cyclist));
+
+            // the request will fallback to this method on networkRequestFinished
+            // but we are done, so set ignore= true to get this function to just
+            // return without doing anything
+            ignore=true;
+            QNetworkReply *bind = manager->post(request, data);
+
+            // blocking request
+            QEventLoop loop;
+            connect(bind, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
+
+            // Bind response lists athlete details, we ignore them for now
+            QByteArray r = bind->readAll();
+            //qDebug()<<bind->errorString()<< "bind response="<<r;
+
             QString info = QString(tr("PolarFlow authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
+
         } else if (site == STRAVA) {
             appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
             service->setSetting(GC_STRAVA_TOKEN, access_token);
