@@ -147,7 +147,8 @@
 // 137 16  Feb 2017 Leif Warland       Added HrvMetrics
 // 138 01  Mar 2017 Mark Liversedge	   Added elapsed_time metric for intervals
 // 139 88  Mar 2017 Leif Warland       Added SDANN and SDNNIDX to HRV metrics
-int DBSchemaVersion = 139;
+// 140 08  Apr 2017 Ale Martinez       Added Peak Pace Hr metrics
+int DBSchemaVersion = 140;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
