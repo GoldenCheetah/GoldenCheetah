@@ -45,11 +45,18 @@ class Strava : public CloudService {
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
+        // read a file
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
+
         // dirent style api
         CloudServiceEntry *root() { return root_; }
         QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
     public slots:
+
+        // getting data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
 
         // sending data
         void writeFileCompleted();
@@ -61,6 +68,8 @@ class Strava : public CloudService {
         CloudServiceEntry *root_;
 
         QMap<QNetworkReply*, QByteArray*> buffers;
+
+        QByteArray* prepareResponse(QByteArray* data, QString name);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);

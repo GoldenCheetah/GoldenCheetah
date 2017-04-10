@@ -176,6 +176,39 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     return returning;
 }
 
+// read a file at location (relative to home) into passed array
+bool
+Strava::readFile(QByteArray *data, QString remotename, QString remoteid)
+{
+    printd("Strava::readFile(%s)\n", remotename.toStdString().c_str());
+
+    // do we have a token ?
+    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
+    if (token == "") return false;
+
+    // lets connect and get basic info on the root directory
+    QString url = QString("https://www.strava.com/api/v3/activities/%1")
+          .arg(remoteid);
+
+    printd("url:%s\n", url.toStdString().c_str());
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->get(request);
+
+    // remember
+    mapReply(reply,remotename);
+    buffers.insert(reply,data);
+
+    // catch finished signal
+    connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    return true;
+}
+
 bool
 Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
@@ -333,9 +366,39 @@ Strava::writeFileCompleted()
     }
 }
 
+void
+Strava::readyRead()
+{
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    buffers.value(reply)->append(reply->readAll());
+}
+
+void
+Strava::readFileCompleted()
+{
+    printd("Strava::readFileCompleted\n");
+
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+
+    printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
+
+    QByteArray* data = prepareResponse(buffers.value(reply), replyName(reply));
+
+    notifyReadComplete(data, replyName(reply), tr("Completed."));
+}
+
+QByteArray*
+Strava::prepareResponse(QByteArray* data, QString name)
+{
+    printd("Strava::prepareResponse()\n");
+
+    return data;
+}
+
 static bool addStrava() {
     CloudServiceFactory::instance().addService(new Strava(NULL));
     return true;
 }
 
 static bool add = addStrava();
+

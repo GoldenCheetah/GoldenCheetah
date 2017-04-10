@@ -1344,7 +1344,7 @@ CloudServiceSyncDialog::downloadNext()
             QByteArray *data = new QByteArray; // gets deleted when read completes
             store->readFile(data, curr->text(1), curr->text(6));
             QApplication::processEvents();
-            delete data;
+            //delete data;
             return true;
         }
     }

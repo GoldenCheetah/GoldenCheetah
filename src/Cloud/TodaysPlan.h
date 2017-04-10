@@ -83,9 +83,7 @@ class TodaysPlan : public CloudService {
 
         QMap<QString, QJsonObject> replyActivity;
 
-        RideFile *sendedRide;
-
-        void rideSend(QString remotename);
+        QByteArray* prepareResponse(QByteArray* data, QString name);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
