@@ -58,7 +58,7 @@ Strava::Strava(Context *context) : CloudService(context), context(context), root
     }
 
     uploadCompression = gzip; // gzip
-    filetype = CloudService::uploadType::TCX;
+    filetype = uploadType::TCX;
     useMetric = true; // distance and duration metadata
 
     // config
@@ -117,8 +117,9 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     QUrl params;
 #endif
 
-    params.addQueryItem("before", QString("%1").arg(to.toSecsSinceEpoch()));
-    params.addQueryItem("after", QString("%1").arg(from.toSecsSinceEpoch()));
+    // use toMSecsSinceEpoch for compatibility with QT4
+    params.addQueryItem("before", QString("%1").arg(to.toMSecsSinceEpoch()/1000.0f));
+    params.addQueryItem("after", QString("%1").arg(from.toMSecsSinceEpoch()/1000.0f));
 
     QUrl url = QUrl( urlstr + "?" + params.toString() );
 
