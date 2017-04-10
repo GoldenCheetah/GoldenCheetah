@@ -24,14 +24,14 @@
 #include <QNetworkRequest>
 #include <QImage>
 
-// OAuth domain (requires client id and secret)
-#define GC_POLARFLOW_OAUTH_URL "https://https://flow.polar.com/"
+// OAuth domain (requires client id)
+#define GC_POLARFLOW_OAUTH_URL "https://flow.polar.com/oauth2/authorization"
 
-// Access token (requires OAuth token)
-#define GC_POLARFLOW_TOKEN_URL "https://https://polarremote.com/v2/oauth2/token"
+// Access token (requires client id and secret)
+#define GC_POLARFLOW_TOKEN_URL "https://polarremote.com/v2/oauth2/token"
 
 // Request URL (requires access token)
-#define GC_POLARFLOW_URL "https://www.polaraccesslink.com/"
+#define GC_POLARFLOW_URL "https://www.polaraccesslink.com"
 
 class PolarFlow : public CloudService {
 

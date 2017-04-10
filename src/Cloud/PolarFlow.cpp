@@ -62,6 +62,7 @@ PolarFlow::PolarFlow(Context *context) : CloudService(context), context(context)
 
     // config
     settings.insert(OAuthToken, GC_POLARFLOW_TOKEN);
+    settings.insert(Local1, GC_POLARFLOW_USER_ID);
 }
 
 PolarFlow::~PolarFlow() {
