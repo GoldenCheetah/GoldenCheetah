@@ -18,6 +18,7 @@
 
 #include "TodaysPlan.h"
 #include "MainWindow.h"
+#include "JsonRideFile.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include <QByteArray>
@@ -409,8 +410,6 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     multiPart->append(jsonPart);
     multiPart->append(attachmentPart);
 
-    sendedRide = new RideFile(ride);
-
     // post the file
     QNetworkReply *reply;
 
@@ -442,7 +441,7 @@ TodaysPlan::writeFileCompleted()
 
         QJsonObject result = document.object();//["result"].toObject();
         replyActivity.insert(name, result);
-        rideSend(name);
+        //rideSend(name);
 
         notifyWriteComplete(
             name,
@@ -470,13 +469,9 @@ TodaysPlan::readFileCompleted()
 
     printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
 
-    //XXX action at a distance anti-pattern XXX
-    //XXX
-    //XXX connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideSaved(RideItem*)));
-    //XXX RPE update needs to happen here to the in-memory version before it is
-    //XXX imported and written, the file IO needs to be performed outside of this class
+    QByteArray* data = prepareResponse(buffers.value(reply), replyName(reply));
 
-    notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
+    notifyReadComplete(data, replyName(reply), tr("Completed."));
 }
 
 QList<CloudServiceAthlete>
@@ -540,77 +535,27 @@ TodaysPlan::selectAthlete(CloudServiceAthlete athlete)
     return true;
 }
 
-#if 0 // disabled so we can look at the core problem
-TodaysPlan::rideSaved(RideItem* ride)
+QByteArray*
+TodaysPlan::prepareResponse(QByteArray* data, QString name)
 {
-    printd("TodaysPlan::rideSaved()\n");
+    printd("TodaysPlan::prepareResponse()\n");
 
-    disconnect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideSaved(RideItem*)));
+    // uncompress and parse
+    QStringList errors;
+    RideFile *ride = uncompressRide(data, name, errors);
 
-    if (ride->ride()) {
-        QJsonObject activity = replyActivity.value(ride->fileName, QJsonObject());
+    if (ride) {
+        QJsonObject activity = replyActivity.value(name, QJsonObject());
         if (activity["rpe"].isDouble()) {
             QString rpe = QString("%1").arg(activity["rpe"].toDouble());
-            qDebug() << "RPE was" << ride->ride()->getTag("RPE", "") << " >> " << rpe;
-            ride->ride()->setTag("RPE", rpe);
-            context->mainWindow->saveSilent(context, ride);
+            qDebug() << "RPE was" << ride->getTag("RPE", "") << " >> " << rpe;
+            ride->setTag("RPE", rpe);
         }
-    }
-}
-#endif
-
-void
-TodaysPlan::rideSend(QString remotename)
-{
-    printd("TodaysPlan::rideSend(%s)\n", remotename.toStdString().c_str());
-
-    QString rpe;
-    qDebug() << "sendedRide"<< sendedRide;
-    if (sendedRide)
-        rpe = sendedRide->getTag("RPE", "");
-    qDebug() << "rpe"<< rpe;
-    delete sendedRide;
-
-    QJsonObject activity = replyActivity.value(remotename, QJsonObject());
-    if (activity["id"].isDouble() && (rpe.length()>0)) {
-        QString remoteid = QString("%1").arg(activity["id"].toInt());
-
-        // lets connect and get basic info on the root directory
-        QString url = QString("%1/rest/plans/files/update/%2")
-              .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
-              .arg(remoteid);
-
-        printd("url:%s\n", url.toStdString().c_str());
-
-        // request using the bearer token
-        QNetworkRequest request(url);
-        QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
-        request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-
-        // application/json
-        QByteArray jsonString;
-        jsonString += "{";
-        if (rpe.length()>0)
-            jsonString += "\"rpe\": "+ rpe;
-        jsonString += "}";
-
-        printd("request: %s\n", jsonString.toStdString().c_str());
-
-        QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
-
-        request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
-        request.setRawHeader("Content-Length", jsonStringDataSize);
-        reply = nam->post(request, jsonString);
-
-        // blocking request
-        QEventLoop loop;
-        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-        loop.exec();
-
-        QByteArray r = reply->readAll();
-        printd("reply:%s\n", r.toStdString().c_str());
+        JsonFileReader reader;
+        data = new QByteArray(reader.toByteArray(context, ride, true, true, true, true));
     }
 
+    return data;
 }
 
 static bool addTodaysPlan() {
@@ -619,3 +564,4 @@ static bool addTodaysPlan() {
 }
 
 static bool add = addTodaysPlan();
+
