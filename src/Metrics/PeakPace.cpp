@@ -1114,6 +1114,186 @@ class BestTimeMarathon : public BestTime {
         RideMetric *clone() const { return new BestTimeMarathon(*this); }
 };
 
+class PeakPaceHr : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr)
+
+    double hr;
+    double secs;
+
+    public:
+
+    PeakPaceHr() : hr(0.0), secs(0.0)
+    {
+        setType(RideMetric::Peak);
+    }
+    void setSecs(double secs) { this->secs=secs; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples or not a run nor a swim
+        if (spec.isEmpty(item->ride()) || !(item->isRun || item->isSwim)) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        // find peak pace interval
+        QList<AddIntervalDialog::AddedInterval> results;
+        AddIntervalDialog::findPeaks(item->context, true, item->ride(), spec, RideFile::kph, RideFile::original, secs, 1, results, "", "");
+
+        // work out average hr during that interval
+        if (results.count() > 0) {
+
+            // start and stop is in seconds within the ride
+            double start = results.first().start;
+            double stop = results.first().stop;
+            int points = 0;
+
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                if (point->secs >= start && point->secs < stop) {
+                    points++;
+                    hr = (point->hr + (points-1)*hr) / (points);
+                }
+            }
+        }
+
+        setValue(hr);
+    }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isRun || ride->isSwim; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PeakPaceHr(*this); }
+};
+
+class PeakPaceHr1m : public PeakPaceHr {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr1m)
+
+    public:
+        PeakPaceHr1m()
+        {
+            setSecs(60);
+            setSymbol("1m_critical_pace_hr");
+            setInternalName("1 min Peak Pace HR");
+        }
+        void initialize () {
+            setName(tr("1 min Peak Pace HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 1 min Peak Pace interval"));
+        }
+        MetricClass classification() const { return Undefined; }
+        MetricValidity validity() const { return Unknown; }
+        RideMetric *clone() const { return new PeakPaceHr1m(*this); }
+};
+
+class PeakPaceHr5m : public PeakPaceHr {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr5m)
+
+    public:
+        PeakPaceHr5m()
+        {
+            setSecs(300);
+            setSymbol("5m_critical_pace_hr");
+            setInternalName("5 min Peak Pace HR");
+        }
+        void initialize () {
+            setName(tr("5 min Peak Pace HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 5 min Peak Pace interval"));
+        }
+        MetricClass classification() const { return Undefined; }
+        MetricValidity validity() const { return Unknown; }
+        RideMetric *clone() const { return new PeakPaceHr5m(*this); }
+};
+
+class PeakPaceHr10m : public PeakPaceHr {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr10m)
+
+    public:
+        PeakPaceHr10m()
+        {
+            setSecs(600);
+            setSymbol("10m_critical_pace_hr");
+            setInternalName("10 min Peak Pace HR");
+        }
+        void initialize () {
+            setName(tr("10 min Peak Pace HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 10 min Peak Pace interval"));
+        }
+        MetricClass classification() const { return Undefined; }
+        MetricValidity validity() const { return Unknown; }
+        RideMetric *clone() const { return new PeakPaceHr10m(*this); }
+};
+
+class PeakPaceHr20m : public PeakPaceHr {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr20m)
+
+    public:
+        PeakPaceHr20m()
+        {
+            setSecs(1200);
+            setSymbol("20m_critical_pace_hr");
+            setInternalName("20 min Peak Pace HR");
+        }
+        void initialize () {
+            setName(tr("20 min Peak Pace HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 20 min Peak Pace interval"));
+        }
+        MetricClass classification() const { return Undefined; }
+        MetricValidity validity() const { return Unknown; }
+        RideMetric *clone() const { return new PeakPaceHr20m(*this); }
+};
+
+class PeakPaceHr30m : public PeakPaceHr {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr30m)
+
+    public:
+        PeakPaceHr30m()
+        {
+            setSecs(1800);
+            setSymbol("30m_critical_pace_hr");
+            setInternalName("30 min Peak Pace HR");
+        }
+        void initialize () {
+            setName(tr("30 min Peak Pace HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 30 min Peak Pace interval"));
+        }
+        MetricClass classification() const { return Undefined; }
+        MetricValidity validity() const { return Unknown; }
+        RideMetric *clone() const { return new PeakPaceHr30m(*this); }
+};
+
+class PeakPaceHr60m : public PeakPaceHr {
+    Q_DECLARE_TR_FUNCTIONS(PeakPaceHr30m)
+
+    public:
+        PeakPaceHr60m()
+        {
+            setSecs(3600);
+            setSymbol("60m_critical_pace_hr");
+            setInternalName("60 min Peak Pace HR");
+        }
+        void initialize () {
+            setName(tr("60 min Peak Pace HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+            setDescription(tr("Average Heart Rate for 60 min Peak Pace interval"));
+        }
+        MetricClass classification() const { return Undefined; }
+        MetricValidity validity() const { return Unknown; }
+        RideMetric *clone() const { return new PeakPaceHr60m(*this); }
+};
+
+
 static bool addAllPacePeaks() {
     RideMetricFactory::instance().addMetric(PeakPace10s());
     RideMetricFactory::instance().addMetric(PeakPace15s());
@@ -1164,6 +1344,13 @@ static bool addAllPacePeaks() {
     RideMetricFactory::instance().addMetric(BestTime30km());
     RideMetricFactory::instance().addMetric(BestTime40km());
     RideMetricFactory::instance().addMetric(BestTimeMarathon());
+
+    RideMetricFactory::instance().addMetric(PeakPaceHr1m());
+    RideMetricFactory::instance().addMetric(PeakPaceHr5m());
+    RideMetricFactory::instance().addMetric(PeakPaceHr10m());
+    RideMetricFactory::instance().addMetric(PeakPaceHr20m());
+    RideMetricFactory::instance().addMetric(PeakPaceHr30m());
+    RideMetricFactory::instance().addMetric(PeakPaceHr60m());
 
     return true;
 }
