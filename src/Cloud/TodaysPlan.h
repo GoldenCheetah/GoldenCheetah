@@ -68,8 +68,6 @@ class TodaysPlan : public CloudService {
         void readyRead(); // a readFile operation has work to do
         void readFileCompleted();
 
-        void rideSaved(RideItem* ride);
-
         // sending data
         void writeFileCompleted();
 
