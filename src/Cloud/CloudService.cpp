@@ -1385,7 +1385,9 @@ CloudServiceSyncDialog::completedRead(QByteArray *data, QString name, QString /*
         return;
     }
 
-    // uncompress and parse
+    // uncompress and parse, note the filename is passed and may be
+    // different to what we asked for (sometimes the data is converted
+    // from one file format to another).
     QStringList errors;
     RideFile *ride = store->uncompressRide(data, name, errors);
 
