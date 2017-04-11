@@ -469,9 +469,14 @@ TodaysPlan::readFileCompleted()
 
     printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
 
-    QByteArray* data = prepareResponse(buffers.value(reply), replyName(reply));
+    // prepateResponse will rename the file if it converts to JSON
+    // to add RPE data, so we need to spot name changes to notify
+    // upstream that it did (e.g. FIT => JSON)
+    QString rename = replyName(reply);
+    QByteArray* data = prepareResponse(buffers.value(reply), rename);
 
-    notifyReadComplete(data, replyName(reply), tr("Completed."));
+    // notify complete with a rename
+    notifyReadComplete(data, rename, tr("Completed."));
 }
 
 QList<CloudServiceAthlete>
@@ -536,7 +541,7 @@ TodaysPlan::selectAthlete(CloudServiceAthlete athlete)
 }
 
 QByteArray*
-TodaysPlan::prepareResponse(QByteArray* data, QString name)
+TodaysPlan::prepareResponse(QByteArray* data, QString &name)
 {
     printd("TodaysPlan::prepareResponse()\n");
 
@@ -551,9 +556,14 @@ TodaysPlan::prepareResponse(QByteArray* data, QString name)
             qDebug() << "RPE was" << ride->getTag("RPE", "") << " >> " << rpe;
             ride->setTag("RPE", rpe);
         }
+
+        // convert
         JsonFileReader reader;
         data->clear();
         data->append(reader.toByteArray(context, ride, true, true, true, true));
+
+        // rename
+        if (QFileInfo(name).suffix() != "json") name = QFileInfo(name).baseName() + ".json";
     }
 
     return data;

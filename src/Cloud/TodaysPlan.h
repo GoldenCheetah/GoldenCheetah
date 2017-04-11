@@ -52,7 +52,7 @@ class TodaysPlan : public CloudService {
         bool readFile(QByteArray *data, QString remotename, QString remoteid);
 
         // todays plan needs the response to be adjusted before being returned
-        QByteArray* prepareResponse(QByteArray* data, QString name);
+        QByteArray* prepareResponse(QByteArray* data, QString &name);
 
         // create a folder
         bool createFolder(QString);
