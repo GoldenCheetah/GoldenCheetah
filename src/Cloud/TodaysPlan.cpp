@@ -362,7 +362,7 @@ TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
 }
 
 bool
-TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
+TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *)
 {
     printd("TodaysPlan::writeFile(%s)\n", remotename.toStdString().c_str());
 
@@ -552,7 +552,8 @@ TodaysPlan::prepareResponse(QByteArray* data, QString name)
             ride->setTag("RPE", rpe);
         }
         JsonFileReader reader;
-        data = new QByteArray(reader.toByteArray(context, ride, true, true, true, true));
+        data->clear();
+        data->append(reader.toByteArray(context, ride, true, true, true, true));
     }
 
     return data;
