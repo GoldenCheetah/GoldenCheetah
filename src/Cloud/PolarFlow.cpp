@@ -146,7 +146,7 @@ PolarFlow::close()
 }
 
 QList<CloudServiceEntry*>
-PolarFlow::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
+PolarFlow::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
 {
     printd("PolarFlow::readdir(%s)\n", path.toStdString().c_str());
 
@@ -219,9 +219,12 @@ PolarFlow::readFileCompleted()
     notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
 
+// development put on hold - AccessLink API compatibility issues with Desktop applications
+#if 0
 static bool addPolarFlow() {
     CloudServiceFactory::instance().addService(new PolarFlow(NULL));
     return true;
 }
 
 static bool add = addPolarFlow();
+#endif
