@@ -467,7 +467,8 @@ TodaysPlan::readFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
+    // even in debug mode we don't want the whole thing...
+    printd("reply:%s\n", buffers.value(reply)->mid(0,500).toStdString().c_str());
 
     // prepateResponse will rename the file if it converts to JSON
     // to add RPE data, so we need to spot name changes to notify
