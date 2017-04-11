@@ -67,6 +67,7 @@ public:
         CYCLING_ANALYTICS,
         GOOGLE_CALENDAR,
         GOOGLE_DRIVE,
+        SPORTTRACKS,
         TODAYSPLAN,
         WITHINGS,
         POLAR
