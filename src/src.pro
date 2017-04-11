@@ -625,6 +625,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         HEADERS += Cloud/SixCycle.h
         SOURCES += Cloud/PolarFlow.cpp
         HEADERS += Cloud/PolarFlow.h
+        SOURCES += Cloud/SportTracks.cpp
+        HEADERS += Cloud/SportTracks.h
         SOURCES += Cloud/TodaysPlan.cpp
         HEADERS += Cloud/TodaysPlan.h
     }

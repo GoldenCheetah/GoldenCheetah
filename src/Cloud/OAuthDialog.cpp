@@ -56,6 +56,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->name() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->name() == "Withings") site = this->site = WITHINGS;
         if (service->name() == "PolarFlow") site = this->site = POLAR;
+        if (service->name() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
     }
 
     // check if SSL is available - if not - message and end
@@ -177,6 +178,15 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_POLARFLOW_CLIENT_ID);
 
+    } else if (site == SPORTTRACKS) {
+
+        // We only request access to the application data folder, not all files.
+        urlstr = QString("https://api.sporttracks.mobi/oauth2/authorize?");
+        urlstr.append("redirect_uri=http://www.goldencheetah.org&");
+        urlstr.append("state=xyzzy&");
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_SPORTTRACKS_CLIENT_ID);
+
     } else if (site == WITHINGS) {
 
 #ifdef GC_HAVE_KQOAUTH
@@ -208,7 +218,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     // different process to get the token for STRAVA, CYCLINGANALYTICS vs.
     // TWITTER or WITHINGS
     if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR ||
-        site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == TODAYSPLAN) {
+        site == SPORTTRACKS || site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == TODAYSPLAN) {
         url = QUrl(urlstr);
         view->setUrl(url);
         // connects
@@ -333,11 +343,16 @@ OAuthDialog::urlChanged(const QUrl &url)
 
     // STRAVA & CYCLINGANALYTICS work with Call-back URLs / change of URL indicates next step is required
     if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN ||
-        site == POLAR) {
+        site == POLAR || site == SPORTTRACKS) {
+
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
             QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
+
+            // sporttracks insists on passing state
+            if (code.endsWith("&state=xyzzy")) code = code.mid(0,code.length()-12);
+
             QByteArray data;
 #if QT_VERSION > 0x050000
             QUrlQuery params;
@@ -365,6 +380,14 @@ OAuthDialog::urlChanged(const QUrl &url)
 #if (defined GC_POLARFLOW_CLIENT_ID) && (defined GC_POLARFLOW_CLIENT_SECRET)
                 authheader = QString("%1:%2").arg(GC_POLARFLOW_CLIENT_ID).arg(GC_POLARFLOW_CLIENT_SECRET);
 #endif
+            }
+            else if (site == SPORTTRACKS) {
+                urlstr = QString("https://api.sporttracks.mobi/oauth2/token?");
+                params.addQueryItem("client_id", GC_SPORTTRACKS_CLIENT_ID);
+                params.addQueryItem("client_secret", GC_SPORTTRACKS_CLIENT_SECRET);
+                params.addQueryItem("redirect_uri","http://www.goldencheetah.org");
+                params.addQueryItem("grant_type", "authorization_code");
+
             }
 
             // now get the final token to store
@@ -419,6 +442,10 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             // client id and secret are encoded and sent in the header for POLAR
             if (site == POLAR)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
+            if (site == SPORTTRACKS) {
+                request.setRawHeader("Accept", "application/json");
+                request.setRawHeader("Content-Type", "application/json");
+            }
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
@@ -568,6 +595,15 @@ void OAuthDialog::networkRequestFinished(QNetworkReply *reply) {
             appsettings->setCValue(context->athlete->cyclist, GC_DROPBOX_TOKEN, access_token);
             service->setSetting(GC_DROPBOX_TOKEN, access_token);
             QString info = QString(tr("Dropbox authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+        } else if (site == SPORTTRACKS) {
+
+            appsettings->setCValue(context->athlete->cyclist, GC_SPORTTRACKS_TOKEN, access_token);
+            service->setSetting(GC_SPORTTRACKS_TOKEN, access_token);
+            service->setSetting(GC_SPORTTRACKS_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_SPORTTRACKS_LAST_REFRESH, QDateTime::currentDateTime());
+            QString info = QString(tr("SportTracks authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
         } else if (site == POLAR) {

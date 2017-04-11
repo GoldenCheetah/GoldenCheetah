@@ -322,6 +322,10 @@
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
+// SportTracks
+#define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
+#define GC_SPORTTRACKS_REFRESH_TOKEN   "<athlete-private>sporttracks/refresh_token"
+#define GC_SPORTTRACKS_LAST_REFRESH    "<athlete-private>sporttracks/last_refresh"
 
 // --------------------------------------------------------------------------------
 #include <QSettings>
