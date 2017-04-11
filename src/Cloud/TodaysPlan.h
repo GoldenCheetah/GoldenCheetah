@@ -51,6 +51,9 @@ class TodaysPlan : public CloudService {
         // read a file
         bool readFile(QByteArray *data, QString remotename, QString remoteid);
 
+        // todays plan needs the response to be adjusted before being returned
+        QByteArray* prepareResponse(QByteArray* data, QString name);
+
         // create a folder
         bool createFolder(QString);
 
@@ -74,7 +77,6 @@ class TodaysPlan : public CloudService {
     private:
         Context *context;
         QNetworkAccessManager *nam;
-        QNetworkReply *reply;
         CloudServiceEntry *root_;
 
         QMap<QNetworkReply*, QByteArray*> buffers;
@@ -83,7 +85,6 @@ class TodaysPlan : public CloudService {
 
         QMap<QString, QJsonObject> replyActivity;
 
-        QByteArray* prepareResponse(QByteArray* data, QString name);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
