@@ -20,6 +20,8 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Secrets.h"
+#include "RideFile.h"
+#include "JsonRideFile.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -59,7 +61,7 @@ SportTracks::SportTracks(Context *context) : CloudService(context), context(cont
 
     uploadCompression = none; // gzip
     downloadCompression = none;
-    filetype = FIT;
+    filetype = TCX; // fit loses texts
     useMetric = true; // distance and duration metadata
 
     // config
@@ -313,6 +315,7 @@ SportTracks::readFileCompleted()
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
     printd("reply:%s ...\n", buffers.value(reply)->toStdString().substr(0,900).c_str());
+    QByteArray *returning = buffers.value(reply);
 
     // we need to parse the JSON and create a ridefile from it
     QJsonParseError parseError;
@@ -329,10 +332,35 @@ SportTracks::readFileCompleted()
         // name	string	Display name of the workout
         // notes	string	Workout notes
         // location_name	string	Named (text) workout location
-        // laps	array	An array of Laps
-        // timer_stops	array	An array of Timer Stops
-        //
+        // laps	array	An array of Laps ** ignored for now
+        // timer_stops	array	An array of Timer Stops ** ignored for now
+
+        QJsonObject ride = document.object();
+        QDateTime starttime = QDateTime::fromString(ride["start_time"].toString(), Qt::ISODate);
+
+        // 1s samples with start time as UTC
+        RideFile *ret = new RideFile(starttime.toUTC(), 1.0f);
+
+        // what sport?
+        if (!ride["type"].isNull()) {
+            QString stype = ride["type"].toString();
+            if (stype == "Cycling") ret->setTag("Sport", "Bike");
+            else if (stype == "Running") ret->setTag("Sport", "Run");
+            else if (stype == "Swimming") ret->setTag("Sport", "Swim");
+            else ret->setTag("Sport", stype);
+        }
+
+        // location => route
+        if (!ride["name"].isNull()) ret->setTag("Objectives", ride["name"].toString());
+        if (!ride["notes"].isNull()) ret->setTag("Notes", ride["notes"].toString());
+        if (!ride["location_name"].isNull()) ret->setTag("Route", ride["location_name"].toString());
+
         // SAMPLES DATA
+        //
+        // NOTE: there is no time data or speed data, the offsets are given in seconds
+        //       so the data is downsampled if <1s and upsampled if >1s samples.
+        //       its not clear how they handle older PT 1.26s data (if at all)
+        //
         // location	array (Track Data)	List of lat/lng pairs associated with this workout
         // elevation	array (Track Data)	List of altitude data (meters) associated with this workout
         // distance	array (Track Data)	List of meters moved associated with this workout
@@ -346,18 +374,134 @@ SportTracks::readFileCompleted()
         // total_hemoglobin_conc	array (Track Data)	List of total blood hemoglobin saturation (g/dL) associated with this workout
         // saturated_hemoglobin_percent	array (Track Data)	List of percent hemoglobin oxygen saturation (0 - 100) associated with this workout
 
-#if 0
-        QJsonObject ride = document.object();
-        QJsonArray location = ride["location"].toArray();
-        QJsonArray distance = ride["distance"].toArray();
-        QJsonArray cadence = ride["cadence"].toArray();
-        QJsonArray power = ride["power"].toArray();
 
-        printd("samples: loc %d, dist %d, cad %d, power %d\n", location.count(), distance.count(), cadence.count(), power.count());
-#endif
+        // for mapping from the names used in the SportTracks json response
+        // to the series names we use in GC, note that lat covers lat and lon
+        // so needs to be treated as a special case
+        static struct {
+            RideFile::seriestype type;
+            const char *sporttracksname;
+            double factor;                  // to convert from ST units to GC units
+        } seriesnames[] = {
+
+            // seriestype          sporttracks name           conversion factor
+            { RideFile::lat,       "location",                     1.0f   },
+            { RideFile::alt,       "elevation",                    1.0f   },
+            { RideFile::km,        "distance" ,                    0.001f },
+            { RideFile::hr,        "heartrate",                    1.0f   },
+            { RideFile::cad,       "cadence",                      1.0f   },
+            { RideFile::watts,     "power",                        1.0f   },
+            { RideFile::temp,      "temperature",                  1.0f   },
+            { RideFile::rvert,     "vertical_oscillation",         1.0f   },
+            { RideFile::rcontact,  "ground_contact_time",          1.0f   },
+            { RideFile::lrbalance, "left_power_percent",           1.0f   },
+            { RideFile::thb,       "total_hemoglobin_conc",        1.0f   },
+            { RideFile::smo2,      "saturated_hemoglobin_percent", 1.0f   },
+            { RideFile::none,      "",                             0.0f   }
+
+        };
+
+        // data to combine into a new ride
+        class st_track {
+        public:
+            int index; // for tracking progress as we move through it
+            double factor; // for converting
+            RideFile::seriestype type;
+            QJsonArray samples;
+        };
+
+        // create a list of all the data we will work with
+        QList<st_track> data;
+
+        // examine the returned object and extract sample data
+        for(int i=0; seriesnames[i].type != RideFile::none; i++) {
+            QString name = seriesnames[i].sporttracksname;
+            st_track add;
+
+            // contained?
+            if (ride[name].isArray()) {
+
+                add.index = 0;
+                add.factor = seriesnames[i].factor;
+                add.type = seriesnames[i].type;
+                add.samples = ride[name].toArray();
+
+                data << add;
+            }
+        }
+
+        // we now work through the tracks combining them into samples
+        // with a common offset (ie, by row, not column).
+        int index=0;
+        do {
+
+            // We stop when all tracks have been accomodated
+            bool stop=true;
+            foreach(st_track track, data)  if (track.index < track.samples.count()) stop=false;
+            if (stop) break;
+
+            // add new point for the point in time we are at
+            RideFilePoint add;
+            add.secs = index;
+
+            // move through tracks if they're waiting for this point
+            for(int t=0; t<data.count(); t++) {
+
+                // if this track still has data to consume
+                if (data[t].index < data[t].samples.count()) {
+
+                    // get the offset for the current sample in the current track
+                    int ct = data[t].samples.at(data[t].index).toInt();
+
+                    // get the value and convert to GC units
+                    double value = data[t].factor * data[t].samples.at(data[t].index+1).toDouble();
+
+                    if (ct == index) {
+
+                        if (data[t].type == RideFile::lat) {
+
+                            // hr, distance et al
+                            double lat = data[t].factor * data[t].samples.at(data[t].index+1).toArray().at(0).toDouble();
+                            double lon = data[t].factor * data[t].samples.at(data[t].index+1).toArray().at(1).toDouble();
+
+                            // this is one for us, update and move on
+                            add.setValue(RideFile::lat, lat);
+                            add.setValue(RideFile::lon, lon);
+                            data[t].index = data[t].index + 2; // pairs
+
+                        } else {
+
+                            // hr, distance et al
+                            double value = data[t].factor * data[t].samples.at(data[t].index+1).toDouble();
+
+                            // this is one for us, update and move on
+                            add.setValue(data[t].type, value);
+                            data[t].index = data[t].index + 2; // pairs
+                        }
+                    }
+                }
+            }
+
+            ret->appendPoint(add);
+            index++;
+
+        } while (true);
+
+        // create a response
+        JsonFileReader reader;
+        returning->clear();
+        returning->append(reader.toByteArray(context, ret, true, true, true, true));
+
+        // temp ride not needed anymore
+        delete ret;
+
+    } else {
+
+        returning->clear();
     }
 
-    //XX not yet notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
+    // return
+    notifyReadComplete(returning, replyName(reply), tr("Completed."));
 }
 
 bool
