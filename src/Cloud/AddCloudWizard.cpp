@@ -585,36 +585,12 @@ AddFinish::initializePage()
 bool
 AddFinish::validatePage()
 {
-    // ok, last thing to do is write out the new settings
-    QHashIterator<CloudService::CloudServiceSetting,QString> want(wizard->cloudService->settings);
-    want.toFront();
-    while(want.hasNext()) {
-        want.next();
-
-        // get value
-        QString value = wizard->cloudService->getSetting(want.value(), "").toString();
-        if (value == "") continue;
-
-        // ok, we have a setting
-        appsettings->setCValue(wizard->context->athlete->cyclist, want.value(), value);
-    }
-
-    // generic settings
-    QString syncstartup = wizard->cloudService->getSetting(wizard->cloudService->syncOnStartupSettingName(), "").toString();
-    if (syncstartup != "")  appsettings->setCValue(wizard->context->athlete->cyclist,
-                                                   wizard->cloudService->syncOnStartupSettingName(),
-                                                   syncstartup);
-
-    QString syncimport = wizard->cloudService->getSetting(wizard->cloudService->syncOnImportSettingName(), "").toString();
-    if (syncimport != "")  appsettings->setCValue(wizard->context->athlete->cyclist,
-                                                   wizard->cloudService->syncOnImportSettingName(),
-                                                   syncimport);
+    // save settings away
+    CloudServiceFactory::instance().saveSettings(wizard->cloudService, wizard->context);
 
     // this service is now active, only way to set to non active would be to delete it
     // in the athlete preferences
-    appsettings->setCValue(wizard->context->athlete->cyclist,
-                                                   wizard->cloudService->activeSettingName(),
-                                                   "true");
+    appsettings->setCValue(wizard->context->athlete->cyclist, wizard->cloudService->activeSettingName(), "true");
 
     // delete the instance
     delete wizard->cloudService;
