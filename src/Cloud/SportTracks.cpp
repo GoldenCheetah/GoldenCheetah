@@ -19,6 +19,7 @@
 #include "SportTracks.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "Secrets.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -237,8 +238,8 @@ SportTracks::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
                     // }
 
                     add->name = QDateTime::fromString(item["start_time"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
-                    add->distance = item["total_distance"].toDouble() / 1000.0f;
-                    add->duration = item["total_distance"].toDouble();
+                    add->distance = item["total_distance"].toString().toDouble() / 1000.0f;
+                    add->duration = item["duration"].toString().toDouble();
                     add->id = item["uri"].toString().split("/").last();
                     add->label = add->id;
                     add->isDir = false;
@@ -264,19 +265,14 @@ SportTracks::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
 bool
 SportTracks::readFile(QByteArray *data, QString remotename, QString remoteid)
 {
-    printd("SportTracks::readFile(%s)\n", remotename.toStdString().c_str());
-#if 0
-    // this must be performed asyncronously and call made
-    // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done
+    printd("SportTracks::readFile(%s, %s)\n", remotename.toStdString().c_str(), remoteid.toStdString().c_str());
 
     // do we have a token ?
     QString token = getSetting(GC_SPORTTRACKS_TOKEN, "").toString();
     if (token == "") return false;
 
-    // lets connect and get basic info on the root directory
-    QString url = QString("%1/rest/files/download/%2")
-          .arg(getSetting(GC_SPORTTRACKS_URL, "https://whats.todaysplan.com.au").toString())
-          .arg(remoteid);
+    // fetch
+    QString url = QString("https://api.sporttracks.mobi/api/v2/fitnessActivities/%1").arg(remoteid);
 
     printd("url:%s\n", url.toStdString().c_str());
 
@@ -294,7 +290,7 @@ SportTracks::readFile(QByteArray *data, QString remotename, QString remoteid)
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
     connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
-#endif
+
     return true;
 }
 
@@ -305,6 +301,10 @@ SportTracks::readyRead()
     buffers.value(reply)->append(reply->readAll());
 }
 
+// SportTracks workouts are delivered back as JSON, the original is lost
+// so we need to parse the response and turn it into a JSON file to
+// import. The description of the format is here:
+// https://sporttracks.mobi/api/doc/data-structures
 void
 SportTracks::readFileCompleted()
 {
@@ -312,9 +312,52 @@ SportTracks::readFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
+    printd("reply:%s ...\n", buffers.value(reply)->toStdString().substr(0,900).c_str());
 
-    notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
+    // we need to parse the JSON and create a ridefile from it
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(*buffers.value(reply), &parseError);
+
+    printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
+    if (parseError.error == QJsonParseError::NoError) {
+
+        // extract the main elements
+        //
+        // SUMMARY DATA
+        // start_time	string (ISO 8601 DateTime)	Start time of the workout
+        // type	string ( Workout Type)	Type of the workout
+        // name	string	Display name of the workout
+        // notes	string	Workout notes
+        // location_name	string	Named (text) workout location
+        // laps	array	An array of Laps
+        // timer_stops	array	An array of Timer Stops
+        //
+        // SAMPLES DATA
+        // location	array (Track Data)	List of lat/lng pairs associated with this workout
+        // elevation	array (Track Data)	List of altitude data (meters) associated with this workout
+        // distance	array (Track Data)	List of meters moved associated with this workout
+        // heartrate	array (Track Data)	List of heartrate data (bpm) associated with this workout
+        // cadence	array (Track Data)	List of cadence data (rpm) associated with this workout
+        // power	array (Track Data)	List of power data (watts) associated with this workout
+        // temperature	array (Track Data)	List of temperature data (Celsius) associated with this workout
+        // vertical_oscillation	array (Track Data)	List of vertical oscillation data (millimeters) associated with this workout
+        // ground_contact_time	array (Track Data)	List of ground contact time data (milliseconds) associated with this workout
+        // left_power_percent	array (Track Data)	List of power balance data (0=left, 100=right) associated with this workout
+        // total_hemoglobin_conc	array (Track Data)	List of total blood hemoglobin saturation (g/dL) associated with this workout
+        // saturated_hemoglobin_percent	array (Track Data)	List of percent hemoglobin oxygen saturation (0 - 100) associated with this workout
+
+#if 0
+        QJsonObject ride = document.object();
+        QJsonArray location = ride["location"].toArray();
+        QJsonArray distance = ride["distance"].toArray();
+        QJsonArray cadence = ride["cadence"].toArray();
+        QJsonArray power = ride["power"].toArray();
+
+        printd("samples: loc %d, dist %d, cad %d, power %d\n", location.count(), distance.count(), cadence.count(), power.count());
+#endif
+    }
+
+    //XX not yet notifyReadComplete(buffers.value(reply), replyName(reply), tr("Completed."));
 }
 
 bool
