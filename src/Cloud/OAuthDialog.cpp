@@ -442,10 +442,6 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             // client id and secret are encoded and sent in the header for POLAR
             if (site == POLAR)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
-            if (site == SPORTTRACKS) {
-                request.setRawHeader("Accept", "application/json");
-                request.setRawHeader("Content-Type", "application/json");
-            }
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
