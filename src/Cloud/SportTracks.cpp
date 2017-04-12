@@ -508,62 +508,34 @@ bool
 SportTracks::writeFile(QByteArray &data, QString remotename, RideFile *)
 {
     printd("SportTracks::writeFile(%s)\n", remotename.toStdString().c_str());
-#if 0
-    // this must be performed asyncronously and call made
-    // to notifyWriteCompleted(QString remotename, QString message) when done
 
     // do we have a token ?
     QString token = getSetting(GC_SPORTTRACKS_TOKEN, "").toString();
     if (token == "") return false;
 
-    // lets connect and get basic info on the root directory
-    QString url = QString("%1/rest/files/upload")
-          .arg(getSetting(GC_SPORTTRACKS_URL, "https://whats.todaysplan.com.au").toString());
+    // set the target url
+    QString url = QString("https://api.sporttracks.mobi/api/v2/fileUpload");
+    //QString url = QString("http://requestb.in/1hfhjkx1");
+    printd("endpoint: '%s'\n", url.toStdString().c_str());
 
-    printd("URL used: %s\n", url.toStdString().c_str());
-
-    QNetworkRequest request = QNetworkRequest(url);
-
-    // MULTIPART *****************
-
-    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
-    multiPart->setBoundary(boundary.toLatin1());
-
+    // create a request passing the session token and user
+    QNetworkRequest request(url);
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    QHttpPart jsonPart;
-    jsonPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"json\""));
+    QUrlQuery params;
 
-    QString userId = getSetting(GC_SPORTTRACKS_ATHLETE_ID, "").toString();
+    params.addQueryItem("format", "TCX");
+    params.addQueryItem("data", data); // I know, this is really how it gets posted !
 
-    QString json;
-    if (userId.length()>0) {
-        json  = QString("{ filename: \"%1\", userId: %2 }").arg(remotename).arg(userId);
-    } else {
-        json  = QString("{ filename: \"%1\" }").arg(remotename);
-    }
-    printd("request: %s\n", json.toStdString().c_str());
-    jsonPart.setBody(json.toLatin1());
-
-    QHttpPart attachmentPart;
-    attachmentPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"attachment\"; type=\"text/xml\""));
-    attachmentPart.setBody(data);
-
-    multiPart->append(jsonPart);
-    multiPart->append(attachmentPart);
-
-    // post the file
-    QNetworkReply *reply;
-
-    reply = nam->post(request, multiPart);
+    QNetworkReply *reply = nam->post(request, params.query(QUrl::FullyEncoded).toUtf8());
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
 
     // remember
     mapReply(reply,remotename);
-#endif
+
     return true;
 }
 
@@ -571,8 +543,9 @@ void
 SportTracks::writeFileCompleted()
 {
     printd("SportTracks::writeFileCompleted()\n");
-#if 0
+
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    QString name = replyName(static_cast<QNetworkReply*>(QObject::sender()));
 
     QByteArray r = reply->readAll();
     printd("reply:%s\n", r.toStdString().c_str());
@@ -581,21 +554,16 @@ SportTracks::writeFileCompleted()
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
     if (reply->error() == QNetworkReply::NoError) {
-        QString name = replyName(static_cast<QNetworkReply*>(QObject::sender()));
 
-        QJsonObject result = document.object();//["result"].toObject();
-        replyActivity.insert(name, result);
-        //rideSend(name);
-
+        //QJsonObject result = document.object();
         notifyWriteComplete( name, tr("Completed."));
 
     } else {
 
         notifyWriteComplete( replyName(static_cast<QNetworkReply*>(QObject::sender())), tr("Network Error - Upload failed."));
     }
-#endif
-
 }
+
 // development put on hold - AccessLink API compatibility issues with Desktop applications
 static bool addSportTracks() {
     CloudServiceFactory::instance().addService(new SportTracks(NULL));
