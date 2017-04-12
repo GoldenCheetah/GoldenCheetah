@@ -84,11 +84,67 @@ SportTracks::open(QStringList &errors)
     printd("SportTracks::open\n");
 
     // do we have a token
-    QString token = getSetting(GC_SPORTTRACKS_TOKEN, "").toString();
+    QString token = getSetting(GC_SPORTTRACKS_REFRESH_TOKEN, "").toString();
     if (token == "") {
         errors << "You must authorise with SportTracks first";
         return false;
     }
+
+    printd("Get access token for this session.\n");
+
+    // refresh endpoint
+    QNetworkRequest request(QUrl("https://api.sporttracks.mobi/oauth2/token?"));
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // set params
+    QString data;
+    data += "client_id=" GC_SPORTTRACKS_CLIENT_ID;
+    data += "&client_secret=" GC_SPORTTRACKS_CLIENT_SECRET;
+    data += "&refresh_token=" + getSetting(GC_SPORTTRACKS_REFRESH_TOKEN).toString();
+    data += "&grant_type=refresh_token";
+
+    // make request
+    QNetworkReply* reply = nam->post(request, data.toLatin1());
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    printd("HTTP response code: %d\n", statusCode);
+
+    // oops, no dice
+    if (reply->error() != 0) {
+        printd("Got error %s\n", reply->errorString().toStdString().c_str());
+        errors << reply->errorString();
+        return false;
+    }
+
+    // lets extract the access token, and possibly a new refresh token
+    QByteArray r = reply->readAll();
+    printd("Got response: %s\n", r.data());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // failed to parse result !?
+    if (parseError.error != QJsonParseError::NoError) {
+        printd("Parse error!\n");
+        errors << tr("JSON parser error") << parseError.errorString();
+        return false;
+    }
+
+    QString access_token = document.object()["access_token"].toString();
+    QString refresh_token = document.object()["refresh_token"].toString();
+
+    // update our settings
+    if (access_token != "") setSetting(GC_SPORTTRACKS_TOKEN, access_token);
+    if (refresh_token != "") setSetting(GC_SPORTTRACKS_REFRESH_TOKEN, refresh_token);
+    setSetting(GC_SPORTTRACKS_LAST_REFRESH, QDateTime::currentDateTime());
+
+    // get the factory to save our settings permanently
+    CloudServiceFactory::instance().saveSettings(this, context);
     return true;
 }
 
@@ -114,7 +170,93 @@ SportTracks::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
         return returning;
     }
 
+    // we get pages of 25 entries
+    bool wantmore=true;
+    int page=0;
+
+    while (wantmore) {
+
+        // we assume there are no more unless we get a full page
+        wantmore=false;
+
+        // set params - lets explicitly get 25 per page
+        QString urlstr("https://api.sporttracks.mobi/api/v2/fitnessActivities?");
+        urlstr += "pageSize=25";
+        urlstr += "&page=" + QString("%1").arg(page);
+
+        // fetch page by page
+        QUrl url(urlstr);
+        QNetworkRequest request(url);
+        request.setRawHeader("Authorization", QString("Bearer %1").arg(getSetting(GC_SPORTTRACKS_TOKEN,"").toString()).toLatin1());
+        request.setRawHeader("Accept", "application/json");
+
+        // make request
+        printd("fetch page: %s\n", urlstr.toStdString().c_str());
+        QNetworkReply *reply = nam->get(request);
+
+        // blocking request
+        QEventLoop loop;
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
+
+        // if successful, lets unpack
+        int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
+
+        if (reply->error() == 0) {
+
+            // get the data
+            QByteArray r = reply->readAll();
+
+            int received = 0;
+            printd("page %d: %s\n", page, r.toStdString().c_str());
+
+            // parse JSON payload
+            QJsonParseError parseError;
+            QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+            printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
+            if (parseError.error == QJsonParseError::NoError) {
+
+                QJsonArray items = document.object()["items"].toArray();
+                received = items.count();
+                for(int i=0; i<items.count(); i++) {
+
+                    QJsonObject item = items.at(i).toObject();
+                    CloudServiceEntry *add = newCloudServiceEntry();
+
+                    // each item looks like this:
+                    // {
+                    //     "duration": "6492.00",
+                    //     "name": "Cycling",
+                    //     "start_time": "2016-08-29T11:14:46+01:00",
+                    //     "total_distance": "40188",
+                    //     "type": "Cycling",
+                    //     "uri": "https://api.sporttracks.mobi/api/v2/fitnessActivities/13861860",
+                    //     "user_id": "57556"
+                    // }
+
+                    add->name = QDateTime::fromString(item["start_time"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                    add->distance = item["total_distance"].toDouble() / 1000.0f;
+                    add->duration = item["total_distance"].toDouble();
+                    add->id = item["uri"].toString().split("/").last();
+                    add->label = add->id;
+                    add->isDir = false;
+
+                    printd("item: %s\n", add->name.toStdString().c_str());
+
+                    returning << add;
+                }
+
+                // we should see if there are more
+                if (received == 25) wantmore = true;
+            }
+        }
+        page++;
+    }
+
     // all good ?
+    printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
     return returning;
 }
 

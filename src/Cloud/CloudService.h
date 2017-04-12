@@ -473,6 +473,30 @@ class CloudServiceFactory {
         return returning;
     }
 
+    void saveSettings(CloudService *service, Context *context) {
+
+        QHashIterator<CloudService::CloudServiceSetting,QString> want(service->settings);
+        want.toFront();
+        while(want.hasNext()) {
+            want.next();
+
+            // get value
+            QString value = service->getSetting(want.value(), "").toString();
+            if (value == "") continue;
+
+            // ok, we have a setting
+            appsettings->setCValue(context->athlete->cyclist, want.value(), value);
+        }
+
+        // generic settings
+        QString syncstartup = service->getSetting(service->syncOnStartupSettingName(), "").toString();
+        if (syncstartup != "")  appsettings->setCValue(context->athlete->cyclist, service->syncOnStartupSettingName(), syncstartup);
+
+        QString syncimport = service->getSetting(service->syncOnImportSettingName(), "").toString();
+        if (syncimport != "")  appsettings->setCValue(context->athlete->cyclist, service->syncOnImportSettingName(), syncimport);
+
+    }
+
     CloudService *newService(const QString &name, Context *context) const {
 
         // INSTANTIATE FOR THIS CONTEXT
