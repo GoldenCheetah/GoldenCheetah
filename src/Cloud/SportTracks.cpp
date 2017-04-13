@@ -445,6 +445,7 @@ SportTracks::readFileCompleted()
             add.secs = index;
 
             // move through tracks if they're waiting for this point
+            bool updated=false;
             for(int t=0; t<data.count(); t++) {
 
                 // if this track still has data to consume
@@ -452,9 +453,6 @@ SportTracks::readFileCompleted()
 
                     // get the offset for the current sample in the current track
                     int ct = data[t].samples.at(data[t].index).toInt();
-
-                    // get the value and convert to GC units
-                    double value = data[t].factor * data[t].samples.at(data[t].index+1).toDouble();
 
                     if (ct == index) {
 
@@ -478,11 +476,13 @@ SportTracks::readFileCompleted()
                             add.setValue(data[t].type, value);
                             data[t].index = data[t].index + 2; // pairs
                         }
+                        updated=true;
                     }
                 }
             }
 
-            ret->appendPoint(add);
+            // don't add blanks
+            if (updated) ret->appendPoint(add);
             index++;
 
         } while (true);
