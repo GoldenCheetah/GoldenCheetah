@@ -913,7 +913,7 @@ CloudServiceSyncDialog::refreshClicked()
         add->setTextAlignment(1, Qt::AlignCenter);
 
         add->setText(2, ridedatetime.toString(tr("MMM d, yyyy")));
-        add->setTextAlignment(2, Qt::AlignLeft);
+        add->setTextAlignment(2, Qt::AlignLeft | Qt::AlignVCenter);
         add->setText(3, ridedatetime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
@@ -976,7 +976,7 @@ CloudServiceSyncDialog::refreshClicked()
             sync->setText(1, workouts[i]->name);
             sync->setTextAlignment(1, Qt::AlignCenter);
             sync->setText(2, ridedatetime.toString(tr("MMM d, yyyy")));
-            sync->setTextAlignment(2, Qt::AlignLeft);
+            sync->setTextAlignment(2, Qt::AlignLeft | Qt::AlignVCenter);
             sync->setText(3, ridedatetime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
 
@@ -991,10 +991,10 @@ CloudServiceSyncDialog::refreshClicked()
 
                 double distance = workouts[i]->distance;
                 sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
-                sync->setTextAlignment(5, Qt::AlignRight);
+                sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             }
             sync->setText(6, tr("Download"));
-            sync->setTextAlignment(6, Qt::AlignLeft);
+            sync->setTextAlignment(6, Qt::AlignLeft | Qt::AlignVCenter);
             sync->setText(7, "");
 
             sync->setText(8, workouts[i]->id); // download_id
@@ -1019,9 +1019,9 @@ CloudServiceSyncDialog::refreshClicked()
         rideListUp->setItemWidget(add, 0, check);
 
         add->setText(1, ride->fileName);
-        add->setTextAlignment(1, Qt::AlignLeft);
+        add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
         add->setText(2, ride->dateTime.toString(tr("MMM d, yyyy")));
-        add->setTextAlignment(2, Qt::AlignLeft);
+        add->setTextAlignment(2, Qt::AlignLeft | Qt::AlignVCenter);
         add->setText(3, ride->dateTime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
@@ -1035,7 +1035,7 @@ CloudServiceSyncDialog::refreshClicked()
 
         double distance = ride->getForSymbol("total_distance");
         add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
-        add->setTextAlignment(5, Qt::AlignRight);
+        add->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
 
         // exists? - we ignore seconds, since TP seems to do odd
         //           things to date times and loses seconds (?)
@@ -1067,15 +1067,15 @@ CloudServiceSyncDialog::refreshClicked()
             sync->setText(1, ride->fileName);
             sync->setTextAlignment(1, Qt::AlignCenter);
             sync->setText(2, ride->dateTime.toString(tr("MMM d, yyyy")));
-            sync->setTextAlignment(2, Qt::AlignLeft);
+            sync->setTextAlignment(2, Qt::AlignLeft | Qt::AlignVCenter );
             sync->setText(3, ride->dateTime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
             sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
-            sync->setTextAlignment(5, Qt::AlignRight);
+            sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             sync->setText(6, tr("Upload"));
-            sync->setTextAlignment(6, Qt::AlignLeft);
+            sync->setTextAlignment(6, Qt::AlignLeft | Qt::AlignVCenter);
             sync->setText(7, "");
         }
         add->setText(7, "");
