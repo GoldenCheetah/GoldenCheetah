@@ -42,6 +42,9 @@ class Strava : public CloudService {
         bool open(QStringList &errors);
         bool close();
 
+        // upload only for now, being worked up by Damien
+        virtual int capabilities() const { return OAuth | Upload ; }
+
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
