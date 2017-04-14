@@ -1434,10 +1434,9 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
             WWPoint *add = new WWPoint(this, point.x / 1000.0f, point.y); // in ms
 
             // increase view and workout maxes to match workout loaded
-            // as we goo these just increase to the last point
+           // as we goo these just increase to the last point
             if (add->x > maxWX_) maxVX_ = maxWX_ = add->x;
             if (add->y > maxY_) maxY_ = add->y;
-            delete add;
         }
 
         maxY_ *= 1.1f;
