@@ -427,6 +427,15 @@ class CloudServiceEntry
         }
 };
 
+struct CloudServiceDownloadEntry {
+
+    CloudServiceEntry *entry;
+    QByteArray *data;
+    CloudService *provider;
+    enum { Pending, InProgress, Failed, Complete } state;
+
+};
+
 class CloudServiceAutoDownload : public QThread {
 
     Q_OBJECT
@@ -438,13 +447,25 @@ class CloudServiceAutoDownload : public QThread {
 
     public slots:
 
+        // external entry point to trigger auto download
         void autoDownload();
+
+        // thread worker to generate download requests
         void run();
+
+        // receiver for downloaded files to add to the ridecache
+        void readComplete(QByteArray*,QString,QString);
 
     private:
 
         Context *context;
         bool initial;
+
+        // list of files to download
+        QList <CloudServiceDownloadEntry> downloadlist;
+
+        // list of providers - so we can clean up
+        QList<CloudService*> providers;
 };
 
 // all cloud services register at startup and can be accessed by name
