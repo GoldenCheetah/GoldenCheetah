@@ -61,6 +61,7 @@ class AnalysisSidebar;
 class Tab;
 class Leaf;
 class DataFilterRuntime;
+class CloudServiceAutoDownload;
 
 class Athlete : public QObject
 {
@@ -99,6 +100,9 @@ class Athlete : public QObject
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;
         QList<BodyMeasure> bodyMeasures_;
+
+        // cloud download
+        CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
         PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);

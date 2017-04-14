@@ -427,6 +427,26 @@ class CloudServiceEntry
         }
 };
 
+class CloudServiceAutoDownload : public QThread {
+
+    Q_OBJECT
+
+    public:
+
+        // automatically downloads from cloud services
+        CloudServiceAutoDownload(Context *context) : context(context), initial(true) {}
+
+    public slots:
+
+        void autoDownload();
+        void run();
+
+    private:
+
+        Context *context;
+        bool initial;
+};
+
 // all cloud services register at startup and can be accessed by name
 // which is typically the website name e.g. "Todays Plan"
 class CloudServiceFactory {

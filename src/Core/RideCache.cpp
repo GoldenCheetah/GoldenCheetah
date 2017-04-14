@@ -475,6 +475,11 @@ RideCache::refresh()
         qSort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
         future = QtConcurrent::map(reverse_, itemRefresh);
         watcher.setFuture(future);
+    } else {
+
+        // nothing to do, notify its started and done immediately
+        context->notifyRefreshStart();
+        context->notifyRefreshEnd();
     }
 }
 
