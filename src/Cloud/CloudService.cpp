@@ -1576,3 +1576,30 @@ CloudServiceFactory::upgrade(QString name)
         appsettings->setCValue(name, s->activeSettingName(), active ? "true" : "false");
     }
 }
+
+//
+// Auto download
+//
+void
+CloudServiceAutoDownload::autoDownload()
+{
+    if (initial) {
+        initial = false;
+        start();
+    }
+}
+
+void
+CloudServiceAutoDownload::run()
+{
+    // this is a separate thread and can run in parallel with the main gui
+    // so we can loop through services and download the data needed.
+    // we notify the main gui via the usual signals.
+    context->notifyAutoDownloadStart();
+
+    // do stuff... progress is 0-100%
+    context->notifyAutoDownloadProgress(100);
+
+    context->notifyAutoDownloadEnd();
+    exit(0);
+}

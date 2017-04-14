@@ -47,6 +47,7 @@
 #include "RideImportWizard.h"
 #include "RideAutoImportConfig.h"
 #include "AthleteBackup.h"
+#include "CloudService.h"
 
 #include "Route.h"
 
@@ -175,6 +176,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             setBodyMeasures(bmData);
         }
     }
+
+    // auto downloader
+    cloudAutoDownload = new CloudServiceAutoDownload(context);
+    connect(context, SIGNAL(refreshEnd()), cloudAutoDownload, SLOT(autoDownload()));
 
     // now most dependencies are in get cache
     rideCache = new RideCache(context);

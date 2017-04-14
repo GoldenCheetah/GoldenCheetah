@@ -186,6 +186,10 @@ class Context : public QObject
         void notifyRideDirty() { rideDirty(ride); }
         void notifyMetadataFlush() { metadataFlush(); }
 
+        void notifyAutoDownloadStart() { emit autoDownloadStart(); }
+        void notifyAutoDownloadEnd() { emit autoDownloadEnd(); }
+        void notifyAutoDownloadProgress(double x) { emit autoDownloadProgress(x); }
+
         void notifyRefreshStart() { emit refreshStart(); }
         void notifyRefreshEnd() { emit refreshEnd(); }
         void notifyRefreshUpdate(QDate date) { emit refreshUpdate(date); }
@@ -226,6 +230,11 @@ class Context : public QObject
         void refreshStart();
         void refreshEnd();
         void refreshUpdate(QDate);
+
+        // cloud download
+        void autoDownloadStart();
+        void autoDownloadEnd();
+        void autoDownloadProgress(double);
 
         void rideSelected(RideItem*);
 
