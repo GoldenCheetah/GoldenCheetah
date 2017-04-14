@@ -1597,9 +1597,216 @@ CloudServiceAutoDownload::run()
     // we notify the main gui via the usual signals.
     context->notifyAutoDownloadStart();
 
-    // do stuff... progress is 0-100%
-    context->notifyAutoDownloadProgress(100);
+    // get a list of services to sync from
+    QStringList worklist;
+    foreach(QString name, CloudServiceFactory::instance().serviceNames()) {
+        if (appsettings->cvalue(context->athlete->cyclist, CloudServiceFactory::instance().service(name)->syncOnStartupSettingName(), "false").toString() == "true") {
+            worklist << name;
+        }
+    }
 
+    // update progress indicator
+    context->notifyAutoDownloadProgress(0.0f);
+
+    //
+    // generate a worklist to process
+    //
+    if (worklist.count()) {
+
+        // workthrough
+        for(int i=0; i<worklist.count(); i++) {
+
+            // instantiate
+            CloudService *service = CloudServiceFactory::instance().newService(worklist[i], context);
+
+            // we want to trap received files
+            connect(service, SIGNAL(readComplete(QByteArray*,QString,QString)), this, SLOT(readComplete(QByteArray*,QString,QString)));
+
+            // open connection
+            QStringList errors;
+            if (service->open(errors) == false) {
+                delete service;
+                continue;
+            }
+
+            // get list of entries
+            QDateTime now = QDateTime::currentDateTime();
+            QList<CloudServiceEntry*> found = service->readdir(service->home(), errors, now.addDays(-30), now);
+
+            // some were found, so lets see if they match
+            if (found.count()) {
+
+                QStringList rideFiles; // what we have already
+
+                Specification specification;
+                specification.setDateRange(DateRange(now.addDays(-30).date(), now.date()));
+                foreach(RideItem *item, context->athlete->rideCache->rides()) {
+                    if (specification.pass(item))
+                        rideFiles << QFileInfo(item->fileName).baseName().mid(0,16);
+                }
+
+                // eliminate matches
+                bool need=false;
+                foreach(CloudServiceEntry *entry, found) {
+
+                    QDateTime ridedatetime;
+
+                    // skip files that aren't ride files
+                    if (!RideFile::parseRideFileName(entry->name, &ridedatetime)) continue;
+
+                    // skip files that aren't in range
+                    if (ridedatetime.date() < now.addDays(-30).date() || ridedatetime.date() > now.date()) continue;
+
+                    // skip files we already have
+                    bool got=false;
+                    foreach(QString name, rideFiles)
+                        if (entry->name.startsWith(name))
+                            got=true;
+
+                    // we want it !
+                    if (!got) {
+                        need = true; // need to download, so don't zap the service
+
+                        CloudServiceDownloadEntry add;
+                        add.state = CloudServiceDownloadEntry::Pending;
+                        add.entry = entry;
+                        add.provider = service;
+                        downloadlist << add;
+                    }
+                }
+
+                if (!need) {
+
+                    // none found that we need
+                    service->close();
+                    delete service;
+                } else {
+                    providers << service; // so we can clean up later
+                }
+
+            } else {
+
+                // none found
+                service->close();
+                delete service;
+            }
+        }
+    }
+
+    //
+    // Worker loop to process the list, blocking on each download
+    // and timeout if no response in 30 seconds for each
+    //
+    // Since this is asynchronous, the actual data is processed
+    // by the receivedFile method
+    //
+
+    double progress=0;
+    double inc = 100.0f / double(downloadlist.count());
+    for(int i=0; i<downloadlist.count(); i++) {
+
+        CloudServiceDownloadEntry download= downloadlist[i];
+
+        // we block on read completing
+        QEventLoop loop;
+        connect(download.provider, SIGNAL(readComplete(QByteArray*,QString,QString)), &loop, SLOT(quit()));
+        QTimer::singleShot(30000,&loop, SLOT(quit())); // timeout after 30 seconds
+
+        // preallocate
+        downloadlist[i].data = new QByteArray;
+
+        download.provider->readFile(downloadlist[i].data, download.entry->name, download.entry->id);
+
+        // block on timeout or readComplete...
+        loop.exec();
+
+        // notify progress
+        context->notifyAutoDownloadProgress(progress += inc);
+    }
+
+    // all done, close the sync notification
+    context->notifyAutoDownloadProgress(100);
     context->notifyAutoDownloadEnd();
+
+    // remove providers
+    foreach(CloudService *s, providers) {
+        s->close();
+        delete s;
+    }
+
+    // in case we restart
+    providers.clear();
+    downloadlist.clear();
+
+    // and end thread
     exit(0);
+}
+
+void
+CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString status)
+{
+    qDebug()<<"received:"<<name<<status; // whilst developing .. will remove when done
+
+    // find the entry I belong too
+    CloudServiceDownloadEntry entry;
+    bool found=false;
+    foreach(CloudServiceDownloadEntry p, downloadlist) {
+        if (p.data == data) {
+            entry=p;
+            found=true;
+        }
+    }
+
+    if (!found) {
+        qDebug() <<"Autodownload: received file has no download entry";
+        return;
+    }
+
+    // ok. so we now know what request it was for
+    // so can process the result
+    // uncompress and parse, note the filename is passed and may be
+    // different to what we asked for (sometimes the data is converted
+    // from one file format to another).
+    QStringList errors;
+    RideFile *ride = entry.provider->uncompressRide(data, name, errors);
+
+    // free up regardless
+    delete data;
+
+    // can't process the content received.
+    if (ride == NULL) return;
+
+    // lets save this one away as json with the right filename
+    QDateTime ridedatetime = ride->startTime();
+
+    QChar zero = QLatin1Char ('0');
+    QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
+                           .arg ( ridedatetime.date().year(), 4, 10, zero )
+                           .arg ( ridedatetime.date().month(), 2, 10, zero )
+                           .arg ( ridedatetime.date().day(), 2, 10, zero )
+                           .arg ( ridedatetime.time().hour(), 2, 10, zero )
+                           .arg ( ridedatetime.time().minute(), 2, 10, zero )
+                           .arg ( ridedatetime.time().second(), 2, 10, zero );
+
+    QString filename = context->athlete->home->activities().canonicalPath() + "/" + targetnosuffix + ".json";
+
+    // exists? -- totally should never happen unless readdir timestamp mismatches actual ride
+    //            could happen if same file available at two services XXX should check above... XXX
+    QFileInfo fileinfo(filename);
+    if (fileinfo.exists()) {
+        qDebug()<<"auto download got a duplicate:"<<filename;
+        delete ride;
+        return;
+    }
+
+    JsonFileReader reader;
+    QFile file(filename);
+    reader.writeRideFile(context, ride, file);
+
+    // delete temporary in-memory copy
+    delete ride;
+
+    // add to the ride list
+    context->athlete->addRide(fileinfo.fileName(), true);
+
 }
