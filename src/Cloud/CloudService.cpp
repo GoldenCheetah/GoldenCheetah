@@ -30,6 +30,7 @@
 #include <QFileIconProvider>
 #include <QMessageBox>
 #include <QHeaderView>
+#include <QDesktopWidget>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"
@@ -1589,6 +1590,11 @@ CloudServiceAutoDownload::autoDownload()
 {
     if (initial) {
         initial = false;
+
+        // Start means we are looking for downloads to do
+        context->notifyAutoDownloadStart();
+
+        // starts a thread
         start();
     }
 }
@@ -1599,7 +1605,6 @@ CloudServiceAutoDownload::run()
     // this is a separate thread and can run in parallel with the main gui
     // so we can loop through services and download the data needed.
     // we notify the main gui via the usual signals.
-    context->notifyAutoDownloadStart();
 
     // get a list of services to sync from
     QStringList worklist;
@@ -1608,9 +1613,6 @@ CloudServiceAutoDownload::run()
             worklist << name;
         }
     }
-
-    // update progress indicator
-    context->notifyAutoDownloadProgress(0.0f);
 
     //
     // generate a worklist to process
@@ -1709,6 +1711,9 @@ CloudServiceAutoDownload::run()
     double inc = 100.0f / double(downloadlist.count());
     for(int i=0; i<downloadlist.count(); i++) {
 
+        // update progress indicator
+        context->notifyAutoDownloadProgress(progress);
+
         CloudServiceDownloadEntry download= downloadlist[i];
 
         // we block on read completing
@@ -1724,12 +1729,14 @@ CloudServiceAutoDownload::run()
         // block on timeout or readComplete...
         loop.exec();
 
-        // notify progress
-        context->notifyAutoDownloadProgress(progress += inc);
+        // update progress
+        progress += inc;
+
+        // if last one we need to signal done.
+        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(progress);
     }
 
-    // all done, close the sync notification
-    context->notifyAutoDownloadProgress(100);
+    // all done, close the sync notification, regardless of if anything was downloaded
     context->notifyAutoDownloadEnd();
 
     // remove providers
@@ -1747,10 +1754,8 @@ CloudServiceAutoDownload::run()
 }
 
 void
-CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString status)
+CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
 {
-    qDebug()<<"received:"<<name<<status; // whilst developing .. will remove when done
-
     // find the entry I belong too
     CloudServiceDownloadEntry entry;
     bool found=false;
@@ -1810,7 +1815,101 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString stat
     // delete temporary in-memory copy
     delete ride;
 
-    // add to the ride list
-    context->athlete->addRide(fileinfo.fileName(), true);
+    // add to the ride list -- but don't select it
+    context->athlete->addRide(fileinfo.fileName(), true, false);
 
+}
+
+
+CloudServiceAutoDownloadWidget::CloudServiceAutoDownloadWidget(Context *context,QWidget *parent) :
+    QWidget(parent), context(context), state(Dormant)
+{
+    connect(context, SIGNAL(autoDownloadStart()), this, SLOT(downloadStart()));
+    connect(context, SIGNAL(autoDownloadEnd()), this, SLOT(downloadFinish()));
+    connect(context, SIGNAL(autoDownloadProgress(double)), this, SLOT(downloadProgress(double)));
+
+    // just a small little thing
+    setFixedHeight(dpiYFactor * 25);
+    hide();
+
+    // animating checking
+    animator= new QPropertyAnimation(this, "transition");
+    animator->setStartValue(0);
+    animator->setEndValue(100);
+    animator->setDuration(1000);
+    animator->setEasingCurve(QEasingCurve::Linear);
+}
+
+void
+CloudServiceAutoDownloadWidget::downloadStart()
+{
+    state = Checking;
+    animator->start();
+    show();
+}
+
+void
+CloudServiceAutoDownloadWidget::downloadFinish()
+{
+    state = Dormant;
+    animator->stop();
+    hide();
+}
+
+void
+CloudServiceAutoDownloadWidget::downloadProgress(double x)
+{
+    state = Downloading;
+    animator->stop();
+    show();
+    progress = x;
+    repaint();
+}
+
+void
+CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    QBrush brush(GColor(CPLOTBACKGROUND));
+    painter.fillRect(0,0,width(),height(), brush);
+
+    QString statusstring;
+    switch(state) {
+    case Dormant: statusstring=""; break;
+    case Downloading: statusstring=tr("Downloading"); break;
+    case Checking: statusstring=tr("Checking"); break;
+    }
+
+    // smallest font we can
+    QFont font;
+    QFontMetrics fm(font);
+    painter.setFont(font);
+    painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    QRectF textbox = QRectF(0,0, fm.width(statusstring), height());
+    painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
+
+    // rectangle
+    QRectF pr(textbox.width()+(5.0f*dpiXFactor), textbox.top()+(8.0f*dpiXFactor), width()-(10.0f*dpiXFactor)-textbox.width(), height()-(16*dpiXFactor));
+
+    // progress rect
+    QColor col = GColor(CPLOTMARKER);
+    col.setAlpha(150);
+    brush= QBrush(col);
+
+    if (state == Downloading) {
+        QRectF bar(pr.left(), pr.top(), (pr.width() / 100.00f * progress), pr.height());
+        painter.fillRect(bar, brush);
+    } else if (state == Checking) {
+        // bounce
+        QRectF lbar(pr.left()+ ((pr.width() *0.8f) / 100.0f * transition), pr.top(), pr.width() * 0.2f, pr.height());
+        QRectF rbar(pr.left()+ (pr.width()*0.8f) - ((pr.width() *0.8f) / 100.0f * transition), pr.top(), pr.width() * 0.2f, pr.height());
+        painter.fillRect(lbar, brush);
+        painter.fillRect(rbar, brush);
+
+        // if we ran out of juice start again
+        if (transition == 100) { animator->stop(); animator->start(); }
+    }
+
+    // border of progress bar
+    painter.drawRect(pr);
 }

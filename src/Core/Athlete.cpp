@@ -274,9 +274,9 @@ void Athlete::selectRideFile(QString fileName)
 }
 
 void
-Athlete::addRide(QString name, bool dosignal, bool useTempActivities, bool planned)
+Athlete::addRide(QString name, bool dosignal, bool select, bool useTempActivities, bool planned)
 {
-    rideCache->addRide(name, dosignal, useTempActivities, planned);
+    rideCache->addRide(name, dosignal, select, useTempActivities, planned);
 }
 
 void

@@ -27,6 +27,7 @@
 #include "RideItem.h"
 #include "IntervalTreeView.h"
 #include "IntervalSummaryWindow.h"
+#include "CloudService.h"
 
 #include <QTreeWidgetItem>
 #include <QTreeWidget>
@@ -104,6 +105,8 @@ class AnalysisSidebar : public QWidget
 
         IntervalTreeView *intervalTree; // the interval tree
         QMap<RideFileInterval::intervaltype, QTreeWidgetItem*> trees;
+
+        CloudServiceAutoDownloadWidget *autowidget;
 };
 
 #endif // _GC_AnalysisSidebar_h

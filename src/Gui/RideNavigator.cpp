@@ -124,6 +124,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
+    connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(setRide(RideItem*)));
 
     // user selected a ride on the ride list, we should reflect that too..
     connect(tableView, SIGNAL(rowSelected(QItemSelection)), this, SLOT(selectionChanged(QItemSelection)));
@@ -949,7 +950,8 @@ RideNavigator::showColumnChooser()
 void
 RideNavigator::setRide(RideItem*rideItem)
 {
-    if (currentItem == rideItem) return;
+    // if we have a selection and its this one just ignore.
+    if (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0) return;
 
     for (int i=0; i<tableView->model()->rowCount(); i++) {
 
