@@ -572,7 +572,7 @@ class AthleteFat : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Bodyfat in kg or lbs from downloaded Body Measure data"));
+        setDescription(tr("Athlete bodyfat in kg or lbs from downloaded Body Measure data"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -591,6 +591,88 @@ class AthleteFat : public RideMetric {
 
 static bool athleteFatAdded =
     RideMetricFactory::instance().addMetric(AthleteFat());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class AthleteBones : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AthleteBones)
+    double kg;
+
+    public:
+
+    AthleteBones() : kg(0.0)
+    {
+        setSymbol("athlete_bones");
+        setInternalName("Athlete Bones");
+    }
+
+    void initialize() {
+        setName(tr("Athlete Bones"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("kg"));
+        setImperialUnits(tr("lbs"));
+        setPrecision(2);
+        setConversion(LB_PER_KG);
+        setDescription(tr("Athlete bones in kg or lbs from downloaded Body Measure data"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        BodyMeasure here;
+
+        // body measures first
+        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
+        setValue(here.boneskg);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new AthleteBones(*this); }
+};
+
+static bool athleteBonesAdded =
+    RideMetricFactory::instance().addMetric(AthleteBones());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class AthleteMuscles : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AthleteMuscles)
+    double kg;
+
+    public:
+
+    AthleteMuscles() : kg(0.0)
+    {
+        setSymbol("athlete_muscles");
+        setInternalName("Athlete Muscles");
+    }
+
+    void initialize() {
+        setName(tr("Athlete Muscles"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("kg"));
+        setImperialUnits(tr("lbs"));
+        setPrecision(2);
+        setConversion(LB_PER_KG);
+        setDescription(tr("Athlete muscles in kg or lbs from downloaded Body Measure data"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+
+        BodyMeasure here;
+
+        // body measures first
+        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
+        setValue(here.musclekg);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new AthleteMuscles(*this); }
+};
+
+static bool athleteMusclesAdded =
+    RideMetricFactory::instance().addMetric(AthleteMuscles());
 
 //////////////////////////////////////////////////////////////////////////////
 
