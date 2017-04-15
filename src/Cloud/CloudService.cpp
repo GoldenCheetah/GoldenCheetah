@@ -1591,9 +1591,6 @@ CloudServiceAutoDownload::autoDownload()
     if (initial) {
         initial = false;
 
-        // Start means we are looking for downloads to do
-        context->notifyAutoDownloadStart();
-
         // starts a thread
         start();
     }
@@ -1618,6 +1615,9 @@ CloudServiceAutoDownload::run()
     // generate a worklist to process
     //
     if (worklist.count()) {
+
+        // Start means we are looking for downloads to do
+        context->notifyAutoDownloadStart();
 
         // workthrough
         for(int i=0; i<worklist.count(); i++) {
