@@ -340,6 +340,7 @@ class gcZoneConfig {
     bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
     QString sport;
     QDate date;
+    QList<int> zoneslow;
     int cp, wprime, pmax,ftp,lthr,rhr,hrmax,cv;
 };
 
@@ -347,7 +348,7 @@ SEXP
 RTool::zones(SEXP pDate, SEXP pSport)
 {
     // return a dataframe with
-    // date, sport, cp, w', pmax, ftp, lthr, rhr, hrmax, cv
+    // date, sport, cp, w', pmax, ftp, lthr, rhr, hrmax, cv, zoneslow, zonescolor
 
     // need non-null context
     if (!rtool || !rtool->context)  return Rf_allocVector(INTSXP, 0);
@@ -378,6 +379,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 bike.wprime = rtool->context->athlete->zones(false)->getWprime(range);
                 bike.pmax = rtool->context->athlete->zones(false)->getPmax(range);
                 bike.ftp = rtool->context->athlete->zones(false)->getFTP(range);
+                bike.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
             }
         }
 
@@ -393,6 +395,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 run.wprime = rtool->context->athlete->zones(true)->getWprime(range);
                 run.pmax = rtool->context->athlete->zones(true)->getPmax(range);
                 run.ftp = rtool->context->athlete->zones(true)->getFTP(range);
+                run.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
             }
         }
 
@@ -463,6 +466,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 c.wprime = rtool->context->athlete->zones(false)->getWprime(range);
                 c.pmax = rtool->context->athlete->zones(false)->getPmax(range);
                 c.ftp = rtool->context->athlete->zones(false)->getFTP(range);
+                c.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
 
                 config << c;
             }
@@ -482,6 +486,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 c.wprime = rtool->context->athlete->zones(true)->getWprime(range);
                 c.pmax = rtool->context->athlete->zones(true)->getPmax(range);
                 c.ftp = rtool->context->athlete->zones(true)->getFTP(range);
+                c.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
 
                 config << c;
             }
@@ -587,6 +592,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 if (x.lthr) lastBike.lthr = x.lthr;
                 if (x.rhr) lastBike.rhr = x.rhr;
                 if (x.hrmax) lastBike.hrmax = x.hrmax;
+                if (x.zoneslow.length()) lastBike.zoneslow = x.zoneslow;
             }
         }
 
@@ -611,6 +617,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 if (x.rhr) lastRun.rhr = x.rhr;
                 if (x.hrmax) lastRun.hrmax = x.hrmax;
                 if (x.cv) lastRun.cv = x.cv;
+                if (x.zoneslow.length()) lastRun.zoneslow = x.zoneslow;
             }
         }
 
@@ -642,12 +649,12 @@ RTool::zones(SEXP pDate, SEXP pSport)
 
     // CREATE A DATAFRAME OF CONFIG
     SEXP ans;
-    PROTECT(ans = Rf_allocVector(VECSXP, 10));
+    PROTECT(ans = Rf_allocVector(VECSXP, 12));
 
-    // 10 columns, size rows
+    // 12 columns, size rows
     SEXP date;
     SEXP sport;
-    SEXP cp, wprime, pmax,ftp,lthr,rhr,hrmax,cv;
+    SEXP cp, wprime, pmax,ftp,lthr,rhr,hrmax,cv, zoneslow, zonescolor;
     SEXP rownames;
 
     PROTECT(date=Rf_allocVector(INTSXP, size));
@@ -660,6 +667,8 @@ RTool::zones(SEXP pDate, SEXP pSport)
     PROTECT(rhr=Rf_allocVector(INTSXP, size));
     PROTECT(hrmax=Rf_allocVector(INTSXP, size));
     PROTECT(cv=Rf_allocVector(INTSXP, size));
+    PROTECT(zoneslow=Rf_allocVector(VECSXP, size));
+    PROTECT(zonescolor=Rf_allocVector(VECSXP, size));
     PROTECT(rownames=Rf_allocVector(STRSXP, size));
 
     SEXP dclas;
@@ -683,6 +692,18 @@ RTool::zones(SEXP pDate, SEXP pSport)
         INTEGER(hrmax)[index] = x.hrmax;
         INTEGER(cv)[index] = x.cv;
 
+        int indexlow=0;
+        SEXP lows, colors;
+        PROTECT(lows=Rf_allocVector(INTSXP, x.zoneslow.length()));
+        PROTECT(colors=Rf_allocVector(STRSXP, x.zoneslow.length()));
+        foreach(int low, x.zoneslow) {
+            INTEGER(lows)[indexlow] = low;
+            SET_STRING_ELT(colors, indexlow, Rf_mkChar(zoneColor(indexlow, x.zoneslow.length()).name().toLatin1().constData()));
+            indexlow++;
+        }
+        SET_VECTOR_ELT(zoneslow, index, lows);
+        SET_VECTOR_ELT(zonescolor, index, colors);
+        UNPROTECT(2);
         index++;
     }
 
@@ -697,10 +718,12 @@ RTool::zones(SEXP pDate, SEXP pSport)
     SET_VECTOR_ELT(ans, 7, rhr);
     SET_VECTOR_ELT(ans, 8, hrmax);
     SET_VECTOR_ELT(ans, 9, cv);
+    SET_VECTOR_ELT(ans, 10, zoneslow);
+    SET_VECTOR_ELT(ans, 11, zonescolor);
 
     // turn into a data.frame, name class etc
     SEXP names;
-    PROTECT(names = Rf_allocVector(STRSXP, 10));
+    PROTECT(names = Rf_allocVector(STRSXP, 12));
     SET_STRING_ELT(names, 0, Rf_mkChar("date"));
     SET_STRING_ELT(names, 1, Rf_mkChar("sport"));
     SET_STRING_ELT(names, 2, Rf_mkChar("cp"));
@@ -711,12 +734,14 @@ RTool::zones(SEXP pDate, SEXP pSport)
     SET_STRING_ELT(names, 7, Rf_mkChar("rhr"));
     SET_STRING_ELT(names, 8, Rf_mkChar("hrmax"));
     SET_STRING_ELT(names, 9, Rf_mkChar("cv"));
+    SET_STRING_ELT(names, 10, Rf_mkChar("zoneslow"));
+    SET_STRING_ELT(names, 11, Rf_mkChar("zonescolor"));
 
     Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
     Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
     Rf_namesgets(ans, names);
 
-    UNPROTECT(14);
+    UNPROTECT(16);
 
     // fail
     return ans;
