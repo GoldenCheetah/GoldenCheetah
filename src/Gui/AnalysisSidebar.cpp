@@ -49,6 +49,9 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitter = new GcSplitter(Qt::Vertical);
     mainLayout->addWidget(splitter);
 
+    autowidget = new CloudServiceAutoDownloadWidget(context, this);
+    mainLayout->addWidget(autowidget);
+
     // calendar
     calendarWidget = new GcMultiCalendar(context);
     calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);

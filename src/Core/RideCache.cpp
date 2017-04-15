@@ -202,7 +202,7 @@ RideCache::itemChanged()
     emit itemChanged(item);
 
     // current ride changed is more relevant for the charts lets notify
-    // them the ride they're showing has changed 
+    // them the ride they're showing has changed
     if (item == context->currentRideItem()) {
 
         context->notifyRideChanged(item);
@@ -211,7 +211,7 @@ RideCache::itemChanged()
 
 // add a new ride
 void
-RideCache::addRide(QString name, bool dosignal, bool useTempActivities, bool planned)
+RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivities, bool planned)
 {
     RideItem *prior = context->ride;
 
@@ -249,7 +249,7 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities, bool pla
         model_->endReset();
     }
 
-    // refresh metrics for *this ride only* 
+    // refresh metrics for *this ride only*
     last->refresh();
 
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
@@ -260,8 +260,13 @@ RideCache::addRide(QString name, bool dosignal, bool useTempActivities, bool pla
     if (prior) prior->close();
 
     // notify everyone to select it
-    context->ride = last;
-    context->notifyRideSelected(last);
+    if (select) {
+        context->ride = last;
+        context->notifyRideSelected(last);
+    } else{
+        // notify everyone to select the one we were already on
+        context->notifyRideSelected(prior);
+    }
 }
 
 void
@@ -464,7 +469,7 @@ RideCache::refresh()
     foreach(RideItem *item, rides_) {
 
         // ok set stale so we refresh
-        if (item->checkStale()) 
+        if (item->checkStale())
             staleCount++;
     }
 
@@ -479,7 +484,9 @@ RideCache::refresh()
 
         // nothing to do, notify its started and done immediately
         context->notifyRefreshStart();
-        context->notifyRefreshEnd();
+
+        // wait five seconds, so mainwindow can get up and running...
+        QTimer::singleShot(5000, context, SLOT(notifyRefreshEnd()));
     }
 }
 
@@ -570,7 +577,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
 
     } else result = metric->toString(useMetricUnits);
 
-    // 0 temp from aggregate means no values 
+    // 0 temp from aggregate means no values
     if ((metric->symbol() == "average_temp" || metric->symbol() == "max_temp") && result == "0.0") result = "-";
     return result;
 }
@@ -585,7 +592,7 @@ bool rideCachesummaryBestLowerThan(const AthleteBest &s1, const AthleteBest &s2)
      return s1.nvalue < s2.nvalue;
 }
 
-QList<AthleteBest> 
+QList<AthleteBest>
 RideCache::getBests(QString symbol, int n, Specification specification, bool useMetricUnits)
 {
     QList<AthleteBest> results;
@@ -665,7 +672,7 @@ class RollingBests {
             returning.fill(0.0f, size);
 
             // get largest values
-            for(int i=0; i<buffer.count(); i++) 
+            for(int i=0; i<buffer.count(); i++)
                 for (int j=0; j<buffer[i].count(); j++)
                     if(buffer[i].at(j) > returning[j])
                         returning[j] = buffer[i].at(j);
@@ -781,7 +788,7 @@ RideCache::refreshCPModelMetrics()
             if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
 
             // so long as the important model derived values are sensible ...
-            if (add.WPrime > 1000 && add.CP > 100) 
+            if (add.WPrime > 1000 && add.CP > 100)
                 context->athlete->PDEstimates_ << add;
 
             //qDebug()<<add.to<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
@@ -801,7 +808,7 @@ RideCache::refreshCPModelMetrics()
             if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
 
             // so long as the model derived values are sensible ...
-            if ((!model->hasWPrime() || add.WPrime > 10.0f) && 
+            if ((!model->hasWPrime() || add.WPrime > 10.0f) &&
                 (!model->hasCP() || add.CP > 1.0f) &&
                 (!model->hasPMax() || add.PMax > 1.0f) &&
                 (!model->hasFTP() || add.FTP > 1.0f))
@@ -826,7 +833,7 @@ RideCache::refreshCPModelMetrics()
     emit modelProgress(0, 0); // all done
 }
 
-QList<QDateTime> 
+QList<QDateTime>
 RideCache::getAllDates()
 {
     QList<QDateTime> returning;
@@ -836,7 +843,7 @@ RideCache::getAllDates()
     return returning;
 }
 
-QStringList 
+QStringList
 RideCache::getAllFilenames()
 {
     QStringList returning;
@@ -876,7 +883,7 @@ RideCache::getRankedValues(QString field)
             int count = returning.value(value,0);
             returning.insert(value,++count);
         }
-    }    
+    }
     return returning;
 }
 

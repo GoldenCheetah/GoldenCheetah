@@ -546,7 +546,7 @@ ManualRideDialog::okClicked()
     if (success) {
 
         // refresh metric db etc
-        context->athlete->addRide(basename + ".json");
+        context->athlete->addRide(basename + ".json", true);
         accept();
 
     } else {

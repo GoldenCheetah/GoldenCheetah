@@ -35,6 +35,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QPropertyAnimation>
 
 #include "Context.h"
 #include "Athlete.h"
@@ -601,6 +602,40 @@ class CloudServiceFactory {
         return true;
     }
 
+};
+
+class CloudServiceAutoDownloadWidget : public QWidget
+{
+
+    Q_OBJECT
+
+    Q_PROPERTY(int transition READ getTransition WRITE setTransition)
+
+    public:
+        CloudServiceAutoDownloadWidget(Context *context,QWidget *parent);
+
+        // transition animation 0-255
+        int getTransition() const {return transition;}
+        void setTransition(int x) { if (transition !=x) {transition=x; update();}}
+
+    protected:
+        void paintEvent(QPaintEvent*);
+
+    public slots:
+
+        void downloadStart();
+        void downloadFinish();
+        void downloadProgress(double x);
+
+    private:
+
+        Context *context;
+        enum { Checking, Downloading, Dormant } state;
+        double progress;
+
+        // animating checking
+        QPropertyAnimation *animator;
+        int transition;
 };
 
 #endif
