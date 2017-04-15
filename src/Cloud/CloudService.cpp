@@ -234,7 +234,11 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
 
     QByteArray jsonData;
 
-    if (downloadCompression == zip) {
+    // some services will offer file as compressed or uncompressed
+    // data. In which case they must add .zip or .gz to the end of the
+    // filename to indicate it. The file format must still be included
+    // in the name e.g. .pwx.gz or .fit.zip
+    if (name.endsWith(".zip")) {
         // write out to a zip file first
         QTemporaryFile zipfile;
         zipfile.open();
@@ -247,7 +251,7 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
         jsonData = reader.fileData(info.filePath);
         // name without the .zip
         name = name.mid(0, name.length()-4);
-    } else if (downloadCompression == gzip) {
+    } else if (name.endsWith(".gz")) {
         jsonData = gUncompress(*data);
         // name without the .gz
         name = name.mid(0, name.length()-3);
@@ -255,7 +259,7 @@ CloudService::uncompressRide(QByteArray *data, QString name, QStringList &errors
         jsonData = *data;
     }
 
-    // uncompress and write to tmp
+    // uncompress and write to tmp preserviing the file extension
     QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(name).baseName() + "." + QFileInfo(name).suffix();
 
     // uncompress and write a file
