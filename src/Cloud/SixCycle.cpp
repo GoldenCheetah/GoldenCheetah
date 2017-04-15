@@ -279,6 +279,16 @@ SixCycle::readdir(QString path, QStringList &errors, QDateTime from, QDateTime t
             //add->name = name;
             QString dateString = each["activityStartDateTime"].toString();
             QString suffix = QFileInfo(add->id).suffix();
+
+            // data might be compressed remotely, need to adapt to their scheme of naming
+            // the rawfiles with the format at the front and compression at the back of the
+            // filename; e.g:
+            // https://s3.amazonaws.com/sixcycle/rawFiles/tcx_ba4319c2-a6dd-4503-9a50-0cb1f0f832ab.gz
+            //
+            if (suffix == "gz") {
+                QString prefix = add->id.split("/").last().split("_").first();
+                suffix = prefix + "." + suffix;
+            }
             QDateTime startTime= QDateTime::fromString(dateString, Qt::ISODate).toLocalTime();
             QChar zero = QLatin1Char ( '0' );
             add->name = QString ( "%1_%2_%3_%4_%5_%6.%7" )
@@ -463,8 +473,8 @@ SixCycle::readFileCompleted()
 
     printd("reply begins:%s", buffers.value(reply)->toStdString().substr(0,80).c_str());
 
-    // lets not override the date use an unformatted file name
-    QString name = QString("temp.%1").arg(QFileInfo(replyName(reply)).suffix());
+    // lets not override the date use an unformatted file name, keeping any .tcx.gz style suffix
+    QString name = QString("temp.%1").arg(QFileInfo(replyName(reply)).completeSuffix());
 
     // process it then ........
     notifyReadComplete(buffers.value(reply), name, tr("Completed."));
