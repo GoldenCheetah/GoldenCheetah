@@ -1210,7 +1210,7 @@ AllPlot::configChanged(qint32 what)
         QwtSymbol *sym = new QwtSymbol;
         sym->setStyle(QwtSymbol::Rect);
         sym->setPen(QPen(QColor(255,127,0))); // orange like a match, will make configurable later
-        sym->setSize(4);
+        sym->setSize(4 *dpiXFactor);
         standard->mCurve->setSymbol(sym);
         QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
         ihlPen.setWidth(width);
@@ -3108,10 +3108,10 @@ static void setSymbol(QwtPlotCurve *curve, int points)
     sym->setPen(QPen(GColor(CPLOTMARKER)));
     if (points < 150) {
         sym->setStyle(QwtSymbol::Ellipse);
-        sym->setSize(3);
+        sym->setSize(3 *dpiXFactor);
     } else {
         sym->setStyle(QwtSymbol::NoSymbol);
-        sym->setSize(0);
+        sym->setSize(0 *dpiXFactor);
     }
     curve->setSymbol(sym);
 }
@@ -3248,7 +3248,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
                                                     .arg(burnt/1000.00, 0, 'f', 1)
                                                     .arg(warn));
 
-        text.setFont(QFont("Helvetica", 10, QFont::Bold));
+        QFont font; // default;
+        font.setWeight(QFont::Bold);
+        text.setFont(font);
         text.setColor(GColor(CWBAL));
         standard->curveTitle.setLabel(text);
     } else {
@@ -4104,12 +4106,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setPen(QPen(GColor(CPLOTMARKER)));
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(3);
+                sym->setSize(3 *dpiXFactor);
                 ourCurve->setSymbol(sym);
             } else {
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::NoSymbol);
-                sym->setSize(0);
+                sym->setSize(0 *dpiXFactor);
                 ourCurve->setSymbol(sym);
             }
         }
@@ -4132,12 +4134,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setPen(QPen(GColor(CPLOTMARKER)));
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(3);
+                sym->setSize(3 *dpiXFactor);
                 ourCurve2->setSymbol(sym);
             } else {
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::NoSymbol);
-                sym->setSize(0);
+                sym->setSize(0 *dpiXFactor);
                 ourCurve2->setSymbol(sym);
             }
         }
@@ -4171,7 +4173,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::NoSymbol);
-            sym->setSize(0);
+            sym->setSize(0 *dpiXFactor);
             ourASCurve->setSymbol(sym);
         }
 
@@ -4871,12 +4873,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                         QwtSymbol *sym = new QwtSymbol;
                         sym->setPen(QPen(GColor(CPLOTMARKER)));
                         sym->setStyle(QwtSymbol::Ellipse);
-                        sym->setSize(3);
+                        sym->setSize(3 *dpiXFactor);
                         ourCurve->setSymbol(sym);
                     } else {
                         QwtSymbol *sym = new QwtSymbol;
                         sym->setStyle(QwtSymbol::NoSymbol);
-                        sym->setSize(0);
+                        sym->setSize(0 *dpiXFactor);
                         ourCurve->setSymbol(sym);
                     }
                 }
@@ -4909,12 +4911,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                         QwtSymbol *sym = new QwtSymbol;
                         sym->setPen(QPen(GColor(CPLOTMARKER)));
                         sym->setStyle(QwtSymbol::Ellipse);
-                        sym->setSize(3);
+                        sym->setSize(3 *dpiXFactor);
                         ourCurve2->setSymbol(sym);
                     } else {
                         QwtSymbol *sym = new QwtSymbol;
                         sym->setStyle(QwtSymbol::NoSymbol);
-                        sym->setSize(0);
+                        sym->setSize(0 *dpiXFactor);
                         ourCurve2->setSymbol(sym);
                     }
                 }
@@ -4966,7 +4968,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
                     QwtSymbol *sym = new QwtSymbol;
                     sym->setStyle(QwtSymbol::NoSymbol);
-                    sym->setSize(0);
+                    sym->setSize(0 *dpiXFactor);
                     ourASCurve->setSymbol(sym);
 
                 }

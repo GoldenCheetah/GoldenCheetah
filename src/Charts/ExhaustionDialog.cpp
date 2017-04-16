@@ -38,7 +38,7 @@ ExhaustionDialog::ExhaustionDialog(AllPlot *parent, Context *context, double sec
     refValue = new QLineEdit();
     refUnit = new QLabel();
     refUnit->setText(tr("secs"));
-    refValue->setFixedWidth(50);
+    refValue->setFixedWidth(50 *dpiXFactor);
     referenceValueLayout->addWidget(refLabel);
     referenceValueLayout->addWidget(refValue);
     referenceValueLayout->addWidget(refUnit);
