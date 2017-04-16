@@ -516,7 +516,7 @@ CPPlot::plotModel()
                 sym->setBrush(QBrush(GColor(CPLOTMARKER)));
                 sym->setPen(QPen(GColor(CPLOTMARKER)));
                 sym->setStyle(QwtSymbol::XCross);
-                sym->setSize(6);
+                sym->setSize(6 *dpiXFactor);
 
                 QwtPlotMarker *cherryp = new QwtPlotMarker();
                 cherryp->setSymbol(sym);
@@ -1084,7 +1084,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4);
+                sym->setSize(4 *dpiXFactor);
                 sym->setBrush(QBrush(fill));
                 sym->setPen(QPen(fill));
                 curve->setSymbol(sym);
@@ -1368,7 +1368,7 @@ CPPlot::plotEfforts()
 
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
-    sym->setSize(rangemode ? 4 : 6);
+    sym->setSize(dpiXFactor * rangemode ? 4 : 6);
     QColor col= GColor(CPOWER);
     col.setAlpha(128);
     sym->setBrush(col);
@@ -2369,7 +2369,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 // show the efforts for each date range
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4);
+                sym->setSize(4 *dpiXFactor);
                 QColor col= compareDateRanges[j].color;
                 col.setAlpha(128);
                 sym->setBrush(col);

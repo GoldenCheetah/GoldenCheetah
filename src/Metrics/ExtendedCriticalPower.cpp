@@ -699,7 +699,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_4_3(TestModel model)
 
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::HLine);
-    sym->setSize(2);
+    sym->setSize(2 *dpiXFactor);
     sym->setPen(QPen(Qt::black));
     sym->setBrush(QBrush(Qt::NoBrush));
     extendedCPCurve2->setSymbol(sym);

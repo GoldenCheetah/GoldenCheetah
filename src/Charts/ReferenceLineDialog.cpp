@@ -40,7 +40,7 @@ ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context, Ride
         refUnit->setText(tr("Watts"));
     else if (serie == RideFile::hr)
         refUnit->setText(tr("BPM"));
-    refValue->setFixedWidth(50);
+    refValue->setFixedWidth(50 *dpiXFactor);
     referenceValueLayout->addWidget(refLabel);
     referenceValueLayout->addWidget(refValue);
     referenceValueLayout->addWidget(refUnit);

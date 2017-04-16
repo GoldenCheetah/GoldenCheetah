@@ -252,7 +252,7 @@ MUPlot::setModel(int model)
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Rect);
-            sym->setSize(8);
+            sym->setSize(8 *dpiXFactor);
             sym->setPen(QPen(handleColor)); // customise ?
             sym->setBrush(QBrush(color));
 
@@ -289,7 +289,7 @@ MUPlot::setModel(int model)
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Rect);
-            sym->setSize(8);
+            sym->setSize(8 *dpiXFactor);
             sym->setPen(QPen(handleColor)); // customise ?
             sym->setBrush(QBrush(color));
 
@@ -346,7 +346,7 @@ MUPlot::setModel(int model)
 
         QwtSymbol *sym = new QwtSymbol;
         sym->setStyle(QwtSymbol::Ellipse);
-        sym->setSize(4);
+        sym->setSize(4 *dpiXFactor);
         sym->setPen(QPen(Qt::yellow)); // customise ?
         sym->setBrush(QBrush(Qt::yellow));
 
