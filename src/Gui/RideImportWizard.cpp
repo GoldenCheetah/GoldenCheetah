@@ -1041,7 +1041,7 @@ RideImportWizard::abortClicked()
                 // to the "clean" activities folder
                 context->athlete->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
                                           tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing
-                                          true);                                       // file is available only in /tmpActivities, so use this one please
+                                          true, true);                                       // file is available only in /tmpActivities, so use this one please
                 // rideCache is successfully updated, let's move the file to the real /activities
                 if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
