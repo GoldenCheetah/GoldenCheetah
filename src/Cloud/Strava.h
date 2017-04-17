@@ -72,7 +72,12 @@ class Strava : public CloudService {
 
         QMap<QNetworkReply*, QByteArray*> buffers;
 
-        QByteArray* prepareResponse(QByteArray* data, QString name);
+        QByteArray* prepareResponse(QByteArray* data);
+
+        void addSamples(RideFile* ride, QString remoteid);
+        QByteArray mockActivities();
+        QByteArray mockActivity();
+        QByteArray mockStream();
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
