@@ -625,13 +625,15 @@ class CloudServiceAutoDownloadWidget : public QWidget
 
         void downloadStart();
         void downloadFinish();
-        void downloadProgress(double x);
+        void downloadProgress(QString s, double x, int i, int n);
 
     private:
 
         Context *context;
         enum { Checking, Downloading, Dormant } state;
         double progress;
+        int oneof, total;
+        QString servicename;
 
         // animating checking
         QPropertyAnimation *animator;

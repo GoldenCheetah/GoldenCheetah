@@ -1712,7 +1712,7 @@ CloudServiceAutoDownload::run()
     for(int i=0; i<downloadlist.count(); i++) {
 
         // update progress indicator
-        context->notifyAutoDownloadProgress(progress);
+        context->notifyAutoDownloadProgress(downloadlist[i].provider->name(), progress, i, downloadlist.count());
 
         CloudServiceDownloadEntry download= downloadlist[i];
 
@@ -1733,8 +1733,11 @@ CloudServiceAutoDownload::run()
         progress += inc;
 
         // if last one we need to signal done.
-        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(progress);
+        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(download.provider->name(), progress, i+1, downloadlist.count());
     }
+
+    // time to see completion
+    sleep(3);
 
     // all done, close the sync notification, regardless of if anything was downloaded
     context->notifyAutoDownloadEnd();
@@ -1826,10 +1829,10 @@ CloudServiceAutoDownloadWidget::CloudServiceAutoDownloadWidget(Context *context,
 {
     connect(context, SIGNAL(autoDownloadStart()), this, SLOT(downloadStart()));
     connect(context, SIGNAL(autoDownloadEnd()), this, SLOT(downloadFinish()));
-    connect(context, SIGNAL(autoDownloadProgress(double)), this, SLOT(downloadProgress(double)));
+    connect(context, SIGNAL(autoDownloadProgress(QString,double,int,int)), this, SLOT(downloadProgress(QString,double,int,int)));
 
     // just a small little thing
-    setFixedHeight(dpiYFactor * 25);
+    setFixedHeight(dpiYFactor * 50);
     hide();
 
     // animating checking
@@ -1857,12 +1860,15 @@ CloudServiceAutoDownloadWidget::downloadFinish()
 }
 
 void
-CloudServiceAutoDownloadWidget::downloadProgress(double x)
+CloudServiceAutoDownloadWidget::downloadProgress(QString s, double x, int i, int n)
 {
     state = Downloading;
     animator->stop();
     show();
     progress = x;
+    oneof=i;
+    total=n;
+    servicename=s;
     repaint();
 }
 
@@ -1885,11 +1891,11 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFontMetrics fm(font);
     painter.setFont(font);
     painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    QRectF textbox = QRectF(0,0, fm.width(statusstring), height());
+    QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 
     // rectangle
-    QRectF pr(textbox.width()+(5.0f*dpiXFactor), textbox.top()+(8.0f*dpiXFactor), width()-(10.0f*dpiXFactor)-textbox.width(), height()-(16*dpiXFactor));
+    QRectF pr(textbox.width()+(5.0f*dpiXFactor), textbox.top()+(8.0f*dpiXFactor), width()-(10.0f*dpiXFactor)-textbox.width(), (height()/2.0f)-(16*dpiXFactor));
 
     // progress rect
     QColor col = GColor(CPLOTMARKER);
@@ -1899,12 +1905,21 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     if (state == Downloading) {
         QRectF bar(pr.left(), pr.top(), (pr.width() / 100.00f * progress), pr.height());
         painter.fillRect(bar, brush);
+
+        // what's being downloaded?
+        QRectF bottom(0, height()/2.0f, width(), height()/2.0f);
+        painter.drawText(bottom, Qt::AlignLeft | Qt::AlignVCenter, QString("%1 of %2").arg(oneof).arg(total));
+        painter.drawText(bottom, Qt::AlignRight | Qt::AlignVCenter, servicename);
+
     } else if (state == Checking) {
         // bounce
         QRectF lbar(pr.left()+ ((pr.width() *0.8f) / 100.0f * transition), pr.top(), pr.width() * 0.2f, pr.height());
         QRectF rbar(pr.left()+ (pr.width()*0.8f) - ((pr.width() *0.8f) / 100.0f * transition), pr.top(), pr.width() * 0.2f, pr.height());
         painter.fillRect(lbar, brush);
         painter.fillRect(rbar, brush);
+
+        QRectF bottom(0, height()/2.0f, width(), height()/2.0f);
+        painter.drawText(bottom, Qt::AlignLeft | Qt::AlignVCenter, tr("Last 30 days"));
 
         // if we ran out of juice start again
         if (transition == 100) { animator->stop(); animator->start(); }

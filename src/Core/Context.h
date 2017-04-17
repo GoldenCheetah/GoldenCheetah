@@ -188,7 +188,7 @@ class Context : public QObject
 
         void notifyAutoDownloadStart() { emit autoDownloadStart(); }
         void notifyAutoDownloadEnd() { emit autoDownloadEnd(); }
-        void notifyAutoDownloadProgress(double x) { emit autoDownloadProgress(x); }
+        void notifyAutoDownloadProgress(QString s, double x, int i, int n) { emit autoDownloadProgress(s, x, i, n); }
 
         void notifyRefreshStart() { emit refreshStart(); }
         void notifyRefreshEnd() { emit refreshEnd(); }
@@ -234,7 +234,7 @@ class Context : public QObject
         // cloud download
         void autoDownloadStart();
         void autoDownloadEnd();
-        void autoDownloadProgress(double);
+        void autoDownloadProgress(QString, double, int, int);
 
         void rideSelected(RideItem*);
 
