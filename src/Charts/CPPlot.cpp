@@ -308,7 +308,11 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     }
 
     // set axis title
-    setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
+    setAxisTitle(yLeft, QString ("%1 %2 (%3) %4")
+                 .arg(prefix)
+                 .arg(series)
+                 .arg(units)
+                 .arg(postfix));
 
     // zap the old curves
     clearCurves();
@@ -1712,12 +1716,26 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         else
             units1 = ""; // time --> no units
 
-        // show percent ?
-        if ((((rangemode && context->isCompareDateRanges)
+        // no units for Heat Curve
+        if (curve == heatCurve) {
+            units2 = tr("%1 %2")
+                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                .arg(tr("Activities"));
+        }
+        else  if ((((rangemode && context->isCompareDateRanges)
             || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
-            || (curve == rideCurve && showPercent)) units2 = QString("%");
+            || (curve == rideCurve && showPercent))
+        {
+            units2 = tr("%1 %2")
+                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                .arg(tr("%")); // Percent
+        }
         else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
-            units2 = "J"; // Joule
+        {
+            units2 = tr("%1 %2")
+                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                .arg(tr("J")); // Joule
+        }
         else if (criticalSeries == CriticalPowerWindow::kph)
         {
 
@@ -1733,7 +1751,10 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         }
         else
         {
-            units2 = RideFile::unitName(rideSeries, context);
+            // eg: "### watts"
+            units2 = tr("%1 %2")
+                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                .arg(RideFile::unitName(rideSeries, context));
         }
         
 		// for the current ride curve, add a percent of rider's actual best.
@@ -1747,8 +1768,6 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 			}
 		}
 
-        // no units for Heat Curve
-        if (curve == heatCurve) units2 = QString(tr("Activities"));
 
         // for speed series add pace with units according to settings
         if (criticalSeries == CriticalPowerWindow::kph) {
@@ -1756,7 +1775,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                 const PaceZones *zones = context->athlete->paceZones(isSwim);
                 if (zones) {
                     bool metricPace = appsettings->value(this, zones->paceSetting(), true).toBool();
-                    paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
+                    paceStr = QString("\n%1 %2")
+                        .arg(zones->kphToPaceString(yvalue, metricPace))
+                        .arg(zones->paceUnits(metricPace));
                 }
             }
             double km = yvalue*xvalue/60.0; // distance in km
