@@ -1719,11 +1719,23 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
             units2 = "J"; // Joule
         else if (criticalSeries == CriticalPowerWindow::kph)
-            // yAxis doesn't obey units settings yet, remove when fixed
-            units2 = tr("kph %1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
-        else
-            units2 = RideFile::unitName(rideSeries, context);
+        {
 
+            // yAxis doesn't obey units settings yet, remove when fixed
+            if (context->athlete->useMetricUnits)
+            {
+                units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            }
+            else
+            {
+                units2 = tr("%1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
+            }
+        }
+        else
+        {
+            units2 = RideFile::unitName(rideSeries, context);
+        }
+        
 		// for the current ride curve, add a percent of rider's actual best.
 		if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
 			double bestY = getBests()[index];
@@ -1748,24 +1760,38 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                 }
             }
             double km = yvalue*xvalue/60.0; // distance in km
-            if (isSwim) {
-                paceStr += tr("\n%1 m %2 yd").arg(1000*km, 0, 'f', 0)
-                                    .arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
-            } else {
-                paceStr += tr("\n%1 km %2 mi").arg(km, 0, 'f', 3)
-                                    .arg(MILES_PER_KM*km, 0, 'f', 3);
+            if (isSwim)
+            {
+                if (context->athlete->useMetricUnits)
+                {
+                    paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
+                }
+                else
+                {
+                    paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+                }
+            }
+            else
+            {
+                if (context->athlete->useMetricUnits)
+                {
+                    paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
+                }
+                else
+                {
+                    paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
+                }
             }
         }
 
         // output the tooltip
-        text = QString("%1%2\n%3 %4%7%5%6")
+        text = QString("%1%2\n%3 %4%5%6")
                .arg(criticalSeries == CriticalPowerWindow::veloclinicplot?QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries)):interval_to_str(60.0*xvalue))
                .arg(units1)
-               .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                .arg(units2)
-               .arg(dateStr)
                .arg(currentRidePercentStr)
-               .arg(paceStr);
+               .arg(paceStr)
+               .arg(dateStr);
 
         // set that text up
         zoomer->setText(text);
