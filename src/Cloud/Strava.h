@@ -20,9 +20,9 @@
 #define GC_Strava_h
 
 #include "CloudService.h"
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QImage>
+
+class QNetworkReply;
+class QNetworkAccessManager;
 
 class Strava : public CloudService {
 
@@ -32,7 +32,7 @@ class Strava : public CloudService {
 
         QString name() const { return (tr("Strava")); }
         QString description() const { return (tr("Upload to the social network for cyclists and runners.")); }
-        QImage logo() const { return QImage(":images/services/strava.png"); }
+        QImage logo() const;
 
         Strava(Context *context);
         CloudService *clone(Context *context) { return new Strava(context); }
