@@ -564,7 +564,7 @@ class CloudServiceFactory {
             if (i.key() == CloudService::Combo1) { sname = i.value().split("::").at(0); }
 
             // populate from appsetting configuration
-            QVariant value = appsettings->cvalue(context->athlete->cyclist, sname, QVariant());
+            QVariant value = appsettings->cvalue(context->athlete->cyclist, sname, "");
 
             // apply default url
             if (i.key() == CloudService::URL && value == "") {
