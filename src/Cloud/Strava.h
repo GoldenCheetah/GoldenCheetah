@@ -42,8 +42,7 @@ class Strava : public CloudService {
         bool open(QStringList &errors);
         bool close();
 
-        // upload only for now, being worked up by Damien
-        virtual int capabilities() const { return OAuth | Upload ; }
+        //virtual int capabilities() const { return OAuth | Upload | Download | Query ; } // Default
 
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
@@ -75,9 +74,6 @@ class Strava : public CloudService {
         QByteArray* prepareResponse(QByteArray* data);
 
         void addSamples(RideFile* ride, QString remoteid);
-        QByteArray mockActivities();
-        QByteArray mockActivity();
-        QByteArray mockStream();
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
