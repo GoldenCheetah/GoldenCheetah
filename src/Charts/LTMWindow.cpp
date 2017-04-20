@@ -1160,18 +1160,23 @@ LTMWindow::dataTable(bool html)
 
     // align the starting X values of all columns using the
     // lowest xValue and highest xValue as borders
+    // for columsn which have data at all
     if (lowestFirstXvalue != highestFirstXvalue) {
         for (int i = 0; i< columns.count(); i++) {
-            double xValue = columns[i].x[0];
-            while (columns[i].x[0] > lowestFirstXvalue) {
-                xValue--;
-                columns[i].x.prepend(xValue);
-                columns[i].y.prepend(0.0);
-                columns[i].n++;
+            if (columns[i].n > 0) {
+                double xValue = columns[i].x[0];
+                while (columns[i].x[0] > lowestFirstXvalue) {
+                    xValue--;
+                    columns[i].x.prepend(xValue);
+                    columns[i].y.prepend(0.0);
+                    columns[i].n++;
+                }
             }
         }
-        // adjust number of visible rows in table
-        rows += qRound(highestFirstXvalue-lowestFirstXvalue);
+        // adjust number of visible rows in table (if we have proper values)
+        if (lowestFirstXvalue != DBL_MAX && highestFirstXvalue != 0.0) {
+            rows += qRound(highestFirstXvalue-lowestFirstXvalue);
+        }
     }
 
 
