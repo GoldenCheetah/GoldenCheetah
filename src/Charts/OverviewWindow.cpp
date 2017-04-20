@@ -1281,8 +1281,9 @@ static QColor FosterColors[11]={
 void
 RPErating::setValue(QString value)
 {
+    // RPE values from other sources (e.g. TodaysPlan) are "double"
     this->value = value;
-    int v = value.toInt();
+    int v = qRound(value.toDouble());
     if (v <0 || v>10) {
         color = GColor(CPLOTMARKER);
         description = QObject::tr("Invalid");
@@ -1420,7 +1421,7 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     // paint the blocks
     double width = geom.width() / 13; // always a block each side for a margin
     int i=0;
-    for(; i<= value.toInt(); i++) {
+    for(; i<= qRound(value.toDouble()); i++) {
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);
