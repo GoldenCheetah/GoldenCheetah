@@ -6989,8 +6989,10 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
     if (index >= 0 && curve != standard->intervalHighlighterCurve && 
                       curve != standard->intervalHoverCurve && curve->isVisible()) {
 
+        int precision = 1; //< default to tens precision
+
+        const double xvalue = curve->sample(index).x();
         double yvalue = curve->sample(index).y();
-        double xvalue = curve->sample(index).x();
 
         X = xvalue;
 
@@ -7005,37 +7007,38 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         // for speed curve add pace with units according to settings
         // only when the activity is a run.
         QString paceStr;
-        if (curve->title() == tr("Speed") && rideItem && rideItem->isRun) {
-            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
-            QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
-            paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, false) : mphToPace(yvalue, metricPace, false)).arg(paceunit);
-        }
-        if (curve->title() == tr("Speed") && rideItem && rideItem->isSwim) {
-            bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
-            QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
-            paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
-        }
-
-        // need to scale for W' bal
-        if (curve->title().text().contains("W'"))
-            yvalue /= 1000.0f;
-
-        // output the tooltip
-        int precision = 1; //< default to tens precision
-        if (curve->title().text() == tr("Hb")) {
+        
+        if (curve->title() == tr("Speed") && rideItem) {
             precision = 2;
-        } else if (curve->title().text() == tr("R-R")) {
+            if (rideItem->isRun) {
+                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
+                paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, false) : mphToPace(yvalue, metricPace, false)).arg(paceunit);
+            } else if (rideItem->isSwim) {
+                bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+                QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
+                paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
+            }
+        } else if (curve->title() == tr("W'")) {
+            // need to scale for W' bal
+            yvalue /= 1000.0f;
+        } else if (curve->title() == tr("Hb")) {
+            precision = 2;
+        } else if (curve->title() == tr("R-R")) {
             precision = 3;
-        } else if (curve->title().text() == tr("Gear Ratio")) {
+        } else if (curve->title() == tr("Gear Ratio")) {
             precision = 2;
         }
         
-        QString text = QString("%1 %2%5\n%3 %4")
-                        .arg(yvalue, 0, 'f', precision)
+        // output the tooltip
+        QString text = QString("%1\n%2 %3%4\n%5 %6")
                         .arg(this->axisTitle(curve->yAxis()).text())
+                        .arg(yvalue, 0, 'f', precision)
+                        .arg("") // TODO: determine units to describe mph, bpm, rpm, etc.
+                        .arg(paceStr)
                         .arg(xstring)
                         .arg(this->axisTitle(curve->xAxis()).text())
-                        .arg(paceStr);
+                        ;
 
         // set that text up
         tooltip->setText(text);
