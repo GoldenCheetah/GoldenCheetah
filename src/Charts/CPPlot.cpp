@@ -674,6 +674,7 @@ CPPlot::plotModel()
 
                 //CV
                 cpw->cpTitle->setText(tr("CV"));
+                // TODO: Should metric instead depend on the swim/run/default unit settings?
                 cpw->cpValue->setText(kphToString(pdModel->CP()));
                 cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
 
@@ -1695,8 +1696,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
     if (index >= 0) {
 
-        double xvalue = curve->sample(index).x();
-        double yvalue = curve->sample(index).y();
+        const double xvalue = curve->sample(index).x();
+        const double yvalue = curve->sample(index).y();
         QString text, dateStr, paceStr;
         QString currentRidePercentStr;
         QString units1;
@@ -1710,12 +1711,25 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                 dateStr = date.toString(tr("\nddd, dd MMM yyyy"));
             }
         }
+        
+        bool metricPace = true;
+        if (isSwim) {
+            metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+            qDebug() << "swim pacing:" << (metricPace ? "metric":"imperial");
+        } else if (isRun) {
+            metricPace = appsettings->value(this, GC_PACE, true).toBool();
+            qDebug() << "run pacing:" << (metricPace ? "metric":"imperial");
+        } else {
+            metricPace = context->athlete->useMetricUnits;
+            qDebug() << "bike/default pacing:" << (metricPace ? "metric":"imperial");
+        }
 
-        if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+        if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
             units1 = RideFile::unitName(rideSeries, context);
-        else
+        } else {
             units1 = ""; // time --> no units
-
+        }
+        
         // no units for Heat Curve
         if (curve == heatCurve) {
             units2 = tr("%1 %2")
@@ -1738,14 +1752,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         }
         else if (criticalSeries == CriticalPowerWindow::kph)
         {
-
-            // yAxis doesn't obey units settings yet, remove when fixed
-            if (context->athlete->useMetricUnits)
-            {
+            if (metricPace) {
                 units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
-            }
-            else
-            {
+            } else {
                 units2 = tr("%1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
             }
         }
@@ -1774,32 +1783,26 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             if (isRun || isSwim) {
                 const PaceZones *zones = context->athlete->paceZones(isSwim);
                 if (zones) {
-                    bool metricPace = appsettings->value(this, zones->paceSetting(), true).toBool();
                     paceStr = QString("\n%1 %2")
                         .arg(zones->kphToPaceString(yvalue, metricPace))
                         .arg(zones->paceUnits(metricPace));
                 }
             }
-            double km = yvalue*xvalue/60.0; // distance in km
+            
+            const double km = yvalue*xvalue/60.0; // distance in km
             if (isSwim)
             {
-                if (context->athlete->useMetricUnits)
-                {
+                if (metricPace) {
                     paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
-                }
-                else
-                {
+                } else {
                     paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
                 }
             }
             else
             {
-                if (context->athlete->useMetricUnits)
-                {
+                if (metricPace) {
                     paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
-                }
-                else
-                {
+                } else {
                     paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
                 }
             }
@@ -1807,7 +1810,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // output the tooltip
         text = QString("%1%2\n%3 %4%5%6")
-               .arg(criticalSeries == CriticalPowerWindow::veloclinicplot?QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries)):interval_to_str(60.0*xvalue))
+               .arg(criticalSeries == CriticalPowerWindow::veloclinicplot ?
+                    QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                    : interval_to_str(60.0*xvalue))
                .arg(units1)
                .arg(units2)
                .arg(currentRidePercentStr)
@@ -1841,9 +1846,9 @@ CPPlot::exportBests(QString filename)
 
         // just output for the bests curve
         for (size_t i=0; i<bestsCurve->data()->size(); i++) {
-            double xvalue = bestsCurve->sample(i).x();
-            double yvalue = bestsCurve->sample(i).y();
-            double modelvalue = expmodel ? pdModel->y(xvalue) : 0;
+            const double xvalue = bestsCurve->sample(i).x();
+            const double yvalue = bestsCurve->sample(i).y();
+            const double modelvalue = expmodel ? pdModel->y(xvalue) : 0;
 
             int index = xvalue * 60.00f;
             QDate date;
