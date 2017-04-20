@@ -7390,11 +7390,12 @@ AllPlot::plotTmpExhaustion(double mx)
     // we need to have a ride to work with
     if (!rideItem || !rideItem->ride()) return;
 
-    double px = invTransform(QwtAxisId(QwtPlot::xBottom), mx);
     double secs = -1;
-
-    if (bydist == true) secs = rideItem->ride()->distanceToTime(px);
-    else secs = px * 60.00f;
+    if (mx > 0) {
+        double px = invTransform(QwtAxisId(QwtPlot::xBottom), mx);
+        if (bydist == true) secs = rideItem->ride()->distanceToTime(px);
+        else secs = px * 60.00f;
+    }
 
     //
     // clear whatever is there
