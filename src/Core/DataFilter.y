@@ -63,6 +63,9 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 %type <op> AND OR;
 
+// Date Range markers for vector expressions
+%token <op> LSB RSB
+
 %union {
    Leaf *leaf;
    QList<Leaf*> *comp;
@@ -78,6 +81,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %right '?' ':'
 %right '[' ']'
+%right LSB RSB
 %right AND OR
 %right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %left ADD SUBTRACT
@@ -253,16 +257,13 @@ lexpr:
                                                   $$->rvalue.l = $5;
                                                   $$->cond.l = $1;
                                                 }
-/* DEPRECATED (TEMPORARILY?)
-        | lexpr '[' lexpr ':' lexpr ']' { $$ = new Leaf(@1.first_column, @6.last_column);
+        | lexpr LSB lexpr ':' lexpr RSB { $$ = new Leaf(@1.first_column, @6.last_column);
                                                   $$->type = Leaf::Vector;
                                                   $$->lvalue.l = $1;
                                                   $$->fparms << $3;
                                                   $$->fparms << $5;
                                                   $$->op = 0;
                                                 }
-*/
-
         | '!' lexpr %prec OR                    { $$ = new Leaf(@1.first_column, @2.last_column);
                                                   $$->type = Leaf::UnaryOperation;
                                                   $$->lvalue.l = $2;
