@@ -390,7 +390,7 @@ Strava::readFileCompleted()
 }
 
 void
-Strava::addSamples(RideFile* ride, QString remoteid)
+Strava::addSamples(RideFile* ret, QString remoteid)
 {
     printd("Strava::addSamples(%s)\n", remoteid.toStdString().c_str());
 
@@ -428,8 +428,7 @@ Strava::addSamples(RideFile* ride, QString remoteid)
 
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "error" << reply->errorString();
-        //errors << tr("Network Problem reading Strava data");
-        //return returning;
+        return;
     }
     // did we get a good response ?
     QByteArray r = reply->readAll();
@@ -440,45 +439,119 @@ Strava::addSamples(RideFile* ride, QString remoteid)
 
     // if path was returned all is good, lets set root
     if (parseError.error == QJsonParseError::NoError) {
+        // Streams is the Strava term for the raw data associated with an activity.
+        // All streams for a given activity or segment effort will be the same length
+        // and the values at a given index correspond to the same time.
+
         QJsonArray streams = document.array();
 
-        QJsonArray timeData;
-        QJsonArray distanceData;
-        QJsonArray altitudeData;
-        QJsonArray latlngData;
+        // Stream types
+        // ==============
+        // Streams are available in 11 different types. If the stream is not available for a particular activity it will be left out of the request results.
 
+        // time:	integer seconds
+        // latlng:	floats [latitude, longitude]
+        // distance:	float meters
+        // altitude:	float meters
+        // velocity_smooth:	float meters per second
+        // heartrate:	integer BPM
+        // cadence:	integer RPM
+        // watts:	integer watts
+        // temp:	integer degrees Celsius
+        // moving:	boolean
+        // grade_smooth:	float percent
+
+        // for mapping from the names used in the Strava json response
+        // to the series names we use in GC
+        static struct {
+            RideFile::seriestype type;
+            const char *stravaname;
+            double factor;                  // to convert from Strava units to GC units
+        } seriesnames[] = {
+
+            // seriestype          strava name           conversion factor
+            { RideFile::secs,      "time",                         1.0f   },
+            { RideFile::lat,       "latlng",                       1.0f   },
+            { RideFile::alt,       "altitude",                     1.0f   },
+            { RideFile::km,        "distance" ,                    0.001f },
+            { RideFile::kph,       "velocity_smooth",              3.6f   },
+            { RideFile::hr,        "heartrate",                    1.0f   },
+            { RideFile::cad,       "cadence",                      1.0f   },
+            { RideFile::watts,     "watts",                        1.0f   },
+            { RideFile::temp,      "temp",                         1.0f   },
+            { RideFile::none,      "",                             0.0f   }
+
+        };
+
+        // data to combine into a new ride
+        class strava_stream {
+        public:
+            double factor; // for converting
+            RideFile::seriestype type;
+            QJsonArray samples;
+        };
+
+        // create a list of all the data we will work with
+        QList<strava_stream> data;
+
+        // examine the returned object and extract sample data
         for(int i=0; i<streams.size(); i++) {
             QJsonObject stream = streams.at(i).toObject();
-
             QString type = stream["type"].toString();
 
-            if (type == "time") {
-                timeData = stream["data"].toArray();
-            } else if (type == "distance") {
-                distanceData = stream["data"].toArray();
-            } else if (type == "altitude") {
-                altitudeData = stream["data"].toArray();
-            }else if (type == "latlng") {
-                latlngData = stream["data"].toArray();
+            for(int j=0; seriesnames[j].type != RideFile::none; j++) {
+                QString name = seriesnames[j].stravaname;
+                strava_stream add;
+
+                // contained?
+                if (type == name) {
+                    add.factor = seriesnames[j].factor;
+                    add.type = seriesnames[j].type;
+                    add.samples = stream["data"].toArray();
+
+                    data << add;
+                    break;
+                }
             }
         }
 
-        for(int i=0; i<timeData.size(); i++) {
-            double secs = timeData.at(i).toInt();
-            double km = distanceData.at(i).toDouble()/1000.0;
-            double alt = altitudeData.at(i).toDouble();
-            double lat = latlngData.at(i).toArray().at(0).toDouble();
-            double lon = latlngData.at(i).toArray().at(1).toDouble();
+        bool end = false;
+        int index=0;
+        do {
+            RideFilePoint add;
 
-            RideFilePoint point;
-            point.setValue(RideFile::secs, secs);
-            point.setValue(RideFile::km, km);
-            point.setValue(RideFile::alt, alt);
-            point.setValue(RideFile::lat, lat);
-            point.setValue(RideFile::lon, lon);
+            // move through streams if they're waiting for this point
+            foreach(strava_stream stream, data) {
 
-            ride->appendPoint(point);
-         }
+                // if this stream still has data to consume
+                if (index < stream.samples.count()) {
+
+                    if (stream.type == RideFile::lat) {
+
+                        double lat = stream.factor * stream.samples.at(index).toArray().at(0).toDouble();
+                        double lon = stream.factor * stream.samples.at(index).toArray().at(1).toDouble();
+
+                        // this is one for us, update and move on
+                        add.setValue(RideFile::lat, lat);
+                        add.setValue(RideFile::lon, lon);
+
+                    } else {
+
+                        // hr, distance et al
+                        double value = stream.factor * stream.samples.at(index).toDouble();
+
+                        // this is one for us, update and move on
+                        add.setValue(stream.type, value);
+                    }
+
+                } else
+                    end = true;
+            }
+
+            ret->appendPoint(add);
+            index++;
+
+        } while (!end);
     }
 }
 
@@ -494,8 +567,20 @@ Strava::prepareResponse(QByteArray* data)
     if (parseError.error == QJsonParseError::NoError) {
         QJsonObject each = document.object();
 
-        RideFile *ride = new RideFile();
-        ride->setStartTime(QDateTime::fromString(each["start_date"].toString(), Qt::ISODate));
+        QDateTime starttime = QDateTime::fromString(each["start_date_local"].toString(), Qt::ISODate);
+
+        // 1s samples with start time
+        RideFile *ride = new RideFile(starttime, 1.0f);
+
+        // what sport?
+        if (!each["type"].isNull()) {
+            QString stype = each["type"].toString();
+            if (stype == "Ride") ride->setTag("Sport", "Bike");
+            else if (stype == "Run") ride->setTag("Sport", "Run");
+            else if (stype == "Swim") ride->setTag("Sport", "Swim");
+            else ride->setTag("Sport", stype);
+        }
+
         if (each["device_name"].toString().length()>0)
             ride->setDeviceType(each["device_name"].toString());
         else
@@ -506,6 +591,9 @@ Strava::prepareResponse(QByteArray* data)
         JsonFileReader reader;
         data->clear();
         data->append(reader.toByteArray(context, ride, true, true, true, true));
+
+        // temp ride not needed anymore
+        delete ride;
 
         printd("reply:%s\n", data->toStdString().c_str());
     }
