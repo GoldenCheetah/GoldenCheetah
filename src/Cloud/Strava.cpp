@@ -111,69 +111,88 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
         return returning;
     }
 
-    QString urlstr = "https://www.strava.com/api/v3/athlete/activities?";
+    // Do Paginated Access to the Activities List
+    const int pageSize = 30;
+    int offset = 0;
+    int resultCount = INT_MAX;
+
+    while (offset < resultCount) {
+        QString urlstr = "https://www.strava.com/api/v3/athlete/activities?";
 
 #if QT_VERSION > 0x050000
-    QUrlQuery params;
+        QUrlQuery params;
 #else
-    QUrl params;
+        QUrl params;
 #endif
 
-    // use toMSecsSinceEpoch for compatibility with QT4
-    params.addQueryItem("before", QString::number(to.toMSecsSinceEpoch()/1000.0f, 'f', 0));
-    params.addQueryItem("after", QString::number(from.toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        // use toMSecsSinceEpoch for compatibility with QT4
+        params.addQueryItem("before", QString::number(to.toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        params.addQueryItem("after", QString::number(from.toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        params.addQueryItem("per_page", QString("%1").arg(pageSize));
+        params.addQueryItem("page",  QString("%1").arg(offset/pageSize+1));
 
-    QUrl url = QUrl( urlstr + params.toString() );
-    printd("URL used: %s\n", url.url().toStdString().c_str());
+        QUrl url = QUrl( urlstr + params.toString() );
+        printd("URL used: %s\n", url.url().toStdString().c_str());
 
-    // request using the bearer token
-    QNetworkRequest request(url);
-    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+        // request using the bearer token
+        QNetworkRequest request(url);
+        request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
 
-    QNetworkReply *reply = nam->get(request);
+        QNetworkReply *reply = nam->get(request);
 
-    // blocking request
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+        // blocking request
+        QEventLoop loop;
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-    if (reply->error() != QNetworkReply::NoError) {
-        qDebug() << "error" << reply->errorString();
-        errors << tr("Network Problem reading Strava data");
-        //return returning;
-    }
-    // did we get a good response ?
-    QByteArray r = reply->readAll();
-    printd("response: %s\n", r.toStdString().c_str());
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << "error" << reply->errorString();
+            errors << tr("Network Problem reading Strava data");
+            //return returning;
+        }
+        // did we get a good response ?
+        QByteArray r = reply->readAll();
+        printd("response: %s\n", r.toStdString().c_str());
 
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
-    // if path was returned all is good, lets set root
-    if (parseError.error == QJsonParseError::NoError) {
+        // if path was returned all is good, lets set root
+        if (parseError.error == QJsonParseError::NoError) {
 
-        // results ?
-        QJsonArray results = document.array();
+            // results ?
+            QJsonArray results = document.array();
 
-        // lets look at that then
-        for(int i=0; i<results.size(); i++) {
-            QJsonObject each = results.at(i).toObject();
-            CloudServiceEntry *add = newCloudServiceEntry();
+            // lets look at that then
+            if (results.size()>0) {
+                for(int i=0; i<results.size(); i++) {
+                    QJsonObject each = results.at(i).toObject();
+                    CloudServiceEntry *add = newCloudServiceEntry();
 
 
-            //Strava has full path, we just want the file name
-            add->label = QFileInfo(each["name"].toString()).fileName();
-            add->id = QString("%1").arg(each["id"].toInt());
-            add->isDir = false;
-            add->distance = each["distance"].toDouble()/1000.0;
-            add->duration = each["elapsed_time"].toInt();
-            add->name = QDateTime::fromString(each["start_date"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                    //Strava has full path, we just want the file name
+                    add->label = QFileInfo(each["name"].toString()).fileName();
+                    add->id = QString("%1").arg(each["id"].toInt());
+                    add->isDir = false;
+                    add->distance = each["distance"].toDouble()/1000.0;
+                    add->duration = each["elapsed_time"].toInt();
+                    add->name = QDateTime::fromString(each["start_date"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
 
-            printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
+                    printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
 
-            returning << add;
+                    returning << add;
+                }
+                // next page
+                offset += pageSize;
+            } else
+                offset = INT_MAX;
+
+        } else {
+            // we had a parsing error - so something is wrong - stop requesting more data by ending the loop
+            offset = INT_MAX;
         }
     }
+
     // all good ?
     return returning;
 }
