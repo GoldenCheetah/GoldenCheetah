@@ -292,7 +292,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 if (suffix == "") suffix = "json";
 
 
-                //TodaysPlan has full path, we just want the file name
+                //TodaysPlan's Label may contain the FileName, or Descriptive Text (whatever is shown/edited on the TP's UI)
                 add->label = QFileInfo(each["name"].toString()).fileName();
                 add->id = QString("%1").arg(each["fileId"].toInt());
                 add->isDir = false;
@@ -300,7 +300,8 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 add->duration = each["training"].toInt();
                 add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
 
-                replyActivity.insert(add->label, each);
+                // only our own name is a reliable key
+                replyActivity.insert(add->name, each);
 
                 //add->size
                 //add->modified
