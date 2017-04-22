@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GC_TrainingStageBuch_h
-#define GC_TrainingStageBuch_h
+#ifndef GC_TrainingsTageBuch_h
+#define GC_TrainingsTageBuch_h
 #include <QImage>
 
 // Cloud Services and HTTP
