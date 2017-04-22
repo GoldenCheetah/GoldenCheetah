@@ -176,6 +176,8 @@ class AddSettings : public QWizardPage
 
     private:
         AddCloudWizard *wizard;
+        QLabel *metaLabel;
+        QComboBox *metaCombo;
         QLabel *folderLabel;
         QLineEdit *folder;
         QPushButton *browse;
