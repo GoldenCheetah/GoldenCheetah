@@ -333,16 +333,16 @@ Strava::writeFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
-
     bool uploadSuccessful = false;
     QString response = reply->readLine();
     QString uploadError="invalid response or parser error";
 
+    printd("reply:%s\n", response.toStdString().c_str());
+
     try {
 
         // parse !
-        MVJSONReader jsonResponse(string(response.toLatin1()));
+        MVJSONReader jsonResponse(response.toStdString());
 
         // get error field
         if (jsonResponse.root) {
