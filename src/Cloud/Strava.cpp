@@ -176,7 +176,7 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
                     add->isDir = false;
                     add->distance = each["distance"].toDouble()/1000.0;
                     add->duration = each["elapsed_time"].toInt();
-                    add->name = QDateTime::fromString(each["start_date"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                    add->name = QDateTime::fromString(each["start_date_local"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
 
                     printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
 
@@ -299,7 +299,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"file.tcx.gz\"; type=\"text/xml\""));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+".tcx.gz\"; type=\"text/xml\""));
     filePart.setBody(data);
 
     multiPart->append(accessTokenPart);
@@ -586,10 +586,10 @@ Strava::prepareResponse(QByteArray* data)
     if (parseError.error == QJsonParseError::NoError) {
         QJsonObject each = document.object();
 
-        QDateTime starttime = QDateTime::fromString(each["start_date_local"].toString(), Qt::ISODate);
+        QDateTime starttime = QDateTime::fromString(each["local_start_date"].toString(), Qt::ISODate);
 
         // 1s samples with start time
-        RideFile *ride = new RideFile(starttime, 1.0f);
+        RideFile *ride = new RideFile(starttime.toUTC(), 1.0f);
 
         // what sport?
         if (!each["type"].isNull()) {
@@ -604,6 +604,8 @@ Strava::prepareResponse(QByteArray* data)
             ride->setDeviceType(each["device_name"].toString());
         else
             ride->setDeviceType("Strava"); // The device type is unknown
+
+        if (!each["name"].isNull()) ride->setTag("Notes", each["name"].toString());
 
         addSamples(ride, QString("%1").arg(each["id"].toInt()));
 
