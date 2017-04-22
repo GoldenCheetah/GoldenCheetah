@@ -36,19 +36,19 @@
 #include <QUrlQuery>
 #endif
 
-class TrainingStageBuch : public CloudService {
+class TrainingsTageBuch : public CloudService {
 
     Q_OBJECT
 
     public:
 
-        QString name() const { return (tr("TrainingStageBuch")); }
+        QString name() const { return (tr("TrainingsTageBuch")); }
         QString description() const { return (tr("Upload to your online and mobile training log.")); }
         QImage logo() const { return QImage(":images/services/trainingstagebuch.png"); }
 
-        TrainingStageBuch(Context *context);
-        CloudService *clone(Context *context) { return new TrainingStageBuch(context); }
-        ~TrainingStageBuch();
+        TrainingsTageBuch(Context *context);
+        CloudService *clone(Context *context) { return new TrainingsTageBuch(context); }
+        ~TrainingsTageBuch();
 
         // upload only and authenticates with a user and password
         int capabilities() const { return UserPass | Upload; }
@@ -83,7 +83,7 @@ class TrainingStageBuch : public CloudService {
 class TTBParser : public QXmlDefaultHandler
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     bool startElement( const QString&, const QString&, const QString&,
         const QXmlAttributes& )
@@ -115,7 +115,7 @@ protected:
 class TTBSettingsParser : public TTBParser
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     TTBSettingsParser() :
         pro(false),
@@ -147,7 +147,7 @@ protected:
 class TTBSessionParser : public TTBParser
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {
@@ -168,7 +168,7 @@ protected:
 class TTBUploadParser : public TTBParser
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {

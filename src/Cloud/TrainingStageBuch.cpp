@@ -18,7 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "TrainingStageBuch.h"
+#include "TrainingsTageBuch.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include <QByteArray>
@@ -52,7 +52,7 @@
 
 const QString TTB_URL( "http://trainingstagebuch.org" );
 
-TrainingStageBuch::TrainingStageBuch(Context *context) : CloudService(context), context(context), root_(NULL) {
+TrainingsTageBuch::TrainingsTageBuch(Context *context) : CloudService(context), context(context), root_(NULL) {
 
     if (context) {
         nam = new QNetworkAccessManager(this);
@@ -68,18 +68,18 @@ TrainingStageBuch::TrainingStageBuch(Context *context) : CloudService(context), 
     settings.insert(Password, GC_TTBPASS);
 }
 
-TrainingStageBuch::~TrainingStageBuch() {
+TrainingsTageBuch::~TrainingsTageBuch() {
     if (context) delete nam;
 }
 
 void
-TrainingStageBuch::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
+TrainingsTageBuch::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 {
     reply->ignoreSslErrors();
 }
 
 bool
-TrainingStageBuch::open(QStringList &errors)
+TrainingsTageBuch::open(QStringList &errors)
 {
     // get a session token, then get the settings for the account
     printd("TrainingStageBuch::open\n");
@@ -192,7 +192,7 @@ TrainingStageBuch::open(QStringList &errors)
 }
 
 bool
-TrainingStageBuch::close()
+TrainingsTageBuch::close()
 {
     printd("TrainingStageBuch::close\n");
     // nothing to do for now
@@ -200,7 +200,7 @@ TrainingStageBuch::close()
 }
 
 bool
-TrainingStageBuch::writeFile(QByteArray &data, QString remotename, RideFile *ride)
+TrainingsTageBuch::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
     Q_UNUSED(ride);
 
@@ -261,7 +261,7 @@ TrainingStageBuch::writeFile(QByteArray &data, QString remotename, RideFile *rid
 }
 
 void
-TrainingStageBuch::writeFileCompleted()
+TrainingsTageBuch::writeFileCompleted()
 {
     printd("TrainingStageBuch::writeFileCompleted()\n");
 
@@ -296,7 +296,7 @@ TrainingStageBuch::writeFileCompleted()
 }
 
 static bool addTrainingStageBuch() {
-    CloudServiceFactory::instance().addService(new TrainingStageBuch(NULL));
+    CloudServiceFactory::instance().addService(new TrainingsTageBuch(NULL));
     return true;
 }
 
