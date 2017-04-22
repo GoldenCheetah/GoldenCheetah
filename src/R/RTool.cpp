@@ -37,6 +37,15 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+// From version 3.4.0 of R the structure for declaring C functions
+// has changed to have fewer members. I'm not sure the guys maintaining
+// the codebase understand how to manage a legacy codebase. Sigh.
+#if R_VERSION >= R_Version(3,4,0)
+#define CDEFCOMPAT
+#else
+#define CDEFCOMPAT ,0
+#endif
+
 RTool::RTool()
 {
     // setup the R runtime elements
@@ -82,23 +91,23 @@ RTool::RTool()
 
         // register our functions
         R_CMethodDef cMethods[] = {
-            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
-            { "GC.page", (DL_FUNC) &RTool::pageSize, 0 ,0, 0 },
-            { "GC.size", (DL_FUNC) &RTool::windowSize, 0 ,0, 0 },
-            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
-            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0 ,0, 0 },
-            { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
-            { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
-            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0 ,0, 0 },
-            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0 ,0, 0 },
-            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 ,0, 0 },
-            { "GC.season", (DL_FUNC) &RTool::season, 0 ,0, 0 },
-            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
-            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0 ,0, 0 },
-            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
-            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0 ,0, 0 },
-            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0 ,0, 0 },
-            { NULL, NULL, 0, 0, 0 }
+            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0,0 CDEFCOMPAT },
+            { "GC.page", (DL_FUNC) &RTool::pageSize, 0,0 CDEFCOMPAT  },
+            { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0 CDEFCOMPAT },
+            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0 CDEFCOMPAT },
+            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0,0 CDEFCOMPAT },
+            { "GC.activities", (DL_FUNC) &RTool::activities, 0,0 CDEFCOMPAT },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 0,0 CDEFCOMPAT },
+            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0 CDEFCOMPAT },
+            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0 CDEFCOMPAT },
+            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0 CDEFCOMPAT },
+            { "GC.season", (DL_FUNC) &RTool::season, 0,0 CDEFCOMPAT },
+            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0 CDEFCOMPAT },
+            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0,0 CDEFCOMPAT },
+            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0,0 CDEFCOMPAT },
+            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0 CDEFCOMPAT },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0 CDEFCOMPAT },
+            { NULL, NULL, 0,0 CDEFCOMPAT }
         };
         R_CallMethodDef callMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
