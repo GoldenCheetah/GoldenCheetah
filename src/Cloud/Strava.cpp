@@ -126,8 +126,8 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 #endif
 
         // use toMSecsSinceEpoch for compatibility with QT4
-        params.addQueryItem("before", QString::number(to.toMSecsSinceEpoch()/1000.0f, 'f', 0));
-        params.addQueryItem("after", QString::number(from.toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        params.addQueryItem("before", QString::number(to.addDays(1).toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        params.addQueryItem("after", QString::number(from.addDays(-1).toMSecsSinceEpoch()/1000.0f, 'f', 0));
         params.addQueryItem("per_page", QString("%1").arg(pageSize));
         params.addQueryItem("page",  QString("%1").arg(offset/pageSize+1));
 
