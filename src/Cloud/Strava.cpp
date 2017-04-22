@@ -65,6 +65,7 @@ Strava::Strava(Context *context) : CloudService(context), context(context), root
 
     // config
     settings.insert(OAuthToken, GC_STRAVA_TOKEN);
+    settings.insert(Metadata1, QString("%1::Activity Name").arg(GC_STRAVA_ACTIVITY_NAME));
 }
 
 Strava::~Strava() {
@@ -275,7 +276,13 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));
-    activityNamePart.setBody(filename.toLatin1());
+
+    // use metadata config if the user selected it
+    QString fieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+    QString meta;
+    if (fieldname != "")  meta = ride->getTag(fieldname, "");
+    if (meta == "") activityNamePart.setBody(filename.toLatin1());
+    else activityNamePart.setBody(meta.toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));

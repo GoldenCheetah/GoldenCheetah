@@ -144,7 +144,7 @@ class CloudService : public QObject {
         // entry points -- to list and accept the choice of athlete by the user
         enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, AthleteID,
                                    Local1, Local2, Local3, Local4, Local5, Local6,
-                                   Combo1 } setting_;
+                                   Combo1, Metadata1 } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
         // When a service is instantiated by the cloud service factory, the configuration
@@ -522,12 +522,22 @@ class CloudServiceFactory {
         while(want.hasNext()) {
             want.next();
 
+            // key might need parsing
+            QString key;
+            if (want.value().contains("::")) key = want.value().split("::").at(0);
+            else key = want.value();
+
             // get value
-            QString value = service->getSetting(want.value(), "").toString();
+            QString value = service->getSetting(key, "").toString();
+
             if (value == "") continue;
 
             // ok, we have a setting
-            appsettings->setCValue(context->athlete->cyclist, want.value(), value);
+            appsettings->setCValue(context->athlete->cyclist, key, value);
+
+            #ifdef GC_WANT_ALLDEBUG
+            qDebug()<<"factory save setting:" <<key<< value;
+            #endif
         }
 
         // generic settings
@@ -560,8 +570,9 @@ class CloudServiceFactory {
             // the setting name
             QString sname=i.value();
 
-            // Combos are tricky
+            // Combos and Metadata are tricky
             if (i.key() == CloudService::Combo1) { sname = i.value().split("::").at(0); }
+            if (i.key() == CloudService::Metadata1) { sname = i.value().split("::").at(0); }
 
             // populate from appsetting configuration
             QVariant value = appsettings->cvalue(context->athlete->cyclist, sname, "");
