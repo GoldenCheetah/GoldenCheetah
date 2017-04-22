@@ -168,7 +168,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // Routes
     routes = new Routes(context, home->config());
 
-    // get body measures if the file exists
+    // get body measurements if the file exists
     QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()));
     if (bmFile.exists()) {
         QList<BodyMeasure> bmData;

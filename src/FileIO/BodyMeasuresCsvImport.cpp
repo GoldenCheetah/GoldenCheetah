@@ -42,7 +42,7 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
   bool weightkgExists = false;
   int lineNo = 0;
 
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select body measures file to import"), "", tr("CSV Files (*.csv)"));
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select body measurements file to import"), "", tr("CSV Files (*.csv)"));
   if (fileName.isEmpty()) {
       error = tr("No file selected.");
       return false;

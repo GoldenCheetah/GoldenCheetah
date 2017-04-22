@@ -523,7 +523,7 @@ class AthleteWeight : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Weight in kg or lbs: first from downloaded Body Measure data, then from Activity metadata and last from Athlete configuration with 75kg default"));
+        setDescription(tr("Weight in kg or lbs: first from Athlete body measurements, then from Activity metadata and last from Athlete configuration with 75kg default"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -572,7 +572,7 @@ class AthleteFat : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Athlete bodyfat in kg or lbs from downloaded Body Measure data"));
+        setDescription(tr("Athlete bodyfat in kg or lbs from body measurements"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -613,7 +613,7 @@ class AthleteBones : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Athlete bones in kg or lbs from downloaded Body Measure data"));
+        setDescription(tr("Athlete bones in kg or lbs from body measurements"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -654,7 +654,7 @@ class AthleteMuscles : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Athlete muscles in kg or lbs from downloaded Body Measure data"));
+        setDescription(tr("Athlete muscles in kg or lbs from body measurements"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -695,7 +695,7 @@ class AthleteLean : public RideMetric {
         setImperialUnits(tr("lbs"));
         setPrecision(2);
         setConversion(LB_PER_KG);
-        setDescription(tr("Lean Weight in kg or lbs from downloaded Body Measure data"));
+        setDescription(tr("Lean Weight in kg or lbs from body measurements"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
@@ -735,7 +735,7 @@ class AthleteFatP : public RideMetric {
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
         setPrecision(1);
-        setDescription(tr("Bodyfat Percent from downloaded Body Measure data"));
+        setDescription(tr("Bodyfat in Percent from body measurements"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
