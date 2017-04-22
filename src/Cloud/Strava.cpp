@@ -271,9 +271,11 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     else
       activityTypePart.setBody("ride");
 
+    QString filename = QFileInfo(remotename).baseName();
+
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));
-    activityNamePart.setBody(remotename.toLatin1());
+    activityNamePart.setBody(filename.toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
@@ -281,7 +283,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QHttpPart externalIdPart;
     externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
-    externalIdPart.setBody("Ride");
+    externalIdPart.setBody(filename.toStdString().c_str());
 
     //XXXQHttpPart privatePart;
     //XXXprivatePart.setHeader(QNetworkRequest::ContentDispositionHeader,
@@ -299,7 +301,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+".tcx.gz\"; type=\"text/xml\""));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+"\"; type=\"text/xml\""));
     filePart.setBody(data);
 
     multiPart->append(accessTokenPart);
