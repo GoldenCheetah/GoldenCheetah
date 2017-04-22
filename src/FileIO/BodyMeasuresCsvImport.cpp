@@ -106,7 +106,7 @@ BodyMeasuresCsvImport::getBodyMeasures(QString &error, QDateTime from, QDateTime
       if (items.count() != headers.count()) {
           // we only process valid data - so stop here
           // independent if other items are ok
-          error = tr("Number of data columns: %1 in line %2 deviates from header columns: %2").arg(items.count()).arg(lineNo).arg(headers.count());
+          error = tr("Number of data columns: %1 in line %2 deviates from header columns: %3").arg(items.count()).arg(lineNo).arg(headers.count());
           goto error;
       }
       // extract the values
