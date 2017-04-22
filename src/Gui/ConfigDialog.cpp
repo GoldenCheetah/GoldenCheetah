@@ -340,7 +340,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));
     tabs->addTab(modelPage, tr("Model"));
-    tabs->addTab(athletePhysPage, tr("Measures"));
+    tabs->addTab(athletePhysPage, tr("Measurements"));
     tabs->addTab(zonesTab, tr("Zones"));
     tabs->addTab(credentialsPage, tr("Accounts"));
     tabs->addTab(autoImportPage, tr("Auto Import"));
