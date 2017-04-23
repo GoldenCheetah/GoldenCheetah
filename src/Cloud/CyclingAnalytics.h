@@ -39,11 +39,14 @@ class CyclingAnalytics : public CloudService {
         ~CyclingAnalytics();
 
         // upload only and authenticates with OAuth tokens
-        int capabilities() const { return OAuthToken | Upload; }
+        int capabilities() const { return OAuthToken | Upload | Download | Query; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
         bool close();
+
+        // get list of rides
+        QList<CloudServiceEntry *> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
