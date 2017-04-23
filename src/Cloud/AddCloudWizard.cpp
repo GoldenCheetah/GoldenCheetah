@@ -100,7 +100,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     layout->addWidget(p);
 
     // Measures
-    p = new QCommandLinkButton(tr("Measures"), tr("Sync measures data such as weight, body fat, HRV and sleep."));
+    p = new QCommandLinkButton(tr("Measurements"), tr("Sync measurements such as weight, body fat, HRV and sleep."));
     p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Measures);

@@ -455,7 +455,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Get &Body Measures..."), this,
+    optionsMenu->addAction(tr("Get &Body Measurements..."), this,
                         SLOT (downloadBodyMeasures()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));

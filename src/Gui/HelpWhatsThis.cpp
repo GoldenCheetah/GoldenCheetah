@@ -123,7 +123,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Tools_AirDens_EST:
         return text.arg("Menu%20Bar_Tools").arg(tr("Estimation of Air Density (Rho)"));
     case MenuBar_Tools_Download_BodyMeasures:
-        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Body Measures (e.g. weight) from multiple sources"));
+        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Body Measurements (e.g. weight) from multiple sources"));
     case MenuBar_Tools_VDOT_CALC:
         return text.arg("Menu%20Bar_Tools").arg(tr("Calculation of VDOT and Threshold Pace according to Daniels' Running Formula"));
     case MenuBar_Tools_Download_ERGDB:

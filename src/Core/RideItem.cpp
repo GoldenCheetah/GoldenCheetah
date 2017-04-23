@@ -674,7 +674,7 @@ RideItem::refresh()
 double
 RideItem::getWeight(int type)
 {
-    // get any body measures first
+    // get any body measurements first
     context->athlete->getBodyMeasure(dateTime.date(), weightData);
 
     // return what was asked for!
