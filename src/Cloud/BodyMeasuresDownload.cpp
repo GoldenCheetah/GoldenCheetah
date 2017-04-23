@@ -30,7 +30,7 @@
 
 BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) {
 
-    setWindowTitle(tr("Body Measures download"));
+    setWindowTitle(tr("Body Measurements download"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_BodyMeasures));
 
@@ -49,7 +49,7 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
 
     QGroupBox *groupBox2 = new QGroupBox(tr("Choose date range for download"));
     dateRangeAll = new QRadioButton(tr("From date of first recorded activity to today"));
-    dateRangeLastMeasure = new QRadioButton(tr("From date of last downloaded measure to today"));
+    dateRangeLastMeasure = new QRadioButton(tr("From date of last downloaded measurement to today"));
     dateRangeManual = new QRadioButton(tr("Enter manually:"));
     dateRangeAll->setChecked(true);
     QVBoxLayout *vbox2 = new QVBoxLayout;
@@ -77,7 +77,7 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     groupBox2->setLayout(vbox2);
     mainLayout->addWidget(groupBox2);
 
-    discardExistingMeasures = new QCheckBox(tr("Discard all existing measures"), this);
+    discardExistingMeasures = new QCheckBox(tr("Discard all existing measurements"), this);
     discardExistingMeasures->setChecked(false);
     mainLayout->addWidget(discardExistingMeasures);
 
@@ -194,7 +194,7 @@ BodyMeasuresDownload::download() {
        toDate = QDateTime::currentDateTimeUtc();
    } else if (dateRangeManual->isChecked()) {
        if (manualFromDate->dateTime() > manualToDate->dateTime()) {
-           QMessageBox::warning(this, tr("Body Measures"), tr("Invalid date range - please check your input"));
+           QMessageBox::warning(this, tr("Body Measurements"), tr("Invalid date range - please check your input"));
            // re-activate the buttons
            downloadButton->setEnabled(true);
            closeButton->setEnabled(true);
@@ -270,7 +270,7 @@ BodyMeasuresDownload::download() {
 
    } else {
        // handle error document in err String
-       QMessageBox::warning(this, tr("Body Measures"), tr("Downloading of body measures failed with error: %1").arg(err));
+       QMessageBox::warning(this, tr("Body Measurements"), tr("Downloading of body measurements failed with error: %1").arg(err));
    }
 
    // re-activate the buttons
