@@ -94,6 +94,159 @@ CyclingAnalytics::close()
     return true;
 }
 
+QList<CloudServiceEntry*>
+CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
+{
+    printd("CyclingAnalytics::readdir(%s)\n", path.toStdString().c_str());
+
+    QList<CloudServiceEntry*> returning;
+
+    // do we have a token
+    QString token = getSetting(GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    if (token == "") {
+        errors << tr("You must authorise with Cycling Analytics first");
+        return returning;
+    }
+
+    // set params - lets explicitly get 25 per page
+    QString urlstr("https://www.cyclinganalytics.com/api/me/rides?");
+    urlstr += "power_curve=false";
+    urlstr += "&epower_curve=false";
+
+    // fetch in one hit
+    QUrl url(urlstr);
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", QString("Bearer %1").arg(getSetting(GC_CYCLINGANALYTICS_TOKEN,"").toString()).toLatin1());
+    request.setRawHeader("Accept", "application/json");
+
+    // make request
+    printd("fetch list: %s\n", urlstr.toStdString().c_str());
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request, with a 30s timeout
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+    QTimer::singleShot(30000,&loop, SLOT(quit())); // timeout after 30 seconds
+
+    // if successful, lets unpack
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
+
+    if (reply->error() == 0) {
+
+        // get the data
+        QByteArray r = reply->readAll();
+
+        // parse JSON payload
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+        printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
+        if (parseError.error == QJsonParseError::NoError) {
+
+            QJsonArray rides = document.object()["rides"].toArray();
+            for(int i=0; i<rides.count(); i++) {
+
+                QJsonObject item = rides.at(i).toObject();
+                CloudServiceEntry *add = newCloudServiceEntry();
+
+                // We extract:
+                // * summary - distance
+                // * summary - duration
+                // * starttime UTC
+                // * format
+                // * id
+                //
+                // Each record looks like this:
+                // {
+                //     "user_id": 8862271,
+                //     "summary": {
+                //         "pwc_r2": 0,
+                //         "avg_power": 0,
+                //         "avg_heartrate": 1,
+                //         "riding_time": 5320,
+                //         "max_speed": 53.0,
+                //         "load": 0,
+                //         "work": 0,
+                //         "pwc170": 0,
+                //         "max_heartrate": 1,
+                //         "intensity": 0.0,
+                //         "max_cadence": 0,
+                //         "distance": 39.852,
+                //         "pwc150": 0,
+                //         "avg_speed": 26.96751879699248,
+                //         "trimp": 0,
+                //         "max_power": 0,
+                //         "climbing": 578,
+                //         "variability": 0,
+                //         "max_temperature": 0.0,
+                //         "lrbalance": null,
+                //         "epower": 0,
+                //         "avg_temperature": 0.0,
+                //         "moving_time": 5320,
+                //         "duration": 5471,
+                //         "min_temperature": 0.0,
+                //         "zones": {
+                //             "heartrate": [
+                //                 0,
+                //                 0,
+                //                 0,
+                //                 0,
+                //                 0
+                //             ],
+                //             "power": [
+                //                 5471,
+                //                 0,
+                //                 0,
+                //                 0,
+                //                 0,
+                //                 0,
+                //                 0
+                //             ]
+                //         },
+                //         "total_time": 5476,
+                //         "avg_cadence": 0
+                //     },
+                //     "utc_datetime": "2012-08-18T11:11:27",
+                //     "trainer": false,
+                //     "format": "tcx",
+                //     "has": {
+                //         "temperature": false,
+                //         "cadence": false,
+                //         "gps": true,
+                //         "speed": true,
+                //         "heartrate": true,
+                //         "power": false,
+                //         "elevation": true
+                //     },
+                //     "id": 104592924158,
+                //     "title": "40km around Cranleigh",
+                //     "notes": "",
+                //     "local_datetime": "2012-08-18T12:11:27"
+                // }
+
+                add->name = QDateTime::fromString(item["local_datetime"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+
+                QJsonObject summary = item["summary"].toObject();
+                add->distance = summary["distance"].toDouble();
+                add->duration = summary["duration"].toDouble();
+                add->id = item["id"].toString();
+                add->label = add->id;
+                add->isDir = false;
+
+                printd("item: %s\n", add->name.toStdString().c_str());
+
+                returning << add;
+            }
+        }
+    }
+
+
+    // all good ?
+    printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
+    return returning;
+}
 bool
 CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
@@ -154,7 +307,6 @@ CyclingAnalytics::writeFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
 
     // remember why we errored
     bool uploadSuccessful = false;
@@ -164,10 +316,13 @@ CyclingAnalytics::writeFileCompleted()
 
         // parse the response
         QString response = reply->readAll();
-        MVJSONReader jsonResponse(string(response.toLatin1()));
+        MVJSONReader jsonResponse(response.toStdString());
+
+        printd("reply:%s\n", response.toStdString().c_str());
 
         // get values
-        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        if (jsonResponse.root) uploadError = jsonResponse.root->getFieldString("error").c_str();
+        else uploadError = "unrecognised response.";
         //XXXcyclingAnalyticsUploadId = jsonResponse.root->getFieldInt("upload_id");
 
     } catch(...) {
