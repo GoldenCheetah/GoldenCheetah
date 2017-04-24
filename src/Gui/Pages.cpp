@@ -865,12 +865,40 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     QString weightUnits = (metricUnits ? tr(" kg") : tr(" lb"));
 
     QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
+    QGridLayout *measuresGrid = new QGridLayout;
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
 #ifdef Q_OS_MAX
     setContentsMargins(10,10,10,10);
     grid->setSpacing(5 *dpiXFactor);
     all->setSpacing(5 *dpiXFactor);
 #endif
+
+    QString defaultWeighttext = tr("Default Weight");
+    defaultWeightlabel = new QLabel(defaultWeighttext);
+    defaultWeight = new QDoubleSpinBox(this);
+    defaultWeight->setMaximum(999.9);
+    defaultWeight->setMinimum(0.0);
+    defaultWeight->setDecimals(1);
+    defaultWeight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * weightFactor);
+    defaultWeight->setSuffix(weightUnits);
+
+
+    QGridLayout *defaultGrid = new QGridLayout;
+    defaultGrid->addWidget(defaultWeightlabel, 1, 0, alignment);
+    defaultGrid->addWidget(defaultWeight, 1, 1, alignment);
+
+    all->addLayout(defaultGrid);
+    all->addSpacing(2);
+
+    QFrame *line;
+    line = new QFrame;
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    all->addWidget(line);
+
+    QLabel* seperatorText = new QLabel(tr("Time dependent measurements"));
+    all->addWidget(seperatorText);
 
     QString datetext = tr("From Date");
     dateLabel = new QLabel(datetext);
@@ -884,7 +912,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     weight->setMaximum(999.9);
     weight->setMinimum(0.0);
     weight->setDecimals(1);
-    weight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * weightFactor);
+    weight->setValue(defaultWeight->value());
     weight->setSuffix(weightUnits);
 
     QString fatkgtext = tr("Fat");
@@ -937,33 +965,31 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     comment = new QLineEdit(this);
     comment->setText("");
 
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+    measuresGrid->addWidget(dateLabel, 1, 0, alignment);
+    measuresGrid->addWidget(dateEdit, 1, 1, alignment);
 
-    grid->addWidget(dateLabel, 1, 0, alignment);
-    grid->addWidget(dateEdit, 1, 1, alignment);
+    measuresGrid->addWidget(weightlabel, 2, 0, alignment);
+    measuresGrid->addWidget(weight, 2, 1, alignment);
 
-    grid->addWidget(weightlabel, 2, 0, alignment);
-    grid->addWidget(weight, 2, 1, alignment);
+    measuresGrid->addWidget(fatkglabel, 3, 0, alignment);
+    measuresGrid->addWidget(fatkg, 3, 1, alignment);
 
-    grid->addWidget(fatkglabel, 3, 0, alignment);
-    grid->addWidget(fatkg, 3, 1, alignment);
+    measuresGrid->addWidget(musclekglabel, 4, 0, alignment);
+    measuresGrid->addWidget(musclekg, 4, 1, alignment);
 
-    grid->addWidget(musclekglabel, 4, 0, alignment);
-    grid->addWidget(musclekg, 4, 1, alignment);
+    measuresGrid->addWidget(boneskglabel, 5, 0, alignment);
+    measuresGrid->addWidget(boneskg, 5, 1, alignment);
 
-    grid->addWidget(boneskglabel, 5, 0, alignment);
-    grid->addWidget(boneskg, 5, 1, alignment);
+    measuresGrid->addWidget(leankglabel, 6, 0, alignment);
+    measuresGrid->addWidget(leankg, 6, 1, alignment);
 
-    grid->addWidget(leankglabel, 6, 0, alignment);
-    grid->addWidget(leankg, 6, 1, alignment);
+    measuresGrid->addWidget(fatpercentlabel, 7, 0, alignment);
+    measuresGrid->addWidget(fatpercent, 7, 1, alignment);
 
-    grid->addWidget(fatpercentlabel, 7, 0, alignment);
-    grid->addWidget(fatpercent, 7, 1, alignment);
+    measuresGrid->addWidget(commentlabel, 8, 0, alignment);
+    measuresGrid->addWidget(comment, 8, 1, alignment);
 
-    grid->addWidget(commentlabel, 8, 0, alignment);
-    grid->addWidget(comment, 8, 1, alignment);
-
-    all->addLayout(grid);
+    all->addLayout(measuresGrid);
 
 
     // Buttons
@@ -973,7 +999,6 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    updateButton->setFixedSize(60,20);
     deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     updateButton->setText(tr("Update"));
@@ -1050,6 +1075,16 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
 
     all->addWidget(bmTree);
 
+    // set default edit values to newest bodymeasurement (if one exists)
+    if (bodyMeasures.count() > 0) {
+        weight->setValue(bodyMeasures.last().weightkg * weightFactor);
+        fatkg->setValue(bodyMeasures.last().fatkg * weightFactor);
+        musclekg->setValue(bodyMeasures.last().musclekg * weightFactor);
+        boneskg->setValue(bodyMeasures.last().boneskg * weightFactor);
+        leankg->setValue(bodyMeasures.last().leankg * weightFactor);
+        fatpercent->setValue(bodyMeasures.last().fatpercent);
+    }
+
     // edit connect
     connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
     connect(weight, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
@@ -1070,7 +1105,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
 
     // save initial values for things we care about
     // weight as stored (always metric) and BodyMeasures checksum
-    b4.weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    b4.defaultWeight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
     b4.fingerprint = 0;
     foreach (BodyMeasure bm, bodyMeasures) {
         b4.fingerprint += bm.getFingerprint();
@@ -1082,6 +1117,7 @@ RiderPhysPage::unitChanged(int currentIndex)
 {
     if (currentIndex == 0) {
         metricUnits = true;
+        defaultWeight->setValue(defaultWeight->value() / LB_PER_KG);
         weight->setValue(weight->value() / LB_PER_KG);
         fatkg->setValue(fatkg->value() / LB_PER_KG);
         musclekg->setValue(musclekg->value() / LB_PER_KG);
@@ -1089,6 +1125,7 @@ RiderPhysPage::unitChanged(int currentIndex)
         leankg->setValue(leankg->value() / LB_PER_KG);
     } else {
         metricUnits = false;
+        defaultWeight->setValue(defaultWeight->value() * LB_PER_KG);
         weight->setValue(weight->value() * LB_PER_KG);
         fatkg->setValue(fatkg->value() * LB_PER_KG);
         musclekg->setValue(musclekg->value() * LB_PER_KG);
@@ -1097,6 +1134,7 @@ RiderPhysPage::unitChanged(int currentIndex)
     }
 
     QString weightUnits = (metricUnits ? tr(" kg") : tr(" lb"));
+    defaultWeight->setSuffix(weightUnits);
     weight->setSuffix(weightUnits);
     fatkg->setSuffix(weightUnits);
     musclekg->setSuffix(weightUnits);
@@ -1119,12 +1157,12 @@ RiderPhysPage::unitChanged(int currentIndex)
 qint32
 RiderPhysPage::saveClicked()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (metricUnits ? 1.0 : KG_PER_LB));
+    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, defaultWeight->value() * (metricUnits ? 1.0 : KG_PER_LB));
 
     qint32 state=0;
 
     // default weight changed ?
-    if (b4.weight != appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()) {
+    if (b4.defaultWeight != appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()) {
         state += CONFIG_ATHLETE;
     }
 
