@@ -51,7 +51,15 @@ class CyclingAnalytics : public CloudService {
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
+        // read a file
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
+
+
     public slots:
+
+        // fetching data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
 
         // sending data
         void writeFileCompleted();

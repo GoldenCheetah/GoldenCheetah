@@ -20,6 +20,7 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "mvjson.h"
+#include "JsonRideFile.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
 #include <QJsonDocument>
@@ -57,6 +58,7 @@ CyclingAnalytics::CyclingAnalytics(Context *context) : CloudService(context), co
     }
 
     uploadCompression = none; // gzip
+    downloadCompression = none; // gzip
     filetype = uploadType::TCX;
     useMetric = true; // distance and duration metadata
 
@@ -231,11 +233,11 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
                 QJsonObject summary = item["summary"].toObject();
                 add->distance = summary["distance"].toDouble();
                 add->duration = summary["duration"].toDouble();
-                add->id = item["id"].toString();
+                add->id = QString("%1").arg(item["id"].toDouble(), 0, 'f', 0);
                 add->label = add->id;
                 add->isDir = false;
 
-                printd("item: %s\n", add->name.toStdString().c_str());
+                printd("item: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
 
                 returning << add;
             }
@@ -247,6 +249,191 @@ CyclingAnalytics::readdir(QString path, QStringList &errors, QDateTime, QDateTim
     printd("returning count(%d), errors(%s)\n", returning.count(), errors.join(",").toStdString().c_str());
     return returning;
 }
+
+// read a file at location (relative to home) into passed array
+bool
+CyclingAnalytics::readFile(QByteArray *data, QString remotename, QString remoteid)
+{
+    printd("CyclingAnalytics::readFile(%s, %s)\n", remotename.toStdString().c_str(), remoteid.toStdString().c_str());
+
+    // do we have a token ?
+    QString token = getSetting(GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    if (token == "") return false;
+
+    // fetch - all data streams
+    QString url = QString("https://www.cyclinganalytics.com/api/ride/%1?streams=all").arg(remoteid);
+
+    printd("url:%s\n", url.toStdString().c_str());
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->get(request);
+
+    // remember
+    mapReply(reply,remotename);
+    buffers.insert(reply,data);
+
+    // catch finished signal
+    connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
+
+    return true;
+}
+
+void
+CyclingAnalytics::readyRead()
+{
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    buffers.value(reply)->append(reply->readAll());
+}
+
+// CyclingAnalytics workouts are delivered back as JSON, the original is lost
+// so we need to parse the response and turn it into a JSON file to
+// import. The description of the format is here:
+// https://sporttracks.mobi/api/doc/data-structures
+void
+CyclingAnalytics::readFileCompleted()
+{
+    printd("CyclingAnalytics::readFileCompleted\n");
+
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+
+    printd("reply:%s ...\n", buffers.value(reply)->toStdString().substr(0,900).c_str());
+
+    QByteArray *returning = buffers.value(reply);
+
+    // we need to parse the JSON and create a ridefile from it
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(*buffers.value(reply), &parseError);
+
+    printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
+    if (parseError.error == QJsonParseError::NoError) {
+
+        // extract the main elements
+        //
+        // SUMMARY DATA
+        // local_datetime	string (ISO 8601 DateTime)	Local Starttime of the activity
+        // title	string	Display name of the workout
+        // notes	string	Workout notes
+
+        QJsonObject ride = document.object();
+        QDateTime starttime = QDateTime::fromString(ride["local_datetime"].toString(), Qt::ISODate);
+
+        // 1s samples with start time as UTC
+        RideFile *ret = new RideFile(starttime.toUTC(), 1.0f);
+
+        // it is called Cycling Analytics after all !
+        ret->setTag("Sport", "Bike");
+
+        // location => route
+        if (!ride["title"].isNull()) ret->setTag(tr("Title"), ride["title"].toString());
+        if (!ride["notes"].isNull()) ret->setTag(tr("Notes"), ride["notes"].toString());
+
+        // SAMPLES DATA
+        //
+        // for mapping from the names used in the CyclingAnalytics json response
+        // to the series names we use in GC, note that lat covers lat and lon
+        // so needs to be treated as a special case
+        static struct {
+            RideFile::seriestype type;
+            const char *caname;
+            double factor;                  // to convert from ST units to GC units
+        } seriesnames[] = {
+
+            // seriestype          sporttracks name           conversion factor
+            { RideFile::lat,       "latitude",                     1.0f   },
+            { RideFile::lon,       "longitude",                    1.0f   },
+            { RideFile::lrbalance, "lrbalance",                    1.0f   },
+            { RideFile::alt,       "elevation",                    1.0f   },
+            { RideFile::km,        "distance" ,                    1.0f   },
+            { RideFile::hr,        "heartrate",                    1.0f   },
+            { RideFile::cad,       "cadence",                      1.0f   },
+            { RideFile::watts,     "power",                        1.0f   },
+            { RideFile::temp,      "temperature",                  1.0f   },
+            { RideFile::kph,       "speed",                        1.0f   },
+            { RideFile::slope,     "gradient",                     1.0f   },
+            { RideFile::none,      "",                             0.0f   }
+
+        };
+
+        // data to combine into a new ride
+        class st_track {
+        public:
+            double factor; // for converting
+            RideFile::seriestype type;
+            QJsonArray samples;
+        };
+
+        // create a list of all the data we will work with
+        QList<st_track> data;
+
+        QJsonObject streams = ride["streams"].toObject();
+        int count=0; // how many samples in the streams?
+
+        // examine the returned object and extract sample data
+        for(int i=0; seriesnames[i].type != RideFile::none; i++) {
+            QString name = seriesnames[i].caname;
+            st_track add;
+
+            // contained?
+            if (streams[name].isArray()) {
+
+                add.factor = seriesnames[i].factor;
+                add.type = seriesnames[i].type;
+                add.samples = streams[name].toArray();
+
+                // they're all the same length
+                count = add.samples.count();
+
+                data << add;
+            }
+        }
+
+        // we now work through the tracks combining them into samples
+        // with a common offset (ie, by row, not column).
+        int index=0;
+        while (index < count) {
+
+            // add new point for the point in time we are at
+            RideFilePoint add;
+            add.secs = index;
+
+            // move through tracks if they're waiting for this point
+            bool updated=false;
+            for(int t=0; t<data.count(); t++) {
+
+               // hr, distance et al
+               double value = data[t].factor * data[t].samples.at(index).toDouble();
+
+               // this is one for us, update and move on
+               add.setValue(data[t].type, value);
+            }
+
+            // don't add blanks
+            ret->appendPoint(add);
+            index++;
+        }
+
+        // create a response
+        JsonFileReader reader;
+        returning->clear();
+        returning->append(reader.toByteArray(context, ret, true, true, true, true));
+
+        // temp ride not needed anymore
+        delete ret;
+
+    } else {
+
+        returning->clear();
+    }
+
+    // return
+    notifyReadComplete(returning, replyName(reply), tr("Completed."));
+}
+
 bool
 CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
