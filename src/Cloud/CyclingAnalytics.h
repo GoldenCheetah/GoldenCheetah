@@ -31,7 +31,7 @@ class CyclingAnalytics : public CloudService {
     public:
 
         QString name() const { return (tr("Cycling Analytics")); }
-        QString description() const { return (tr("Upload to the power focused cycling site.")); }
+        QString description() const { return (tr("Sync with the power focused cycling site.")); }
         QImage logo() const { return QImage(":images/services/cyclinganalytics.png"); }
 
         CyclingAnalytics(Context *context);
