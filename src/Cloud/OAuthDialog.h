@@ -84,7 +84,6 @@ private slots:
     void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
 #ifdef GC_HAVE_KQOAUTH
-    // Twitter OAUTH
     void onTemporaryTokenReceived(QString, QString);
     void onAuthorizationReceived(QString, QString);
     void onAccessTokenReceived(QString token, QString tokenSecret);

@@ -65,9 +65,6 @@
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
 #include "BatchExportDialog.h"
-#ifdef GC_HAVE_KQOAUTH
-#include "TwitterDialog.h"
-#endif
 #include "ShareDialog.h"
 #include "TodaysPlan.h"
 #include "BodyMeasuresDownload.h"
