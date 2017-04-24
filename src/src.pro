@@ -323,13 +323,6 @@ unix:!macx {
     }
 }
 
-# if we have it we can add twitter support
-contains(DEFINES, "GC_HAVE_KQOAUTH") {
-        SOURCES     += Cloud/TwitterDialog.cpp
-        HEADERS     += Cloud/TwitterDialog.h
-}
-
-
 ###=======================================================
 ### OPTIONAL => D2XX FOR FTDI DRIVERS ON WINDOWS PLATFORMS
 ###=======================================================
