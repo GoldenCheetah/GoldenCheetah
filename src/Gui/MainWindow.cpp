@@ -65,7 +65,6 @@
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
 #include "BatchExportDialog.h"
-#include "ShareDialog.h"
 #include "TodaysPlan.h"
 #include "BodyMeasuresDownload.h"
 #include "WorkoutWizard.h"
