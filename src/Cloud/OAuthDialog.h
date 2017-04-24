@@ -62,10 +62,8 @@ public:
     typedef enum {
         NONE=0,
         STRAVA,
-        TWITTER,
         DROPBOX,
         CYCLING_ANALYTICS,
-        GOOGLE_CALENDAR,
         GOOGLE_DRIVE,
         SPORTTRACKS,
         TODAYSPLAN,
