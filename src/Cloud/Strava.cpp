@@ -616,7 +616,31 @@ Strava::prepareResponse(QByteArray* data)
 
         if (!each["name"].isNull()) ride->setTag("Notes", each["name"].toString());
 
-        addSamples(ride, QString("%1").arg(each["id"].toInt()));
+        if (each["manual"].toBool()) {
+            if (each["distance"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["distance"].toDouble()));
+                ride->metricOverrides.insert("total_distance", map);
+            }
+            if (each["moving_time"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["moving_time"].toDouble()));
+                ride->metricOverrides.insert("time_riding", map);
+            }
+            if (each["elapsed_time"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["elapsed_time"].toDouble()));
+                ride->metricOverrides.insert("workout_time", map);
+            }
+            if (each["total_elevation_gain"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["total_elevation_gain"].toDouble()));
+                ride->metricOverrides.insert("elevation_gain", map);
+            }
+
+        } else {
+            addSamples(ride, QString("%1").arg(each["id"].toInt()));
+        }
 
         JsonFileReader reader;
         data->clear();
