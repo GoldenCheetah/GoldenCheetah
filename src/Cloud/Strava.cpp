@@ -619,7 +619,7 @@ Strava::prepareResponse(QByteArray* data)
         if (each["manual"].toBool()) {
             if (each["distance"].toDouble()>0) {
                 QMap<QString,QString> map;
-                map.insert("value", QString("%1").arg(each["distance"].toDouble()));
+                map.insert("value", QString("%1").arg(each["distance"].toDouble()/1000.0));
                 ride->metricOverrides.insert("total_distance", map);
             }
             if (each["moving_time"].toDouble()>0) {
