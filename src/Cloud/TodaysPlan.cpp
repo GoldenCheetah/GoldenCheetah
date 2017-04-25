@@ -30,7 +30,7 @@
 
 #ifndef TODAYSPLAN_DEBUG
 // TODO(gille): This should be a command line flag.
-#define TODAYSPLAN_DEBUG true
+#define TODAYSPLAN_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
