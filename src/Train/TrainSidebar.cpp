@@ -1638,7 +1638,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces
             double g = 9.81;     // g constant 9.81 m/s
-            double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, 0.0).toDouble();
+            double weight = context->athlete->getWeight(QDate::currentDate());
             double m = weight ? weight + 8 : 83; // default to 75kg weight, plus 8kg bike
             double sl = slope / 100; // 10% = 0.1
             double ad = 1.226f; // default air density at sea level

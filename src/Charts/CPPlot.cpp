@@ -566,7 +566,7 @@ CPPlot::plotModel()
                     cpw->ftpValue->setText(QString(tr("%1 w")).arg(pdModel->FTP(), 0, 'f', 0));
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
-                    int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                    int _ftpLevel = 15 * (pdModel->FTP() / context->athlete->getWeight(QDate::currentDate()) - 2.5) / (6.25-2.5) ;
                     if (_ftpLevel > 0 && _ftpLevel < 16) // check bounds
                         cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
                     else
@@ -584,7 +584,7 @@ CPPlot::plotModel()
                     cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
 
                     // Reference 22.5W/kg -> untrained 8W/kg
-                    int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                    int _pMaxLevel = 15 * (pdModel->PMax() / context->athlete->getWeight(QDate::currentDate()) - 8) / (23-8) ;
                     if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
                         cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
                     else
@@ -987,7 +987,7 @@ CPPlot::plotBests(RideItem *rideItem)
     int shadingCP = 0; 
     double shadingRatio = 1.0;
     if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower) && shadeMode) shadingCP = dateCP;
-    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) && shadeMode) shadingRatio = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) && shadeMode) shadingRatio = context->athlete->getWeight(QDate::currentDate());
     double shadingCV = 0.0;
     if (rideSeries == RideFile::kph && shadeMode) shadingCV = dateCV;
 
