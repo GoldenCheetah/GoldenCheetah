@@ -162,7 +162,7 @@ class RiderPhysPage : public QWidget
         QDoubleSpinBox *defaultWeight;
 
         QLabel *dateLabel;
-        QDateEdit *dateEdit;
+        QDateTimeEdit *dateTimeEdit;
         QLabel *weightlabel;
         QDoubleSpinBox *weight;
         QLabel *fatkglabel;
