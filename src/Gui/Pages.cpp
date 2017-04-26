@@ -1226,7 +1226,7 @@ RiderPhysPage::addOReditClicked()
     // time
     add->setText(2, "");
     // Weight
-    add->setText(2, QString("%1").arg(weight->value()));
+    add->setText(2, QString("%1").arg(defaultWeight->value()));
     add->setText(3, QString("%1").arg(fatkg->value()));
     add->setText(4, QString("%1").arg(musclekg->value()));
     add->setText(5, QString("%1").arg(boneskg->value()));
@@ -1260,7 +1260,7 @@ RiderPhysPage::rangeEdited()
         QDate date = dateEdit->date();
         QDate odate = bodyMeasures[index].when.date();
 
-        double nweight = weight->value();
+        double nweight = defaultWeight->value();
         double oweight = bodyMeasures[index].weightkg * weightFactor;
         double nfatkg = fatkg->value();
         double ofatkg = bodyMeasures[index].fatkg * weightFactor;
@@ -1300,7 +1300,7 @@ RiderPhysPage::rangeSelectionChanged()
         BodyMeasure current = bodyMeasures[index];
 
         dateEdit->setDate(current.when.date());
-        weight->setValue(current.weightkg * weightFactor);
+        defaultWeight->setValue(current.weightkg * weightFactor);
         fatkg->setValue(current.fatkg * weightFactor);
         musclekg->setValue(current.musclekg * weightFactor);
         boneskg->setValue(current.boneskg * weightFactor);
