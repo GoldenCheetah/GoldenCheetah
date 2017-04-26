@@ -56,7 +56,7 @@ const QChar deltaChar(0x0394);
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             wstale(true), startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), wprime_(NULL), 
-            weight_(0), totalCount(0), totalTemp(0), dstale(true)
+            weight_(0), totalCount(0), totalTemp(0), dstale(true), filetype_(unknown)
 {
     command = new RideFileCommand(this);
 
@@ -71,7 +71,7 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
 // and we want to get special fields and ESPECIALLY "CP" and "Weight"
 RideFile::RideFile(RideFile *p) :
     wstale(true), recIntSecs_(p->recIntSecs_), deviceType_(p->deviceType_), data(NULL), wprime_(NULL), 
-    weight_(p->weight_), totalCount(0), dstale(true)
+    weight_(p->weight_), totalCount(0), dstale(true), filetype_(p->filetype_)
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
@@ -92,7 +92,7 @@ RideFile::RideFile(RideFile *p) :
 
 RideFile::RideFile() : 
     wstale(true), recIntSecs_(0.0), deviceType_("unknown"), data(NULL), wprime_(NULL), 
-    weight_(0), totalCount(0), dstale(true)
+    weight_(0), totalCount(0), dstale(true), filetype_(unknown)
 {
     command = new RideFileCommand(this);
 
@@ -204,15 +204,33 @@ RideFile::isRun() const
 {
     // for now we just look at Sport and if there are any
     // running specific data series in the data
-    return (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
-           (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact);
+
+    // we call this *a lot* and it doesn't change once we have the file, so only lookup once.
+    if (filetype_ == RideFile::unknown)
+    {
+        if ((getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
+                (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact))
+            filetype_ = RideFile::run;
+        else
+            filetype_ = RideFile::swim;
+    }
+
+    return filetype_ == RideFile::run;
 }
 
 bool
 RideFile::isSwim() const
 {
     // for now we just look at Sport
-    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
+    // we call this *a lot* and it doesn't change once we have the file, so only lookup once.
+    if (filetype_ == RideFile::unknown)
+    {
+        if (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"))
+            filetype_ = RideFile::swim;
+        else
+            filetype_ = RideFile::run;
+    }
+    return filetype_ == RideFile::swim;
 }
 
 // compatibility means used in e.g. R so no spaces in names,
