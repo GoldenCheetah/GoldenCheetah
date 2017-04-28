@@ -1148,7 +1148,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
         //reset all calibration data
         calibrating = startCalibration = restartCalibration = finishCalibration = false;
-        calibrationSpindownTime = calibrationZeroOffset = calibrationTargetSpeed = 0;
+        calibrationSpindownTime = calibrationZeroOffset = calibrationSlope = calibrationTargetSpeed = 0;
         calibrationCadence = calibrationCurrentSpeed = calibrationTorque = 0;
         calibrationState = CALIBRATION_STATE_IDLE;
         calibrationType = CALIBRATION_TYPE_NOT_SUPPORTED;
@@ -1272,7 +1272,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     //reset all calibration data
     calibrating = startCalibration = restartCalibration = finishCalibration = false;
-    calibrationSpindownTime = calibrationZeroOffset = calibrationTargetSpeed = 0;
+    calibrationSpindownTime = calibrationZeroOffset = calibrationSlope = calibrationTargetSpeed = 0;
     calibrationCadence = calibrationCurrentSpeed = calibrationTorque = 0;
     calibrationState = CALIBRATION_STATE_IDLE;
     calibrationType = CALIBRATION_TYPE_NOT_SUPPORTED;
@@ -1485,6 +1485,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     calibrationSpindownTime =  Devices[dev].controller->getCalibrationSpindownTime();
                     calibrationZeroOffset =  Devices[dev].controller->getCalibrationZeroOffset();
+                    calibrationSlope = Devices[dev].controller->getCalibrationSlope();
 
                     // if calibration is moving out of pending state..
                     if ((calibrationState == CALIBRATION_STATE_PENDING) && startCalibration) {
@@ -2069,6 +2070,59 @@ void TrainSidebar::updateCalibration()
 
             }
             break;
+
+        case CALIBRATION_TYPE_ZERO_OFFSET_SRM:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+                break;
+
+            case CALIBRATION_STATE_PENDING:
+                // Wait for cadence to be zero before requesting zero offset calibration
+                status = QString(tr("Unclip or stop pedalling to begin calibration.."));
+                if (calibrationCadence == 0)
+                    startCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_REQUESTED:
+                status = QString(tr("Requesting calibration.."));
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                status = QString(tr("Requesting calibration.."));
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                break;
+
+            case CALIBRATION_STATE_POWER:
+                break;
+
+            case CALIBRATION_STATE_COAST:
+                status = QString(tr("Calibrating...\nUnclip or stop pedalling until process is completed..\nZero Offset %1")).arg(QString::number((int16_t)calibrationZeroOffset));
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                // yuk, zero offset for FE-C devices is unsigned, but for power meters is signed..
+                status = QString(tr("Calibration completed successfully!\nZero Offset %1\nSlope %2")).arg(QString::number((int16_t)calibrationZeroOffset), QString::number(calibrationSlope));;
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed!"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            }
+            break;
+
         }
 
         lastState = calibrationState;

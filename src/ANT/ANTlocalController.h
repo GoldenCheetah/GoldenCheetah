@@ -73,6 +73,7 @@ public:
     void     setCalibrationState(uint8_t);
     uint16_t getCalibrationSpindownTime();
     uint16_t getCalibrationZeroOffset();
+    uint16_t getCalibrationSlope();
     void     resetCalibrationState();
 
 signals:
