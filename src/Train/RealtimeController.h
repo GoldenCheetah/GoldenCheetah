@@ -68,6 +68,7 @@ public:
     virtual void     setCalibrationState(uint8_t) {return; }
     virtual uint16_t getCalibrationSpindownTime() { return 0; }
     virtual uint16_t getCalibrationZeroOffset() { return 0; }
+    virtual uint16_t getCalibrationSlope() {return 0; }
     virtual void     resetCalibrationState() { return; }
 
     void   setCalibrationTimestamp();
