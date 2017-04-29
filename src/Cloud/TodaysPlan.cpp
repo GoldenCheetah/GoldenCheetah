@@ -289,8 +289,15 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 // file details
                 QJsonObject fileindex = each["fileindex"].toObject();
                 QString suffix = QFileInfo(fileindex["filename"].toString()).suffix();
-                if (suffix == "") suffix = "json";
-
+                if (suffix == "") {
+                    // Zwift uploads files without an extension - work ongoing to get Zwift fixed
+                    if (fileindex["filename"].toString().startsWith("zwift-activity-")) {
+                        qDebug() << "Correcting Zwift Activity extension: " << fileindex["filename"].toString();
+                        suffix = "fit";
+                    } else {
+                        suffix = "json";
+                    }
+                }
 
                 //TodaysPlan's Label may contain the FileName, or Descriptive Text (whatever is shown/edited on the TP's UI)
                 add->label = QFileInfo(each["name"].toString()).fileName();
