@@ -30,7 +30,7 @@
 
 #ifndef TODAYSPLAN_DEBUG
 // TODO(gille): This should be a command line flag.
-#define TODAYSPLAN_DEBUG false
+#define TODAYSPLAN_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -370,7 +370,7 @@ TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
 }
 
 bool
-TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *)
+TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
     printd("TodaysPlan::writeFile(%s)\n", remotename.toStdString().c_str());
 
@@ -402,12 +402,27 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *)
 
     QString userId = getSetting(GC_TODAYSPLAN_ATHLETE_ID, "").toString();
 
-    QString json;
+    QString json = QString("{ filename: \"%1\"").arg(remotename);
+
     if (userId.length()>0) {
-        json  = QString("{ filename: \"%1\", userId: %2 }").arg(remotename).arg(userId);
-    } else {
-        json  = QString("{ filename: \"%1\" }").arg(remotename);
+        json  += QString(", userId: %1").arg(userId);
     }
+    // RPE, LQS and TQR
+    double rpe = ride->getTag("RPE", "0.0").toDouble();
+    if (rpe > 0.0) {
+        json  += QString(", rpe: %1").arg(rpe);
+    }
+    double tqr = ride->getTag("TQR", "0.0").toDouble();
+    if (tqr > 0.0) {
+        json  += QString(", tqr: %1").arg(tqr);
+    }
+    double lqs = ride->getTag("LQS", "0.0").toDouble();
+    if (lqs > 0.0) {
+        json  += QString(", pain: %1").arg(lqs);
+    }
+
+    json  += " }";
+
     printd("request: %s\n", json.toStdString().c_str());
     jsonPart.setBody(json.toLatin1());
 
