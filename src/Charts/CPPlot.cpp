@@ -1711,18 +1711,13 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                 dateStr = date.toString(tr("\nddd, dd MMM yyyy"));
             }
         }
-        
+
+        // use the right pace config
         bool metricPace = true;
-        if (isSwim) {
-            metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
-            qDebug() << "swim pacing:" << (metricPace ? "metric":"imperial");
-        } else if (isRun) {
-            metricPace = appsettings->value(this, GC_PACE, true).toBool();
-            qDebug() << "run pacing:" << (metricPace ? "metric":"imperial");
-        } else {
-            metricPace = context->athlete->useMetricUnits;
-            qDebug() << "bike/default pacing:" << (metricPace ? "metric":"imperial");
-        }
+        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, true).toBool();
+        else  metricPace = context->athlete->useMetricUnits;
+
 
         if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
             units1 = RideFile::unitName(rideSeries, context);
@@ -1730,46 +1725,41 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             units1 = ""; // time --> no units
         }
         
-        // no units for Heat Curve
+        // pace units for heat curve
         if (curve == heatCurve) {
-            units2 = tr("%1 %2")
-                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-                .arg(tr("Activities"));
-        }
-        else  if ((((rangemode && context->isCompareDateRanges)
-            || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
-            || (curve == rideCurve && showPercent))
-        {
-            units2 = tr("%1 %2")
-                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-                .arg(tr("%")); // Percent
-        }
-        else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
-        {
-            units2 = tr("%1 %2")
-                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-                .arg(tr("J")); // Joule
-        }
-        else if (criticalSeries == CriticalPowerWindow::kph)
-        {
-            if (metricPace) {
-                units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
-            } else {
-                units2 = tr("%1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
-            }
-        }
-        else
-        {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(tr("Activities"));
+
+        } else  if ((((rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
+                   || (curve == rideCurve && showPercent)) {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(tr("%")); // Percent
+
+        } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(tr("J")); // Joule
+
+        } else if (criticalSeries == CriticalPowerWindow::kph) {
+
+            if (metricPace)  units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            else  units2 = tr("%1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
+
+        } else {
+
             // eg: "### watts"
-            units2 = tr("%1 %2")
-                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-                .arg(RideFile::unitName(rideSeries, context));
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(RideFile::unitName(rideSeries, context));
         }
         
 		// for the current ride curve, add a percent of rider's actual best.
-		if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
+        if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
+
 			double bestY = getBests()[index];
-			if (0 != bestY) {
+            if (0 != bestY) {
+
 				// use 0 decimals for the percent.
 				currentRidePercentStr = QString("\n%1 %2")
 					.arg((yvalue *100)/ bestY, 0, 'f', 0)
@@ -1780,31 +1770,26 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // for speed series add pace with units according to settings
         if (criticalSeries == CriticalPowerWindow::kph) {
+
             if (isRun || isSwim) {
+
                 const PaceZones *zones = context->athlete->paceZones(isSwim);
-                if (zones) {
-                    paceStr = QString("\n%1 %2")
-                        .arg(zones->kphToPaceString(yvalue, metricPace))
-                        .arg(zones->paceUnits(metricPace));
-                }
+                if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
+                                                       .arg(zones->paceUnits(metricPace));
+
             }
             
             const double km = yvalue*xvalue/60.0; // distance in km
-            if (isSwim)
-            {
-                if (metricPace) {
-                    paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
-                } else {
-                    paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
-                }
-            }
-            else
-            {
-                if (metricPace) {
-                    paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
-                } else {
-                    paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
-                }
+            if (isSwim) {
+
+                if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
+                else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+
+            } else {
+
+                if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
+                else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
+
             }
         }
 
