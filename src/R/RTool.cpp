@@ -154,6 +154,11 @@ RTool::RTool()
             if (exp.exactMatch(strings[1])) version = exp.cap(1);
             else version = strings[1];
         }
+
+        // what version are we running?
+        #ifdef GC_WANT_ALLDEBUG
+        fprintf(stderr,"R loaded. [Compiled=%s.%s, Loaded=%s, Loaded DeviceEngine=%d]\n", R_MAJOR, R_MINOR, version.toStdString().c_str(), GC_R_GE_getVersion());
+        #endif
         rtool->messages.clear();
 
         // load the dynamix library and create function wrapper
