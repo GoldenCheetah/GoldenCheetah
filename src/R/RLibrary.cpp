@@ -456,5 +456,6 @@ RLibrary::load()
         // sadly, there is no standard place on windows
         setenv("R_HOME", home.toLatin1().constData(), true);
     }
+
     return loaded;
 }
