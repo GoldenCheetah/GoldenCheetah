@@ -32,6 +32,7 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
+#include <QGLWidget>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -63,6 +64,10 @@ OverviewWindow::OverviewWindow(Context *context) :
     view->setRenderHint(QPainter::Antialiasing, true);
     view->setFrameStyle(QFrame::NoFrame);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+#ifdef Q_OS_LINUX
+    view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+#endif
     view->setScene(scene);
 
     // layout
