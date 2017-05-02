@@ -51,9 +51,11 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     setFrameStyle(QFrame::NoFrame);
 
 #ifdef Q_OS_LINUX // mac and windows both have issues. sigh.
-    //disabled for now as Linux also has issues on High DPI screen
-    setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
-    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    // Enabled on Linux depending on Open GL version
+    if (QGLFormat::openGLVersionFlags().testFlag(QGLFormat::OpenGL_Version_2_0)) {
+        setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
+        setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    }
 #endif
 
     // allow to click and drag
