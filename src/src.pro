@@ -52,7 +52,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 } else {
 
     ## QT5 modules we use
-    QT += widgets concurrent serialport multimedia multimediawidgets
+    QT += widgets concurrent serialport multimedia multimediawidgets opengl
 
     ## Always add debug information for Windows, MSVC
     win32-msvc* { CONFIG += force_debug_info }
