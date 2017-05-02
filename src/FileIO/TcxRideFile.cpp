@@ -96,6 +96,16 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         activity.appendChild(notes);
     }
 
+    // device type if present
+    if (ride->deviceType() != "") {
+        QDomElement creator = doc.createElement("Creator");
+        QDomElement creatorName = doc.createElement("Name");
+        text = doc.createTextNode(ride->deviceType());
+        creatorName.appendChild(text);
+        creator.appendChild(creatorName);
+        activity.appendChild(creator);
+    }
+
     QDomElement lap = doc.createElement("Lap");
     lap.setAttribute("StartTime", ride->startTime().toUTC().toString(Qt::ISODate));
     activity.appendChild(lap);
