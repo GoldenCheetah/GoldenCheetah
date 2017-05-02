@@ -88,6 +88,14 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     id.appendChild(text);
     activity.appendChild(id);
 
+    // notes if present
+    if (ride->getTag("Notes","") != "") {
+        QDomElement notes = doc.createElement("Notes");
+        text = doc.createTextNode(ride->getTag("Notes",""));
+        notes.appendChild(text);
+        activity.appendChild(notes);
+    }
+
     QDomElement lap = doc.createElement("Lap");
     lap.setAttribute("StartTime", ride->startTime().toUTC().toString(Qt::ISODate));
     activity.appendChild(lap);
