@@ -43,6 +43,15 @@
 #include <samplerate.h>
 #endif
 
+#include "../qzip/zipwriter.h"
+#include "../qzip/zipreader.h"
+
+#ifdef Q_CC_MSVC
+#include <QtZlib/zlib.h>
+#else
+#include <zlib.h>
+#endif
+
 #define mark() \
 { \
     addInterval(RideFileInterval::USER, start, previous->secs + recIntSecs_, \
@@ -654,11 +663,8 @@ RideFileFactory &RideFileFactory::instance()
     return *instance_;
 }
 
-int RideFileFactory::registerReader(const QString &suffix,
-                                    const QString &description,
-                                       RideFileReader *reader)
+int RideFileFactory::registerReader(const QString &suffix, const QString &description, RideFileReader *reader)
 {
-    assert(!readFuncs_.contains(suffix));
     readFuncs_.insert(suffix, reader);
     descriptions_.insert(suffix, description);
     return 1;
@@ -678,6 +684,11 @@ QStringList RideFileFactory::writeSuffixes() const
         if (i.value()->hasWrite()) returning << i.key();
     }
     return returning;
+}
+
+bool RideFileFactory::supportedFormat(QString filename) const
+{
+    return suffixes().contains(QFileInfo(filename).suffix());
 }
 
 QRegExp
@@ -704,21 +715,123 @@ RideFileReader *RideFileFactory::readerForSuffix(QString suffix) const
     return readFuncs_.value(suffix.toLower());
 }
 
+static QByteArray gUncompress(const QByteArray &data)
+{
+    if (data.size() <= 4) {
+        qWarning("gUncompress: Input data is truncated");
+        return QByteArray();
+    }
+
+    QByteArray result;
+
+    int ret;
+    z_stream strm;
+    static const int CHUNK_SIZE = 1024;
+    char out[CHUNK_SIZE];
+
+    /* allocate inflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = data.size();
+    strm.next_in = (Bytef*)(data.data());
+
+    ret = inflateInit2(&strm, 15 +  16); // gzip decoding
+    if (ret != Z_OK)
+        return QByteArray();
+
+    // run inflate()
+    do {
+        strm.avail_out = CHUNK_SIZE;
+        strm.next_out = (Bytef*)(out);
+
+        ret = inflate(&strm, Z_NO_FLUSH);
+        Q_ASSERT(ret != Z_STREAM_ERROR);  // state not clobbered
+
+        switch (ret) {
+        case Z_NEED_DICT:
+        case Z_DATA_ERROR:
+        case Z_MEM_ERROR:
+            (void)inflateEnd(&strm);
+            return QByteArray();
+        }
+
+        result.append(out, CHUNK_SIZE - strm.avail_out);
+    } while (strm.avail_out == 0);
+
+    // clean up and return
+    inflateEnd(&strm);
+    return result;
+}
+
 RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                                            QStringList &errors, QList<RideFile*> *rideList) const
 {
-    QString suffix = file.fileName();
-    int dot = suffix.lastIndexOf(".");
-    assert(dot >= 0);
-    suffix.remove(0, dot + 1);
-    RideFileReader *reader = readFuncs_.value(suffix.toLower());
-    assert(reader);
-//qDebug()<<"open"<<file.fileName()<<"start:"<<QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-    RideFile *result = reader->openRideFile(file, errors, rideList);
-//qDebug()<<"open"<<file.fileName()<<"end:"<<QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
+    // is it compressed with gzip?
+    QString suffix = QFileInfo(file).completeSuffix();
 
-    // NULL returned to indicate openRide failed
+    // did we uncompress?
+    QByteArray data;
+    bool uncompressed=false;
+
+    // the result we will return
+    RideFile *result;
+
+    // decompress if its compressed data
+    if (suffix.endsWith(".zip", Qt::CaseInsensitive)) {
+        suffix.replace(".zip","", Qt::CaseInsensitive);
+
+        // open zip and uncompress
+        ZipReader reader(file.fileName());
+        ZipReader::FileInfo info = reader.entryInfoAt(0);
+        data = reader.fileData(info.filePath);
+
+        uncompressed = true;
+
+    }
+
+    // decompress
+    if (suffix.endsWith(".gz", Qt::CaseInsensitive)) {
+        suffix.replace(".gz","", Qt::CaseInsensitive);
+
+        // read and uncompress
+        file.open(QFile::ReadOnly);
+        data = gUncompress(file.readAll());
+        file.close();
+
+        uncompressed = true;
+    }
+
+    // do we have a reader for this type of file?
+    RideFileReader *reader = readFuncs_.value(suffix.toLower());
+    if (!reader) return NULL;
+
+    // if we uncompressed a ride, we need to save to a temporary ride for import
+    if (uncompressed) {
+
+        // create a temporary ride
+        QString tmp = context->athlete->home->temp().absolutePath() + "/" + QFileInfo(file.fileName()).baseName() + "." + suffix;
+
+        QFile ufile(tmp); // look at uncompressed version mot the source
+        ufile.open(QFile::ReadWrite);
+        ufile.write(data);
+        ufile.close();
+
+        // open and read the  uncompressed file
+        result = reader->openRideFile(ufile, errors, rideList);
+
+        // now zap the temporary file
+        ufile.remove();
+
+    } else {
+
+        // open and read the file
+        result = reader->openRideFile(file, errors, rideList);
+    }
+
+    // if it was successful, lets post process the file
     if (result) {
+
         result->context = context;
 
         if (result->intervals().empty()) result->fillInIntervals();
@@ -2081,18 +2194,17 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
     static char rideFileRegExp[] = "^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
                                    "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
     QRegExp rx(rideFileRegExp);
-    if (!rx.exactMatch(name))
-            return false;
-    assert(rx.captureCount() == 8);
+
+    // no dice
+    if (!rx.exactMatch(name)) return false;
+
     QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
     QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
-    if ((! date.isValid()) || (! time.isValid())) {
-	QMessageBox::warning(NULL,
-			     tr("Invalid File Name"),
-			     tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name)
-			     );
-	return false;
-    }
+
+    // didn't parse a meaningful date
+    if ((! date.isValid()) || (! time.isValid()))  return false;
+
+    // return value
     *dt = QDateTime(date, time);
     return true;
 }

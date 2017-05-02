@@ -628,6 +628,7 @@ class RideFileFactory {
         bool writeRideFile(Context *context, const RideFile *ride, QFile &file, QString format) const;
         QStringList suffixes() const;
         QStringList writeSuffixes() const;
+        bool supportedFormat(QString filename) const;
         QString description(const QString &suffix) const {
             return descriptions_[suffix];
         }
