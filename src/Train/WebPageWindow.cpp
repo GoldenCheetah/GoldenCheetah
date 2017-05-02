@@ -213,6 +213,7 @@ void
 WebPageWindow::forceReplot()
 {   
 #ifdef NOWEBKIT
+    view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(customUrl->text()));
 #else
     view->page()->mainFrame()->load(QUrl(customUrl->text()));
@@ -228,6 +229,7 @@ WebPageWindow::userUrl()
     QString url = rCustomUrl->text();
     if (!hasscheme.exactMatch(url)) url = "http://" + url;
 #ifdef NOWEBKIT
+    view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(url));
 #else
     view->page()->mainFrame()->load(QUrl(url));
