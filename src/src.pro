@@ -639,7 +639,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     # qt charts is officially supported from QT5.8 or higher
     # in 5.7 it is a tech preview and not always available
     greaterThan(QT_MINOR_VERSION, 7) {
-        QT += charts
+        QT += charts opengl
 
         # Dashboard uses qt charts, so needs at least Qt 5.7
         DEFINES += GC_HAVE_OVERVIEW
