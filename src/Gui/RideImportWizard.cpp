@@ -454,7 +454,12 @@ RideImportWizard::process()
             QRegExp suffixes(QString("^(%1)$").arg(suffixList.join("|")));
             suffixes.setCaseSensitivity(Qt::CaseInsensitive);
 
-            if (suffixes.exactMatch(thisfile.suffix())) {
+            // strip off gz or zip as openRideFile will sort that for us
+            QString suffix = thisfile.completeSuffix();
+            suffix.replace(".zip","", Qt::CaseInsensitive);
+            suffix.replace(".gz","", Qt::CaseInsensitive);
+
+            if (suffixes.exactMatch(suffix)) {
 
                 // Woot. We know how to parse this baby
                 tableWidget->item(i,5)->setText(tr("Queued"));
@@ -512,13 +517,14 @@ RideImportWizard::process()
 
 
                  // ok so create a temporary file and add to the tableWidget
+                 // we write as JSON to ensure we don't lose data e.g. XDATA.
                  int counter = 0;
                  foreach(RideFile *extracted, rides) {
 
                      // write as a temporary file, using the original
                      // filename with "-n" appended
-                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
-                     TcxFileReader reader;
+                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.json").arg(counter+1);
+                     JsonFileReader reader;
                      QFile target(fulltarget);
                      reader.writeRideFile(context, extracted, target);
                      deleteMe.append(fulltarget);
