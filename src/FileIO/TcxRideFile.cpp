@@ -88,6 +88,24 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     id.appendChild(text);
     activity.appendChild(id);
 
+    // notes if present
+    if (ride->getTag("Notes","") != "") {
+        QDomElement notes = doc.createElement("Notes");
+        text = doc.createTextNode(ride->getTag("Notes",""));
+        notes.appendChild(text);
+        activity.appendChild(notes);
+    }
+
+    // device type if present
+    if (ride->deviceType() != "") {
+        QDomElement creator = doc.createElement("Creator");
+        QDomElement creatorName = doc.createElement("Name");
+        text = doc.createTextNode(ride->deviceType());
+        creatorName.appendChild(text);
+        creator.appendChild(creatorName);
+        activity.appendChild(creator);
+    }
+
     QDomElement lap = doc.createElement("Lap");
     lap.setAttribute("StartTime", ride->startTime().toUTC().toString(Qt::ISODate));
     activity.appendChild(lap);
@@ -137,19 +155,23 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         lap_calories.appendChild(text);
         lap.appendChild(lap_calories);
 
-        QDomElement avg_heartrate = doc.createElement("AverageHeartRateBpm");
-        QDomElement value = doc.createElement("Value");
-        text = doc.createTextNode(QString("%1").arg((int)computed.value("average_hr")->value(true)));
-        value.appendChild(text);
-        avg_heartrate.appendChild(value);
-        lap.appendChild(avg_heartrate);
+        // optional per XSD, so only generate them if the data is to be exported and is present
+        if (withHr && ride->areDataPresent()->hr)
+        {
+            QDomElement avg_heartrate = doc.createElement("AverageHeartRateBpm");
+            QDomElement value = doc.createElement("Value");
+            text = doc.createTextNode(QString("%1").arg((int)computed.value("average_hr")->value(true)));
+            value.appendChild(text);
+            avg_heartrate.appendChild(value);
+            lap.appendChild(avg_heartrate);
 
-        QDomElement max_heartrate = doc.createElement("MaximumHeartRateBpm");
-        value = doc.createElement("Value");
-        text = doc.createTextNode(QString("%1").arg((int)computed.value("max_heartrate")->value(true)));
-        value.appendChild(text);
-        max_heartrate.appendChild(value);
-        lap.appendChild(max_heartrate);
+            QDomElement max_heartrate = doc.createElement("MaximumHeartRateBpm");
+            value = doc.createElement("Value");
+            text = doc.createTextNode(QString("%1").arg((int)computed.value("max_heartrate")->value(true)));
+            value.appendChild(text);
+            max_heartrate.appendChild(value);
+            lap.appendChild(max_heartrate);
+        }
 
         QDomElement lap_intensity = doc.createElement("Intensity");
         text = doc.createTextNode("Active");
@@ -214,7 +236,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
                 trackpoint.appendChild(dist);
             }
 
-            if (withHr)  {
+            if (withHr && ride->areDataPresent()->hr)  {
                 // HeartRate hack for Garmin Training Center
                 // It needs an hr datapoint for every trackpoint or else the
                 // hr graph in TC won't display. Schema defines the datapoint
