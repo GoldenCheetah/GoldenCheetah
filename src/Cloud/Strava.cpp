@@ -614,7 +614,11 @@ Strava::prepareResponse(QByteArray* data)
         else
             ride->setDeviceType("Strava"); // The device type is unknown
 
-        if (!each["name"].isNull()) ride->setTag("Notes", each["name"].toString());
+        // activity name save to configured meta field
+        if (!each["name"].isNull()) {
+            QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+            if (meta != "") ride->setTag(meta, each["name"].toString());
+        }
 
         if (each["manual"].toBool()) {
             if (each["distance"].toDouble()>0) {
