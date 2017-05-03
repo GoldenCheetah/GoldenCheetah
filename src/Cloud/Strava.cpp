@@ -280,7 +280,8 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // use metadata config if the user selected it
     QString fieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
     QString activityName = "";
-    if (fieldname != "") activityName = ride->getTag(fieldname, "").toLatin1();
+    if (fieldname != "") activityName = ride->getTag(fieldname, "");
+    activityNamePart.setBody(activityName.toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
