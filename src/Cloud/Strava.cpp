@@ -275,14 +275,12 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     QString filename = QFileInfo(remotename).baseName();
 
     QHttpPart activityNamePart;
-    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));
+    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
 
     // use metadata config if the user selected it
     QString fieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
-    QString meta;
-    if (fieldname != "")  meta = ride->getTag(fieldname, "");
-    if (meta == "") activityNamePart.setBody(filename.toLatin1());
-    else activityNamePart.setBody(meta.toLatin1());
+    QString activityName = "";
+    if (fieldname != "") activityName = ride->getTag(fieldname, "").toLatin1();
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
@@ -313,7 +311,9 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     multiPart->append(accessTokenPart);
     multiPart->append(activityTypePart);
-    multiPart->append(activityNamePart);
+    if (activityName != "") {
+        multiPart->append(activityNamePart);
+    }
     multiPart->append(dataTypePart);
     multiPart->append(externalIdPart);
     //XXXmultiPart->append(privatePart);
