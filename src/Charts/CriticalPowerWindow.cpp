@@ -210,9 +210,14 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     cl->addRow(gridify, showGridCheck);
 
     showBestCheck = new QCheckBox(this);
-    showBestCheck->setChecked(true); // default off
+    showBestCheck->setChecked(true); // default on
     QLabel *bestify = new QLabel(tr("Show Bests"));
     cl->addRow(bestify, showBestCheck);
+
+    filterBestCheck = new QCheckBox(this);
+    filterBestCheck->setChecked(false); // default off
+    QLabel *filterify = new QLabel(tr("Filter Unique Bests"));
+    cl->addRow(filterify, filterBestCheck);
 
     showEffortCheck = new QCheckBox(this);
     showEffortCheck->setChecked(false); // default off
@@ -520,6 +525,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
+    connect(filterBestCheck, SIGNAL(stateChanged(int)), this, SLOT(filterBestChanged(int)));
     connect(showGridCheck, SIGNAL(stateChanged(int)), this, SLOT(showGridChanged(int)));
     connect(rPercent, SIGNAL(stateChanged(int)), this, SLOT(rPercentChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -1694,6 +1700,15 @@ CriticalPowerWindow::showGridChanged(int state)
     cpPlot->replot();
 }
 
+void
+CriticalPowerWindow::filterBestChanged(int state)
+{
+    cpPlot->setFilterBest(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
+}
 void
 CriticalPowerWindow::showBestChanged(int state)
 {
