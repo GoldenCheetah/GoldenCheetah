@@ -60,7 +60,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showBest(true), filterBest(false), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
 
     // curves and plot objects
@@ -1109,8 +1109,48 @@ CPPlot::plotBests(RideItem *rideItem)
                 curve->setSamples(time, work);
             else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
                 curve->setSamples(bestsCache->meanMaxArray(rideSeries).data()+1, wprime.data(), maxNonZero-1);
-            else
-                curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
+            else {
+
+                if (filterBest) {
+
+                    QVector<double> t = time;
+                    QVector<double> p = bestsCache->meanMaxArray(rideSeries);
+                    p.remove(0);
+                    QVector<QDate> w = bestsCache->meanMaxDates(rideSeries);
+                    w.remove(0);
+
+                    // filter out efforts on same day XXX we need a better
+                    //                                XXX way to decide which to keep
+                    for(int i=0; i<t.count(); i++) {
+                        if (w[i] != QDate()) {
+                            for(int x=i+1; x<t.count(); x++) {
+                                if (w[x] == w[i]) {
+                                    w[x] = QDate();
+                                    p[x] = 0;
+                                    t[x] = 0;
+                                }
+                            }
+                        }
+                    }
+                    // set a series where t > 1
+                    QVector<double> tp;
+                    QVector<double> pp;
+                    for(int i=0; i<t.count(); i++) {
+                        if (t[i] >0) {
+                            tp << t[i];
+                            pp << p[i];
+                        }
+                    }
+
+                    // only show filtered data
+                    curve->setSamples(tp.data(), pp.data(), pp.count());
+
+                } else {
+
+                    // unfiltered MMP data
+                    curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
+                }
+            }
 
             curve->attach(this);
             bestsCurves.append(curve);
@@ -1884,6 +1924,13 @@ void
 CPPlot::setShowEffort(bool x)
 {
     showEffort = x;
+    clearCurves();
+}
+
+void
+CPPlot::setFilterBest(bool x)
+{
+    filterBest = x;
     clearCurves();
 }
 
