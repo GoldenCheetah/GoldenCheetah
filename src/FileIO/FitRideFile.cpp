@@ -481,18 +481,54 @@ struct FitFileReaderState
                     return RideFile::slope;
             case 13: // TEMPERATURE
                     return RideFile::temp;
-            case 30: //LEFT_RIGHT_BALANCE
+            case 30: // LEFT_RIGHT_BALANCE
                     return RideFile::lrbalance;
             case 39: // VERTICAL OSCILLATION
                     return RideFile::rvert;
             case 41: // GROUND CONTACT TIME
                     return RideFile::rcontact;
+            case 45: // LEFT_PEDAL_SMOOTHNESS
+                    return RideFile::lps;
+            case 46: // RIGHT_PEDAL_SMOOTHNESS
+                    return RideFile::rps;
+            //case 47: // COMBINED_PEDAL_SMOOTHNES
+            //        return RideFile::cps;
             case 54: // THb
                     return RideFile::thb;
             case 57: // SMO2
                     return RideFile::smo2;
             default:
                     return RideFile::none;
+        }
+    }
+
+    QString getNameForExtraNative(int native_num) {
+        switch (native_num) {
+
+            case 47: // COMBINED_PEDAL_SMOOTHNES
+                    return "COMBINEDSMOOTHNESS"; //Combined Pedal Smoothness
+
+            default:
+                    return QString("FIELD_%1").arg(native_num);
+        }
+    }
+
+    int getScaleForExtraNative(int native_num) {
+        switch (native_num) {
+
+            case 47: // COMBINED_PEDAL_SMOOTHNES
+                    return 2;
+
+            default:
+                    return 1;
+        }
+    }
+
+    int getOffsetForExtraNative(int native_num) {
+        switch (native_num) {
+
+            default:
+                    return 0;
         }
     }
 
@@ -1363,6 +1399,8 @@ struct FitFileReaderState
                              break;
                     case 47: // COMBINED_PEDAL_SMOOTHNES
                              //qDebug() << "COMBINED_PEDAL_SMOOTHNES" << value;
+                             // --> XDATA
+                             native_num = -1;
                              break;
                     case 53: // RUNNING CADENCE FRACTIONAL VALUE
                              if (rideFile->getTag("Sport", "Bike") == "Run")
@@ -1470,7 +1508,7 @@ struct FitFileReaderState
                         QString nativeName = rideFile->symbolForSeries(series);
 
                         if (nativeName.length() == 0)
-                            nativeName = QString("FIELD_%1").arg(field.num);
+                            nativeName = getNameForExtraNative(field.num);
 
                         extraXdata->valuename << nativeName;
                         extraXdata->unitname << "";
@@ -1482,6 +1520,9 @@ struct FitFileReaderState
                     idx = record_extra_fields[field.num];
 
                     if (idx>-1) {
+                        int scale = getScaleForExtraNative(field.num);
+                        int offset = getOffsetForExtraNative(field.num);
+
                         if (p_extra == NULL &&
                                 (_values.type == SingleValue ||
                                  _values.type == FloatValue ||
@@ -1489,8 +1530,8 @@ struct FitFileReaderState
                            p_extra = new XDataPoint();
 
                         switch (_values.type) {
-                            case SingleValue: p_extra->number[idx]=_values.v; break;
-                            case FloatValue: p_extra->number[idx]=_values.f; break;
+                            case SingleValue: p_extra->number[idx]=_values.v/(float)scale+offset; break;
+                            case FloatValue: p_extra->number[idx]=_values.f/(float)scale+offset; break;
                             case StringValue: p_extra->string[idx]=_values.s.c_str(); break;
                             default: break;
                         }
