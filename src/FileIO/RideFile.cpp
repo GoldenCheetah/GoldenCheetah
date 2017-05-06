@@ -3181,6 +3181,7 @@ static struct {
 	{ "RIGHTEFFECTIVENESS", RideFile::rte },
 	{ "LEFTSMOOTHNESS", RideFile::lps },
 	{ "RIGHTSMOOTHNESS", RideFile::rps },
+    //{ "COMBINEDSMOOTHNESS", RideFile::cps },
 	{ "SMO2", RideFile::smo2 },
 	{ "THB", RideFile::thb },
 	{ "RUNVERT", RideFile::rvert },
