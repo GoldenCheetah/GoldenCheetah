@@ -49,6 +49,8 @@
 #include "TimeUtils.h"
 #include "Units.h"
 
+#include "LTMTrend.h"
+
 
 CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
@@ -1089,7 +1091,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4 *dpiXFactor);
+                sym->setSize((filterBest ? 8 : 4) *dpiXFactor);
                 sym->setBrush(QBrush(fill));
                 sym->setPen(QPen(fill));
                 curve->setSymbol(sym);
@@ -1113,23 +1115,88 @@ CPPlot::plotBests(RideItem *rideItem)
 
                 if (filterBest) {
 
+                    // get data to filter
                     QVector<double> t = time;
                     QVector<double> p = bestsCache->meanMaxArray(rideSeries);
-                    p.remove(0);
                     QVector<QDate> w = bestsCache->meanMaxDates(rideSeries);
+                    p.remove(0);
                     w.remove(0);
 
-                    // filter out efforts on same day XXX we need a better
-                    //                                XXX way to decide which to keep
+
+                    // linear regression of the full data, to help determine
+                    // the maximal point on the MMP curve for each day
+                    // using brace to set scope and descope temporary variables
+                    // as we use a fair few, but not worth making a function
+                    double slope=0, intercept=0;
+                    {
+                        // we want 2m to 20min data (check bounds)
+                        int want = p.count() > 1200 ? 1200-121 : p.count()-121;
+                        QVector<double> j = bestsCache->meanMaxArray(rideSeries).mid(120, want);
+                        QVector<double> ts = t.mid(120, want);
+
+                        // convert time data to seconds (is in minutes)
+                        // and power to joules (power x time)
+                        for(int i=0; i<j.count(); i++) {
+                            ts[i] = ts[i] * 60.0f;
+                            j[i] = (j[i] * ts[i]) ;
+                        }
+
+                        // LTMTrend does a linear regression for us, lets reuse it
+                        LTMTrend regress(ts.data(), j.data(), ts.count());
+
+                        // save away the slope and intercept
+                        slope = regress.slope();
+                        intercept = regress.intercept();
+                    }
+
+                    // filter out efforts on same day that are the furthest
+                    // away from a linear regression
+
+                    // the best we found is stored in here
+                    struct { int i; double p, t, d; } keep;
+
                     for(int i=0; i<t.count(); i++) {
+
+                        // reset our holding variable - it will be updated
+                        // with the maximal point we want to retain for the
+                        // day we are filtering for. Initial means no value
+                        // has been set yet, so the first point will set it.
                         if (w[i] != QDate()) {
+
+                            // lets filter all on today, use first one to set the best found so far
+                            keep.d = (p[i] * t[i] * 60.0f) - ((slope * t[i] * 60.00f) + intercept);
+                            keep.i=i;
+                            keep.p=p[i];
+                            keep.t=t[i];
+
+                            // but clear since we iterate beyond
+                            p[i]=0;
+                            t[i]=0;
+
+                            // from here to the end of all the points, lets see if there is one further away?
                             for(int x=i+1; x<t.count(); x++) {
+
                                 if (w[x] == w[i]) {
+
+                                    // if its beloe the line multiply distance by -1
+                                    double d = (p[x] * t[x] * 60.0f) - ((slope * t[x] * 60.00f) + intercept);
+
+                                    if (keep.d < d) {
+                                        keep.d = d;
+                                        keep.i = x;
+                                        keep.p = p[x];
+                                        keep.t = t[x];
+                                    }
+
                                     w[x] = QDate();
                                     p[x] = 0;
                                     t[x] = 0;
                                 }
                             }
+
+                            // reinstate best we found
+                            p[keep.i] = keep.p;
+                            t[keep.i] = keep.t;
                         }
                     }
                     // set a series where t > 1
