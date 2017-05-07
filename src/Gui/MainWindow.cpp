@@ -433,6 +433,12 @@ MainWindow::MainWindow(const QDir &home)
     uploadMenu = shareMenu->addMenu("Upload");
     syncMenu = shareMenu->addMenu("Synchronise");
 
+    shareMenu->addSeparator();
+    shareAction = new QAction(tr("Check For New Data"), this);
+    shareAction->setShortcut(tr("Ctrl-C"));
+    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
+    shareMenu->addAction(shareAction);
+
     // set the menus to reflect the configured accounts
     connect(uploadMenu, SIGNAL(aboutToShow()), this, SLOT(setUploadMenu()));
     connect(syncMenu, SIGNAL(aboutToShow()), this, SLOT(setSyncMenu()));
@@ -2025,6 +2031,13 @@ MainWindow::addAccount()
     // lets get a new cloud service account
     AddCloudWizard *p = new AddCloudWizard(currentTab->context);
     p->show();
+}
+
+void
+MainWindow::checkCloud()
+{
+    // kick off a check
+    currentTab->context->athlete->cloudAutoDownload->checkDownload();
 }
 
 void
