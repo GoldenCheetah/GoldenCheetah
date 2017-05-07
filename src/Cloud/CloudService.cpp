@@ -1597,6 +1597,13 @@ CloudServiceAutoDownload::autoDownload()
 }
 
 void
+CloudServiceAutoDownload::checkDownload()
+{
+    // manually called to check
+    start();
+}
+
+void
 CloudServiceAutoDownload::run()
 {
     // this is a separate thread and can run in parallel with the main gui

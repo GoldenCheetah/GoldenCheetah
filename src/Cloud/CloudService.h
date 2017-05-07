@@ -446,6 +446,9 @@ class CloudServiceAutoDownload : public QThread {
         // automatically downloads from cloud services
         CloudServiceAutoDownload(Context *context) : context(context), initial(true) {}
 
+        // re-run after inital
+        void checkDownload();
+
     public slots:
 
         // external entry point to trigger auto download
