@@ -294,9 +294,8 @@ class MainWindow : public QMainWindow
         QAction *showhideToolbar;
         QAction *showhideTabbar;
 
-        QAction *tweetAction;
         QAction *shareAction;
-        QAction *syncAction;
+        QAction *checkAction;
 
         // Miscellany
         QSignalMapper *toolMapper;
