@@ -173,7 +173,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     layout->addWidget(smallPlot);
     layout->setStretch(1, 20);
 
-    first = true;
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -210,13 +209,13 @@ RideMapWindow::setTileServerUrlForTileType(int x)
     osmCustomTSUrl->setVisible(false);
     osmCustomTSUrlLabel->setVisible(false);
     if (x == 0)
-        osmCurrentTileServerUrl = QString("http://tile.openstreetmap.org");
+        osmCustomTSUrl->setText("http://tile.openstreetmap.org");
     else if (x == 10)
-        osmCurrentTileServerUrl = QString("http://a.tile.opencyclemap.org/cycle");
+        osmCustomTSUrl->setText("http://a.tile.opencyclemap.org/cycle");
     else if (x == 11)
-        osmCurrentTileServerUrl = QString("http://b.tile.opencyclemap.org/cycle");
+        osmCustomTSUrl->setText("http://b.tile.opencyclemap.org/cycle");
     else if (x == 20)
-        osmCurrentTileServerUrl = QString("http://otile1.mqcdn.com/tiles/1.0.0/osm");
+        osmCustomTSUrl->setText("http://otile1.mqcdn.com/tiles/1.0.0/osm");
     else if (x == 1000) {
         osmCustomTSUrlLabel->setVisible(true);
         osmCustomTSUrl->setVisible(true);
@@ -254,25 +253,16 @@ RideMapWindow::showFullPlotChanged(int value)
 void
 RideMapWindow::osmCustomTSURLTextChanged(QString text)
 {
-    if (first) {
-        if (tileCombo->itemData(tileCombo->currentIndex()).toInt() == 1000 && (text.length() > 0)) {
-            osmCurrentTileServerUrl = text;
-            // only do this once when the text is set automatically by properties
-            first = false;
-            if (mapCombo->currentIndex() == OSM) {
-                forceReplot();
-            }
-        }
+    if (text.length() > 0 && osmCustomTSUrl->text() != text) {
+       osmCustomTSUrl->setText(text);
+       forceReplot();
     }
 }
 
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
-    if (osmCurrentTileServerUrl != osmCustomTSUrl->text()) {
-        osmCurrentTileServerUrl = osmCustomTSUrl->text();
-        forceReplot();
-    }
+    forceReplot();
 }
 
 void 
@@ -639,7 +629,7 @@ void RideMapWindow::createHtml()
                 "       } \n"
                         // Wrap y (latitude) in a like manner if you want to enable vertical infinite scroll
 
-                "       return \""+osmCurrentTileServerUrl+"/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
+                "       return \""+osmCustomTSUrl->text()+"/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
                 "    }, \n"
                 "    tileSize: new google.maps.Size(256, 256), \n"
                 "    name: \"OpenStreetMap\", \n"
@@ -1195,7 +1185,11 @@ void RideMapWindow::zoomInterval(IntervalItem *which)
 }
 
 // quick diag, used to debug code only
-void MapWebBridge::call(int count) { qDebug()<<"webBridge call:"<<count; }
+void MapWebBridge::call(int count)
+{
+    Q_UNUSED(count);
+    //qDebug()<<"webBridge call:"<<count;
+}
 
 // how many intervals are highlighted?
 int
