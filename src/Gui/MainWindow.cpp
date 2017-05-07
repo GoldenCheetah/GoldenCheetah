@@ -430,14 +430,17 @@ MainWindow::MainWindow(const QDir &home)
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
 
-    uploadMenu = shareMenu->addMenu("Upload");
-    syncMenu = shareMenu->addMenu("Synchronise");
+    uploadMenu = shareMenu->addMenu(tr("Upload"));
+    syncMenu = shareMenu->addMenu(tr("Synchronise"));
+    shareMenu->addSeparator();
+    checkAction = new QAction(tr("Check For New Data"), this);
+    checkAction->setShortcut(tr("Ctrl-C"));
+    connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
+    shareMenu->addAction(checkAction);
 
     shareMenu->addSeparator();
-    shareAction = new QAction(tr("Check For New Data"), this);
-    shareAction->setShortcut(tr("Ctrl-C"));
-    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
-    shareMenu->addAction(shareAction);
+    shareMenu->addAction(tr("Get &Body Measurements..."), this,
+                        SLOT (downloadBodyMeasures()));
 
     // set the menus to reflect the configured accounts
     connect(uploadMenu, SIGNAL(aboutToShow()), this, SLOT(setUploadMenu()));
@@ -446,7 +449,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(uploadMenu, SIGNAL(triggered(QAction*)), this, SLOT(uploadCloud(QAction*)));
     connect(syncMenu, SIGNAL(triggered(QAction*)), this, SLOT(syncCloud(QAction*)));
 
-    HelpWhatsThis *helpShare = new HelpWhatsThis(rideMenu);
+    HelpWhatsThis *helpShare = new HelpWhatsThis(shareMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
 
     // TOOLS MENU
@@ -456,9 +459,6 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
     optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
-    optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Get &Body Measurements..."), this,
-                        SLOT (downloadBodyMeasures()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
