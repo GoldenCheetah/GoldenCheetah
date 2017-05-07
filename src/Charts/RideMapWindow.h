@@ -159,10 +159,14 @@ class RideMapWindow : public GcChartWindow
         void setFullPlot(bool x) { if (x) showFullPlotCk->setCheckState(Qt::Checked); else showFullPlotCk->setCheckState(Qt::Unchecked) ;}
 
         int osmTS() const { return ( tileCombo->itemData(tileCombo->currentIndex()).toInt()); }
-        void setOsmTS(int x) { tileCombo->setCurrentIndex(tileCombo->findData(x)); /*setTileServerUrlForTileType(x);*/}
+        void setOsmTS(int x) {
+            tileCombo->setCurrentIndex(tileCombo->findData(x)); /*setTileServerUrlForTileType(x);*/
+        }
 
         QString osmTSUrl() const { return osmCustomTSUrl->text(); }
-        void setOsmTSUrl(QString x) { osmCustomTSUrl->setText(x) ;}
+        void setOsmTSUrl(QString x) {
+            osmCustomTSUrl->setText(x);
+        }
 
         QString getStyleOptions() const { return styleoptions; }
         void setStyleOptions(QString x) { styleoptions=x; }
@@ -217,7 +221,6 @@ class RideMapWindow : public GcChartWindow
         IntervalSummaryWindow *overlayIntervals;
 
         QString osmTileServerUrlDefault;
-        QString osmCurrentTileServerUrl;
 
         QColor GetColor(int watts);
         void createHtml();
