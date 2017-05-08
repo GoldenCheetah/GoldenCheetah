@@ -30,7 +30,7 @@
 
 #ifndef TODAYSPLAN_DEBUG
 // TODO(gille): This should be a command line flag.
-#define TODAYSPLAN_DEBUG true
+#define TODAYSPLAN_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -579,6 +579,16 @@ TodaysPlan::prepareResponse(QByteArray* data, QString &name)
             QString rpe = QString("%1").arg(activity["rpe"].toDouble());
             qDebug() << "RPE was" << ride->getTag("RPE", "") << " >> " << rpe;
             ride->setTag("RPE", rpe);
+        }
+        if (activity["tqr"].isDouble()) {
+            QString tqr = QString("%1").arg(activity["tqr"].toDouble());
+            qDebug() << "TQR was" << ride->getTag("TQR", "") << " >> " << tqr;
+            ride->setTag("TQR", tqr);
+        }
+        if (activity["pain"].isDouble()) {
+            QString lqs = QString("%1").arg(activity["pain"].toDouble());
+            qDebug() << "LQS was" << ride->getTag("LQS", "") << " >> " << lqs;
+            ride->setTag("LQS", lqs);
         }
 
         // convert
