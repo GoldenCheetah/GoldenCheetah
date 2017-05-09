@@ -645,7 +645,19 @@ Strava::prepareResponse(QByteArray* data)
 
         } else {
             addSamples(ride, QString("%1").arg(each["id"].toInt()));
+
+            // laps?
+            if (!each["laps"].isNull()) {
+                QJsonArray laps = each["laps"].toArray();
+
+                foreach (QJsonValue value, laps) {
+                    QJsonObject lap = value.toObject();
+                    ride->addInterval(RideFileInterval::USER, lap["start_index"].toDouble(), lap["end_index"].toDouble(), lap["name"].toString());
+                }
+            }
         }
+
+
 
         JsonFileReader reader;
         data->clear();
