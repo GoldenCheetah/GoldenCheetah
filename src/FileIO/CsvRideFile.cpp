@@ -160,7 +160,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
     QRegExp rowproCSV("Date,Comment,Password,ID,Version,RowfileId,Rowfile_Id", Qt::CaseInsensitive);
     QRegExp wahooMACSV("GroundContactTime,MotionCount,MotionPowerZ,Cadence,MotionPowerX,WorkoutActive,Timestamp,Smoothness,MotionPowerY,_ID,VerticalOscillation,", Qt::CaseInsensitive);
-    QRegExp rp3CSV("\"id\",\"workout_interval_id\",\"ref\",\"stroke_number\",\"power\",\"avg_power\",\"stroke_rate\",\"time\",\"stroke_length\",\"distance\",\"distance_per_stroke\",\"estimated_500m_time\",\"energy_per_stroke\",\"energy_sum\",\"pulse\",\"work_per_pulse\",\"peak_force\",\"peak_force_pos\",\"rel_peak_force_pos\",\"drive_time\",\"recover_time\",\"k\",\"curve_data\",\"stroke_number_in_interval\",\"avg_calculated_power\"", Qt::CaseSensitive);
+    QRegExp rp3CSV ("\"id\",\"workout_interval_id\",\"ref\",\"stroke_number\",\"power\",\"avg_power\",\"stroke_rate\",\"time\",\"stroke_length\",\"distance\",\"distance_per_stroke\",\"estimated_500m_time\",\"energy_per_stroke\",\"energy_sum\",\"pulse\",\"work_per_pulse\",\"peak_force\",\"peak_force_pos\",\"rel_peak_force_pos\",\"drive_time\",\"recover_time\",\"k\",\"curve_data\",\"stroke_number_in_interval\",\"avg_calculated_power\"", Qt::CaseSensitive);
 
     int recInterval = 1;
 
@@ -968,7 +968,27 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // row perfect is variable rate (for every stroke)
                     // we add time, distance and power to standard fields
                     // and the rest becomes XDATA
-                    QStringList els = line.split(",", QString::KeepEmptyParts);
+
+                    // we need to handle data surrounded by quotes for RP3
+                    QStringList els;
+                    QString word;
+                    bool inquote=false;
+                    for(int i=0; i<line.length(); i++) {
+                        switch(line[i].toLatin1()) {
+                            case ',' : if (inquote) word.append(line.mid(i,1));
+                                       else {
+                                            els << word;
+                                            word="";
+                                       }
+                                       break;
+                            case '\"': inquote = !inquote;
+                                       break;
+                            default:   word.append(line.mid(i,1));
+                                       break;
+                        }
+                    }
+                    els << word; // last entry not comma delimeted
+
                     if (els.count() == 25) {
 
                         if (els[1].toInt() != lastinterval) {
