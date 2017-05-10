@@ -59,7 +59,7 @@ CyclingAnalytics::CyclingAnalytics(Context *context) : CloudService(context), co
 
     uploadCompression = none; // gzip
     downloadCompression = none; // gzip
-    filetype = uploadType::TCX;
+    filetype = uploadType::FIT;
     useMetric = true; // distance and duration metadata
 
     // config
@@ -454,23 +454,23 @@ CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride
 
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
 
-    QHttpPart activityNamePart;
-    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"title\""));
-    activityNamePart.setBody(remotename.toLatin1());
+    QHttpPart notesPart;
+    notesPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"notes\""));
+    notesPart.setBody(ride->getTag(tr("Notes"), "").toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"format\""));
-    dataTypePart.setBody("tcx");
+    dataTypePart.setBody("fit");
 
     QHttpPart filenamePart;
     filenamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"filename\""));
     filenamePart.setBody(remotename.toLatin1());
 
     QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"file.tcx\"; type=\"text/xml\""));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"file.fit\"; type=\"text/xml\""));
     filePart.setBody(data);
 
-    multiPart->append(activityNamePart);
+    multiPart->append(notesPart);
     multiPart->append(filenamePart);
     multiPart->append(dataTypePart);
     multiPart->append(filePart);
