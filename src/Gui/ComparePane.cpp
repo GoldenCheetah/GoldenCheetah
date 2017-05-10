@@ -698,7 +698,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
             // RideFile *data;
             add.data = new RideFile(ride);
-            add.data->context = context;
+            add.data->context = sourceContext;
 
 
             // manage offsets
