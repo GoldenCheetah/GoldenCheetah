@@ -85,7 +85,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     // prepare the widget to show the status of the directory
     directoryWidget = new QTableWidget(rules.count(), 3, this);
 
-    directoryWidget->verticalHeader()->setDefaultSectionSize(20);
+    directoryWidget->verticalHeader()->setDefaultSectionSize(20 *dpiYFactor);
 
     QTableWidgetItem *directoryHeading = new QTableWidgetItem;
     directoryHeading->setText(tr("Directory"));
