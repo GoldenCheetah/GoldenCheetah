@@ -430,17 +430,15 @@ MainWindow::MainWindow(const QDir &home)
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
 
-    uploadMenu = shareMenu->addMenu(tr("Upload"));
-    syncMenu = shareMenu->addMenu(tr("Synchronise"));
+    uploadMenu = shareMenu->addMenu(tr("Upload Activity..."));
+    syncMenu = shareMenu->addMenu(tr("Synchronise Activities..."));
+    shareMenu->addAction(tr("Get &Body Measurements..."), this, SLOT (downloadBodyMeasures()));
     shareMenu->addSeparator();
-    checkAction = new QAction(tr("Check For New Data"), this);
+    checkAction = new QAction(tr("Check For New Activities"), this);
     checkAction->setShortcut(tr("Ctrl-C"));
     connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
     shareMenu->addAction(checkAction);
 
-    shareMenu->addSeparator();
-    shareMenu->addAction(tr("Get &Body Measurements..."), this,
-                        SLOT (downloadBodyMeasures()));
 
     // set the menus to reflect the configured accounts
     connect(uploadMenu, SIGNAL(aboutToShow()), this, SLOT(setUploadMenu()));
@@ -2038,6 +2036,9 @@ MainWindow::checkCloud()
 {
     // kick off a check
     currentTab->context->athlete->cloudAutoDownload->checkDownload();
+
+    // and auto import too whilst we're at it
+    currentTab->context->athlete->importFilesWhenOpeningAthlete();
 }
 
 void
