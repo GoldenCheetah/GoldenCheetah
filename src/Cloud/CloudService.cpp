@@ -188,7 +188,7 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
     }
 
     QFile jsonFile(tempfile.fileName());
-    if (RideFileFactory::instance().writeRideFile(NULL, ride, jsonFile, spec) == true) {
+    if (RideFileFactory::instance().writeRideFile(ride->context, ride, jsonFile, spec) == true) {
 
         if (uploadCompression == zip) {
             // create a temp zip file
