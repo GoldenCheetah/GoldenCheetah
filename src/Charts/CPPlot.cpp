@@ -522,7 +522,7 @@ CPPlot::plotModel()
                 sym->setBrush(QBrush(GColor(CPLOTMARKER)));
                 sym->setPen(QPen(GColor(CPLOTMARKER)));
                 sym->setStyle(QwtSymbol::XCross);
-                sym->setSize(6 *dpiXFactor);
+                sym->setSize(10 *dpiXFactor);
 
                 QwtPlotMarker *cherryp = new QwtPlotMarker();
                 cherryp->setSymbol(sym);
