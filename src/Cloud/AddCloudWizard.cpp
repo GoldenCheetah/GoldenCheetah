@@ -173,11 +173,11 @@ AddService::initializePage()
         // only ones with the capability we need.
         if (s->type() != wizard->type) continue;
 
-        QCommandLinkButton *p = new QCommandLinkButton(s->name(), s->description(), this);
+        QCommandLinkButton *p = new QCommandLinkButton(s->id(), s->description(), this);
         p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
         p->setFixedHeight(50 *dpiYFactor);
         connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
-        mapper->setMapping(p, s->name());
+        mapper->setMapping(p, s->id());
         buttonlayout->addWidget(p);
     }
     buttonlayout->addStretch();
@@ -294,7 +294,7 @@ AddAuth::initializePage()
     tokenLabel->hide();
 
     // clone to do next few steps!
-    setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->name()));
+    setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->id()));
 
     // show  all the widgets relevant for this service and update the value from the
     // settings we have collected (which will have been defaulted).

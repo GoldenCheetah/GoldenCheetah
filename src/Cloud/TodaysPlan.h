@@ -34,7 +34,7 @@ class TodaysPlan : public CloudService {
         CloudService *clone(Context *context) { return new TodaysPlan(context); }
         ~TodaysPlan();
 
-        QString name() const { return (tr("Today's Plan")); }
+        QString id() const { return "Today's Plan"; }
         QString description() const { return (tr("Sync with the smarter training site.")); }
         QImage logo() const { return QImage(":images/services/todaysplan.png"); }
 
