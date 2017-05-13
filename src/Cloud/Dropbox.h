@@ -34,6 +34,7 @@ class Dropbox : public CloudService {
         ~Dropbox();
 
         QString id() const { return "Dropbox"; }
+        QString uiName() const { return tr("Dropbox"); }
         QString description() const { return (tr("Sync activities via your cloud storage.")); }
         QImage logo() const { return QImage(":images/services/dropbox.png"); }
 

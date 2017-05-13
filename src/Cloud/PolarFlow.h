@@ -44,6 +44,7 @@ class PolarFlow : public CloudService {
         ~PolarFlow();
 
         QString id() const { return "PolarFlow"; }
+        QString uiName() const { return tr("PolarFlow"); }
         QString description() const { return (tr("Download from the popular Polar website.")); }
         QImage logo() const { return QImage(":images/services/polarflow.png"); }
 

@@ -2042,20 +2042,20 @@ MainWindow::checkCloud()
 }
 
 void
-MainWindow::uploadCloud(QAction *name)
+MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
-        CloudService *db = CloudServiceFactory::instance().newService(name->text(), currentTab->context);
+        CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
         CloudService::upload(this, db, currentTab->context->ride);
     }
 }
 
 void
-MainWindow::syncCloud(QAction *name)
+MainWindow::syncCloud(QAction *action)
 {
     // sync with cloud
-    CloudService *db = CloudServiceFactory::instance().newService(name->text(), currentTab->context);
+    CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
     CloudServiceSyncDialog sync(currentTab->context, db);
     sync.exec();
 }
@@ -2225,7 +2225,12 @@ MainWindow::setUploadMenu()
         const CloudService *s = CloudServiceFactory::instance().service(name);
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
-        if (s->capabilities() & CloudService::Upload)  uploadMenu->addAction(name);
+        if (s->capabilities() & CloudService::Upload) {
+            QAction *service = new QAction(s->uiName());
+            // we need the technical name to identify the service to be called
+            service->setData(name);
+            uploadMenu->addAction(service);
+        }
     }
 }
 
@@ -2238,7 +2243,12 @@ MainWindow::setSyncMenu()
         const CloudService *s = CloudServiceFactory::instance().service(name);
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
-        if (s->capabilities() & CloudService::Query)  syncMenu->addAction(name);
+        if (s->capabilities() & CloudService::Query)  {
+            QAction *service = new QAction(s->uiName());
+            // we need the technical name to identify the service to be called
+            service->setData(name);
+            syncMenu->addAction(service);
+        }
     }
 }
 
