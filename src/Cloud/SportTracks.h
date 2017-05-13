@@ -35,6 +35,7 @@ class SportTracks : public CloudService {
         ~SportTracks();
 
         QString id() const { return "SportTracks.mobi"; }
+        QString uiName() const { return tr("SportTracks.mobi"); }
         QString description() const { return (tr("Sync with the popular multisport website.")); }
         QImage logo() const { return QImage(":images/services/sporttracks.png"); }
 

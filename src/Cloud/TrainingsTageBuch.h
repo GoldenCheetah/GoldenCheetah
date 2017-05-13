@@ -43,6 +43,7 @@ class TrainingsTageBuch : public CloudService {
     public:
 
         QString id() const { return "TrainingsTageBuch"; }
+        QString uiName() const { return tr("Trainingstagebuch"); }
         QString description() const { return (tr("Upload to your online and mobile training log.")); }
         QImage logo() const { return QImage(":images/services/trainingstagebuch.png"); }
 

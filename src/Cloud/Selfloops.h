@@ -31,6 +31,7 @@ class Selfloops : public CloudService {
     public:
 
         QString id() const { return "Selfloops"; }
+        QString uiName() const { return tr("Selfloops"); }
         QString description() const { return tr("Upload and track your training and progress."); }
         QImage logo() const { return QImage(":images/services/selfloops.png"); }
 
