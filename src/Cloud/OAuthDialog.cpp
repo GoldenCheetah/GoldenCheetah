@@ -43,14 +43,14 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     setMinimumSize(640 *dpiXFactor, 640 *dpiYFactor);
 
     if (service) { // ultimately this will be the only way this works
-        if (service->name() == "Strava") site = this->site = STRAVA;
-        if (service->name() == "Dropbox") site = this->site = DROPBOX;
-        if (service->name() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
-        if (service->name() == "Google Drive") site = this->site = GOOGLE_DRIVE;
-        if (service->name() == "Today's Plan") site = this->site = TODAYSPLAN;
-        if (service->name() == "Withings") site = this->site = WITHINGS;
-        if (service->name() == "PolarFlow") site = this->site = POLAR;
-        if (service->name() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
+        if (service->id() == "Strava") site = this->site = STRAVA;
+        if (service->id() == "Dropbox") site = this->site = DROPBOX;
+        if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
+        if (service->id() == "Google Drive") site = this->site = GOOGLE_DRIVE;
+        if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
+        if (service->id() == "Withings") site = this->site = WITHINGS;
+        if (service->id() == "PolarFlow") site = this->site = POLAR;
+        if (service->id() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
     }
 
     // check if SSL is available - if not - message and end
