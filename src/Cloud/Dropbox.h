@@ -33,7 +33,7 @@ class Dropbox : public CloudService {
         CloudService *clone(Context *context) { return new Dropbox(context); }
         ~Dropbox();
 
-        QString name() const { return (tr("Dropbox")); }
+        QString id() const { return "Dropbox"; }
         QString description() const { return (tr("Sync activities via your cloud storage.")); }
         QImage logo() const { return QImage(":images/services/dropbox.png"); }
 

@@ -30,7 +30,7 @@ class RideWithGPS : public CloudService {
 
     public:
 
-        QString name() const { return (tr("RideWithGPS")); }
+        QString id() const { return "RideWithGPS"; }
         QString description() const { return(tr("Upload rides and analyse them using Google Maps.")); }
 
         QImage logo() const { return QImage(":images/services/ridewithgps.png"); }
