@@ -423,7 +423,7 @@ CredentialsPage::resetList()
 
         QTreeWidgetItem *add = new QTreeWidgetItem;
         add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, s->name());
+        add->setText(0, s->id());
         add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
         add->setText(1, s->description());
 

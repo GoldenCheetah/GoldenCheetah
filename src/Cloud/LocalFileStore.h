@@ -32,7 +32,7 @@ class LocalFileStore : public CloudService {
         CloudService *clone(Context *context) { return new LocalFileStore(context); }
         ~LocalFileStore();
 
-        QString name() const { return (tr("Local Store")); }
+        QString id() const { return "Local Store"; }
         QString description() const { return (tr("Sync with a local folder or thumbdrive.")); }
         QImage logo() const { return QImage(":images/services/localstore.png"); }
 

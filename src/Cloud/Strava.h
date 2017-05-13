@@ -30,7 +30,7 @@ class Strava : public CloudService {
 
     public:
 
-        QString name() const { return (tr("Strava")); }
+        QString id() const { return "Strava"; }
         QString description() const { return (tr("Sync with the social network for cyclists and runners.")); }
         QImage logo() const { return QImage(":images/services/strava.png"); }
 
