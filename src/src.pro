@@ -628,6 +628,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/MonarkController.h Train/MonarkConnection.h
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
     HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
+    SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
+    HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
 
     # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
     greaterThan(QT_MINOR_VERSION, 4) {
