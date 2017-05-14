@@ -2226,8 +2226,9 @@ MainWindow::setUploadMenu()
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Upload) {
-            QAction *service = new QAction(s->uiName());
             // we need the technical name to identify the service to be called
+            QAction *service = new QAction(NULL);
+            service->setText(s->uiName());
             service->setData(name);
             uploadMenu->addAction(service);
         }
@@ -2244,8 +2245,9 @@ MainWindow::setSyncMenu()
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Query)  {
-            QAction *service = new QAction(s->uiName());
             // we need the technical name to identify the service to be called
+            QAction *service = new QAction(NULL);
+            service->setText(s->uiName());
             service->setData(name);
             syncMenu->addAction(service);
         }
