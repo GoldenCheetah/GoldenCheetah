@@ -89,6 +89,7 @@ class CloudService : public QObject {
         // that represents the website, so likely to just be the URL simplified
         // e.g. https://www.strava.com => "Strava"
         virtual QString id() const { return "NONE"; }
+        virtual QString uiName() const { return tr("None"); }
         virtual QString description() const { return ""; }
 
         // need a logo, we may resize but will keep aspect ratio

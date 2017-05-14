@@ -423,11 +423,13 @@ CredentialsPage::resetList()
 
         QTreeWidgetItem *add = new QTreeWidgetItem;
         add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, s->id());
+        add->setText(0, s->uiName());
         add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
         add->setText(1, s->description());
+        add->setText(2, s->id());
 
         accounts->invisibleRootItem()->insertChild(index++, add);
+        accounts->hideColumn(2);
     }
 }
 
@@ -459,7 +461,7 @@ CredentialsPage::deleteClicked()
     if (accounts->selectedItems().count() == 0) return;
 
     // does it exist?
-    const CloudService *service = CloudServiceFactory::instance().service(accounts->selectedItems().first()->text(0));
+    const CloudService *service = CloudServiceFactory::instance().service(accounts->selectedItems().first()->text(2));
     if (service) {
 
         // set it inactive
@@ -477,7 +479,7 @@ CredentialsPage::editClicked()
     if (accounts->selectedItems().count() == 0) return;
 
     // edit the details
-    AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(0));
+    AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(2));
     edit->exec();
 
 }

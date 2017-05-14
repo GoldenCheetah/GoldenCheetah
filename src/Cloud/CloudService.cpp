@@ -327,7 +327,7 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService
 
         // didn't work dude
         QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Upload Failed") + store->id());
+        msgBox.setWindowTitle(tr("Upload Failed") + store->uiName());
         msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
 
         msgBox.setIcon(QMessageBox::Critical);
@@ -369,7 +369,7 @@ CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QSt
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setMinimumSize(350*dpiXFactor, 400*dpiYFactor);
-    setWindowTitle(title + " (" + store->id() + ")");
+    setWindowTitle(title + " (" + store->uiName() + ")");
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     pathEdit = new QLineEdit(this);
@@ -638,7 +638,7 @@ FolderNameDialog::FolderNameDialog(QWidget *parent) : QDialog(parent)
 CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *store)
     : QDialog(context->mainWindow, Qt::Dialog), context(context), store(store), downloading(false), aborted(false)
 {
-    setWindowTitle(tr("Synchronise ") + store->id());
+    setWindowTitle(tr("Synchronise ") + store->uiName());
     setMinimumSize(850 *dpiXFactor,450 *dpiYFactor);
 
     QStringList errors;
@@ -646,7 +646,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
         QWidget::hide(); // meh
 
         QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Sync with ") + store->id());
+        msgBox.setWindowTitle(tr("Sync with ") + store->uiName());
         msgBox.setText(tr("Unable to connect, check your configuration in preferences."));
         msgBox.setDetailedText(errors.join("\n"));
 
@@ -759,8 +759,8 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     selectAllSync->setChecked(Qt::Unchecked);
     syncMode = new QComboBox(this);
     syncMode->addItem(tr("Keep all do not delete"));
-    syncMode->addItem(tr("Keep %1 but delete Local").arg(store->id()));
-    syncMode->addItem(tr("Keep Local but delete %1").arg(store->id()));
+    syncMode->addItem(tr("Keep %1 but delete Local").arg(store->uiName()));
+    syncMode->addItem(tr("Keep Local but delete %1").arg(store->uiName()));
     QHBoxLayout *syncList = new QHBoxLayout;
     syncList->addWidget(selectAllSync);
     syncList->addStretch();
@@ -1719,7 +1719,7 @@ CloudServiceAutoDownload::run()
     for(int i=0; i<downloadlist.count(); i++) {
 
         // update progress indicator
-        context->notifyAutoDownloadProgress(downloadlist[i].provider->id(), progress, i, downloadlist.count());
+        context->notifyAutoDownloadProgress(downloadlist[i].provider->uiName(), progress, i, downloadlist.count());
 
         CloudServiceDownloadEntry download= downloadlist[i];
 
@@ -1740,7 +1740,7 @@ CloudServiceAutoDownload::run()
         progress += inc;
 
         // if last one we need to signal done.
-        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(download.provider->id(), progress, i+1, downloadlist.count());
+        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(download.provider->uiName(), progress, i+1, downloadlist.count());
     }
 
     // time to see completion
