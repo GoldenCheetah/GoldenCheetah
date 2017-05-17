@@ -2492,7 +2492,7 @@ RideFile::recalculateDerivedSeries(bool force)
             // -> above ration 3, round to next 0,5 border (mainly Racebike - even wider differences)
             // speed and wheelsize in meters
             // but only if ride point has power, cadence and speed > 0 otherwise calculation will give a random result
-            if (p->watts > 0.0f && p->cad > 0.0f && p->kph > 0.0f) {
+            if ((p->watts > 0.0f || !dataPresent.watts) && p->cad > 0.0f && p->kph > 0.0f) {
                 p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
 
                 // Round Gear ratio to the hundreths.
