@@ -454,7 +454,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 run.wprime = rtool->context->athlete->zones(true)->getWprime(range);
                 run.pmax = rtool->context->athlete->zones(true)->getPmax(range);
                 run.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                run.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                run.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
             }
         }
 
@@ -545,7 +545,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 c.wprime = rtool->context->athlete->zones(true)->getWprime(range);
                 c.pmax = rtool->context->athlete->zones(true)->getPmax(range);
                 c.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                c.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
 
                 config << c;
             }
