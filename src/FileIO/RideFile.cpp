@@ -2479,35 +2479,49 @@ RideFile::recalculateDerivedSeries(bool force)
             }
         }
 
-        // can we derive gear ratio ?
-        // needs speed and cadence
-        if (p->kph && p->cad && !isRun() && !isSwim()) {
-
-            // need to say we got it
+        // derive or calculate gear ratio either from XDATA (if "GEARS" XData data exists)
+        // or from speed and cadence
+        XDataSeries *series = xdata("GEARS");
+        if (series && series->datapoints.count() > 0)  {
             setDataPresent(RideFile::gear, true);
-
-            // calculate gear ratio, with simple 3 level rounding (considering that the ratio steps are not linear):
-            // -> below ratio 1, round to next 0,05 border (ratio step of 2 tooth change is around 0,03 for 20/36 (MTB)
-            // -> above ratio 1 and 3,  round to next 0,1 border (MTB + Racebike - bigger differences per shifting step)
-            // -> above ration 3, round to next 0,5 border (mainly Racebike - even wider differences)
-            // speed and wheelsize in meters
-            // but only if ride point has power, cadence and speed > 0 otherwise calculation will give a random result
-            if ((p->watts > 0.0f || !dataPresent.watts) && p->cad > 0.0f && p->kph > 0.0f) {
-                p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
-
-                // Round Gear ratio to the hundreths.
-                // final rounding to 2 decimals
-                p->gear = floor(p->gear * 100.00f +.5) / 100.00f;
+            int idx=0;
+            double front = xdataValue(p, idx, "GEARS", "FRONT", RideFile::REPEAT);
+            double rear = xdataValue(p, idx, "GEARS", "REAR", RideFile::REPEAT);
+            if (front != RideFile::NA && rear != RideFile::NA) {
+                p->gear = front / rear;
             }
-            else {
-                p->gear = 0.0f; // to be filled up with previous gear later
+        }
+        else {
+
+            // can we derive gear ratio ? needs speed and cadence
+            if (p->kph && p->cad && !isRun() && !isSwim()) {
+
+                // need to say we got it
+                setDataPresent(RideFile::gear, true);
+
+                // calculate gear ratio, with simple 3 level rounding (considering that the ratio steps are not linear):
+                // -> below ratio 1, round to next 0,05 border (ratio step of 2 tooth change is around 0,03 for 20/36 (MTB)
+                // -> above ratio 1 and 3,  round to next 0,1 border (MTB + Racebike - bigger differences per shifting step)
+                // -> above ration 3, round to next 0,5 border (mainly Racebike - even wider differences)
+                // speed and wheelsize in meters
+                // but only if ride point has power, cadence and speed > 0 otherwise calculation will give a random result
+                if ((p->watts > 0.0f || !dataPresent.watts) && p->cad > 0.0f && p->kph > 0.0f) {
+                    p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
+
+                    // Round Gear ratio to the hundreths.
+                    // final rounding to 2 decimals
+                    p->gear = floor(p->gear * 100.00f +.5) / 100.00f;
+                }
+                else {
+                    p->gear = 0.0f; // to be filled up with previous gear later
+                }
+
+                // truncate big values
+                if (p->gear > maximumFor(RideFile::gear)) p->gear = 0;
+
+            } else {
+                p->gear = 0.0f;
             }
-
-            // truncate big values
-            if (p->gear > maximumFor(RideFile::gear)) p->gear = 0;
-
-        } else {
-            p->gear = 0.0f;
         }
 
         // split out O2Hb and HHb when we have SmO2 and tHb
