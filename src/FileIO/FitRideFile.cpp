@@ -136,6 +136,7 @@ struct FitFileReaderState
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
+    XDataSeries *gearsXdata;
     XDataSeries *swimXdata;
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
@@ -965,6 +966,7 @@ struct FitFileReaderState
         int event = -1;
         int event_type = -1;
         qint16 data16 = -1;
+        qint32 data32 = -1;
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -982,9 +984,10 @@ struct FitFileReaderState
                     event_type = value; break;
                 case 2: // data16 field
                     data16 = value; break;
+                case 3: //data32 field
+                    data32 = value; break;
 
                 // additional values (ignored at present):
-                case 3: //data
                 case 4: // event group
                 default: ; // do nothing
             }
@@ -1037,6 +1040,29 @@ struct FitFileReaderState
                 }
                 break;
 
+            case 42: /* front_gear_change */
+            case 43: /* rear_gear_change */
+                {
+                    int secs = (start_time==0?0:time-start_time);
+                    XDataPoint *p = new XDataPoint();
+
+                    switch (event_type) {
+                        case 3:
+                            p->secs = secs;
+                            p->km = last_distance;
+                            p->number[0] = ((data32 >> 24) & 255);
+                            p->number[1] = ((data32 >> 8) & 255);
+                            p->number[2] = ((data32 >> 16) & 255);
+                            p->number[3] = (data32 & 255);
+                            gearsXdata->datapoints.append(p);
+                            break;
+                        default:
+                            errors << QString("Unknown gear change event %1 type %2 data %3").arg(event).arg(event_type).arg(data32);
+                            break;
+                    }
+                }
+                break;
+
             case 3: /* workout */
             case 4: /* workout_step */
             case 5: /* power_down */
@@ -1065,9 +1091,6 @@ struct FitFileReaderState
             case 28: /* length */
             case 32: /* user_marker */
             case 33: /* sport_point */
-            case 42: /* front_gear_change */
-            case 43: /* rear_gear_change */
-
             default: ;
         }
 
@@ -2702,6 +2725,17 @@ struct FitFileReaderState
 	hrvXdata->valuename << "R-R";
 	hrvXdata->unitname << "msecs";
 
+        gearsXdata = new XDataSeries();
+        gearsXdata->name = "GEARS";
+        gearsXdata->valuename << "FRONT";
+        gearsXdata->unitname << "t";
+        gearsXdata->valuename << "REAR";
+        gearsXdata->unitname << "t";
+        gearsXdata->valuename << "FRONT-NUM";
+        gearsXdata->unitname << "";
+        gearsXdata->valuename << "REAR-NUM";
+        gearsXdata->unitname << "";
+
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";
 
@@ -2818,6 +2852,11 @@ struct FitFileReaderState
                 rideFile->addXData("HRV", hrvXdata);
             else
                 delete hrvXdata;
+
+            if (gearsXdata->datapoints.count()>0)
+                rideFile->addXData("GEARS", gearsXdata);
+            else
+                delete gearsXdata;
 
             if (deveXdata->datapoints.count()>0)
                 rideFile->addXData("DEVELOPER", deveXdata);
