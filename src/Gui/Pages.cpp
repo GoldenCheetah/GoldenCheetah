@@ -46,6 +46,8 @@
 #include "Secrets.h"
 #include "Utils.h"
 
+extern ConfigDialog *configdialog_ptr;
+
 //
 // Main Config Page - tabs for each sub-page
 //
@@ -387,6 +389,7 @@ CredentialsPage::CredentialsPage(Context *context) : context(context)
     accounts->headerItem()->setText(0, tr("Service"));
     accounts->headerItem()->setText(1, tr("Description"));
     accounts->setColumnCount(2);
+    accounts->setColumnWidth(0, 175 * dpiXFactor);
     accounts->setSelectionMode(QAbstractItemView::SingleSelection);
     //fields->setUniformRowHeights(true);
     accounts->setIndentation(0);
@@ -445,10 +448,10 @@ CredentialsPage::addClicked()
 {
     // just run the add cloud wizard
     AddCloudWizard *wizard = new AddCloudWizard(context);
-    wizard->exec();
 
-    // we need to raise, as wizard drops us
-    raise();
+    // when the wizard closes we need to raise back - or else we get hidden
+    connect(wizard, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
+    wizard->exec();
 
     // update the account list
     resetList();
@@ -480,6 +483,9 @@ CredentialsPage::editClicked()
 
     // edit the details
     AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(2));
+
+    // when the wizard closes we need to raise back - or else we get hidden
+    connect(edit, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
     edit->exec();
 
 }

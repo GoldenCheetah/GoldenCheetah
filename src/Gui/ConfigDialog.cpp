@@ -31,11 +31,13 @@
 #include "MainWindow.h"
 
 extern bool restarting; //its actually in main.cpp
+ConfigDialog *configdialog_ptr = NULL;
 
 ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     home(_home), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+    configdialog_ptr = this;
 
 #ifdef Q_OS_MAC
     QToolBar *head = addToolBar(tr("Preferences"));
@@ -194,6 +196,9 @@ void ConfigDialog::changePage(int index)
 
 void ConfigDialog::closeClicked()
 {
+    // hack for raise event
+    configdialog_ptr = NULL;
+
     // don't save!
     close();
 }
