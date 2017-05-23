@@ -115,7 +115,7 @@ class FixRunningPowerConfig : public DataProcessorConfig
                               "to adjust for drafting, 1 is no drafting "
                               " and 0.7 seems legit for drafting in a group\n\n"
                               "wind speed shall be indicated in kph\n"
-                              "wind heading (origin) unit is degrees "
+                              "wind direction (origin) unit is degrees "
                               "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
                               "Note: if the file already contain wind data "
                               "it will be overridden if wind is entered")));
