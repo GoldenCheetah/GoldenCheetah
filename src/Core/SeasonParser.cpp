@@ -17,14 +17,10 @@
  */
 
 #include "SeasonParser.h"
+#include "Utils.h"
 #include <QDate>
 #include <QDebug>
 #include <QMessageBox>
-
-static inline QString unquote(QString quoted)
-{
-    return quoted.mid(1,quoted.length()-2);
-}
 
 bool SeasonParser::startDocument()
 {
@@ -36,9 +32,9 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
 {
     if(qName == "name") {
         if (isPhase)
-            phase.setName(buffer.trimmed());
+            phase.setName(Utils::unprotect(buffer));
         else
-            season.setName(buffer.trimmed());
+            season.setName(Utils::unprotect(buffer));
     } else if(qName == "startdate") {
         if (isPhase)
             phase.setStart(seasonDateToDate(buffer.trimmed()));
@@ -75,7 +71,7 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
             season.setSeed(buffer.trimmed().toInt());
     } else if (qName == "event") {
 
-        season.events.append(SeasonEvent(unquote(buffer.trimmed()), seasonDateToDate(dateString)));
+        season.events.append(SeasonEvent(Utils::unprotect(buffer), seasonDateToDate(dateString)));
 
     } else if(qName == "season") {
 
@@ -205,7 +201,7 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
                       "\t\t\t<id>%5</id>\n"
                       "\t\t\t<seed>%6</seed>\n"
                       "\t\t\t<low>%7</low>\n"
-                      "\t\t</phase>\n") .arg(phase.getName())
+                      "\t\t</phase>\n") .arg(Utils::xmlprotect(phase.getName()))
                                              .arg(phase.getStart().toString("yyyy-MM-dd"))
                                              .arg(phase.getEnd().toString("yyyy-MM-dd"))
                                              .arg(phase.getType())
@@ -221,7 +217,7 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
                   "\t\t<type>%4</type>\n"
                   "\t\t<id>%5</id>\n"
                   "\t\t<seed>%6</seed>\n"
-                  "\t\t<low>%7</low>\n") .arg(season.getName())
+                  "\t\t<low>%7</low>\n") .arg(Utils::xmlprotect(season.getName()))
                                          .arg(season.getStart().toString("yyyy-MM-dd"))
                                          .arg(season.getEnd().toString("yyyy-MM-dd"))
                                          .arg(season.getType())
@@ -240,7 +236,7 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
 
                 out<<QString("\t\t<event date=\"%1\">\"%2\"</event>")
                             .arg(x.date.toString("yyyy-MM-dd"))
-                            .arg(x.name);
+                            .arg(Utils::xmlprotect(x.name));
             
             }
             out <<QString("\t</season>\n");
