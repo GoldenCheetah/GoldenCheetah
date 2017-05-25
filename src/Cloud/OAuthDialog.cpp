@@ -108,7 +108,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if (site == DROPBOX) {
 
-        urlstr = QString("https://www.dropbox.com/1/oauth2/authorize?");
+        urlstr = QString("https://www.dropbox.com/oauth2/authorize?");
 #ifdef GC_DROPBOX_CLIENT_ID
         urlstr.append("client_id=").append(GC_DROPBOX_CLIENT_ID).append("&");
 #endif
@@ -355,7 +355,7 @@ OAuthDialog::urlChanged(const QUrl &url)
             // now get the final token to store
             if (site == DROPBOX) {
 
-                urlstr = QString("https://api.dropboxapi.com/1/oauth2/token?");
+                urlstr = QString("https://api.dropboxapi.com/oauth2/token?");
                 urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
                 params.addQueryItem("grant_type", "authorization_code");
 #ifdef GC_DROPBOX_CLIENT_ID
