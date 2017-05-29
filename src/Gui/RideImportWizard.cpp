@@ -55,7 +55,7 @@ RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget 
     init(filenames, context);
     filenames.clear();
     _importInProcess = false;
-
+    _importState = READY;
 }
 
 RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidget *parent) : QDialog(parent), context(context)
@@ -66,7 +66,7 @@ RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidg
     autoImportStealth = false;
     init(files, context);
     _importInProcess = false;
-
+    _importState = READY;
 }
 
 
@@ -75,6 +75,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     _importInProcess = true;
     autoImportMode = true;
     autoImportStealth = true;
+    _importState = READY;
 
     if (autoImportStealth) hide();
     QList<QString> files;
@@ -905,14 +906,14 @@ RideImportWizard::abortClicked()
     QString label = abortButton->text();
 
     // Process "ABORT"
-    if (label == tr("Abort")) {
+    if (_importState == RUNNING) {
         hide();
         aborted=true; // terminated. I'll be back.
         return;
     }
 
     // Process "FINISH"
-    if (label == tr("Finish")) {
+    if (_importState == DONE) {
        // phew. our work is done. -- lets force an update stats...
        hide();
        if (autoImportStealth) {
@@ -927,6 +928,7 @@ RideImportWizard::abortClicked()
 
     // SAVE STEP 2 - set the labels and make the text un-editable
     phaseLabel->setText(tr("Step 4 of 4: Save to Library"));
+    _importState = RUNNING;
 
     abortButton->setText(tr("Abort"));
     aborted = false;
@@ -1090,6 +1092,7 @@ RideImportWizard::abortClicked()
     progressBar->setValue(progressBar->maximum());
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
+    _importState = DONE;
     aborted = false;
     if (autoImportStealth) {
         abortClicked();  // simulate pressing the "Finish" button - even if the window got visible
