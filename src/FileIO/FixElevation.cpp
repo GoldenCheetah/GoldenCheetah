@@ -25,6 +25,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QMessageBox>
 
 // MapQuest default API key.
 // If you have reliability problems with Fix Elevation, caused by too
