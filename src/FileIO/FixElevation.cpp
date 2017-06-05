@@ -161,6 +161,9 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
         }
     } catch (QString err) {
         qDebug() << "Cannot fetch elevation data: " << err;
+        QMessageBox oops(QMessageBox::Critical, tr("Fix Elevation Data not possible"),
+                         tr("The following problem occured: %1").arg(err));
+        oops.exec();
         return false;
     }
 
@@ -272,12 +275,18 @@ FetchElevationDataFromMapQuest(QString latLngCollection)
     QString elevationJSON;
     elevationJSON = reply->readAll();
 
+    QNetworkReply::NetworkError error = reply->error();
+
     delete networkMgr;
 
     if (elevationJSON.contains("Exceeded developer limit configuration"))
-        throw QString("Developer limit exceeded");
+        throw QString(QObject::tr("Developer limit exceeded"));
+    if (elevationJSON.contains("exceeded the number of monthly transactions"))
+        throw QString(QObject::tr("Monthly free plan limit exceeded"));
     if (elevationJSON.contains("Bad Request"))
-        throw QString("Bad request");
+        throw QString(QObject::tr("Bad request"));
+    if (error != QNetworkReply::NoError)
+        throw QString(QObject::tr("Networkerror: %1")).arg(error);
 
     elevationJSON = elevationJSON.mid(elevationJSON.indexOf("elevationProfile") + 19);
     elevationJSON = elevationJSON.mid(0, elevationJSON.indexOf("]"));
