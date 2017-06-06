@@ -35,7 +35,7 @@
 #include <cmath>
 
 #define FIT_DEBUG               false // debug traces
-#define FIT_DEBUG_LEVEL         3    // debug level : 1 message, 2 definition, 3 data without record, 4 data
+#define FIT_DEBUG_LEVEL         4    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
 #define MATHCONST_PI            3.141592653589793238462643383279502884L /* pi */
@@ -1141,6 +1141,10 @@ struct FitFileReaderState
         int i = 0;
         time_t this_start_time = 0;
         double total_distance = 0.0;
+
+        int lap_trigger = -1;
+        QString lap_name;
+
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
             printf( " FIT decode lap \n");
         }
@@ -1170,6 +1174,8 @@ struct FitFileReaderState
                 case 9:
                     total_distance = value.v / 100000.0;
                     break;
+                case 24:
+                    lap_trigger = value.v;
 
                 // other data (ignored at present):
                 case 254: // lap nbr
@@ -1235,10 +1241,13 @@ struct FitFileReaderState
             ++interval;
         } else if (rideFile->dataPoints().count()) { // no samples means no laps
             ++interval;
+            if (lap_name == "") {
+                lap_name = QObject::tr("Lap %1").arg(interval);
+            }
             rideFile->addInterval(RideFileInterval::DEVICE,
                                   this_start_time - start_time,
                                   time - start_time,
-                                  QObject::tr("Lap %1").arg(interval));
+                                  lap_name);
         }
     }
 
