@@ -2481,24 +2481,26 @@ RideFile::recalculateDerivedSeries(bool force)
 
         // derive or calculate gear ratio either from XDATA (if "GEARS" XData data exists)
         // or from speed and cadence
+        double front = RideFile::NA;
+        double rear = RideFile::NA;
+
         XDataSeries *series = xdata("GEARS");
         if (series && series->datapoints.count() > 0)  {
-            setDataPresent(RideFile::gear, true);
             int idx=0;
-            double front = xdataValue(p, idx, "GEARS", "FRONT", RideFile::REPEAT);
-            double rear = xdataValue(p, idx, "GEARS", "REAR", RideFile::REPEAT);
-            if (front != RideFile::NA && rear != RideFile::NA) {
-                p->gear = front / rear;
-            }
+            front = xdataValue(p, idx, "GEARS", "FRONT", RideFile::REPEAT);
+            rear = xdataValue(p, idx, "GEARS", "REAR", RideFile::REPEAT);
         }
-        else {
 
+        if (front != RideFile::NA && rear != RideFile::NA) {
+            // gear data were part of XDATA series, use it
+            setDataPresent(RideFile::gear, true);
+            p->gear = front / rear;
+        } else {
+            // gear data were not present in XDATA series, we have to derive from other data:
             // can we derive gear ratio ? needs speed and cadence
             if (p->kph && p->cad && !isRun() && !isSwim()) {
-
                 // need to say we got it
                 setDataPresent(RideFile::gear, true);
-
                 // calculate gear ratio, with simple 3 level rounding (considering that the ratio steps are not linear):
                 // -> below ratio 1, round to next 0,05 border (ratio step of 2 tooth change is around 0,03 for 20/36 (MTB)
                 // -> above ratio 1 and 3,  round to next 0,1 border (MTB + Racebike - bigger differences per shifting step)
@@ -2507,7 +2509,6 @@ RideFile::recalculateDerivedSeries(bool force)
                 // but only if ride point has power, cadence and speed > 0 otherwise calculation will give a random result
                 if ((p->watts > 0.0f || !dataPresent.watts) && p->cad > 0.0f && p->kph > 0.0f) {
                     p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
-
                     // Round Gear ratio to the hundreths.
                     // final rounding to 2 decimals
                     p->gear = floor(p->gear * 100.00f +.5) / 100.00f;
