@@ -173,6 +173,8 @@
 #define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
+#define GC_DPDP_CDA                     "<global-general>dataprocess/fixderivepower/cda"
+#define GC_DPDP_DRAFTM                  "<global-general>dataprocess/fixderivepower/draftm"
 #define GC_DPRP_EQUIPWEIGHT             "<global-general>dataprocess/fixrunningpower/equipwheight"
 #define GC_DPDR_DRAFTM                  "<global-general>dataprocess/fixrunningpower/draftm"
 #define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
