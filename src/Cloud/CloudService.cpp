@@ -301,9 +301,6 @@ CloudService::uploadExtension() {
 
 CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
 {
-    // get a compressed version
-    store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
-
     // setup the gui!
     QVBoxLayout *layout = new QVBoxLayout(this);
     info = new QLabel(QString(tr("Uploading %1 bytes...")).arg(data.size()));
@@ -320,9 +317,21 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService
     buttons->addWidget(okcancel);
     layout->addLayout(buttons);
 
-    // ok, so now we can kickoff the upload
-    status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
+    // lets open the store
+    QStringList errors;
+    status = store->open(errors);
 
+    // compress and upload if opened successfully.
+    if (status == true) {
+
+        // get a compressed version
+        store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
+
+        // ok, so now we can kickoff the upload
+        status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
+    }
+
+    // if the upload failed in any way, bail out
     if (status == false) {
 
         // didn't work dude
