@@ -128,7 +128,11 @@ bool GoogleDrive::open(QStringList &errors) {
     new_root->id = GetRootDirId();
     root_dir_.reset(new_root);
 
-    return true;
+    MaybeRefreshCredentials();
+
+    // if this fails we're toast
+    readdir(home(), errors);
+    return errors.count() == 0;
 }
 
 bool GoogleDrive::close() {
