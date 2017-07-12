@@ -404,6 +404,7 @@ struct FitFileReaderState
             switch (prod) {
                 case 0: return "Wahoo fitness";
                 case 28: return "Wahoo ELEMNT";
+                case 31: return "Wahoo ELEMNT BOLT";
                 default: return QString("Wahoo fitness %1").arg(prod);
             }
         } else if (manu == 38) {
