@@ -2599,7 +2599,7 @@ struct FitFileReaderState
                 case EVENT_MSG_NUM: // #21
                     decodeEvent(def, time_offset, values); break;
                 case 23:
-                    //decodeDeviceInfo(def, time_offset, values); /* device info */
+                    decodeDeviceInfo(def, time_offset, values); /* device info */
                     break;
                 case 101:
                     decodeLength(def, time_offset, values);
