@@ -515,14 +515,14 @@ struct FitFileReaderState
         }
     }
 
-    int getScaleForExtraNative(int native_num) {
+    float getScaleForExtraNative(int native_num) {
         switch (native_num) {
 
             case 47: // COMBINED_PEDAL_SMOOTHNES
-                    return 2;
+                    return 2.0;
 
             default:
-                    return 1;
+                    return 1.0;
         }
     }
 
@@ -1544,7 +1544,7 @@ struct FitFileReaderState
                     idx = record_extra_fields[field.num];
 
                     if (idx>-1) {
-                        int scale = getScaleForExtraNative(field.num);
+                        float scale = getScaleForExtraNative(field.num);
                         int offset = getOffsetForExtraNative(field.num);
 
                         if (p_extra == NULL &&
@@ -1554,8 +1554,8 @@ struct FitFileReaderState
                            p_extra = new XDataPoint();
 
                         switch (_values.type) {
-                            case SingleValue: p_extra->number[idx]=_values.v/(float)scale+offset; break;
-                            case FloatValue: p_extra->number[idx]=_values.f/(float)scale+offset; break;
+                            case SingleValue: p_extra->number[idx]=_values.v/scale+offset; break;
+                            case FloatValue: p_extra->number[idx]=_values.f/scale+offset; break;
                             case StringValue: p_extra->string[idx]=_values.s.c_str(); break;
                             default: break;
                         }
