@@ -928,7 +928,7 @@ struct FitFileReaderState
                      version = value.v;
                      break;
                 case 27:   // product name
-                     name = values[i++].s;
+                     name = value.s;
                  break;
 
                 // all oher fields are ignored at present
