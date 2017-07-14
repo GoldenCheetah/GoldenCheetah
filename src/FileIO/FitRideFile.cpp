@@ -510,6 +510,9 @@ struct FitFileReaderState
             case 47: // COMBINED_PEDAL_SMOOTHNES
                     return "COMBINEDSMOOTHNESS"; //Combined Pedal Smoothness
 
+            case 81: // BATTERY_SOC
+                    return "BATTERYSOC";
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -519,6 +522,7 @@ struct FitFileReaderState
         switch (native_num) {
 
             case 47: // COMBINED_PEDAL_SMOOTHNES
+            case 81: // BATTERY_SOC
                     return 2.0;
 
             default:
