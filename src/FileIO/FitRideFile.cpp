@@ -2830,11 +2830,10 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
-            QString deviceInfo;
-            foreach(QString info, deviceInfos) {
-                deviceInfo += info + "\n";
-            }
-            if (deviceInfo.length()>0)
+            QStringList uniqueDevices(deviceInfos.values());
+            uniqueDevices.removeDuplicates();
+            QString deviceInfo = uniqueDevices.join('\n');
+            if (not deviceInfo.isEmpty())
                 rideFile->setTag("Device Info", deviceInfo);
 
             QString dataInfo;
