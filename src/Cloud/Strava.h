@@ -20,9 +20,9 @@
 #define GC_Strava_h
 
 #include "CloudService.h"
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QImage>
+
+class QNetworkReply;
+class QNetworkAccessManager;
 
 class Strava : public CloudService {
 
