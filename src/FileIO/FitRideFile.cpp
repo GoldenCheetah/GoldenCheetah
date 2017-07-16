@@ -965,6 +965,55 @@ struct FitFileReaderState
 
     }
 
+    void decodeActivity(const FitDefinition &def, int,
+                        const std::vector<FitValue>& values) {
+        int i = 0;
+
+        int event = -1, event_type = -1, local_timestamp = -1, timestamp = -1;
+
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if (value == NA_VALUE)
+                continue;
+
+            switch (field.num) {
+                case 3: // event
+                    event = value;
+                    break;
+                case 4: // event_type
+                    event_type = value;
+                    break;
+                case 5: // local_timestamp
+                    local_timestamp = value + qbase_time.toTime_t();
+                    break;
+                case 253: // timestamp
+                    timestamp = value + qbase_time.toTime_t();
+                    break;
+
+                case 1: // num_sessions
+                case 2: // type
+                default:
+                    break;
+            }
+
+            //qDebug() << field.num << value;
+        }
+
+        if (event != 26) // activity
+            return;
+
+        if (event_type != 1) // stop
+            return;
+
+        if (local_timestamp < 0 || timestamp < 0)
+            return;
+
+        // adjust start time to time zone of the ride
+        QDateTime t(rideFile->startTime().toUTC());
+        rideFile->setStartTime(t.addSecs(local_timestamp - timestamp));
+    }
+
     void decodeEvent(const FitDefinition &def, int,
                      const std::vector<FitValue>& values) {
         int time = -1;
@@ -2601,6 +2650,9 @@ struct FitFileReaderState
                 case 23:
                     decodeDeviceInfo(def, time_offset, values); /* device info */
                     break;
+                case ACTIVITY_MSG_NUM: // #34
+                    decodeActivity(def, time_offset, values);
+                    break;
                 case 101:
                     decodeLength(def, time_offset, values);
                     break; /* lap swimming */
@@ -2642,7 +2694,6 @@ struct FitFileReaderState
                 case 31: /* course */
                 case 32: /* course point */
                 case 33: /* totals */
-                case ACTIVITY_MSG_NUM: /* #34 activity */
                 case 35: /* software */
                 case 37: /* file capabilities */
                 case 38: /* message capabilities */
