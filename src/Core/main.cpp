@@ -296,6 +296,12 @@ main(int argc, char *argv[])
     rtool = NULL;
 #endif
 
+    // numerous bugs related to autoscaling and opengl that have persisted since Qt5.6 on and off
+    // now we support hidpi natively we will unset scaling factors and use our own scaling ratios
+#ifdef Q_OS_LINUX
+    unsetenv("QT_SCALE_FACTOR");
+#endif
+
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
     //XXXIdleEventFilter idleFilter;

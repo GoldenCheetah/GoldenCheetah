@@ -30,9 +30,10 @@ class Strava : public CloudService {
 
     public:
 
-        QString name() const { return (tr("Strava")); }
-        QString description() const { return (tr("Upload to the social network for cyclists and runners.")); }
-        QImage logo() const;
+        QString id() const { return "Strava"; }
+        QString uiName() const { return tr("Strava"); }
+        QString description() const { return (tr("Sync with the social network for cyclists and runners.")); }
+        QImage logo() const { return QImage(":images/services/strava.png"); }
 
         Strava(Context *context);
         CloudService *clone(Context *context) { return new Strava(context); }
@@ -42,8 +43,7 @@ class Strava : public CloudService {
         bool open(QStringList &errors);
         bool close();
 
-        // upload only for now, being worked up by Damien
-        virtual int capabilities() const { return OAuth | Upload ; }
+        //virtual int capabilities() const { return OAuth | Upload | Download | Query ; } // Default
 
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
@@ -72,7 +72,9 @@ class Strava : public CloudService {
 
         QMap<QNetworkReply*, QByteArray*> buffers;
 
-        QByteArray* prepareResponse(QByteArray* data, QString name);
+        QByteArray* prepareResponse(QByteArray* data);
+
+        void addSamples(RideFile* ret, QString remoteid);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);

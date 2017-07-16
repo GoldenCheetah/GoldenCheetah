@@ -1211,7 +1211,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - 7, myOption.rect.y(), 7, (rideNavigator->fontHeight+2) * 3);
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 3);
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
@@ -1301,7 +1301,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     buttons->setContentsMargins(0,0,0,0);
 
     QFont smallFont;
-    smallFont.setPointSize(8);
+    smallFont.setPointSizeF(baseFont.pointSizeF() *0.8f);
 
     QList<QString> buttonNames = logicalHeadings;
     qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
@@ -1330,9 +1330,9 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     }
     scrollarea->setWidget(but);
 
-    but->setFixedWidth(230);
-    scrollarea->setFixedWidth(250);
-    setFixedWidth(250);
+    but->setFixedWidth(230* dpiXFactor);
+    scrollarea->setFixedWidth(250* dpiXFactor);
+    setFixedWidth(250* dpiXFactor);
 }
 
 void

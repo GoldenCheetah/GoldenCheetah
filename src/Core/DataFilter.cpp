@@ -2847,7 +2847,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         // so you can use them within a formula for simple kinds of
         // operations; e.g. how much of todays' workouts in time
         // does this workout represent would be:
-        // Duration / Duration[today:today] * 100.00
+        // Duration / Duration[[today:today]] * 100.00
 
         Specification spec;
 

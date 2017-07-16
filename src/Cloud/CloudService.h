@@ -85,10 +85,11 @@ class CloudService : public QObject {
         // clone for the context its used in before doing anything - including config
         virtual CloudService *clone(Context *) = 0;
 
-        // name of service, but should NOT be translated - it is the symbol
+        // id of service, which MUST NOT be translated - it is the symbol
         // that represents the website, so likely to just be the URL simplified
         // e.g. https://www.strava.com => "Strava"
-        virtual QString name() const { return "NONE"; }
+        virtual QString id() const { return "NONE"; }
+        virtual QString uiName() const { return tr("None"); }
         virtual QString description() const { return ""; }
 
         // need a logo, we may resize but will keep aspect ratio
@@ -144,7 +145,7 @@ class CloudService : public QObject {
         // entry points -- to list and accept the choice of athlete by the user
         enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, AthleteID,
                                    Local1, Local2, Local3, Local4, Local5, Local6,
-                                   Combo1 } setting_;
+                                   Combo1, Metadata1 } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
         // When a service is instantiated by the cloud service factory, the configuration
@@ -173,14 +174,14 @@ class CloudService : public QObject {
         // UTILITY
         void mapReply(QNetworkReply *reply, QString name) { replymap_.insert(reply,name); }
         QString replyName(QNetworkReply *reply) { return replymap_.value(reply,""); }
-        void compressRide(RideFile*ride, QByteArray &data, QString name);
-        RideFile *uncompressRide(QByteArray *data, QString name, QStringList &errors);
+        void compressRide(RideFile*ride, QByteArray &data, QString id);
+        RideFile *uncompressRide(QByteArray *data, QString id, QStringList &errors);
         QString uploadExtension();
 
         // APPSETTINGS SYMBOLS - SERVICE SPECIFIC
-        QString syncOnImportSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
-        QString syncOnStartupSettingName() const { return QString("%1/%2/syncstartup").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
-        QString activeSettingName() const { return QString("%1/%2/active").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(name()); }
+        QString syncOnImportSettingName() const { return QString("%1/%2/syncimport").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(id()); }
+        QString syncOnStartupSettingName() const { return QString("%1/%2/syncstartup").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(id()); }
+        QString activeSettingName() const { return QString("%1/%2/active").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(id()); }
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
         static bool upload(QWidget *parent, CloudService *store, RideItem*);
@@ -196,8 +197,8 @@ class CloudService : public QObject {
         bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)
 
     signals:
-        void writeComplete(QString name, QString message);
-        void readComplete(QByteArray *data, QString name, QString message);
+        void writeComplete(QString id, QString message);
+        void readComplete(QByteArray *data, QString id, QString message);
 
     protected:
 
@@ -446,6 +447,9 @@ class CloudServiceAutoDownload : public QThread {
         // automatically downloads from cloud services
         CloudServiceAutoDownload(Context *context) : context(context), initial(true) {}
 
+        // re-run after inital
+        void checkDownload();
+
     public slots:
 
         // external entry point to trigger auto download
@@ -522,12 +526,22 @@ class CloudServiceFactory {
         while(want.hasNext()) {
             want.next();
 
+            // key might need parsing
+            QString key;
+            if (want.value().contains("::")) key = want.value().split("::").at(0);
+            else key = want.value();
+
             // get value
-            QString value = service->getSetting(want.value(), "").toString();
+            QString value = service->getSetting(key, "").toString();
+
             if (value == "") continue;
 
             // ok, we have a setting
-            appsettings->setCValue(context->athlete->cyclist, want.value(), value);
+            appsettings->setCValue(context->athlete->cyclist, key, value);
+
+            #ifdef GC_WANT_ALLDEBUG
+            qDebug()<<"factory save setting:" <<key<< value;
+            #endif
         }
 
         // generic settings
@@ -560,8 +574,9 @@ class CloudServiceFactory {
             // the setting name
             QString sname=i.value();
 
-            // Combos are tricky
+            // Combos and Metadata are tricky
             if (i.key() == CloudService::Combo1) { sname = i.value().split("::").at(0); }
+            if (i.key() == CloudService::Metadata1) { sname = i.value().split("::").at(0); }
 
             // populate from appsetting configuration
             QVariant value = appsettings->cvalue(context->athlete->cyclist, sname, "");
@@ -593,11 +608,11 @@ class CloudServiceFactory {
     bool addService(CloudService *service) {
 
         // duplicates not welcome
-        if(names_.contains(service->name())) return false;
+        if(names_.contains(service->id())) return false;
 
         // register - but must never use, since it has a NULL context
-        services_.insert(service->name(), service);
-        names_.append(service->name());
+        services_.insert(service->id(), service);
+        names_.append(service->id());
 
         return true;
     }

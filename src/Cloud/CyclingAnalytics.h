@@ -30,8 +30,9 @@ class CyclingAnalytics : public CloudService {
 
     public:
 
-        QString name() const { return (tr("Cycling Analytics")); }
-        QString description() const { return (tr("Upload to the power focused cycling site.")); }
+        QString id() const { return "Cycling Analytics"; }
+        QString uiName() const { return tr("Cycling Analytics"); }
+        QString description() const { return (tr("Sync with the power focused cycling site.")); }
         QImage logo() const { return QImage(":images/services/cyclinganalytics.png"); }
 
         CyclingAnalytics(Context *context);
@@ -39,16 +40,27 @@ class CyclingAnalytics : public CloudService {
         ~CyclingAnalytics();
 
         // upload only and authenticates with OAuth tokens
-        int capabilities() const { return OAuthToken | Upload; }
+        int capabilities() const { return OAuthToken | Upload | Download | Query; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
         bool close();
 
+        // get list of rides
+        QList<CloudServiceEntry *> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
+
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
+        // read a file
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
+
+
     public slots:
+
+        // fetching data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
 
         // sending data
         void writeFileCompleted();

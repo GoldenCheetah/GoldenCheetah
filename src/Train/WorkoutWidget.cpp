@@ -289,15 +289,29 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     // process as normal if not one of ours
     if (obj != this) return false;
 
-    // where is the cursor
-    QPoint p = mapFromGlobal(QCursor::pos());
-    QPointF v = reverseTransform(p.x(),p.y());
-
     // is a repaint going to be needed?
     bool updateNeeded=false;
 
     // are we filtering out the event? (e.g. keyboard / scroll)
     bool filterNeeded=false;
+
+    //
+    // 9 RESIZE EVENT
+    //
+    if (event->type() == QEvent::Resize) {
+
+        // we need to adjust layout and repaint
+        adjustLayout();
+        updateNeeded = true;
+    }
+
+    // if we're recording only want to act on resize events, no need to
+    // process mouse/keyboard event which is just for editing
+    if (recording_) return false;
+
+    // where is the cursor
+    QPoint p = mapFromGlobal(QCursor::pos());
+    QPointF v = reverseTransform(p.x(),p.y());
 
     //
     // 1 MOUSE MOVE [we always repaint]
@@ -644,15 +658,6 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-    //
-    // 9. RESIZE EVENT
-    //
-    if (event->type() == QEvent::Resize) {
-
-        // we need to adjust layout and repaint
-        adjustLayout();
-        updateNeeded = true;
-    }
 
 
     // ALL DONE

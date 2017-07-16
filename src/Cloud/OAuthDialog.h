@@ -62,10 +62,8 @@ public:
     typedef enum {
         NONE=0,
         STRAVA,
-        TWITTER,
         DROPBOX,
         CYCLING_ANALYTICS,
-        GOOGLE_CALENDAR,
         GOOGLE_DRIVE,
         SPORTTRACKS,
         TODAYSPLAN,
@@ -86,7 +84,6 @@ private slots:
     void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
 #ifdef GC_HAVE_KQOAUTH
-    // Twitter OAUTH
     void onTemporaryTokenReceived(QString, QString);
     void onAuthorizationReceived(QString, QString);
     void onAccessTokenReceived(QString token, QString tokenSecret);

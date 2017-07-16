@@ -45,6 +45,7 @@
 #if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
+#include "KettlerRacerController.h"
 #endif
 #include "ANTlocalController.h"
 #include "NullController.h"
@@ -642,6 +643,8 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new MonarkController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_KETTLER) {
             Devices[i].controller = new KettlerController(this, &Devices[i]);
+        } else if (Devices.at(i).type == DEV_KETTLER_RACER) {
+            Devices[i].controller = new KettlerRacerController(this, &Devices[i]);
 #endif
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
@@ -1148,7 +1151,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
         //reset all calibration data
         calibrating = startCalibration = restartCalibration = finishCalibration = false;
-        calibrationSpindownTime = calibrationZeroOffset = calibrationTargetSpeed = 0;
+        calibrationSpindownTime = calibrationZeroOffset = calibrationSlope = calibrationTargetSpeed = 0;
         calibrationCadence = calibrationCurrentSpeed = calibrationTorque = 0;
         calibrationState = CALIBRATION_STATE_IDLE;
         calibrationType = CALIBRATION_TYPE_NOT_SUPPORTED;
@@ -1272,7 +1275,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     //reset all calibration data
     calibrating = startCalibration = restartCalibration = finishCalibration = false;
-    calibrationSpindownTime = calibrationZeroOffset = calibrationTargetSpeed = 0;
+    calibrationSpindownTime = calibrationZeroOffset = calibrationSlope = calibrationTargetSpeed = 0;
     calibrationCadence = calibrationCurrentSpeed = calibrationTorque = 0;
     calibrationState = CALIBRATION_STATE_IDLE;
     calibrationType = CALIBRATION_TYPE_NOT_SUPPORTED;
@@ -1485,6 +1488,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     calibrationSpindownTime =  Devices[dev].controller->getCalibrationSpindownTime();
                     calibrationZeroOffset =  Devices[dev].controller->getCalibrationZeroOffset();
+                    calibrationSlope = Devices[dev].controller->getCalibrationSlope();
 
                     // if calibration is moving out of pending state..
                     if ((calibrationState == CALIBRATION_STATE_PENDING) && startCalibration) {
@@ -1600,9 +1604,17 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // see https://bugreports.qt.io/browse/QTBUG-40823
 #else
                 // alert when approaching end of lap
-                if (lapTimeRemaining > 0 && lapTimeRemaining < 3000 && lapAudioEnabled && lapAudioThisLap) {
-                    lapAudioThisLap = false;
-                    QSound::play(":audio/lap.wav");
+                if (lapAudioEnabled && lapAudioThisLap) {
+
+                    double currentposition = displayWorkoutDistance*1000;
+                    double lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
+
+                    // alert when 3 seconds from end of ERG lap, or 20 meters from end of CRS lap
+                    if ((status&RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) ||
+                        (status&RT_MODE_SLOPE && lapmarker != -1 && lapmarker - currentposition < 20)) {
+                        lapAudioThisLap = false;
+                        QSound::play(":audio/lap.wav");
+                    }
                 }
 #endif
 
@@ -1638,7 +1650,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces
             double g = 9.81;     // g constant 9.81 m/s
-            double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, 0.0).toDouble();
+            double weight = context->athlete->getWeight(QDate::currentDate());
             double m = weight ? weight + 8 : 83; // default to 75kg weight, plus 8kg bike
             double sl = slope / 100; // 10% = 0.1
             double ad = 1.226f; // default air density at sea level
@@ -2069,6 +2081,59 @@ void TrainSidebar::updateCalibration()
 
             }
             break;
+
+        case CALIBRATION_TYPE_ZERO_OFFSET_SRM:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+                break;
+
+            case CALIBRATION_STATE_PENDING:
+                // Wait for cadence to be zero before requesting zero offset calibration
+                status = QString(tr("Unclip or stop pedalling to begin calibration.."));
+                if (calibrationCadence == 0)
+                    startCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_REQUESTED:
+                status = QString(tr("Requesting calibration.."));
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                status = QString(tr("Requesting calibration.."));
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                break;
+
+            case CALIBRATION_STATE_POWER:
+                break;
+
+            case CALIBRATION_STATE_COAST:
+                status = QString(tr("Calibrating...\nUnclip or stop pedalling until process is completed..\nZero Offset %1")).arg(QString::number((int16_t)calibrationZeroOffset));
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                // yuk, zero offset for FE-C devices is unsigned, but for power meters is signed..
+                status = QString(tr("Calibration completed successfully!\nZero Offset %1\nSlope %2")).arg(QString::number((int16_t)calibrationZeroOffset), QString::number(calibrationSlope));;
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed!"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            }
+            break;
+
         }
 
         lastState = calibrationState;

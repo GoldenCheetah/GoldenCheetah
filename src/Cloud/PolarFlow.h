@@ -43,7 +43,8 @@ class PolarFlow : public CloudService {
         CloudService *clone(Context *context) { return new PolarFlow(context); }
         ~PolarFlow();
 
-        QString name() const { return (tr("PolarFlow")); }
+        QString id() const { return "PolarFlow"; }
+        QString uiName() const { return tr("PolarFlow"); }
         QString description() const { return (tr("Download from the popular Polar website.")); }
         QImage logo() const { return QImage(":images/services/polarflow.png"); }
 

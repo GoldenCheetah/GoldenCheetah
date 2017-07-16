@@ -65,10 +65,6 @@
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
 #include "BatchExportDialog.h"
-#ifdef GC_HAVE_KQOAUTH
-#include "TwitterDialog.h"
-#endif
-#include "ShareDialog.h"
 #include "TodaysPlan.h"
 #include "BodyMeasuresDownload.h"
 #include "WorkoutWizard.h"
@@ -434,8 +430,15 @@ MainWindow::MainWindow(const QDir &home)
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
 
-    uploadMenu = shareMenu->addMenu("Upload");
-    syncMenu = shareMenu->addMenu("Synchronise");
+    uploadMenu = shareMenu->addMenu(tr("Upload Activity..."));
+    syncMenu = shareMenu->addMenu(tr("Synchronise Activities..."));
+    shareMenu->addAction(tr("Get &Body Measurements..."), this, SLOT (downloadBodyMeasures()));
+    shareMenu->addSeparator();
+    checkAction = new QAction(tr("Check For New Activities"), this);
+    checkAction->setShortcut(tr("Ctrl-C"));
+    connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
+    shareMenu->addAction(checkAction);
+
 
     // set the menus to reflect the configured accounts
     connect(uploadMenu, SIGNAL(aboutToShow()), this, SLOT(setUploadMenu()));
@@ -444,7 +447,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(uploadMenu, SIGNAL(triggered(QAction*)), this, SLOT(uploadCloud(QAction*)));
     connect(syncMenu, SIGNAL(triggered(QAction*)), this, SLOT(syncCloud(QAction*)));
 
-    HelpWhatsThis *helpShare = new HelpWhatsThis(rideMenu);
+    HelpWhatsThis *helpShare = new HelpWhatsThis(shareMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
 
     // TOOLS MENU
@@ -454,9 +457,6 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
     optionsMenu->addAction(tr("VDOT and T-Pace Calculator..."), this, SLOT(showVDOTCalculator()));
 
-    optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Get &Body Measures..."), this,
-                        SLOT (downloadBodyMeasures()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
@@ -2032,20 +2032,30 @@ MainWindow::addAccount()
 }
 
 void
-MainWindow::uploadCloud(QAction *name)
+MainWindow::checkCloud()
+{
+    // kick off a check
+    currentTab->context->athlete->cloudAutoDownload->checkDownload();
+
+    // and auto import too whilst we're at it
+    currentTab->context->athlete->importFilesWhenOpeningAthlete();
+}
+
+void
+MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
-        CloudService *db = CloudServiceFactory::instance().newService(name->text(), currentTab->context);
+        CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
         CloudService::upload(this, db, currentTab->context->ride);
     }
 }
 
 void
-MainWindow::syncCloud(QAction *name)
+MainWindow::syncCloud(QAction *action)
 {
     // sync with cloud
-    CloudService *db = CloudServiceFactory::instance().newService(name->text(), currentTab->context);
+    CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
     CloudServiceSyncDialog sync(currentTab->context, db);
     sync.exec();
 }
@@ -2215,7 +2225,13 @@ MainWindow::setUploadMenu()
         const CloudService *s = CloudServiceFactory::instance().service(name);
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
-        if (s->capabilities() & CloudService::Upload)  uploadMenu->addAction(name);
+        if (s->capabilities() & CloudService::Upload) {
+            // we need the technical name to identify the service to be called
+            QAction *service = new QAction(NULL);
+            service->setText(s->uiName());
+            service->setData(name);
+            uploadMenu->addAction(service);
+        }
     }
 }
 
@@ -2228,7 +2244,13 @@ MainWindow::setSyncMenu()
         const CloudService *s = CloudServiceFactory::instance().service(name);
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
-        if (s->capabilities() & CloudService::Query)  syncMenu->addAction(name);
+        if (s->capabilities() & CloudService::Query)  {
+            // we need the technical name to identify the service to be called
+            QAction *service = new QAction(NULL);
+            service->setText(s->uiName());
+            service->setData(name);
+            syncMenu->addAction(service);
+        }
     }
 }
 

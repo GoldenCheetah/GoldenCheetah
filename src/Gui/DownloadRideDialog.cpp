@@ -466,7 +466,7 @@ DownloadRideDialog::downloadClicked()
 
         }
 
-        context->athlete->addRide(targetFileName, true, true);
+        context->athlete->addRide(targetFileName, true, true, true);
         // Ride Cache was updated without crash - so move the file from /tmpactivities to /activities
         QFile targetFileActivities(targetFileActivitiesName);
         // renaming does not overwrite - so remove any existing version (if exists) from /activities first

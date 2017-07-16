@@ -202,7 +202,7 @@ class RideFile : public QObject // QObject to emit signals
         // Working with DATASERIES
         enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd,
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
-                          vam, wattsKg, lrbalance, lte, rte, lps, rps, 
+                          vam, wattsKg, lrbalance, lte, rte, lps, rps,
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
@@ -628,6 +628,7 @@ class RideFileFactory {
         bool writeRideFile(Context *context, const RideFile *ride, QFile &file, QString format) const;
         QStringList suffixes() const;
         QStringList writeSuffixes() const;
+        bool supportedFormat(QString filename) const;
         QString description(const QString &suffix) const {
             return descriptions_[suffix];
         }

@@ -307,12 +307,12 @@ class TSSPerHour : public RideMetric {
         assert(duration);
 
         points = tss->value(true);
-        hours = duration->value(true) / 3600;
+        hours = duration->value(true) / 3600.0;
 
         // set
         if (hours) setValue(points/hours);
-        else setValue(0);
-        setCount(hours);
+        else setValue(RideFile::NIL);
+        setCount(duration->value(true));
     }
 
     bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }

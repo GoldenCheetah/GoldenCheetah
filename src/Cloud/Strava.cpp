@@ -18,6 +18,7 @@
  */
 
 #include "Strava.h"
+#include "JsonRideFile.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "mvjson.h"
@@ -29,7 +30,7 @@
 #include <QJsonValue>
 
 #ifndef STRAVA_DEBUG
-#define STRAVA_DEBUG true
+#define STRAVA_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -58,11 +59,13 @@ Strava::Strava(Context *context) : CloudService(context), context(context), root
     }
 
     uploadCompression = gzip; // gzip
+    downloadCompression = none;
     filetype = uploadType::TCX;
     useMetric = true; // distance and duration metadata
 
     // config
     settings.insert(OAuthToken, GC_STRAVA_TOKEN);
+    settings.insert(Metadata1, QString("%1::Activity Name").arg(GC_STRAVA_ACTIVITY_NAME));
 }
 
 Strava::~Strava() {
@@ -114,69 +117,88 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
         return returning;
     }
 
-    QString urlstr = "https://www.strava.com/api/v3/athlete/activities?";
+    // Do Paginated Access to the Activities List
+    const int pageSize = 30;
+    int offset = 0;
+    int resultCount = INT_MAX;
+
+    while (offset < resultCount) {
+        QString urlstr = "https://www.strava.com/api/v3/athlete/activities?";
 
 #if QT_VERSION > 0x050000
-    QUrlQuery params;
+        QUrlQuery params;
 #else
-    QUrl params;
+        QUrl params;
 #endif
 
-    // use toMSecsSinceEpoch for compatibility with QT4
-    params.addQueryItem("before", QString::number(to.toMSecsSinceEpoch()/1000.0f, 'f', 0));
-    params.addQueryItem("after", QString::number(from.toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        // use toMSecsSinceEpoch for compatibility with QT4
+        params.addQueryItem("before", QString::number(to.addDays(1).toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        params.addQueryItem("after", QString::number(from.addDays(-1).toMSecsSinceEpoch()/1000.0f, 'f', 0));
+        params.addQueryItem("per_page", QString("%1").arg(pageSize));
+        params.addQueryItem("page",  QString("%1").arg(offset/pageSize+1));
 
-    QUrl url = QUrl( urlstr + params.toString() );
-    printd("URL used: %s\n", url.url().toStdString().c_str());
+        QUrl url = QUrl( urlstr + params.toString() );
+        printd("URL used: %s\n", url.url().toStdString().c_str());
 
-    // request using the bearer token
-    QNetworkRequest request(url);
-    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+        // request using the bearer token
+        QNetworkRequest request(url);
+        request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
 
-    QNetworkReply *reply = nam->get(request);
+        QNetworkReply *reply = nam->get(request);
 
-    // blocking request
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+        // blocking request
+        QEventLoop loop;
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-    if (reply->error() != QNetworkReply::NoError) {
-        qDebug() << "error" << reply->errorString();
-        errors << tr("Network Problem reading Strava data");
-        return returning;
-    }
-    // did we get a good response ?
-    QByteArray r = reply->readAll();
-    printd("response: %s\n", r.toStdString().c_str());
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << "error" << reply->errorString();
+            errors << tr("Network Problem reading Strava data");
+            //return returning;
+        }
+        // did we get a good response ?
+        QByteArray r = reply->readAll();
+        printd("response: %s\n", r.toStdString().c_str());
 
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
-    // if path was returned all is good, lets set root
-    if (parseError.error == QJsonParseError::NoError) {
+        // if path was returned all is good, lets set root
+        if (parseError.error == QJsonParseError::NoError) {
 
-        // results ?
-        QJsonArray results = document.array();
+            // results ?
+            QJsonArray results = document.array();
 
-        // lets look at that then
-        for(int i=0; i<results.size(); i++) {
-            QJsonObject each = results.at(i).toObject();
-            CloudServiceEntry *add = newCloudServiceEntry();
+            // lets look at that then
+            if (results.size()>0) {
+                for(int i=0; i<results.size(); i++) {
+                    QJsonObject each = results.at(i).toObject();
+                    CloudServiceEntry *add = newCloudServiceEntry();
 
 
-            //Strava has full path, we just want the file name
-            add->label = QFileInfo(each["name"].toString()).fileName();
-            add->id = QString("%1").arg(each["id"].toInt());
-            add->isDir = false;
-            add->distance = each["distance"].toDouble()/1000.0;
-            add->duration = each["elapsed_time"].toInt();
-            add->name = QDateTime::fromString(each["start_date"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                    //Strava has full path, we just want the file name
+                    add->label = QFileInfo(each["name"].toString()).fileName();
+                    add->id = QString("%1").arg(each["id"].toInt());
+                    add->isDir = false;
+                    add->distance = each["distance"].toDouble()/1000.0;
+                    add->duration = each["elapsed_time"].toInt();
+                    add->name = QDateTime::fromString(each["start_date_local"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
 
-            printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
+                    printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
 
-            returning << add;
+                    returning << add;
+                }
+                // next page
+                offset += pageSize;
+            } else
+                offset = INT_MAX;
+
+        } else {
+            // we had a parsing error - so something is wrong - stop requesting more data by ending the loop
+            offset = INT_MAX;
         }
     }
+
     // all good ?
     return returning;
 }
@@ -255,9 +277,16 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     else
       activityTypePart.setBody("ride");
 
+    QString filename = QFileInfo(remotename).baseName();
+
     QHttpPart activityNamePart;
-    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));
-    activityNamePart.setBody(remotename.toLatin1());
+    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
+
+    // use metadata config if the user selected it
+    QString fieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+    QString activityName = "";
+    if (fieldname != "") activityName = ride->getTag(fieldname, "");
+    activityNamePart.setBody(activityName.toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
@@ -265,7 +294,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QHttpPart externalIdPart;
     externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
-    externalIdPart.setBody("Ride");
+    externalIdPart.setBody(filename.toStdString().c_str());
 
     //XXXQHttpPart privatePart;
     //XXXprivatePart.setHeader(QNetworkRequest::ContentDispositionHeader,
@@ -283,12 +312,14 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\"file.tcx.gz\"; type=\"text/xml\""));
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+"\"; type=\"text/xml\""));
     filePart.setBody(data);
 
     multiPart->append(accessTokenPart);
     multiPart->append(activityTypePart);
-    multiPart->append(activityNamePart);
+    if (activityName != "") {
+        multiPart->append(activityNamePart);
+    }
     multiPart->append(dataTypePart);
     multiPart->append(externalIdPart);
     //XXXmultiPart->append(privatePart);
@@ -315,16 +346,16 @@ Strava::writeFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
-
     bool uploadSuccessful = false;
     QString response = reply->readLine();
     QString uploadError="invalid response or parser error";
 
+    printd("reply:%s\n", response.toStdString().c_str());
+
     try {
 
         // parse !
-        MVJSONReader jsonResponse(string(response.toLatin1()));
+        MVJSONReader jsonResponse(response.toStdString());
 
         // get error field
         if (jsonResponse.root) {
@@ -387,17 +418,262 @@ Strava::readFileCompleted()
 
     printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
 
-    QByteArray* data = prepareResponse(buffers.value(reply), replyName(reply));
+    QByteArray* data = prepareResponse(buffers.value(reply));
 
     notifyReadComplete(data, replyName(reply), tr("Completed."));
 }
 
+void
+Strava::addSamples(RideFile* ret, QString remoteid)
+{
+    printd("Strava::addSamples(%s)\n", remoteid.toStdString().c_str());
+
+    // do we have a token ?
+    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
+    if (token == "") return;
+
+    // lets connect and get basic info on the root directory
+    QString streamsList = "time,latlng,distance,altitude,velocity_smooth,heartrate,cadence,watts,temp";
+    QString urlstr = QString("https://www.strava.com/api/v3/activities/%1/streams/%2")
+          .arg(remoteid).arg(streamsList);
+
+#if QT_VERSION > 0x050000
+    QUrlQuery params;
+#else
+    QUrl params;
+#endif
+
+    params.addQueryItem("series_type", "time");
+
+    QUrl url = QUrl( urlstr + params.toString() );
+    printd("url:%s\n", url.url().toStdString().c_str());
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "error" << reply->errorString();
+        return;
+    }
+    // did we get a good response ?
+    QByteArray r = reply->readAll();
+    printd("response: %s\n", r.toStdString().c_str());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // if path was returned all is good, lets set root
+    if (parseError.error == QJsonParseError::NoError) {
+        // Streams is the Strava term for the raw data associated with an activity.
+        // All streams for a given activity or segment effort will be the same length
+        // and the values at a given index correspond to the same time.
+
+        QJsonArray streams = document.array();
+
+        // Stream types
+        // ==============
+        // Streams are available in 11 different types. If the stream is not available for a particular activity it will be left out of the request results.
+
+        // time:	integer seconds
+        // latlng:	floats [latitude, longitude]
+        // distance:	float meters
+        // altitude:	float meters
+        // velocity_smooth:	float meters per second
+        // heartrate:	integer BPM
+        // cadence:	integer RPM
+        // watts:	integer watts
+        // temp:	integer degrees Celsius
+        // moving:	boolean
+        // grade_smooth:	float percent
+
+        // for mapping from the names used in the Strava json response
+        // to the series names we use in GC
+        static struct {
+            RideFile::seriestype type;
+            const char *stravaname;
+            double factor;                  // to convert from Strava units to GC units
+        } seriesnames[] = {
+
+            // seriestype          strava name           conversion factor
+            { RideFile::secs,      "time",                         1.0f   },
+            { RideFile::lat,       "latlng",                       1.0f   },
+            { RideFile::alt,       "altitude",                     1.0f   },
+            { RideFile::km,        "distance" ,                    0.001f },
+            { RideFile::kph,       "velocity_smooth",              3.6f   },
+            { RideFile::hr,        "heartrate",                    1.0f   },
+            { RideFile::cad,       "cadence",                      1.0f   },
+            { RideFile::watts,     "watts",                        1.0f   },
+            { RideFile::temp,      "temp",                         1.0f   },
+            { RideFile::none,      "",                             0.0f   }
+
+        };
+
+        // data to combine into a new ride
+        class strava_stream {
+        public:
+            double factor; // for converting
+            RideFile::seriestype type;
+            QJsonArray samples;
+        };
+
+        // create a list of all the data we will work with
+        QList<strava_stream> data;
+
+        // examine the returned object and extract sample data
+        for(int i=0; i<streams.size(); i++) {
+            QJsonObject stream = streams.at(i).toObject();
+            QString type = stream["type"].toString();
+
+            for(int j=0; seriesnames[j].type != RideFile::none; j++) {
+                QString name = seriesnames[j].stravaname;
+                strava_stream add;
+
+                // contained?
+                if (type == name) {
+                    add.factor = seriesnames[j].factor;
+                    add.type = seriesnames[j].type;
+                    add.samples = stream["data"].toArray();
+
+                    data << add;
+                    break;
+                }
+            }
+        }
+
+        bool end = false;
+        int index=0;
+        do {
+            RideFilePoint add;
+
+            // move through streams if they're waiting for this point
+            foreach(strava_stream stream, data) {
+
+                // if this stream still has data to consume
+                if (index < stream.samples.count()) {
+
+                    if (stream.type == RideFile::lat) {
+
+                        double lat = stream.factor * stream.samples.at(index).toArray().at(0).toDouble();
+                        double lon = stream.factor * stream.samples.at(index).toArray().at(1).toDouble();
+
+                        // this is one for us, update and move on
+                        add.setValue(RideFile::lat, lat);
+                        add.setValue(RideFile::lon, lon);
+
+                    } else {
+
+                        // hr, distance et al
+                        double value = stream.factor * stream.samples.at(index).toDouble();
+
+                        // this is one for us, update and move on
+                        add.setValue(stream.type, value);
+                    }
+
+                } else
+                    end = true;
+            }
+
+            ret->appendPoint(add);
+            index++;
+
+        } while (!end);
+    }
+}
+
 QByteArray*
-Strava::prepareResponse(QByteArray* data, QString name)
+Strava::prepareResponse(QByteArray* data)
 {
     Q_UNUSED(name)
     printd("Strava::prepareResponse()\n");
 
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(data->constData(), &parseError);
+
+    // if path was returned all is good, lets set root
+    if (parseError.error == QJsonParseError::NoError) {
+        QJsonObject each = document.object();
+
+        QDateTime starttime = QDateTime::fromString(each["local_start_date"].toString(), Qt::ISODate);
+
+        // 1s samples with start time
+        RideFile *ride = new RideFile(starttime.toUTC(), 1.0f);
+
+        // what sport?
+        if (!each["type"].isNull()) {
+            QString stype = each["type"].toString();
+            if (stype == "Ride") ride->setTag("Sport", "Bike");
+            else if (stype == "Run") ride->setTag("Sport", "Run");
+            else if (stype == "Swim") ride->setTag("Sport", "Swim");
+            else ride->setTag("Sport", stype);
+        }
+
+        if (each["device_name"].toString().length()>0)
+            ride->setDeviceType(each["device_name"].toString());
+        else
+            ride->setDeviceType("Strava"); // The device type is unknown
+
+        // activity name save to configured meta field
+        if (!each["name"].isNull()) {
+            QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+            if (meta != "") ride->setTag(meta, each["name"].toString());
+        }
+
+        if (each["manual"].toBool()) {
+            if (each["distance"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["distance"].toDouble()/1000.0));
+                ride->metricOverrides.insert("total_distance", map);
+            }
+            if (each["moving_time"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["moving_time"].toDouble()));
+                ride->metricOverrides.insert("time_riding", map);
+            }
+            if (each["elapsed_time"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["elapsed_time"].toDouble()));
+                ride->metricOverrides.insert("workout_time", map);
+            }
+            if (each["total_elevation_gain"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(each["total_elevation_gain"].toDouble()));
+                ride->metricOverrides.insert("elevation_gain", map);
+            }
+
+        } else {
+            addSamples(ride, QString("%1").arg(each["id"].toInt()));
+
+            // laps?
+            if (!each["laps"].isNull()) {
+                QJsonArray laps = each["laps"].toArray();
+
+                foreach (QJsonValue value, laps) {
+                    QJsonObject lap = value.toObject();
+                    ride->addInterval(RideFileInterval::USER, lap["start_index"].toDouble(), lap["end_index"].toDouble(), lap["name"].toString());
+                }
+            }
+        }
+
+
+
+        JsonFileReader reader;
+        data->clear();
+        data->append(reader.toByteArray(context, ride, true, true, true, true));
+
+        // temp ride not needed anymore
+        delete ride;
+
+        printd("reply:%s\n", data->toStdString().c_str());
+    }
     return data;
 }
 

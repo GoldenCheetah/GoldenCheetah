@@ -158,8 +158,11 @@ class RiderPhysPage : public QWidget
         bool metricUnits;
         QList<BodyMeasure> bodyMeasures;
 
+        QLabel *defaultWeightlabel;
+        QDoubleSpinBox *defaultWeight;
+
         QLabel *dateLabel;
-        QDateEdit *dateEdit;
+        QDateTimeEdit *dateTimeEdit;
         QLabel *weightlabel;
         QDoubleSpinBox *weight;
         QLabel *fatkglabel;
@@ -179,7 +182,7 @@ class RiderPhysPage : public QWidget
         QPushButton *addButton, *updateButton, *deleteButton;
 
     struct {
-        double weight;
+        double defaultWeight;
         unsigned long fingerprint;
     } b4;
 

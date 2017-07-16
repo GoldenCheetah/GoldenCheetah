@@ -323,13 +323,6 @@ unix:!macx {
     }
 }
 
-# if we have it we can add twitter support
-contains(DEFINES, "GC_HAVE_KQOAUTH") {
-        SOURCES     += Cloud/TwitterDialog.cpp
-        HEADERS     += Cloud/TwitterDialog.h
-}
-
-
 ###=======================================================
 ### OPTIONAL => D2XX FOR FTDI DRIVERS ON WINDOWS PLATFORMS
 ###=======================================================
@@ -635,6 +628,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/MonarkController.h Train/MonarkConnection.h
     SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
     HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
+    SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
+    HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
 
     # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
     greaterThan(QT_MINOR_VERSION, 4) {
@@ -646,7 +641,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     # qt charts is officially supported from QT5.8 or higher
     # in 5.7 it is a tech preview and not always available
     greaterThan(QT_MINOR_VERSION, 7) {
-        QT += charts
+        QT += charts opengl
 
         # Dashboard uses qt charts, so needs at least Qt 5.7
         DEFINES += GC_HAVE_OVERVIEW
@@ -699,9 +694,8 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h Cloud/LocalFileStore.h \
-           Cloud/OAuthDialog.h Cloud/ShareDialog.h Cloud/SportPlusHealthUploader.h Cloud/TodaysPlanBodyMeasures.h \
-           Cloud/TrainingstagebuchUploader.h Cloud/VeloHeroUploader.h Cloud/WithingsDownload.h \
-           Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h Cloud/TrainingStageBuch.h \
+           Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h Cloud/WithingsDownload.h \
+           Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h Cloud/TrainingsTageBuch.h \
            Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h Cloud/AddCloudWizard.h \
            Cloud/Withings.h
 
@@ -791,9 +785,8 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp Cloud/LocalFileStore.cpp \
-           Cloud/OAuthDialog.cpp Cloud/ShareDialog.cpp Cloud/SportPlusHealthUploader.cpp Cloud\TodaysPlanBodyMeasures.cpp \
-           Cloud/TrainingstagebuchUploader.cpp Cloud/VeloHeroUploader.cpp Cloud/WithingsDownload.cpp \
-           Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp Cloud/TrainingStageBuch.cpp \
+           Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp Cloud/WithingsDownload.cpp \
+           Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp Cloud/TrainingsTageBuch.cpp \
            Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp Cloud/AddCloudWizard.cpp \
            Cloud/Withings.cpp
 

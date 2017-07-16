@@ -34,7 +34,8 @@ class SixCycle : public CloudService {
         CloudService *clone(Context *context) { return new SixCycle(context); }
         ~SixCycle();
 
-        QString name() const { return (tr("Sixcycle")); }
+        QString id() const { return "Sixcycle"; }
+        QString uiName() const { return tr("Sixcycle"); }
         QString description() const { return (tr("Sync with the innovative training site.")); }
         QImage logo() const { return QImage(":images/services/sixcycle.png"); }
 

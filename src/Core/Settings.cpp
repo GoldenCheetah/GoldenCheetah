@@ -712,8 +712,6 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_DVPASS);
     migrateCValue(athlete, GC_DVCALDAVTYPE);
     migrateCValue(athlete, GC_DVGOOGLE_CALID);
-    migrateCValue(athlete, GC_TWITTER_TOKEN);
-    migrateCValue(athlete, GC_TWITTER_SECRET);
     migrateCValue(athlete, GC_GOOGLE_CALENDAR_REFRESH_TOKEN);
     migrateCValue(athlete, GC_STRAVA_TOKEN);
     migrateCValue(athlete, GC_CYCLINGANALYTICS_TOKEN);

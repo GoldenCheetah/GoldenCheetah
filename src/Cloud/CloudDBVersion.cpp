@@ -159,7 +159,11 @@ CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1
     QLabel *header = new QLabel(this);
     header->setWordWrap(true);
     header->setTextFormat(Qt::RichText);
-    header->setText(QString(tr("<b><big>New Version(s) of GoldenCheetah are available</big></b>")));
+    if (versions.count()>1) {
+        header->setText(QString(tr("<b><big>New versions of GoldenCheetah are available</big></b>")));
+    } else {
+        header->setText(QString(tr("<b><big>A new version of GoldenCheetah is available</big></b>")));
+    }
 
     QHBoxLayout *toprow = new QHBoxLayout;
     toprow->addWidget(important);
@@ -176,14 +180,17 @@ CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1
     VersionAPIGetV1 version;
     foreach (version, versions) {
         if (version.Type == CloudDBVersionClient::CloudDBVersion_Release) {
-            messageText.append("<h2>" + tr("Release: %1 ").arg(version.VersionText));
+            messageText.append("<h3>" + tr("Release: %1 ").arg(version.VersionText));
         } else if (version.Type == CloudDBVersionClient::CloudDBVersion_ReleaseCandidate) {
-            messageText.append("<h2>" + tr("Release Candidate: %1 ").arg(version.VersionText));
+            messageText.append("<h3>" + tr("Release Candidate: %1 ").arg(version.VersionText));
         } else if (version.Type == CloudDBVersionClient::CloudDBVersion_DevelopmentBuild) {
-            messageText.append("<h2>" + tr("Development Release: %1 ").arg(version.VersionText));
+            messageText.append("<h3>" + tr("Development Release: %1 ").arg(version.VersionText));
         };
-        messageText.append( QString("</h2><b><a href=\"%1\">%2</a></b><br><br>").arg(version.URL).arg(version.URL) +
+        messageText.append( QString("</h3><b><a href=\"%1\">%2</a></b><br><br>").arg(version.URL).arg(version.URL) +
                             version.Text + "<br>");
+        if (versions.count()>1) {
+            messageText.append("<hr>");
+        }
     };
 
     text->setText(messageText);
@@ -195,9 +202,9 @@ CloudDBUpdateAvailableDialog::CloudDBUpdateAvailableDialog(QList<VersionAPIGetV1
 
     QHBoxLayout *lastRow = new QHBoxLayout;
 
-    doNotAskAgainButton = new QPushButton(tr("Do not show these versions again"), this);
+    doNotAskAgainButton = new QPushButton(tr("Do not show again"), this);
     connect(doNotAskAgainButton, SIGNAL(clicked()), this, SLOT(doNotAskAgain()));
-    askAgainNextStartButton = new QPushButton(tr("Show available versions again in %1 days").arg(CloudDBVersionClient::CloudDBVersion_Days_Delay), this);
+    askAgainNextStartButton = new QPushButton(tr("Show again in %1 days").arg(CloudDBVersionClient::CloudDBVersion_Days_Delay), this);
     askAgainNextStartButton->setDefault(true);
     connect(askAgainNextStartButton, SIGNAL(clicked()), this, SLOT(askAgainOnNextStart()));
 

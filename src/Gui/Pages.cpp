@@ -46,6 +46,8 @@
 #include "Secrets.h"
 #include "Utils.h"
 
+extern ConfigDialog *configdialog_ptr;
+
 //
 // Main Config Page - tabs for each sub-page
 //
@@ -387,6 +389,7 @@ CredentialsPage::CredentialsPage(Context *context) : context(context)
     accounts->headerItem()->setText(0, tr("Service"));
     accounts->headerItem()->setText(1, tr("Description"));
     accounts->setColumnCount(2);
+    accounts->setColumnWidth(0, 175 * dpiXFactor);
     accounts->setSelectionMode(QAbstractItemView::SingleSelection);
     //fields->setUniformRowHeights(true);
     accounts->setIndentation(0);
@@ -423,11 +426,13 @@ CredentialsPage::resetList()
 
         QTreeWidgetItem *add = new QTreeWidgetItem;
         add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, s->name());
+        add->setText(0, s->uiName());
         add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
         add->setText(1, s->description());
+        add->setText(2, s->id());
 
         accounts->invisibleRootItem()->insertChild(index++, add);
+        accounts->hideColumn(2);
     }
 }
 
@@ -443,10 +448,10 @@ CredentialsPage::addClicked()
 {
     // just run the add cloud wizard
     AddCloudWizard *wizard = new AddCloudWizard(context);
-    wizard->exec();
 
-    // we need to raise, as wizard drops us
-    raise();
+    // when the wizard closes we need to raise back - or else we get hidden
+    connect(wizard, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
+    wizard->exec();
 
     // update the account list
     resetList();
@@ -459,7 +464,7 @@ CredentialsPage::deleteClicked()
     if (accounts->selectedItems().count() == 0) return;
 
     // does it exist?
-    const CloudService *service = CloudServiceFactory::instance().service(accounts->selectedItems().first()->text(0));
+    const CloudService *service = CloudServiceFactory::instance().service(accounts->selectedItems().first()->text(2));
     if (service) {
 
         // set it inactive
@@ -477,7 +482,10 @@ CredentialsPage::editClicked()
     if (accounts->selectedItems().count() == 0) return;
 
     // edit the details
-    AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(0));
+    AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(2));
+
+    // when the wizard closes we need to raise back - or else we get hidden
+    connect(edit, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
     edit->exec();
 
 }
@@ -856,7 +864,7 @@ BackupPage::saveClicked()
 }
 
 //
-// About me - physiology settings
+// About me - Body Measures
 //
 RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
@@ -865,18 +873,46 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     QString weightUnits = (metricUnits ? tr(" kg") : tr(" lb"));
 
     QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
+    QGridLayout *measuresGrid = new QGridLayout;
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
 #ifdef Q_OS_MAX
     setContentsMargins(10,10,10,10);
     grid->setSpacing(5 *dpiXFactor);
     all->setSpacing(5 *dpiXFactor);
 #endif
 
-    QString datetext = tr("From Date");
-    dateLabel = new QLabel(datetext);
-    dateEdit = new QDateEdit;
-    dateEdit->setDate(QDate::currentDate());
-    dateEdit->setCalendarPopup(true);
+    QString defaultWeighttext = tr("Default Weight");
+    defaultWeightlabel = new QLabel(defaultWeighttext);
+    defaultWeight = new QDoubleSpinBox(this);
+    defaultWeight->setMaximum(999.9);
+    defaultWeight->setMinimum(0.0);
+    defaultWeight->setDecimals(1);
+    defaultWeight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * weightFactor);
+    defaultWeight->setSuffix(weightUnits);
+
+
+    QGridLayout *defaultGrid = new QGridLayout;
+    defaultGrid->addWidget(defaultWeightlabel, 1, 0, alignment);
+    defaultGrid->addWidget(defaultWeight, 1, 1, alignment);
+
+    all->addLayout(defaultGrid);
+    all->addSpacing(2);
+
+    QFrame *line;
+    line = new QFrame;
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    all->addWidget(line);
+
+    QLabel* seperatorText = new QLabel(tr("Time dependent measurements"));
+    all->addWidget(seperatorText);
+
+    QString dateTimetext = tr("From Date - Time");
+    dateLabel = new QLabel(dateTimetext);
+    dateTimeEdit = new QDateTimeEdit;
+    dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    dateTimeEdit->setCalendarPopup(true);
 
     QString weighttext = tr("Weight");
     weightlabel = new QLabel(weighttext);
@@ -884,7 +920,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     weight->setMaximum(999.9);
     weight->setMinimum(0.0);
     weight->setDecimals(1);
-    weight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * weightFactor);
+    weight->setValue(defaultWeight->value());
     weight->setSuffix(weightUnits);
 
     QString fatkgtext = tr("Fat");
@@ -937,33 +973,31 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     comment = new QLineEdit(this);
     comment->setText("");
 
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+    measuresGrid->addWidget(dateLabel, 1, 0, alignment);
+    measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
 
-    grid->addWidget(dateLabel, 1, 0, alignment);
-    grid->addWidget(dateEdit, 1, 1, alignment);
+    measuresGrid->addWidget(weightlabel, 2, 0, alignment);
+    measuresGrid->addWidget(weight, 2, 1, alignment);
 
-    grid->addWidget(weightlabel, 2, 0, alignment);
-    grid->addWidget(weight, 2, 1, alignment);
+    measuresGrid->addWidget(fatkglabel, 3, 0, alignment);
+    measuresGrid->addWidget(fatkg, 3, 1, alignment);
 
-    grid->addWidget(fatkglabel, 3, 0, alignment);
-    grid->addWidget(fatkg, 3, 1, alignment);
+    measuresGrid->addWidget(musclekglabel, 4, 0, alignment);
+    measuresGrid->addWidget(musclekg, 4, 1, alignment);
 
-    grid->addWidget(musclekglabel, 4, 0, alignment);
-    grid->addWidget(musclekg, 4, 1, alignment);
+    measuresGrid->addWidget(boneskglabel, 5, 0, alignment);
+    measuresGrid->addWidget(boneskg, 5, 1, alignment);
 
-    grid->addWidget(boneskglabel, 5, 0, alignment);
-    grid->addWidget(boneskg, 5, 1, alignment);
+    measuresGrid->addWidget(leankglabel, 6, 0, alignment);
+    measuresGrid->addWidget(leankg, 6, 1, alignment);
 
-    grid->addWidget(leankglabel, 6, 0, alignment);
-    grid->addWidget(leankg, 6, 1, alignment);
+    measuresGrid->addWidget(fatpercentlabel, 7, 0, alignment);
+    measuresGrid->addWidget(fatpercent, 7, 1, alignment);
 
-    grid->addWidget(fatpercentlabel, 7, 0, alignment);
-    grid->addWidget(fatpercent, 7, 1, alignment);
+    measuresGrid->addWidget(commentlabel, 8, 0, alignment);
+    measuresGrid->addWidget(comment, 8, 1, alignment);
 
-    grid->addWidget(commentlabel, 8, 0, alignment);
-    grid->addWidget(comment, 8, 1, alignment);
-
-    all->addLayout(grid);
+    all->addLayout(measuresGrid);
 
 
     // Buttons
@@ -973,7 +1007,6 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    updateButton->setFixedSize(60,20);
     deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 #else
     updateButton->setText(tr("Update"));
@@ -991,28 +1024,26 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
 
     // Body Measures
     bmTree = new QTreeWidget;
-    bmTree->headerItem()->setText(0, datetext);
+    bmTree->headerItem()->setText(0, dateTimetext);
     bmTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(1, tr("Time"));
+    bmTree->headerItem()->setText(1, weighttext);
     bmTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(2, weighttext);
+    bmTree->headerItem()->setText(2, fatkgtext);
     bmTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(3, fatkgtext);
+    bmTree->headerItem()->setText(3, musclekgtext);
     bmTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(4, musclekgtext);
+    bmTree->headerItem()->setText(4, boneskgtext);
     bmTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(5, boneskgtext);
+    bmTree->headerItem()->setText(5, leankgtext);
     bmTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(6, leankgtext);
+    bmTree->headerItem()->setText(6, fatpercenttext);
     bmTree->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(7, fatpercenttext);
+    bmTree->headerItem()->setText(7, commenttext);
     bmTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(8, commenttext);
+    bmTree->headerItem()->setText(8, tr("Source"));
     bmTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(9, tr("Source"));
-    bmTree->header()->setSectionResizeMode(9, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(10, tr("Original Source"));
-    bmTree->setColumnCount(11);
+    bmTree->headerItem()->setText(9, tr("Original Source"));
+    bmTree->setColumnCount(10);
     bmTree->setSelectionMode(QAbstractItemView::SingleSelection);
     bmTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     bmTree->setUniformRowHeights(true);
@@ -1029,29 +1060,35 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     for (int i=0; i<bodyMeasures.count(); i++) {
         QTreeWidgetItem *add = new QTreeWidgetItem(bmTree->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        // date
-        add->setText(0, bodyMeasures[i].when.date().toString(tr("MMM d, yyyy")));
-        // time
-        if (bodyMeasures[i].source != BodyMeasure::Manual) {
-            add->setText(1, bodyMeasures[i].when.time().toString("hh:mm:ss"));
-        }
+        // date & time
+        add->setText(0, bodyMeasures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
         // weight
-        add->setText(2, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
-        add->setText(3, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
-        add->setText(4, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
-        add->setText(5, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
-        add->setText(6, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
-        add->setText(7, QString("%1").arg(bodyMeasures[i].fatpercent));
-        add->setText(8, bodyMeasures[i].comment);
+        add->setText(1, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
+        add->setText(2, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
+        add->setText(3, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
+        add->setText(4, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
+        add->setText(5, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
+        add->setText(6, QString("%1").arg(bodyMeasures[i].fatpercent));
+        add->setText(7, bodyMeasures[i].comment);
         // source
-        add->setText(9, bodyMeasures[i].getSourceDescription());
-        add->setText(10, bodyMeasures[i].originalSource);
+        add->setText(8, bodyMeasures[i].getSourceDescription());
+        add->setText(9, bodyMeasures[i].originalSource);
     }
 
     all->addWidget(bmTree);
 
+    // set default edit values to newest bodymeasurement (if one exists)
+    if (bodyMeasures.count() > 0) {
+        weight->setValue(bodyMeasures.last().weightkg * weightFactor);
+        fatkg->setValue(bodyMeasures.last().fatkg * weightFactor);
+        musclekg->setValue(bodyMeasures.last().musclekg * weightFactor);
+        boneskg->setValue(bodyMeasures.last().boneskg * weightFactor);
+        leankg->setValue(bodyMeasures.last().leankg * weightFactor);
+        fatpercent->setValue(bodyMeasures.last().fatpercent);
+    }
+
     // edit connect
-    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
+    connect(dateTimeEdit, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(rangeEdited()));
     connect(weight, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(fatkg, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(musclekg, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
@@ -1070,7 +1107,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
 
     // save initial values for things we care about
     // weight as stored (always metric) and BodyMeasures checksum
-    b4.weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    b4.defaultWeight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
     b4.fingerprint = 0;
     foreach (BodyMeasure bm, bodyMeasures) {
         b4.fingerprint += bm.getFingerprint();
@@ -1082,6 +1119,7 @@ RiderPhysPage::unitChanged(int currentIndex)
 {
     if (currentIndex == 0) {
         metricUnits = true;
+        defaultWeight->setValue(defaultWeight->value() / LB_PER_KG);
         weight->setValue(weight->value() / LB_PER_KG);
         fatkg->setValue(fatkg->value() / LB_PER_KG);
         musclekg->setValue(musclekg->value() / LB_PER_KG);
@@ -1089,6 +1127,7 @@ RiderPhysPage::unitChanged(int currentIndex)
         leankg->setValue(leankg->value() / LB_PER_KG);
     } else {
         metricUnits = false;
+        defaultWeight->setValue(defaultWeight->value() * LB_PER_KG);
         weight->setValue(weight->value() * LB_PER_KG);
         fatkg->setValue(fatkg->value() * LB_PER_KG);
         musclekg->setValue(musclekg->value() * LB_PER_KG);
@@ -1097,6 +1136,7 @@ RiderPhysPage::unitChanged(int currentIndex)
     }
 
     QString weightUnits = (metricUnits ? tr(" kg") : tr(" lb"));
+    defaultWeight->setSuffix(weightUnits);
     weight->setSuffix(weightUnits);
     fatkg->setSuffix(weightUnits);
     musclekg->setSuffix(weightUnits);
@@ -1108,23 +1148,23 @@ RiderPhysPage::unitChanged(int currentIndex)
     for (int i=0; i<bmTree->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *edit = bmTree->invisibleRootItem()->child(i);
         // weight
-        edit->setText(2, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
-        edit->setText(3, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
-        edit->setText(4, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
-        edit->setText(5, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
-        edit->setText(6, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
+        edit->setText(1, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
+        edit->setText(2, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
+        edit->setText(3, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
+        edit->setText(4, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
+        edit->setText(5, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
     }
 }
 
 qint32
 RiderPhysPage::saveClicked()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (metricUnits ? 1.0 : KG_PER_LB));
+    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, defaultWeight->value() * (metricUnits ? 1.0 : KG_PER_LB));
 
     qint32 state=0;
 
     // default weight changed ?
-    if (b4.weight != appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()) {
+    if (b4.defaultWeight != appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()) {
         state += CONFIG_ATHLETE;
     }
 
@@ -1154,10 +1194,10 @@ RiderPhysPage::addOReditClicked()
     int index;
     QTreeWidgetItem *add;
     BodyMeasure addBM;
-    QString dateTxt = dateEdit->date().toString(tr("MMM d, yyyy"));
+    QString dateTimeTxt = dateTimeEdit->dateTime().toString(tr("MMM d, yyyy - hh:mm:ss"));
 
-    // if an entry for this date already exists, edit item otherwise add new
-    QList<QTreeWidgetItem*> matches = bmTree->findItems(dateTxt, Qt::MatchExactly, 0);
+    // if an entry for this date & time already exists, edit item otherwise add new
+    QList<QTreeWidgetItem*> matches = bmTree->findItems(dateTimeTxt, Qt::MatchExactly, 0);
     if (matches.count() > 0) {
         // edit existing
         add = matches[0];
@@ -1171,7 +1211,7 @@ RiderPhysPage::addOReditClicked()
         bmTree->invisibleRootItem()->insertChild(index, add);
     }
 
-    addBM.when = dateEdit->dateTime().toUTC();
+    addBM.when = dateTimeEdit->dateTime().toUTC();
     addBM.weightkg = weight->value() / weightFactor;
     addBM.fatkg = fatkg->value() / weightFactor;
     addBM.musclekg = musclekg->value() / weightFactor;
@@ -1183,20 +1223,18 @@ RiderPhysPage::addOReditClicked()
     addBM.originalSource = "";
     bodyMeasures.insert(index, addBM);
 
-    // date
-    add->setText(0, dateTxt);
-    // time
-    add->setText(2, "");
+    // date and time
+    add->setText(0, dateTimeTxt);
     // Weight
-    add->setText(2, QString("%1").arg(weight->value()));
-    add->setText(3, QString("%1").arg(fatkg->value()));
-    add->setText(4, QString("%1").arg(musclekg->value()));
-    add->setText(5, QString("%1").arg(boneskg->value()));
-    add->setText(6, QString("%1").arg(leankg->value()));
-    add->setText(7, QString("%1").arg(fatpercent->value()));
-    add->setText(8, QString("%1").arg(comment->text()));
-    add->setText(9, QString("%1").arg(tr("Manual entry")));
-    add->setText(10, ""); // Original Source
+    add->setText(1, QString("%1").arg(weight->value()));
+    add->setText(2, QString("%1").arg(fatkg->value()));
+    add->setText(3, QString("%1").arg(musclekg->value()));
+    add->setText(4, QString("%1").arg(boneskg->value()));
+    add->setText(5, QString("%1").arg(leankg->value()));
+    add->setText(6, QString("%1").arg(fatpercent->value()));
+    add->setText(7, QString("%1").arg(comment->text()));
+    add->setText(8, QString("%1").arg(tr("Manual entry")));
+    add->setText(9, ""); // Original Source
 
     updateButton->hide();
 }
@@ -1219,8 +1257,8 @@ RiderPhysPage::rangeEdited()
     if (bmTree->currentItem()) {
         int index = bmTree->invisibleRootItem()->indexOfChild(bmTree->currentItem());
 
-        QDate date = dateEdit->date();
-        QDate odate = bodyMeasures[index].when.date();
+        QDateTime dateTime = dateTimeEdit->dateTime();
+        QDateTime odateTime = bodyMeasures[index].when;
 
         double nweight = weight->value();
         double oweight = bodyMeasures[index].weightkg * weightFactor;
@@ -1237,13 +1275,13 @@ RiderPhysPage::rangeEdited()
         QString ncomment = comment->text();
         QString ocomment = bodyMeasures[index].comment;
 
-        if (date == odate && (nweight != oweight ||
-                              nfatkg != ofatkg ||
-                              nmusclekg != omusclekg ||
-                              nboneskg != oboneskg ||
-                              nleankg != oleankg ||
-                              nfatpercent != ofatpercent ||
-                              ncomment != ocomment))
+        if (dateTime == odateTime && (nweight != oweight ||
+                                      nfatkg != ofatkg ||
+                                      nmusclekg != omusclekg ||
+                                      nboneskg != oboneskg ||
+                                      nleankg != oleankg ||
+                                      nfatpercent != ofatpercent ||
+                                      ncomment != ocomment))
             updateButton->show();
         else
             updateButton->hide();
@@ -1261,7 +1299,7 @@ RiderPhysPage::rangeSelectionChanged()
         int index = bmTree->invisibleRootItem()->indexOfChild(bmTree->currentItem());
         BodyMeasure current = bodyMeasures[index];
 
-        dateEdit->setDate(current.when.date());
+        dateTimeEdit->setDateTime(current.when);
         weight->setValue(current.weightkg * weightFactor);
         fatkg->setValue(current.fatkg * weightFactor);
         musclekg->setValue(current.musclekg * weightFactor);

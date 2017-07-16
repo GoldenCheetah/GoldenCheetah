@@ -30,7 +30,7 @@
 
 #ifndef TODAYSPLAN_DEBUG
 // TODO(gille): This should be a command line flag.
-#define TODAYSPLAN_DEBUG true
+#define TODAYSPLAN_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -289,10 +289,17 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 // file details
                 QJsonObject fileindex = each["fileindex"].toObject();
                 QString suffix = QFileInfo(fileindex["filename"].toString()).suffix();
-                if (suffix == "") suffix = "json";
+                if (suffix == "") {
+                    // Zwift uploads files without an extension - work ongoing to get Zwift fixed
+                    if (fileindex["filename"].toString().startsWith("zwift-activity-")) {
+                        qDebug() << "Correcting Zwift Activity extension: " << fileindex["filename"].toString();
+                        suffix = "fit";
+                    } else {
+                        suffix = "json";
+                    }
+                }
 
-
-                //TodaysPlan has full path, we just want the file name
+                //TodaysPlan's Label may contain the FileName, or Descriptive Text (whatever is shown/edited on the TP's UI)
                 add->label = QFileInfo(each["name"].toString()).fileName();
                 add->id = QString("%1").arg(each["fileId"].toInt());
                 add->isDir = false;
@@ -300,7 +307,8 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 add->duration = each["training"].toInt();
                 add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
 
-                replyActivity.insert(add->label, each);
+                // only our own name is a reliable key
+                replyActivity.insert(add->name, each);
 
                 //add->size
                 //add->modified
@@ -362,7 +370,7 @@ TodaysPlan::readFile(QByteArray *data, QString remotename, QString remoteid)
 }
 
 bool
-TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *)
+TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
     printd("TodaysPlan::writeFile(%s)\n", remotename.toStdString().c_str());
 
@@ -394,12 +402,27 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *)
 
     QString userId = getSetting(GC_TODAYSPLAN_ATHLETE_ID, "").toString();
 
-    QString json;
+    QString json = QString("{ filename: \"%1\"").arg(remotename);
+
     if (userId.length()>0) {
-        json  = QString("{ filename: \"%1\", userId: %2 }").arg(remotename).arg(userId);
-    } else {
-        json  = QString("{ filename: \"%1\" }").arg(remotename);
+        json  += QString(", userId: %1").arg(userId);
     }
+    // RPE, LQS and TQR
+    double rpe = ride->getTag("RPE", "0.0").toDouble();
+    if (rpe > 0.0) {
+        json  += QString(", rpe: %1").arg(rpe);
+    }
+    double tqr = ride->getTag("TQR", "0.0").toDouble();
+    if (tqr > 0.0) {
+        json  += QString(", tqr: %1").arg(tqr);
+    }
+    double lqs = ride->getTag("LQS", "0.0").toDouble();
+    if (lqs > 0.0) {
+        json  += QString(", pain: %1").arg(lqs);
+    }
+
+    json  += " }";
+
     printd("request: %s\n", json.toStdString().c_str());
     jsonPart.setBody(json.toLatin1());
 
@@ -554,8 +577,15 @@ TodaysPlan::prepareResponse(QByteArray* data, QString &name)
         QJsonObject activity = replyActivity.value(name, QJsonObject());
         if (activity["rpe"].isDouble()) {
             QString rpe = QString("%1").arg(activity["rpe"].toDouble());
-            qDebug() << "RPE was" << ride->getTag("RPE", "") << " >> " << rpe;
             ride->setTag("RPE", rpe);
+        }
+        if (activity["tqr"].isDouble()) {
+            QString tqr = QString("%1").arg(activity["tqr"].toDouble());
+            ride->setTag("TQR", tqr);
+        }
+        if (activity["pain"].isDouble()) {
+            QString lqs = QString("%1").arg(activity["pain"].toDouble());
+            ride->setTag("LQS", lqs);
         }
 
         // convert

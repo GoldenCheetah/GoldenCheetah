@@ -50,6 +50,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
     Q_PROPERTY(bool showBest READ showBest WRITE setShowBest USER true)
+    Q_PROPERTY(bool filterBest READ filterBest WRITE setFilterBest USER true)
     Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
     Q_PROPERTY(bool showGrid READ showGrid WRITE setShowGrid USER true)
 
@@ -196,6 +197,9 @@ class CriticalPowerWindow : public GcChartWindow
         bool showGrid() { return showGridCheck->isChecked(); }
         void setShowGrid(bool x) { return showGridCheck->setChecked(x); }
 
+        bool filterBest() { return filterBestCheck->isChecked(); }
+        void setFilterBest(bool x) { return filterBestCheck->setChecked(x); }
+
         bool showBest() { return showBestCheck->isChecked(); }
         void setShowBest(bool x) { return showBestCheck->setChecked(x); }
 
@@ -217,6 +221,7 @@ class CriticalPowerWindow : public GcChartWindow
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
         void showBestChanged(int check);
+        void filterBestChanged(int check);
         void showGridChanged(int check);
         void shadeIntervalsChanged(int state);
         void setPlotType(int index);
@@ -280,6 +285,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;
         QCheckBox *showBestCheck;
+        QCheckBox *filterBestCheck;
         QCheckBox *showGridCheck;
         QCheckBox *rPercent, *rHeat, *rDelta, *rDeltaPercent;
         QwtPlotPicker *picker;

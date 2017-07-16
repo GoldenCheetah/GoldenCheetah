@@ -34,7 +34,7 @@ void CalibrationData::resetCalibrationState()
         requested[i] = false;
     }
     state = CALIBRATION_STATE_IDLE;
-    activechannel = targetspeed = spindowntime = zerooffset = 0;
+    activechannel = targetspeed = spindowntime = zerooffset = slope = 0;
 }
 
 uint8_t CalibrationData::getType()
@@ -90,6 +90,19 @@ void CalibrationData::setZeroOffset(uint16_t offset)
     if (this->zerooffset != offset) {
         qDebug() << "Calibration zero offset changing to" << offset;
         this->zerooffset = offset;
+    }
+}
+
+uint16_t CalibrationData::getSlope()
+{
+    return this->slope;
+}
+
+void CalibrationData::setSlope(uint16_t slope)
+{
+    if (this->slope != slope) {
+        qDebug() << "Calibration slope changing to" << slope;
+        this->slope = slope;
     }
 }
 

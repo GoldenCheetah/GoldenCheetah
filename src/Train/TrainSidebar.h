@@ -265,7 +265,7 @@ class TrainSidebar : public GcWindow
         bool     startCalibration, restartCalibration, finishCalibration;
         int      calibrationDeviceIndex;
         uint8_t  calibrationType, calibrationState;
-        uint16_t calibrationSpindownTime, calibrationZeroOffset;
+        uint16_t calibrationSpindownTime, calibrationZeroOffset, calibrationSlope;
         double   calibrationTargetSpeed, calibrationCurrentSpeed;
         double   calibrationCadence, calibrationTorque;
 
