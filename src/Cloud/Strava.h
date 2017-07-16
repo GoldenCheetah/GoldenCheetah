@@ -33,7 +33,7 @@ class Strava : public CloudService {
         QString id() const { return "Strava"; }
         QString uiName() const { return tr("Strava"); }
         QString description() const { return (tr("Sync with the social network for cyclists and runners.")); }
-        QImage logo() const { return QImage(":images/services/strava.png"); }
+        QImage logo() const;
 
         Strava(Context *context);
         CloudService *clone(Context *context) { return new Strava(context); }

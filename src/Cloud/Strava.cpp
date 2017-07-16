@@ -592,7 +592,6 @@ Strava::addSamples(RideFile* ret, QString remoteid)
 QByteArray*
 Strava::prepareResponse(QByteArray* data)
 {
-    Q_UNUSED(name)
     printd("Strava::prepareResponse()\n");
 
     QJsonParseError parseError;
