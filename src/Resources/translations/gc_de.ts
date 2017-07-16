@@ -9501,7 +9501,7 @@ Einige Geräte zeichnen ohne Geschwindigkeitsmesser keine Distanz, aber die Posi
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="65"/>
-        <source>, heading</source>
+        <source>, direction</source>
         <translation>, Richtung</translation>
     </message>
     <message>
@@ -9512,7 +9512,7 @@ Bike Weight parameter is added to athlete&apos;s weight to compound total mass, 
 
 CRR parameter is the coefficient of rolling resistance, it depends on tires and surface
 wind speed shall be indicated in kph
-wind heading (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
+wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the ride file already contain wind data
       it will be overridden if wind is entered manually</source>
         <translation>Schätzung der Leistung aufgrund von Geschwindigkeit/Höhe/Gewicht usw.
@@ -9810,7 +9810,7 @@ Equipment Weight parameter is added to athlete&apos;s weight to compound total m
 Draft Mult. parameter is the multiplier to adjust for drafting, 1 is no drafting  and 0.7 seems legit for drafting in a group
 
 wind speed shall be indicated in kph
-wind heading (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
+wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the file already contain wind data it will be overridden if wind is entered</source>
         <translation>Schätzung der Leistung (Laufen) aufgrund von Geschwindigkeit/Höhe/Gewicht usw. unter Verwendung der &apos;di Prampero&apos; Koeffizienten
 
