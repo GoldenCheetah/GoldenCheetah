@@ -1604,9 +1604,17 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // see https://bugreports.qt.io/browse/QTBUG-40823
 #else
                 // alert when approaching end of lap
-                if (lapTimeRemaining > 0 && lapTimeRemaining < 3000 && lapAudioEnabled && lapAudioThisLap) {
-                    lapAudioThisLap = false;
-                    QSound::play(":audio/lap.wav");
+                if (lapAudioEnabled && lapAudioThisLap) {
+
+                    double currentposition = displayWorkoutDistance*1000;
+                    double lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
+
+                    // alert when 3 seconds from end of ERG lap, or 20 meters from end of CRS lap
+                    if ((status&RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) ||
+                        (status&RT_MODE_SLOPE && lapmarker != -1 && lapmarker - currentposition < 20)) {
+                        lapAudioThisLap = false;
+                        QSound::play(":audio/lap.wav");
+                    }
                 }
 #endif
 
