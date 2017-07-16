@@ -188,7 +188,7 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
     }
 
     QFile jsonFile(tempfile.fileName());
-    if (RideFileFactory::instance().writeRideFile(NULL, ride, jsonFile, spec) == true) {
+    if (RideFileFactory::instance().writeRideFile(ride->context, ride, jsonFile, spec) == true) {
 
         if (uploadCompression == zip) {
             // create a temp zip file
@@ -301,9 +301,6 @@ CloudService::uploadExtension() {
 
 CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
 {
-    // get a compressed version
-    store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
-
     // setup the gui!
     QVBoxLayout *layout = new QVBoxLayout(this);
     info = new QLabel(QString(tr("Uploading %1 bytes...")).arg(data.size()));
@@ -320,14 +317,26 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService
     buttons->addWidget(okcancel);
     layout->addLayout(buttons);
 
-    // ok, so now we can kickoff the upload
-    status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
+    // lets open the store
+    QStringList errors;
+    status = store->open(errors);
 
+    // compress and upload if opened successfully.
+    if (status == true) {
+
+        // get a compressed version
+        store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
+
+        // ok, so now we can kickoff the upload
+        status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
+    }
+
+    // if the upload failed in any way, bail out
     if (status == false) {
 
         // didn't work dude
         QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Upload Failed") + store->name());
+        msgBox.setWindowTitle(tr("Upload Failed") + store->uiName());
         msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
 
         msgBox.setIcon(QMessageBox::Critical);
@@ -369,7 +378,7 @@ CloudServiceDialog::CloudServiceDialog(QWidget *parent, CloudService *store, QSt
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setMinimumSize(350*dpiXFactor, 400*dpiYFactor);
-    setWindowTitle(title + " (" + store->name() + ")");
+    setWindowTitle(title + " (" + store->uiName() + ")");
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     pathEdit = new QLineEdit(this);
@@ -638,7 +647,7 @@ FolderNameDialog::FolderNameDialog(QWidget *parent) : QDialog(parent)
 CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *store)
     : QDialog(context->mainWindow, Qt::Dialog), context(context), store(store), downloading(false), aborted(false)
 {
-    setWindowTitle(tr("Synchronise ") + store->name());
+    setWindowTitle(tr("Synchronise ") + store->uiName());
     setMinimumSize(850 *dpiXFactor,450 *dpiYFactor);
 
     QStringList errors;
@@ -646,7 +655,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
         QWidget::hide(); // meh
 
         QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Sync with ") + store->name());
+        msgBox.setWindowTitle(tr("Sync with ") + store->uiName());
         msgBox.setText(tr("Unable to connect, check your configuration in preferences."));
         msgBox.setDetailedText(errors.join("\n"));
 
@@ -759,8 +768,8 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     selectAllSync->setChecked(Qt::Unchecked);
     syncMode = new QComboBox(this);
     syncMode->addItem(tr("Keep all do not delete"));
-    syncMode->addItem(tr("Keep %1 but delete Local").arg(store->name()));
-    syncMode->addItem(tr("Keep Local but delete %1").arg(store->name()));
+    syncMode->addItem(tr("Keep %1 but delete Local").arg(store->uiName()));
+    syncMode->addItem(tr("Keep Local but delete %1").arg(store->uiName()));
     QHBoxLayout *syncList = new QHBoxLayout;
     syncList->addWidget(selectAllSync);
     syncList->addStretch();
@@ -1597,6 +1606,13 @@ CloudServiceAutoDownload::autoDownload()
 }
 
 void
+CloudServiceAutoDownload::checkDownload()
+{
+    // manually called to check
+    start();
+}
+
+void
 CloudServiceAutoDownload::run()
 {
     // this is a separate thread and can run in parallel with the main gui
@@ -1712,7 +1728,7 @@ CloudServiceAutoDownload::run()
     for(int i=0; i<downloadlist.count(); i++) {
 
         // update progress indicator
-        context->notifyAutoDownloadProgress(downloadlist[i].provider->name(), progress, i, downloadlist.count());
+        context->notifyAutoDownloadProgress(downloadlist[i].provider->uiName(), progress, i, downloadlist.count());
 
         CloudServiceDownloadEntry download= downloadlist[i];
 
@@ -1733,7 +1749,7 @@ CloudServiceAutoDownload::run()
         progress += inc;
 
         // if last one we need to signal done.
-        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(download.provider->name(), progress, i+1, downloadlist.count());
+        if ((i+1) == downloadlist.count()) context->notifyAutoDownloadProgress(download.provider->uiName(), progress, i+1, downloadlist.count());
     }
 
     // time to see completion

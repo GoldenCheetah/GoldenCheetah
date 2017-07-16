@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GC_TrainingStageBuch_h
-#define GC_TrainingStageBuch_h
+#ifndef GC_TrainingsTageBuch_h
+#define GC_TrainingsTageBuch_h
 #include <QImage>
 
 // Cloud Services and HTTP
@@ -36,19 +36,20 @@
 #include <QUrlQuery>
 #endif
 
-class TrainingStageBuch : public CloudService {
+class TrainingsTageBuch : public CloudService {
 
     Q_OBJECT
 
     public:
 
-        QString name() const { return (tr("TrainingStageBuch")); }
+        QString id() const { return "TrainingsTageBuch"; }
+        QString uiName() const { return tr("Trainingstagebuch"); }
         QString description() const { return (tr("Upload to your online and mobile training log.")); }
         QImage logo() const { return QImage(":images/services/trainingstagebuch.png"); }
 
-        TrainingStageBuch(Context *context);
-        CloudService *clone(Context *context) { return new TrainingStageBuch(context); }
-        ~TrainingStageBuch();
+        TrainingsTageBuch(Context *context);
+        CloudService *clone(Context *context) { return new TrainingsTageBuch(context); }
+        ~TrainingsTageBuch();
 
         // upload only and authenticates with a user and password
         int capabilities() const { return UserPass | Upload; }
@@ -83,7 +84,7 @@ class TrainingStageBuch : public CloudService {
 class TTBParser : public QXmlDefaultHandler
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     bool startElement( const QString&, const QString&, const QString&,
         const QXmlAttributes& )
@@ -115,7 +116,7 @@ protected:
 class TTBSettingsParser : public TTBParser
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     TTBSettingsParser() :
         pro(false),
@@ -147,7 +148,7 @@ protected:
 class TTBSessionParser : public TTBParser
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {
@@ -168,7 +169,7 @@ protected:
 class TTBUploadParser : public TTBParser
 {
 public:
-    friend class TrainingStageBuch;
+    friend class TrainingsTageBuch;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {

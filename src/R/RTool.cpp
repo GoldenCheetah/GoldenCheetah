@@ -37,6 +37,30 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+// Structure used to register routines has changed in v3.4 of R
+//
+// there is no way to support older versions without declaring our
+// own versions of these structures. The R code maintainers don't
+// consider legacy support, so we have to do this hack
+//
+// reduced number of members from v3.4 onwards
+typedef struct {
+    const char *name;
+    DL_FUNC     fun;
+    int         numArgs;
+    R_NativePrimitiveArgType *types;
+} R_CMethodDef34;
+
+// prior to v3.4 they used this structure
+typedef struct {
+    const char *name;
+    DL_FUNC     fun;
+    int         numArgs;
+    R_NativePrimitiveArgType *types;
+    enum { R_ARG_IN, R_ARG_OUT, R_IRRELEVANT } *styles; // deprecated in 3.4
+
+} R_CMethodDef33;
+
 RTool::RTool()
 {
     // setup the R runtime elements
@@ -80,26 +104,50 @@ RTool::RTool()
 
         dev = new RGraphicsDevice();
 
-        // register our functions
-        R_CMethodDef cMethods[] = {
-            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 ,0, 0 },
-            { "GC.page", (DL_FUNC) &RTool::pageSize, 0 ,0, 0 },
-            { "GC.size", (DL_FUNC) &RTool::windowSize, 0 ,0, 0 },
-            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 ,0, 0 },
-            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0 ,0, 0 },
-            { "GC.activities", (DL_FUNC) &RTool::activities, 0 ,0, 0 },
-            { "GC.activity", (DL_FUNC) &RTool::activity, 0 ,0, 0 },
-            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0 ,0, 0 },
-            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0 ,0, 0 },
-            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0 ,0, 0 },
-            { "GC.season", (DL_FUNC) &RTool::season, 0 ,0, 0 },
-            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0 ,0, 0 },
-            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0 ,0, 0 },
-            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0 ,0, 0 },
-            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0 ,0, 0 },
-            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0 ,0, 0 },
-            { NULL, NULL, 0, 0, 0 }
+        // IMPORTANT: **** REMEMBER TO CHANGE BOTH WHEN ADDING NEW ROUTINES ****
+        //
+        // setup when embedding v3.4 or higher
+        R_CMethodDef34 cMethods34[] = {
+            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0,0 },
+            { "GC.page", (DL_FUNC) &RTool::pageSize, 0,0  },
+            { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0 },
+            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0 },
+            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0,0 },
+            { "GC.activities", (DL_FUNC) &RTool::activities, 0,0 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 0,0 },
+            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0 },
+            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0 },
+            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0 },
+            { "GC.season", (DL_FUNC) &RTool::season, 0,0 },
+            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0 },
+            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0,0 },
+            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0,0 },
+            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0 },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0 },
+            { NULL, NULL, 0,0 }
         };
+
+        // setup when embedding prior to 3.4
+        R_CMethodDef33 cMethods33[] = {
+            { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0,0,0 },
+            { "GC.page", (DL_FUNC) &RTool::pageSize, 0,0,0  },
+            { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0,0 },
+            { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0,0 },
+            { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0,0,0 },
+            { "GC.activities", (DL_FUNC) &RTool::activities, 0,0,0 },
+            { "GC.activity", (DL_FUNC) &RTool::activity, 0,0,0 },
+            { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0,0 },
+            { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0,0 },
+            { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0,0 },
+            { "GC.season", (DL_FUNC) &RTool::season, 0,0,0 },
+            { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0,0 },
+            { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0,0,0 },
+            { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0,0,0 },
+            { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0,0 },
+            { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0,0 },
+            { NULL, NULL, 0,0,0 }
+        };
+
         R_CallMethodDef callMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 2 },
@@ -130,11 +178,6 @@ RTool::RTool()
             { NULL, NULL, 0 }
         };
 
-        // set them up
-        DllInfo *info = R_getEmbeddingDllInfo();
-        R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
-
-        // reinstate R method for getting version since we are
         // dynamically loading now, so the version may not be
         // the same as the version we built with.
         R->parseEvalNT("print(R.version.string)");
@@ -145,6 +188,22 @@ RTool::RTool()
             if (exp.exactMatch(strings[1])) version = exp.cap(1);
             else version = strings[1];
         }
+
+        // set them up
+        DllInfo *info = R_getEmbeddingDllInfo();
+        QStringList nums = version.split(".");
+        int majorN = nums[0].toInt();
+        int minorN = nums[1].toInt();
+
+        // future proof, 3.4 or higher use new structure, 3.3 anything lower uses older structure
+        if (majorN > 3 || (majorN == 3 && minorN > 3)) R_registerRoutines(info, (const R_CMethodDef*)(cMethods34), callMethods, NULL, NULL);
+        else R_registerRoutines(info, (const R_CMethodDef*)(cMethods33), callMethods, NULL, NULL);
+
+        // what version are we running?
+        #ifdef GC_WANT_ALLDEBUG
+        fprintf(stderr,"R loaded. [Compiled=%s.%s, Loaded=%d.%d, Loaded DeviceEngine=%d]\n", R_MAJOR, R_MINOR, majorN, minorN, GC_R_GE_getVersion());
+        #endif
+
         rtool->messages.clear();
 
         // load the dynamix library and create function wrapper
@@ -395,7 +454,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 run.wprime = rtool->context->athlete->zones(true)->getWprime(range);
                 run.pmax = rtool->context->athlete->zones(true)->getPmax(range);
                 run.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                run.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                run.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
             }
         }
 
@@ -486,7 +545,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
                 c.wprime = rtool->context->athlete->zones(true)->getWprime(range);
                 c.pmax = rtool->context->athlete->zones(true)->getPmax(range);
                 c.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                c.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
 
                 config << c;
             }

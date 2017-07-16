@@ -32,6 +32,7 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
+#include <QGLWidget>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -63,6 +64,12 @@ OverviewWindow::OverviewWindow(Context *context) :
     view->setRenderHint(QPainter::Antialiasing, true);
     view->setFrameStyle(QFrame::NoFrame);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+#ifdef Q_OS_LINUX
+    if (QGLFormat::openGLVersionFlags().testFlag(QGLFormat::OpenGL_Version_2_0)) {
+        view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+        view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    }
+#endif
     view->setScene(scene);
 
     // layout
@@ -1281,8 +1288,9 @@ static QColor FosterColors[11]={
 void
 RPErating::setValue(QString value)
 {
+    // RPE values from other sources (e.g. TodaysPlan) are "double"
     this->value = value;
-    int v = value.toInt();
+    int v = qRound(value.toDouble());
     if (v <0 || v>10) {
         color = GColor(CPLOTMARKER);
         description = QObject::tr("Invalid");
@@ -1420,7 +1428,7 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     // paint the blocks
     double width = geom.width() / 13; // always a block each side for a margin
     int i=0;
-    for(; i<= value.toInt(); i++) {
+    for(; i<= qRound(value.toDouble()); i++) {
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);

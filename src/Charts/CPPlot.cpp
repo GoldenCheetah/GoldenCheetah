@@ -49,6 +49,8 @@
 #include "TimeUtils.h"
 #include "Units.h"
 
+#include "LTMTrend.h"
+
 
 CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
@@ -60,7 +62,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showBest(true), filterBest(false), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
 
     // curves and plot objects
@@ -308,7 +310,11 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     }
 
     // set axis title
-    setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
+    setAxisTitle(yLeft, QString ("%1 %2 (%3) %4")
+                 .arg(prefix)
+                 .arg(series)
+                 .arg(units)
+                 .arg(postfix));
 
     // zap the old curves
     clearCurves();
@@ -516,7 +522,7 @@ CPPlot::plotModel()
                 sym->setBrush(QBrush(GColor(CPLOTMARKER)));
                 sym->setPen(QPen(GColor(CPLOTMARKER)));
                 sym->setStyle(QwtSymbol::XCross);
-                sym->setSize(6 *dpiXFactor);
+                sym->setSize(10 *dpiXFactor);
 
                 QwtPlotMarker *cherryp = new QwtPlotMarker();
                 cherryp->setSymbol(sym);
@@ -562,7 +568,7 @@ CPPlot::plotModel()
                     cpw->ftpValue->setText(QString(tr("%1 w")).arg(pdModel->FTP(), 0, 'f', 0));
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
-                    int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                    int _ftpLevel = 15 * (pdModel->FTP() / context->athlete->getWeight(QDate::currentDate()) - 2.5) / (6.25-2.5) ;
                     if (_ftpLevel > 0 && _ftpLevel < 16) // check bounds
                         cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
                     else
@@ -580,7 +586,7 @@ CPPlot::plotModel()
                     cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
 
                     // Reference 22.5W/kg -> untrained 8W/kg
-                    int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                    int _pMaxLevel = 15 * (pdModel->PMax() / context->athlete->getWeight(QDate::currentDate()) - 8) / (23-8) ;
                     if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
                         cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
                     else
@@ -670,6 +676,7 @@ CPPlot::plotModel()
 
                 //CV
                 cpw->cpTitle->setText(tr("CV"));
+                // TODO: Should metric instead depend on the swim/run/default unit settings?
                 cpw->cpValue->setText(kphToString(pdModel->CP()));
                 cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
 
@@ -982,7 +989,7 @@ CPPlot::plotBests(RideItem *rideItem)
     int shadingCP = 0; 
     double shadingRatio = 1.0;
     if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower) && shadeMode) shadingCP = dateCP;
-    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) && shadeMode) shadingRatio = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) && shadeMode) shadingRatio = context->athlete->getWeight(QDate::currentDate());
     double shadingCV = 0.0;
     if (rideSeries == RideFile::kph && shadeMode) shadingCV = dateCV;
 
@@ -1084,7 +1091,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4 *dpiXFactor);
+                sym->setSize((filterBest ? 8 : 4) *dpiXFactor);
                 sym->setBrush(QBrush(fill));
                 sym->setPen(QPen(fill));
                 curve->setSymbol(sym);
@@ -1104,8 +1111,113 @@ CPPlot::plotBests(RideItem *rideItem)
                 curve->setSamples(time, work);
             else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
                 curve->setSamples(bestsCache->meanMaxArray(rideSeries).data()+1, wprime.data(), maxNonZero-1);
-            else
-                curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
+            else {
+
+                if (filterBest) {
+
+                    // get data to filter
+                    QVector<double> t = time;
+                    QVector<double> p = bestsCache->meanMaxArray(rideSeries);
+                    QVector<QDate> w = bestsCache->meanMaxDates(rideSeries);
+                    p.remove(0);
+                    w.remove(0);
+
+
+                    // linear regression of the full data, to help determine
+                    // the maximal point on the MMP curve for each day
+                    // using brace to set scope and descope temporary variables
+                    // as we use a fair few, but not worth making a function
+                    double slope=0, intercept=0;
+                    {
+                        // we want 2m to 20min data (check bounds)
+                        int want = p.count() > 1200 ? 1200-121 : p.count()-121;
+                        QVector<double> j = bestsCache->meanMaxArray(rideSeries).mid(120, want);
+                        QVector<double> ts = t.mid(120, want);
+
+                        // convert time data to seconds (is in minutes)
+                        // and power to joules (power x time)
+                        for(int i=0; i<j.count(); i++) {
+                            ts[i] = ts[i] * 60.0f;
+                            j[i] = (j[i] * ts[i]) ;
+                        }
+
+                        // LTMTrend does a linear regression for us, lets reuse it
+                        LTMTrend regress(ts.data(), j.data(), ts.count());
+
+                        // save away the slope and intercept
+                        slope = regress.slope();
+                        intercept = regress.intercept();
+                    }
+
+                    // filter out efforts on same day that are the furthest
+                    // away from a linear regression
+
+                    // the best we found is stored in here
+                    struct { int i; double p, t, d; } keep;
+
+                    for(int i=0; i<t.count(); i++) {
+
+                        // reset our holding variable - it will be updated
+                        // with the maximal point we want to retain for the
+                        // day we are filtering for. Initial means no value
+                        // has been set yet, so the first point will set it.
+                        if (w[i] != QDate()) {
+
+                            // lets filter all on today, use first one to set the best found so far
+                            keep.d = (p[i] * t[i] * 60.0f) - ((slope * t[i] * 60.00f) + intercept);
+                            keep.i=i;
+                            keep.p=p[i];
+                            keep.t=t[i];
+
+                            // but clear since we iterate beyond
+                            p[i]=0;
+                            t[i]=0;
+
+                            // from here to the end of all the points, lets see if there is one further away?
+                            for(int x=i+1; x<t.count(); x++) {
+
+                                if (w[x] == w[i]) {
+
+                                    // if its beloe the line multiply distance by -1
+                                    double d = (p[x] * t[x] * 60.0f) - ((slope * t[x] * 60.00f) + intercept);
+
+                                    if (keep.d < d) {
+                                        keep.d = d;
+                                        keep.i = x;
+                                        keep.p = p[x];
+                                        keep.t = t[x];
+                                    }
+
+                                    w[x] = QDate();
+                                    p[x] = 0;
+                                    t[x] = 0;
+                                }
+                            }
+
+                            // reinstate best we found
+                            p[keep.i] = keep.p;
+                            t[keep.i] = keep.t;
+                        }
+                    }
+                    // set a series where t > 1
+                    QVector<double> tp;
+                    QVector<double> pp;
+                    for(int i=0; i<t.count(); i++) {
+                        if (t[i] >0) {
+                            tp << t[i];
+                            pp << p[i];
+                        }
+                    }
+
+                    // only show filtered data
+                    curve->setSamples(tp.data(), pp.data(), pp.count());
+
+                } else {
+
+                    // unfiltered MMP data
+                    curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
+                }
+            }
 
             curve->attach(this);
             bestsCurves.append(curve);
@@ -1691,8 +1803,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
     if (index >= 0) {
 
-        double xvalue = curve->sample(index).x();
-        double yvalue = curve->sample(index).y();
+        const double xvalue = curve->sample(index).x();
+        const double yvalue = curve->sample(index).y();
         QString text, dateStr, paceStr;
         QString currentRidePercentStr;
         QString units1;
@@ -1707,27 +1819,54 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             }
         }
 
-        if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+        // use the right pace config
+        bool metricPace = true;
+        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, true).toBool();
+        else  metricPace = context->athlete->useMetricUnits;
+
+
+        if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
             units1 = RideFile::unitName(rideSeries, context);
-        else
+        } else {
             units1 = ""; // time --> no units
+        }
+        
+        // pace units for heat curve
+        if (curve == heatCurve) {
 
-        // show percent ?
-        if ((((rangemode && context->isCompareDateRanges)
-            || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
-            || (curve == rideCurve && showPercent)) units2 = QString("%");
-        else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
-            units2 = "J"; // Joule
-        else if (criticalSeries == CriticalPowerWindow::kph)
-            // yAxis doesn't obey units settings yet, remove when fixed
-            units2 = tr("kph %1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
-        else
-            units2 = RideFile::unitName(rideSeries, context);
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(tr("Activities"));
 
+        } else  if ((((rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
+                   || (curve == rideCurve && showPercent)) {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(tr("%")); // Percent
+
+        } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(tr("J")); // Joule
+
+        } else if (criticalSeries == CriticalPowerWindow::kph) {
+
+            if (metricPace)  units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            else  units2 = tr("%1 mph").arg(yvalue*MILES_PER_KM, 0, 'f', RideFile::decimalsFor(rideSeries));
+
+        } else {
+
+            // eg: "### watts"
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                                .arg(RideFile::unitName(rideSeries, context));
+        }
+        
 		// for the current ride curve, add a percent of rider's actual best.
-		if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
+        if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
+
 			double bestY = getBests()[index];
-			if (0 != bestY) {
+            if (0 != bestY) {
+
 				// use 0 decimals for the percent.
 				currentRidePercentStr = QString("\n%1 %2")
 					.arg((yvalue *100)/ bestY, 0, 'f', 0)
@@ -1735,37 +1874,42 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 			}
 		}
 
-        // no units for Heat Curve
-        if (curve == heatCurve) units2 = QString(tr("Activities"));
 
         // for speed series add pace with units according to settings
         if (criticalSeries == CriticalPowerWindow::kph) {
+
             if (isRun || isSwim) {
+
                 const PaceZones *zones = context->athlete->paceZones(isSwim);
-                if (zones) {
-                    bool metricPace = appsettings->value(this, zones->paceSetting(), true).toBool();
-                    paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace)).arg(zones->paceUnits(metricPace));
-                }
+                if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
+                                                       .arg(zones->paceUnits(metricPace));
+
             }
-            double km = yvalue*xvalue/60.0; // distance in km
+            
+            const double km = yvalue*xvalue/60.0; // distance in km
             if (isSwim) {
-                paceStr += tr("\n%1 m %2 yd").arg(1000*km, 0, 'f', 0)
-                                    .arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+
+                if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
+                else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
+
             } else {
-                paceStr += tr("\n%1 km %2 mi").arg(km, 0, 'f', 3)
-                                    .arg(MILES_PER_KM*km, 0, 'f', 3);
+
+                if (metricPace) paceStr += tr("\n%1 km").arg(km, 0, 'f', 3);
+                else  paceStr += tr("\n%1 mi").arg(MILES_PER_KM*km, 0, 'f', 3);
+
             }
         }
 
         // output the tooltip
-        text = QString("%1%2\n%3 %4%7%5%6")
-               .arg(criticalSeries == CriticalPowerWindow::veloclinicplot?QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries)):interval_to_str(60.0*xvalue))
+        text = QString("%1%2\n%3 %4%5%6")
+               .arg(criticalSeries == CriticalPowerWindow::veloclinicplot ?
+                    QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+                    : interval_to_str(60.0*xvalue))
                .arg(units1)
-               .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                .arg(units2)
-               .arg(dateStr)
                .arg(currentRidePercentStr)
-               .arg(paceStr);
+               .arg(paceStr)
+               .arg(dateStr);
 
         // set that text up
         zoomer->setText(text);
@@ -1794,9 +1938,9 @@ CPPlot::exportBests(QString filename)
 
         // just output for the bests curve
         for (size_t i=0; i<bestsCurve->data()->size(); i++) {
-            double xvalue = bestsCurve->sample(i).x();
-            double yvalue = bestsCurve->sample(i).y();
-            double modelvalue = expmodel ? pdModel->y(xvalue) : 0;
+            const double xvalue = bestsCurve->sample(i).x();
+            const double yvalue = bestsCurve->sample(i).y();
+            const double modelvalue = expmodel ? pdModel->y(xvalue) : 0;
 
             int index = xvalue * 60.00f;
             QDate date;
@@ -1847,6 +1991,13 @@ void
 CPPlot::setShowEffort(bool x)
 {
     showEffort = x;
+    clearCurves();
+}
+
+void
+CPPlot::setFilterBest(bool x)
+{
+    filterBest = x;
     clearCurves();
 }
 

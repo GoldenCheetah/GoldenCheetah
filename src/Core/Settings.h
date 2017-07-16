@@ -35,9 +35,6 @@
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
 
-//Twitter oauth keys / see also Athlete parameter
-#define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
-
 //Google Calendar-CALDAV oauthkeys / see also Athlete parameter
 #define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
 
@@ -176,6 +173,8 @@
 #define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
+#define GC_DPDP_CDA                     "<global-general>dataprocess/fixderivepower/cda"
+#define GC_DPDP_DRAFTM                  "<global-general>dataprocess/fixderivepower/draftm"
 #define GC_DPRP_EQUIPWEIGHT             "<global-general>dataprocess/fixrunningpower/equipwheight"
 #define GC_DPDR_DRAFTM                  "<global-general>dataprocess/fixrunningpower/draftm"
 #define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
@@ -286,9 +285,11 @@
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
 #define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
 #define GC_DVGOOGLE_DRIVE               "<athlete-private>dv/googledrive"
-//Twitter oauth keys
+//Dropbox oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
+
+//Google oauth keys
 #define GC_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>google-drive/auth_scope"
 #define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
 #define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
@@ -296,9 +297,6 @@
 
 #define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
 #define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
-//Twitter
-#define GC_TWITTER_TOKEN                "<athlete-private>twitter_token"
-#define GC_TWITTER_SECRET               "<athlete-private>twitter_secret"
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
 #define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
@@ -306,6 +304,7 @@
 #define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
 //Strava
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
+#define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
 //Today's Plan

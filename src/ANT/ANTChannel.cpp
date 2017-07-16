@@ -43,6 +43,7 @@ ANTChannel::init()
     is_old_cinqo=0;
     is_alt=0;
     is_master=0;
+    is_srm=0;
     manufacturer_id=0;
     product_id=0;
     product_version=0;
@@ -283,6 +284,16 @@ void ANTChannel::checkMoxy()
         is_moxy=1;
 }
 
+// are we an SRM?
+// has different calibration flow to other power meters
+void ANTChannel::checkSRM()
+{
+    if (!is_srm && manufacturer_id==6) {
+        qDebug() << "SRM device detected on channel" << number;
+        is_srm=1;
+    }
+}
+
 // notify we have a cinqo, does nothing
 void ANTChannel::sendCinqoSuccess() {}
 
@@ -331,6 +342,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         product_version|=(PRODUCT_SW_REV(message))<<8;
         checkCinqo();
         checkMoxy();
+        checkSRM();
 
         // TODO in some case ? eg a cadence sensor we have telemetry too
         //telemetry = true;
@@ -369,7 +381,11 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_POWER:
 
                 // Device is a power meter, so assume we support manual zero offset calibration
-                parent->setCalibrationType(number, CALIBRATION_TYPE_ZERO_OFFSET);
+                // (unique type for SRM as CTF devices show different output in train view)
+                if (is_srm)
+                    parent->setCalibrationType(number, CALIBRATION_TYPE_ZERO_OFFSET_SRM);
+                else
+                    parent->setCalibrationType(number, CALIBRATION_TYPE_ZERO_OFFSET);
 
                 // calibration has been manually requested
                 if (parent->modeCALIBRATE() && (parent->getCalibrationChannel() == number) && (parent->getCalibrationState() == CALIBRATION_STATE_REQUESTED)) {
@@ -378,9 +394,27 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     //qDebug() << "Setting last calibration timestamp for channel" << number;
                     parent->setCalibrationTimestamp(number, get_timestamp());
 
-                    // note: no obvious feedback that calibration is underway, therefore go straight to COAST
-                    parent->setCalibrationState(CALIBRATION_STATE_COAST);
+                    // No obvious feedback that calibration is underway for wheel torque or crank torque devices, therefore go straight to COAST
+                    // Crank torque frequency devices (SRM) do send updates during calibration, so can react to these to change state later..
+                    if (is_srm)
+                        parent->setCalibrationState(CALIBRATION_STATE_STARTING);
+                    else
+                        parent->setCalibrationState(CALIBRATION_STATE_COAST);
+
                     parent->requestPwrCalibration(number, ANT_SPORT_CALIBRATION_REQUEST_MANUALZERO);
+                }
+
+                // Crank torque frequency (SRM) devices do not signal that calibration has completed, therefore we need to
+                // check whether a manual calibration is in progress, and just wait 5 seconds before calling it done..
+                if (is_srm && parent->modeCALIBRATE() && (parent->getCalibrationChannel() == number) && (parent->getCalibrationState() == CALIBRATION_STATE_COAST)) {
+                    if (get_timestamp() - srm_calibration_timestamp > 5) {
+                        // 5 seconds have elapsed since starting calibration, so assume completed
+                        qDebug() << "ANT Sport calibration succeeded";
+                        srm_offset = srm_offset_instant;
+                        parent->setCalibrationZeroOffset(srm_offset);
+                        parent->setCalibrationSlope(srm_slope);
+                        parent->setCalibrationState(CALIBRATION_STATE_SUCCESS);
+                    }
                 }
 
                 // what kind of power device is this?
@@ -405,13 +439,40 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         switch (antMessage.ctfID) {
 
                             case 0x01: // offset
-                                // if we're getting calibration messages then
-                                // we should be coasting, so power and cadence
-                                // will be zero
-                                srm_offset = antMessage.srmOffset;
-                                is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
-                                parent->setSecondaryCadence(0);
-                                value2=value=0;
+
+                                // Can either be manually calibrating this device, or receiving auto zero messages
+                                if (parent->modeCALIBRATE() && (parent->getCalibrationChannel() == number)) {
+                                    // Manually requested calibration on this channel, note that srm_offset
+                                    // is only set after final calibration message
+
+                                    srm_offset_instant = antMessage.srmOffset;
+
+                                    // set these now so they can be displayed in notification area progress messages
+                                    parent->setCalibrationZeroOffset(srm_offset_instant);
+                                    parent->setCalibrationSlope(srm_slope);
+
+                                    if (parent->getCalibrationState() == CALIBRATION_STATE_STARTING) {
+                                        // First calibration message received, move the state on to indicate progress..
+                                        srm_calibration_timestamp = get_timestamp();
+                                        parent->setCalibrationState(CALIBRATION_STATE_COAST);
+                                    }
+
+                                } else {
+                                    // Auto zero
+
+                                    // Note that original code does not follow the spec in the ANT docs, should average
+                                    // multiple readings and only adjust within 4Hz, comment out until auto-zero support
+                                    // added in for all power meter types...
+
+                                    // if we're getting calibration messages then
+                                    // we should be coasting, so power and cadence
+                                    // will be zero
+                                    //srm_offset = antMessage.srmOffset;
+                                    //is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
+                                    //parent->setSecondaryCadence(0);
+                                    //value2=value=0;
+                                }
+
                                 break;
 
                             case 0x02: // slope
@@ -465,17 +526,24 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 // SRM - crank torque frequency
                 //
-                case ANT_CRANKSRM_POWER: // 0x20 - crank torque (SRM)
+                case ANT_CRANKSRM_POWER: // 0x20 - crank torque frequency (SRM)
                 {
+                    // for SimulANT testing
+                    //if (!is_srm) is_srm=1;
+
                     uint16_t period = antMessage.period - lastMessage.period;
                     uint16_t torque = antMessage.torque - lastMessage.torque;
                     float time = (float)period / (float)2000.00;
 
+                    // note: can't calculate/display calibration torque if crank not turning, as time=0
+                    //qDebug() << "period:" << period << "time:" << time << "torque:" << torque << "slope:" << antMessage.slope  << "offset:" << srm_offset;
+
                     if (time && antMessage.slope && period) {
 
                         nullCount = 0;
-                        float torque_freq = torque / time - 420/*srm_offset*/;
-                        float nm_torque = 10.0 * torque_freq / antMessage.slope;
+                        srm_slope = antMessage.slope;
+                        float torque_freq = torque / time - srm_offset;
+                        float nm_torque = 10.0 * torque_freq / srm_slope;
                         float cadence = 2000.0 * 60 * (antMessage.eventCount - lastMessage.eventCount) / period;
                         float power = 3.14159 * nm_torque * cadence / 30;
 

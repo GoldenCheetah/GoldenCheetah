@@ -162,12 +162,17 @@ class ANTChannel : public QObject {
         bool is_moxy; // bool
         bool is_cinqo; // bool
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
+        bool is_srm;
         bool is_fec;
         bool is_alt; // is alternative channel for power
         bool is_master; // is a master channel (for remote control)
 
         int search_type;
-        int srm_offset;
+
+        int      srm_offset;
+        int      srm_offset_instant;
+        double   srm_calibration_timestamp;
+        uint16_t srm_slope;
 
         ANTChannel(int number, ANT *parent);
 
@@ -208,6 +213,7 @@ class ANTChannel : public QObject {
         void sendCinqoSuccess();
         void checkCinqo();
         void checkMoxy();
+        void checkSRM();
 
         void setAlt(bool value) { is_alt = value; }
 

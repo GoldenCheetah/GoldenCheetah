@@ -18,6 +18,7 @@
 
 #include "AddCloudWizard.h"
 #include "MainWindow.h"
+#include "RideMetadata.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -99,7 +100,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     layout->addWidget(p);
 
     // Measures
-    p = new QCommandLinkButton(tr("Measures"), tr("Sync measures data such as weight, body fat, HRV and sleep."));
+    p = new QCommandLinkButton(tr("Measurements"), tr("Sync measurements such as weight, body fat, HRV and sleep."));
     p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Measures);
@@ -172,11 +173,11 @@ AddService::initializePage()
         // only ones with the capability we need.
         if (s->type() != wizard->type) continue;
 
-        QCommandLinkButton *p = new QCommandLinkButton(s->name(), s->description(), this);
+        QCommandLinkButton *p = new QCommandLinkButton(s->uiName(), s->description(), this);
         p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
         p->setFixedHeight(50 *dpiYFactor);
         connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
-        mapper->setMapping(p, s->name());
+        mapper->setMapping(p, s->id());
         buttonlayout->addWidget(p);
     }
     buttonlayout->addStretch();
@@ -293,7 +294,7 @@ AddAuth::initializePage()
     tokenLabel->hide();
 
     // clone to do next few steps!
-    setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->name()));
+    setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->uiName()));
 
     // show  all the widgets relevant for this service and update the value from the
     // settings we have collected (which will have been defaulted).
@@ -429,6 +430,16 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     setLayout(layout);
 
+    metaLabel = new QLabel("none", this);
+    metaCombo = new QComboBox(this);
+    metaCombo->addItem("None", QVariant("")); // default "None" .. before adding the rest
+    // add an entry for every single metadata field, which is a text
+    foreach(FieldDefinition field, wizard->context->athlete->rideMetadata()->getFields()) {
+
+        // only add text fields
+        if (field.type < 3) metaCombo->addItem(field.name, QVariant(field.name));
+    }
+
     folderLabel = new QLabel(tr("Folder"));
     folder = new QLineEdit(this);
     folder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -441,6 +452,7 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     flayout->addWidget(folder);
     flayout->addWidget(browse);
     layout->addRow(flayout);
+    layout->addRow(metaLabel, metaCombo);
 
     layout->addRow(syncStartup); // only makes sense if the service has a query api
     layout->addRow(syncImport); // only makes sense if the service has an upload api
@@ -454,14 +466,27 @@ AddSettings::initializePage()
     setTitle(QString(tr("Service Settings")));
 
     // hide everything first
+    metaLabel->hide();
+    metaCombo->hide();
     folderLabel->hide();
     folder->hide();
     browse->hide();
     syncStartup->hide();
     syncImport->hide();
 
-    // if we need a folder then set that to show
     QString cname;
+    // if we need a meta field
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Metadata1, "")) != "") {
+        metaCombo->setCurrentIndex(0); // default to none
+        metaLabel->setText(cname.split("::").at(1)); // set name
+        metaLabel->show(); metaCombo->show();
+        QString current = wizard->cloudService->getSetting(cname.split("::").at(0), "").toString();
+        if (current != "") {
+            int index=metaCombo->findText(current);
+            if (index >=0) metaCombo->setCurrentIndex(index);
+        }
+    }
+    // if we need a folder then set that to show
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
         browse->show(); folder->show(); folderLabel->show();
         folder->setText(wizard->cloudService->getSetting(cname, "").toString());
@@ -483,6 +508,11 @@ AddSettings::validatePage()
 {
     // check the authorisation has been completed
     QString cname;
+    if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Metadata1, "")) != "") {
+        QString meta;
+        if (metaCombo->currentIndex() > 0) meta=metaCombo->itemData(metaCombo->currentIndex(), Qt::UserRole).toString();
+        wizard->cloudService->setSetting(cname.split("::").at(0), meta);
+    }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Folder, "")) != "") {
         wizard->cloudService->setSetting(cname, folder->text());
     }
@@ -557,6 +587,7 @@ AddFinish::initializePage()
             case CloudService::Folder: label=tr("Folder"); break;
             case CloudService::AthleteID: label=tr("Athlete ID"); break;
             case CloudService::Combo1: label=want.value().split("::").at(1); sname=want.value().split("::").at(0); break;
+            case CloudService::Metadata1: label=want.value().split("::").at(1); sname=want.value().split("::").at(0); break;
             case CloudService::Local1:
             case CloudService::Local2:
             case CloudService::Local3:

@@ -170,6 +170,7 @@ class MainWindow : public QMainWindow
         // menus to reflect cloud
         void setUploadMenu();
         void setSyncMenu();
+        void checkCloud();
 
         void showOptions();
 
@@ -293,9 +294,8 @@ class MainWindow : public QMainWindow
         QAction *showhideToolbar;
         QAction *showhideTabbar;
 
-        QAction *tweetAction;
         QAction *shareAction;
-        QAction *syncAction;
+        QAction *checkAction;
 
         // Miscellany
         QSignalMapper *toolMapper;

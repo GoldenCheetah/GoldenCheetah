@@ -136,6 +136,7 @@ struct FitFileReaderState
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
+    XDataSeries *gearsXdata;
     XDataSeries *swimXdata;
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
@@ -481,18 +482,54 @@ struct FitFileReaderState
                     return RideFile::slope;
             case 13: // TEMPERATURE
                     return RideFile::temp;
-            case 30: //LEFT_RIGHT_BALANCE
+            case 30: // LEFT_RIGHT_BALANCE
                     return RideFile::lrbalance;
             case 39: // VERTICAL OSCILLATION
                     return RideFile::rvert;
             case 41: // GROUND CONTACT TIME
                     return RideFile::rcontact;
+            case 45: // LEFT_PEDAL_SMOOTHNESS
+                    return RideFile::lps;
+            case 46: // RIGHT_PEDAL_SMOOTHNESS
+                    return RideFile::rps;
+            //case 47: // COMBINED_PEDAL_SMOOTHNES
+            //        return RideFile::cps;
             case 54: // THb
                     return RideFile::thb;
             case 57: // SMO2
                     return RideFile::smo2;
             default:
                     return RideFile::none;
+        }
+    }
+
+    QString getNameForExtraNative(int native_num) {
+        switch (native_num) {
+
+            case 47: // COMBINED_PEDAL_SMOOTHNES
+                    return "COMBINEDSMOOTHNESS"; //Combined Pedal Smoothness
+
+            default:
+                    return QString("FIELD_%1").arg(native_num);
+        }
+    }
+
+    int getScaleForExtraNative(int native_num) {
+        switch (native_num) {
+
+            case 47: // COMBINED_PEDAL_SMOOTHNES
+                    return 2;
+
+            default:
+                    return 1;
+        }
+    }
+
+    int getOffsetForExtraNative(int native_num) {
+        switch (native_num) {
+
+            default:
+                    return 0;
         }
     }
 
@@ -929,6 +966,7 @@ struct FitFileReaderState
         int event = -1;
         int event_type = -1;
         qint16 data16 = -1;
+        qint32 data32 = -1;
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -946,9 +984,10 @@ struct FitFileReaderState
                     event_type = value; break;
                 case 2: // data16 field
                     data16 = value; break;
+                case 3: //data32 field
+                    data32 = value; break;
 
                 // additional values (ignored at present):
-                case 3: //data
                 case 4: // event group
                 default: ; // do nothing
             }
@@ -1001,6 +1040,29 @@ struct FitFileReaderState
                 }
                 break;
 
+            case 42: /* front_gear_change */
+            case 43: /* rear_gear_change */
+                {
+                    int secs = (start_time==0?0:time-start_time);
+                    XDataPoint *p = new XDataPoint();
+
+                    switch (event_type) {
+                        case 3:
+                            p->secs = secs;
+                            p->km = last_distance;
+                            p->number[0] = ((data32 >> 24) & 255);
+                            p->number[1] = ((data32 >> 8) & 255);
+                            p->number[2] = ((data32 >> 16) & 255);
+                            p->number[3] = (data32 & 255);
+                            gearsXdata->datapoints.append(p);
+                            break;
+                        default:
+                            errors << QString("Unknown gear change event %1 type %2 data %3").arg(event).arg(event_type).arg(data32);
+                            break;
+                    }
+                }
+                break;
+
             case 3: /* workout */
             case 4: /* workout_step */
             case 5: /* power_down */
@@ -1029,9 +1091,6 @@ struct FitFileReaderState
             case 28: /* length */
             case 32: /* user_marker */
             case 33: /* sport_point */
-            case 42: /* front_gear_change */
-            case 43: /* rear_gear_change */
-
             default: ;
         }
 
@@ -1363,6 +1422,8 @@ struct FitFileReaderState
                              break;
                     case 47: // COMBINED_PEDAL_SMOOTHNES
                              //qDebug() << "COMBINED_PEDAL_SMOOTHNES" << value;
+                             // --> XDATA
+                             native_num = -1;
                              break;
                     case 53: // RUNNING CADENCE FRACTIONAL VALUE
                              if (rideFile->getTag("Sport", "Bike") == "Run")
@@ -1470,7 +1531,7 @@ struct FitFileReaderState
                         QString nativeName = rideFile->symbolForSeries(series);
 
                         if (nativeName.length() == 0)
-                            nativeName = QString("FIELD_%1").arg(field.num);
+                            nativeName = getNameForExtraNative(field.num);
 
                         extraXdata->valuename << nativeName;
                         extraXdata->unitname << "";
@@ -1482,6 +1543,9 @@ struct FitFileReaderState
                     idx = record_extra_fields[field.num];
 
                     if (idx>-1) {
+                        int scale = getScaleForExtraNative(field.num);
+                        int offset = getOffsetForExtraNative(field.num);
+
                         if (p_extra == NULL &&
                                 (_values.type == SingleValue ||
                                  _values.type == FloatValue ||
@@ -1489,8 +1553,8 @@ struct FitFileReaderState
                            p_extra = new XDataPoint();
 
                         switch (_values.type) {
-                            case SingleValue: p_extra->number[idx]=_values.v; break;
-                            case FloatValue: p_extra->number[idx]=_values.f; break;
+                            case SingleValue: p_extra->number[idx]=_values.v/(float)scale+offset; break;
+                            case FloatValue: p_extra->number[idx]=_values.f/(float)scale+offset; break;
                             case StringValue: p_extra->string[idx]=_values.s.c_str(); break;
                             default: break;
                         }
@@ -2661,6 +2725,17 @@ struct FitFileReaderState
 	hrvXdata->valuename << "R-R";
 	hrvXdata->unitname << "msecs";
 
+        gearsXdata = new XDataSeries();
+        gearsXdata->name = "GEARS";
+        gearsXdata->valuename << "FRONT";
+        gearsXdata->unitname << "t";
+        gearsXdata->valuename << "REAR";
+        gearsXdata->unitname << "t";
+        gearsXdata->valuename << "FRONT-NUM";
+        gearsXdata->unitname << "";
+        gearsXdata->valuename << "REAR-NUM";
+        gearsXdata->unitname << "";
+
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";
 
@@ -2777,6 +2852,11 @@ struct FitFileReaderState
                 rideFile->addXData("HRV", hrvXdata);
             else
                 delete hrvXdata;
+
+            if (gearsXdata->datapoints.count()>0)
+                rideFile->addXData("GEARS", gearsXdata);
+            else
+                delete gearsXdata;
 
             if (deveXdata->datapoints.count()>0)
                 rideFile->addXData("DEVELOPER", deveXdata);

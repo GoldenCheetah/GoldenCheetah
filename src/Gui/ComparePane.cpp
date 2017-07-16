@@ -698,7 +698,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
             // RideFile *data;
             add.data = new RideFile(ride);
-            add.data->context = context;
+            add.data->context = sourceContext;
 
 
             // manage offsets
@@ -1051,7 +1051,7 @@ RouteDropDialog::RouteDropDialog(QWidget *parent, Context *context, QString segm
     mainLayout->setSpacing(5 *dpiXFactor);
 
     // Grid
-    QLabel *season = new QLabel("Season");
+    QLabel *season = new QLabel(tr("Season"));
     seasonSelector = new QComboBox(this);
     QHBoxLayout *seasonLayout = new QHBoxLayout;
     seasonLayout->addWidget(season);

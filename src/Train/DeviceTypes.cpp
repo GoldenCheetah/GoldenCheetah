@@ -60,6 +60,9 @@ DeviceTypes::DeviceTypes()
       { DEV_KETTLER,       DEV_SERIAL,  (char *) "Kettler Ergo Bike",true,    false,
         tr("Kettler serial device ") ,
         ":images/devices/kettler_ex1.png"                                        },
+      { DEV_KETTLER_RACER,       DEV_SERIAL,  (char *) "Kettler Racer",true,    false,
+        tr("Kettler Racer serial device ") ,
+        ":images/devices/kettler_ex1.png"                                        },
 #endif
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,

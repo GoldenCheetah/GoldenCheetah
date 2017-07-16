@@ -180,6 +180,12 @@ ANTlocalController::getCalibrationZeroOffset()
     return myANTlocal->getCalibrationZeroOffset();
 }
 
+uint16_t
+ANTlocalController::getCalibrationSlope()
+{
+    return myANTlocal->getCalibrationSlope();
+}
+
 void
 ANTlocalController::setCalibrationState(uint8_t state)
 {

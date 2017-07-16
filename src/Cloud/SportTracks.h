@@ -34,7 +34,8 @@ class SportTracks : public CloudService {
         CloudService *clone(Context *context) { return new SportTracks(context); }
         ~SportTracks();
 
-        QString name() const { return (tr("SportTracks.mobi")); }
+        QString id() const { return "SportTracks.mobi"; }
+        QString uiName() const { return tr("SportTracks.mobi"); }
         QString description() const { return (tr("Sync with the popular multisport website.")); }
         QImage logo() const { return QImage(":images/services/sporttracks.png"); }
 

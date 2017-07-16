@@ -23,6 +23,10 @@ isinf(p1)
 isnan(p1)
 
 LIST / VECTOR REDUCE FUNCTIONS
+Vectors are about collecting data from across a date range, specified as
+    expression[[Date_From:Date_To]]
+where dates can be absolute s.t. 2017/09/19 or relative s.t. Date-7
+you can use them within a formula using the following functions:
 sum(...)
 mean(...)
 max(...)

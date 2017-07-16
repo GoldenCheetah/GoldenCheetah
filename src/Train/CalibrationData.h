@@ -21,10 +21,11 @@
 
 #include <stdint.h> // uint8_t etc
 
-#define CALIBRATION_TYPE_NOT_SUPPORTED  0x00
-#define CALIBRATION_TYPE_COMPUTRAINER   0x01
-#define CALIBRATION_TYPE_ZERO_OFFSET    0x02
-#define CALIBRATION_TYPE_SPINDOWN       0x04
+#define CALIBRATION_TYPE_NOT_SUPPORTED      0x00
+#define CALIBRATION_TYPE_COMPUTRAINER       0x01
+#define CALIBRATION_TYPE_ZERO_OFFSET        0x02
+#define CALIBRATION_TYPE_ZERO_OFFSET_SRM    0x04
+#define CALIBRATION_TYPE_SPINDOWN           0x08
 
 #define CALIBRATION_STATE_IDLE          0x00
 #define CALIBRATION_STATE_PENDING       0x01
@@ -59,6 +60,9 @@ public:
     double getTargetSpeed();
     void setTargetSpeed(double speed);
 
+    uint16_t getSlope();
+    void setSlope(uint16_t slope);
+
     void    resetCalibrationState(void);
     void    setRequested(uint8_t channel, bool required);
     void    setTimestamp(uint8_t channel, double time);
@@ -77,6 +81,7 @@ private:
     uint8_t  state;
     uint16_t zerooffset;
     uint16_t spindowntime;
+    uint16_t slope;
     double   targetspeed;
 
 };

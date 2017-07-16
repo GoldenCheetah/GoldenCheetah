@@ -1101,7 +1101,7 @@ RideSummaryWindow::htmlSummary()
             }
 
             summary += tr("<h3>Heart Rate Zones</h3>");
-            if (rideSummary) summary += context->athlete->hrZones(rideItem->isRun)->summarize(hrrange, time_in_zone, altColor); //aggregating
+            if (ridesummary) summary += context->athlete->hrZones(rideItem->isRun)->summarize(hrrange, time_in_zone, altColor); //aggregating
             else summary += context->athlete->hrZones(nActivities==nRuns)->summarize(hrrange, time_in_zone, altColor); //aggregating
         }
     }

@@ -152,10 +152,10 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view->page()->profile()->setCachePath(temp);
     view->page()->profile()->setPersistentStoragePath(temp);
 
-    // web scheme handler
-    WebSchemeHandler *handler = new WebSchemeHandler(view);
+    // web scheme handler - not needed must compile with QT 5.9 or higher
+    //WebSchemeHandler *handler = new WebSchemeHandler(view);
     //view->page()->profile()->installUrlSchemeHandler("filesystem:https", handler);
-    view->page()->profile()->installUrlSchemeHandler("filesystem", handler);
+    //view->page()->profile()->installUrlSchemeHandler("filesystem", handler);
 
     // add some settings
     view->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
@@ -213,6 +213,7 @@ void
 WebPageWindow::forceReplot()
 {   
 #ifdef NOWEBKIT
+    view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(customUrl->text()));
 #else
     view->page()->mainFrame()->load(QUrl(customUrl->text()));
@@ -228,6 +229,7 @@ WebPageWindow::userUrl()
     QString url = rCustomUrl->text();
     if (!hasscheme.exactMatch(url)) url = "http://" + url;
 #ifdef NOWEBKIT
+    view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(url));
 #else
     view->page()->mainFrame()->load(QUrl(url));
@@ -283,6 +285,9 @@ WebPageWindow::event(QEvent *event)
 void
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 {
+    // only do it if I am visible, as shared across web page instances
+    if (!amVisible()) return;
+
     //qDebug()<<"Download Requested:"<<item->path()<<item->url().toString();
 
     //qDebug() << "Format: " <<  item->savePageFormat();

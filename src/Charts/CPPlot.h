@@ -67,6 +67,7 @@ class CPPlot : public QwtPlot
         void setDateRange(const QDate &start, const QDate &end);
         void setShowPercent(bool x);
         void setShowBest(bool x);
+        void setFilterBest(bool x);
         void setShowHeat(bool x);
         void setShowEffort(bool x);
         void setShowHeatByDate(bool x);
@@ -163,6 +164,7 @@ class CPPlot : public QwtPlot
         bool shadeIntervals;
         bool rangemode;
         bool showBest;
+        bool filterBest;
         bool showPercent;
         bool showHeat;
         bool showEffort;

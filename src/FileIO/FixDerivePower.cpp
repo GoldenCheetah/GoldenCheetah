@@ -43,6 +43,10 @@ class FixDerivePowerConfig : public DataProcessorConfig
         QDoubleSpinBox *bikeWeight;
         QLabel *crrLabel;
         QDoubleSpinBox *crr;
+        QLabel *cdALabel;
+        QDoubleSpinBox *cdA;
+        QLabel *draftMLabel;
+        QDoubleSpinBox *draftM;
         QLabel *windSpeedLabel;
         QDoubleSpinBox *windSpeed;
         QLabel *windHeadingLabel;
@@ -61,6 +65,8 @@ class FixDerivePowerConfig : public DataProcessorConfig
 
             bikeWeightLabel = new QLabel(tr("Bike Weight (kg)"));
             crrLabel = new QLabel(tr("Crr"));
+            cdALabel = new QLabel(tr("CdA"));
+            draftMLabel = new QLabel(tr("Draft mult."));
             windSpeedLabel = new QLabel(tr("Wind (kph)"));
             windHeadingLabel = new QLabel(tr(", heading"));
 
@@ -75,6 +81,18 @@ class FixDerivePowerConfig : public DataProcessorConfig
             crr->setMinimum(0);
             crr->setSingleStep(0.0001);
             crr->setDecimals(4);
+
+            cdA = new QDoubleSpinBox();
+            cdA->setMaximum(0.999);
+            cdA->setMinimum(0);
+            cdA->setSingleStep(0.001);
+            cdA->setDecimals(3);
+
+            draftM = new QDoubleSpinBox();
+            draftM->setMaximum(1.0);
+            draftM->setMinimum(0.1);
+            draftM->setSingleStep(0.1);
+            draftM->setDecimals(1);
 
             windSpeed = new QDoubleSpinBox();
             windSpeed->setMaximum(99.9);
@@ -92,6 +110,10 @@ class FixDerivePowerConfig : public DataProcessorConfig
             layout->addWidget(bikeWeight);
             layout->addWidget(crrLabel);
             layout->addWidget(crr);
+            layout->addWidget(cdALabel);
+            layout->addWidget(cdA);
+            layout->addWidget(draftMLabel);
+            layout->addWidget(draftM);
             layout->addWidget(windSpeedLabel);
             layout->addWidget(windSpeed);
             layout->addWidget(windHeadingLabel);
@@ -111,9 +133,15 @@ class FixDerivePowerConfig : public DataProcessorConfig
                               "weight to compound total mass, it should "
                               "include apparel, shoes, etc\n\n"
                               "CRR parameter is the coefficient of rolling "
-                              "resistance, it depends on tires and surface\n"
+                              "resistance, it depends on tires and surface\n\n"
+                              "CdA parameter is the effective frontal area "
+                              "in m^2, it depends on position and equipment. "
+                              "If 0 estimated from anthropometric data\n\n"
+                              "Draft Mult. parameter is the multiplier "
+                              "to adjust for drafting, 1 is no drafting "
+                              " and 0.7 seems legit for drafting in a group\n\n"
                               "wind speed shall be indicated in kph\n"
-                              "wind heading (origin) unit is degrees "
+                              "wind direction (origin) unit is degrees "
                               "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
                               "Note: if the ride file already contain wind data\n"
                               "      it will be overridden if wind is entered manually")));
@@ -124,6 +152,10 @@ class FixDerivePowerConfig : public DataProcessorConfig
             bikeWeight->setValue(MBik);
             double Crr = appsettings->value(NULL, GC_DPDP_CRR, "0.0031").toDouble();
             crr->setValue(Crr);
+            double CdA = appsettings->value(NULL, GC_DPDP_CDA, "0.0").toDouble();
+            cdA->setValue(CdA);
+            double Draft = appsettings->value(NULL, GC_DPDP_DRAFTM, "1.0").toDouble();
+            draftM->setValue(Draft);
             windSpeed->setValue(0.0);
             windHeading->setValue(0.0);
         }
@@ -131,6 +163,8 @@ class FixDerivePowerConfig : public DataProcessorConfig
         void saveConfig() {
             appsettings->setValue(GC_DPDP_BIKEWEIGHT, bikeWeight->value());
             appsettings->setValue(GC_DPDP_CRR, crr->value());
+            appsettings->setValue(GC_DPDP_CDA, cdA->value());
+            appsettings->setValue(GC_DPDP_DRAFTM, draftM->value());
         }
 };
 
@@ -169,16 +203,22 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
     // get settings
     double MBik; // Bike weight kg
     double CrV;  // Coefficient of Rolling Resistance
+    double CdA;  // Effective frontal area
+    double DraftM; // Drafting multiplier
     double windSpeed; // wind speed
     double windHeading; //wind direction
     if (config == NULL) { // being called automatically
         MBik = appsettings->value(NULL, GC_DPDP_BIKEWEIGHT, "9.5").toDouble();
         CrV = appsettings->value(NULL, GC_DPDP_CRR, "0.0031").toDouble();
+        CdA = appsettings->value(NULL, GC_DPDP_CDA, "0.0").toDouble();
+        DraftM = appsettings->value(NULL, GC_DPDP_DRAFTM, "1.0").toDouble();
         windSpeed = 0.0;
         windHeading = 0.0;
     } else { // being called manually
         MBik = ((FixDerivePowerConfig*)(config))->bikeWeight->value();
         CrV = ((FixDerivePowerConfig*)(config))->crr->value();
+        CdA = ((FixDerivePowerConfig*)(config))->cdA->value();
+        DraftM = ((FixDerivePowerConfig*)(config))->draftM->value();
         windSpeed = ((FixDerivePowerConfig*)(config))->windSpeed->value();                // kph
         windHeading = ((FixDerivePowerConfig*)(config))->windHeading->value() / 180 * MATHCONST_PI; // rad
     }
@@ -250,13 +290,16 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 double V = p->kph * 0.27777777777778; // Cyclist speed m/s
                 double CrDyn = 0.1 * cos(Slope);
 
-                double CwaRider, Ka;
+                double Ka;
                 double Frg = 9.81 * (MBik + M) * (CrEff * cos(Slope) + sin(Slope));
 
                 double vw=V+W; // Wind speed against cyclist = cyclist speed + wind speed
 
-                CwaRider = (1 + cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
-                Ka = 176.5 * exp(-p->alt * .0001253) * (CwaRider + CwaBike) / (273 + T);
+                if (CdA == 0) {
+                    double CwaRider = (1 + cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
+                    CdA = CwaRider + CwaBike;
+                }
+                Ka = 176.5 * exp(-p->alt * .0001253) * CdA * DraftM / (273 + T);
                 //qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd*V*M);
                 double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn))+(p->kphd > 1 ? 1 : p->kphd*V*M);
                 ride->command->setPointValue(i, RideFile::watts, watts > 0 ? (watts > 1000 ? 1000 : watts) : 0);

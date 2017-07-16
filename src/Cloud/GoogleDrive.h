@@ -40,7 +40,8 @@ class GoogleDrive : public CloudService {
         CloudService *clone(Context *context) { return new GoogleDrive(context); }
         virtual ~GoogleDrive();
 
-        virtual QString name() const { return (tr("Google Drive")); }
+        virtual QString id() const { return "Google Drive"; }
+        virtual QString uiName() const { return tr("Google Drive"); }
         virtual QString description() const { return (tr("Sync your data via your cloud storage.")); }
         QImage logo() const { return QImage(":images/services/googledrive.png"); }
 

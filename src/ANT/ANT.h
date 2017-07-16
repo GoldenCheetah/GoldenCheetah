@@ -521,6 +521,11 @@ public:
         return calibration.getZeroOffset();
     }
 
+    uint16_t getCalibrationSlope()
+    {
+        return calibration.getSlope();
+    }
+
     uint16_t getCalibrationSpindownTime()
     {
         return calibration.getZeroOffset();
@@ -544,6 +549,11 @@ public:
     void setCalibrationZeroOffset(uint16_t offset)
     {
         calibration.setZeroOffset(offset);
+    }
+
+    void setCalibrationSlope(uint16_t slope)
+    {
+        calibration.setSlope(slope);
     }
 
     void setCalibrationSpindownTime(uint16_t time)

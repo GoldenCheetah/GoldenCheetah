@@ -84,6 +84,8 @@ int DataFiltercolumn = 1;
 "||"                                        DataFilterlval.op = OR; return OR;
 [Oo][Rr]                                    DataFilterlval.op = OR; return OR;
 
+"[["                                        return LSB; /* start date range */
+"]]"                                        return RSB; /* end date range */
 
 [0-9]+                                      return DF_INTEGER;
 [0-9]+e-[0-9]+                              return DF_FLOAT;
