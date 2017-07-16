@@ -72,6 +72,11 @@ Strava::~Strava() {
     if (context) delete nam;
 }
 
+QImage Strava::logo() const
+{
+    return QImage(":images/services/strava.png");
+}
+
 void
 Strava::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 {
@@ -587,6 +592,7 @@ Strava::addSamples(RideFile* ret, QString remoteid)
 QByteArray*
 Strava::prepareResponse(QByteArray* data)
 {
+    Q_UNUSED(name)
     printd("Strava::prepareResponse()\n");
 
     QJsonParseError parseError;
