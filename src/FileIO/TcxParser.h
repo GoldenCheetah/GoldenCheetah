@@ -60,6 +60,8 @@ private:
     XDataSeries *swimXdata; // length-by-length pool swim XData
 
     bool   first; // first ride found, when it may contain collections!
+    bool   creator;
+
     int	   lap;
     double power;
     double cadence;

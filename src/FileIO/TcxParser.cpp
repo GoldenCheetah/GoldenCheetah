@@ -37,6 +37,7 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
     GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
     first = true;
+    creator = false;
 
     // First initialisation for altitude (not initialised for each point)
     alt= 0;
@@ -111,6 +112,8 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
         secs = 0;
 
+    } else if (qName == "Creator") {
+        creator = true;
     }
 
     return true;
@@ -379,6 +382,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             rideFile->addXData("SWIM", swimXdata);
         else
             delete swimXdata;
+    } else if (qName == "Creator") {
+        creator = false;
+    } else if (creator && qName == "Name") {
+        if (!buffer.isEmpty())
+            rideFile->setDeviceType(buffer);
     }
     return true;
 }
