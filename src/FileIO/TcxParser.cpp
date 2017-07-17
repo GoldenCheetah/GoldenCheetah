@@ -56,6 +56,8 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
     if (qName == "Activity") {
 
         lap = 0;
+        for (int i = 0; i < ltLast; ++i)
+            lapCount[i] = 0;
 
         if (first == true) first = false;
         else {
@@ -79,11 +81,14 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         lastLength = 0.0;
 
     } else if (qName == "Lap") {
+        lap_start_time = convertToLocalTime(qAttributes.value("StartTime"));
+        lapSecs = 0.0;
+        lapTrigger = ltManual;
 
-    // Use the time of the first lap as the time of the activity.
+        // Use the time of the first lap as the time of the activity.
         if (lap == 0) {
 
-            start_time = convertToLocalTime(qAttributes.value("StartTime"));
+            start_time = lap_start_time;
             rideFile->setStartTime(start_time);
 
             last_distance = 0.0;
@@ -336,6 +341,16 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         }
         last_distance = distance;
         last_time = time;
+    } else if (qName == "TriggerMethod") {
+        // see "TriggerMethod_t" in Garmin's Training Center Database XML (TCX) Schema
+        if (buffer == "Distance")
+            lapTrigger = ltDistance;
+        else if (buffer == "Location")
+            lapTrigger = ltLocation;
+        else if (buffer == "Time")
+            lapTrigger = ltTime;
+        else if (buffer == "HeartRate")
+            lapTrigger = ltHeartRate;
     } else if (qName == "Lap") {
         // for pool swimming, laps with distance 0 are pauses, without trackpoints
         // length-by-length Swim XData
@@ -376,6 +391,28 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                       lap);
             last_time = last_time.addSecs(round(lapSecs));
         }
+
+        QString name;
+        switch (lapTrigger) {
+        case ltDistance:
+            name = QObject::tr("Distance %1").arg(++lapCount[lapTrigger]);
+            break;
+        case ltLocation:
+            name = QObject::tr("Location %1").arg(++lapCount[lapTrigger]);
+            break;
+        case ltTime:
+            name = QObject::tr("Time %1").arg(++lapCount[lapTrigger]);
+            break;
+        case ltHeartRate:
+            name = QObject::tr("HeartRate %1").arg(++lapCount[lapTrigger]);
+            break;
+        default:
+            name = QObject::tr("Lap %1").arg(++lapCount[ltManual]);
+            break;
+        }
+
+        double start = double(start_time.msecsTo(lap_start_time)) / 1000.00f;
+        rideFile->addInterval(RideFileInterval::DEVICE, start, start + lapSecs, name);
     } else if (qName == "Activity") {
         // Add length-by-length Swim XData, if present
         if (swimXdata->datapoints.count()>0)
