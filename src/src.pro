@@ -83,6 +83,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 ### Directory Structure - Split into subdirs to be more manageable
 ###=======================================================================
 INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./R ./Planning
+QMAKE_CFLAGS_ISYSTEM =
 
 
 ###=======================================================================
