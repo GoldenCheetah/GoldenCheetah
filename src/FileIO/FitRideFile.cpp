@@ -1738,9 +1738,11 @@ struct FitFileReaderState
                 last_distance = 0.00f;
                 interval = 1;
                 QString deviceType = rideFile->deviceType();
+                QString fileFormat = rideFile->fileFormat();
                 delete rideFile;
                 rideFile = new RideFile;
                 rideFile->setDeviceType(deviceType);
+                rideFile->setFileFormat(fileFormat);
                 rideFile->setRecIntSecs(1.0);
              }
         }
@@ -2693,6 +2695,7 @@ struct FitFileReaderState
         // start
         rideFile = new RideFile;
         rideFile->setDeviceType("Garmin FIT");
+        rideFile->setFileFormat("Flexible and Interoperable Data Transfer (FIT)");
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;
