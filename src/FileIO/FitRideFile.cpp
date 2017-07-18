@@ -1196,7 +1196,6 @@ struct FitFileReaderState
         time_t this_start_time = 0;
         double total_distance = 0.0;
 
-        int lap_trigger = -1;
         QString lap_name;
 
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
@@ -1229,7 +1228,7 @@ struct FitFileReaderState
                     total_distance = value.v / 100000.0;
                     break;
                 case 24:
-                    lap_trigger = value.v;
+                    //lap_trigger = value.v;
 
                 // other data (ignored at present):
                 case 254: // lap nbr
