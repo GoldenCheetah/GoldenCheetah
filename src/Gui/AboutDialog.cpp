@@ -119,6 +119,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Alejandro Martinez");
     contributors.append("Alex Harsanyi");
     contributors.append("Alexandre Prokoudine");
+    contributors.append("Andre Heider");
     contributors.append("Andrew Bryson");
     contributors.append("Andy Froncioni");
     contributors.append("Antonius Riha");
@@ -204,7 +205,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     QString contributorsTable = "<center><table><tr>";
     for (int i=0;i<contributors.count();i++){
         contributorsTable.append("<td><center>"+contributors.at(i)+"</center></td>");
-        if ((i+1) % 3 == 0)
+        if ((i+1) % 4 == 0)
             contributorsTable.append("</tr><tr>");
     }
     contributorsTable.append("</tr></table></center>");
