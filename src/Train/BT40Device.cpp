@@ -97,8 +97,20 @@ void BT40Device::deviceDisconnected() {
 
 void BT40Device::serviceDiscovered(QBluetoothUuid uuid) {
     if (supportedServiceUuids.contains(uuid)) {
-	qDebug() << "Discovering details for service" << uuid << "for device" << m_currentDevice.name();
 	QLowEnergyService *service = m_control->createServiceObject(uuid, this);
+	m_services.append(service);
+    }
+}
+
+void BT40Device::serviceScanDone()
+{
+    qDebug() << "Service scan done for device" << m_currentDevice.name();
+    bool has_power = false;
+    bool has_csc = false;
+    QLowEnergyService* csc_service;
+    foreach (QLowEnergyService* const &service, m_services) {
+	qDebug() << "Discovering details for service" << service->serviceUuid() <<
+	    "for device" << m_currentDevice.name();
 	connect(service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
 		this, SLOT(serviceStateChanged(QLowEnergyService::ServiceState)));
 	connect(service, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),
@@ -107,14 +119,27 @@ void BT40Device::serviceDiscovered(QBluetoothUuid uuid) {
 		this, SLOT(confirmedDescriptorWrite(QLowEnergyDescriptor,QByteArray)));
 	connect(service, SIGNAL(error(QLowEnergyService::ServiceError)),
 		this, SLOT(serviceError(QLowEnergyService::ServiceError)));
-	service->discoverDetails();
-	m_services.append(service);
+	if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
+	    has_power = true;
+	    service->discoverDetails();
+	}
+	else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
+	    has_csc = true;
+	    csc_service = service;
+	}
+	else {
+	    service->discoverDetails();
+	}
     }
-}
-
-void BT40Device::serviceScanDone()
-{
-    qDebug() << "Service scan done" << "for device" << m_currentDevice.name();
+    if (has_csc && !has_power) {
+	// Only connect to CSC service if the same device doesn't provide a power service
+	// since the power service also provides the same readings.
+	qDebug() << "Connecting to the CSC service for device" << m_currentDevice.name();
+	csc_service->discoverDetails();
+    }
+    else {
+	qDebug() << "Ignoring the CSC service for device" << m_currentDevice.name();
+    }
 }
 
 void BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
