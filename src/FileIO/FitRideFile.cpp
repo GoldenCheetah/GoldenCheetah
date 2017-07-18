@@ -404,6 +404,7 @@ struct FitFileReaderState
             switch (prod) {
                 case 0: return "Wahoo fitness";
                 case 28: return "Wahoo ELEMNT";
+                case 31: return "Wahoo ELEMNT BOLT";
                 default: return QString("Wahoo fitness %1").arg(prod);
             }
         } else if (manu == 38) {
@@ -509,19 +510,23 @@ struct FitFileReaderState
             case 47: // COMBINED_PEDAL_SMOOTHNES
                     return "COMBINEDSMOOTHNESS"; //Combined Pedal Smoothness
 
+            case 81: // BATTERY_SOC
+                    return "BATTERYSOC";
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
     }
 
-    int getScaleForExtraNative(int native_num) {
+    float getScaleForExtraNative(int native_num) {
         switch (native_num) {
 
             case 47: // COMBINED_PEDAL_SMOOTHNES
-                    return 2;
+            case 81: // BATTERY_SOC
+                    return 2.0;
 
             default:
-                    return 1;
+                    return 1.0;
         }
     }
 
@@ -923,7 +928,7 @@ struct FitFileReaderState
                      version = value.v;
                      break;
                 case 27:   // product name
-                     name = values[i++].s;
+                     name = value.s;
                  break;
 
                 // all oher fields are ignored at present
@@ -958,6 +963,55 @@ struct FitFileReaderState
         if (type>-1 && type != 0 && type != 7 && type != 3)
             deviceInfos.insert(index, deviceInfo);
 
+    }
+
+    void decodeActivity(const FitDefinition &def, int,
+                        const std::vector<FitValue>& values) {
+        int i = 0;
+
+        int event = -1, event_type = -1, local_timestamp = -1, timestamp = -1;
+
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if (value == NA_VALUE)
+                continue;
+
+            switch (field.num) {
+                case 3: // event
+                    event = value;
+                    break;
+                case 4: // event_type
+                    event_type = value;
+                    break;
+                case 5: // local_timestamp
+                    local_timestamp = value + qbase_time.toTime_t();
+                    break;
+                case 253: // timestamp
+                    timestamp = value + qbase_time.toTime_t();
+                    break;
+
+                case 1: // num_sessions
+                case 2: // type
+                default:
+                    break;
+            }
+
+            //qDebug() << field.num << value;
+        }
+
+        if (event != 26) // activity
+            return;
+
+        if (event_type != 1) // stop
+            return;
+
+        if (local_timestamp < 0 || timestamp < 0)
+            return;
+
+        // adjust start time to time zone of the ride
+        QDateTime t(rideFile->startTime().toUTC());
+        rideFile->setStartTime(t.addSecs(local_timestamp - timestamp));
     }
 
     void decodeEvent(const FitDefinition &def, int,
@@ -1552,7 +1606,7 @@ struct FitFileReaderState
                     idx = record_extra_fields[field.num];
 
                     if (idx>-1) {
-                        int scale = getScaleForExtraNative(field.num);
+                        float scale = getScaleForExtraNative(field.num);
                         int offset = getOffsetForExtraNative(field.num);
 
                         if (p_extra == NULL &&
@@ -1562,8 +1616,8 @@ struct FitFileReaderState
                            p_extra = new XDataPoint();
 
                         switch (_values.type) {
-                            case SingleValue: p_extra->number[idx]=_values.v/(float)scale+offset; break;
-                            case FloatValue: p_extra->number[idx]=_values.f/(float)scale+offset; break;
+                            case SingleValue: p_extra->number[idx]=_values.v/scale+offset; break;
+                            case FloatValue: p_extra->number[idx]=_values.f/scale+offset; break;
                             case StringValue: p_extra->string[idx]=_values.s.c_str(); break;
                             default: break;
                         }
@@ -1747,9 +1801,11 @@ struct FitFileReaderState
                 last_distance = 0.00f;
                 interval = 1;
                 QString deviceType = rideFile->deviceType();
+                QString fileFormat = rideFile->fileFormat();
                 delete rideFile;
                 rideFile = new RideFile;
                 rideFile->setDeviceType(deviceType);
+                rideFile->setFileFormat(fileFormat);
                 rideFile->setRecIntSecs(1.0);
              }
         }
@@ -2601,7 +2657,10 @@ struct FitFileReaderState
                 case EVENT_MSG_NUM: // #21
                     decodeEvent(def, time_offset, values); break;
                 case 23:
-                    //decodeDeviceInfo(def, time_offset, values); /* device info */
+                    decodeDeviceInfo(def, time_offset, values); /* device info */
+                    break;
+                case ACTIVITY_MSG_NUM: // #34
+                    decodeActivity(def, time_offset, values);
                     break;
                 case 101:
                     decodeLength(def, time_offset, values);
@@ -2644,7 +2703,6 @@ struct FitFileReaderState
                 case 31: /* course */
                 case 32: /* course point */
                 case 33: /* totals */
-                case ACTIVITY_MSG_NUM: /* #34 activity */
                 case 35: /* software */
                 case 37: /* file capabilities */
                 case 38: /* message capabilities */
@@ -2702,6 +2760,7 @@ struct FitFileReaderState
         // start
         rideFile = new RideFile;
         rideFile->setDeviceType("Garmin FIT");
+        rideFile->setFileFormat("Flexible and Interoperable Data Transfer (FIT)");
         rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;
@@ -2831,11 +2890,10 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
-            QString deviceInfo;
-            foreach(QString info, deviceInfos) {
-                deviceInfo += info + "\n";
-            }
-            if (deviceInfo.length()>0)
+            QStringList uniqueDevices(deviceInfos.values());
+            uniqueDevices.removeDuplicates();
+            QString deviceInfo = uniqueDevices.join('\n');
+            if (not deviceInfo.isEmpty())
                 rideFile->setTag("Device Info", deviceInfo);
 
             QString dataInfo;

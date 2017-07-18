@@ -52,15 +52,21 @@ private:
     QDateTime last_time;
     QDateTime time;
 
+    int lap;
+    QDateTime lap_start_time;
+    double lapSecs; // for pause intervals in pool swimming files
+    enum { ltManual = 0, ltDistance = 1, ltLocation = 2, ltTime = 3, ltHeartRate = 4, ltLast = 5} lapTrigger;
+    int lapCount[ltLast];
+
     double last_distance;
     double distance;
-    double lapSecs; // for pause intervals in pool swimming files
     enum { NotSwim, MayBeSwim, Swim } swim; // to detect pool swimming files
     double lastLength; // for pool swimming files
     XDataSeries *swimXdata; // length-by-length pool swim XData
 
     bool   first; // first ride found, when it may contain collections!
-    int	   lap;
+    bool   creator;
+
     double power;
     double cadence;
     double rcad;
