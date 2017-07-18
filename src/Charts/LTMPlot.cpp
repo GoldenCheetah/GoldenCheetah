@@ -2649,7 +2649,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
         // value for day
         double value;
         if (metricDetail.type == METRIC_META)
-            value = ride->getText(metricDetail.symbol, "0.0").toDouble();
+            value = ride->getText(metricDetail.name, "0.0").toDouble();
         else
             value = ride->getForSymbol(metricDetail.symbol);
 
