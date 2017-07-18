@@ -107,7 +107,7 @@ void BT40Device::serviceScanDone()
     qDebug() << "Service scan done for device" << m_currentDevice.name();
     bool has_power = false;
     bool has_csc = false;
-    QLowEnergyService* csc_service;
+    QLowEnergyService* csc_service=NULL;
     foreach (QLowEnergyService* const &service, m_services) {
 	qDebug() << "Discovering details for service" << service->serviceUuid() <<
 	    "for device" << m_currentDevice.name();
@@ -131,7 +131,7 @@ void BT40Device::serviceScanDone()
 	    service->discoverDetails();
 	}
     }
-    if (has_csc && !has_power) {
+    if (csc_service && has_csc && !has_power) {
 	// Only connect to CSC service if the same device doesn't provide a power service
 	// since the power service also provides the same readings.
 	qDebug() << "Connecting to the CSC service for device" << m_currentDevice.name();
