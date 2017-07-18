@@ -223,7 +223,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
             metametric.smooth = false;
             metametric.trendtype = 0;
             metametric.topN = 1;
-            metametric.uname = metametric.name = sp.displayName(field.name);
+            metametric.name = field.name; // used to retrieve metadata value
+            metametric.uname = sp.displayName(field.name);
             metametric.units = "";
             metametric.uunits = "";
             metrics.append(metametric);
