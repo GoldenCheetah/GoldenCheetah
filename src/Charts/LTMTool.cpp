@@ -2501,10 +2501,9 @@ void DataFilterEdit::insertCompletion(const QString& completion)
     if (c->widget() != this)
         return;
     QTextCursor tc = textCursor();
-    int extra = completion.length() - c->completionPrefix().length();
-    tc.movePosition(QTextCursor::Left);
-    tc.movePosition(QTextCursor::EndOfWord);
-    tc.insertText(completion.right(extra));
+    tc.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, c->completionPrefix().length());
+    tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+    tc.insertText(completion);
     setTextCursor(tc);
 
     checkErrors();
