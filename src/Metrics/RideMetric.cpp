@@ -149,7 +149,8 @@
 // 139 88  Mar 2017 Leif Warland       Added SDANN and SDNNIDX to HRV metrics
 // 140 08  Apr 2017 Ale Martinez       Added Peak Pace Hr metrics
 // 141 14  Apr 2017 Joern Rischmueller Added 'Athlete Bones', 'Athlete Muscles' Body Measures metric
-int DBSchemaVersion = 141;
+// 142 25  Jul 2017 Ale Martinez       Added HRV metrics at rest (Measures)
+int DBSchemaVersion = 142;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

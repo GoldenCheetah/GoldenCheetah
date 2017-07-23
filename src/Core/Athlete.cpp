@@ -177,6 +177,15 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         }
     }
 
+    // get hrv measurements if the file exists
+    QFile hrvFile(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()));
+    if (hrvFile.exists()) {
+        QList<HrvMeasure> hrvData;
+        if (HrvMeasureParser::unserialize(hrvFile, hrvData)){
+            setHrvMeasures(hrvData);
+        }
+    }
+
     // auto downloader
     cloudAutoDownload = new CloudServiceAutoDownload(context);
     connect(context, SIGNAL(refreshEnd()), cloudAutoDownload, SLOT(autoDownload()));
@@ -574,6 +583,53 @@ Athlete::getHeight(RideFile *ride)
 
     return height;
 }
+
+// working with hrv data
+void 
+Athlete::setHrvMeasures(QList<HrvMeasure>&x)
+{
+    hrvMeasures_ = x;
+    qSort(hrvMeasures_); // date order
+}
+
+void 
+Athlete::getHrvMeasure(QDate date, HrvMeasure &here)
+{
+    // always set to not found before searching
+    here = HrvMeasure();
+
+    // loop
+    foreach(HrvMeasure x, hrvMeasures_) {
+
+        if (x.when.date() <= date) here = x;
+        if (x.when.date() > date) break;
+    }
+
+    // will be empty if none found
+    return;
+}
+
+double 
+Athlete::getHrvMeasure(QDate date, int type)
+{
+    HrvMeasure hrv;
+    getHrvMeasure(date, hrv);
+
+    // return what was asked for!
+    switch(type) {
+
+        default:
+        case HrvMeasure::HR : return hrv.hr;
+        case HrvMeasure::AVNN : return hrv.avnn;
+        case HrvMeasure::SDNN : return hrv.sdnn;
+        case HrvMeasure::RMSSD : return hrv.rmssd;
+        case HrvMeasure::PNN50 : return hrv.pnn50;
+        case HrvMeasure::LF : return hrv.lf;
+        case HrvMeasure::HF : return hrv.hf;
+        case HrvMeasure::RECOVERY_POINTS : return hrv.recovery_points;
+    }
+}
+
 
 // working with PMC data series
 PMCData *

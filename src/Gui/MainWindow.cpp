@@ -67,6 +67,7 @@
 #include "BatchExportDialog.h"
 #include "TodaysPlan.h"
 #include "BodyMeasuresDownload.h"
+#include "HrvMeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
@@ -433,6 +434,7 @@ MainWindow::MainWindow(const QDir &home)
     uploadMenu = shareMenu->addMenu(tr("Upload Activity..."));
     syncMenu = shareMenu->addMenu(tr("Synchronise Activities..."));
     shareMenu->addAction(tr("Get &Body Measurements..."), this, SLOT (downloadBodyMeasures()));
+    shareMenu->addAction(tr("Get &HRV Measurements..."), this, SLOT (downloadHrvMeasures()));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
     checkAction->setShortcut(tr("Ctrl-C"));
@@ -2109,6 +2111,15 @@ MainWindow::downloadBodyMeasures()
 {
 
     BodyMeasuresDownload dialog(currentTab->context);
+    dialog.exec();
+
+}
+
+void
+MainWindow::downloadHrvMeasures()
+{
+
+    HrvMeasuresDownload dialog(currentTab->context);
     dialog.exec();
 
 }
