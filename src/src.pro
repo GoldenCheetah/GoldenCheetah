@@ -698,7 +698,7 @@ HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownl
            Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h Cloud/WithingsDownload.h \
            Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h Cloud/TrainingsTageBuch.h \
            Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h Cloud/AddCloudWizard.h \
-           Cloud/Withings.h
+           Cloud/Withings.h Cloud/HrvMeasures.h Cloud/HrvMeasuresDownload.h
 
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
@@ -718,7 +718,7 @@ HEADERS += FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h Fi
            FileIO/SlfParser.h FileIO/SlfRideFile.h FileIO/SmfParser.h FileIO/SmfRideFile.h FileIO/SmlParser.h FileIO/SmlRideFile.h \
            FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
            FileIO/TcxRideFile.h FileIO/TxtRideFile.h FileIO/WkoRideFile.h FileIO/XDataDialog.h FileIO/XDataTableModel.h \
-           FileIO/FilterHRV.h
+           FileIO/FilterHRV.h FileIO/HrvMeasuresCsvImport.h
 
 # GUI components
 HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/ChooseCyclistDialog.h Gui/ColorButton.h \
@@ -789,7 +789,7 @@ SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarD
            Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp Cloud/WithingsDownload.cpp \
            Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp Cloud/TrainingsTageBuch.cpp \
            Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp Cloud/AddCloudWizard.cpp \
-           Cloud/Withings.cpp
+           Cloud/Withings.cpp Cloud/HrvMeasures.cpp Cloud/HrvMeasuresDownload.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
@@ -812,7 +812,7 @@ SOURCES += FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.c
            FileIO/Serial.cpp FileIO/SlfParser.cpp FileIO/SlfRideFile.cpp FileIO/SmfParser.cpp FileIO/SmfRideFile.cpp FileIO/SmlParser.cpp \
            FileIO/SmlRideFile.cpp FileIO/Snippets.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
            FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp \
-           FileIO/XDataDialog.cpp FileIO/XDataTableModel.cpp FileIO/FilterHRV.cpp
+           FileIO/XDataDialog.cpp FileIO/XDataTableModel.cpp FileIO/FilterHRV.cpp FileIO/HrvMeasuresCsvImport.cpp
 
 ## GUI Elements and Dialogs
 SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp Gui/ChooseCyclistDialog.cpp Gui/ColorButton.cpp \

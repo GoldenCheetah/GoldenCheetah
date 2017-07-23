@@ -20,6 +20,7 @@
 #define _GC_Athlete_h 1
 
 #include "BodyMeasures.h"
+#include "HrvMeasures.h"
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -100,6 +101,7 @@ class Athlete : public QObject
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;
         QList<BodyMeasure> bodyMeasures_;
+        QList<HrvMeasure> hrvMeasures_;
 
         // cloud download
         CloudServiceAutoDownload *cloudAutoDownload;
@@ -148,6 +150,13 @@ class Athlete : public QObject
         QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
         double getBodyMeasure(QDate date, int type=BodyMeasure::WeightKg);
         void getBodyMeasure(QDate date,BodyMeasure&);
+
+        // work with HRV data from HRV4Training, and other sources
+        void setHrvMeasures(QList<HrvMeasure>&x);
+
+        QList<HrvMeasure>& hrvMeasures() { return hrvMeasures_; }
+        double getHrvMeasure(QDate date, int type=HrvMeasure::RMSSD);
+        void getHrvMeasure(QDate date, HrvMeasure&);
 
         // ride collection
         void selectRideFile(QString);

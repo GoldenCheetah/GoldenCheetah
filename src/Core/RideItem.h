@@ -23,6 +23,7 @@
 
 #include "RideMetric.h"
 #include "BodyMeasures.h"
+#include "HrvMeasures.h"
 
 #include <QString>
 #include <QMap>
@@ -163,6 +164,7 @@ class RideItem : public QObject
         QMap <int, double>&stdvariances() { return stdvariance_; }
         const QStringList errors() { return errors_; }
         double getWeight(int type=0);
+        double getHrvMeasure(int type=HrvMeasure::RMSSD);
 
         // when retrieving interval lists we can provide criteria too
         QList<IntervalItem*> &intervals()  { return intervals_; }
