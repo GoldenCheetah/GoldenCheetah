@@ -148,6 +148,7 @@ Q_OBJECT
                  Preferences_General,
                  Preferences_Athlete_About,
                  Preferences_Athlete_About_Phys,
+                 Preferences_Athlete_Hrv,
                  Preferences_Athlete_About_Model,
                  Preferences_Athlete_TrainingZones_Power,
                  Preferences_Athlete_TrainingZones_HR,
