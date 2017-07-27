@@ -308,6 +308,10 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     HelpWhatsThis *athletePhysHelp = new HelpWhatsThis(athletePhysPage);
     athletePhysPage->setWhatsThis(athletePhysHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Phys));
 
+    hrvPage = new HrvPage(this, context);
+    HelpWhatsThis *hrvHelp = new HelpWhatsThis(hrvPage);
+    hrvPage->setWhatsThis(hrvHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Hrv));
+
     zonePage = new ZonePage(context);
     HelpWhatsThis *zoneHelp = new HelpWhatsThis(zonePage);
     zonePage->setWhatsThis(zoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_Power));
@@ -346,6 +350,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     tabs->addTab(athletePage, tr("About"));
     tabs->addTab(modelPage, tr("Model"));
     tabs->addTab(athletePhysPage, tr("Measurements"));
+    tabs->addTab(hrvPage, tr("HRV"));
     tabs->addTab(zonesTab, tr("Zones"));
     tabs->addTab(credentialsPage, tr("Accounts"));
     tabs->addTab(autoImportPage, tr("Auto Import"));
@@ -361,6 +366,7 @@ qint32 AthleteConfig::saveClicked()
     state |= athletePage->saveClicked();
     state |= modelPage->saveClicked();
     state |= athletePhysPage->saveClicked();
+    state |= hrvPage->saveClicked();
     state |= zonePage->saveClicked();
     state |= hrZonePage->saveClicked();
     state |= paceZonePage->saveClicked();
