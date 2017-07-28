@@ -538,3 +538,305 @@ static bool addPnnx()
 }
 
 static bool pnnxadded = addPnnx();
+
+// HRV Measures for the date of the ride or the closer available
+
+class rest_hr : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_hr)
+
+public:
+
+    rest_hr()
+    {
+        setSymbol("Rest_HR");
+        setInternalName("Rest HR");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest HR"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
+        setType(RideMetric::Average);
+        setDescription(tr("Average HR measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::HR));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_hr(*this); }
+};
+
+static bool rest_hrAdded =
+    RideMetricFactory::instance().addMetric(rest_hr());
+
+class rest_avnn : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_avnn)
+
+public:
+
+    rest_avnn()
+    {
+        setSymbol("Rest_AVNN");
+        setInternalName("Rest AVNN");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest AVNN"));
+        setMetricUnits(tr("msec"));
+        setImperialUnits(tr("msec"));
+        setType(RideMetric::Average);
+        setDescription(tr("Average of all NN intervals measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::AVNN));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_avnn(*this); }
+};
+
+static bool rest_avnnAdded =
+    RideMetricFactory::instance().addMetric(rest_avnn());
+
+
+class rest_sdnn : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_sdnn)
+
+public:
+
+    rest_sdnn()
+    {
+        setSymbol("Rest_SDNN");
+        setInternalName("Rest SDNN");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest SDNN"));
+        setMetricUnits(tr("msec"));
+        setImperialUnits(tr("msec"));
+        setType(RideMetric::StdDev);
+        setDescription(tr("Standard deviation of all NN intervals measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::SDNN));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_sdnn(*this); }
+};
+
+static bool rest_sdnnAdded =
+    RideMetricFactory::instance().addMetric(rest_sdnn());
+
+
+class rest_rmssd : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_rmssd)
+
+public:
+
+    rest_rmssd()
+    {
+        setSymbol("Rest_rMSSD");
+        setInternalName("Rest rMSSD");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest rMSSD"));
+        setMetricUnits(tr("msec"));
+        setImperialUnits(tr("msec"));
+        setType(RideMetric::MeanSquareRoot);
+        setDescription(tr("Square root of the mean of the squares of differences between adjacent NN intervals, measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::RMSSD));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_rmssd(*this); }
+};
+
+static bool rest_rmssdAdded =
+    RideMetricFactory::instance().addMetric(rest_rmssd());
+
+
+class rest_pNN50 : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_pNN50)
+
+public:
+
+    rest_pNN50()
+    {
+        setSymbol("Rest_PNN50");
+        setInternalName("Rest PNN50");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest PNN50"));
+        setMetricUnits(tr("pct"));
+        setImperialUnits(tr("pct"));
+        setType(RideMetric::Average);
+        setDescription(tr("Percentage of differences between adjacent NN intervals that are greater than 50 ms, measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::PNN50));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_pNN50(*this); }
+};
+
+static bool rest_pNN50Added =
+    RideMetricFactory::instance().addMetric(rest_pNN50());
+
+
+class rest_lf : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_lf)
+
+public:
+
+    rest_lf()
+    {
+        setSymbol("Rest_LF");
+        setInternalName("Rest LF");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest LF"));
+        setMetricUnits(tr("msec^2"));
+        setImperialUnits(tr("msec^2"));
+        setType(RideMetric::Average);
+        setDescription(tr("Low Frequency Power HRV, measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::LF));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_lf(*this); }
+};
+
+static bool rest_lfAdded =
+    RideMetricFactory::instance().addMetric(rest_lf());
+
+
+class rest_hf : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(rest_hf)
+
+public:
+
+    rest_hf()
+    {
+        setSymbol("Rest_HF");
+        setInternalName("Rest HF");
+    }
+
+    void initialize()
+    {
+        setName(tr("Rest HF"));
+        setMetricUnits(tr("msec^2"));
+        setImperialUnits(tr("msec^2"));
+        setType(RideMetric::Average);
+        setDescription(tr("High Frequency Power HRV, measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        setValue(item->getHrvMeasure(HrvMeasure::HF));
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new rest_hf(*this); }
+};
+
+static bool rest_hfAdded =
+    RideMetricFactory::instance().addMetric(rest_hf());
+
+
+class hrv_recovery_points : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(hrv_recovery_points)
+
+public:
+
+    hrv_recovery_points()
+    {
+        setSymbol("HRV_Recovery_Points");
+        setInternalName("HRV Recovery Points");
+    }
+
+    void initialize()
+    {
+        setName(tr("HRV Recovery Points"));
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setType(RideMetric::Average);
+        setDescription(tr("Natural Log transform of rMSSD, measured at rest"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
+    {
+        if (item->getHrvMeasure(HrvMeasure::RECOVERY_POINTS) > 0)
+            setValue(item->getHrvMeasure(HrvMeasure::RECOVERY_POINTS));
+        else if (item->getHrvMeasure(HrvMeasure::RMSSD) > 0)
+            setValue(1.5*item->getHrvMeasure(HrvMeasure::RMSSD) + 2);
+        else
+            setValue(0.0);
+        setCount(0);
+    }
+
+    bool isRelevantForRide(const RideItem *) const { return true; }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new hrv_recovery_points(*this); }
+};
+
+static bool hrv_recovery_points_hfAdded =
+    RideMetricFactory::instance().addMetric(hrv_recovery_points());
+

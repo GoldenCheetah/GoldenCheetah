@@ -203,6 +203,7 @@ class MainWindow : public QMainWindow
 
         // Measures View
         void downloadBodyMeasures();
+        void downloadHrvMeasures();
 
         // cloud
         void uploadCloud(QAction *);

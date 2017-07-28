@@ -710,6 +710,13 @@ RideItem::getWeight(int type)
 }
 
 double
+RideItem::getHrvMeasure(int type)
+{
+    // get HRV measure for the date of the ride
+    return context->athlete->getHrvMeasure(dateTime.date(), type);
+}
+
+double
 RideItem::getForSymbol(QString name, bool useMetricUnits)
 {
     const RideMetricFactory &factory = RideMetricFactory::instance();
