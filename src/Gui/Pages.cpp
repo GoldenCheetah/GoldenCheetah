@@ -1313,6 +1313,391 @@ RiderPhysPage::rangeSelectionChanged()
 }
 
 //
+// About me - HRV Measures
+//
+HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *measuresGrid = new QGridLayout;
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
+#ifdef Q_OS_MAX
+    setContentsMargins(10,10,10,10);
+    grid->setSpacing(5 *dpiXFactor);
+    all->setSpacing(5 *dpiXFactor);
+#endif
+
+    QLabel* seperatorText = new QLabel(tr("Time dependent HRV measurements"));
+    all->addWidget(seperatorText);
+
+    QString dateTimetext = tr("From Date - Time");
+    dateLabel = new QLabel(dateTimetext);
+    dateTimeEdit = new QDateTimeEdit;
+    dateTimeEdit->setDateTime(QDateTime::currentDateTime());
+    dateTimeEdit->setCalendarPopup(true);
+
+    QString rmssdtext = tr("rMSSD");
+    rmssdlabel = new QLabel(rmssdtext);
+    rmssd = new QDoubleSpinBox(this);
+    rmssd->setMaximum(999.9);
+    rmssd->setMinimum(0.0);
+    rmssd->setDecimals(1);
+    rmssd->setValue(0.0);
+
+    QString hrtext = tr("HR");
+    hrlabel = new QLabel(hrtext);
+    hr = new QDoubleSpinBox(this);
+    hr->setMaximum(999.9);
+    hr->setMinimum(0.0);
+    hr->setDecimals(1);
+    hr->setValue(0.0);
+
+    QString avnntext = tr("AVNN");
+    avnnlabel = new QLabel(avnntext);
+    avnn = new QDoubleSpinBox(this);
+    avnn->setMaximum(9999.9);
+    avnn->setMinimum(0.0);
+    avnn->setDecimals(1);
+    avnn->setValue(0.0);
+
+    QString sdnntext = tr("SDNN");
+    sdnnlabel = new QLabel(sdnntext);
+    sdnn = new QDoubleSpinBox(this);
+    sdnn->setMaximum(999.9);
+    sdnn->setMinimum(0.0);
+    sdnn->setDecimals(1);
+    sdnn->setValue(0.0);
+
+    QString pnn50text = tr("pNN50");
+    pnn50label = new QLabel(pnn50text);
+    pnn50 = new QDoubleSpinBox(this);
+    pnn50->setMaximum(100.0);
+    pnn50->setMinimum(0.0);
+    pnn50->setDecimals(1);
+    pnn50->setValue(0.0);
+
+    QString lftext = tr("LF");
+    lflabel = new QLabel(lftext);
+    lf = new QDoubleSpinBox(this);
+    lf->setMaximum(1.0);
+    lf->setMinimum(0.0);
+    lf->setDecimals(4);
+    lf->setValue(0.0);
+
+    QString hftext = tr("HF");
+    hflabel = new QLabel(hftext);
+    hf = new QDoubleSpinBox(this);
+    hf->setMaximum(1.0);
+    hf->setMinimum(0.0);
+    hf->setDecimals(4);
+    hf->setValue(0.0);
+
+    QString recovery_pointstext = tr("Rec.Points");
+    recovery_pointslabel = new QLabel(recovery_pointstext);
+    recovery_points = new QDoubleSpinBox(this);
+    recovery_points->setMaximum(10.0);
+    recovery_points->setMinimum(0.0);
+    recovery_points->setDecimals(1);
+    recovery_points->setValue(0.0);
+
+    measuresGrid->addWidget(dateLabel, 1, 0, alignment);
+    measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
+
+    measuresGrid->addWidget(rmssdlabel, 2, 0, alignment);
+    measuresGrid->addWidget(rmssd, 2, 1, alignment);
+
+    measuresGrid->addWidget(hrlabel, 3, 0, alignment);
+    measuresGrid->addWidget(hr, 3, 1, alignment);
+
+    measuresGrid->addWidget(avnnlabel, 4, 0, alignment);
+    measuresGrid->addWidget(avnn, 4, 1, alignment);
+
+    measuresGrid->addWidget(sdnnlabel, 5, 0, alignment);
+    measuresGrid->addWidget(sdnn, 5, 1, alignment);
+
+    measuresGrid->addWidget(pnn50label, 6, 0, alignment);
+    measuresGrid->addWidget(pnn50, 6, 1, alignment);
+
+    measuresGrid->addWidget(lflabel, 7, 0, alignment);
+    measuresGrid->addWidget(lf, 7, 1, alignment);
+
+    measuresGrid->addWidget(hflabel, 8, 0, alignment);
+    measuresGrid->addWidget(hf, 8, 1, alignment);
+
+    measuresGrid->addWidget(recovery_pointslabel, 9, 0, alignment);
+    measuresGrid->addWidget(recovery_points, 9, 1, alignment);
+
+    all->addLayout(measuresGrid);
+
+
+    // Buttons
+    updateButton = new QPushButton(tr("Update"));
+    updateButton->hide();
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
+    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+#else
+    updateButton->setText(tr("Update"));
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
+#endif
+
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2 *dpiXFactor);
+    actionButtons->addStretch();
+    actionButtons->addWidget(updateButton);
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+    all->addLayout(actionButtons);
+
+    // HRV Measures
+    hrvTree = new QTreeWidget;
+    hrvTree->headerItem()->setText(0, dateTimetext);
+    hrvTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(1, rmssdtext);
+    hrvTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(2, hrtext);
+    hrvTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(3, avnntext);
+    hrvTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(4, sdnntext);
+    hrvTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(5, pnn50text);
+    hrvTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(6, lftext);
+    hrvTree->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(7, hftext);
+    hrvTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(8, recovery_pointstext);
+    hrvTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(9, tr("Source"));
+    hrvTree->header()->setSectionResizeMode(9, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(10, tr("Original Source"));
+    hrvTree->setColumnCount(11);
+    hrvTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    hrvTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    hrvTree->setUniformRowHeights(true);
+    hrvTree->setIndentation(0);
+
+    // get body measures if the file exists
+    QFile hrvFile(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()));
+    if (hrvFile.exists()) {
+        HrvMeasureParser::unserialize(hrvFile, hrvMeasures);
+    }
+    qSort(hrvMeasures); // date order
+
+    // setup hrvTree
+    for (int i=0; i<hrvMeasures.count(); i++) {
+        QTreeWidgetItem *add = new QTreeWidgetItem(hrvTree->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+        // date & time
+        add->setText(0, hrvMeasures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
+        // weight
+        add->setText(1, QString("%1").arg(hrvMeasures[i].rmssd, 0, 'f', 1));
+        add->setText(2, QString("%1").arg(hrvMeasures[i].hr, 0, 'f', 1));
+        add->setText(3, QString("%1").arg(hrvMeasures[i].avnn, 0, 'f', 1));
+        add->setText(4, QString("%1").arg(hrvMeasures[i].sdnn, 0, 'f', 1));
+        add->setText(5, QString("%1").arg(hrvMeasures[i].pnn50));
+        add->setText(6, QString("%1").arg(hrvMeasures[i].lf, 0, 'f', 4));
+        add->setText(7, QString("%1").arg(hrvMeasures[i].hf, 0, 'f', 4));
+        add->setText(8, QString("%1").arg(hrvMeasures[i].recovery_points, 0, 'f', 1));
+        // source
+        add->setText(9, hrvMeasures[i].getSourceDescription());
+        add->setText(10, hrvMeasures[i].originalSource);
+    }
+
+    all->addWidget(hrvTree);
+
+    // set default edit values to newest hrvmeasurement (if one exists)
+    if (hrvMeasures.count() > 0) {
+        rmssd->setValue(hrvMeasures.last().rmssd);
+        hr->setValue(hrvMeasures.last().hr);
+        avnn->setValue(hrvMeasures.last().avnn);
+        sdnn->setValue(hrvMeasures.last().sdnn);
+        pnn50->setValue(hrvMeasures.last().pnn50);
+        lf->setValue(hrvMeasures.last().lf);
+        hf->setValue(hrvMeasures.last().hf);
+        recovery_points->setValue(hrvMeasures.last().recovery_points);
+    }
+
+    // edit connect
+    connect(dateTimeEdit, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(rangeEdited()));
+    connect(rmssd, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(hr, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(avnn, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(sdnn, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(pnn50, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(lf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(hf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(recovery_points, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+
+    // button connect
+    connect(updateButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+
+    // list selection connect
+    connect(hrvTree, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+
+    // save initial values for things we care about
+    b4.fingerprint = 0;
+    foreach (HrvMeasure hrv, hrvMeasures) {
+        b4.fingerprint += hrv.getFingerprint();
+    }
+}
+
+qint32
+HrvPage::saveClicked()
+{
+    qint32 state=0;
+
+    // HRV Measures changed ?
+    unsigned long fingerprint = 0;
+    foreach (HrvMeasure hrv, hrvMeasures) {
+        fingerprint += hrv.getFingerprint();
+    }
+    if (fingerprint != b4.fingerprint) {
+        // date order
+        qSort(hrvMeasures);
+        // now save data away if we actually got something !
+        HrvMeasureParser::serialize(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()), hrvMeasures);
+        // store in athlete
+        context->athlete->setHrvMeasures(hrvMeasures);
+        state += CONFIG_ATHLETE;
+    }
+
+    return state;
+}
+
+void
+HrvPage::addOReditClicked()
+{
+    int index;
+    QTreeWidgetItem *add;
+    HrvMeasure addHrv;
+    QString dateTimeTxt = dateTimeEdit->dateTime().toString(tr("MMM d, yyyy - hh:mm:ss"));
+
+    // if an entry for this date & time already exists, edit item otherwise add new
+    QList<QTreeWidgetItem*> matches = hrvTree->findItems(dateTimeTxt, Qt::MatchExactly, 0);
+    if (matches.count() > 0) {
+        // edit existing
+        add = matches[0];
+        index = hrvTree->invisibleRootItem()->indexOfChild(matches[0]);
+        hrvMeasures.removeAt(index);
+    } else {
+        // add new
+        index = hrvMeasures.count();
+        add = new QTreeWidgetItem;
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+        hrvTree->invisibleRootItem()->insertChild(index, add);
+    }
+
+    addHrv.when = dateTimeEdit->dateTime().toUTC();
+    addHrv.rmssd = rmssd->value();
+    addHrv.hr = hr->value();
+    addHrv.avnn = avnn->value();
+    addHrv.sdnn = sdnn->value();
+    addHrv.pnn50 = pnn50->value();
+    addHrv.lf = lf->value();
+    addHrv.hf = hf->value();
+    addHrv.recovery_points = recovery_points->value();
+    addHrv.source = HrvMeasure::Manual;
+    addHrv.originalSource = "";
+    hrvMeasures.insert(index, addHrv);
+
+    // date and time
+    add->setText(0, dateTimeTxt);
+    // Weight
+    add->setText(1, QString("%1").arg(rmssd->value()));
+    add->setText(2, QString("%1").arg(hr->value()));
+    add->setText(3, QString("%1").arg(avnn->value()));
+    add->setText(4, QString("%1").arg(sdnn->value()));
+    add->setText(5, QString("%1").arg(pnn50->value()));
+    add->setText(6, QString("%1").arg(lf->value()));
+    add->setText(7, QString("%1").arg(hf->value()));
+    add->setText(8, QString("%1").arg(recovery_points->value()));
+    add->setText(9, QString("%1").arg(tr("Manual entry")));
+    add->setText(10, ""); // Original Source
+
+    updateButton->hide();
+}
+
+void
+HrvPage::deleteClicked()
+{
+    if (hrvTree->currentItem()) {
+        int index = hrvTree->invisibleRootItem()->indexOfChild(hrvTree->currentItem());
+        delete hrvTree->invisibleRootItem()->takeChild(index);
+        hrvMeasures.removeAt(index);
+    }
+}
+
+void
+HrvPage::rangeEdited()
+{
+    if (hrvTree->currentItem()) {
+        int index = hrvTree->invisibleRootItem()->indexOfChild(hrvTree->currentItem());
+
+        QDateTime dateTime = dateTimeEdit->dateTime();
+        QDateTime odateTime = hrvMeasures[index].when;
+
+        double nrmssd = rmssd->value();
+        double ormssd = hrvMeasures[index].rmssd;
+        double nhr = hr->value();
+        double ohr = hrvMeasures[index].hr;
+        double navnn = avnn->value();
+        double oavnn = hrvMeasures[index].avnn;
+        double nsdnn = sdnn->value();
+        double osdnn = hrvMeasures[index].sdnn;
+        double npnn50 = pnn50->value();
+        double opnn50 = hrvMeasures[index].pnn50;
+        double nlf = lf->value();
+        double olf = hrvMeasures[index].lf;
+        double nhf = hf->value();
+        double ohf = hrvMeasures[index].hf;
+        double nrecovery_points = recovery_points->value();
+        double orecovery_points = hrvMeasures[index].recovery_points;
+
+        if (dateTime == odateTime && (nrmssd != ormssd ||
+                                      nhr != ohr ||
+                                      navnn != oavnn ||
+                                      sdnn != sdnn ||
+                                      npnn50 != opnn50 ||
+                                      nlf != olf ||
+                                      nhf != ohf ||
+                                      nrecovery_points != orecovery_points))
+            updateButton->show();
+        else
+            updateButton->hide();
+    }
+}
+
+void
+HrvPage::rangeSelectionChanged()
+{
+    // fill with current details
+    if (hrvTree->currentItem()) {
+
+        int index = hrvTree->invisibleRootItem()->indexOfChild(hrvTree->currentItem());
+        HrvMeasure current = hrvMeasures[index];
+
+        dateTimeEdit->setDateTime(current.when);
+        rmssd->setValue(current.rmssd);
+        hr->setValue(current.hr);
+        avnn->setValue(current.avnn);
+        sdnn->setValue(current.sdnn);
+        pnn50->setValue(current.pnn50);
+        lf->setValue(current.lf);
+        hf->setValue(current.hf);
+        recovery_points->setValue(current.recovery_points);
+
+        updateButton->hide();
+    }
+}
+
+//
 // Realtime devices page
 //
 DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), context(context)

@@ -52,6 +52,7 @@
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "BodyMeasures.h"
+#include "HrvMeasures.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -183,6 +184,55 @@ class RiderPhysPage : public QWidget
 
     struct {
         double defaultWeight;
+        unsigned long fingerprint;
+    } b4;
+
+    private slots:
+};
+
+class HrvPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        HrvPage(QWidget *parent, Context *context);
+        qint32 saveClicked();
+
+    public slots:
+        void addOReditClicked();
+        void deleteClicked();
+        void rangeEdited();
+        void rangeSelectionChanged();
+
+    private:
+        Context *context;
+        QList<HrvMeasure> hrvMeasures;
+
+        QLabel *dateLabel;
+        QDateTimeEdit *dateTimeEdit;
+        QLabel *rmssdlabel;
+        QDoubleSpinBox *rmssd;
+        QLabel *hrlabel;
+        QDoubleSpinBox *hr;
+        QLabel *avnnlabel;
+        QDoubleSpinBox *avnn;
+        QLabel *sdnnlabel;
+        QDoubleSpinBox *sdnn;
+        QLabel *pnn50label;
+        QDoubleSpinBox *pnn50;
+        QLabel *lflabel;
+        QDoubleSpinBox *lf;
+        QLabel *hflabel;
+        QDoubleSpinBox *hf;
+        QLabel *recovery_pointslabel;
+        QDoubleSpinBox *recovery_points;
+
+        QTreeWidget *hrvTree;
+        QPushButton *addButton, *updateButton, *deleteButton;
+
+    struct {
         unsigned long fingerprint;
     } b4;
 
