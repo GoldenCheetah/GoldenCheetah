@@ -546,6 +546,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         widget = new QDoubleSpinBox(this);
         //widget->setFixedHeight(18);
         ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
+        ((QDoubleSpinBox*)widget)->setMinimum(-999999.99);
         ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
         if (meta->sp.isMetric(field.name)) {
 
