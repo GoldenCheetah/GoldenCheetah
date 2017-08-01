@@ -185,6 +185,7 @@
 #define GC_RR_MIN                       "<global-general>dataprocess/filterhrv/rr_min"                 //
 #define GC_RR_FILT                      "<global-general>dataprocess/filterhrv/rr_filt"                 //
 #define GC_RR_WINDOW                    "<global-general>dataprocess/filterhrv/rr_window"
+#define GC_RR_SET_REST_HRV              "<global-general>dataprocess/filterhrv/rr_set_rest_hrv"
 
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
