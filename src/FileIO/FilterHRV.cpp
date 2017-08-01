@@ -21,6 +21,8 @@
 #include "DataProcessor.h"
 #include "Context.h"
 #include "HelpWhatsThis.h"
+#include "HrvMeasuresDownload.h"
+#include "HrvMeasures.h"
 
 void FilterHrv(XDataSeries *rr, double rr_min, double rr_max, double filt, int hwin)
 {
@@ -136,6 +138,8 @@ protected:
     QLabel *hrvWindowLabel;
     QDoubleSpinBox *hrvWindow;
 
+    QCheckBox *setRestHrv;
+
 public:
     FilterHrvOutliersConfig(QWidget *parent) : DataProcessorConfig(parent) {
         HelpWhatsThis *help = new HelpWhatsThis(parent);
@@ -175,6 +179,8 @@ public:
         hrvWindow->setSingleStep(1);
         hrvWindow->setDecimals(0);
 
+        setRestHrv = new QCheckBox(tr("Set Rest Hrv"));
+
         layout->addWidget(hrvMaxLabel);
         layout->addWidget(hrvMax);
         layout->addWidget(hrvMinLabel);
@@ -183,6 +189,7 @@ public:
         layout->addWidget(hrvFilt);
         layout->addWidget(hrvWindowLabel);
         layout->addWidget(hrvWindow);
+        layout->addWidget(setRestHrv);
 
         layout->addStretch();
     }
@@ -191,6 +198,7 @@ public:
                           "  - \"R-R min and maximum\" exclude samples outside (flag -1). Also excluded when filtering range.\n"
                           "  - \"Filter range\" of the average within a window (flag 0)\n"
                           "  - \"Filter window size\" distance on either side of the current interval\n"
+                          "  - \"Set Rest HRV\" if checked the computed HRV metrics are set as Rest HRV Measures\n"
                           ""
                           )));
     }
@@ -200,16 +208,20 @@ public:
         double FiltVal = appsettings->value(NULL, GC_RR_FILT, "0.20").toDouble();
         double Window = appsettings->value(NULL, GC_RR_WINDOW, "20").toDouble();
 
+        bool SetRestHrv = appsettings->value(NULL, GC_RR_SET_REST_HRV, Qt::Checked).toBool();
+
         hrvMax->setValue(MaxVal);
         hrvMin->setValue(MinVal);
         hrvFilt->setValue(FiltVal);
         hrvWindow->setValue(Window);
+        setRestHrv->setCheckState(SetRestHrv ? Qt::Checked : Qt::Unchecked);
     }
     void saveConfig() {
         appsettings->setValue(GC_RR_MAX, hrvMax->value());
         appsettings->setValue(GC_RR_MIN, hrvMin->value());
         appsettings->setValue(GC_RR_FILT, hrvFilt->value());
         appsettings->setValue(GC_RR_WINDOW, hrvWindow->value());
+        appsettings->setValue(GC_RR_SET_REST_HRV, setRestHrv->checkState());
     }
 };
 
@@ -248,21 +260,44 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         double rrMin;
         double rrFilt;
         int rrWindow;
+        bool setRestHrv;
 
         if (config == NULL) { // being called automatically
             rrMax = appsettings->value(NULL, GC_RR_MAX, "2000.0").toDouble();
             rrMin = appsettings->value(NULL, GC_RR_MIN, "270.0").toDouble();
             rrFilt = appsettings->value(NULL, GC_RR_FILT, "0.2").toDouble();
             rrWindow = appsettings->value(NULL, GC_RR_WINDOW, "20").toInt();
+            setRestHrv = appsettings->value(NULL, GC_RR_SET_REST_HRV, Qt::Unchecked).toBool();
         }
         else { // being called manually
             rrMax = ((FilterHrvOutliersConfig*)(config))->hrvMax->value();
             rrMin = ((FilterHrvOutliersConfig*)(config))->hrvMin->value();
             rrFilt = ((FilterHrvOutliersConfig*)(config))->hrvFilt->value();
             rrWindow = (int) ((FilterHrvOutliersConfig*)(config))->hrvWindow->value();
+            setRestHrv = (bool) ((FilterHrvOutliersConfig*)(config))->setRestHrv->checkState();
         }
         FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
         ride->context->rideItem()->refresh();
+
+        // Set HRV Measures according to user request
+        if (setRestHrv) {
+            RideItem *rideItem = ride->context->rideItem();
+
+            HrvMeasure hrvMeasure;
+            hrvMeasure.when = rideItem->dateTime;
+            hrvMeasure.hr = rideItem->getForSymbol("average_hr");
+            hrvMeasure.avnn = rideItem->getForSymbol("AVNN");
+            hrvMeasure.sdnn = rideItem->getForSymbol("SDNN");
+            hrvMeasure.rmssd = rideItem->getForSymbol("rMSSD");
+            hrvMeasure.pnn50 = rideItem->getForSymbol("pNN50");
+            hrvMeasure.recovery_points = 1.5 * log(hrvMeasure.rmssd) + 2;
+
+            QList<HrvMeasure> hrvMeasures;
+            hrvMeasures.append(hrvMeasure);
+
+            HrvMeasuresDownload::updateMeasures(ride->context, hrvMeasures);
+        }
+
         return true;
     }
     else {

@@ -192,43 +192,7 @@ HrvMeasuresDownload::download() {
            }
        }
 
-       // we discard only if we have new data loaded - otherwise keep what is there
-       if (discardExistingMeasures->isChecked()) {
-           // now the new measures do not contain any "ts" of the current data any more
-           current.clear();
-       };
-
-       // if exists, merge current data with new data - new data has preferences
-       // no merging of weight data which has the same time stamp - new wins
-       if (current.count() > 0) {
-           // remove entry from current list if a new entry with same timestamp exists
-           QMutableListIterator<HrvMeasure> i(current);
-           HrvMeasure c;
-           while (i.hasNext()) {
-               c = i.next();
-               foreach(HrvMeasure m, hrvMeasures) {
-                   if (m.when == c.when) {
-                       i.remove();
-                   }
-               }
-           }
-           // combine the result (without duplicates)
-           hrvMeasures.append(current);
-       }
-
-       // update measures in cache and on file store
-       context->athlete->rideCache->cancel();
-
-       // store in athlete
-       context->athlete->setHrvMeasures(hrvMeasures);
-
-       // now save data away if we actually got something !
-       // doing it here means we don't overwrite previous responses
-       // when we fail to get any data (e.g. errors / network problems)
-       HrvMeasureParser::serialize(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()), context->athlete->hrvMeasures());
-
-       // do a refresh, it will check if needed
-       context->athlete->rideCache->refresh();
+       updateMeasures(context, hrvMeasures, discardExistingMeasures->isChecked());
 
    } else {
        // handle error document in err String
@@ -288,4 +252,50 @@ HrvMeasuresDownload::downloadProgress(int current) {
 void
 HrvMeasuresDownload::downloadProgressEnd(int final) {
     progressBar->setValue(final);
+}
+
+void
+HrvMeasuresDownload::updateMeasures(Context *context,
+                                    QList<HrvMeasure>&hrvMeasures,
+                                    bool discardExisting) {
+
+   QList<HrvMeasure> current = context->athlete->hrvMeasures();
+
+   // we discard only if we have new data loaded - otherwise keep what is there
+   if (discardExisting) {
+       // now the new measures do not contain any "ts" of the current data any more
+       current.clear();
+   };
+
+   // if exists, merge current data with new data - new data has preferences
+   // no merging of HRV data which has the same time stamp - new wins
+   if (current.count() > 0) {
+       // remove entry from current list if a new entry with same timestamp exists
+       QMutableListIterator<HrvMeasure> i(current);
+       HrvMeasure c;
+       while (i.hasNext()) {
+           c = i.next();
+           foreach(HrvMeasure m, hrvMeasures) {
+               if (m.when == c.when) {
+                   i.remove();
+               }
+           }
+       }
+       // combine the result (without duplicates)
+       hrvMeasures.append(current);
+   }
+
+   // update measures in cache and on file store
+   context->athlete->rideCache->cancel();
+
+   // store in athlete
+   context->athlete->setHrvMeasures(hrvMeasures);
+
+   // now save data away if we actually got something !
+   // doing it here means we don't overwrite previous responses
+   // when we fail to get any data (e.g. errors / network problems)
+   HrvMeasureParser::serialize(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()), context->athlete->hrvMeasures());
+
+   // do a refresh, it will check if needed
+   context->athlete->rideCache->refresh();
 }

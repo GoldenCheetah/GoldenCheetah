@@ -40,6 +40,9 @@ class HrvMeasuresDownload : public QDialog
 public:
     HrvMeasuresDownload(Context *context);
     ~HrvMeasuresDownload();
+    static void updateMeasures(Context *context,
+                               QList<HrvMeasure>&hrvMeasures,
+                               bool discardExisting=false);
 
 private:
 
