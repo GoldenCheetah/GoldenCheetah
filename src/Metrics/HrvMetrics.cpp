@@ -532,7 +532,7 @@ public:
 
 static bool addPnnx()
 {
-    for (int i=1; i<10; i++)
+    for (int i=1; i<=10; i++)
         { RideMetricFactory::instance().addMetric(pnnx(i*5));}
     return true;
 }
@@ -824,7 +824,7 @@ public:
         if (item->getHrvMeasure(HrvMeasure::RECOVERY_POINTS) > 0)
             setValue(item->getHrvMeasure(HrvMeasure::RECOVERY_POINTS));
         else if (item->getHrvMeasure(HrvMeasure::RMSSD) > 0)
-            setValue(1.5*item->getHrvMeasure(HrvMeasure::RMSSD) + 2);
+            setValue(1.5 * log(item->getHrvMeasure(HrvMeasure::RMSSD)) + 2);
         else
             setValue(0.0);
         setCount(0);
