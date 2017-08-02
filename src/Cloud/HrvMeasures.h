@@ -44,8 +44,8 @@ public:
 
     double  hr,             // Average heart rate
             avnn,           // Average of all NN intervals
-			sdnn,           // Standard Deviation of all NN intervals
-			rmssd,          // Square root of the mean of the squares of differences between adjacent NN intervals
+            sdnn,           // Standard Deviation of all NN intervals
+            rmssd,          // Square root of the mean of the squares of differences between adjacent NN intervals
             pnn50,          // Percentage of differences between adjacent NN intervals that are greater than 50 ms
             lf,             // Power in Low Frequency range
             hf,             // Power in High Frequency range

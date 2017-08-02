@@ -486,6 +486,7 @@ RideItem::checkStale()
             // range (e.g. set CP from today) but none of the other
             // ranges change then there is no need to recompute the
             // metrics for older rides !
+            // HRV fingerprint added to detect changes on HRV Measures
 
             // get the new zone configuration fingerprint that applies for the ride date
             unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones(isRun)->getFingerprint(dateTime.date()))
@@ -493,6 +494,7 @@ RideItem::checkStale()
                         + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones(isRun)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->routes->getFingerprint())
+                        + static_cast<unsigned long>(getHrvFingerprint())
                         + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
             if (fingerprint != rfingerprint) {
@@ -638,6 +640,7 @@ RideItem::refresh()
                     + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones(isRun)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->routes->getFingerprint()) +
+                    + static_cast<unsigned long>(getHrvFingerprint())
                     + appsettings->cvalue(context->athlete->cyclist, GC_DISCOVERY, 57).toInt(); // 57 does not include search for PEAKS
 
         dbversion = DBSchemaVersion;
@@ -714,6 +717,15 @@ RideItem::getHrvMeasure(int type)
 {
     // get HRV measure for the date of the ride
     return context->athlete->getHrvMeasure(dateTime.date(), type);
+}
+
+unsigned short
+RideItem::getHrvFingerprint()
+{
+    // get HRV measure for the date of the ride
+    HrvMeasure hrvMeasure;
+    context->athlete->getHrvMeasure(dateTime.date(), hrvMeasure);
+    return hrvMeasure.getFingerprint();
 }
 
 double
