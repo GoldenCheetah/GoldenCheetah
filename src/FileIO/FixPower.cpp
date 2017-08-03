@@ -33,9 +33,9 @@ class FixPowerConfig : public DataProcessorConfig
     friend class ::FixPower;
     protected:
         QHBoxLayout *layout;
-        QLabel *paLabel;
-        QLabel *percentLabel;
-        QLineEdit *pa;
+        QLabel *relPaLabel, *absPaLabel;
+        QLabel *percentLabel,*wattLabel;
+        QLineEdit *paRel, *paAbs;
 
     public:
         FixPowerConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -44,20 +44,27 @@ class FixPowerConfig : public DataProcessorConfig
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_AdjustPowerValues));
 
             layout = new QHBoxLayout(this);
-
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
-            paLabel = new QLabel(tr("Power Adjustment"));
-
-            pa = new QLineEdit();
-
+            relPaLabel = new QLabel(tr("Percent Adjustment"));
+            paRel = new QLineEdit();
             percentLabel = new QLabel(tr("%"));
 
-            layout->addWidget(paLabel);
-            layout->addWidget(pa);
-            layout->addStretch();
+            absPaLabel = new QLabel(tr("Fix Adjustment"));
+            paAbs = new QLineEdit();
+            wattLabel = new QLabel(tr("watt"));
+
+            layout->addWidget(relPaLabel);
+            layout->addWidget(paRel);
             layout->addWidget(percentLabel);
+            layout->addStretch();
+
+            layout->addWidget(absPaLabel);
+            layout->addWidget(paAbs);
+            layout->addWidget(wattLabel);
+
+
         }
 
         //~FixPowerConfig() {} // deliberately not declared since Qt will delete
@@ -66,18 +73,25 @@ class FixPowerConfig : public DataProcessorConfig
         QString explain() {
             return(QString(tr("Adjusting power values allows you to "
                            "uplift or degrade the power values by a "
-                           "percentage. It takes a single parameter:\n\n"
-                           "Power Adjustment - this defines percentage "
-                           " to modify values by. Negative values are supported."
+                           "percentage and/or a fix value. It takes two parameters:\n\n"
+                           "Percent Adjustment - this defines percentage "
+                           " to modify values by. Negative values are supported.\n\n"
+                           "Fix Adjustment - this defines an fix amount "
+                           " to modify values by. Negative values are supported.\n\n"
+                           "If both parameters are given, first the relative adjustment "
+                           "takes place, then the fix value adjustment is applied on the result."
                            )));
         }
 
         void readConfig() {
-            pa->setText(appsettings->value(NULL, GC_DPPA, "0").toString());
+            paRel->setText(appsettings->value(NULL, GC_DPPA, "0").toString());
+            paAbs->setText(appsettings->value(NULL, GC_DPPA_ABS, "0").toString());
         }
 
         void saveConfig() {
-            appsettings->setValue(GC_DPPA, pa->text());
+            appsettings->setValue(GC_DPPA, paRel->text());
+            appsettings->setValue(GC_DPPA_ABS, paAbs->text());
+
         }
 };
 
@@ -115,30 +129,43 @@ FixPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
     Q_UNUSED(op)
 
     // Lets do it then!
-    QString tp;
+    QString tpRel, tpAbs;
     double percentageAdjust = 0;
+    double absoluteAdjust = 0;
 
     if (config == NULL) { // being called automatically
-        tp = appsettings->value(NULL, GC_DPPA, "0").toString();
+        tpRel = appsettings->value(NULL, GC_DPPA, "0").toString();
+        tpAbs = appsettings->value(NULL, GC_DPPA_ABS, "0").toString();
     } else { // being called manually
-        tp = ((FixPowerConfig*)(config))->pa->text();
+        tpRel = ((FixPowerConfig*)(config))->paRel->text();
+        tpAbs = ((FixPowerConfig*)(config))->paAbs->text();
+
     }
 
-    percentageAdjust = tp.toDouble();
+    percentageAdjust = tpRel.toDouble();
+    absoluteAdjust = tpAbs.toDouble();
 
     // does this ride have power?
     if (ride->areDataPresent()->watts == false) return false;
 
     // no adjustment required
-    if (percentageAdjust == 0) return false;
+    if ((percentageAdjust == 0) && (absoluteAdjust == 0)) return false;
 
     // apply the change
     ride->command->startLUW("Adjust Power");
     for (int i=0; i<ride->dataPoints().count(); i++) {
         RideFilePoint *point = ride->dataPoints()[i];
-
+        double newWatts = point->watts;
+        // only add/adjust if we have a value > 0
         if (point->watts != 0 && percentageAdjust != 0) {
-            ride->command->setPointValue(i, RideFile::watts, point->watts + (point->watts * (percentageAdjust / 100)));
+            newWatts += (newWatts * (percentageAdjust / 100));
+        }
+        // only add/adjust if we have a value > 0
+        if (point->watts != 0 && absoluteAdjust != 0) {
+            newWatts += absoluteAdjust;
+        }
+        if (newWatts != point->watts) {
+           ride->command->setPointValue(i, RideFile::watts, newWatts);
         }
 
     }
@@ -146,6 +173,9 @@ FixPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
 
     double currentta = ride->getTag("Power Adjust", "0.0").toDouble();
     ride->setTag("Power Adjust", QString("%1").arg(currentta + percentageAdjust));
+    double currenttaAbs = ride->getTag("Power Adjust fix", "0.0").toDouble();
+    ride->setTag("Power Adjust fix", QString("%1").arg(currenttaAbs + absoluteAdjust));
+
 
     return true;
 }
