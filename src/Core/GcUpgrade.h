@@ -86,6 +86,8 @@
 // 3960 - V3.5 DEVELOPMENT RENAME AND DEVBUILD 1703
 // 3961 - V3.5 DEVELOPMENT CLOUD REFACTOR PRIOR TO 1704
 // 3962 - V3.5 DEVELOPMENT 1705
+// 3963 - V3.5 DEVELOPMENT 1708
+
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -95,14 +97,14 @@
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
-#define VERSION35_BUILD   3962 // development release
+#define VERSION35_BUILD   3963 // development release
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3962
-#define VERSION_STRING "DEV-V3.5 1705"
+#define VERSION_LATEST 3963
+#define VERSION_STRING "DEV-V3.5 1708"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
