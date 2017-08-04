@@ -1607,7 +1607,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (lapAudioEnabled && lapAudioThisLap) {
 
                     double currentposition = displayWorkoutDistance*1000;
-                    double lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
+
+                    double lapmarker = -1;
+                    if (ergFile)
+                        lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
 
                     // alert when 3 seconds from end of ERG lap, or 20 meters from end of CRS lap
                     if ((status&RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) ||
