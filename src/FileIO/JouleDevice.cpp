@@ -296,7 +296,7 @@ JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
                 data_version = qByteArray2Int(response.payload.right(2));
 
             QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
-            emit updateStatus(tr("Version")+version);
+            emit updateStatus(tr("Version ")+version);
             return true;
         }
     }
