@@ -318,8 +318,11 @@ struct FitFileReaderState
     QString getManuProd(int manu, int prod) {
         if (manu == 1) {
             // Garmin
+            if (prod == -1)
+                return "Garmin";
+
             // Product IDs can be found in c/fit_example.h in the FIT SDK.
-            // Multiple product IDs refer to different regions e.g. China, Japan etc.
+            // Multiple product IDs refer to different regions e.g. China, Japan etc. 
             switch (prod) {
                 case 473: case 474: case 475: case 494: return "Garmin FR301";
                 case 717: case 987: return "Garmin FR405";
@@ -369,16 +372,21 @@ struct FitFileReaderState
             }
         } else if (manu == 6 ) {
             // SRM
+            if (prod == -1)
+                return "SRM";
+
             // powercontrol now uses FIT files from PC8
             switch (prod) {
-
-            case 6: return "SRM PC6";
-            case 7: return "SRM PC7";
-            case 8: return "SRM PC8";
-            default: return "SRM Powercontrol";
+                case 6: return "SRM PC6";
+                case 7: return "SRM PC7";
+                case 8: return "SRM PC8";
+                default: return "SRM Powercontrol";
             }
         } else if (manu == 9 ) {
             // Powertap
+            if (prod == -1)
+                return "Powertap";
+
             switch (prod) {
                 case 14: return "Joule 2.0";
                 case 18: return "Joule";
@@ -390,17 +398,26 @@ struct FitFileReaderState
             }
         } else if (manu == 13 ) {
             // dynastream_oem
+            if (prod == -1)
+                return "Dynastream";
+
             switch (prod) {
                 default: return QString("Dynastream %1").arg(prod);
             }
         } else if (manu == 29 ) {
             // saxonar
+            if (prod == -1)
+                return "Power2max";
+
             switch (prod) {
                 case 1031: return "Power2max S";
                 default: return QString("Power2max %1").arg(prod);
             }
         } else if (manu == 32) {
             // wahoo
+            if (prod == -1)
+                return "Wahoo";
+
             switch (prod) {
                 case 0: return "Wahoo fitness";
                 case 28: return "Wahoo ELEMNT";
@@ -408,12 +425,18 @@ struct FitFileReaderState
                 default: return QString("Wahoo fitness %1").arg(prod);
             }
         } else if (manu == 38) {
-            // o_synce
+             // o_synce
+            if (prod == -1)
+                return "o_synce";
+
             switch (prod) {
                 case 1: return "o_synce navi2coach";
                 default: return QString("o_synce %1").arg(prod);
             }
         } else if (manu == 48) {
+            if (prod == -1)
+                return "Pioneer";
+
             // Pioneer
             switch (prod) {
                 case 2: return "Pioneer SGX-CA500";
@@ -430,6 +453,9 @@ struct FitFileReaderState
             return "Stryd";
         } else if (manu == 98) {
             // BSX
+            if (prod == -1)
+                return "BSX";
+
             switch(prod) {
                   case 2: return "BSX Insight 2";
                   default: return QString("BSX %1").arg(prod);
@@ -900,7 +926,7 @@ struct FitFileReaderState
         int i = 0;
 
         int index=-1;
-        int manu = -1, prod = -1, version = -1, type = -1;
+        int manu = -1, prod = -1, version = -1, type = -1, serial = -1;
         fit_string_value name;
 
         QString deviceInfo;
@@ -908,7 +934,7 @@ struct FitFileReaderState
         foreach(const FitField &field, def.fields) {
             FitValue value = values[i++];
 
-            //qDebug() << field.num << value;
+            //qDebug() << field.num << field.type << value.v;
 
             switch (field.num) {
                 case 0:   // device index
@@ -921,6 +947,9 @@ struct FitFileReaderState
                 case 2:   // manufacturer
                      manu = value.v;
                      break;
+                case 3:   // serial number (can be ANT id)
+                     serial = value.v;
+                     break;
                 case 4:   // product
                      prod = value.v;
                      break;
@@ -931,9 +960,8 @@ struct FitFileReaderState
                      name = value.s;
                  break;
 
-                // all oher fields are ignored at present
+                // all other fields are ignored at present
                 case 253: //timestamp
-                case 3:   // serial number
                 case 10:  // battery voltage
                 case 6:   // hardware version
                 case 11:  // battery status
@@ -951,12 +979,14 @@ struct FitFileReaderState
 
         //deviceInfo += QString("Device %1 ").arg(index);
         deviceInfo += QString("%1 ").arg(getDeviceType(type));
-        if (manu>-1 && prod>-1)
+        if (manu>-1)
             deviceInfo += getManuProd(manu, prod);
         if (name.length()>0)
             deviceInfo += QString(" %1").arg(name.c_str());
         if (version>0)
             deviceInfo += QString(" (v%1)").arg(version/100.0);
+        if (serial>0 && serial < 100000)
+            deviceInfo += QString(" ID:%1").arg(serial);
 
         // What is 7 and 0 ?
         // 3 for Moxy ?
