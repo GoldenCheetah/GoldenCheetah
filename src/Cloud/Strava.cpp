@@ -657,7 +657,9 @@ Strava::prepareResponse(QByteArray* data)
 
                 foreach (QJsonValue value, laps) {
                     QJsonObject lap = value.toObject();
-                    ride->addInterval(RideFileInterval::USER, lap["start_index"].toDouble(), lap["end_index"].toDouble(), lap["name"].toString());
+                    double start = ride->getPoint(lap["start_index"].toInt(), RideFile::secs).toDouble();
+                    double end = start + lap["elapsed_time"].toDouble();
+                    ride->addInterval(RideFileInterval::USER, start, end, lap["name"].toString());
                 }
             }
         }
