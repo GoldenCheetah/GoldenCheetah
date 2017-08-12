@@ -465,7 +465,7 @@ RideImportWizard::process()
                 tableWidget->item(i,5)->setText(tr("Queued"));
 
             } else {
-                tableWidget->item(i,5)->setText(tr("Error - Unknown file type"));
+                tableWidget->item(i,5)->setText(tr("Error - Unknown file type") + ": " + suffix);
             }
         }
         progressBar->setValue(progressBar->value()+1);
