@@ -815,6 +815,7 @@ public:
         setName(tr("HRV Recovery Points"));
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
+        setPrecision(1);
         setType(RideMetric::Average);
         setDescription(tr("Natural Log transform of rMSSD, measured at rest"));
     }
