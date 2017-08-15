@@ -212,9 +212,9 @@ bool
 RideFile::isRun() const
 {
     // for now we just look at Sport and if there are any
-    // running specific data series in the data
+    // running specific data series in the data when Sport is not set
     return (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
-           (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact);
+           (getTag("Sport","") == "" && (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact));
 }
 
 bool
