@@ -427,7 +427,7 @@ class BikeScore : public RideMetric {
         setValue(score);
     }
 
-    bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
+    bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new BikeScore(*this); }
