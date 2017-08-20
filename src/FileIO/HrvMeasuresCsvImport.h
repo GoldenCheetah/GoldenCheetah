@@ -45,7 +45,6 @@ class HrvMeasuresCsvImport : public QObject {
 
     private:
         Context *context;
-        QStringList allowedHeaders;
 
 };
 
