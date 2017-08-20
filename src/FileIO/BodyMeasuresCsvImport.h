@@ -52,7 +52,7 @@ class CsvString : public QString
     public:
     CsvString(QString other) : QString(other) {}
 
-    // we just reimplement split, to process "," in a string
+    // we just reimplement split, to process "," and ";" in a string
     QStringList split() {
 
     enum State {Normal, Quote} state = Normal;
@@ -64,7 +64,7 @@ class CsvString : public QString
 
         if (state == Normal) { // Normal state
 
-            if (current == ',') {
+            if (current == ',' || current == ';') {
                 // Save field
                 returning.append(value);
                 value.clear();
