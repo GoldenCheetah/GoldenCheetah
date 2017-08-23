@@ -756,6 +756,17 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
+    
+    //
+    // Model: rolling bests week count
+    //
+    modelInputWeekCntLabel = new QLabel(tr("Model Input Data Range (weeks)"));
+    modelInputWeekCnt = new QSpinBox();
+    modelInputWeekCnt->setMinimum(1);
+    modelInputWeekCnt->setMaximum(24);
+    QVariant curModelInputWeekVal = appsettings->cvalue(context->athlete->cyclist, GC_MODEL_INPUT_WEEKS);
+    if (curModelInputWeekVal.isNull() || curModelInputWeekVal.toInt() == 0) curModelInputWeekVal = 4;
+    modelInputWeekCnt->setValue(curModelInputWeekVal.toInt());
 
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
@@ -767,6 +778,9 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
     grid->addWidget(perfManLTSLabel, 11, 0, alignment);
     grid->addWidget(perfManLTSavg, 11, 1, alignment);
     grid->addWidget(showSBToday, 12, 1, alignment);
+    
+    grid->addWidget(modelInputWeekCntLabel, 13, 0, alignment);
+    grid->addWidget(modelInputWeekCnt, 13, 1, alignment);
 
     all->addLayout(grid);
     all->addStretch();
@@ -778,6 +792,7 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
     // care about tracking as it is used by metrics
     b4.lts = perfManLTSVal.toInt();
     b4.sts = perfManSTSVal.toInt();
+    b4.modelInputWeekCnt = curModelInputWeekVal.toInt();
 }
 
 qint32
@@ -790,6 +805,9 @@ AboutModelPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+    
+    // Model: rolling bests week count
+    appsettings->setCValue(context->athlete->cyclist, GC_MODEL_INPUT_WEEKS, modelInputWeekCnt->value());
 
     qint32 state=0;
 
@@ -797,6 +815,9 @@ AboutModelPage::saveClicked()
     if(b4.lts != perfManLTSavg->text().toInt() || b4.sts != perfManSTSavg->text().toInt())
         state += CONFIG_PMC;
 
+    if (b4.modelInputWeekCnt != modelInputWeekCnt->value())
+        state += CONFIG_ZONES;
+    
     return state;
 }
 
