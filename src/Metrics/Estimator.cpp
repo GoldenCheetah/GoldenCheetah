@@ -18,6 +18,7 @@
 
 #include "Estimator.h"
 
+#include "Settings.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFileCache.h"
@@ -168,9 +169,11 @@ Estimator::run()
 
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
-    // bests data from the previous 6 weeks
-    RollingBests bests(6);
-    RollingBests bestsWPK(6);
+    // bests data from the previous n weeks
+    QVariant curModelInputWeekVal = appsettings->cvalue(context->athlete->cyclist, GC_MODEL_INPUT_WEEKS);
+    if (curModelInputWeekVal.isNull() || curModelInputWeekVal.toInt() == 0) curModelInputWeekVal = 6;
+    RollingBests bests(curModelInputWeekVal.toInt());
+    RollingBests bestsWPK(curModelInputWeekVal.toInt());
 
     // clear any previous calculations
     QList<PDEstimate> est;
