@@ -16,12 +16,98 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <QMutexLocker>
+
 #include "PDModel.h"
 
+PDModelDescriptor::PDModelDescriptor(int position, bool hasWPrime, bool hasCP, bool hasFTP, bool hasPMax,
+                                     QString name, QString code)
+    : position(position), hasWPrime(hasWPrime), hasCP(hasCP), hasFTP(hasFTP), hasPMax(hasPMax), name(name), code(code)
+{
+}
+
+const PDModelDescriptor &CP2Model::descriptor =
+        PDModelDescriptor(0, true, true, false, false, tr("Classic 2 Parameter"), "2 Parm");
+
+const PDModelDescriptor &CP3Model::descriptor =
+        PDModelDescriptor(1, true, true, false, true, tr("Morton 3 Parameter"), "3 Parm");
+
+const PDModelDescriptor &WSModel::descriptor =
+        PDModelDescriptor(2, true, true, true, true, tr("Ward-Smith"), "WS");
+
+const PDModelDescriptor &MultiModel::descriptor =
+        PDModelDescriptor(3, true, true, true, true, tr("Veloclinic Multicomponent"), "Velo");
+
+const PDModelDescriptor &ExtendedModel::descriptor =
+        PDModelDescriptor(4, true, true, true, true, tr("Extended CP"), "Ext");
+
+struct PDModelRegistryImpl
+{
+    PDModelRegistryImpl();
+    ~PDModelRegistryImpl();
+
+    static QMutex mutex;
+    QMap<QString, const PDModelDescriptor *> descriptors;
+    
+    struct
+    {
+        bool operator()(const PDModelDescriptor *a, const PDModelDescriptor *b) const
+        {   
+            return a->position < b->position;
+        }   
+    } descrLessThanCmp;
+};
+
+QMutex PDModelRegistryImpl::mutex;
+
+PDModelRegistryImpl::PDModelRegistryImpl() : descriptors()
+{
+    descriptors.insert(CP2Model::descriptor.code, &CP2Model::descriptor);
+    descriptors.insert(CP3Model::descriptor.code, &CP3Model::descriptor);
+    descriptors.insert(WSModel::descriptor.code, &WSModel::descriptor);
+    descriptors.insert(MultiModel::descriptor.code, &MultiModel::descriptor);
+    descriptors.insert(ExtendedModel::descriptor.code, &ExtendedModel::descriptor);
+}
+
+PDModelRegistryImpl::~PDModelRegistryImpl()
+{
+    descriptors.clear();
+}
+
+PDModelRegistry &PDModelRegistry::instance()
+{
+    QMutexLocker locker(&PDModelRegistryImpl::mutex);
+    
+    static PDModelRegistry registry;
+    return registry;
+}
+
+PDModelRegistry::PDModelRegistry() : impl(new PDModelRegistryImpl)
+{
+}
+
+PDModelRegistry::~PDModelRegistry()
+{
+    delete impl;
+}
+
+const QList<const PDModelDescriptor *> PDModelRegistry::descriptors() const
+{
+    QList<const PDModelDescriptor *> list = impl->descriptors.values();
+    std::sort(list.begin(), list.end(), impl->descrLessThanCmp);
+    return list;
+}
+
+const PDModelDescriptor *PDModelRegistry::getDescriptorByCode(QString code) const
+{
+    return impl->descriptors.value(code);
+}
+
 // base class for all models
-PDModel::PDModel(Context *context) :
+PDModel::PDModel(Context *context, const PDModelDescriptor &descriptor) :
     QwtSyntheticPointData(PDMODEL_MAXT),
     inverseTime(false),
+    descriptor(descriptor),
     context(context),
     sanI1(0), sanI2(0), anI1(0), anI2(0), aeI1(0), aeI2(0), laeI1(0), laeI2(0),
     cp(0), tau(0), t0(0), minutes(false)
@@ -225,7 +311,7 @@ PDModel::deriveCPParameters(int model)
 //
 
 CP2Model::CP2Model(Context *context) :
-    PDModel(context)
+    PDModel(context, descriptor)
 {
     // set default intervals to search CP 2-3 mins and 7-20 mins
     anI1=120;
@@ -286,7 +372,7 @@ void CP2Model::onIntervalsChanged()
 // Morton 3 Parameter Model
 //
 CP3Model::CP3Model(Context *context) :
-    PDModel(context)
+    PDModel(context, descriptor)
 {
     // set default intervals to search CP 30-60
     anI1=1800;
@@ -356,7 +442,7 @@ void CP3Model::onIntervalsChanged()
 //
 // Ward Smith Model
 //
-WSModel::WSModel(Context *context) : PDModel(context)
+WSModel::WSModel(Context *context) : PDModel(context, descriptor)
 {
     // set default intervals to search CP 30-60
     anI1=1800;
@@ -470,7 +556,7 @@ void WSModel::onIntervalsChanged()
 // Currently deciding which of the three formulations to use
 // as the base for GoldenCheetah (we have enough models already !)
 MultiModel::MultiModel(Context *context) :
-    PDModel(context),
+    PDModel(context, descriptor),
     variant(0), w1(0), p1(0), p2(0), tau1(0), tau2(0), alpha(0), beta(0)
 {
     // set default intervals to search CP 30-60
@@ -614,7 +700,7 @@ void MultiModel::onIntervalsChanged()
 // Extended CP Model
 //
 ExtendedModel::ExtendedModel(Context *context) :
-    PDModel(context),
+    PDModel(context, descriptor),
     paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0),
     ecp_dec_del(0)
 {
