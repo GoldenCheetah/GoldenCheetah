@@ -45,9 +45,11 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
+#include "PDModel.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #endif
+
 extern ConfigDialog *configdialog_ptr;
 
 //
@@ -4122,6 +4124,7 @@ ZonePage::ZonePage(Context *context) : context(context)
         // setup maintenance pages using current config
         schemePage[i] = new SchemePage(zones[i]);
         cpPage[i] = new CPPage(context, zones[i], schemePage[i]);
+        cpEstimatesPage[i] = new CPEstiamtesPage(context, i > 0);
     }
 
     // finish setup for the default sport
@@ -4139,6 +4142,7 @@ ZonePage::changeSport(int i)
     // change tabs according to the selected sport
     tabs->clear();
     tabs->addTab(cpPage[i], tr("Critical Power"));
+    tabs->addTab(cpEstimatesPage[i], tr("Model Estimates"));
     tabs->addTab(schemePage[i], tr("Default"));
 }
 
@@ -4910,6 +4914,124 @@ CPPage::zonesChanged()
             // now replace the current range struct
             zones_->setZoneRange(index, current);
         }
+    }
+}
+
+CPEstiamtesPage::CPEstiamtesPage(Context *context, bool isRun)
+    : context(context), isRun(isRun)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setSpacing(10 * dpiXFactor);
+
+    modelCombo = new QComboBox;
+    QList<const PDModelDescriptor *> modelDescriptors = PDModelRegistry::instance().descriptors();
+    for (int i = 0; i < modelDescriptors.length(); i++) {
+        const PDModelDescriptor *descriptor = modelDescriptors.at(i);
+        modelCombo->addItem(descriptor->name, descriptor->code);
+    }
+
+    QHBoxLayout *headLayout = new QHBoxLayout;
+    headLayout->addWidget(modelCombo);
+
+    ranges = new QTreeWidget;
+    ranges->headerItem()->setText(RangeColumns::DateFrom, tr("From Date"));
+    ranges->headerItem()->setText(RangeColumns::CP, tr("Critical Power"));
+    ranges->headerItem()->setText(RangeColumns::FTP, tr("FTP"));
+    ranges->headerItem()->setText(RangeColumns::WPrime, tr("W'"));
+    ranges->headerItem()->setText(RangeColumns::PMax, tr("Pmax"));
+    ranges->headerItem()->setText(RangeColumns::RightPadding, "");
+    ranges->setColumnCount(RangeColumns::Count);
+
+    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
+    ranges->setUniformRowHeights(true);
+    ranges->setIndentation(0);
+
+    initializeRanges();
+
+    mainLayout->addLayout(headLayout, 0, 0);
+    mainLayout->addWidget(ranges, 1, 0);
+
+    connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+}
+
+void
+CPEstiamtesPage::configChanged(qint32 config)
+{
+    if (config & CONFIG_ZONES) {
+        initializeRanges();
+    }
+}
+
+void
+CPEstiamtesPage::initializeRanges()
+{
+    ranges->clear();
+
+    QString cpForFtpSettingKey = isRun ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
+    bool useCPForFTP = appsettings->cvalue(context->athlete->cyclist, cpForFtpSettingKey, false).toBool();
+    ranges->setColumnHidden(RangeColumns::FTP, useCPForFTP);
+
+    PDModelRegistry &modelReg = PDModelRegistry::instance();
+    QString curModelCode = modelCombo->currentData().toString();
+    const PDModelDescriptor *curModel = modelReg.getDescriptorByCode(curModelCode);
+
+    ranges->setColumnHidden(RangeColumns::CP, !curModel->hasCP);
+    ranges->setColumnHidden(RangeColumns::FTP, !curModel->hasFTP);
+    ranges->setColumnHidden(RangeColumns::WPrime, !curModel->hasWPrime);
+    ranges->setColumnHidden(RangeColumns::PMax, !curModel->hasPMax);
+
+    // we don't support run power models, so empty list for runs
+    QList<PDEstimate> estimates = isRun ? QList<PDEstimate>() : context->athlete->PDEstimates_;
+
+    const PDEstimate *prevEst = NULL;
+    for (int i = 0; i < estimates.length(); i++) {
+        const PDEstimate &est = estimates.at(i);
+
+        // check whether this estimate belongs to the selected model and it's not wpk
+        if (est.model != curModel->code || est.wpk) {
+            continue;
+        }
+
+        // check if any of the visible parameters have (significantly) changed
+        if (prevEst != NULL) {
+            if ((!curModel->hasCP || (curModel->hasCP && qRound(est.CP) == qRound(prevEst->CP))) &&
+                (!curModel->hasFTP || (curModel->hasFTP && qRound(est.FTP) == qRound(prevEst->FTP))) &&
+                (!curModel->hasWPrime || (curModel->hasWPrime && qRound(est.WPrime) == qRound(prevEst->WPrime))) &&
+                (!curModel->hasPMax || (curModel->hasPMax && qRound(est.PMax) == qRound(prevEst->PMax)))) {
+                continue;
+            }
+        }
+
+        // add the entry
+        QTreeWidgetItem *newEntry = new QTreeWidgetItem(ranges->invisibleRootItem());
+        newEntry->setFlags(newEntry->flags() & ~Qt::ItemIsEditable);
+
+        // date: the end date of the estimate (est.to) is the start date of the new range (DateFrom)
+        // also: correct the any date that might be in the future
+        QDate dateFrom = est.to;
+        if (dateFrom > QDate::currentDate()) {
+            dateFrom = QDate::currentDate();
+        }
+
+        newEntry->setText(RangeColumns::DateFrom, dateFrom.toString(tr("MMM d, yyyy")));
+        newEntry->setText(RangeColumns::CP, QString("%1").arg(qRound(est.CP)));
+        newEntry->setText(RangeColumns::FTP, QString("%1").arg(qRound(est.FTP)));
+        newEntry->setText(RangeColumns::WPrime, QString("%1").arg(qRound(est.WPrime)));
+        newEntry->setText(RangeColumns::PMax, QString("%1").arg(qRound(est.PMax)));
+
+        newEntry->setTextAlignment(RangeColumns::DateFrom, Qt::AlignmentFlag::AlignRight);
+        newEntry->setTextAlignment(RangeColumns::CP, Qt::AlignmentFlag::AlignRight);
+        newEntry->setTextAlignment(RangeColumns::FTP, Qt::AlignmentFlag::AlignRight);
+        newEntry->setTextAlignment(RangeColumns::WPrime, Qt::AlignmentFlag::AlignRight);
+        newEntry->setTextAlignment(RangeColumns::PMax, Qt::AlignmentFlag::AlignRight);
+
+        // update ptr to prev entry
+        prevEst = &est;
+    }
+
+    for (int i = 0; i < ranges->columnCount(); i++) {
+        ranges->resizeColumnToContents(i);
     }
 }
 

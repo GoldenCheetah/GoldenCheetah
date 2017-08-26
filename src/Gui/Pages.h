@@ -902,6 +902,36 @@ class CPPage : public QWidget
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
 };
 
+class CPEstiamtesPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+    
+    enum RangeColumns {
+        DateFrom,
+        CP,
+        FTP,
+        WPrime,
+        PMax,
+        RightPadding,
+        Count
+    };
+    
+    public:
+        CPEstiamtesPage(Context *context, bool isRun);
+    
+    private slots:
+        void configChanged(qint32 config);
+        void initializeRanges();
+
+    private:
+        Context *context;
+        const bool isRun;
+        
+        QComboBox *modelCombo;
+        QTreeWidget *ranges;
+};
+
 class ZonePage : public QWidget
 {
     Q_OBJECT
@@ -935,6 +965,7 @@ class ZonePage : public QWidget
         quint16 b4Fingerprint[nSports]; // how did it start ?
         SchemePage *schemePage[nSports];
         CPPage *cpPage[nSports];
+        CPEstiamtesPage *cpEstimatesPage[nSports];
 
     private slots:
         void changeSport(int i);
