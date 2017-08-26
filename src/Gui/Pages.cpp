@@ -4980,10 +4980,6 @@ CPEstiamtesPage::initializeRanges()
 {
     ranges->clear();
 
-    QString cpForFtpSettingKey = isRun ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
-    bool useCPForFTP = appsettings->cvalue(context->athlete->cyclist, cpForFtpSettingKey, false).toBool();
-    ranges->setColumnHidden(RangeColumns::FTP, useCPForFTP);
-
     PDModelRegistry &modelReg = PDModelRegistry::instance();
     QString curModelCode = modelCombo->currentData().toString();
     const PDModelDescriptor *curModel = modelReg.getDescriptorByCode(curModelCode);
