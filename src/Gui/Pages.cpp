@@ -46,6 +46,7 @@
 #include "Secrets.h"
 #include "Utils.h"
 #include "PDModel.h"
+#include "RideCache.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #endif
@@ -4920,8 +4921,17 @@ CPPage::zonesChanged()
 CPEstiamtesPage::CPEstiamtesPage(Context *context, bool isRun)
     : context(context), isRun(isRun)
 {
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *outerLayout = new QVBoxLayout(this);
+
+    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->setSpacing(0);
+
+    outerLayout->addWidget(new ProgressLine(this, context));
+
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->setContentsMargins(10, 10, 10, 10);
     mainLayout->setSpacing(10 * dpiXFactor);
+    outerLayout->addLayout(mainLayout);
 
     modelCombo = new QComboBox;
     QList<const PDModelDescriptor *> modelDescriptors = PDModelRegistry::instance().descriptors();
@@ -4953,6 +4963,8 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, bool isRun)
 
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(refreshStart()), ranges, SLOT(clear()));
+    connect(context, SIGNAL(refreshEnd()), this, SLOT(initializeRanges()));
 }
 
 void
@@ -4980,6 +4992,11 @@ CPEstiamtesPage::initializeRanges()
     ranges->setColumnHidden(RangeColumns::FTP, !curModel->hasFTP);
     ranges->setColumnHidden(RangeColumns::WPrime, !curModel->hasWPrime);
     ranges->setColumnHidden(RangeColumns::PMax, !curModel->hasPMax);
+
+    // check whether ride cache is refreshing ...
+    if (context->athlete->rideCache->isRunning()) {
+        return;
+    }
 
     // we don't support run power models, so empty list for runs
     QList<PDEstimate> estimates = isRun ? QList<PDEstimate>() : context->athlete->PDEstimates_;
