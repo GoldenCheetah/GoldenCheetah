@@ -62,12 +62,13 @@ struct ZoneRange {
     int ftp;
     int wprime; // aka awc
     int pmax;
+    QString origin; // where does it originate from? Was it created manually or imported from a model estimate?
     QList<ZoneInfo> zones;
     bool zonesSetFromCP;
     ZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), cp(0), ftp(0), wprime(0), pmax(0), zonesSetFromCP(false) {}
-    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int pmax) :
-        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
+        begin(b), end(e), cp(0), ftp(0), wprime(0), pmax(0), origin(), zonesSetFromCP(false) {}
+    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int pmax, QString origin) :
+        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), origin(origin), zonesSetFromCP(false) {}
 
     // used by qSort()
     bool operator< (ZoneRange right) const {
@@ -131,8 +132,8 @@ class Zones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax);
-        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax);
+        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax, QString origin);
+        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax, QString origin);
         void addZoneRange();
 
         // Get / Set ZoneRange details
@@ -148,6 +149,8 @@ class Zones : public QObject
         void setWprime(int rnum, int wprime);
         int getPmax(int rnum) const;
         void setPmax(int rnum, int pmax);
+        QString getOrigin(int rnum);
+        void setOrigin(int rnum, QString origin);
 
         // calculate and then set zoneinfo for a given range
         void setZonesFromCP(int rnum);
