@@ -4473,7 +4473,7 @@ CPPage::addClicked()
 
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
-    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
+    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax, QString());
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;

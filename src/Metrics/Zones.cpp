@@ -125,6 +125,7 @@ bool Zones::read(QFile &file)
     QRegExp ftpx("^FTP=(\\d+)$");
     QRegExp wprimerx("^W'=(\\d+)$");
     QRegExp pmaxx("^Pmax=(\\d+)$");
+    QRegExp originrx("^Origin=(.*)$");
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
                    "(\\d+)\\s*(%?)\\s*(?:,\\s*(\\d+|MAX)\\s*(%?)\\s*)?$",
                    Qt::CaseInsensitive);
@@ -141,6 +142,7 @@ bool Zones::read(QFile &file)
     int ftp=0;
     int wprime=0;
     int pmax=0;
+    QString origin;
     QList<ZoneInfo> zoneInfos;
 
     // true if zone defaults are found in the file (then we need to write them)
@@ -180,7 +182,7 @@ bool Zones::read(QFile &file)
                 if (in_range) {
 
                     // if zones are empty, then generate them
-                    ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
+                    ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax, origin);
                     range.zones = zoneInfos;
 
                     if (range.zones.empty()) {
@@ -290,6 +292,15 @@ bool Zones::read(QFile &file)
             }
         }
 
+        // check for origin
+        if (originrx.indexIn(line, 0) != -1) {
+            if (!in_range)
+                qDebug()<<"ignoring errant Origin= in "<<fileName_;
+            else {
+                origin = originrx.cap(1);
+            }
+        }
+
 
         // check for zone definition
         if (zonerx.indexIn(line, 0) != -1) {
@@ -378,7 +389,7 @@ next_line: {}
 
     if (in_range) {
 
-        ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
+        ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax, origin);
         range.zones = zoneInfos;
 
         if (range.zones.empty()) {
@@ -589,6 +600,12 @@ int Zones::getPmax(int rnum) const
     return ranges[rnum].pmax;
 }
 
+QString Zones::getOrigin(int rnum)
+{
+    assert(rnum < ranges.size());
+    return ranges[rnum].origin;
+}
+
 void Zones::setCP(int rnum, int cp)
 {
     ranges[rnum].cp = cp;
@@ -610,6 +627,12 @@ void Zones::setWprime(int rnum, int wprime)
 void Zones::setPmax(int rnum, int pmax)
 {
     ranges[rnum].pmax = pmax;
+    modificationTime = QDateTime::currentDateTime();
+}
+
+void Zones::setOrigin(int rnum, QString origin)
+{
+    ranges[rnum].origin = origin;
     modificationTime = QDateTime::currentDateTime();
 }
 
@@ -801,6 +824,7 @@ void Zones::write(QDir home)
         int ftp = getFTP(i);
         int wprime = getWprime(i);
         int pmax = getPmax(i);
+        QString origin = getOrigin(i);
 
         // print header for range
         // note this explicitly sets the first and last ranges such that all time is spanned
@@ -818,6 +842,8 @@ void Zones::write(QDir home)
         strzones += QString("W'=%1\n").arg(wprime);
         // wite out the Pmax value
         strzones += QString("Pmax=%1\n").arg(pmax);
+        // wite out the Origin value
+        strzones += QString("Origin=%1\n").arg(origin);
 
         // step through and print the zones if they've been explicitly set
         if (!ranges[i].zonesSetFromCP) {
@@ -876,14 +902,14 @@ void Zones::write(QDir home)
     }
 }
 
-void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax)
+void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax, QString origin)
 {
-    ranges.append(ZoneRange(_start, _end, _cp, _ftp, _wprime, _pmax));
+    ranges.append(ZoneRange(_start, _end, _cp, _ftp, _wprime, _pmax, origin));
 }
 
 // insert a new zone range using the current scheme
 // return the range number
-int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
+int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax, QString origin)
 {
     int rnum;
 
@@ -891,8 +917,8 @@ int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _pmax));
-    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _ftp, _wprime, _pmax));
+    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _pmax, origin));
+    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _ftp, _wprime, _pmax, origin));
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
