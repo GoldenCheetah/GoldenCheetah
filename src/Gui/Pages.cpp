@@ -4529,28 +4529,31 @@ CPPage::editClicked()
 
     int columns = 0;
 
+    ZoneRange zoneRange = zones_->getZoneRange(index);
+
     // date
-    zones_->setStartDate(index, dateEdit->date());
+    zoneRange.begin = dateEdit->date();
     edit->setText(columns++, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CP
-    zones_->setCP(index, cp);
+    zoneRange.cp = cp;
     edit->setText(columns++, QString("%1").arg(cp));
 
     // show FTP if we use FTP for Coggan Metrics
     if (useCPForFTPCombo->currentIndex() == 1) {
-        zones_->setFTP(index, ftp);
+        zoneRange.ftp = ftp;
         edit->setText(columns++, QString("%1").arg(ftp));
     }
 
     // W'
-    zones_->setWprime(index, wp);
+    zoneRange.wprime = wp;
     edit->setText(columns++, QString("%1").arg(wp));
 
     // Pmax
-    zones_->setPmax(index, pmax);
+    zoneRange.pmax = pmax;
     edit->setText(columns++, QString("%1").arg(pmax));
 
+    zones_->setZoneRange(index, zoneRange);
 }
 
 void

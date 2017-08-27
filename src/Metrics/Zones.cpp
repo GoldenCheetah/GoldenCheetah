@@ -520,7 +520,7 @@ next_line: {}
 
     // mark zones as modified so pages which depend on zones can be updated
     modificationTime = QDateTime::currentDateTime();
-
+    emit zoneRangesRefreshed();
     return true;
 }
 
@@ -604,36 +604,6 @@ QString Zones::getOrigin(int rnum)
 {
     assert(rnum < ranges.size());
     return ranges[rnum].origin;
-}
-
-void Zones::setCP(int rnum, int cp)
-{
-    ranges[rnum].cp = cp;
-    modificationTime = QDateTime::currentDateTime();
-}
-
-void Zones::setFTP(int rnum, int ftp)
-{
-    ranges[rnum].ftp = ftp;
-    modificationTime = QDateTime::currentDateTime();
-}
-
-void Zones::setWprime(int rnum, int wprime)
-{
-    ranges[rnum].wprime = wprime;
-    modificationTime = QDateTime::currentDateTime();
-}
-
-void Zones::setPmax(int rnum, int pmax)
-{
-    ranges[rnum].pmax = pmax;
-    modificationTime = QDateTime::currentDateTime();
-}
-
-void Zones::setOrigin(int rnum, QString origin)
-{
-    ranges[rnum].origin = origin;
-    modificationTime = QDateTime::currentDateTime();
 }
 
 // generate a list of zones from CP
@@ -902,11 +872,6 @@ void Zones::write(QDir home)
     }
 }
 
-void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax, QString origin)
-{
-    ranges.append(ZoneRange(_start, _end, _cp, _ftp, _wprime, _pmax, origin));
-}
-
 // insert a new zone range using the current scheme
 // return the range number
 int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax, QString origin)
@@ -917,37 +882,34 @@ int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax,
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _pmax, origin));
-    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _ftp, _wprime, _pmax, origin));
+    ZoneRange range = ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _pmax, origin);
+    if (rnum == ranges.count()) {
+        ranges.append(range);
+    } else {
+        range.end = ranges[rnum].begin;
+        ranges.insert(rnum, range);
+    }
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
 
     // set zones from CP
     if (_cp > 0) {
-        setCP(rnum, _cp);
-        setWprime(rnum, _wprime);
         setZonesFromCP(rnum);
     }
+
+    modificationTime = QDateTime::currentDateTime();
+    emit zoneRangeAdded(rnum, range);
 
     return rnum;
 }
 
-void Zones::addZoneRange()
+void Zones::setZoneRange(int rnum, ZoneRange x)
 {
-    ranges.append(ZoneRange(date_zero, date_infinity));
-}
-
-void Zones::setEndDate(int rnum, QDate endDate)
-{
-    ranges[rnum].end = endDate;
+    ZoneRange oldRange = ranges[rnum];
+    ranges[rnum] = x;
     modificationTime = QDateTime::currentDateTime();
-}
-
-void Zones::setStartDate(int rnum, QDate startDate)
-{
-    ranges[rnum].begin = startDate;
-    modificationTime = QDateTime::currentDateTime();
+    emit zoneRangeUpdated(rnum, oldRange, x);
 }
 
 QDate Zones::getStartDate(int rnum) const
@@ -1008,9 +970,15 @@ int Zones::deleteRange(int rnum) {
 
     // extend the previous range to the end of this range
     // but only if we have a previous range
-    if (rnum > 0) setEndDate(rnum-1, getEndDate(rnum));
+    if (rnum > 0) {
+        ranges[rnum - 1].end = getEndDate(rnum);
+        modificationTime = QDateTime::currentDateTime();
+    }
+
     // delete this range then
+    ZoneRange range = getZoneRange(rnum);
     ranges.removeAt(rnum);
+    emit zoneRangeDeleted(rnum, range);
 
     return rnum-1;
 }
