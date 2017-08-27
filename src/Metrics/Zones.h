@@ -132,25 +132,18 @@ class Zones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax, QString origin);
         int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax, QString origin);
-        void addZoneRange();
 
         // Get / Set ZoneRange details
         ZoneRange getZoneRange(int rnum) { return ranges[rnum]; }
-        void setZoneRange(int rnum, ZoneRange x) { ranges[rnum] = x; }
+        void setZoneRange(int rnum, ZoneRange x);
 
-        // get and set CP for a given range
+        // get a value for a given range
         int getCP(int rnum) const;
-        void setCP(int rnum, int cp);
         int getFTP(int rnum) const;
-        void setFTP(int rnum, int ftp);
         int getWprime(int rnum) const;
-        void setWprime(int rnum, int wprime);
         int getPmax(int rnum) const;
-        void setPmax(int rnum, int pmax);
         QString getOrigin(int rnum);
-        void setOrigin(int rnum, QString origin);
 
         // calculate and then set zoneinfo for a given range
         void setZonesFromCP(int rnum);
@@ -201,8 +194,6 @@ class Zones : public QObject
         QDate getEndDate(int rnum) const;
         QString getStartDateString(int rnum) const;
         QString getEndDateString(int rnum) const;
-        void setEndDate(int rnum, QDate date);
-        void setStartDate(int rnum, QDate date);
 
         // When was this last updated?
         QDateTime modificationTime;
@@ -219,6 +210,12 @@ class Zones : public QObject
 
         // USE_CP_FOR_FTP setting differenciated by sport
         QString useCPforFTPSetting() const;
+
+    signals:
+        void zoneRangeAdded(int rnum, ZoneRange range);
+        void zoneRangeDeleted(int rnum, ZoneRange range);
+        void zoneRangeUpdated(int rnum, ZoneRange oldRange, ZoneRange newRange);
+        void zoneRangesRefreshed();
 };
 
 QColor zoneColor(int zone, int num_zones);
