@@ -45,7 +45,6 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
-#include "PDModel.h"
 #include "RideCache.h"
 
 extern ConfigDialog *configdialog_ptr;
@@ -3995,7 +3994,8 @@ ZonePage::ZonePage(Context *context) : context(context)
     layout->addWidget(tabs);
 
     for (int i=0; i < nSports; i++) {
-        zones[i] = new Zones(i > 0);
+        bool isRun = i > 0;
+        zones[i] = new Zones(isRun);
 
         // get current config by reading it in (leave mainwindow zones alone)
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones[i]->fileName());
@@ -4008,7 +4008,10 @@ ZonePage::ZonePage(Context *context) : context(context)
         // setup maintenance pages using current config
         schemePage[i] = new SchemePage(zones[i]);
         cpPage[i] = new CPPage(context, zones[i], schemePage[i]);
-        cpEstimatesPage[i] = new CPEstiamtesPage(context, i > 0);
+
+        // no power model estimates for runners
+        QList<PDEstimate> estimates = isRun ? QList<PDEstimate>() : context->athlete->PDEstimates_;
+        cpEstimatesPage[i] = new CPEstiamtesPage(context, estimates);
     }
 
     // finish setup for the default sport
@@ -4804,8 +4807,8 @@ CPPage::zonesChanged()
     }
 }
 
-CPEstiamtesPage::CPEstiamtesPage(Context *context, bool isRun)
-    : context(context), isRun(isRun)
+CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates)
+    : context(context), estimates(estimates)
 {
     QVBoxLayout *outerLayout = new QVBoxLayout(this);
 
@@ -4879,9 +4882,6 @@ CPEstiamtesPage::initializeRanges()
     if (context->athlete->rideCache->isRunning()) {
         return;
     }
-
-    // we don't support run power models, so empty list for runs
-    QList<PDEstimate> estimates = isRun ? QList<PDEstimate>() : context->athlete->PDEstimates_;
 
     const PDEstimate *prevEst = NULL;
     for (int i = 0; i < estimates.length(); i++) {
