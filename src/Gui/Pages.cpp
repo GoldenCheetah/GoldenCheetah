@@ -4949,6 +4949,13 @@ CPEstiamtesPage::initializeRanges()
         QTreeWidgetItem *newEntry = new QTreeWidgetItem();
         newEntry->setFlags(newEntry->flags() & ~Qt::ItemIsEditable);
 
+        // date: the end date of the estimate (est.to) is the start date of the new range (DateFrom)
+        // also: correct any date that might be in the future
+        QDate dateFrom = est.to;
+        if (dateFrom > QDate::currentDate()) {
+            dateFrom = QDate::currentDate();
+        }
+
         // inclusion in CP range settings
         // check whether this estimate is included
         Qt::CheckState isIncluded = Qt::CheckState::Unchecked;
@@ -4957,7 +4964,7 @@ CPEstiamtesPage::initializeRanges()
             QString rangeModelCode;
             QDate rangeBeginDate;
             if (!TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate) ||
-                rangeModelCode != curModelCode || rangeBeginDate != est.to) {
+                rangeModelCode != curModelCode || rangeBeginDate != dateFrom) {
                 continue;
             }
 
@@ -4970,22 +4977,12 @@ CPEstiamtesPage::initializeRanges()
         newEntry->setToolTip(RangeColumns::IncludedInSettings,
                              tr("Include/exclude this estimate in your CP range settings"));
 
-        // date: the end date of the estimate (est.to) is the start date of the new range (DateFrom)
-        QDate dateFrom = est.to;
-
-        // before the date correction below: save the original value for est identification purposes
+        // save raw values for all parameters
         newEntry->setData(RangeColumns::DateFrom, Qt::UserRole, dateFrom);
-
-        // save raw values for other parameters too
         newEntry->setData(RangeColumns::CP, Qt::UserRole, est.CP);
         newEntry->setData(RangeColumns::FTP, Qt::UserRole, est.FTP);
         newEntry->setData(RangeColumns::WPrime, Qt::UserRole, est.WPrime);
         newEntry->setData(RangeColumns::PMax, Qt::UserRole, est.PMax);
-
-        // correct any date that might be in the future
-        if (dateFrom > QDate::currentDate()) {
-            dateFrom = QDate::currentDate();
-        }
 
         newEntry->setText(RangeColumns::DateFrom, dateFrom.toString(tr("MMM d, yyyy")));
         newEntry->setText(RangeColumns::CP, QString("%1").arg(qRound(est.CP)));
@@ -5040,7 +5037,8 @@ CPEstiamtesPage::zoneRangeDeleted(int, ZoneRange range)
     }
 }
 
-void CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
+void
+CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
 {
     if (column == RangeColumns::IncludedInSettings) {
 
@@ -5055,11 +5053,6 @@ void CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
             // get current model
             PDModelRegistry &modelReg = PDModelRegistry::instance();
             const PDModelDescriptor *curModel = modelReg.getDescriptorByCode(curModelCode);
-
-            // correct any date that might be in the future
-            if (dateFrom > QDate::currentDate()) {
-                dateFrom = QDate::currentDate();
-            }
 
             // get CP - all models have at least CP
             double cp = item->data(RangeColumns::CP, Qt::UserRole).toDouble();
