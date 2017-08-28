@@ -4851,12 +4851,21 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, 
     mainLayout->setSpacing(10 * dpiXFactor);
     outerLayout->addLayout(mainLayout);
 
+    int selectedIdx = 0;
+    QVariant curModelSetting = appsettings->cvalue(
+        context->athlete->cyclist, GC_CURRENT_MODEL, ExtendedModel::descriptor.code).toString();
     modelCombo = new QComboBox;
     QList<const PDModelDescriptor *> modelDescriptors = PDModelRegistry::instance().descriptors();
     for (int i = 0; i < modelDescriptors.length(); i++) {
         const PDModelDescriptor *descriptor = modelDescriptors.at(i);
         modelCombo->addItem(descriptor->name, descriptor->code);
+
+        if (descriptor->code == curModelSetting) {
+            selectedIdx = i;
+        }
     }
+
+    modelCombo->setCurrentIndex(selectedIdx);
 
     QHBoxLayout *headLayout = new QHBoxLayout;
     headLayout->addWidget(modelCombo);
@@ -4880,7 +4889,7 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, 
     mainLayout->addLayout(headLayout, 0, 0);
     mainLayout->addWidget(ranges, 1, 0);
 
-    connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
+    connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelComboCurrentIndexChanged(int)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(refreshStart()), ranges, SLOT(clear()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(initializeRanges()));
@@ -5080,6 +5089,15 @@ void CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
             }
         }
     }
+}
+
+void
+CPEstiamtesPage::modelComboCurrentIndexChanged(int index)
+{
+    QString curModelCode = modelCombo->currentData().toString();
+    appsettings->setCValue(context->athlete->cyclist, GC_CURRENT_MODEL, curModelCode);
+
+    initializeRanges();
 }
 
 QString

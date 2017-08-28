@@ -911,6 +911,7 @@ class CPEstiamtesPage : public QWidget
         void initializeRanges();
         void zoneRangeDeleted(int, ZoneRange range);
         void rangesItemChanged(QTreeWidgetItem *item, int column);
+        void modelComboCurrentIndexChanged(int index);
 
     private:
         Context *context;
