@@ -941,6 +941,8 @@ class CPEstiamtesPage : public QWidget
 
         QString ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate);
         bool TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate);
+        void emphasizeLastEntry();
+        void deEmphasizeLastEntry();
 };
 
 class ZonePage : public QWidget
