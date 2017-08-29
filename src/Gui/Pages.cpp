@@ -4958,7 +4958,7 @@ CPEstiamtesPage::initializeRanges()
 
         // inclusion in CP range settings
         // check whether this estimate is included
-        Qt::CheckState isIncluded = Qt::CheckState::Unchecked;
+        bool isIncluded = false;
         for (int j = 0; j < zones->getRangeSize(); j++) {
             ZoneRange range = zones->getZoneRange(j);
             QString rangeModelCode;
@@ -4969,11 +4969,12 @@ CPEstiamtesPage::initializeRanges()
             }
 
             // we have a match
-            isIncluded = Qt::CheckState::Checked;
+            isIncluded = true;
         }
 
         // a checkbox to include/exclude the entry in/from the CP range settings
-        newEntry->setCheckState(RangeColumns::IncludedInSettings, isIncluded);
+        newEntry->setCheckState(RangeColumns::IncludedInSettings,
+                                isIncluded ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
         newEntry->setToolTip(RangeColumns::IncludedInSettings,
                              tr("Include/exclude this estimate in your CP range settings"));
 
@@ -4990,17 +4991,17 @@ CPEstiamtesPage::initializeRanges()
         newEntry->setText(RangeColumns::WPrime, QString("%1").arg(qRound(est.WPrime)));
         newEntry->setText(RangeColumns::PMax, QString("%1").arg(qRound(est.PMax)));
 
-        newEntry->setTextAlignment(RangeColumns::DateFrom, Qt::AlignmentFlag::AlignRight);
-        newEntry->setTextAlignment(RangeColumns::CP, Qt::AlignmentFlag::AlignRight);
-        newEntry->setTextAlignment(RangeColumns::FTP, Qt::AlignmentFlag::AlignRight);
-        newEntry->setTextAlignment(RangeColumns::WPrime, Qt::AlignmentFlag::AlignRight);
-        newEntry->setTextAlignment(RangeColumns::PMax, Qt::AlignmentFlag::AlignRight);
+        for (int j = RangeColumns::DateFrom; j < RangeColumns::Count; j++) {
+            newEntry->setTextAlignment(j, Qt::AlignmentFlag::AlignRight);
+        }
 
         ranges->invisibleRootItem()->addChild(newEntry);
 
         // update ptr to prev entry
         prevEst = &est;
     }
+
+    emphasizeLastEntry();
 
     for (int i = 0; i < ranges->columnCount(); i++) {
         ranges->resizeColumnToContents(i);
@@ -5030,6 +5031,11 @@ CPEstiamtesPage::zoneRangeDeleted(int, ZoneRange range)
             Qt::CheckState checkState = item->checkState(RangeColumns::IncludedInSettings);
             if (checkState != Qt::CheckState::Unchecked) {
                 item->setCheckState(RangeColumns::IncludedInSettings, Qt::CheckState::Unchecked);
+            }
+
+            // if this is the last entry, emphasize it
+            if (i + 1 == ranges->invisibleRootItem()->childCount()) {
+                emphasizeLastEntry();
             }
 
             break;
@@ -5072,6 +5078,12 @@ CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
             // add it
             zones->addZoneRange(dateFrom, qRound(cp), qRound(ftp), qRound(wPrime), qRound(pMax), origin);
 
+            // check, if this was the last item, and de-emphasize if so
+            int itemIdx = ranges->invisibleRootItem()->indexOfChild(item);
+            if (itemIdx + 1 == ranges->invisibleRootItem()->childCount()) {
+                deEmphasizeLastEntry();
+            }
+
         } else if (checkState == Qt::CheckState::Unchecked) {
             for (int i = 0; i < zones->getRangeSize(); i++) {
                 ZoneRange range = zones->getZoneRange(i);
@@ -5111,6 +5123,92 @@ CPEstiamtesPage::TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDa
     modelCode = originTokens[0];
     zoneRangeBeginDate = QDate::fromString(originTokens[1], Qt::ISODate);
     return zoneRangeBeginDate.isValid();
+}
+
+void
+CPEstiamtesPage::emphasizeLastEntry()
+{
+    if (ranges->invisibleRootItem()->childCount() == 0 || zones->getRangeSize() == 0) {
+        return;
+    }
+
+    // for the last item, if it is different to the last item in the CP range settings, make it more visible
+    int lastItemIdx = ranges->invisibleRootItem()->childCount() - 1;
+    QTreeWidgetItem *lastItem = ranges->invisibleRootItem()->child(lastItemIdx);
+
+    // if it's already included in the settings, no need to emphasize it
+    bool isIncluded = lastItem->checkState(RangeColumns::IncludedInSettings) == Qt::CheckState::Checked;
+    if (isIncluded) {
+        return;
+    }
+
+    int lastRangeIdx = zones->getRangeSize() - 1;
+    ZoneRange lastRange = zones->getZoneRange(lastRangeIdx);
+
+    // only emphasize, if it's actually newer than the last setting
+    QDate dateFrom = lastItem->data(RangeColumns::DateFrom, Qt::UserRole).toDate();
+    if (lastRange.begin >= dateFrom) {
+        return;
+    }
+
+    PDModelRegistry &modelReg = PDModelRegistry::instance();
+    QString curModelCode = modelCombo->currentData().toString();
+    const PDModelDescriptor *curModel = modelReg.getDescriptorByCode(curModelCode);
+
+    bool hasDifference = false;
+    QBrush redTextBrush (Qt::red);
+    QString toolTipTextTemplate = QString(tr("The last set value for %1 is %2."));
+
+    double cp = lastItem->data(RangeColumns::CP, Qt::UserRole).toDouble();
+    if (curModel->hasCP && qRound(cp) != lastRange.cp) {
+        hasDifference = true;
+        lastItem->setForeground(RangeColumns::CP, redTextBrush);
+        lastItem->setToolTip(RangeColumns::CP, toolTipTextTemplate.arg(tr("CP")).arg(lastRange.cp));
+    }
+
+    double ftp = lastItem->data(RangeColumns::FTP, Qt::UserRole).toDouble();
+    if (curModel->hasFTP && qRound(ftp) != lastRange.ftp) {
+        hasDifference = true;
+        lastItem->setForeground(RangeColumns::FTP, redTextBrush);
+        lastItem->setToolTip(RangeColumns::FTP, toolTipTextTemplate.arg(tr("FTP")).arg(lastRange.ftp));
+    }
+
+    double wPrime = lastItem->data(RangeColumns::WPrime, Qt::UserRole).toDouble();
+    if (curModel->hasWPrime && qRound(wPrime) != lastRange.wprime) {
+        hasDifference = true;
+        lastItem->setForeground(RangeColumns::WPrime, redTextBrush);
+        lastItem->setToolTip(RangeColumns::WPrime, toolTipTextTemplate.arg(tr("W'")).arg(lastRange.wprime));
+    }
+
+    double pMax = lastItem->data(RangeColumns::PMax, Qt::UserRole).toDouble();
+    if (curModel->hasPMax && qRound(pMax) != lastRange.pmax) {
+        hasDifference = true;
+        lastItem->setForeground(RangeColumns::PMax, redTextBrush);
+        lastItem->setToolTip(RangeColumns::PMax, toolTipTextTemplate.arg(tr("PMax")).arg(lastRange.pmax));
+    }
+
+    // if at least 1 parameter is different, colorize the date as well
+    if (hasDifference) {
+        lastItem->setForeground(RangeColumns::DateFrom, redTextBrush);
+        lastItem->setToolTip(RangeColumns::DateFrom,
+                             tr("This estimate is newer than the last CP setting entry."));
+    }
+}
+
+void
+CPEstiamtesPage::deEmphasizeLastEntry()
+{
+    if (ranges->invisibleRootItem()->childCount() == 0) {
+        return;
+    }
+
+    QBrush blackTextBrush (Qt::black);
+    int lastItemIdx = ranges->invisibleRootItem()->childCount() - 1;
+    QTreeWidgetItem *lastItem = ranges->invisibleRootItem()->child(lastItemIdx);
+    for (int i = RangeColumns::DateFrom; i < RangeColumns::Count; i++) {
+        lastItem->setForeground(i, blackTextBrush);
+        lastItem->setToolTip(i, QString());
+    }
 }
 
 //
