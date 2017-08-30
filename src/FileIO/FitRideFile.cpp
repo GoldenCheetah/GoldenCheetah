@@ -382,6 +382,18 @@ struct FitFileReaderState
                 case 8: return "SRM PC8";
                 default: return "SRM Powercontrol";
             }
+        } else if (manu == 7 ) {
+            // Quarq
+            if (prod == -1)
+                return "Quarq";
+
+            switch (prod) {
+                case 1: return "Quarq Cinqo";
+
+                case 9479: return "Quarq DZERO";
+
+                default: return QString("Quarq %1").arg(prod);
+            }
         } else if (manu == 9 ) {
             // Powertap
             if (prod == -1)
@@ -392,6 +404,8 @@ struct FitFileReaderState
                 case 18: return "Joule";
                 case 19: return "Joule GPS";
                 case 22: return "Joule GPS+";
+                case 272: return "Powertap C1";
+                case 288: return "Powertap P1";
                 case 4096: return "Powertap G3";
 
                 default: return QString("Powertap Device %1").arg(prod);
