@@ -37,6 +37,8 @@
 
 #ifdef NOWEBKIT
 #include <QtWebChannel>
+#include <QWebEngineView>
+#include <QWebEngineSettings>
 #endif
 
 // overlay helper
@@ -121,6 +123,10 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
 #ifdef NOWEBKIT
     view = new QWebEngineView(this);
+#if QT_VERSION >= 0x050800
+    // stop stealing focus!
+    view->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+#endif
 #else
     view = new QWebView();
 #endif

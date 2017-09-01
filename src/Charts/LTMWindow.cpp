@@ -144,6 +144,10 @@ LTMWindow::LTMWindow(Context *context) :
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
 #ifdef NOWEBKIT
     dataSummary = new QWebEngineView(this);
+#if QT_VERSION >= 0x050800
+    // stop stealing focus!
+    dataSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+#endif
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
     if (dpiXFactor > 1) {
     // 80 lines per page on hidpi screens (?)
