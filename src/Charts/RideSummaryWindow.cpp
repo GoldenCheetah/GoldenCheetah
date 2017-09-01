@@ -91,12 +91,15 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(10,10,10,10);
 
- #ifdef NOWEBKIT
+#ifdef NOWEBKIT
     rideSummary = new QWebEngineView(this);
-    //XXX steals focus rideSummary->setEnabled(false);
- #else
+#if QT_VERSION >= 0x050800
+    // stop stealing focus!
+    rideSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+#endif
+#else
     rideSummary = new QWebView(this);
- #endif
+#endif
 
     rideSummary->setContentsMargins(0,0,0,0);
     rideSummary->page()->view()->setContentsMargins(0,0,0,0);
