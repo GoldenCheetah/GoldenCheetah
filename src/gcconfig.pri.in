@@ -278,8 +278,8 @@ macx {
 #DEFINES += GC_MAPQUESTAPI_KEY=\\\"xxxxxxxxxxxxxxxxxxxxxx\\\"
 
 # USING THE WITHINGS API (http://oauth.withings.com/api)
-#DEFINES += GC_WITHINGS_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
-#DEFINES += GC_WITHINGS_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_WITHINGS_CONSUMER_KEY=\\\"xxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_WITHINGS_CONSUMER_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
