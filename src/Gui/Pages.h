@@ -929,6 +929,7 @@ class CPEstiamtesPage : public QWidget
         void initializeRanges();
         void zoneRangeDeleted(int, ZoneRange range);
         void rangesItemChanged(QTreeWidgetItem *item, int column);
+        void autoCpChkBoxToggled(bool value);
         void modelComboCurrentIndexChanged(int index);
 
     private:
@@ -937,10 +938,9 @@ class CPEstiamtesPage : public QWidget
         Zones *zones;
 
         QComboBox *modelCombo;
+        QCheckBox *autoCpChkBox;
         QTreeWidget *ranges;
 
-        QString ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate);
-        bool TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate);
         void emphasizeLastEntry();
         void deEmphasizeLastEntry();
 };

@@ -1058,3 +1058,25 @@ Zones::useCPforFTPSetting() const
 {
     return run ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
 }
+
+
+
+QString
+ZoneRange::ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate)
+{
+    QString estimateEndDateString = estimateEndDate.toString(Qt::ISODate);
+    return QString("%1|%2").arg(modelCode).arg(estimateEndDateString);
+}
+
+bool
+ZoneRange::TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate)
+{
+    QStringList originTokens = origin.split('|');
+    if (originTokens.count() < 2) {
+        return false;
+    }
+
+    modelCode = originTokens[0];
+    zoneRangeBeginDate = QDate::fromString(originTokens[1], Qt::ISODate);
+    return zoneRangeBeginDate.isValid();
+}

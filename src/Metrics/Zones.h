@@ -77,6 +77,14 @@ struct ZoneRange {
                 ((begin == right.begin) && (! end.isNull()) &&
                 ( right.end.isNull() || end < right.end )));
     }
+
+    // whether this zone range was created manually (rather than originating from a model estimate)
+    bool isManualEntry() const {
+        return origin.isNull() || origin.isEmpty();
+    }
+
+    static QString ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate);
+    static bool TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate);
 };
 
 

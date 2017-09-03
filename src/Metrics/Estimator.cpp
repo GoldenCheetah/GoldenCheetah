@@ -18,6 +18,7 @@
 
 #include "Estimator.h"
 
+#include "Settings.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFileCache.h"
@@ -344,6 +345,9 @@ Estimator::run()
     // filter performances
     perfs = filter(perfs);
 
+    // handle auto cp
+    updateCPRangeSettings();
+
     // now update them
     lock.lock();
     if (i == 0) {
@@ -451,4 +455,99 @@ Estimator::filter(QList<Performance> perfs)
      }
 
     return returning;
+}
+
+void
+Estimator::updateCPRangeSettings()
+{
+    // if auto cp is set, check if we need to update the CP range settings
+    QVariant autoCPSetting = appsettings->cvalue(context->athlete->cyclist, GC_AUTO_CP, false);
+    if (!autoCPSetting.toBool()) {
+        return;
+    }
+
+    // get last cycling zone range
+    Zones *zones = context->athlete->zones_[0];
+    int zoneRangeCount = zones->getRangeSize();
+    ZoneRange lastZoneRange = zoneRangeCount > 0
+            ? zones->getZoneRange(zoneRangeCount - 1)
+            : ZoneRange(QDate(1900, 1, 1), QDate(9999, 12, 31));
+
+    // if last entry is a future entry, don't go any further
+    if (lastZoneRange.begin > QDate::currentDate()) {
+        return;
+    }
+
+    // get last non-wpk estimate of current model
+    QVariant curModelSetting = appsettings->cvalue(context->athlete->cyclist, GC_CURRENT_MODEL,
+                                                   ExtendedModel::descriptor.code);
+    QString curModelCode = curModelSetting.toString();
+
+    PDEstimate lastEst;
+    bool lastEstFound = false;
+    QList<PDEstimate> estimates = context->athlete->getPDEstimates();
+    for (int i = estimates.count() - 1; i >= 0; i--) {
+        PDEstimate est = estimates.at(i);
+        if (!est.wpk && est.model == curModelCode) {
+            lastEstFound = true;
+            lastEst = estimates.at(i);
+            break;
+        }
+    }
+
+    // only if we have found an estimate
+    if (!lastEstFound) {
+        return;
+    }
+
+    // get estimate date and correct any future date
+    QDate dateFrom = lastEst.to;
+    if (dateFrom > QDate::currentDate()) {
+        dateFrom = QDate::currentDate();
+    }
+
+    // if CP setting is newer than last estimate, don't go any further or
+    // if the date is the same, only continue, if the setting is not a manual entry
+    if (lastZoneRange.begin > dateFrom ||
+        (lastZoneRange.begin == dateFrom && lastZoneRange.isManualEntry())) {
+        return;
+    }
+
+    // compare zone range and estimate
+    ZoneRangeEstimateComparisonResult compResult = compareZoneRangeToEstimate(lastZoneRange, lastEst);
+    if (!compResult.isDifferent()) {
+        return;
+    }
+
+    // if the dates are the same, replace, otherwise add a new entry
+    QString origin = ZoneRange::ToZoneRangeOrigin(curModelCode, dateFrom);
+    if (lastZoneRange.begin == dateFrom && zoneRangeCount > 0) {
+        ZoneRange newZoneRange = lastZoneRange;
+        newZoneRange.cp = qRound(lastEst.CP);
+        newZoneRange.ftp = qRound(lastEst.FTP);
+        newZoneRange.wprime = qRound(lastEst.WPrime);
+        newZoneRange.pmax = qRound(lastEst.PMax);
+        newZoneRange.origin = origin;
+        zones->setZoneRange(zoneRangeCount - 1, newZoneRange);
+    } else {
+        zones->addZoneRange(dateFrom, qRound(lastEst.CP), qRound(lastEst.FTP),
+                            qRound(lastEst.WPrime), qRound(lastEst.PMax), origin);
+    }
+
+    // write the settings to file
+    zones->write(context->athlete->home->config());
+}
+
+ZoneRangeEstimateComparisonResult
+Estimator::compareZoneRangeToEstimate(ZoneRange range, PDEstimate est)
+{
+    PDModelRegistry &modelReg = PDModelRegistry::instance();
+    const PDModelDescriptor *model = modelReg.getDescriptorByCode(est.model);
+
+    ZoneRangeEstimateComparisonResult result;
+    result.isCpDifferent = model->hasCP && range.cp != qRound(est.CP);
+    result.isFtpDifferent = model->hasFTP && range.ftp != qRound(est.FTP);
+    result.isWPrimeDifferent = model->hasWPrime && range.wprime != qRound(est.WPrime);
+    result.isPMaxDifferent = model->hasPMax && range.pmax != qRound(est.PMax);
+    return result;
 }
