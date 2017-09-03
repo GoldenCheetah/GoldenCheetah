@@ -45,7 +45,9 @@
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
 
 //Withings oauth keys
+#ifndef GC_WITHINGS_CONSUMER_KEY
 #define GC_WITHINGS_CONSUMER_KEY    "292875b6883b87e27cefd2555d1cb872b2282f02fee25b4906871314934" //< consumer key
+#endif
 
 // Dropbox id
 #ifndef GC_DROPBOX_CLIENT_ID
