@@ -24,6 +24,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include "PDModel.h"
+#include "Zones.h"
 
 #include <QVector>
 #include <QThread>
@@ -41,6 +42,21 @@ class RideCacheBackgroundRefresh;
 class Specification;
 class AthleteBest;
 class RideCacheModel;
+
+struct ZoneRangeEstimateComparisonResult
+{
+    bool isCpDifferent;
+    bool isFtpDifferent;
+    bool isWPrimeDifferent;
+    bool isPMaxDifferent;
+
+    bool isDifferent() const {
+        return isCpDifferent ||
+               isFtpDifferent ||
+               isWPrimeDifferent ||
+               isPMaxDifferent;
+    }
+};
 
 class RideCache : public QObject
 {
@@ -100,6 +116,8 @@ class RideCache : public QObject
         // PD Model refreshing (temporary move)
         void refreshCPModelMetrics();
 
+        static ZoneRangeEstimateComparisonResult compareZoneRangeToEstimate(ZoneRange range, PDEstimate est);
+
     public slots:
 
         // restore / dump cache to disk (json)
@@ -144,6 +162,8 @@ class RideCache : public QObject
         QFuture<void> future;
         QFutureWatcher<void> watcher;
 
+    private:
+        void updateCPRangeSettings();
 };
 
 class AthleteBest

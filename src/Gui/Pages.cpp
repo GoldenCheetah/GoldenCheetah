@@ -4867,8 +4867,14 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, 
 
     modelCombo->setCurrentIndex(selectedIdx);
 
+    autoCpChkBox = new QCheckBox(tr("Auto CP"));
+    autoCpChkBox->setToolTip(tr("Automatically add the latest CP estimate to the CP range settings when it changes."));
+    QVariant autoCpSetting = appsettings->cvalue(context->athlete->cyclist, GC_AUTO_CP, false);
+    autoCpChkBox->setCheckState(autoCpSetting.toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+
     QHBoxLayout *headLayout = new QHBoxLayout;
     headLayout->addWidget(modelCombo);
+    headLayout->addWidget(autoCpChkBox);
 
     ranges = new QTreeWidget;
     ranges->headerItem()->setText(RangeColumns::IncludedInSettings, "");
@@ -4890,6 +4896,7 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, 
     mainLayout->addWidget(ranges, 1, 0);
 
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelComboCurrentIndexChanged(int)));
+    connect(autoCpChkBox, SIGNAL(toggled(bool)), this, SLOT(autoCpChkBoxToggled(bool)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(refreshStart()), ranges, SLOT(clear()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(initializeRanges()));
@@ -4963,7 +4970,7 @@ CPEstiamtesPage::initializeRanges()
             ZoneRange range = zones->getZoneRange(j);
             QString rangeModelCode;
             QDate rangeBeginDate;
-            if (!TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate) ||
+            if (!ZoneRange::TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate) ||
                 rangeModelCode != curModelCode || rangeBeginDate != dateFrom) {
                 continue;
             }
@@ -5013,7 +5020,7 @@ CPEstiamtesPage::zoneRangeDeleted(int, ZoneRange range)
 {
     QString rangeModelCode;
     QDate rangeBeginDate;
-    if (!TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate)) {
+    if (!ZoneRange::TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate)) {
         return;
     }
 
@@ -5051,7 +5058,7 @@ CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
         // create 'origin' string (for zone range identification)
         QString curModelCode = modelCombo->currentData().toString();
         QDate dateFrom = item->data(RangeColumns::DateFrom, Qt::UserRole).toDate();
-        QString origin = ToZoneRangeOrigin(curModelCode, dateFrom);
+        QString origin = ZoneRange::ToZoneRangeOrigin(curModelCode, dateFrom);
 
         Qt::CheckState checkState = item->checkState(RangeColumns::IncludedInSettings);
         if (checkState == Qt::CheckState::Checked) {
@@ -5097,32 +5104,18 @@ CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
 }
 
 void
+CPEstiamtesPage::autoCpChkBoxToggled(bool value)
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_AUTO_CP, value);
+}
+
+void
 CPEstiamtesPage::modelComboCurrentIndexChanged(int index)
 {
     QString curModelCode = modelCombo->currentData().toString();
     appsettings->setCValue(context->athlete->cyclist, GC_CURRENT_MODEL, curModelCode);
 
     initializeRanges();
-}
-
-QString
-CPEstiamtesPage::ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate)
-{
-    QString estimateEndDateString = estimateEndDate.toString(Qt::ISODate);
-    return QString("%1|%2").arg(modelCode).arg(estimateEndDateString);
-}
-
-bool
-CPEstiamtesPage::TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate)
-{
-    QStringList originTokens = origin.split('|');
-    if (originTokens.count() < 2) {
-        return false;
-    }
-
-    modelCode = originTokens[0];
-    zoneRangeBeginDate = QDate::fromString(originTokens[1], Qt::ISODate);
-    return zoneRangeBeginDate.isValid();
 }
 
 void
@@ -5145,53 +5138,49 @@ CPEstiamtesPage::emphasizeLastEntry()
     int lastRangeIdx = zones->getRangeSize() - 1;
     ZoneRange lastRange = zones->getZoneRange(lastRangeIdx);
 
-    // only emphasize, if it's actually newer than the last setting
     QDate dateFrom = lastItem->data(RangeColumns::DateFrom, Qt::UserRole).toDate();
-    if (lastRange.begin >= dateFrom) {
+
+    // only emphasize, if it's actually newer than the last setting
+    if (lastRange.begin > dateFrom) {
         return;
     }
 
-    PDModelRegistry &modelReg = PDModelRegistry::instance();
-    QString curModelCode = modelCombo->currentData().toString();
-    const PDModelDescriptor *curModel = modelReg.getDescriptorByCode(curModelCode);
+    PDEstimate est;
+    est.model = modelCombo->currentData().toString();
+    est.CP = lastItem->data(RangeColumns::CP, Qt::UserRole).toDouble();
+    est.FTP = lastItem->data(RangeColumns::FTP, Qt::UserRole).toDouble();
+    est.WPrime = lastItem->data(RangeColumns::WPrime, Qt::UserRole).toDouble();
+    est.PMax = lastItem->data(RangeColumns::PMax, Qt::UserRole).toDouble();
 
-    bool hasDifference = false;
+    ZoneRangeEstimateComparisonResult compResult = RideCache::compareZoneRangeToEstimate(lastRange, est);
+    if (!compResult.isDifferent()) {
+        return;
+    }
+
     QBrush redTextBrush (Qt::red);
     QString toolTipTextTemplate = QString(tr("The last set value for %1 is %2."));
 
-    double cp = lastItem->data(RangeColumns::CP, Qt::UserRole).toDouble();
-    if (curModel->hasCP && qRound(cp) != lastRange.cp) {
-        hasDifference = true;
+    lastItem->setForeground(RangeColumns::DateFrom, redTextBrush);
+    lastItem->setToolTip(RangeColumns::DateFrom, tr("This estimate is newer than the last CP setting entry."));
+
+    if (compResult.isCpDifferent) {
         lastItem->setForeground(RangeColumns::CP, redTextBrush);
         lastItem->setToolTip(RangeColumns::CP, toolTipTextTemplate.arg(tr("CP")).arg(lastRange.cp));
     }
 
-    double ftp = lastItem->data(RangeColumns::FTP, Qt::UserRole).toDouble();
-    if (curModel->hasFTP && qRound(ftp) != lastRange.ftp) {
-        hasDifference = true;
+    if (compResult.isFtpDifferent) {
         lastItem->setForeground(RangeColumns::FTP, redTextBrush);
         lastItem->setToolTip(RangeColumns::FTP, toolTipTextTemplate.arg(tr("FTP")).arg(lastRange.ftp));
     }
 
-    double wPrime = lastItem->data(RangeColumns::WPrime, Qt::UserRole).toDouble();
-    if (curModel->hasWPrime && qRound(wPrime) != lastRange.wprime) {
-        hasDifference = true;
+    if (compResult.isWPrimeDifferent) {
         lastItem->setForeground(RangeColumns::WPrime, redTextBrush);
         lastItem->setToolTip(RangeColumns::WPrime, toolTipTextTemplate.arg(tr("W'")).arg(lastRange.wprime));
     }
 
-    double pMax = lastItem->data(RangeColumns::PMax, Qt::UserRole).toDouble();
-    if (curModel->hasPMax && qRound(pMax) != lastRange.pmax) {
-        hasDifference = true;
+    if (compResult.isPMaxDifferent) {
         lastItem->setForeground(RangeColumns::PMax, redTextBrush);
         lastItem->setToolTip(RangeColumns::PMax, toolTipTextTemplate.arg(tr("PMax")).arg(lastRange.pmax));
-    }
-
-    // if at least 1 parameter is different, colorize the date as well
-    if (hasDifference) {
-        lastItem->setForeground(RangeColumns::DateFrom, redTextBrush);
-        lastItem->setToolTip(RangeColumns::DateFrom,
-                             tr("This estimate is newer than the last CP setting entry."));
     }
 }
 
