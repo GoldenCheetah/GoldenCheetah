@@ -175,6 +175,7 @@ class RideFile : public QObject // QObject to emit signals
         friend struct JsonFileReader;
         friend class ManualRideDialog;
         friend class PolarFileReader;
+        friend class Strava;
         // split and mergers
         friend class MergeActivityWizard;
         friend class SplitActivityWizard;

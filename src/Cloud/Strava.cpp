@@ -589,6 +589,194 @@ Strava::addSamples(RideFile* ret, QString remoteid)
     }
 }
 
+void
+Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
+{
+    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
+
+    // Lap Swim & SmartRecording enabled: use distance from laps to fix samples
+    if (isGarminSmartRecording.toInt() != 0 && ret->isSwim() &&
+        ret->isDataPresent(RideFile::km) &&
+        !ret->isDataPresent(RideFile::lat)) {
+
+        int lastSecs = 0;
+        double lastDist = 0.0;
+        for (int i=0; i<laps.count() && i<ret->intervals().count(); i++) {
+            QJsonObject lap = laps[i].toObject();
+            double start = ret->intervals()[i]->start;
+            double end = ret->intervals()[i]->stop;
+            int startIndex = ret->timeIndex(start) ? ret->timeIndex(start)-1 : 0;
+            double km = ret->getPointValue(startIndex, RideFile::km);
+
+            // fill gaps and fix distance before the lap
+            double deltaDist = (start>lastSecs && km>lastDist+0.001) ? (km-lastDist)/(start-lastSecs) : 0;
+            double kph = 3600.0*deltaDist;
+            for (int secs=lastSecs; secs<start; secs++) {
+                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist,
+                        kph, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        RideFile::NA, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0, false);
+                // force update, even when secs or kph are 0
+                if (secs == 0 || kph == 0.0)
+                    ret->setPointValue(secs, RideFile::kph, kph);
+                lastDist += deltaDist;
+            }
+
+            // fill gaps and fix distance inside the lap
+            deltaDist = 0.001*lap["distance"].toDouble()/(end-start);
+            kph = 3600.0*deltaDist;
+            for (int secs=start; secs<end; secs++) {
+                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist,
+                        kph, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        RideFile::NA, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0,
+                        0, false);
+                // force update, even when secs or kph are 0
+                if (secs == 0 || kph == 0.0)
+                    ret->setPointValue(secs, RideFile::kph, kph);
+                lastDist += deltaDist;
+            }
+            lastSecs = end;
+        }
+    }
+}
+
+void
+Strava:: fixSmartRecording(RideFile* ret)
+{
+    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
+    // do nothing if disabled
+    if (isGarminSmartRecording.toInt() == 0) return;
+
+    QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
+    // default to 30 seconds
+    if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(30);
+    // minimum 90 seconds for swims
+    if (ret->isSwim() && GarminHWM.toInt()<90) GarminHWM.setValue(90);
+
+    // The following fragment was adapted from FixGaps
+
+    // If there are less than 2 dataPoints then there
+    // is no way of post processing anyway (e.g. manual workouts)
+    if (ret->dataPoints().count() < 2) return;
+
+    // OK, so there are probably some gaps, lets post process them
+    RideFilePoint *last = NULL;
+    int dropouts = 0;
+    double dropouttime = 0.0;
+
+    for (int position = 0; position < ret->dataPoints().count(); position++) {
+        RideFilePoint *point = ret->dataPoints()[position];
+
+        if (NULL != last) {
+            double gap = point->secs - last->secs - ret->recIntSecs();
+
+            // if we have gps and we moved, then this isn't a stop
+            bool stationary = ((last->lat || last->lon) && (point->lat || point->lon)) // gps is present
+                         && last->lat == point->lat && last->lon == point->lon;
+
+            // moved for less than GarminHWM seconds ... interpolate
+            if (!stationary && gap > 1 && gap < GarminHWM.toInt()) {
+
+                // what's needed?
+                dropouts++;
+                dropouttime += gap;
+
+                int count = gap/ret->recIntSecs();
+                double hrdelta = (point->hr - last->hr) / (double) count;
+                double pwrdelta = (point->watts - last->watts) / (double) count;
+                double kphdelta = (point->kph - last->kph) / (double) count;
+                double kmdelta = (point->km - last->km) / (double) count;
+                double caddelta = (point->cad - last->cad) / (double) count;
+                double altdelta = (point->alt - last->alt) / (double) count;
+                double nmdelta = (point->nm - last->nm) / (double) count;
+                double londelta = (point->lon - last->lon) / (double) count;
+                double latdelta = (point->lat - last->lat) / (double) count;
+                double hwdelta = (point->headwind - last->headwind) / (double) count;
+                double slopedelta = (point->slope - last->slope) / (double) count;
+                double temperaturedelta = (point->temp - last->temp) / (double) count;
+                double lrbalancedelta = (point->lrbalance - last->lrbalance) / (double) count;
+                double ltedelta = (point->lte - last->lte) / (double) count;
+                double rtedelta = (point->rte - last->rte) / (double) count;
+                double lpsdelta = (point->lps - last->lps) / (double) count;
+                double rpsdelta = (point->rps - last->rps) / (double) count;
+                double lpcodelta = (point->lpco - last->lpco) / (double) count;
+                double rpcodelta = (point->rpco - last->rpco) / (double) count;
+                double lppbdelta = (point->lppb - last->lppb) / (double) count;
+                double rppbdelta = (point->rppb - last->rppb) / (double) count;
+                double lppedelta = (point->lppe - last->lppe) / (double) count;
+                double rppedelta = (point->rppe - last->rppe) / (double) count;
+                double lpppbdelta = (point->lpppb - last->lpppb) / (double) count;
+                double rpppbdelta = (point->rpppb - last->rpppb) / (double) count;
+                double lpppedelta = (point->lpppe - last->lpppe) / (double) count;
+                double rpppedelta = (point->rpppe - last->rpppe) / (double) count;
+                double smo2delta = (point->smo2 - last->smo2) / (double) count;
+                double thbdelta = (point->thb - last->thb) / (double) count;
+                double rcontactdelta = (point->rcontact - last->rcontact) / (double) count;
+                double rcaddelta = (point->rcad - last->rcad) / (double) count;
+                double rvertdelta = (point->rvert - last->rvert) / (double) count;
+                double tcoredelta = (point->tcore - last->tcore) / (double) count;
+
+                // add the points
+                for(int i=0; i<count; i++) {
+                    RideFilePoint *add = new RideFilePoint(last->secs+((i+1)*ret->recIntSecs()),
+                                                           last->cad+((i+1)*caddelta),
+                                                           last->hr + ((i+1)*hrdelta),
+                                                           last->km + ((i+1)*kmdelta),
+                                                           last->kph + ((i+1)*kphdelta),
+                                                           last->nm + ((i+1)*nmdelta),
+                                                           last->watts + ((i+1)*pwrdelta),
+                                                           last->alt + ((i+1)*altdelta),
+                                                           last->lon + ((i+1)*londelta),
+                                                           last->lat + ((i+1)*latdelta),
+                                                           last->headwind + ((i+1)*hwdelta),
+                                                           last->slope + ((i+1)*slopedelta),
+                                                           last->temp + ((i+1)*temperaturedelta),
+                                                           last->lrbalance + ((i+1)*lrbalancedelta),
+                                                           last->lte + ((i+1)*ltedelta),
+                                                           last->rte + ((i+1)*rtedelta),
+                                                           last->lps + ((i+1)*lpsdelta),
+                                                           last->rps + ((i+1)*rpsdelta),
+                                                           last->lpco + ((i+1)*lpcodelta),
+                                                           last->rpco + ((i+1)*rpcodelta),
+                                                           last->lppb + ((i+1)*lppbdelta),
+                                                           last->rppb + ((i+1)*rppbdelta),
+                                                           last->lppe + ((i+1)*lppedelta),
+                                                           last->rppe + ((i+1)*rppedelta),
+                                                           last->lpppb + ((i+1)*lpppbdelta),
+                                                           last->rpppb + ((i+1)*rpppbdelta),
+                                                           last->lpppe + ((i+1)*lpppedelta),
+                                                           last->rpppe + ((i+1)*rpppedelta),
+                                                           last->smo2 + ((i+1)*smo2delta),
+                                                           last->thb + ((i+1)*thbdelta),
+                                                           last->rvert + ((i+1)*rvertdelta),
+                                                           last->rcad + ((i+1)*rcaddelta),
+                                                           last->rcontact + ((i+1)*rcontactdelta),
+                                                           last->tcore + ((i+1)*tcoredelta),
+                                                           last->interval);
+
+                    ret->insertPoint(position++, add);
+                }
+
+            }
+        }
+        last = point;
+    }
+}
+
 QByteArray*
 Strava::prepareResponse(QByteArray* data)
 {
@@ -601,7 +789,7 @@ Strava::prepareResponse(QByteArray* data)
     if (parseError.error == QJsonParseError::NoError) {
         QJsonObject each = document.object();
 
-        QDateTime starttime = QDateTime::fromString(each["local_start_date"].toString(), Qt::ISODate);
+        QDateTime starttime = QDateTime::fromString(each["start_date_local"].toString(), Qt::ISODate);
 
         // 1s samples with start time
         RideFile *ride = new RideFile(starttime.toUTC(), 1.0f);
@@ -650,7 +838,6 @@ Strava::prepareResponse(QByteArray* data)
 
         } else {
             addSamples(ride, QString("%1").arg(each["id"].toInt()));
-
             // laps?
             if (!each["laps"].isNull()) {
                 QJsonArray laps = each["laps"].toArray();
@@ -661,7 +848,11 @@ Strava::prepareResponse(QByteArray* data)
                     double end = start + lap["elapsed_time"].toDouble();
                     ride->addInterval(RideFileInterval::USER, start, end, lap["name"].toString());
                 }
+
+                // Fix distance from laps and fill gaps for pool swims
+                fixLapSwim(ride, laps);
             }
+            fixSmartRecording(ride);
         }
 
 
