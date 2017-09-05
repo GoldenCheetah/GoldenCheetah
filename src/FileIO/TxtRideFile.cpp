@@ -88,7 +88,8 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     // of multiple tokens, separated by a tab, which match
     // the pattern "name [units]"
     bool isWattBike = false;
-    QStringList tokens = in.readLine().split(QRegExp("[\t\n\r]"), QString::SkipEmptyParts);
+    QString line = in.readLine();
+    QStringList tokens = line.split(QRegExp("[\t\n\r]"), QString::SkipEmptyParts);
 
     if (tokens.count() > 1) {
         // ok, so we have a bunch of tokens, thats a good sign this
@@ -106,7 +107,25 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
     }
 
+    // RR text file can include RR interval values in one or two column format.
+    // That is, the RR interval values can be given as:
+    //    Type 1     Type 2
+    //    0.759      0.759 0.759
+    //    0.690      1.449 0.690
+    //    0.702      2.151 0.702
+    // So in the second type of input, the first column includes the time
+    // indexes of R wave detections (zero time for the first detection) and
+    // second column the RR interval values. The RR interval values above are
+    // given in seconds, but millisecond values can also be given.
+    enum { RR_None, RR_Type1, RR_Type2 } rrType = RR_None;
     if (!isWattBike) {
+        bool ok;
+        tokens = line.split(QRegExp("[ \t]"), QString::SkipEmptyParts);
+        if (tokens.count() == 1 && tokens[0].toDouble() > 0) rrType = RR_Type1;
+        if (tokens.count() == 2 && tokens[0].toDouble(&ok) >= 0 && ok && tokens[1].toDouble() > 0) rrType = RR_Type2;
+    }
+
+    if (rrType == RR_None && !isWattBike) {
 
         // RACERMATE STYLE
 
@@ -370,7 +389,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
         return rideFile;
 
-    } else {
+    } else if (rrType == RR_None && isWattBike)  {
         // WATTBIKE STYLE 
 
         // Lets construct our rideFile
@@ -504,6 +523,93 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                      wb2Pattern.cap(2).toInt(),
                                      wb2Pattern.cap(3).toInt()),
                                QTime(0, 0, 0));
+            rideFile->setStartTime(datetime);
+        }
+
+        return rideFile;
+    } else {
+        // RR File
+
+        // Lets construct our rideFile
+        RideFile *rideFile = new RideFile();
+        rideFile->setDeviceType("R-R");
+        rideFile->setFileFormat("R-R text file (txt)");
+        rideFile->setRecIntSecs(1);
+
+        XDataSeries *hrvXdata = new XDataSeries();
+        hrvXdata->name = "HRV";
+        hrvXdata->valuename << "R-R";
+        hrvXdata->unitname << "msecs";
+
+        double secs = 0.0;
+        do {
+            double rr;
+
+            if (rrType == RR_Type2 && tokens.count() > 1) rr = tokens[1].toDouble();
+            else if (rrType == RR_Type1 && tokens.count() > 0) rr = tokens[0].toDouble();
+            else continue; // skip blank or incomplete lines
+
+            if (rr > 30) rr /= 1000.0; // convert to seconds if milliseconds
+
+            double bpm = rr>0.0 ? 60.0/rr : 0.0; // HR without filtering
+
+            rideFile->appendPoint(secs, 0.0, bpm, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+
+            XDataPoint *p = new XDataPoint();
+            p->secs = secs;
+            p->km = 0;
+            p->number[0] = rr * 1000.0;
+            hrvXdata->datapoints.append(p);
+
+            secs += rr;
+
+            line = in.readLine();
+            tokens = line.split(QRegExp("[ \t]"), QString::SkipEmptyParts);
+        } while (!in.atEnd());
+
+        if (hrvXdata->datapoints.count()>0)
+            rideFile->addXData("HRV", hrvXdata);
+        else
+            delete hrvXdata;
+
+        QRegExp gcPattern("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.txt$");
+        gcPattern.setCaseSensitivity(Qt::CaseInsensitive);
+
+        // Filenames we have seen are yyyy-mm-dd hh-mm-ss.txt
+        QRegExp rr1Pattern("^.*/(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)[ _](\\d\\d)-(\\d\\d)-(\\d\\d)\\.txt$");
+        rr1Pattern.setCaseSensitivity(Qt::CaseInsensitive);
+        // Filenames we have seen are name_yyyy-mm-dd_hh-mm-ss.txt
+        QRegExp rr2Pattern("^.*/[^_]*_[^_]*_(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)[ _](\\d\\d)-(\\d\\d)-(\\d\\d)\\.txt$");
+        rr2Pattern.setCaseSensitivity(Qt::CaseInsensitive);
+
+        // It is a GC Filename
+        if (gcPattern.exactMatch(file.fileName())) {
+            QDateTime datetime(QDate(gcPattern.cap(1).toInt(),
+                                    gcPattern.cap(2).toInt(),
+                                    gcPattern.cap(3).toInt()),
+                               QTime(gcPattern.cap(4).toInt(),
+                                    gcPattern.cap(5).toInt(),
+                                    gcPattern.cap(6).toInt()));
+            rideFile->setStartTime(datetime);
+        }
+
+        // It is a R-R Filename
+        if (rr1Pattern.exactMatch(file.fileName())) {
+            QDateTime datetime(QDate(rr1Pattern.cap(1).toInt(),
+                                    rr1Pattern.cap(2).toInt(),
+                                    rr1Pattern.cap(3).toInt()),
+                               QTime(rr1Pattern.cap(4).toInt(),
+                                    rr1Pattern.cap(5).toInt(),
+                                    rr1Pattern.cap(6).toInt()));
+            rideFile->setStartTime(datetime);
+        }
+        if (rr2Pattern.exactMatch(file.fileName())) {
+            QDateTime datetime(QDate(rr2Pattern.cap(1).toInt(),
+                                    rr2Pattern.cap(2).toInt(),
+                                    rr2Pattern.cap(3).toInt()),
+                               QTime(rr2Pattern.cap(4).toInt(),
+                                    rr2Pattern.cap(5).toInt(),
+                                    rr2Pattern.cap(6).toInt()));
             rideFile->setStartTime(datetime);
         }
 
