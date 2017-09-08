@@ -805,6 +805,32 @@ SplitConfirm::createRideFile(long start, long stop)
                 returning->addInterval(RideFileInterval::USER, interval->start - offset, interval->stop - offset, interval->name);
         }
     }
+
+    // and the XData Series, check in bounds too!
+    foreach (XDataSeries *xdata, ride->xdata()) {
+        XDataSeries* xd = new XDataSeries;
+        xd->name = xdata->name;
+        xd->valuename = xdata->valuename;
+        xd->unitname = xdata->unitname;
+        xd->valuetype = xdata->valuetype;
+        foreach (XDataPoint *point, xdata->datapoints) {
+            if (point->secs >= startTime && point->secs <= stopTime) {
+                XDataPoint *p = new XDataPoint;
+                p->secs = point->secs - offset;
+                p->km = point->km - distanceoffset;
+                for(int i=0; i<XDATA_MAXVALUES; i++) {
+                    p->number[i] = point->number[i];
+                    p->string[i] = point->string[i];
+                }
+                xd->datapoints.append(p);
+            }
+        }
+        if (xd->datapoints.count() > 0)
+            returning->addXData(xd->name, xd);
+        else
+            delete xd;
+    }
+
     return returning;
 }
 
