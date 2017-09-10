@@ -506,7 +506,7 @@ public:
                             }
                     }
 
-                setValue(count > 0 ? nnx/count*100.0 : 0.0);
+                setValue(count > 0 ? 100.0*(double)nnx/(double)count : 0.0);
                 setCount(count);
             }
         else {
