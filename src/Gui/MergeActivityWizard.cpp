@@ -408,6 +408,16 @@ MergeActivityWizard::combine()
             last = add;
         }
 
+        // Just preserve XData from first ride and add XData from the second,
+        // if not already present, in the future we could let the user to
+        // choose, like for standard series
+        foreach (XDataSeries *xdata, ride1->xdata())
+            combined->addXData(xdata->name, new XDataSeries (*xdata));
+        foreach (XDataSeries *xdata, ride2->xdata()) {
+            if (!combined->xdata().contains(xdata->name))
+                combined->addXData(xdata->name, new XDataSeries (*xdata));
+        }
+
         // now realign the intervals, first we need to
         // clear what we already have in combined
         combined->clearIntervals();
