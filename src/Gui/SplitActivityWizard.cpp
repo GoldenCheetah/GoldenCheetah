@@ -792,10 +792,29 @@ SplitConfirm::createRideFile(long start, long stop)
                                p->interval);
     }
 
+    double startTime = ride->dataPoints().at(start)->secs;
+    double stopTime = ride->dataPoints().at(stop)->secs;
+
+    // and the XData Series, check in bounds too!
+    foreach (XDataSeries *xdata, ride->xdata()) {
+        XDataSeries* xd = new XDataSeries(*xdata);
+        xd->datapoints.clear();
+        foreach (XDataPoint *point, xdata->datapoints) {
+            if (point->secs >= startTime && point->secs <= stopTime) {
+                XDataPoint *pt = new XDataPoint(*point);
+                pt->secs = point->secs - offset;
+                pt->km = point->km - distanceoffset;
+                xd->datapoints.append(pt);
+            }
+        }
+        if (xd->datapoints.count() > 0)
+            returning->addXData(xd->name, xd);
+        else
+            delete xd;
+    }
+
     // lets keep intervals that start in our section truncating them
     // if neccessary (some folks want to keep lap markers)
-    double startTime = wizard->rideItem->ride()->dataPoints().at(start)->secs;
-    double stopTime = wizard->rideItem->ride()->dataPoints().at(stop)->secs;
     foreach (RideFileInterval *interval, wizard->rideItem->ride()->intervals()) {
 
         if (interval->start >= startTime && interval->start <= stopTime) {
