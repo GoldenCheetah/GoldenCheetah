@@ -109,6 +109,12 @@ MergeActivityWizard::setRide(RideFile **here, RideFile *with)
     // data to 'pollute' the process
     if (with) *here = with->resample(recIntSecs);
     else *here = NULL;
+
+    // preserve XData
+    if (with && *here) {
+        foreach (XDataSeries *xdata, with->xdata())
+            (*here)->addXData(xdata->name, new XDataSeries(*xdata));
+    }
 }
 
 void 
@@ -284,6 +290,10 @@ MergeActivityWizard::combine()
             lp = p;
         }
 
+        // preserve XData from first ride
+        foreach (XDataSeries *xdata, ride1->xdata())
+            combined->addXData(xdata->name, new XDataSeries (*xdata));
+
         // now add the data from the second one!
         double distanceOffset=0;
         double timeOffset=0;
@@ -304,6 +314,28 @@ MergeActivityWizard::combine()
             add.km += distanceOffset;
 
             combined->appendPoint(add);
+        }
+
+        // and XData from second ride, append if series already present
+        foreach (XDataSeries *xdata, ride2->xdata()) {
+            if (combined->xdata().contains(xdata->name)) {
+                foreach (XDataPoint *point, xdata->datapoints) {
+                    XDataPoint *pt = new XDataPoint(*point);
+                    pt->secs = point->secs + timeOffset;
+                    pt->km = point->km + distanceOffset;
+                    combined->xdata(xdata->name)->datapoints.append(pt);
+                }
+            } else {
+                XDataSeries *xd = new XDataSeries(*xdata);
+                xd->datapoints.clear();
+                foreach (XDataPoint *point, xdata->datapoints) {
+                    XDataPoint *pt = new XDataPoint(*point);
+                    pt->secs = point->secs + timeOffset;
+                    pt->km = point->km + distanceOffset;
+                    xd->datapoints.append(pt);
+                }
+                combined->addXData(xd->name, xd);
+            }
         }
 
         // any intervals with a number name? find the last
@@ -374,6 +406,16 @@ MergeActivityWizard::combine()
 
             combined->appendPoint(add);
             last = add;
+        }
+
+        // Just preserve XData from first ride and add XData from the second,
+        // if not already present, in the future we could let the user to
+        // choose, like for standard series
+        foreach (XDataSeries *xdata, ride1->xdata())
+            combined->addXData(xdata->name, new XDataSeries (*xdata));
+        foreach (XDataSeries *xdata, ride2->xdata()) {
+            if (!combined->xdata().contains(xdata->name))
+                combined->addXData(xdata->name, new XDataSeries (*xdata));
         }
 
         // now realign the intervals, first we need to
@@ -717,7 +759,6 @@ MergeChoose::validatePage()
     RideFile *ride = RideFileFactory::instance().openRideFile(wizard->context, thisfile, errors, &rides);
 
     if (ride && ride->dataPoints().count()) {
-
         wizard->setRide(&wizard->ride2, ride);
         return true;
     }
