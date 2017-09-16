@@ -614,8 +614,12 @@ CloudServiceDialog::createFolderClicked()
     FolderNameDialog dialog(this);
     int ret = dialog.exec();
     if (ret == QDialog::Accepted && dialog.name() != "") {
-        // go and create it !
-        store->createFolder(pathname + "/" + dialog.name());
+        // go and create it ! special treatment for / root
+        if (pathname == "/") {
+            store->createFolder(pathname + dialog.name());
+        } else {
+            store->createFolder(pathname + "/" + dialog.name());
+        }
 
         // refresh !
         setPath(pathname, true);
