@@ -48,45 +48,24 @@ Dropbox::open(QStringList &errors)
         return false;
     }
 
-    // lets connect and get basic info on the root directory
-    QString url("https://api.dropboxapi.com/1/metadata/auto/?list=false");
-
-    // request using the bearer token
-    QNetworkRequest request(url);
-    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-    QNetworkReply *reply = nam->get(request);
-
-    // blocking request
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    if (reply->error() != QNetworkReply::NoError) {
-       errors << tr("Network Problem reading Dropbox data");
-       return false;
-    }
-    // did we get a good response ?
-    QByteArray r = reply->readAll();
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+    // lets connect and read "" which is root - with API V2 root
+    // does not provide any metadata any more, so we just
+    // check that we have access to "something"
+    readdir("", errors);
 
     // if path was returned all is good, lets set root
-    if (parseError.error == QJsonParseError::NoError) {
+    if (errors.count() == 0) {
 
         // we have a root
         root_ = newCloudServiceEntry();
 
         // path name
-        root_->name = document.object()["path"].toString();
-        root_->isDir = document.object()["is_dir"].toBool();
-        root_->size = document.object()["bytes"].toInt();
-
-        // happy with what we got ?
-        if (root_->name != "/") errors << tr("invalid root path.");
-        if (root_->isDir != true) errors << tr("root is not a directory.");
+        root_->name = "/";
+        root_->isDir = true;
+        root_->size = 0;
 
     } else {
-        errors << tr("problem parsing Dropbox data");
+        errors << tr("Problem accessing Dropbox data");
     }
 
     // ok so far ?
@@ -110,17 +89,22 @@ Dropbox::home()
 
 bool Dropbox::createFolder(QString path)
 {
+
     // do we have a token
     QString token = getSetting(GC_DROPBOX_TOKEN, "").toString();
     if (token == "") return false;
 
     // lets connect and get basic info on the root directory
-    QString url("https://api.dropboxapi.com/1/fileops/create_folder?root=auto&path=" + path);
+    QString url("https://api.dropboxapi.com/2/files/create_folder_v2");
 
     // request using the bearer token
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-    QNetworkReply *reply = nam->get(request);
+    request.setRawHeader("Content-Type", "application/json");
+
+    QByteArray data;
+    data.append(QString("{ \"path\": \"%1\", \"autorename\": false }").arg(path));
+    QNetworkReply *reply = nam->post(request, data);
 
     // blocking request
     QEventLoop loop;
@@ -134,6 +118,10 @@ bool Dropbox::createFolder(QString path)
 QList<CloudServiceEntry*> 
 Dropbox::readdir(QString path, QStringList &errors)
 {
+    // Dropbox API V2 uses "" for root, not "/" to not change any other places in the code,
+    // affecting other cloud services, special handling is introduced here
+    if (path == "/") path = "";
+
     QList<CloudServiceEntry*> returning;
 
     // do we have a token
@@ -144,47 +132,69 @@ Dropbox::readdir(QString path, QStringList &errors)
     }
 
     // lets connect and get basic info on the root directory
-    QString url("https://api.dropboxapi.com/1/metadata/auto/" + path + "?include_deleted=false&list=true");
+    QString url("https://api.dropboxapi.com/2/files/list_folder");
 
     // request using the bearer token
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-    QNetworkReply *reply = nam->get(request);
+    request.setRawHeader("Content-Type", "application/json");
 
-    // blocking request
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    bool listHasMoreEntries = true;
+    bool firstRequest = true;
+    QByteArray data;
+    QString cursor;
+    while (listHasMoreEntries) {
 
-    // did we get a good response ?
-    QByteArray r = reply->readAll();
+        if (firstRequest) {
+            data.append(QString("{ \"path\": \"%1\", \"recursive\": false ,\"include_deleted\": false }").arg(path));
+            firstRequest = false;
+        } else {
+            data.append(QString("{ \"cursor\": \"%1\" }").arg(cursor));
+        }
+        QNetworkReply *reply = nam->post(request, data);
 
-    QJsonParseError parseError;
-    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
-    // if path was returned all is good, lets set root
-    if (parseError.error == QJsonParseError::NoError) {
+        // blocking request
+        QEventLoop loop;
+        connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-        // contents ?
-        QJsonArray contents = document.object()["contents"].toArray();
+        // did we get a good response ?
+        QByteArray r = reply->readAll();
 
-        // lets look at that then
-        for(int i=0; i<contents.size(); i++) {
+        QJsonParseError parseError;
+        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
-            QJsonValue each = contents.at(i);
-            CloudServiceEntry *add = newCloudServiceEntry();
+        // if path was returned all is good, lets set root
+        if (parseError.error == QJsonParseError::NoError) {
 
-            //dropbox has full path, we just want the file name
-            add->name = QFileInfo(each.toObject()["path"].toString()).fileName();
-            add->isDir = each.toObject()["is_dir"].toBool();
-            add->size = each.toObject()["bytes"].toInt();
-            add->id = add->name;
+            // contents ?
+            QJsonArray contents = document.object()["entries"].toArray();
+            cursor = document.object()["cursor"].toString();
+            if (document.object()["has_more"].toBool()) {
+                listHasMoreEntries = true;
+            } else {
+                listHasMoreEntries = false;
+            }
 
-            // dates in format "Tue, 19 Jul 2011 21:55:38 +0000"
-            add->modified = QDateTime::fromString(each.toObject()["modified"].toString().mid(0,25),
-                               "ddd, dd MMM yyyy hh:mm:ss");
+            // lets look at that then
+            for(int i=0; i<contents.size(); i++) {
 
-            returning << add;
+                QJsonValue each = contents.at(i);
+                CloudServiceEntry *add = newCloudServiceEntry();
+
+                //dropbox has full path, we just want the file name
+                add->name = QFileInfo(each.toObject()["path_display"].toString()).fileName();
+                add->isDir = each.toObject()[".tag"].toString() == "folder";
+                add->size = each.toObject()["bytes"].toInt();
+                add->id = add->name;
+
+                // dates in format "Tue, 19 Jul 2011 21:55:38 +0000"
+                add->modified = QDateTime::fromString(each.toObject()["client_modified"].toString(),
+                        "ddd, dd MMM yyyy hh:mm:ss");
+
+                returning << add;
+            }
         }
     }
 
@@ -208,14 +218,15 @@ Dropbox::readFile(QByteArray *data, QString remotename, QString)
     if (path == "") return false;
 
     // lets connect and get basic info on the root directory
-    QString url("https://content.dropboxapi.com/1/files/auto/" + path + "/" + remotename);
+    QString url("https://content.dropboxapi.com/2/files/download");
 
     // request using the bearer token
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-
+    request.setRawHeader("Dropbox-API-Arg", (QString("{ \"path\": \"%1/%2\" }").arg(path).arg(remotename)).toLatin1());
     // put the file
-    QNetworkReply *reply = nam->get(request);
+    QByteArray emptyPostData = "";
+    QNetworkReply *reply = nam->post(request, emptyPostData);
 
     // remember
     mapReply(reply,remotename);
@@ -244,14 +255,16 @@ Dropbox::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     if (path == "") return false;
 
     // lets connect and get basic info on the root directory
-    QString url("https://content.dropboxapi.com/1/files_put/auto/" + path + "/" + remotename + "?overwrite=true&autorename=false");
+    QString url("https://content.dropboxapi.com/2/files/upload");
 
     // request using the bearer token
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+    request.setRawHeader("Dropbox-API-Arg", (QString("{ \"path\": \"%1/%2\", \"mode\": \"overwrite\" }").arg(path).arg(remotename)).toLatin1());
+    request.setRawHeader("Content-Type", "application/octet-stream");
 
     // put the file
-    QNetworkReply *reply = nam->put(request, data);
+    QNetworkReply *reply = nam->post(request, data);
 
     // catch finished signal
     connect(reply, SIGNAL(finished()), this, SLOT(writeFileCompleted()));
