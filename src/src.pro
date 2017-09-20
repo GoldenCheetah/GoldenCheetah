@@ -139,8 +139,8 @@ win32-msvc* {
         # Linux Flex compiler grumbles about unsigned comparisons
         QMAKE_CXXFLAGS += -Wno-sign-compare
 
-        # Ubuntu 16.04 with gcc-5.4.0, it does not compile, unless c++ 2014 is set
-        CONFIG += c++14
+        # Ubuntu 16.04 with gcc-5.4.0, it does not compile, unless c++ 2011 is set
+        CONFIG += c++11
     }
 }
 
