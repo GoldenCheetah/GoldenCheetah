@@ -141,18 +141,18 @@ Dropbox::readdir(QString path, QStringList &errors)
 
     bool listHasMoreEntries = true;
     bool firstRequest = true;
-    QByteArray data;
     QString cursor;
     while (listHasMoreEntries) {
+        QByteArray data;
 
         if (firstRequest) {
             data.append(QString("{ \"path\": \"%1\", \"recursive\": false ,\"include_deleted\": false }").arg(path));
             firstRequest = false;
         } else {
+            request.setUrl(QUrl("https://api.dropboxapi.com/2/files/list_folder/continue"));
             data.append(QString("{ \"cursor\": \"%1\" }").arg(cursor));
         }
         QNetworkReply *reply = nam->post(request, data);
-
 
         // blocking request
         QEventLoop loop;
@@ -195,6 +195,9 @@ Dropbox::readdir(QString path, QStringList &errors)
 
                 returning << add;
             }
+        } else {
+            errors << tr("Parsing Error: %1").arg(QString::fromUtf8(r));
+            return returning;
         }
     }
 
