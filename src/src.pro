@@ -611,8 +611,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     # Features that only work with QT5 or higher
     SOURCES += Cloud/Dropbox.cpp
     HEADERS += Cloud/Dropbox.h
-    SOURCES += Cloud/GoogleDrive.cpp
-    HEADERS += Cloud/GoogleDrive.h
+    SOURCES += Cloud/GoogleDrive.cpp Cloud/KentUniversity.cpp
+    HEADERS += Cloud/GoogleDrive.h Cloud/KentUniversity.h
 
     greaterThan(QT_MINOR_VERSION, 3) {
         SOURCES += Cloud/SixCycle.cpp
