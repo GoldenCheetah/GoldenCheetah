@@ -77,7 +77,7 @@ bool GarminServiceHelper::stopService()
     if (manager == NULL)
         goto fail;
 
-    SC_HANDLE service = OpenService(manager, GARMIN_SERVICE_NAME, SERVICE_STOP);
+    SC_HANDLE service = OpenService(manager, GARMIN_SERVICE_NAME, SERVICE_STOP | SERVICE_QUERY_STATUS);
     if (service == NULL)
         goto fail;
 
@@ -86,8 +86,14 @@ bool GarminServiceHelper::stopService()
     if (ControlService(service, SERVICE_CONTROL_STOP, &serviceStatus) == 0)
         goto fail;
 
-    bool success = serviceStatus.dwCurrentState == SERVICE_STOPPED
-            || serviceStatus.dwCurrentState == SERVICE_STOP_PENDING;
+    while (serviceStatus.dwCurrentState == SERVICE_STOP_PENDING)
+    {
+        Sleep(serviceStatus.dwWaitHint);
+        if (QueryServiceStatus(service, &serviceStatus) == 0)
+            goto fail;
+    }
+
+    bool success = serviceStatus.dwCurrentState == SERVICE_STOPPED;
 
     if (success)
     {
@@ -96,6 +102,8 @@ bool GarminServiceHelper::stopService()
 
     CloseServiceHandle(manager);
     CloseServiceHandle(service);
+    // We need to wait some more time to make sure Windows catches up
+    Sleep(3000);
     return success;
 
     fail:
