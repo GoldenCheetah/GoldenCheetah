@@ -68,7 +68,8 @@ public:
         SPORTTRACKS,
         TODAYSPLAN,
         WITHINGS,
-        POLAR
+        POLAR,
+        KENTUNI
     } OAuthSite;
 
     // will work with old config via site and new via cloudservice (which is null for calendar and withings for now)

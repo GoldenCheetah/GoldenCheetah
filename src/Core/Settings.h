@@ -301,6 +301,16 @@
 
 #define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
 #define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
+
+//University of Kent (same as google drive)
+#define GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>uok-google-drive/auth_scope"
+#define GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>uok-google-drive/access_token"
+#define GC_UOK_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>uok-google-drive/refresh_token"
+#define GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>uok-google-drive/last_access_token_refresh"
+
+#define GC_UOK_GOOGLE_DRIVE_FOLDER          "<athlete-private>uok-google-drive/folder"
+#define GC_UOK_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>uok-google-drive/folder_id"
+
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
 #define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"

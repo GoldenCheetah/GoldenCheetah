@@ -47,6 +47,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Dropbox") site = this->site = DROPBOX;
         if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
         if (service->id() == "Google Drive") site = this->site = GOOGLE_DRIVE;
+        if (service->id() == "University of Kent") site = this->site = KENTUNI;
         if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->id() == "Withings") site = this->site = WITHINGS;
         if (service->id() == "PolarFlow") site = this->site = POLAR;
@@ -138,6 +139,18 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
 
+    } else if (site == KENTUNI) {
+
+        const QString scope =  service->getSetting(GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
+
+        // OAUTH 2.0 - Google flow for installed applications
+        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
+        // We only request access to the application data folder, not all files.
+        urlstr.append("scope=https://www.googleapis.com/auth/" + scope + "&");
+        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
+
 #endif
 
     } else if (site == TODAYSPLAN) {
@@ -195,7 +208,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_DRIVE || site == TODAYSPLAN) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN) {
 
         url = QUrl(urlstr);
         view->setUrl(url);
@@ -453,7 +466,7 @@ void
 OAuthDialog::loadFinished(bool ok)
 {
 
-    if (site == GOOGLE_DRIVE) {
+    if (site == GOOGLE_DRIVE || site == KENTUNI) {
 
         if (ok && url.toString().startsWith("https://accounts.google.com/o/oauth2/auth")) {
 
@@ -472,7 +485,7 @@ OAuthDialog::loadFinished(bool ok)
                 QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
                 params.addQueryItem("client_id", GC_GOOGLE_DRIVE_CLIENT_ID);
 
-                if (site == GOOGLE_DRIVE) {
+                if (site == GOOGLE_DRIVE || site == KENTUNI) {
                     params.addQueryItem("client_secret", GC_GOOGLE_DRIVE_CLIENT_SECRET);
                 }
 
@@ -571,7 +584,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
         // if we failed to extract then we have a big problem
         // google uses a refresh token so trap for them only
-        if ((site == GOOGLE_DRIVE && refresh_token == "") || access_token == "") {
+        if (((site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") || access_token == "") {
 
             // Something failed.
             // Only Google uses both refresh and access tokens.
@@ -651,9 +664,17 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 
+        } else if (site == KENTUNI) {
+
+            service->setSetting(GC_UOK_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
+            service->setSetting(GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, QDateTime::currentDateTime());
+            QString info = QString(tr("Kent University Google Drive authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+
         } else if (site == GOOGLE_DRIVE) {
 
-            // remove the Google Page first
             service->setSetting(GC_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
             service->setSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
             service->setSetting(GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, QDateTime::currentDateTime());
