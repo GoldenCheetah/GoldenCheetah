@@ -85,7 +85,7 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 // thread and is part of the GC architecture NOT related to the
 // hardware controller.
 //
-ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThread(parent), devConf(devConf)
+ANT::ANT(QObject *parent, DeviceConfiguration *devConf, QString athlete) : QThread(parent), devConf(devConf), portInitDone(1)
 {
     qRegisterMetaType<ANTMessage>("ANTMessage");
     qRegisterMetaType<uint16_t>("uint16_t");
@@ -257,9 +257,14 @@ void ANT::run()
         // will enable us to check responses to these messages in the future.
 
     } else {
+        // This wakes up start()
+        portInitDone.release();
         quit(0);
         return;
     }
+
+    // This wakes up start()
+    portInitDone.release();
 
     while(1)
     {
@@ -469,17 +474,19 @@ ANT::kickrCommand()
 int
 ANT::start()
 {
+    portInitDone.acquire();
     QThread::start();
+
+    // Give the thread a chance to start; run() makes one resource available that we can acquire
+    portInitDone.acquire();
+    // we promptly release the resource again since we're only interested in synchronization with run()
+    portInitDone.release();
     return 0;
 }
 
 int
 ANT::setup()
 {
-    // Give the thread a chance to start.
-    // fixme: better synchronisation?
-    msleep(500);
-
     uint8_t attempts = 0;
     do
     {
