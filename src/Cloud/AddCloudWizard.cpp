@@ -344,7 +344,6 @@ AddAuth::updateServiceSettings()
 {
     QString cname;
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Combo1, "")) != "") {
-    qDebug()<<"combo"<<cname<<cname.split("::").at(0)<<combo->text();
         wizard->cloudService->setSetting(cname.split("::").at(0), combo->text());
     }
     if ((cname=wizard->cloudService->settings.value(CloudService::CloudServiceSetting::URL, "")) != "") {
