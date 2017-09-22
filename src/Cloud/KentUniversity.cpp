@@ -42,7 +42,7 @@
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
-    if (GOOGLE_DRIVE_DEBUG) {                                 \
+    if (UOK_GOOGLE_DRIVE_DEBUG) {                                 \
         printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
                __FUNCTION__, __VA_ARGS__);                    \
         fflush(stdout);                                       \
