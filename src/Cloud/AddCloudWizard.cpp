@@ -547,7 +547,9 @@ AddSettings::browseFolder()
     if (ret == QDialog::Accepted) {
         path = dialog.pathnameSelected();
         folder->setText(path);
-        qDebug()<<"calling folder selected";
+
+        // let the cloud service set any local ids etc when the
+        // home directory is selected (used by google drive/kent uni)
         wizard->cloudService->folderSelected(path);
     }
 }
