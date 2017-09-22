@@ -132,12 +132,19 @@ class KentUniversityUploadDialog : public QDialog
     public:
         KentUniversityUploadDialog(QWidget *parent, CloudService *store, RideItem *item);
 
+        QLabel *feedback, *rpelabel, *roflabel;
+        QComboBox *rpe, *rof;
+        QLabel *noteslabel;
+        QTextEdit *notes;
+
         QLabel *info;               // how much being uploaded / status
         QProgressBar *progress;     // whilst we wait
-        QPushButton *okcancel;      // cancel whilst occurring, ok once done
+        QPushButton *okcancel;      // ok to go, cancel when working, then done at end
 
     public slots:
-        int exec();
+        //int exec();
+        void check(); // check if all the fields are set, and set button as needed
+        void uploadFile();
         void completed(QString name, QString message);
 
     private:

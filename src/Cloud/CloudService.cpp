@@ -289,6 +289,7 @@ CloudService::uploadExtension() {
         case TCX: spec = ".tcx"; break;
         case PWX: spec = ".pwx"; break;
         case FIT: spec = ".fit"; break;
+        case CSV: spec = ".csv"; break;
     }
 
     switch (uploadCompression) {
