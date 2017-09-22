@@ -154,6 +154,13 @@ QString KentUniversity::home() {
     return getSetting(GC_UOK_GOOGLE_DRIVE_FOLDER, "").toString();
 }
 
+void KentUniversity::folderSelected(QString path)
+{
+    // we selected a folder so we need to set the FOLDER_ID
+    QString id = GetFileId(path);
+    setSetting(GC_UOK_GOOGLE_DRIVE_FOLDER_ID, id);
+}
+
 QNetworkRequest KentUniversity::MakeRequestWithURL(
     const QString& url, const QString& token, const QString& args) {
     QString request_url(

@@ -713,6 +713,13 @@ QString GoogleDrive::GetRootDirId() {
     }
 }
 
+void GoogleDrive::folderSelected(QString path)
+{
+    // we selected a folder so we need to set the FOLDER_ID
+    QString id = GetFileId(path);
+    setSetting(GC_GOOGLE_DRIVE_FOLDER_ID, id);
+}
+
 QString GoogleDrive::GetFileId(const QString& path) {
     FileInfo* fi = WalkFileInfo(path, false);
     if (fi == NULL) {

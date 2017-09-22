@@ -114,6 +114,9 @@ class CloudService : public QObject {
         // create a folder
         virtual bool createFolder(QString path) { Q_UNUSED(path); return false; }
 
+        // set any local settings on folder selection (used by google drive)
+        virtual void folderSelected(QString path) { Q_UNUSED(path); return; }
+
         // write a file - call notify when done
         virtual bool writeFile(QByteArray &data, QString remotename, RideFile *ride) {
             Q_UNUSED(data); Q_UNUSED(remotename); Q_UNUSED(ride); return false;

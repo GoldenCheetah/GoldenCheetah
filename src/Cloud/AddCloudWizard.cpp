@@ -547,6 +547,8 @@ AddSettings::browseFolder()
     if (ret == QDialog::Accepted) {
         path = dialog.pathnameSelected();
         folder->setText(path);
+        qDebug()<<"calling folder selected";
+        wizard->cloudService->folderSelected(path);
     }
 }
 
