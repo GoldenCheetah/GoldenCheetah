@@ -191,7 +191,7 @@ class CloudService : public QObject {
 
         CompressionType uploadCompression;
         CompressionType downloadCompression;
-        enum uploadType { JSON, TCX, PWX, FIT } filetype;
+        enum uploadType { JSON, TCX, PWX, FIT, CSV } filetype;
 
         bool useMetric; // CloudService know distance or duration metadata (eg Today's Plan)
         bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)

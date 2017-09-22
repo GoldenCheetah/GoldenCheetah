@@ -28,6 +28,8 @@
 #include "Secrets.h"
 #include "Settings.h"
 
+#include "RideItem.h"
+
 #include <QByteArray>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -90,7 +92,13 @@ KentUniversity::KentUniversity(Context *context)
     }
     root_ = NULL;
 
+    uploadCompression = none; // gzip
+    downloadCompression = none;
+    filetype = uploadType::CSV;
+    useMetric = true; // distance and duration metadata
+
     // config
+    settings.clear();
     settings.insert(Combo1, QString("%1::Scope::drive::drive.appdata::drive.file").arg(GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE));
     settings.insert(OAuthToken, GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN);
     settings.insert(Folder, GC_UOK_GOOGLE_DRIVE_FOLDER);
@@ -757,6 +765,79 @@ KentUniversity::FileInfo* KentUniversity::BuildDirectoriesForAthleteDirectory(
     return fi;
 }
 
+KentUniversityUploadDialog::KentUniversityUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
+{
+    // setup the gui!
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    info = new QLabel(QString(tr("Uploading %1 bytes...")).arg(data.size()));
+    layout->addWidget(info);
+
+    progress = new QProgressBar(this);
+    progress->setMaximum(0);
+    progress->setValue(0);
+    layout->addWidget(progress);
+
+    okcancel = new QPushButton(tr("Cancel"));
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addStretch();
+    buttons->addWidget(okcancel);
+    layout->addLayout(buttons);
+
+    // lets open the store
+    QStringList errors;
+    status = store->open(errors);
+
+    // compress and upload if opened successfully.
+    if (status == true) {
+
+        // get a compressed version
+        store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
+
+        // ok, so now we can kickoff the upload
+        status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
+    }
+
+    // if the upload failed in any way, bail out
+    if (status == false) {
+
+        // didn't work dude
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Upload Failed") + store->uiName());
+        msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
+
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        QWidget::hide(); // don't show just yet...
+        QApplication::processEvents();
+
+        return;
+    }
+
+    // get notification when done
+    connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
+
+}
+
+int
+KentUniversityUploadDialog::exec()
+{
+    if (status) return QDialog::exec();
+    else {
+        QDialog::accept();
+        return 0;
+    }
+}
+
+void
+KentUniversityUploadDialog::completed(QString file, QString message)
+{
+    info->setText(file + "\n" + message);
+    progress->setMaximum(1);
+    progress->setValue(1);
+    okcancel->setText(tr("OK"));
+    connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
+}
 
 static bool addKentUniversity() {
     CloudServiceFactory::instance().addService(new KentUniversity(NULL));

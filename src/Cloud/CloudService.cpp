@@ -185,6 +185,7 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
         case TCX: spec="tcx"; break;
         case PWX: spec="pwx"; break;
         case FIT: spec="fit"; break;
+        case CSV: spec="csv"; break;
     }
 
     QFile jsonFile(tempfile.fileName());

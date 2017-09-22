@@ -121,4 +121,28 @@ class KentUniversity : public GoogleDrive {
         QMutex mu_;
 };
 
+// SPECIAL UPLOADER dialog to upload a single rideitem but ensure
+//          the relevant metadata and data quality is completed.
+class KentUniversityUploadDialog : public QDialog
+{
+
+    Q_OBJECT
+
+    public:
+        KentUniversityUploadDialog(QWidget *parent, CloudService *store, RideItem *item);
+
+        QLabel *info;               // how much being uploaded / status
+        QProgressBar *progress;     // whilst we wait
+        QPushButton *okcancel;      // cancel whilst occurring, ok once done
+
+    public slots:
+        int exec();
+        void completed(QString name, QString message);
+
+    private:
+        CloudService *store;
+        RideItem *item;
+        QByteArray data;            // compressed data to upload
+        bool status;                // did upload get kicked off ok?
+};
 #endif  // GC_KENT_UNI_H

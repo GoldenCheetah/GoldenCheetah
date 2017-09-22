@@ -74,6 +74,7 @@
 #if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
+#include "KentUniversity.h"
 #include "SixCycle.h"
 #endif
 #include "AddCloudWizard.h"
@@ -2048,8 +2049,17 @@ MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
-        CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
-        CloudService::upload(this, db, currentTab->context->ride);
+
+        if (action->text() == "University of Kent") {
+#if QT_VERSION > 0x50000
+            CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
+            KentUniversityUploadDialog uploader(this, db, currentTab->context->ride);
+            int ret = uploader.exec();
+ #endif
+        } else {
+            CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
+            CloudService::upload(this, db, currentTab->context->ride);
+        }
     }
 }
 
@@ -2237,10 +2247,14 @@ MainWindow::setUploadMenu()
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Upload) {
+
             // we need the technical name to identify the service to be called
             QAction *service = new QAction(NULL);
             service->setText(s->uiName());
             service->setData(name);
+
+            // Kent doesn't use the standard uploader, we trap for that
+            // in the upload action method
             uploadMenu->addAction(service);
         }
     }
@@ -2256,6 +2270,10 @@ MainWindow::setSyncMenu()
         if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Query)  {
+
+            // We don't sync with Kent
+            if (s->id() == "University of Kent") continue;
+
             // we need the technical name to identify the service to be called
             QAction *service = new QAction(NULL);
             service->setText(s->uiName());
