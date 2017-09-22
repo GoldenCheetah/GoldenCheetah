@@ -64,6 +64,7 @@ class KentUniversity : public GoogleDrive {
 
         // create a folder
         virtual bool createFolder(QString path);
+        void folderSelected(QString path);
 
         // dirent style api
         virtual CloudServiceEntry *root() { return root_; }
