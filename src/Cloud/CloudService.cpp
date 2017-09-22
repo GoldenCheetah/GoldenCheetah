@@ -23,6 +23,7 @@
 #include "RideItem.h"
 #include "MainWindow.h"
 #include "JsonRideFile.h"
+#include "CsvRideFile.h"
 #include "Colors.h"
 #include "Units.h"
 
@@ -189,7 +190,16 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
     }
 
     QFile jsonFile(tempfile.fileName());
-    if (RideFileFactory::instance().writeRideFile(ride->context, ride, jsonFile, spec) == true) {
+    bool result;
+
+    if (spec == "csv") {
+        CsvFileReader writer;
+        result = writer.writeRideFile(ride->context, ride, jsonFile, CsvFileReader::gc);
+    } else {
+        result = RideFileFactory::instance().writeRideFile(ride->context, ride, jsonFile, spec);
+    }
+
+    if (result == true) {
 
         if (uploadCompression == zip) {
             // create a temp zip file
