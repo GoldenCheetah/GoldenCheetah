@@ -24,6 +24,7 @@
 #include <set>
 #include <string>
 
+#include "Colors.h"
 #include "Athlete.h"
 #include "Secrets.h"
 #include "Settings.h"
@@ -772,37 +773,93 @@ KentUniversity::FileInfo* KentUniversity::BuildDirectoriesForAthleteDirectory(
     return fi;
 }
 
+static QString FosterDesc[11]={
+    QObject::tr("0 Rest"), // 0
+    QObject::tr("1 Very, very easy"), // 1
+    QObject::tr("2 Easy"), // 2
+    QObject::tr("3 Moderate"), // 3
+    QObject::tr("4 Somewhat hard"), // 4
+    QObject::tr("5 Hard"), // 5
+    QObject::tr("6 Hard+"), // 6
+    QObject::tr("7 Very hard"), // 7
+    QObject::tr("8 Very hard+"), // 8
+    QObject::tr("9 Very hard++"), // 9
+    QObject::tr("10 Maximum")// 10
+};
+
 KentUniversityUploadDialog::KentUniversityUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
 {
+
+    setWindowTitle(tr("Upload to Kent University"));
+    setWindowFlags(windowFlags() | Qt::WindowCloseButtonHint);
+    setModal(true);
+
+    // make is usable
+    setMinimumSize(QSize(500*dpiXFactor, 200*dpiYFactor));
+
     // setup the gui!
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QGridLayout *layout = new QGridLayout(this);
+
+    // rpe and rof
+    rpelabel = new QLabel(tr("Session RPE"), this);
+    layout->addWidget(rpelabel, 0,0);
+
+    rpe = new QComboBox(this);
+    rpe->addItem("");
+    for(int i=0; i<11; i++) rpe->addItem(FosterDesc[i]);
+    layout->addWidget(rpe, 0,1, Qt::AlignLeft);
+    connect(rpe, SIGNAL(currentIndexChanged(int)), this, SLOT(check()));
+
+    // notes
+    noteslabel = new QLabel(tr("Notes"),this);
+    layout->addWidget(noteslabel, 1,0);
+    notes = new QTextEdit(this);
+    notes->setText(item->getText("Notes", ""));
+    layout->addWidget(notes,2,0,3,2);
+    connect(notes, SIGNAL(textChanged()), this, SLOT(check()));
+
     info = new QLabel(QString(tr("Uploading %1 bytes...")).arg(data.size()));
-    layout->addWidget(info);
+    info->hide();
+    layout->addWidget(info, 10,0,1,2,Qt::AlignLeft);
 
     progress = new QProgressBar(this);
     progress->setMaximum(0);
     progress->setValue(0);
-    layout->addWidget(progress);
+    progress->hide();
+    layout->addWidget(progress, 11,0,1,2);
 
-    okcancel = new QPushButton(tr("Cancel"));
+    okcancel = new QPushButton(tr("Upload"));
+    okcancel->setEnabled(false);
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->addStretch();
     buttons->addWidget(okcancel);
-    layout->addLayout(buttons);
+    layout->addLayout(buttons, 12,1);
+    connect(okcancel, SIGNAL(clicked()), this, SLOT(uploadFile()));
 
-    // lets open the store
+    // enable/disable pushbutton
+    check();
+
+    // get ready
     QStringList errors;
-    status = store->open(errors);
+    store->open(errors);
+    connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
+}
 
-    // compress and upload if opened successfully.
-    if (status == true) {
+void
+KentUniversityUploadDialog::uploadFile()
+{
+    // lets open the store
+    bool status;
 
-        // get a compressed version
-        store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
+    // get a compressed version
+    store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".csv");
 
-        // ok, so now we can kickoff the upload
-        status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
-    }
+    info->show();
+    progress->show();
+    QApplication::processEvents();
+
+    // ok, so now we can kickoff the upload
+    status = store->writeFile(data, QFileInfo(item->fileName).baseName() + store->uploadExtension(), item->ride());
 
     // if the upload failed in any way, bail out
     if (status == false) {
@@ -815,34 +872,27 @@ KentUniversityUploadDialog::KentUniversityUploadDialog(QWidget *parent, CloudSer
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
 
-        QWidget::hide(); // don't show just yet...
-        QApplication::processEvents();
-
-        return;
     }
-
-    // get notification when done
-    connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
-
 }
 
-int
-KentUniversityUploadDialog::exec()
+void
+KentUniversityUploadDialog::check()
 {
-    if (status) return QDialog::exec();
-    else {
-        QDialog::accept();
-        return 0;
+    // notes, rpe and rof must have someething in them
+    if (rpe->currentIndex() && notes->document()->toPlainText() != "") {
+        okcancel->setEnabled(true);
+    } else {
+        okcancel->setEnabled(false);
     }
 }
 
 void
 KentUniversityUploadDialog::completed(QString file, QString message)
 {
-    info->setText(file + "\n" + message);
+    info->setText(file + " " + message);
     progress->setMaximum(1);
     progress->setValue(1);
-    okcancel->setText(tr("OK"));
+    okcancel->setText(tr("Done"));
     connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
