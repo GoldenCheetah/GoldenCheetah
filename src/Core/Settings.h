@@ -246,6 +246,7 @@
 #define GC_SB_TODAY                     "<athlete-preferences>PMshowSBtoday"
 #define GC_LTS_DAYS                             "<athlete-preferences>LTSdays"
 #define GC_STS_DAYS                             "<athlete-preferences>STSdays"
+#define GC_MODEL_INPUT_WEEKS            "<athlete-preferences>ModelInputWeeks"
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
