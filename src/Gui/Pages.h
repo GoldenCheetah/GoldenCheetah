@@ -53,6 +53,7 @@
 #include "RemoteControl.h"
 #include "BodyMeasures.h"
 #include "HrvMeasures.h"
+#include "PDModel.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -865,6 +866,8 @@ class CPPage : public QWidget
         void deleteZoneClicked();
         void zonesChanged();
         void initializeRanges();
+        void rangeAdded(int index, ZoneRange range);
+        void rangeDeleted(int index, ZoneRange);
 
     private:
         bool active;
@@ -882,6 +885,46 @@ class CPPage : public QWidget
         QTreeWidget *zones;
         QPushButton *addButton, *updateButton, *deleteButton;
         QPushButton *addZoneButton, *deleteZoneButton, *defaultButton;
+};
+
+class CPEstiamtesPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+    
+    enum RangeColumns {
+        IncludedInSettings,
+        DateFrom,
+        CP,
+        FTP,
+        WPrime,
+        PMax,
+        RightPadding,
+        Count
+    };
+    
+    public:
+        CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, Zones *zones);
+    
+    private slots:
+        void configChanged(qint32 config);
+        void initializeRanges();
+        void zoneRangeDeleted(int, ZoneRange range);
+        void rangesItemChanged(QTreeWidgetItem *item, int column);
+        void autoCpChkBoxToggled(bool value);
+        void modelComboCurrentIndexChanged(int index);
+
+    private:
+        Context *context;
+        QList<PDEstimate> estimates;
+        Zones *zones;
+
+        QComboBox *modelCombo;
+        QCheckBox *autoCpChkBox;
+        QTreeWidget *ranges;
+
+        void emphasizeLastEntry();
+        void deEmphasizeLastEntry();
 };
 
 class ZonePage : public QWidget
@@ -917,6 +960,7 @@ class ZonePage : public QWidget
         quint16 b4Fingerprint[nSports]; // how did it start ?
         SchemePage *schemePage[nSports];
         CPPage *cpPage[nSports];
+        CPEstiamtesPage *cpEstimatesPage[nSports];
 
     private slots:
         void changeSport(int i);

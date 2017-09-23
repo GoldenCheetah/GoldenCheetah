@@ -62,12 +62,13 @@ struct ZoneRange {
     int ftp;
     int wprime; // aka awc
     int pmax;
+    QString origin; // where does it originate from? Was it created manually or imported from a model estimate?
     QList<ZoneInfo> zones;
     bool zonesSetFromCP;
     ZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), cp(0), ftp(0), wprime(0), pmax(0), zonesSetFromCP(false) {}
-    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int pmax) :
-        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
+        begin(b), end(e), cp(0), ftp(0), wprime(0), pmax(0), origin(), zonesSetFromCP(false) {}
+    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int pmax, QString origin) :
+        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), origin(origin), zonesSetFromCP(false) {}
 
     // used by qSort()
     bool operator< (ZoneRange right) const {
@@ -76,6 +77,14 @@ struct ZoneRange {
                 ((begin == right.begin) && (! end.isNull()) &&
                 ( right.end.isNull() || end < right.end )));
     }
+
+    // whether this zone range was created manually (rather than originating from a model estimate)
+    bool isManualEntry() const {
+        return origin.isNull() || origin.isEmpty();
+    }
+
+    static QString ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate);
+    static bool TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate);
 };
 
 
@@ -131,23 +140,18 @@ class Zones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax);
-        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax);
-        void addZoneRange();
+        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax, QString origin);
 
         // Get / Set ZoneRange details
         ZoneRange getZoneRange(int rnum) { return ranges[rnum]; }
-        void setZoneRange(int rnum, ZoneRange x) { ranges[rnum] = x; }
+        void setZoneRange(int rnum, ZoneRange x);
 
-        // get and set CP for a given range
+        // get a value for a given range
         int getCP(int rnum) const;
-        void setCP(int rnum, int cp);
         int getFTP(int rnum) const;
-        void setFTP(int rnum, int ftp);
         int getWprime(int rnum) const;
-        void setWprime(int rnum, int wprime);
         int getPmax(int rnum) const;
-        void setPmax(int rnum, int pmax);
+        QString getOrigin(int rnum);
 
         // calculate and then set zoneinfo for a given range
         void setZonesFromCP(int rnum);
@@ -198,8 +202,6 @@ class Zones : public QObject
         QDate getEndDate(int rnum) const;
         QString getStartDateString(int rnum) const;
         QString getEndDateString(int rnum) const;
-        void setEndDate(int rnum, QDate date);
-        void setStartDate(int rnum, QDate date);
 
         // When was this last updated?
         QDateTime modificationTime;
@@ -216,6 +218,12 @@ class Zones : public QObject
 
         // USE_CP_FOR_FTP setting differenciated by sport
         QString useCPforFTPSetting() const;
+
+    signals:
+        void zoneRangeAdded(int rnum, ZoneRange range);
+        void zoneRangeDeleted(int rnum, ZoneRange range);
+        void zoneRangeUpdated(int rnum, ZoneRange oldRange, ZoneRange newRange);
+        void zoneRangesRefreshed();
 };
 
 QColor zoneColor(int zone, int num_zones);
