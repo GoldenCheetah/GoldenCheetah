@@ -98,8 +98,24 @@ KentUniversity::KentUniversity(Context *context)
     filetype = uploadType::CSV;
     useMetric = true; // distance and duration metadata
 
+    QString consenttext= QString("<h2>Data Sharing Consent</h2>"
+    "<p>Your data will be shared with the researchers at the University of Kent as part of your participation in their study.</p>"
+    "<p>This data will include all telemetry data for each ride you share via a Google Drive folder. This data will be shared exactly as it can be viewed within GoldenCheetah.</p>"
+    "<p>This includes GPS, Power, Heart rate data and so on. No data is stripped and no data is resampled or adjusted.</p>"
+    "<h2>Controlling the data you share</h2>"
+    "<p>Only data that you explicitly upload via the Share menu will be shared. No data will be sent "
+    "without you explicitly triggering it. At any point you can revoke access to the data you have previously shared ("
+    "see revoking access below)."
+    "<h2>How Kent University will use your data</h2>"
+    "<p>The researchers at the University of Kent will use your data to support analyses as outlined in the study design.</p>"
+    "<p>This data may be shared with other researchers but will not include any personally identifiable information.</p>"
+    "<h2>Rekoving access to your data</h2>"
+    "<p>At any point you can revoke access to the data by unsharing the Google Drive folder using standard Google Drive functionality.</p>"
+    "<p>&nbsp;</p>");
+
     // config
     settings.clear();
+    settings.insert(Consent, QString("%1::%2").arg(GC_UOK_CONSENT).arg(consenttext));
     settings.insert(Combo1, QString("%1::Scope::drive::drive.appdata::drive.file").arg(GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE));
     settings.insert(OAuthToken, GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN);
     settings.insert(Folder, GC_UOK_GOOGLE_DRIVE_FOLDER);
@@ -714,6 +730,9 @@ void KentUniversity::MaybeRefreshCredentials() {
         QString access_token = document.object()["access_token"].toString();
 
         // LOCALLY MAINTAINED -- WILL BE AN ISSUE IF ALLOW >1 ACCOUNT XXX
+        setSetting(GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
+        setSetting(GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, now.toString());
+
         appsettings->setCValue(context_->athlete->cyclist, GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
         appsettings->setCValue(context_->athlete->cyclist, GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, now.toString());
     } else {

@@ -33,6 +33,7 @@
 //
 // 01. Select Service Class (e.g. Activities, Measures)
 // 10. Select Cloud Service Type (via CloudServiceFactory)
+// 15. Agree to terms of service (optional)
 // 20. Authenticate Account (URL+Key, OAUTH or User/Pass)
 // 25. Select Athlete [optional]
 // 30. Settings (Folder,sync on startup, sync on import)
@@ -57,8 +58,9 @@ AddCloudWizard::AddCloudWizard(Context *context, QString sname) : QWizard(contex
     if (service == "") {
 
         setWindowTitle(tr("Add Cloud Wizard"));
-        setPage(01, new AddClass(this));   // done
-        setPage(10, new AddService(this));   // done
+        setPage(01, new AddClass(this));
+        setPage(10, new AddService(this));
+        setPage(15, new AddConsent(this));
         cloudService = NULL; // not cloned yet
 
     } else {
@@ -183,6 +185,16 @@ AddService::initializePage()
     buttonlayout->addStretch();
 }
 
+int AddService::nextId() const
+{
+    if (wizard->cloudService) {
+        if (wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Consent, "") != "") return 15;
+        else return 20;
+    }
+
+    // loop round
+    return 10;
+}
 void
 AddService::clicked(QString p)
 {
@@ -195,6 +207,45 @@ AddService::clicked(QString p)
     wizard->cloudService = CloudServiceFactory::instance().newService(p, wizard->context);
 
     wizard->next();
+}
+
+// Consent to terms of service if needed
+AddConsent::AddConsent(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent), consented(false)
+{
+    setTitle(tr("Terms of Service"));
+    setSubTitle(tr("Your consent is needed"));
+
+    layout = new QVBoxLayout;
+    setLayout(layout);
+
+    document = new QTextEdit(this);
+    document->setReadOnly(true);
+    layout->addWidget(document);
+
+    QHBoxLayout *buttons = new QHBoxLayout;
+    approve = new QPushButton(tr("Accept"), this);
+    buttons->addStretch();
+    buttons->addWidget(approve);
+    buttons->addStretch();
+    layout->addLayout(buttons);
+
+    connect(approve, SIGNAL(clicked(bool)), this, SLOT(setConsent()));
+}
+
+void AddConsent::setConsent()
+{
+    consented = true;
+    emit completeChanged();
+
+    // move on if accepted
+    wizard->next();
+}
+
+void AddConsent::initializePage()
+{
+    QStringList parts = wizard->cloudService->settings.value(CloudService::CloudServiceSetting::Consent, "::").split("::");
+    if (parts.count() < 2) document->setHtml("");
+    else document->setHtml(parts.at(1));
 }
 
 //Select Cloud type
@@ -599,6 +650,7 @@ AddFinish::initializePage()
             case CloudService::Local4:
             case CloudService::Local5:
             case CloudService::Local6: label=want.value().split(QRegExp("[<>/]")).last(); break;
+            case CloudService::Consent:
             case CloudService::DefaultURL: break;
         }
         // no clue

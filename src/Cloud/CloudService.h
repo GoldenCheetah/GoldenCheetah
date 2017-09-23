@@ -148,7 +148,7 @@ class CloudService : public QObject {
         // entry points -- to list and accept the choice of athlete by the user
         enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, AthleteID,
                                    Local1, Local2, Local3, Local4, Local5, Local6,
-                                   Combo1, Metadata1 } setting_;
+                                   Combo1, Metadata1, Consent } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
         // When a service is instantiated by the cloud service factory, the configuration
