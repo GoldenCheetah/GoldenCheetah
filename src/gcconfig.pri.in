@@ -169,17 +169,21 @@
 #USBXPRESS_LIBS    = 
 
 # If you want support for using USB2 sticks in Train View on Linux or Windows
-# then you need to install libusb (Linux) version 0.1.12 
-# or libusb-win32 (Windows) version 1.2.6.0
-# For Linux builds download: (There is a copy in the contrib directory)
-#     http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
-# For Windows builds download:
-#     ttps://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/
+# then you need to install libusb. For Linux it is recommended to use libusb-1.0.
+# To do that uncomment LIBUSB_USE_V_1 below. For Windows it is recommended to
+# use libusb-win32 version 0.1.12. For MacOSX use libusb version 0.1.12 (a copy
+# can be found in the contrib directory).
+# You can acquire the appropriate package from the following download locations:
+#   libusb-1.0: https://sourceforge.net/projects/libusb/files/libusb-1.0/
+#   libusb (0.1)
+#     Linux: https://sourceforge.net/projects/libusb/files/libusb-0.1%20%28LEGACY%29/
+#     Windows: https://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/
 # You may override the INCLUDE and LIB files if you like.
 # You *must* define LIBUSB_INSTALL to use this feature.
 #LIBUSB_INSTALL = /usr/local
 #LIBUSB_INCLUDE = 
 #LIBUSB_LIBS    = 
+#LIBUSB_USE_V_1 = true
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from

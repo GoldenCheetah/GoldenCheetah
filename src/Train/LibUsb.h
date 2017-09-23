@@ -26,16 +26,7 @@
 #include <windows.h>
 #endif
 
-#include <usb.h> // for the constants etc
-
-// EZ-USB firmware loader for Fortius
-extern "C" {
-#include "EzUsb.h"
-}
-
-#ifdef WIN32
-#include <QLibrary> // for dynamically loading libusb0.dll
-#endif
+#include "LibUsbLib.h"
 
 #define GARMIN_USB2_VID   0x0fcf
 #define GARMIN_USB2_PID   0x1008
@@ -55,6 +46,7 @@ class LibUsb {
 
 public:
     LibUsb(int type);
+    ~LibUsb();
     int open();
     void close();
     int read(char *buf, int bytes);
@@ -64,18 +56,13 @@ public:
     bool find();
 private:
 
-    struct usb_dev_handle* OpenAntStick();
-    struct usb_dev_handle* OpenFortius();
-    bool findAntStick();
-    bool findFortius();
+    UsbDevice *getDevice() const;
+    UsbDeviceHandle* openAntStick();
+    UsbDeviceHandle* openFortius();
+    UsbDeviceHandle* openUsb(UsbDevice *device, bool detachKernelDriver);
 
-    struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
-    struct usb_dev_handle* device;
-    struct usb_interface_descriptor* intf;
-
-    int readEndpoint, writeEndpoint;
-    int interface;
-    int alternate;
+    UsbDeviceHandle* device;
+    UsbDeviceInterface* intf;
 
     char readBuf[64];
     int readBufIndex;
@@ -83,36 +70,7 @@ private:
 
     int type;
 
-#ifdef WIN32
-    bool libNotInstalled;
-    typedef void (*PrototypeVoid)();
-    typedef char* (*PrototypeChar_Void)();
-    typedef void (*PrototypeVoid_Int)(int);
-    typedef int (*PrototypeInt_Handle)(usb_dev_handle*);
-    typedef int (*PrototypeInt_Handle_Int)(usb_dev_handle*, unsigned int);
-    typedef int (*PrototypeInt_Handle_Int_Char_Int_Int)(usb_dev_handle*, int, char*, int, int);
-    typedef struct usb_bus* (*PrototypeBus) (void);
-    typedef usb_dev_handle* (*PrototypeHandle_Device) (struct usb_device *dev);
-
-
-    PrototypeVoid usb_init;
-    PrototypeVoid_Int usb_set_debug;
-    PrototypeVoid usb_find_busses;
-    PrototypeVoid usb_find_devices;
-    PrototypeInt_Handle_Int usb_clear_halt;
-    PrototypeInt_Handle_Int usb_release_interface;
-    PrototypeInt_Handle usb_close;
-    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_read;
-    PrototypeInt_Handle_Int_Char_Int_Int usb_bulk_write;
-    PrototypeBus usb_get_busses;
-    PrototypeHandle_Device usb_open;
-    PrototypeInt_Handle_Int usb_set_configuration;
-    PrototypeInt_Handle_Int usb_claim_interface;
-    PrototypeInt_Handle_Int_Char_Int_Int usb_interrupt_write;
-    PrototypeInt_Handle_Int usb_set_altinterface;
-    PrototypeChar_Void usb_strerror;
-
-#endif
+    LibUsbLib *usbLib;
 };
 #endif
 #endif // gc_LibUsb_h
