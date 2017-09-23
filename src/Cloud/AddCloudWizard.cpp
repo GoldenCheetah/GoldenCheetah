@@ -443,6 +443,7 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     folderLabel = new QLabel(tr("Folder"));
     folder = new QLineEdit(this);
     folder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    folder->setReadOnly(true); // only allow folder selection via di
     browse = new QPushButton(tr("Browse"));
     syncStartup = new QCheckBox(tr("Sync on startup"));
     syncImport = new QCheckBox(tr("Sync on import"));
