@@ -4378,30 +4378,22 @@ CPPage::saveClicked()
 
 void
 CPPage::initializeRanges() {
-    bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0? true : false);
-
-    int column = 0;
-
-    bool resize = (ranges->columnCount() == 4);
-
     while( int nb = ranges->topLevelItemCount () )
     {
         delete ranges->takeTopLevelItem( nb - 1 );
     }
+
+    int column = 0;
     ranges->headerItem()->setText(column++, tr("From Date"));
-
     ranges->headerItem()->setText(column++, tr("Critical Power"));
-    if (!useCPForFTP) {
-        ranges->headerItem()->setText(column++, tr("FTP"));
-    }
-
+    ranges->headerItem()->setText(column++, tr("FTP"));
     ranges->headerItem()->setText(column++, tr("W'"));
     ranges->headerItem()->setText(column++, tr("Pmax"));
 
-    if (resize)
-        ranges->setColumnWidth(3, (ranges->columnWidth(3)/2) *dpiXFactor);
-
     ranges->setColumnCount(column);
+
+    bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0? true : false);    
+    ranges->setColumnHidden(2, useCPForFTP);
 
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
     //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -4428,11 +4420,9 @@ CPPage::initializeRanges() {
         add->setText(column, QString("%1").arg(zones_->getCP(i)));
         add->setFont(column++, font);
 
-        if (!useCPForFTP) {
-            // FTP
-            add->setText(column, QString("%1").arg(zones_->getFTP(i)));
-            add->setFont(column++, font);
-        }
+        // FTP
+        add->setText(column, QString("%1").arg(zones_->getFTP(i)));
+        add->setFont(column++, font);
 
         // W'
         add->setText(column, QString("%1").arg(zones_->getWprime(i)));
@@ -4485,9 +4475,7 @@ CPPage::addClicked()
     add->setText(column++, QString("%1").arg(cpEdit->value()));
 
     // FTP
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        add->setText(column++, QString("%1").arg(ftpEdit->value()));
-    }
+    add->setText(column++, QString("%1").arg(ftpEdit->value()));
 
     // W'
     add->setText(column++, QString("%1").arg(wp));
@@ -4534,10 +4522,8 @@ CPPage::editClicked()
     edit->setText(columns++, QString("%1").arg(cp));
 
     // show FTP if we use FTP for Coggan Metrics
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        zones_->setFTP(index, ftp);
-        edit->setText(columns++, QString("%1").arg(ftp));
-    }
+    zones_->setFTP(index, ftp);
+    edit->setText(columns++, QString("%1").arg(ftp));
 
     // W'
     zones_->setWprime(index, wp);
