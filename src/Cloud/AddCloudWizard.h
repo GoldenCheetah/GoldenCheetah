@@ -91,7 +91,7 @@ class AddService : public QWizardPage
         void initializePage();
         bool validate() const { return false; }
         bool isComplete() const { return false; }
-        int nextId() const { return 20; }
+        int nextId() const;
 
     public slots:
         void clicked(QString);
@@ -104,6 +104,28 @@ class AddService : public QWizardPage
         QScrollArea *scrollarea;
 };
 
+class AddConsent : public QWizardPage
+{
+    Q_OBJECT
+
+    public:
+        AddConsent(AddCloudWizard *);
+        void initializePage();
+        bool isComplete() const { return consented; }
+        //bool isCommitPage() { return true; }
+        int nextId() const { return 20; }
+
+    public slots:
+        void setConsent();
+
+    private:
+        AddCloudWizard *wizard;
+        QVBoxLayout *layout;
+        QTextEdit *document;
+        QPushButton *approve;
+        bool consented;
+
+};
 class AddAuth : public QWizardPage
 {
     Q_OBJECT

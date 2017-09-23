@@ -697,6 +697,8 @@ void GoogleDrive::MaybeRefreshCredentials() {
         QString access_token = document.object()["access_token"].toString();
 
         // LOCALLY MAINTAINED -- WILL BE AN ISSUE IF ALLOW >1 ACCOUNT XXX
+        setSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
+        setSetting(GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, now.toString());
         appsettings->setCValue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
         appsettings->setCValue(context_->athlete->cyclist, GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, now.toString());
     } else {
