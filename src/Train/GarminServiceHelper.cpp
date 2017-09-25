@@ -16,9 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "GarminServiceHelper.h"
-#include <QDebug>
 
 #if defined(_MSC_VER)
+
 #pragma comment(lib, "advapi32.lib")
 #include <windows.h>
 
@@ -111,6 +111,74 @@ bool GarminServiceHelper::stopService()
         CloseServiceHandle(service);
     if (manager != NULL)
         CloseServiceHandle(manager);
+    return false;
+}
+
+#elif defined(__APPLE__)
+
+#include <vector>
+#include <string>
+
+#include <sys/sysctl.h>
+#include <signal.h>
+#include <unistd.h>
+
+static pid_t findProcess(const std::string& pattern)
+{
+    int queryArgMax[] = { CTL_KERN, KERN_ARGMAX };
+    int queryProcAll[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL };
+
+    int maxArgSize = 0;
+    size_t size = sizeof(maxArgSize);
+    if (sysctl(queryArgMax, 2, &maxArgSize, &size, nullptr, 0) == -1)
+        return -1;
+
+    size_t processInfoSize;
+    if (sysctl(queryProcAll, 3, nullptr, &processInfoSize, nullptr, 0) < 0)
+        return -1;
+
+    std::vector<struct kinfo_proc> processInfo(processInfoSize / sizeof(struct kinfo_proc));
+    if (sysctl(queryProcAll, 3, processInfo.data(), &processInfoSize, nullptr, 0) < 0)
+        return -1;
+
+    std::vector<char> argumentsBuffer(maxArgSize);
+    for (auto& process : processInfo)
+    {
+        pid_t pid = process.kp_proc.p_pid;
+        if (pid == 0)
+            continue;
+
+        size = maxArgSize;
+        int queryProcArgs2[] = { CTL_KERN, KERN_PROCARGS2, pid };
+        if (sysctl(queryProcArgs2, 3, argumentsBuffer.data(), &size, nullptr, 0) < 0)
+        {
+            // this generally happens if we don't have enough privileges
+            // therefore not a fatal error
+            continue;
+        }
+
+        // the KERN_PROCARGS2 data is first an int (argc), then all of argv
+        // argv[0] is the path to the executable of the process we're interested in
+        std::string executablePath(&argumentsBuffer[sizeof(int)]);
+        if (executablePath.find(pattern) != std::string::npos)
+            return pid;
+    }
+
+    return -1;
+}
+
+static const char* GARMIN_SERVICE_EXECUTABLE = "/Garmin Express Service.app/Contents/MacOS/Garmin Express Service";
+
+bool GarminServiceHelper::isServiceRunning()
+{
+    return findProcess(GARMIN_SERVICE_EXECUTABLE) != -1;
+}
+
+bool GarminServiceHelper::stopService()
+{
+    pid_t pid = findProcess(GARMIN_SERVICE_EXECUTABLE);
+    if (pid != -1)
+        return killpg(getpgid(pid), SIGTERM) != -1;
     return false;
 }
 
