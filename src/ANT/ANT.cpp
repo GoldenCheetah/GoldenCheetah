@@ -487,6 +487,12 @@ ANT::start()
 int
 ANT::setup()
 {
+    if (channels == 0)
+    {
+        // we obviously have not managed to open an ANT stick, fail fast
+        return 0;
+    }
+
     uint8_t attempts = 0;
     do
     {
