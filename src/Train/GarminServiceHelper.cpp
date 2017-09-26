@@ -119,6 +119,7 @@ bool GarminServiceHelper::stopService()
 
 #include <vector>
 #include <string>
+#include <cstddef>
 
 #include <sys/sysctl.h>
 #include <signal.h>
@@ -131,27 +132,27 @@ static pid_t findProcess(const std::string& pattern)
 
     int maxArgSize = 0;
     size_t size = sizeof(maxArgSize);
-    if (sysctl(queryArgMax, 2, &maxArgSize, &size, nullptr, 0) == -1)
+    if (sysctl(queryArgMax, 2, &maxArgSize, &size, NULL, 0) == -1)
         return -1;
 
     size_t processInfoSize;
-    if (sysctl(queryProcAll, 3, nullptr, &processInfoSize, nullptr, 0) < 0)
+    if (sysctl(queryProcAll, 3, NULL, &processInfoSize, NULL, 0) < 0)
         return -1;
 
     std::vector<struct kinfo_proc> processInfo(processInfoSize / sizeof(struct kinfo_proc));
-    if (sysctl(queryProcAll, 3, processInfo.data(), &processInfoSize, nullptr, 0) < 0)
+    if (sysctl(queryProcAll, 3, processInfo.data(), &processInfoSize, NULL, 0) < 0)
         return -1;
 
     std::vector<char> argumentsBuffer(maxArgSize);
-    for (auto& process : processInfo)
+    for (int i = 0; i < processInfo.size(); i++)
     {
-        pid_t pid = process.kp_proc.p_pid;
+        pid_t pid = processInfo[i].kp_proc.p_pid;
         if (pid == 0)
             continue;
 
         size = maxArgSize;
         int queryProcArgs2[] = { CTL_KERN, KERN_PROCARGS2, pid };
-        if (sysctl(queryProcArgs2, 3, argumentsBuffer.data(), &size, nullptr, 0) < 0)
+        if (sysctl(queryProcArgs2, 3, argumentsBuffer.data(), &size, NULL, 0) < 0)
         {
             // this generally happens if we don't have enough privileges
             // therefore not a fatal error
