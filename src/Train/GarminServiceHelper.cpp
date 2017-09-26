@@ -22,75 +22,83 @@
 #pragma comment(lib, "advapi32.lib")
 #include <windows.h>
 
+class WindowsServiceHandle
+{
+private:
+    SC_HANDLE _handle;
+
+public:
+    WindowsServiceHandle(const WindowsServiceHandle&) = delete;
+
+    WindowsServiceHandle(SC_HANDLE handle)
+        : _handle(handle)
+    {
+    }
+
+    ~WindowsServiceHandle()
+    {
+        if (isValid())
+            CloseServiceHandle(_handle);
+    }
+
+    bool isValid() { return _handle != nullptr; }
+    SC_HANDLE getHandle() { return _handle; }
+};
+
 static LPCWSTR GARMIN_SERVICE_NAME = L"Garmin Device Interaction Service";
 
 bool GarminServiceHelper::isServiceRunning()
 {
-    SC_HANDLE manager = OpenSCManager(NULL, NULL, 0);
-    if (manager == NULL)
-        goto fail;
+    WindowsServiceHandle manager(OpenSCManager(nullptr, nullptr, 0));
+    if (!manager.isValid())
+        return false;
 
-    SC_HANDLE service = OpenService(manager, GARMIN_SERVICE_NAME, SERVICE_QUERY_STATUS);
-    if (service == NULL)
-        goto fail;
+    WindowsServiceHandle service(OpenService(manager.getHandle(), GARMIN_SERVICE_NAME, SERVICE_QUERY_STATUS));
+    if (!service.isValid())
+        return false;
 
     SERVICE_STATUS serviceStatus;
-    if (QueryServiceStatus(service, &serviceStatus) == 0)
-        goto fail;
+    if (QueryServiceStatus(service.getHandle(), &serviceStatus) == 0)
+        return false;
 
-    CloseServiceHandle(service);
-    CloseServiceHandle(manager);
     return serviceStatus.dwCurrentState == SERVICE_RUNNING
             || serviceStatus.dwCurrentState == SERVICE_START_PENDING;
-
-    fail:
-    if (service != NULL)
-        CloseServiceHandle(service);
-    if (manager != NULL)
-        CloseServiceHandle(manager);
-    return false;
 }
 
 static void restartGarminService()
 {
-    SC_HANDLE manager = OpenSCManager(NULL, NULL, 0);
-    if (manager == NULL)
-        goto cleanup;
+    WindowsServiceHandle manager(OpenSCManager(nullptr, nullptr, 0));
+    if (!manager.isValid())
+        return;
 
-    SC_HANDLE service = OpenService(manager, GARMIN_SERVICE_NAME, SERVICE_START);
-    if (service == NULL)
-        goto cleanup;
+    WindowsServiceHandle service(OpenService(manager.getHandle(), GARMIN_SERVICE_NAME, SERVICE_START));
+    if (!service.isValid())
+        return;
 
     // we don't care if this works out
-    StartService(service, 0, NULL);
-
-    cleanup:
-    if (service != NULL)
-        CloseServiceHandle(service);
-    if (manager != NULL)
-        CloseServiceHandle(manager);
+    StartService(service.getHandle(), 0, nullptr);
 }
 
 bool GarminServiceHelper::stopService()
 {
-    SC_HANDLE manager = OpenSCManager(NULL, NULL, 0);
-    if (manager == NULL)
-        goto fail;
+    WindowsServiceHandle manager(OpenSCManager(nullptr, nullptr, 0));
+    if (!manager.isValid())
+        return false;
 
-    SC_HANDLE service = OpenService(manager, GARMIN_SERVICE_NAME, SERVICE_STOP | SERVICE_QUERY_STATUS);
-    if (service == NULL)
-        goto fail;
+    WindowsServiceHandle service(OpenService(manager.getHandle(), GARMIN_SERVICE_NAME, SERVICE_STOP | SERVICE_QUERY_STATUS));
+    if (!service.isValid())
+        return false;
 
     SERVICE_STATUS serviceStatus;
     // this unfortunately blocks until the service is stopped, but the Garmin service is generally well behaved
-    if (ControlService(service, SERVICE_CONTROL_STOP, &serviceStatus) == 0)
-        goto fail;
+    if (ControlService(service.getHandle(), SERVICE_CONTROL_STOP, &serviceStatus) == 0)
+        return false;
 
     while (serviceStatus.dwCurrentState == SERVICE_STOP_PENDING)
     {
         Sleep(serviceStatus.dwWaitHint);
-        if (QueryServiceStatus(service, &serviceStatus) == 0)
-            goto fail;
+        if (QueryServiceStatus(service.getHandle(), &serviceStatus) == 0)
+            return false;
     }
 
     bool success = serviceStatus.dwCurrentState == SERVICE_STOPPED;
@@ -100,18 +108,9 @@ bool GarminServiceHelper::stopService()
         atexit(restartGarminService);
     }
 
-    CloseServiceHandle(manager);
-    CloseServiceHandle(service);
     // We need to wait some more time to make sure Windows catches up
     Sleep(3000);
     return success;
-
-    fail:
-    if (service != NULL)
-        CloseServiceHandle(service);
-    if (manager != NULL)
-        CloseServiceHandle(manager);
-    return false;
 }
 
 #elif defined(__APPLE__)
