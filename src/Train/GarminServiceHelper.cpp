@@ -115,6 +115,8 @@ bool GarminServiceHelper::stopService()
 
 #elif defined(__APPLE__)
 
+#include <QThread>
+
 #include <vector>
 #include <string>
 
@@ -177,7 +179,13 @@ bool GarminServiceHelper::stopService()
 {
     pid_t pid = findProcess(GARMIN_SERVICE_EXECUTABLE);
     if (pid != -1)
-        return killpg(getpgid(pid), SIGTERM) != -1;
+    {
+        if (killpg(getpgid(pid), SIGTERM) == -1)
+            return false;
+        // Wait for the ANT stick to be freed
+        QThread::sleep(3);
+        return true;
+    }
     return false;
 }
 
