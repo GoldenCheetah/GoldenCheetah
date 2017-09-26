@@ -68,11 +68,13 @@ ANTlocalController::start()
     // Before we do the low level device opening, check for an active Garmin Service
     if (GarminServiceHelper::isServiceRunning())
     {
-       int dialogStatus = QMessageBox::warning(parent, tr("Found Garmin Express service"),
-                                               tr("The Garmin Express service is active on your computer.\n"
-                                                  "This can block GoldenCheetah from accessing your ANT+ stick.\n\n"
-                                                  "Do you want to temporarily disable the service?"),
-                                               QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
+        // HACK the event loop gets very angry when we open a dialog in response to a UI event
+        QApplication::processEvents();
+        int dialogStatus = QMessageBox::warning(parent, tr("Found Garmin Express service"),
+                                                tr("The Garmin Express service is active on your computer.\n"
+                                                   "This can block GoldenCheetah from accessing your ANT+ stick.\n\n"
+                                                   "Do you want to temporarily disable the service?"),
+                                                QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
 
         if (dialogStatus == QMessageBox::Ok)
         {
