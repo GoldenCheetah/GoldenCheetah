@@ -28,6 +28,7 @@
 #include <QWizard>
 #include <QFormLayout>
 #include <QHeaderView>
+#include <QTextEdit>
 #include <QProgressBar>
 #include <QFileDialog>
 #include <QCommandLinkButton>
