@@ -26,6 +26,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QNetworkAccessManager>
+#include <QTextEdit>
 #include <QNetworkRequest>
 #include <QScopedPointer>
 #include <QSharedPointer>
