@@ -36,6 +36,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QMessageBox>
+
 
 #ifndef UOK_GOOGLE_DRIVE_DEBUG
 // TODO(gille): This should be a command line flag.
