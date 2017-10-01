@@ -81,7 +81,7 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         lastLength = 0.0;
 
     } else if (qName == "Lap") {
-        lap_start_time = convertToLocalTime(qAttributes.value("StartTime"));
+        lap_start_time = convertToLocalTime(qAttributes.value("StartTime").trimmed());
         lapSecs = 0.0;
         lapTrigger = ltManual;
 
