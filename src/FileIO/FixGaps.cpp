@@ -94,7 +94,7 @@ class FixGapsConfig : public DataProcessorConfig
 
         void readConfig() {
             double tol = appsettings->value(NULL, GC_DPFG_TOLERANCE, "1.0").toDouble();
-            double stop = appsettings->value(NULL, GC_DPFG_STOP, "1.0").toDouble();
+            double stop = appsettings->value(NULL, GC_DPFG_STOP, "90.0").toDouble();
             tolerance->setValue(tol);
             beerandburrito->setValue(stop);
         }
@@ -142,7 +142,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="
     double tolerance, stop;
     if (config == NULL) { // being called automatically
         tolerance = appsettings->value(NULL, GC_DPFG_TOLERANCE, "1.0").toDouble();
-        stop = appsettings->value(NULL, GC_DPFG_STOP, "1.0").toDouble();
+        stop = appsettings->value(NULL, GC_DPFG_STOP, "90.0").toDouble();
     } else { // being called manually
         tolerance = ((FixGapsConfig*)(config))->tolerance->value();
         stop = ((FixGapsConfig*)(config))->beerandburrito->value();
@@ -174,7 +174,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="
             bool stationary = ((last->lat || last->lon) && (point->lat || point->lon)) // gps is present
                          && last->lat == point->lat && last->lon == point->lon;
 
-            // moved for less than 30 seconds ... interpolate
+            // moved for less than stop seconds ... interpolate
             if (!stationary && gap > tolerance && gap < stop) {
 
                 // what's needed?

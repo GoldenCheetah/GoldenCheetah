@@ -75,6 +75,8 @@ class Strava : public CloudService {
         QByteArray* prepareResponse(QByteArray* data);
 
         void addSamples(RideFile* ret, QString remoteid);
+        void fixLapSwim(RideFile* ret, QJsonArray laps);
+        void fixSmartRecording(RideFile* ret);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
