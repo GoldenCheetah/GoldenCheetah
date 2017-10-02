@@ -135,8 +135,9 @@ class KentUniversityUploadDialog : public QDialog
 
         QLabel *feedback, *rpelabel, *roflabel;
         QComboBox *rpe, *rof;
-        QLabel *noteslabel;
-        QTextEdit *notes;
+        QLabel *noteslabel, *reasonlabel;
+        QTextEdit *notes, *reasons;
+        QCheckBox *isTest;
 
         QLabel *info;               // how much being uploaded / status
         QProgressBar *progress;     // whilst we wait

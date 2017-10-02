@@ -795,17 +795,30 @@ KentUniversity::FileInfo* KentUniversity::BuildDirectoriesForAthleteDirectory(
 }
 
 static QString FosterDesc[11]={
-    QObject::tr("0 Rest"), // 0
-    QObject::tr("1 Very, very easy"), // 1
-    QObject::tr("2 Easy"), // 2
-    QObject::tr("3 Moderate"), // 3
-    QObject::tr("4 Somewhat hard"), // 4
-    QObject::tr("5 Hard"), // 5
-    QObject::tr("6 Hard+"), // 6
-    QObject::tr("7 Very hard"), // 7
-    QObject::tr("8 Very hard+"), // 8
-    QObject::tr("9 Very hard++"), // 9
-    QObject::tr("10 Maximum")// 10
+    QObject::tr("0 Rest"),
+    QObject::tr("1 Very, very easy"),
+    QObject::tr("2 Easy"),
+    QObject::tr("3 Moderate"),
+    QObject::tr("4 Somewhat hard"),
+    QObject::tr("5 Hard"),
+    QObject::tr("6 Hard+"),
+    QObject::tr("7 Very hard"),
+    QObject::tr("8 Very hard+"),
+    QObject::tr("9 Very hard++"),
+    QObject::tr("10 Maximum")
+};
+static QString ROFDesc[11]={ // need to add digramatics in future
+    QObject::tr("0 Not Fatigued At All"),
+    QObject::tr("1 "),
+    QObject::tr("2 A Little Fatigued"),
+    QObject::tr("3 "),
+    QObject::tr("4 "),
+    QObject::tr("5 Moderately Fatigued"),
+    QObject::tr("6 "),
+    QObject::tr("7 Very fatigued+"),
+    QObject::tr("8 "),
+    QObject::tr("9 "),
+    QObject::tr("10 Total Fatigue, Nothing Left")
 };
 
 KentUniversityUploadDialog::KentUniversityUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
@@ -816,45 +829,75 @@ KentUniversityUploadDialog::KentUniversityUploadDialog(QWidget *parent, CloudSer
     setModal(true);
 
     // make is usable
-    setMinimumSize(QSize(500*dpiXFactor, 200*dpiYFactor));
+    setMinimumSize(QSize(500*dpiXFactor, 400*dpiYFactor));
 
     // setup the gui!
     QGridLayout *layout = new QGridLayout(this);
 
     // rpe and rof
-    rpelabel = new QLabel(tr("Session RPE"), this);
+    rpelabel = new QLabel(tr("Session Perceived Exertion (sRPE)"), this);
     layout->addWidget(rpelabel, 0,0);
 
     rpe = new QComboBox(this);
     rpe->addItem("");
     for(int i=0; i<11; i++) rpe->addItem(FosterDesc[i]);
     layout->addWidget(rpe, 0,1, Qt::AlignLeft);
+
+    // use RPE if it is set ...
+    QString meta = item->getText("RPE", "-1");
+    if (meta != "-1") {
+        int x=meta.toInt();
+        if (x >= 0 && x<=10) rpe->setCurrentIndex(x+1);
+    }
     connect(rpe, SIGNAL(currentIndexChanged(int)), this, SLOT(check()));
+
+    roflabel = new QLabel(tr("Post Session Fatigue (ROF)"), this);
+    layout->addWidget(roflabel, 1,0);
+
+    rof = new QComboBox(this);
+    rof->addItem("");
+    for(int i=0; i<11; i++) rof->addItem(ROFDesc[i]);
+    layout->addWidget(rof, 1,1, Qt::AlignLeft);
+    meta = item->getText("ROF", "-1");
+    if (meta != "-1") {
+        int x=meta.toInt();
+        if (x >= 0 && x<=10) rof->setCurrentIndex(x+1);
+    }
+    connect(rof, SIGNAL(currentIndexChanged(int)), this, SLOT(check()));
 
     // notes
     noteslabel = new QLabel(tr("Notes"),this);
-    layout->addWidget(noteslabel, 1,0);
+    layout->addWidget(noteslabel, 2,0);
     notes = new QTextEdit(this);
     notes->setText(item->getText("Notes", ""));
-    layout->addWidget(notes,2,0,3,2);
+    layout->addWidget(notes,3,0,3,2);
     connect(notes, SIGNAL(textChanged()), this, SLOT(check()));
+
+    // reasons for skipped workouts
+    reasonlabel = new QLabel(tr("Missed workouts"),this);
+    layout->addWidget(reasonlabel, 6,0);
+    reasons = new QTextEdit(this);
+    layout->addWidget(reasons,7,0,3,2);
+
+    isTest = new QCheckBox(tr("Is a self administered test workout"));
+    layout->addWidget(isTest, 10,0,1,2);
 
     info = new QLabel(QString(tr("Uploading %1 bytes...")).arg(data.size()));
     info->hide();
-    layout->addWidget(info, 10,0,1,2,Qt::AlignLeft);
+    layout->addWidget(info, 11,0,1,2,Qt::AlignLeft);
 
     progress = new QProgressBar(this);
     progress->setMaximum(0);
     progress->setValue(0);
     progress->hide();
-    layout->addWidget(progress, 11,0,1,2);
+    layout->addWidget(progress, 12,0,1,2);
 
     okcancel = new QPushButton(tr("Upload"));
     okcancel->setEnabled(false);
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->addStretch();
     buttons->addWidget(okcancel);
-    layout->addLayout(buttons, 12,1);
+    layout->addLayout(buttons, 13,1);
     connect(okcancel, SIGNAL(clicked()), this, SLOT(uploadFile()));
 
     // enable/disable pushbutton
@@ -866,6 +909,15 @@ KentUniversityUploadDialog::KentUniversityUploadDialog(QWidget *parent, CloudSer
     connect(store, SIGNAL(writeComplete(QString,QString)), this, SLOT(completed(QString,QString)));
 }
 
+// don't send special characters that break the formatting
+static QString tidy(QString in)
+{
+    QString returning = in.replace("\"", "\\\"");
+    returning = returning.replace("\n", "\\n");
+    returning = returning.replace("\r", "\\r");
+    returning = returning.replace("\t", "\\t");
+    return returning;
+}
 void
 KentUniversityUploadDialog::uploadFile()
 {
@@ -894,13 +946,55 @@ KentUniversityUploadDialog::uploadFile()
         msgBox.exec();
 
     }
+
+    // now send the metadata associated with the ride
+    QByteArray meta= QString("RPE: %1\nROF: %2\nTEST: \"%5\"\nNOTES: \"%3\"\nREASONS: \"%4\"\n")
+            .arg(rpe->currentIndex()-1)
+            .arg(rof->currentIndex()-1)
+            .arg(tidy(notes->toPlainText()))
+            .arg(tidy(reasons->toPlainText()))
+            .arg(isTest->isChecked() ? "Y" : "N").toLatin1();
+
+    QString metafilename = QFileInfo(item->fileName).baseName() + ".txt";
+    info->setText(metafilename);
+    progress->setValue(0);
+    QApplication::processEvents();
+
+    status = store->writeFile(meta, metafilename, item->ride());
+
+    // if the upload failed in any way, bail out
+    if (status == false) {
+
+        // didn't work dude
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Upload Failed") + store->uiName());
+        msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
+
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+    }
+
+    // set standard metadata if needed
+    if (item->getText("Notes", "") != notes->toPlainText()) {
+        item->ride()->setTag("Notes", notes->toPlainText());
+        item->setDirty(true);
+    }
+    if (item->getText("RPE", "") != QString("%1").arg(rpe->currentIndex()-1)) {
+        item->ride()->setTag("RPE", QString("%1").arg(rpe->currentIndex()-1));
+        item->setDirty(true);
+    }
+    if (item->getText("ROF", "") != QString("%1").arg(rof->currentIndex()-1)) {
+        item->ride()->setTag("ROF", QString("%1").arg(rof->currentIndex()-1));
+        item->setDirty(true);
+    }
 }
 
 void
 KentUniversityUploadDialog::check()
 {
     // notes, rpe and rof must have someething in them
-    if (rpe->currentIndex() && notes->document()->toPlainText() != "") {
+    if (rof->currentIndex() && rpe->currentIndex() && notes->document()->toPlainText() != "") {
         okcancel->setEnabled(true);
     } else {
         okcancel->setEnabled(false);
