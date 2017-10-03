@@ -76,8 +76,8 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
   }
 
   foreach(QString h, headers) {
-      if (h == "timestamp_measurement") tsExists = true;
-      if (h == "rMSSD" || h == "rMSSD_lying") rmssdExists = true;
+      if (h == "timestamp_measurement" || h == "Datetime") tsExists = true;
+      if (h == "rMSSD" || h == "rMSSD_lying" || h == "Rmssd") rmssdExists = true;
   }
   if (!tsExists) {
       error = tr("Column 'timestamp_measurement' is missing.");
@@ -109,7 +109,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           if (i.isEmpty() || i == "-") {
                 continue; // skip empty values
           }
-          if (h == "timestamp_measurement") {
+          if (h == "timestamp_measurement" || h == "Datetime") {
             // parse date ISO 8601
             m.when = QDateTime::fromString(i, Qt::ISODate);
             if (m.when.isValid()) {
@@ -122,7 +122,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
                 error = tr("Invalid 'date' - Date/Time not ISO 8601 format - in line %1").arg(lineNo) + ": " + i;
                 goto error;
             }
-          } else if (h == "rMSSD" || h == "rMSSD_lying") {
+          } else if (h == "rMSSD" || h == "rMSSD_lying" || h == "Rmssd") {
               m.rmssd = i.toDouble(&ok);
               if (!ok) {
                   error = tr("Invalid 'rMSSD' - in line %1").arg(lineNo);
@@ -140,13 +140,13 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
                   error = tr("Invalid 'AVNN' - in line %1").arg(lineNo);
                   goto error;
               }
-          } else if (h == "SDNN" || h == "SDNN_lying") {
+          } else if (h == "SDNN" || h == "SDNN_lying" || h == "Sdnn") {
               m.sdnn = i.toDouble(&ok);
               if (!ok) {
                   error = tr("Invalid 'SDNN' - in line %1").arg(j);
                   goto error;
               }
-          } else if (h == "pNN50" || h == "pNN50_lying") {
+          } else if (h == "pNN50" || h == "pNN50_lying" || h == "Pnn50") {
               m.pnn50 = i.toDouble(&ok);
               if (!ok) {
                   error = tr("Invalid 'pNN50' - in line %1").arg(lineNo);
@@ -164,7 +164,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
                   error = tr("Invalid 'HF' - in line %1").arg(lineNo);
                   goto error;
               }
-          } else if (h == "HRV4T_Recovery_Points") {
+          } else if (h == "HRV4T_Recovery_Points" || h == "lnRmssd") {
               m.recovery_points = i.toDouble(&ok);
               if (!ok) {
                   error = tr("Invalid 'HRV4T_Recovery_Points' - in line %1").arg(lineNo);
