@@ -40,6 +40,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
 
   // all variables to be defined here (to allow :goto - for simplified error handling/less redundant code)
   bool tsExists = false;
+  bool dateExists = false;
   bool rmssdExists = false;
 
   QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select HRV measurements file to import"), "", tr("CSV Files (*.csv)"));
@@ -77,27 +78,28 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
 
   foreach(QString h, headers) {
       if (h == "timestamp_measurement" || h == "Datetime") tsExists = true;
+      if (h == "date") dateExists = true;
       if (h == "rMSSD" || h == "rMSSD_lying" || h == "Rmssd") rmssdExists = true;
   }
-  if (!tsExists) {
-      error = tr("Column 'timestamp_measurement' is missing.");
+  if (!tsExists && !dateExists) {
+      error = tr("Column 'timestamp_measurement'/'Datetime'/'date' is missing.");
       goto error;
   }
   if (!rmssdExists) {
-      error = tr("Column 'rMSSD' is missing.");
+      error = tr("Column 'rMSSD'/'rMSSD_lying'/'Rmssd' is missing.");
       goto error;
   }
 
-  // No duplicates and minimal "timestamp_measurement" and "rmssd" exist
+  // No duplicates and minimal "timestamp"/"date" and "rmssd" exist
   emit downloadProgress(50);
   for (int lineNo = 1; lineNo<lines.count(); lineNo++) {
       CsvString itemLine = lines[lineNo];
       QStringList items = itemLine.split();
       if (items.count() == 0) continue; // skip empty lines
-      if (items.count() != headers.count()) {
+      if (items.count() < headers.count()) {
           // we only process valid data - so stop here
           // independent if other items are ok
-          error = tr("Number of data columns: %1 in line %2 deviates from header columns: %3").arg(items.count()).arg(lineNo).arg(headers.count());
+          error = tr("Number of data columns: %1 in line %2 lower than header columns: %3").arg(items.count()).arg(lineNo).arg(headers.count());
           goto error;
       }
       // extract the values
@@ -107,21 +109,37 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           QString i = items.at(j);
           bool ok;
           if (i.isEmpty() || i == "-") {
-                continue; // skip empty values
+              continue; // skip empty values
           }
           if (h == "timestamp_measurement" || h == "Datetime") {
-            // parse date ISO 8601
-            m.when = QDateTime::fromString(i, Qt::ISODate);
-            if (m.when.isValid()) {
-                // skip line if not in date range
-                if (m.when < from || m.when > to) {
-                    m.when = QDateTime::fromMSecsSinceEpoch(0);
-                    break; // stop analysing the data items of the line
-                }
-            } else {
-                error = tr("Invalid 'date' - Date/Time not ISO 8601 format - in line %1").arg(lineNo) + ": " + i;
-                goto error;
-            }
+              // parse date/time ISO 8601 (HRV4Training for iPhone or EliteHRV)
+              m.when = QDateTime::fromString(i, Qt::ISODate);
+              if (m.when.isValid()) {
+                  // skip line if not in date range
+                  if (m.when < from || m.when > to) {
+                      m.when = QDateTime::fromMSecsSinceEpoch(0);
+                      break; // stop analysing the data items of the line
+                  }
+              } else {
+                  error = tr("Invalid 'timestamp' - Date/Time not ISO 8601 format - in line %1").arg(lineNo) + ": " + i;
+                  goto error;
+              }
+          } else if (!tsExists && h == "date") {
+              // parse date (HRV4Training for Android)
+              m.when = QDateTime(QDate::fromString(i, "yyyy-dd-MM"));
+              if (m.when.isValid()) {
+                  // skip line if not in date range
+                  if (m.when < from || m.when > to) {
+                      m.when = QDateTime::fromMSecsSinceEpoch(0);
+                      break; // stop analysing the data items of the line
+                  }
+              } else {
+                  error = tr("Invalid 'date' - Date not yyyy-dd-MM format - in line %1").arg(lineNo) + ": " + i;
+                  goto error;
+              }
+          } else if (!tsExists && h == "time") {
+              // parse time (HRV4Training for Android)
+              m.when.setTime(QTime::fromString(i, "hh:mm"));
           } else if (h == "rMSSD" || h == "rMSSD_lying" || h == "Rmssd") {
               m.rmssd = i.toDouble(&ok);
               if (!ok) {
