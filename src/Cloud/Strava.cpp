@@ -437,15 +437,7 @@ Strava::addSamples(RideFile* ret, QString remoteid)
     QString urlstr = QString("https://www.strava.com/api/v3/activities/%1/streams/%2")
           .arg(remoteid).arg(streamsList);
 
-#if QT_VERSION > 0x050000
-    QUrlQuery params;
-#else
-    QUrl params;
-#endif
-
-    params.addQueryItem("series_type", "time");
-
-    QUrl url = QUrl( urlstr + params.toString() );
+    QUrl url = QUrl( urlstr );
     printd("url:%s\n", url.url().toStdString().c_str());
 
     // request using the bearer token
