@@ -80,6 +80,7 @@ class CPPlot : public QwtPlot
         void setSport(bool run, bool swim) { isRun = run; isSwim = swim; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
         void setPlotType(int index);
+        void showXAxisLinear(bool x);
         void setModel(int sanI1, int sanI2, int anI1, int anI2,
                       int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant);
 
@@ -173,6 +174,7 @@ class CPPlot : public QwtPlot
         bool showDeltaPercent; // only in compare mode
         double shadingCP; // the CP value we use to draw the shade
         int plotType;
+        bool xAxisLinearOnSpeed;
 
         // Curves
         QList<QwtPlotCurve*> bestsCurves;
