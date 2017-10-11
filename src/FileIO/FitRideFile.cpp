@@ -41,6 +41,7 @@
 #define MATHCONST_PI            3.141592653589793238462643383279502884L /* pi */
 #endif
 
+#define DEFINITION_MSG_HEADER   64
 #define FILE_ID_MSG_NUM         0
 #define SESSION_MSG_NUM         18
 #define LAP_MSG_NUM             19
@@ -3054,9 +3055,9 @@ void write_header(QByteArray *array, quint32 data_size) {
     write_int16(array, header_crc, false);
 }
 
-void write_message_definition(QByteArray *array, int global_msg_num, int num_fields) {
+void write_message_definition(QByteArray *array, int global_msg_num, int local_msg_typ, int num_fields) {
     // Definition ------
-    write_int8(array, 64); // definition_header
+    write_int8(array, DEFINITION_MSG_HEADER + local_msg_typ); // definition_header
     write_int8(array, 0); // reserved
     write_int8(array, 1); // is_big_endian
     write_int16(array, global_msg_num, true);
@@ -3078,7 +3079,7 @@ void write_file_id(QByteArray *array, const RideFile *ride) {
     // 5	number
     // 8	product_name
 
-    write_message_definition(array, FILE_ID_MSG_NUM, 6); // global_msg_num, num_fields
+    write_message_definition(array, FILE_ID_MSG_NUM, 0, 6); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 0, 1, 0); // 1. type (0)
     write_field_definition(array, 1, 2, 132); // 2. manufacturer (1)
@@ -3122,7 +3123,7 @@ void write_file_creator(QByteArray *array) {
     // 0	software_version	uint16
     // 1	hardware_version	uint8
 
-    write_message_definition(array, FILE_CREATOR_MSG_NUM, 2); // global_msg_num, num_fields
+    write_message_definition(array, FILE_CREATOR_MSG_NUM, 0, 2); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 0, 2, 132); // 1. software_version (0)
     write_field_definition(array, 2, 1, 2); // 1. hardware_version (0)
@@ -3144,7 +3145,7 @@ void write_file_creator(QByteArray *array) {
 
 void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
 
-    write_message_definition(array, SESSION_MSG_NUM, 9); // global_msg_num, num_fields
+    write_message_definition(array, SESSION_MSG_NUM, 0, 9); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 254, 2, 132); // message_index (254)
@@ -3199,7 +3200,7 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
 }
 
 void write_lap(QByteArray *array, const RideFile *ride) {
-    write_message_definition(array, LAP_MSG_NUM, 5); // global_msg_num, num_fields
+    write_message_definition(array, LAP_MSG_NUM, 0, 5); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
@@ -3239,7 +3240,7 @@ void write_lap(QByteArray *array, const RideFile *ride) {
 
 void write_start_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, EVENT_MSG_NUM, 5); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 0, 5); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
@@ -3274,7 +3275,7 @@ void write_start_event(QByteArray *array, const RideFile *ride) {
 
 void write_stop_event(QByteArray *array, const RideFile *ride) {
 
-    write_message_definition(array, EVENT_MSG_NUM, 5); // global_msg_num, num_fields
+    write_message_definition(array, EVENT_MSG_NUM, 0, 5); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 1, 2); // event (0)
@@ -3309,7 +3310,7 @@ void write_stop_event(QByteArray *array, const RideFile *ride) {
 
 void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideMetricPtr> computed) {
 
-    write_message_definition(array, ACTIVITY_MSG_NUM, 6); // global_msg_num, num_fields
+    write_message_definition(array, ACTIVITY_MSG_NUM, 0, 6); // global_msg_num, local_msg_type, num_fields
 
     write_field_definition(array, 253, 4, 134); // timestamp (253)
     write_field_definition(array, 0, 4, 134); // total_timer_time (0)
@@ -3410,46 +3411,49 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         write_int8(fields, base_type);
     }*/
 
-    write_message_definition(array, RECORD_MSG_NUM, num_fields); // global_msg_num, num_fields
+    write_message_definition(array, RECORD_MSG_NUM, 0, num_fields); // global_msg_num, local_msg_type, num_fields
     array->append(fields->data(), fields->size());
 
     // Record ------
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         int record_header = 0;
 
-        write_int8(array, record_header);
+        QByteArray *ridePoint = new QByteArray();
+        write_int8(ridePoint, record_header);
 
         int value = point->secs + ride->startTime().toTime_t() - qbase_time.toTime_t();
-        write_int32(array, value, true);
+        write_int32(ridePoint, value, true);
 
         if ( ride->areDataPresent()->lat ) {
-            write_int32(array, point->lat * 0x7fffffff / 180, true);
-            write_int32(array, point->lon * 0x7fffffff / 180, true);
+            write_int32(ridePoint, point->lat * 0x7fffffff / 180, true);
+            write_int32(ridePoint, point->lon * 0x7fffffff / 180, true);
         }
         if ( withAlt && ride->areDataPresent()->alt ) {
-            write_int16(array, (point->alt+500) * 5, true);
+            write_int16(ridePoint, (point->alt+500) * 5, true);
         }
         if ( withHr && ride->areDataPresent()->hr ) {
-            write_int8(array, point->hr);
+            write_int8(ridePoint, point->hr);
         }
         if ( withCad && ride->areDataPresent()->cad ) {
-            write_int8(array, point->cad);
+            write_int8(ridePoint, point->cad);
         }
         if ( ride->areDataPresent()->km ) {
-            write_int32(array, point->km * 100000, true);
+            write_int32(ridePoint, point->km * 100000, true);
         }
         if ( ride->areDataPresent()->kph ) {
-            write_int16(array, point->kph / 3.6 * 1000, true);
+            write_int16(ridePoint, point->kph / 3.6 * 1000, true);
         }
         if ( withWatts && ride->areDataPresent()->watts ) {
-            write_int16(array, point->watts, true);
+            write_int16(ridePoint, point->watts, true);
         }
         /*if ( ride->areDataPresent()->temp ) {
-            write_int8(array, point->temp);
+            write_int8(ridePoint, point->temp);
         }
         if ( ride->areDataPresent()->lrbalance ) {
-            write_int8(array, point->lrbalance);
+            write_int8(ridePoint, point->lrbalance);
         }*/
+
+        array->append(ridePoint->data(), ridePoint->size());
     }
 
 }
