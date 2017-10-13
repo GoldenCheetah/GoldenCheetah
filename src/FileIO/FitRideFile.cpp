@@ -3352,14 +3352,14 @@ void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideM
     write_int8(array, value);
 }
 
-void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
+void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, int> *local_msg_type_for_record_type, bool withAlt, bool withWatts, bool withHr, bool withCad, int type ) {
     int num_fields = 1;
     QByteArray *fields = new QByteArray();
 
     write_field_definition(fields, 253, 4, 134); // timestamp (253)
 
     if ( ride->areDataPresent()->lat ) {
-        num_fields ++;        
+        num_fields ++;
         write_field_definition(fields, 0, 4, 133); // position_lat (0)
 
         num_fields ++;
@@ -3389,35 +3389,44 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         num_fields ++;
         write_field_definition(fields, 7, 2, 132); // power (7)
     }
-    /* can be NA...
-    if ( ride->areDataPresent()->temp ) {
+    // can be NA...
+    if ( (type&1)==1 ) {
         num_fields ++;
-        field_num = 13; // temperature
-        field_size = 1;
-        base_type = 2;
-
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
+        write_field_definition(fields, 13, 1, 2); // temperature (13)
     }
-    if ( ride->areDataPresent()->lrbalance ) {
+    if ( (type&2)==1 ) {
         num_fields ++;
-        field_num = 30; // left_right_balance
-        field_size = 1;
-        base_type = 2;
+        write_field_definition(fields, 30, 1, 2); // left_right_balance (30)
+    }
 
-        write_int8(fields, field_num);
-        write_int8(fields, field_size);
-        write_int8(fields, base_type);
-    }*/
+    int local_msg_type = local_msg_type_for_record_type->values().count()+1;
 
-    write_message_definition(array, RECORD_MSG_NUM, 0, num_fields); // global_msg_num, local_msg_type, num_fields
+    write_message_definition(array, RECORD_MSG_NUM, local_msg_type, num_fields); // global_msg_num, local_msg_type, num_fields
     array->append(fields->data(), fields->size());
+
+    local_msg_type_for_record_type->insert(type, local_msg_type);
+}
+
+void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad ) {
+    QMap<int, int> *local_msg_type_for_record_type = new QMap<int, int>();
 
     // Record ------
     foreach (const RideFilePoint *point, ride->dataPoints()) {
-        int record_header = 0;
+        int type = 0;
+        // Temperature and lrbalance can be NA
+        if ( ride->areDataPresent()->temp && point->temp != RideFile::NA) {
+            type += 1;
+        }
+        if ( ride->areDataPresent()->lrbalance && point->lrbalance != RideFile::NA) {
+            type += 2;
+        }
 
+        // Add record definition for this type of record
+        if (local_msg_type_for_record_type->value(type, -1)==-1)
+            write_record_definition(array, ride, local_msg_type_for_record_type, withAlt, withWatts, withHr, withCad, type);
+        int record_header = local_msg_type_for_record_type->value(type, 1);
+
+        // RidePoint
         QByteArray *ridePoint = new QByteArray();
         write_int8(ridePoint, record_header);
 
@@ -3446,12 +3455,14 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( withWatts && ride->areDataPresent()->watts ) {
             write_int16(ridePoint, point->watts, true);
         }
-        /*if ( ride->areDataPresent()->temp ) {
+
+        // temp and lrbalance can be NA... Not present for a point even if present in RideFile
+        if ( (type&1)==1) {
             write_int8(ridePoint, point->temp);
         }
-        if ( ride->areDataPresent()->lrbalance ) {
+        if ( (type&2)==1 ) {
             write_int8(ridePoint, point->lrbalance);
-        }*/
+        }
 
         array->append(ridePoint->data(), ridePoint->size());
     }
