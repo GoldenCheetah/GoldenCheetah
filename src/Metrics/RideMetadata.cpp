@@ -978,25 +978,24 @@ FormField::stateChanged(int state)
     widget->setHidden(state ? false : true);
 
     // remove from overrides if neccessary
-    QMap<QString,QString> override;
-    if (ourRideItem && ourRideItem->ride())
-        override  = ourRideItem->ride()->metricOverrides.value
-                                        (meta->sp.metricSymbol(definition.name));
-
-    // setup initial override value
-    if (state) {
-
-        // clear and reset override value for this metric
-        override.insert("value", QString("%1").arg(0.0)); // add metric value
-        if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0));
-        else ((QDoubleSpinBox *)widget)->setValue(0.0);
-
-    } else if (override.contains("value")) // clear override value
-         override.remove("value");
-
     if (ourRideItem && ourRideItem->ride()) {
-        // update overrides for this metric in the main QMap
-        ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+
+        if (state) {
+            // setup initial override value
+            QMap<QString,QString> override = ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name));
+
+            // clear and reset override value for this metric
+            override.insert("value", QString("%1").arg(0.0)); // add metric value
+            // update UI
+            if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0));
+            else ((QDoubleSpinBox *)widget)->setValue(0.0);
+            // update overrides for this metric in the main QMap
+            ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+
+        } else if (ourRideItem->ride()->metricOverrides.contains(meta->sp.metricSymbol(definition.name))) {
+            // remove existing override for this metric
+            ourRideItem->ride()->metricOverrides.remove(meta->sp.metricSymbol(definition.name));
+        }
 
         // rideFile is now dirty!
         ourRideItem->setDirty(true);
