@@ -479,9 +479,6 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
         QMap<QString,QMap<QString, QString> >::const_iterator k;
         for (k=ride->metricOverrides.constBegin(); k != ride->metricOverrides.constEnd(); k++) {
 
-            // may not contain anything
-            if (k.value().isEmpty()) continue;
-
             if (nonblanks == false) {
                 out += ",\n\t\t\"OVERRIDES\":[\n";
                 nonblanks = true;
