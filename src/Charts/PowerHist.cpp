@@ -1356,11 +1356,20 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(standard.wbalArray, cache->distributionArray(RideFile::wbal));
 
     if (!context->athlete->useMetricUnits) {
-        double torque_factor = (context->athlete->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
-        double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
-
-        for(int i=0; i<standard.nmArray.size(); i++) standard.nmArray[i] = standard.nmArray[i] * torque_factor;
-        for(int i=0; i<standard.kphArray.size(); i++) standard.kphArray[i] = standard.kphArray[i] * speed_factor;
+        for(int i=1; i<standard.nmArray.size(); i++) {
+            int nmIndex = round(i / FOOT_POUNDS_PER_METER);
+            if (nmIndex < standard.nmArray.size())
+                standard.nmArray[i] = standard.nmArray[nmIndex];
+            else
+                standard.nmArray[i] = 0;
+        }
+        for(int i=1; i<standard.kphArray.size(); i++) {
+            int kphIndex = round(i / MILES_PER_KM);
+            if (kphIndex < standard.kphArray.size())
+                standard.kphArray[i] = standard.kphArray[kphIndex];
+            else
+                standard.kphArray[i] = 0;
+        }
     }
 
     // zone array
@@ -1496,11 +1505,20 @@ PowerHist::setDataFromCompare()
 
         // convert for metric imperial types
         if (!context->athlete->useMetricUnits) {
-            double torque_factor = (context->athlete->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
-            double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
-
-            for(int i=0; i<add.nmArray.size(); i++) add.nmArray[i] = add.nmArray[i] * torque_factor;
-            for(int i=0; i<add.kphArray.size(); i++) add.kphArray[i] = add.kphArray[i] * speed_factor;
+            for(int i=1; i<add.nmArray.size(); i++) {
+                int nmIndex = round(i / FOOT_POUNDS_PER_METER);
+                if (nmIndex < add.nmArray.size())
+                    add.nmArray[i] = add.nmArray[nmIndex];
+                else
+                    add.nmArray[i] = 0;
+            }
+            for(int i=1; i<add.kphArray.size(); i++) {
+                int kphIndex = round(i / MILES_PER_KM);
+                if (kphIndex < add.kphArray.size())
+                    add.kphArray[i] = add.kphArray[kphIndex];
+                else
+                    add.kphArray[i] = 0;
+            }
         }
 
         // zone array
