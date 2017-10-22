@@ -6,7 +6,7 @@
 
 #### **Do you have questions about the source code?**
 
-* Ask any question about how to build GoldenCheetah or anything related to the source code in the [golden-cheetah-developers mailing list](https://groups.google.com/forum/#!forum/golden-cheetah-developers).
+* Ask any question about how to build GoldenCheetah or anything related to the source code in the [golden-cheetah-developers mailing list](https://groups.google.com/forum/#!forum/golden-cheetah-developers), please see the [GoldenCheetah Developers Guide](https://github.com/GoldenCheetah/GoldenCheetah/wiki/Developers-guide) for addtional information.
 
 ## How to contribute to GoldenCheetah
 
@@ -22,6 +22,8 @@
 
 * Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
 
+* See [GoldenCheetah Guidelines for submitting a patch](https://github.com/GoldenCheetah/GoldenCheetah/wiki/Guidelines-for-submitting-a-patch) for additional information.
+
 #### **Did you fix whitespace, format code, or make a purely cosmetic patch?**
 
 Changes that are cosmetic in nature and do not add anything substantial to the stability or functionality of GoldenCheetah will generally not be accepted.
@@ -31,6 +33,10 @@ Changes that are cosmetic in nature and do not add anything substantial to the s
 * Suggest your change in the [golden-cheetah-developers mailing list](https://groups.google.com/forum/#!forum/golden-cheetah-developers) and start writing code.
 
 * Do not open an issue on GitHub until you have collected positive feedback about the change. GitHub issues are primarily intended for bug reports and fixes.
+
+#### **Do you want to contribute to GoldenCheetah translations?**
+
+* Translators are very welcome, please see [GoldenCheetah Guidelines for translators](https://github.com/GoldenCheetah/GoldenCheetah/wiki/Guidelines-for-translators)
 
 #### **Do you want to contribute to GoldenCheetah documentation?**
 
