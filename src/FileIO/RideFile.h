@@ -296,7 +296,8 @@ class RideFile : public QObject // QObject to emit signals
 
         // Working with FIRST CLASS variables
         const QDateTime &startTime() const { return startTime_; }
-        void setStartTime(const QDateTime &value) { startTime_ = value; }
+        void setStartTime(const QDateTime &value);
+    
         double recIntSecs() const { return recIntSecs_; }
         void setRecIntSecs(double value) { recIntSecs_ = value; }
         const QString &deviceType() const { return deviceType_; }
