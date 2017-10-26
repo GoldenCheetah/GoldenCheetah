@@ -2954,7 +2954,7 @@ struct FitFileReaderState
 
             QStringList uniqueDevices(deviceInfos.values());
             uniqueDevices.removeDuplicates();
-            QString deviceInfo = uniqueDevices.join('\n');
+            QString deviceInfo = uniqueDevices.join("\n");
             if (! deviceInfo.isEmpty())
                 rideFile->setTag("Device Info", deviceInfo);
 
