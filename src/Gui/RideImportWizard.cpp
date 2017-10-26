@@ -603,7 +603,7 @@ RideImportWizard::process()
                    }
 
                    // Set Date and Time
-                   if (ride->startTime().isNull()) {
+                   if (!ride->startTime().isValid()) {
 
                        // Poo. The user needs to supply the date/time for this ride
                        blanks[i] = true;

@@ -134,6 +134,10 @@ RideFile::~RideFile()
     //!!! if (data) delete data; // need a mechanism to notify the editor
 }
 
+void RideFile::setStartTime(const QDateTime &value) {
+    startTime_ = value;
+}
+
 unsigned int
 RideFile::computeFileCRC(QString filename)
 {
@@ -838,10 +842,13 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         // override the file ride time with that set from the filename
         // but only if it matches the GC format
         QFileInfo fileInfo(file.fileName());
-        QRegExp rx ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
-
+        
+        // Regular expression to match either date format, including a mix of dashes and underscores
+        // yyyy-MM-dd-hh-mm-ss.extension
+        // or yyyy_MM_dd_hh_mm_ss.extension
+        // year is the only one matching for 4 digits, the rest can either be 1 or 2 digits.
+        QRegExp rx ("^((\\d{4})[-_](\\d{1,2})[-_](\\d{1,2})[-_](\\d{1,2})[-_](\\d{1,2})[-_](\\d{1,2}))\\.(.+)$");
         if (rx.exactMatch(fileInfo.fileName())) {
-
             QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
             QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
             QDateTime datetime(date, time);

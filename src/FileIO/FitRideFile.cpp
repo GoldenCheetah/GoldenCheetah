@@ -56,6 +56,7 @@ static int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "fit", "Garmin FIT", new FitFileReader());
 
+// 1989-12-31 00:00:00 UTC
 static const QDateTime qbase_time(QDate(1989, 12, 31), QTime(0, 0, 0), Qt::UTC);
 
 /* FIT has uint32 as largest integer type. So qint64 is large enough to
@@ -1014,6 +1015,7 @@ struct FitFileReaderState
                         const std::vector<FitValue>& values) {
         int i = 0;
 
+        const int delta = qbase_time.toTime_t();
         int event = -1, event_type = -1, local_timestamp = -1, timestamp = -1;
 
         foreach(const FitField &field, def.fields) {
@@ -1030,10 +1032,18 @@ struct FitFileReaderState
                     event_type = value;
                     break;
                 case 5: // local_timestamp
-                    local_timestamp = value + qbase_time.toTime_t();
+                    // adjust from seconds since 1989-12-31 00:00:00 UTC
+                    if (0 != value)
+                    {
+                        local_timestamp = value + delta;
+                    }
                     break;
                 case 253: // timestamp
-                    timestamp = value + qbase_time.toTime_t();
+                    // adjust from seconds since 1989-12-31 00:00:00 UTC
+                    if (0 != value)
+                    {
+                        timestamp = value + delta;
+                    }
                     break;
 
                 case 1: // num_sessions
@@ -1053,10 +1063,18 @@ struct FitFileReaderState
 
         if (local_timestamp < 0 || timestamp < 0)
             return;
+        
+        if (0 == local_timestamp && 0 == timestamp)
+            return;
 
-        // adjust start time to time zone of the ride
         QDateTime t(rideFile->startTime().toUTC());
-        rideFile->setStartTime(t.addSecs(local_timestamp - timestamp));
+        if (0 == local_timestamp) {
+            // ZWift FIT files are not reporting local timestamp
+            rideFile->setStartTime(t.addSecs(timestamp));
+        } else {
+            // adjust start time to time zone of the ride
+            rideFile->setStartTime(t.addSecs(local_timestamp - timestamp));
+        }
     }
 
     void decodeEvent(const FitDefinition &def, int,
