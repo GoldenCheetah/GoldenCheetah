@@ -127,7 +127,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           } else if (!tsExists && h == "date") {
               // parse date (HRV4Training for Android)
               m.when = QDateTime(QDate::fromString(i, "yyyy-dd-MM"));
-              if (m.when.isValid()) {
+              if (m.when.date().isValid()) {
                   // skip line if not in date range
                   if (m.when < from || m.when > to) {
                       m.when = QDateTime::fromMSecsSinceEpoch(0);
