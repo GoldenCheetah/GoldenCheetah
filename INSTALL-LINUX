@@ -34,7 +34,7 @@ CONTENTS
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
 =================================================
 
-Installed Ubuntu 11.04 from CD image amd-64.iso. You will not need to do this if you
+Installed Linux distribution of choice on platforms i386 or amd-64 (currently Debian-based distributions and Arch-based distributions are covered). You will not need to do this if you
 already have a Linux distribution installed. Left this step in to highlight the
 Linux distribution the commands below were executed on.
 
@@ -42,8 +42,12 @@ login and open a terminal to get a shell prompt
 
 Download MANDATORY DEPENDENCIES (browser)
 -----------------------------------------
-Download and install the Qt 4.8 SDK from http://qt-project.org/
+Download and install the Qt SDK from http://qt-project.org/
 Once that is completed test qmake is ok with: qmake --version (should report 4.7.0 or higher)
+
+
+DEBIAN-BASED DISTRIBUTION INSTRUCTIONS
+--------------------------------------
 
 Install git with:
 $ sudo apt-get install git
@@ -55,6 +59,20 @@ Install FLEX and BISON
 You will need flex v2.5.9 or later
 $ sudo apt-get install bison
 $ sudo apt-get install flex
+-----------------------------------
+
+ARCH-BASED DISTRIBUTION INSTRUCTIONS
+------------------------------------
+
+Install git:
+$ sudo pacman -S git
+
+INSTALL FLEX and BISON
+----------------------
+$ sudo pacman -S flex bison
+
+NEXT STEPS
+----------
 $ vi gcconfig.pri
 
 Ensure you have the following lines (which are now also in gcconfig.pri.in which has
