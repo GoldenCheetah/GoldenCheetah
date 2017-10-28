@@ -3038,20 +3038,8 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     // what is the first period
     int firstPeriod = groupForDate(settings->start.date(), settings->groupBy);
 
-    // get first PDEstimate / fillup X/Y with missing time range
-    if (!context->athlete->getPDEstimates().isEmpty()) {
-      PDEstimate firstEst = context->athlete->getPDEstimates().first();
-      if ((settings->start.date() < firstEst.from) &&
-          (settings->end.date() > firstEst.from)){
-        int timeforward = groupForDate(firstEst.from, settings->groupBy)
-                - groupForDate(settings->start.date(), settings->groupBy);
-        for (int i = 0; i < timeforward; i++) {
-            x[n] = n;
-            y[n] = 0;
-            n++;
-        }
-      }
-    }
+    // track last est end date
+    int prevEstEndDate = firstPeriod - 1;
 
     // loop through all the estimate data
     foreach(PDEstimate est, context->athlete->getPDEstimates()) {
@@ -3068,6 +3056,19 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
         // get dat for first and last
         QDate from = est.from < settings->start.date() ? settings->start.date() : est.from;
         QDate to = est.to > settings->end.date() ? settings->end.date() : est.to;
+
+        // if for some reason there is a gap in the estimate data, fill it with 0
+        int fromPeriod = groupForDate(from, settings->groupBy);
+        int timeforward = fromPeriod - (prevEstEndDate + 1);
+        for (int i = 0; i < timeforward && n <= maxdays; i++) {
+            // the following works for non-aggregates as well
+            flushAggregateEstimateData(x, y, xCount, yTotal, n);
+        }
+
+        // save this estimate's end date (for gap fill up)
+        prevEstEndDate = settings->groupBy != LTM_DAY
+            ? fromPeriod
+            : groupForDate(to, settings->groupBy);
 
         // what value to plot ?
         double value=0;
@@ -3154,13 +3155,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
              if (n != (currentPeriod - firstPeriod)) {
                  // data of next period of estimates is available,
                  // so calculate the current period and switch forward to next
-                 x[n] = n;
-                 if (xCount[n]> 0) {
-                    y[n] = yTotal[n] / xCount[n];
-                 } else {
-                    y[n] = 0;
-                 }
-                 n++;
+                 flushAggregateEstimateData(x, y, xCount, yTotal, n);
              };
              // store for calculation
              yTotal[n] += value;
@@ -3209,17 +3204,25 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
         case LTM_MONTH:
         case LTM_YEAR:
         case LTM_ALL:
-            x[n] = n;
-            if (xCount[n]> 0) {
-               y[n] = yTotal[n] / xCount[n];
-            } else {
-               y[n] = 0;
-            }
-            n++;
+            flushAggregateEstimateData(x, y, xCount, yTotal, n);
         }
     }
     // always seems to be one too many ...
     if (n>0)n--;
+}
+
+void
+LTMPlot::flushAggregateEstimateData(QVector<double> &x, QVector<double> &y,
+                                    QVector<double> &xCount, QVector<double> &yTotal, int &n)
+{
+    x[n] = n;
+    if (xCount[n] > 0) {
+       y[n] = yTotal[n] / xCount[n];
+    } else {
+       y[n] = 0;
+    }
+
+    n++;
 }
 
 void
