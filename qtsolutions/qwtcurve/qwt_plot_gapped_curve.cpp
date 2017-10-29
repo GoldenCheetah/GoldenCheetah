@@ -33,6 +33,8 @@ void QwtPlotGappedCurve::drawSeries(QPainter *painter, const QwtScaleMap &xMap,
 
     int i = from;
     double last = 0;
+    bool isGap = true;
+    int startPoint = to;
     while (i < to)
     {
         // First non-missed point will be the start of curve section.
@@ -40,15 +42,44 @@ void QwtPlotGappedCurve::drawSeries(QPainter *painter, const QwtScaleMap &xMap,
         double y = sample(i).y();
         if ((y < (naValue_ + -0.001) || y > (naValue_ + 0.001)) && x - last <= gapValue_) {
 
-            int start = i-1;
-            int end = i;
+            // check if this is the first point after a gap
+            if (isGap) {
 
-            // Draw the curve section
-            QwtPlotCurve::drawSeries(painter, xMap, yMap, canvRect, start, end);
+                // this is the start point of a new segment
+                startPoint = i;
+            }
+
+            isGap = false;
+        } else {
+
+            // check whether this is the end of a segment
+            if (!isGap) {
+
+                // draw the segment
+                QwtPlotCurve::drawSeries(painter, xMap, yMap, canvRect, startPoint, i - 1);
+            }
+
+            isGap = true;
         }
 
         last = x;
         i++;
+    }
+
+    // if there is a segment still pending to be drawn, draw it
+    if (!isGap) {
+        QwtPlotCurve::drawSeries(painter, xMap, yMap, canvRect, startPoint, i - 1);
+    }
+}
+
+void QwtPlotGappedCurve::drawLines(QPainter *p, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+                                   const QRectF &canvasRect, int from, int to) const
+{
+    // if this segment consists only of a single point, draw a point instead of line
+    if (from == to) {
+        QwtPlotCurve::drawDots(p, xMap, yMap, canvasRect, from, to);
+    } else {
+        QwtPlotCurve::drawLines(p, xMap, yMap, canvasRect, from, to);
     }
 }
 
