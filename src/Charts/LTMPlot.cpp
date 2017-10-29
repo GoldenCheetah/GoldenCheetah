@@ -45,6 +45,7 @@
 #include <qwt_legend.h>
 #include <qwt_legend_label.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_gapped_curve.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_curve_fitter.h>
 #include <qwt_plot_grid.h>
@@ -437,7 +438,9 @@ LTMPlot::setData(LTMSettings *set)
         if (count <= 0) continue;
 
         // Create a curve
-        QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
+        QwtPlotCurve *current = metricDetail.type == METRIC_ESTIMATE
+                ? new QwtPlotGappedCurve(metricDetail.uname, 1)
+                : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
         if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
@@ -589,7 +592,9 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
-        QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
+        QwtPlotCurve *current = metricDetail.type == METRIC_ESTIMATE
+                ? new QwtPlotGappedCurve(metricDetail.uname, 1)
+                : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
         if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
