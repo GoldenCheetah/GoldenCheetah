@@ -52,14 +52,32 @@ HrvMeasure::getSourceDescription() const {
 
     switch(source) {
     case HrvMeasure::Manual:
-        return QObject::tr("Manual entry");
+        return tr("Manual entry");
     case HrvMeasure::CSV:
-        return QObject::tr("CSV Upload");
+        return tr("CSV Upload");
     default:
-        return QObject::tr("Unknown");
+        return tr("Unknown");
     }
 }
 
+QStringList
+HrvMeasure::getFieldSymbols() {
+    static const QStringList symbols = QStringList()<<"HR"<<"AVNN"<<"SDNN"<<"RMSSD"<<"PNN50"<<"LF"<<"HF"<<"RecoveryPoints";
+    return symbols;
+}
+
+QStringList
+HrvMeasure::getFieldNames() {
+    static const QStringList names = QStringList()<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("RMSSD")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points");
+    return names;
+}
+
+QString
+HrvMeasure::getFieldUnits(int field, bool useMetricUnits) {
+    Q_UNUSED(useMetricUnits);
+    static const QStringList units = QStringList()<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points");
+    return units.value(field);
+}
 
 bool
 HrvMeasureParser::serialize(QString filename, QList<HrvMeasure> &data) {

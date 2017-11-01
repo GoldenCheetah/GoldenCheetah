@@ -27,7 +27,7 @@
 #include <QDateTime>
 
 class HrvMeasure {
-
+    Q_DECLARE_TR_FUNCTIONS(HrvMeasure)
 public:
 
     enum hrvmeasuretype { HR = 0, AVNN = 1, SDNN = 2, RMSSD = 3, PNN50 = 4, LF = 5, HF = 6, RECOVERY_POINTS = 7 };
@@ -64,6 +64,13 @@ public:
 
     // getdescription text for source
     QString getSourceDescription() const;
+
+    // get Field Symbols/Names in HrvMeasureType order
+    static QStringList getFieldSymbols();
+    static QStringList getFieldNames();
+
+    // get Units for field and metrics
+    static QString getFieldUnits(int field, bool useMetricUnits);
 };
 
 class HrvMeasureParser  {

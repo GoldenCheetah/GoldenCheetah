@@ -169,18 +169,21 @@ class EditMetricDetailDialog : public QDialog
         void bestName();
         void stressName();
         void estimateName();
+        void measureName();
 
         void modelChanged();
         void estimateChanged();
+
+        void measureGroupChanged();
 
     private:
         Context *context;
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure;
         QButtonGroup *group;
-        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget;
         QStackedWidget *typeStack;
 
         // filter
@@ -210,6 +213,10 @@ class EditMetricDetailDialog : public QDialog
         // formula
         DataFilterEdit *formulaEdit; // edit your formula
         QComboBox *formulaType;      // Average etc
+
+        // measure
+        QComboBox *measureGroupSelect; // Body, Hrv
+        QComboBox *measureFieldSelect; // Weight, RMSSD, etc.
 
         QComboBox *curveStyle,
                   *curveSymbol;

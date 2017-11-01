@@ -26,7 +26,7 @@
 #include <QDateTime>
 
 class BodyMeasure {
-
+    Q_DECLARE_TR_FUNCTIONS(BodyMeasure)
 public:
 
     enum bodymeasuretype { WeightKg = 0, FatKg = 1, MuscleKg = 2, BonesKg = 3, LeanKg = 4, FatPercent = 5 };
@@ -62,6 +62,13 @@ public:
 
     // getdescription text for source
     QString getSourceDescription() const;
+
+    // get Field Symbols/Names in BodyMeasureType order
+    static QStringList getFieldSymbols();
+    static QStringList getFieldNames();
+
+    // get Units for field and metrics
+    static QString getFieldUnits(int field, bool useMetricUnits);
 };
 
 class BodyMeasureParser  {

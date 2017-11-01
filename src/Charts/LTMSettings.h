@@ -50,8 +50,9 @@ class RideBest;
 // 14        13 Aug 2015 Mark Liversedge  Added formula metric type
 // 15        13 Aug 2015 Mark Liversedge  Added formula aggregation type Avg, Total, Low etc
 // 16        14 Aug 2015 Mark Liversedge  Added curve specific filter
+// 17        01 Nov 2017 Ale Martinez     Added Daily Measure type (Body/Hrv)
 
-#define LTM_VERSION_NUMBER 16
+#define LTM_VERSION_NUMBER 17
 
 // group by settings
 #define LTM_DAY     1
@@ -70,6 +71,7 @@ class RideBest;
 #define METRIC_ESTIMATE  6
 #define METRIC_STRESS    7
 #define METRIC_FORMULA   8
+#define METRIC_D_MEASURE 9
 
 // type of estimate
 #define ESTIMATE_WPRIME  0
@@ -104,7 +106,7 @@ class MetricDetail {
     public:
 
     MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), formulaType(RideMetric::Average), name(""), 
-                     metric(NULL), stressType(0),
+                     metric(NULL), stressType(0), measureGroup(0), measureField(0),
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
@@ -139,6 +141,10 @@ class MetricDetail {
 
     // for STRESS
     int stressType;     // 0-LTS 1-STS 2-SB 3-RR
+
+    // for DAILY MEASURES
+    int measureGroup;   // 0-BODY 1-HRV
+    int measureField;   // Weight, RMSSD, etc.
 
     // GENERAL SETTINGS FOR A METRIC
     QString uname, uunits; // user specified name and units (axis choice)

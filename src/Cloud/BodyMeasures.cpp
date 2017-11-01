@@ -50,18 +50,36 @@ BodyMeasure::getSourceDescription() const {
 
     switch(source) {
     case BodyMeasure::Manual:
-        return QObject::tr("Manual entry");
+        return tr("Manual entry");
     case BodyMeasure::Withings:
-        return QObject::tr("Withings");
+        return tr("Withings");
     case BodyMeasure::TodaysPlan:
-        return QObject::tr("Today's Plan");
+        return tr("Today's Plan");
     case BodyMeasure::CSV:
-        return QObject::tr("CSV Upload");
+        return tr("CSV Upload");
     default:
-        return QObject::tr("Unknown");
+        return tr("Unknown");
     }
 }
 
+QStringList
+BodyMeasure::getFieldSymbols() {
+    static const QStringList symbols = QStringList()<<"Weight"<<"FatKg"<<"MuscleKg"<<"BonesKg"<<"LeanKg"<<"FatPercent";
+    return symbols;
+}
+
+QStringList
+BodyMeasure::getFieldNames() {
+    static const QStringList names = QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bones Mass")<<tr("Lean Mass")<<tr("Fat Percent");
+    return names;
+}
+
+QString
+BodyMeasure::getFieldUnits(int field, bool useMetricUnits) {
+    static const QStringList metricUnits = QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%");
+    static const QStringList imperialUnits = QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%");
+    return useMetricUnits ? metricUnits.value(field) : imperialUnits.value(field);
+}
 
 bool
 BodyMeasureParser::serialize(QString filename, QList<BodyMeasure> &data) {

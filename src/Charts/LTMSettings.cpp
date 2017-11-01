@@ -227,6 +227,8 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.formula;
         out<<static_cast<int>(metric.formulaType);
         out<<metric.datafilter;
+        out<<metric.measureGroup;
+        out<<metric.measureField;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -351,6 +353,10 @@ while(counter-- && !in.atEnd()) {
         }
         if (version >= 16) {
             in >> m.datafilter;
+        }
+        if (version >= 17) {
+            in >> m.measureGroup;
+            in >> m.measureField;
         }
         bool keep=true;
         // check for deprecated things and set keep=false if

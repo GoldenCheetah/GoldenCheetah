@@ -148,15 +148,23 @@ class Athlete : public QObject
         void setBodyMeasures(QList<BodyMeasure>&x);
 
         QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
-        double getBodyMeasure(QDate date, int type=BodyMeasure::WeightKg);
+        double getBodyMeasure(QDate date, int field=BodyMeasure::WeightKg, bool useMetricUnits=true);
         void getBodyMeasure(QDate date,BodyMeasure&);
 
         // work with HRV data from HRV4Training, and other sources
         void setHrvMeasures(QList<HrvMeasure>&x);
 
         QList<HrvMeasure>& hrvMeasures() { return hrvMeasures_; }
-        double getHrvMeasure(QDate date, int type=HrvMeasure::RMSSD);
+        double getHrvMeasure(QDate date, int field=HrvMeasure::RMSSD, bool useMetricUnits=true);
         void getHrvMeasure(QDate date, HrvMeasure&);
+
+        // Common access to Measures
+        QStringList getMeasureGroupSymbols() const;
+        QStringList getMeasureGroupNames() const;
+        QStringList getMeasureFieldSymbols(int group) const;
+        QStringList getMeasureFieldNames(int group) const;
+        QString getMeasureUnits(int group, int field, bool useMetricUnits=true);
+        double getMeasureValue(QDate date, int group, int field, bool useMetricUnits=true);
 
         // ride collection
         void selectRideFile(QString);
