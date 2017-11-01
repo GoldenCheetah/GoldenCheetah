@@ -45,12 +45,15 @@
 #include <qwt_legend.h>
 #include <qwt_legend_label.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_gapped_curve.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_curve_fitter.h>
 #include <qwt_plot_grid.h>
 #include <qwt_symbol.h>
 
 #include <cmath> // for isinf() isnan()
+
+//#include <QDebug>
 
 LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) : 
     bg(NULL), parent(parent), context(context), highlighter(NULL), first(first), isolation(false)
@@ -437,7 +440,9 @@ LTMPlot::setData(LTMSettings *set)
         if (count <= 0) continue;
 
         // Create a curve
-        QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
+        QwtPlotCurve *current = metricDetail.type == METRIC_ESTIMATE
+                ? new QwtPlotGappedCurve(metricDetail.uname, 1)
+                : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
         if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
@@ -589,7 +594,9 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
-        QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
+        QwtPlotCurve *current = metricDetail.type == METRIC_ESTIMATE
+                ? new QwtPlotGappedCurve(metricDetail.uname, 1)
+                : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
         if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
@@ -3038,20 +3045,8 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     // what is the first period
     int firstPeriod = groupForDate(settings->start.date(), settings->groupBy);
 
-    // get first PDEstimate / fillup X/Y with missing time range
-    if (!context->athlete->getPDEstimates().isEmpty()) {
-      PDEstimate firstEst = context->athlete->getPDEstimates().first();
-      if ((settings->start.date() < firstEst.from) &&
-          (settings->end.date() > firstEst.from)){
-        int timeforward = groupForDate(firstEst.from, settings->groupBy)
-                - groupForDate(settings->start.date(), settings->groupBy);
-        for (int i = 0; i < timeforward; i++) {
-            x[n] = n;
-            y[n] = 0;
-            n++;
-        }
-      }
-    }
+    // track last est end date
+    int prevEstEndDate = firstPeriod - 1;
 
     // loop through all the estimate data
     foreach(PDEstimate est, context->athlete->getPDEstimates()) {
@@ -3065,9 +3060,41 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
         // skip if no in our time period
         if (est.to < settings->start.date() || est.from > settings->end.date()) continue;
 
+//        for (int i = est.from.toJulianDay(); i <= est.to.toJulianDay(); i++) {
+//            QDate d = QDate::fromJulianDay(i);
+//            qDebug() << d.toString("dd.MM.yyyy") << "\t" << est.PMax;
+//        }
+
         // get dat for first and last
         QDate from = est.from < settings->start.date() ? settings->start.date() : est.from;
         QDate to = est.to > settings->end.date() ? settings->end.date() : est.to;
+
+        // if for some reason there is a gap in the estimate data, fill it with 0
+        int fromPeriod = groupForDate(from, settings->groupBy);
+        int timeforward = fromPeriod - (prevEstEndDate + 1);
+        for (int i = 0; i < timeforward && n <= maxdays; i++) {
+            // the following works for non-aggregates as well
+            flushAggregateEstimateData(x, y, xCount, yTotal, n);
+
+//            int prevN = n - 1;
+//            QDate d;
+//            if (settings->groupBy == LTM_MONTH) {
+//                d = settings->start.addMonths(prevN).date();
+//            } else if (settings->groupBy == LTM_YEAR) {
+//                d = settings->start.addYears(prevN).date();
+//            } else if (settings->groupBy == LTM_WEEK) {
+//                d = settings->start.addDays(prevN * 7).date();
+//            } else if (settings->groupBy == LTM_DAY) {
+//                d = settings->start.addDays(prevN).date();
+//            }
+
+//            qDebug() << d.toString("dd.MM.yyyy") << "\t" << prevN << "\t" << x[prevN] << "\t" << y[prevN];
+        }
+
+        // save this estimate's end date (for gap fill up)
+        prevEstEndDate = settings->groupBy != LTM_DAY
+            ? fromPeriod
+            : groupForDate(to, settings->groupBy);
 
         // what value to plot ?
         double value=0;
@@ -3154,13 +3181,17 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
              if (n != (currentPeriod - firstPeriod)) {
                  // data of next period of estimates is available,
                  // so calculate the current period and switch forward to next
-                 x[n] = n;
-                 if (xCount[n]> 0) {
-                    y[n] = yTotal[n] / xCount[n];
-                 } else {
-                    y[n] = 0;
-                 }
-                 n++;
+                 flushAggregateEstimateData(x, y, xCount, yTotal, n);
+
+//                 int prevN = n - 1;
+//                 QDate d;
+//                 if (settings->groupBy == LTM_MONTH) {
+//                     d = settings->start.addMonths(prevN).date();
+//                 } else if (settings->groupBy == LTM_YEAR) {
+//                     d = settings->start.addYears(prevN).date();
+//                 }
+
+//                 qDebug() << d.toString("dd.MM.yyyy") << "\t" << prevN << "\t" << x[prevN] << "\t" << y[prevN];
              };
              // store for calculation
              yTotal[n] += value;
@@ -3176,6 +3207,11 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                 x[n] = n;
                 y[n] = value;
                 n++;
+
+//                int prevN = n - 1;
+//                QDate d = settings->start.addDays(prevN).date();
+//                qDebug() << d.toString("dd.MM.yyyy") << "\t" << prevN << "\t" << x[prevN] << "\t" << y[prevN];
+
                 int currentDay = groupForDate(from, settings->groupBy);
                 int nextDay = groupForDate(to, settings->groupBy);
                 while (n <= maxdays && nextDay > currentDay) { // i.e. not the same day
@@ -3183,6 +3219,10 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                     y[n] = value;
                     n++;
                     currentDay++;
+
+//                    int prevN = n - 1;
+//                    QDate d = settings->start.addDays(prevN).date();
+//                    qDebug() << d.toString("dd.MM.yyyy") << "\t" << prevN << "\t" << x[prevN] << "\t" << y[prevN];
                 }
             }
             break;
@@ -3196,6 +3236,10 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                 x[n] = n;
                 y[n] = value;
                 n++;
+
+//                int prevN = n - 1;
+//                QDate d = settings->start.addDays(prevN * 7).date();
+//                qDebug() << d.toString("dd.MM.yyyy") << "\t" << prevN << "\t" << x[prevN] << "\t" << y[prevN];
             }
             break;
         }
@@ -3209,17 +3253,35 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
         case LTM_MONTH:
         case LTM_YEAR:
         case LTM_ALL:
-            x[n] = n;
-            if (xCount[n]> 0) {
-               y[n] = yTotal[n] / xCount[n];
-            } else {
-               y[n] = 0;
-            }
-            n++;
+            flushAggregateEstimateData(x, y, xCount, yTotal, n);
+
+//            int prevN = n - 1;
+//            QDate d;
+//            if (settings->groupBy == LTM_MONTH) {
+//                d = settings->start.addMonths(prevN).date();
+//            } else if (settings->groupBy == LTM_YEAR) {
+//                d = settings->start.addYears(prevN).date();
+//            }
+
+//            qDebug() << d.toString("dd.MM.yyyy") << "\t" << prevN << "\t" << x[prevN] << "\t" << y[prevN];
         }
     }
     // always seems to be one too many ...
     if (n>0)n--;
+}
+
+void
+LTMPlot::flushAggregateEstimateData(QVector<double> &x, QVector<double> &y,
+                                    QVector<double> &xCount, QVector<double> &yTotal, int &n)
+{
+    x[n] = n;
+    if (xCount[n] > 0) {
+       y[n] = yTotal[n] / xCount[n];
+    } else {
+       y[n] = 0;
+    }
+
+    n++;
 }
 
 void

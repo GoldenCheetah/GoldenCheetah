@@ -121,6 +121,8 @@ class LTMPlot : public QwtPlot
 
         // create curve data from estimate
         void createEstimateData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
+        void flushAggregateEstimateData(QVector<double> &x, QVector<double> &y,
+                                        QVector<double> &xCount, QVector<double> &yTotal, int &n);
 
         // create curve data from metadata or metric (from ridecache)
         void createMetricData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
