@@ -2614,6 +2614,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     } else if (metricDetail.type == METRIC_FORMULA) {
         createFormulaData(context, settings, metricDetail, x,y,n, forceZero);
         return;
+    } else if (metricDetail.type == METRIC_D_MEASURE) {
+        createMeasureData(context, settings, metricDetail, x,y,n, forceZero);
+        return;
     }
 
 }
@@ -3528,6 +3531,88 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 
     // wipe away local
     if (localPMC) delete localPMC;
+}
+
+void
+LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
+{
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    // skip for negative or empty time periods.
+    if (maxdays <=0) return;
+
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // iterate over it and create curve...
+    n=-1;
+    int lastDay=0;
+    unsigned long secondsPerGroupBy=0;
+    bool wantZero = true;
+
+
+    for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
+        // day we are on
+        int currentDay = groupForDate(date, settings->groupBy);
+
+        // value for day
+        double value = context->athlete->getMeasureValue(date, metricDetail.measureGroup, metricDetail.measureField, context->athlete->useMetricUnits);
+
+        if (value || wantZero) {
+            unsigned long seconds = 1;
+            if (currentDay > lastDay) {
+                if (lastDay && wantZero) {
+                    while (lastDay<currentDay) {
+                        lastDay++;
+                        n++;
+                        x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
+                        y[n]=0;
+                    }
+                } else {
+                    n++;
+                }
+
+                y[n] = value;
+                x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
+
+                // only increment counter if nonzero or we aggregate zeroes
+                secondsPerGroupBy = seconds;
+
+            } else {
+                // sum totals, average averages and choose best for Peaks
+                int type = RideMetric::Average;
+
+                // first time thru
+                if (n<0) n++;
+
+                switch (type) {
+                case RideMetric::Total:
+                    y[n] += value;
+                    break;
+                case RideMetric::Average:
+                    {
+                    // average should be calculated taking into account
+                    // the duration of the ride, otherwise high value but
+                    // short rides will skew the overall average
+                    y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    break;
+                    }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
+                case RideMetric::Peak:
+                    if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
+                    break;
+                }
+                secondsPerGroupBy += seconds; // increment for same group
+            }
+            lastDay = currentDay;
+        }
+    }
 }
 
 QwtAxisId

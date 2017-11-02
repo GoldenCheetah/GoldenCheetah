@@ -524,20 +524,21 @@ Athlete::getBodyMeasure(QDate date, BodyMeasure &here)
 }
 
 double 
-Athlete::getBodyMeasure(QDate date, int type)
+Athlete::getBodyMeasure(QDate date, int field, bool useMetricUnits)
 {
+    const double units_factor = useMetricUnits ? 1.0 : LB_PER_KG;
     BodyMeasure weight;
     getBodyMeasure(date, weight);
 
     // return what was asked for!
-    switch(type) {
+    switch(field) {
 
         default:
-        case BodyMeasure::WeightKg : return weight.weightkg;
-        case BodyMeasure::FatKg : return weight.fatkg;
-        case BodyMeasure::MuscleKg : return weight.musclekg;
-        case BodyMeasure::BonesKg : return weight.boneskg;
-        case BodyMeasure::LeanKg : return weight.leankg;
+        case BodyMeasure::WeightKg : return weight.weightkg * units_factor;
+        case BodyMeasure::FatKg : return weight.fatkg * units_factor;
+        case BodyMeasure::MuscleKg : return weight.musclekg * units_factor;
+        case BodyMeasure::BonesKg : return weight.boneskg * units_factor;
+        case BodyMeasure::LeanKg : return weight.leankg * units_factor;
         case BodyMeasure::FatPercent : return weight.fatpercent;
     }
 }
@@ -610,13 +611,14 @@ Athlete::getHrvMeasure(QDate date, HrvMeasure &here)
 }
 
 double 
-Athlete::getHrvMeasure(QDate date, int type)
+Athlete::getHrvMeasure(QDate date, int field, bool useMetricUnits)
 {
+    Q_UNUSED(useMetricUnits);
     HrvMeasure hrv;
     getHrvMeasure(date, hrv);
 
     // return what was asked for!
-    switch(type) {
+    switch(field) {
 
         default:
         case HrvMeasure::HR : return hrv.hr;
@@ -628,6 +630,53 @@ Athlete::getHrvMeasure(QDate date, int type)
         case HrvMeasure::HF : return hrv.hf;
         case HrvMeasure::RECOVERY_POINTS : return hrv.recovery_points;
     }
+}
+
+// Common access to Measures
+QStringList
+Athlete::getMeasureGroupSymbols() const
+{
+    const QStringList groups = QStringList() << "Body" << "Hrv";
+    return groups;
+}
+
+QStringList
+Athlete::getMeasureGroupNames() const
+{
+    const QStringList groups = QStringList() << tr("Body") << tr("Hrv");
+    return groups;
+}
+
+QStringList
+Athlete::getMeasureFieldSymbols(int group) const
+{
+    if (group == 0) return BodyMeasure::getFieldSymbols();
+    else if (group == 1) return HrvMeasure::getFieldSymbols();
+    else return QStringList();
+}
+
+QStringList
+Athlete::getMeasureFieldNames(int group) const
+{
+    if (group == 0) return BodyMeasure::getFieldNames();
+    else if (group == 1) return HrvMeasure::getFieldNames();
+    else return QStringList();
+}
+
+QString
+Athlete::getMeasureUnits(int group, int field, bool useMetricUnits)
+{
+    if (group == 0) return BodyMeasure::getFieldUnits(field, useMetricUnits);
+    else if (group == 1) return HrvMeasure::getFieldUnits(field, useMetricUnits);
+    else return QString();
+}
+
+double
+Athlete::getMeasureValue(QDate date, int group, int field, bool useMetricUnits)
+{
+    if (group == 0) return getBodyMeasure(date, field, useMetricUnits);
+    else if (group == 1) return getHrvMeasure(date, field, useMetricUnits);
+    else return 0.0;
 }
 
 
