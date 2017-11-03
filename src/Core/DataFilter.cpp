@@ -111,9 +111,13 @@ static struct {
     { "autoprocess", 1 }, // autoprocess(filter) to run auto data processors
     { "postprocess", 2 }, // postprocess(processor, filter) to run processor
 
-    // add new ones above this line
+    // XDATA access
     { "XDATA_UNITS", 2 }, // e.g. xdata("WEATHER", "HUMIDITY") returns "Relative Humidity"
 
+    // Daily Measures Access by date
+    { "measure", 3 },   // measure(DATE, "Hrv", "RMSSD")
+
+    // add new ones above this line
     { "", -1 }
 };
 
@@ -152,6 +156,8 @@ DataFilter::builtins()
             returning << "XDATA(\"xdata\", \"series\", sparse|repeat|interpolate|resample)";
         } else if (i == 41) {
             returning << "XDATA_UNITS(\"xdata\", \"series\")";
+        } else if (i == 42) {
+            returning << "measure(date, \"group\", \"field\")";
         } else {
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
@@ -2465,6 +2471,29 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         } else return Result("");
 
                     } else return Result(""); // not for filtering
+                }
+                break;
+
+        case 42 :
+                {   // MEASURE (DATE, GROUP, FIELD) get measure
+                    if (leaf->fparms.count() < 3) return Result(0);
+
+                    Result days = eval(df, leaf->fparms[0], x, m, p, c);
+                    if (!days.isNumber) return Result(0); // invalid date
+                    QDate date = QDate(1900,01,01).addDays(days.number);
+                    if (!date.isValid()) return Result(0); // invalid date
+
+                    QString group_symbol = *(leaf->fparms[1]->lvalue.s);
+                    int group = m->context->athlete->getMeasureGroupSymbols().indexOf(group_symbol);
+                    if (group < 0) return Result(0); // unknown group
+
+                    QString field_symbol = *(leaf->fparms[2]->lvalue.s);
+                    int field = m->context->athlete->getMeasureFieldSymbols(group).indexOf(field_symbol);
+                    if (field < 0) return Result(0); // unknown field
+
+                    // retrieve measure value
+                    double value = m->context->athlete->getMeasureValue(date, group, field);
+                    return Result(value);
                 }
                 break;
         default:
