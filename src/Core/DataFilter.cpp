@@ -157,7 +157,10 @@ DataFilter::builtins()
         } else if (i == 41) {
             returning << "XDATA_UNITS(\"xdata\", \"series\")";
         } else if (i == 42) {
-            returning << "measure(date, \"group\", \"field\")";
+            QStringList groupSymbols = Athlete::getMeasureGroupSymbols();
+            for (int g=0; g<groupSymbols.count(); g++)
+                foreach (QString fieldSymbol, Athlete::getMeasureFieldSymbols(g))
+                    returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
         } else {
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
@@ -2483,10 +2486,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     QDate date = QDate(1900,01,01).addDays(days.number);
                     if (!date.isValid()) return Result(0); // invalid date
 
+                    if (leaf->fparms[1]->type != String) return Result(0);
                     QString group_symbol = *(leaf->fparms[1]->lvalue.s);
                     int group = m->context->athlete->getMeasureGroupSymbols().indexOf(group_symbol);
                     if (group < 0) return Result(0); // unknown group
 
+                    if (leaf->fparms[2]->type != String) return Result(0);
                     QString field_symbol = *(leaf->fparms[2]->lvalue.s);
                     int field = m->context->athlete->getMeasureFieldSymbols(group).indexOf(field_symbol);
                     if (field < 0) return Result(0); // unknown field

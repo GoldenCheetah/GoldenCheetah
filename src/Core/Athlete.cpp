@@ -634,21 +634,21 @@ Athlete::getHrvMeasure(QDate date, int field, bool useMetricUnits)
 
 // Common access to Measures
 QStringList
-Athlete::getMeasureGroupSymbols() const
+Athlete::getMeasureGroupSymbols()
 {
     const QStringList groups = QStringList() << "Body" << "Hrv";
     return groups;
 }
 
 QStringList
-Athlete::getMeasureGroupNames() const
+Athlete::getMeasureGroupNames()
 {
     const QStringList groups = QStringList() << tr("Body") << tr("Hrv");
     return groups;
 }
 
 QStringList
-Athlete::getMeasureFieldSymbols(int group) const
+Athlete::getMeasureFieldSymbols(int group)
 {
     if (group == 0) return BodyMeasure::getFieldSymbols();
     else if (group == 1) return HrvMeasure::getFieldSymbols();
@@ -656,7 +656,7 @@ Athlete::getMeasureFieldSymbols(int group) const
 }
 
 QStringList
-Athlete::getMeasureFieldNames(int group) const
+Athlete::getMeasureFieldNames(int group)
 {
     if (group == 0) return BodyMeasure::getFieldNames();
     else if (group == 1) return HrvMeasure::getFieldNames();
