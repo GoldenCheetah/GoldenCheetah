@@ -81,6 +81,9 @@ DATA PROCESSOR FUNCTIONS
 autoprocess(filter)
 postprocess(processor, filter)
 
+DAILY MEASURES ACCESS
+measure(date, "group", "field")
+
 RIDE SAMPLE DATA
 
 SECS

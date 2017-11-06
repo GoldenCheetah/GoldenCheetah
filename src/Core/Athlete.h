@@ -159,11 +159,11 @@ class Athlete : public QObject
         void getHrvMeasure(QDate date, HrvMeasure&);
 
         // Common access to Measures
-        QStringList getMeasureGroupSymbols() const;
-        QStringList getMeasureGroupNames() const;
-        QStringList getMeasureFieldSymbols(int group) const;
-        QStringList getMeasureFieldNames(int group) const;
-        QString getMeasureUnits(int group, int field, bool useMetricUnits=true);
+        static QStringList getMeasureGroupSymbols();
+        static QStringList getMeasureGroupNames();
+        static QStringList getMeasureFieldSymbols(int group);
+        static QStringList getMeasureFieldNames(int group);
+        static QString getMeasureUnits(int group, int field, bool useMetricUnits=true);
         double getMeasureValue(QDate date, int group, int field, bool useMetricUnits=true);
 
         // ride collection
