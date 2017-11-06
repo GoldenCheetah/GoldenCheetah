@@ -124,6 +124,7 @@ RTool::RTool()
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0,0 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0 },
+            { "GC.season.measures", (DL_FUNC) &RTool::measures, 0,0 },
             { NULL, NULL, 0,0 }
         };
 
@@ -145,6 +146,7 @@ RTool::RTool()
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 0,0,0 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0,0 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0,0 },
+            { "GC.season.measures", (DL_FUNC) &RTool::measures, 0,0,0 },
             { NULL, NULL, 0,0,0 }
         };
 
@@ -175,6 +177,8 @@ RTool::RTool()
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 5 },
             // return a data.frame of pmc series (all=FALSE, metric="TSS")
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
+            // return a data.frame of measure fields (all=FALSE, group="Body")
+            { "GC.season.measures", (DL_FUNC) &RTool::measures, 2 },
             { NULL, NULL, 0 }
         };
 
@@ -231,6 +235,7 @@ RTool::RTool()
                                "GC.season.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
                                "GC.season.intervals <- function(type=NULL, compare=FALSE) { .Call(\"GC.season.intervals\", type, compare) }\n"
                                "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
+                               "GC.season.measures <- function(all=FALSE, group=\"Body\") { .Call(\"GC.season.measures\", all, group) }\n"
                                "GC.season.meanmax <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.meanmax\", all, filter, compare) }\n"
                                // find peaks does a few validation checks on the R side
                                "GC.season.peaks <- function(all=FALSE, filter=\"\", compare=FALSE, series, duration) {\n"
@@ -3203,6 +3208,117 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
         Rf_namesgets(ans, names);
 
         UNPROTECT(10);
+
+        // return it
+        return ans;
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::measures(SEXP pAll, SEXP pGroup)
+{
+    // parse parameters
+    // p1 - all=TRUE|FALSE - return all measures or just within
+    //                       the currently selected date range
+    pAll = Rf_coerceVector(pAll, LGLSXP);
+    bool all = LOGICAL(pAll)[0];
+
+    // p2 - group="Body"|"Hrv" - return list of measures for selected group
+    pGroup = Rf_coerceVector(pGroup, STRSXP);
+    QString groupSymbol (CHAR(STRING_ELT(pGroup,0)));
+
+    // return a dataframe with Measures data for all or the current season
+    if (rtool->context) {
+
+        // get the currently selected date range
+        DateRange range(rtool->context->currentDateRange());
+
+        // convert the group symbol to an index, default to Body=0
+        int groupIdx = Athlete::getMeasureGroupSymbols().indexOf(groupSymbol);
+        if (groupIdx < 0) groupIdx = 0;
+
+        // Update range for all
+        if (all) {
+            range.from = rtool->context->athlete->getMeasureGroupStart(groupIdx);
+            range.to = rtool->context->athlete->getMeasureGroupEnd(groupIdx);
+        }
+
+        // how many entries ?
+        QDate d1970(1970,01,01);
+
+        // not unsigned coz date could be configured < 1970 (!)
+        int from =d1970.daysTo(range.from);
+        int to =d1970.daysTo(range.to);
+        unsigned int size = to - from + 1;
+
+        // returning a dataframe with
+        // date, field1, field2, ...
+        SEXP ans, names;
+        QStringList fieldSymbols = Athlete::getMeasureFieldSymbols(groupIdx);
+
+        // date, field1, field2, ...
+        PROTECT(ans=Rf_allocVector(VECSXP, fieldSymbols.count() + 1));
+
+        // set the names
+        PROTECT(names = Rf_allocVector(STRSXP, fieldSymbols.count() + 1));
+        SET_STRING_ELT(names, 0, Rf_mkChar("date"));
+        for (int i=0; i<fieldSymbols.count(); i++)
+            SET_STRING_ELT(names, i + 1, Rf_mkChar(fieldSymbols[i].toLatin1().constData()));
+
+        // DATE - 1 a day from start
+        SEXP date;
+        PROTECT(date=Rf_allocVector(INTSXP, size));
+        unsigned int start = d1970.daysTo(range.from);
+        for(unsigned int k=0; k<size; k++) INTEGER(date)[k] = start + k;
+
+        SEXP dclas;
+        PROTECT(dclas=Rf_allocVector(STRSXP, 1));
+        SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
+        Rf_classgets(date,dclas);
+
+        // add to the data.frame
+        SET_VECTOR_ELT(ans, 0, date);
+
+        // MEASURES DATA
+
+        QVector<SEXP> fields(fieldSymbols.count());
+        for (int i=0; i<fieldSymbols.count(); i++)
+            PROTECT(fields[i]=Rf_allocVector(REALSXP, size));
+
+        int index=0;
+        int day = from;
+        for(int k=0; k < size; k++) {
+
+            // day today
+            if (day >= from && day <= to) {
+
+                for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
+                    REAL(fields[fieldIdx])[index] = rtool->context->athlete->getMeasureValue(d1970.addDays(day), groupIdx, fieldIdx);
+                index++;
+            }
+            day++;
+        }
+
+        // add to the list
+        for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
+            SET_VECTOR_ELT(ans, fieldIdx+1, fields[fieldIdx]);
+
+        SEXP rownames;
+        PROTECT(rownames = Rf_allocVector(STRSXP, size));
+        for(unsigned int i=0; i<size; i++) {
+            QString rownumber=QString("%1").arg(i+1);
+            SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+        }
+
+        // turn the list into a data frame + set column names
+        Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+        Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+        Rf_namesgets(ans, names);
+
+        UNPROTECT(5 + fieldSymbols.count());
 
         // return it
         return ans;

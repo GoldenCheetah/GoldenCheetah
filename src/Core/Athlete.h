@@ -164,6 +164,8 @@ class Athlete : public QObject
         static QStringList getMeasureFieldSymbols(int group);
         static QStringList getMeasureFieldNames(int group);
         static QString getMeasureUnits(int group, int field, bool useMetricUnits=true);
+        QDate getMeasureGroupStart(int group);
+        QDate getMeasureGroupEnd(int group);
         double getMeasureValue(QDate date, int group, int field, bool useMetricUnits=true);
 
         // ride collection

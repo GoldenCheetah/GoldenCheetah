@@ -671,6 +671,28 @@ Athlete::getMeasureUnits(int group, int field, bool useMetricUnits)
     else return QString();
 }
 
+QDate
+Athlete::getMeasureGroupStart(int group)
+{
+    if (group == 0 && !bodyMeasures_.isEmpty())
+        return bodyMeasures_.first().when.date();
+    else if (group == 1 && !hrvMeasures_.isEmpty())
+        return hrvMeasures_.first().when.date();
+    else
+        return QDate();
+}
+
+QDate
+Athlete::getMeasureGroupEnd(int group)
+{
+    if (group == 0 && !bodyMeasures_.isEmpty())
+        return bodyMeasures_.last().when.date();
+    else if (group == 1 && !hrvMeasures_.isEmpty())
+        return hrvMeasures_.last().when.date();
+    else
+        return QDate();
+}
+
 double
 Athlete::getMeasureValue(QDate date, int group, int field, bool useMetricUnits)
 {
