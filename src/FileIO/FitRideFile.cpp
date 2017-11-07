@@ -477,11 +477,17 @@ struct FitFileReaderState
                   default: return QString("BSX %1").arg(prod);
             }
         } else if (manu == 260) {
-            // Zwift!
+            // Zwift
             return "Zwift";
         } else if (manu == 267) {
-            // Bryton!
+            // Bryton
             return "Bryton";
+        } else if (manu == 282) {
+            // Bryton
+            return "The Sufferfest";
+        } else if (manu == 284) {
+            // Rouvy
+            return "Rouvy";
         } else {
             QString name = "Unknown FIT Device";
             return name + QString(" %1:%2").arg(manu).arg(prod);
