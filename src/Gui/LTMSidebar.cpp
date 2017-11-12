@@ -1400,7 +1400,7 @@ LTMSidebar::addPhase()
         active = true;
         seasons->seasons[seasonindex].phases.append(myphase);
 
-        QTreeWidgetItem *addPhase = new QTreeWidgetItem(dateRangeTree->selectedItems().first(), myphase.getType());
+        QTreeWidgetItem *addPhase = new QTreeWidgetItem(selectedDateRange, myphase.getType());
         addPhase->setSelected(true);
         addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         addPhase->setText(0, myphase.getName());
