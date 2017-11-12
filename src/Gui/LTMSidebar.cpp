@@ -1278,9 +1278,15 @@ LTMSidebar::addEvent()
         return; // need a season selected!
     }
 
-    int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+    // if a phase is selected (rather than a season), get the season this phase belongs to
+    QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+    if (selectedDateRange->parent() != NULL) {
+        selectedDateRange = selectedDateRange->parent();
+    }
 
-    if (seasons->seasons[seasonindex].getType() == Season::temporary) {
+    int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
+
+    if (seasonindex == -1 || seasons->seasons[seasonindex].getType() == Season::temporary) {
         QMessageBox::warning(this, tr("Add Event"), tr("You can only add events to user defined seasons. Please select a season you have created before adding an event."));
         return; // must be a user season
     }
@@ -1373,9 +1379,15 @@ LTMSidebar::addPhase()
         return; // need a season selected!
     }
 
-    int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+    // if a phase is selected (rather than a season), get the season this phase belongs to
+    QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+    if (selectedDateRange->parent() != NULL) {
+        selectedDateRange = selectedDateRange->parent();
+    }
 
-    if (seasons->seasons[seasonindex].getType() == Season::temporary) {
+    int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
+
+    if (seasonindex == -1 || seasons->seasons[seasonindex].getType() == Season::temporary) {
         QMessageBox::warning(this, tr("Add Phase"), tr("You can only add phases to user defined seasons. Please select a season you have created before adding a phase."));
         return; // must be a user season
     }
