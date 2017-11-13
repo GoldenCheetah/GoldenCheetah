@@ -631,7 +631,7 @@ RideImportWizard::process()
 
                    // show duration by looking at last data point
                    if (!ride->dataPoints().isEmpty() && ride->dataPoints().last() != NULL) {
-                       if (!secs) secs = ride->dataPoints().last()->secs;
+                       if (!secs) secs = ride->dataPoints().last()->secs + ride->recIntSecs();
                        if (!km) km = ride->dataPoints().last()->km;
                    }
 
