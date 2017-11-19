@@ -20,6 +20,7 @@
 #define _Gc_BodyMeasures_h
 
 #include "Context.h"
+#include "Measures.h"
 
 #include <QString>
 #include <QStringList>
@@ -62,13 +63,6 @@ public:
 
     // getdescription text for source
     QString getSourceDescription() const;
-
-    // get Field Symbols/Names in BodyMeasureType order
-    static QStringList getFieldSymbols();
-    static QStringList getFieldNames();
-
-    // get Units for field and metrics
-    static QString getFieldUnits(int field, bool useMetricUnits);
 };
 
 class BodyMeasureParser  {
@@ -76,6 +70,34 @@ class BodyMeasureParser  {
 public:
     static bool serialize(QString, QList<BodyMeasure> &);
     static bool unserialize(QFile &, QList<BodyMeasure> &);
+};
+
+
+class BodyMeasures : public MeasuresGroup {
+    Q_DECLARE_TR_FUNCTIONS(BodyMeasures)
+public:
+    // Default constructor intended to access metadata,
+    // directory and withData must be provided to access data.
+    BodyMeasures(QDir dir=QDir(), bool withData=false);
+    ~BodyMeasures() {}
+    void write();
+    QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
+    void setBodyMeasures(QList<BodyMeasure>&x);
+    void getBodyMeasure(QDate date, BodyMeasure&) const;
+
+    QString getSymbol() const { return "Body"; }
+    QString getName() const { return tr("Body"); }
+    QStringList getFieldSymbols() const ;
+    QStringList getFieldNames() const;
+    QDate getStartDate() const;
+    QDate getEndDate() const;
+    QString getFieldUnits(int field, bool useMetricUnits=true) const;
+    double getFieldValue(QDate date, int field=BodyMeasure::WeightKg, bool useMetricUnits=true) const;
+
+private:
+    QDir dir;
+    bool withData;
+    QList<BodyMeasure> bodyMeasures_;
 };
 
 

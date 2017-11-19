@@ -1567,7 +1567,7 @@ EditMetricDetailDialog::measureGroupChanged()
 {
     measureFieldSelect->clear();
     int currentIndex=measureGroupSelect->currentIndex();
-    foreach(QString field, context->athlete->getMeasureFieldNames(currentIndex)) {
+    foreach(QString field, context->athlete->measures->getFieldNames(currentIndex)) {
         measureFieldSelect->addItem(field);
     }
     measureFieldSelect->setCurrentIndex(metricDetail->measureField);
@@ -1949,7 +1949,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QVBoxLayout *measureLayout = new QVBoxLayout(measureWidget);
 
     measureGroupSelect = new QComboBox(this);
-    foreach(QString group, context->athlete->getMeasureGroupNames()) {
+    foreach(QString group, context->athlete->measures->getGroupNames()) {
         measureGroupSelect->addItem(group);
     }
     measureGroupSelect->setCurrentIndex(metricDetail->measureGroup);
@@ -1958,7 +1958,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     measureLayout->addWidget(measureGroupSelect);
 
     measureFieldSelect = new QComboBox(this);
-    foreach(QString field, context->athlete->getMeasureFieldNames(metricDetail->measureGroup)) {
+    foreach(QString field, context->athlete->measures->getFieldNames(metricDetail->measureGroup)) {
         measureFieldSelect->addItem(field);
     }
     measureFieldSelect->setCurrentIndex(metricDetail->measureField);
@@ -2293,10 +2293,10 @@ EditMetricDetailDialog::measureName()
 
     // set uname from current parms
     QString desc = QString(tr("%1 - %2"))
-        .arg(context->athlete->getMeasureGroupNames().value(measureGroup))
-        .arg(context->athlete->getMeasureFieldNames(measureGroup).value(measureField));
+        .arg(context->athlete->measures->getGroupNames().value(measureGroup))
+        .arg(context->athlete->measures->getFieldNames(measureGroup).value(measureField));
     userName->setText(desc);
-    userUnits->setText(context->athlete->getMeasureUnits(measureGroup, measureField));
+    userUnits->setText(context->athlete->measures->getFieldUnits(measureGroup, measureField));
 }
 
 void

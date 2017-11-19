@@ -164,7 +164,8 @@ BodyMeasuresDownload::download() {
    progressBar->setValue(0);
 
    // do the job
-   QList<BodyMeasure> current = context->athlete->bodyMeasures();
+   BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
+   QList<BodyMeasure> current = pBodyMeasures->bodyMeasures();
    QList<BodyMeasure> bodyMeasures;
    QDateTime fromDate;
    QDateTime toDate;
@@ -258,12 +259,12 @@ BodyMeasuresDownload::download() {
        context->athlete->rideCache->cancel();
 
        // store in athlete
-       context->athlete->setBodyMeasures(bodyMeasures);
+       pBodyMeasures->setBodyMeasures(bodyMeasures);
 
        // now save data away if we actually got something !
        // doing it here means we don't overwrite previous responses
        // when we fail to get any data (e.g. errors / network problems)
-       BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()), context->athlete->bodyMeasures());
+       pBodyMeasures->write();
 
        // do a refresh, it will check if needed
        context->athlete->rideCache->refresh();

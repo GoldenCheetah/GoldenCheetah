@@ -678,7 +678,8 @@ double
 RideItem::getWeight(int type)
 {
     // get any body measurements first
-    context->athlete->getBodyMeasure(dateTime.date(), weightData);
+    BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
+    pBodyMeasures->getBodyMeasure(dateTime.date(), weightData);
 
     // return what was asked for!
     switch(type) {
@@ -716,7 +717,7 @@ double
 RideItem::getHrvMeasure(int type)
 {
     // get HRV measure for the date of the ride
-    return context->athlete->getHrvMeasure(dateTime.date(), type);
+    return context->athlete->measures->getFieldValue(Measures::Hrv, dateTime.date(), type);
 }
 
 unsigned short
@@ -724,7 +725,8 @@ RideItem::getHrvFingerprint()
 {
     // get HRV measure for the date of the ride
     HrvMeasure hrvMeasure;
-    context->athlete->getHrvMeasure(dateTime.date(), hrvMeasure);
+    HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
+    pHrvMeasures->getHrvMeasure(dateTime.date(), hrvMeasure);
     return hrvMeasure.getFingerprint();
 }
 

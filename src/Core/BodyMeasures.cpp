@@ -17,6 +17,7 @@
  */
 
 #include "BodyMeasures.h"
+#include "Units.h"
 
 #include <QList>
 #include <QMessageBox>
@@ -60,25 +61,6 @@ BodyMeasure::getSourceDescription() const {
     default:
         return tr("Unknown");
     }
-}
-
-QStringList
-BodyMeasure::getFieldSymbols() {
-    static const QStringList symbols = QStringList()<<"Weight"<<"FatKg"<<"MuscleKg"<<"BonesKg"<<"LeanKg"<<"FatPercent";
-    return symbols;
-}
-
-QStringList
-BodyMeasure::getFieldNames() {
-    static const QStringList names = QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bones Mass")<<tr("Lean Mass")<<tr("Fat Percent");
-    return names;
-}
-
-QString
-BodyMeasure::getFieldUnits(int field, bool useMetricUnits) {
-    static const QStringList metricUnits = QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%");
-    static const QStringList imperialUnits = QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%");
-    return useMetricUnits ? metricUnits.value(field) : imperialUnits.value(field);
 }
 
 bool
@@ -181,3 +163,112 @@ BodyMeasureParser::unserialize(QFile &file, QList<BodyMeasure> &data) {
     return true;
 }
 
+BodyMeasures::BodyMeasures(QDir dir, bool withData) : dir(dir), withData(withData) {
+    // don't load data if not requested
+    if (!withData) return;
+
+    // get body measurements if the file exists
+    QFile bodyFile(QString("%1/bodymeasures.json").arg(dir.canonicalPath()));
+    if (bodyFile.exists()) {
+        QList<BodyMeasure> bodyData;
+        if (BodyMeasureParser::unserialize(bodyFile, bodyData)){
+            setBodyMeasures(bodyData);
+        }
+    }
+}
+
+void
+BodyMeasures::write() {
+    // Nothing to do if data not loaded
+    if (!withData) return;
+
+    // now save data away
+    BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(dir.canonicalPath()), bodyMeasures_);
+}
+
+void
+BodyMeasures::setBodyMeasures(QList<BodyMeasure>&x)
+{
+    bodyMeasures_ = x;
+    qSort(bodyMeasures_); // date order
+}
+
+QStringList
+BodyMeasures::getFieldSymbols() const {
+    static const QStringList symbols = QStringList()<<"Weight"<<"FatKg"<<"MuscleKg"<<"BonesKg"<<"LeanKg"<<"FatPercent";
+    return symbols;
+}
+
+QStringList
+BodyMeasures::getFieldNames() const {
+    static const QStringList names = QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bones Mass")<<tr("Lean Mass")<<tr("Fat Percent");
+    return names;
+}
+
+QDate
+BodyMeasures::getStartDate() const {
+    if (!bodyMeasures_.isEmpty())
+        return bodyMeasures_.first().when.date();
+    else
+        return QDate();
+}
+
+QDate
+BodyMeasures::getEndDate() const {
+    if (!bodyMeasures_.isEmpty())
+        return bodyMeasures_.last().when.date();
+    else
+        return QDate();
+}
+
+QString
+BodyMeasures::getFieldUnits(int field, bool useMetricUnits) const {
+    static const QStringList metricUnits = QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%");
+    static const QStringList imperialUnits = QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%");
+    return useMetricUnits ? metricUnits.value(field) : imperialUnits.value(field);
+}
+
+void
+BodyMeasures::getBodyMeasure(QDate date, BodyMeasure &here) const {
+    // the optimisation below is not thread safe and should be encapsulated
+    // by a mutex, but this kind of defeats to purpose of the optimisation!
+
+    //if (withings_.count() && withings_.last().when.date() <= date) here = withings_.last();
+    //if (!withings_.count() || withings_.first().when.date() > date) here = WithingsReading();
+
+    // always set to not found before searching
+    here = BodyMeasure();
+
+    // loop
+    foreach(BodyMeasure x, bodyMeasures_) {
+
+        // we only look for weight readings at present
+        // some readings may not include this so skip them
+        if (x.weightkg <= 0) continue;
+
+        if (x.when.date() <= date) here = x;
+        if (x.when.date() > date) break;
+    }
+
+    // will be empty if none found
+    return;
+}
+
+double
+BodyMeasures::getFieldValue(QDate date, int field, bool useMetricUnits) const {
+    const double units_factor = useMetricUnits ? 1.0 : LB_PER_KG;
+    BodyMeasure weight;
+    getBodyMeasure(date, weight);
+
+    // return what was asked for!
+    switch(field) {
+
+        default:
+        case BodyMeasure::WeightKg : return weight.weightkg * units_factor;
+        case BodyMeasure::FatKg : return weight.fatkg * units_factor;
+        case BodyMeasure::MuscleKg : return weight.musclekg * units_factor;
+        case BodyMeasure::BonesKg : return weight.boneskg * units_factor;
+        case BodyMeasure::LeanKg : return weight.leankg * units_factor;
+        case BodyMeasure::FatPercent : return weight.fatpercent;
+    }
+}

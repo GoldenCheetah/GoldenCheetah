@@ -168,23 +168,8 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // Routes
     routes = new Routes(context, home->config());
 
-    // get body measurements if the file exists
-    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()));
-    if (bmFile.exists()) {
-        QList<BodyMeasure> bmData;
-        if (BodyMeasureParser::unserialize(bmFile, bmData)){
-            setBodyMeasures(bmData);
-        }
-    }
-
-    // get hrv measurements if the file exists
-    QFile hrvFile(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()));
-    if (hrvFile.exists()) {
-        QList<HrvMeasure> hrvData;
-        if (HrvMeasureParser::unserialize(hrvFile, hrvData)){
-            setHrvMeasures(hrvData);
-        }
-    }
+    // Daily Measures
+    measures = new Measures(home->config(), true);
 
     // auto downloader
     cloudAutoDownload = new CloudServiceAutoDownload(context);
@@ -256,6 +241,7 @@ Athlete::~Athlete()
     delete namedSearches;
     delete routes;
     delete seasons;
+    delete measures;
 
     delete rideMetadata_;
     delete colorEngine;
@@ -489,67 +475,13 @@ Athlete::getPDEstimates()
 
 
 // working with weight data
-void 
-Athlete::setBodyMeasures(QList<BodyMeasure>&x)
-{
-    bodyMeasures_ = x;
-    qSort(bodyMeasures_); // date order
-}
-
-void 
-Athlete::getBodyMeasure(QDate date, BodyMeasure &here)
-{
-    // the optimisation below is not thread safe and should be encapsulated
-    // by a mutex, but this kind of defeats to purpose of the optimisation!
-
-    //if (withings_.count() && withings_.last().when.date() <= date) here = withings_.last();
-    //if (!withings_.count() || withings_.first().when.date() > date) here = WithingsReading();
-
-    // always set to not found before searching
-    here = BodyMeasure();
-
-    // loop
-    foreach(BodyMeasure x, bodyMeasures_) {
-
-        // we only look for weight readings at present
-        // some readings may not include this so skip them
-        if (x.weightkg <= 0) continue;
-
-        if (x.when.date() <= date) here = x;
-        if (x.when.date() > date) break;
-    }
-
-    // will be empty if none found
-    return;
-}
-
-double 
-Athlete::getBodyMeasure(QDate date, int field, bool useMetricUnits)
-{
-    const double units_factor = useMetricUnits ? 1.0 : LB_PER_KG;
-    BodyMeasure weight;
-    getBodyMeasure(date, weight);
-
-    // return what was asked for!
-    switch(field) {
-
-        default:
-        case BodyMeasure::WeightKg : return weight.weightkg * units_factor;
-        case BodyMeasure::FatKg : return weight.fatkg * units_factor;
-        case BodyMeasure::MuscleKg : return weight.musclekg * units_factor;
-        case BodyMeasure::BonesKg : return weight.boneskg * units_factor;
-        case BodyMeasure::LeanKg : return weight.leankg * units_factor;
-        case BodyMeasure::FatPercent : return weight.fatpercent;
-    }
-}
-
 double
 Athlete::getWeight(QDate date, RideFile *ride)
 {
     double weight;
 
-    // withings first
-    weight = getBodyMeasure(date);
+    // daily weight first
+    weight = measures->getGroup(Measures::Body)->getFieldValue(date);
 
     // ride (if available)
     if (!weight && ride)
@@ -584,123 +516,6 @@ Athlete::getHeight(RideFile *ride)
 
     return height;
 }
-
-// working with hrv data
-void 
-Athlete::setHrvMeasures(QList<HrvMeasure>&x)
-{
-    hrvMeasures_ = x;
-    qSort(hrvMeasures_); // date order
-}
-
-void 
-Athlete::getHrvMeasure(QDate date, HrvMeasure &here)
-{
-    // always set to not found before searching
-    here = HrvMeasure();
-
-    // loop
-    foreach(HrvMeasure x, hrvMeasures_) {
-
-        if (x.when.date() <= date) here = x;
-        if (x.when.date() > date) break;
-    }
-
-    // will be empty if none found
-    return;
-}
-
-double 
-Athlete::getHrvMeasure(QDate date, int field, bool useMetricUnits)
-{
-    Q_UNUSED(useMetricUnits);
-    HrvMeasure hrv;
-    getHrvMeasure(date, hrv);
-
-    // return what was asked for!
-    switch(field) {
-
-        default:
-        case HrvMeasure::HR : return hrv.hr;
-        case HrvMeasure::AVNN : return hrv.avnn;
-        case HrvMeasure::SDNN : return hrv.sdnn;
-        case HrvMeasure::RMSSD : return hrv.rmssd;
-        case HrvMeasure::PNN50 : return hrv.pnn50;
-        case HrvMeasure::LF : return hrv.lf;
-        case HrvMeasure::HF : return hrv.hf;
-        case HrvMeasure::RECOVERY_POINTS : return hrv.recovery_points;
-    }
-}
-
-// Common access to Measures
-QStringList
-Athlete::getMeasureGroupSymbols()
-{
-    const QStringList groups = QStringList() << "Body" << "Hrv";
-    return groups;
-}
-
-QStringList
-Athlete::getMeasureGroupNames()
-{
-    const QStringList groups = QStringList() << tr("Body") << tr("Hrv");
-    return groups;
-}
-
-QStringList
-Athlete::getMeasureFieldSymbols(int group)
-{
-    if (group == 0) return BodyMeasure::getFieldSymbols();
-    else if (group == 1) return HrvMeasure::getFieldSymbols();
-    else return QStringList();
-}
-
-QStringList
-Athlete::getMeasureFieldNames(int group)
-{
-    if (group == 0) return BodyMeasure::getFieldNames();
-    else if (group == 1) return HrvMeasure::getFieldNames();
-    else return QStringList();
-}
-
-QString
-Athlete::getMeasureUnits(int group, int field, bool useMetricUnits)
-{
-    if (group == 0) return BodyMeasure::getFieldUnits(field, useMetricUnits);
-    else if (group == 1) return HrvMeasure::getFieldUnits(field, useMetricUnits);
-    else return QString();
-}
-
-QDate
-Athlete::getMeasureGroupStart(int group)
-{
-    if (group == 0 && !bodyMeasures_.isEmpty())
-        return bodyMeasures_.first().when.date();
-    else if (group == 1 && !hrvMeasures_.isEmpty())
-        return hrvMeasures_.first().when.date();
-    else
-        return QDate();
-}
-
-QDate
-Athlete::getMeasureGroupEnd(int group)
-{
-    if (group == 0 && !bodyMeasures_.isEmpty())
-        return bodyMeasures_.last().when.date();
-    else if (group == 1 && !hrvMeasures_.isEmpty())
-        return hrvMeasures_.last().when.date();
-    else
-        return QDate();
-}
-
-double
-Athlete::getMeasureValue(QDate date, int group, int field, bool useMetricUnits)
-{
-    if (group == 0) return getBodyMeasure(date, field, useMetricUnits);
-    else if (group == 1) return getHrvMeasure(date, field, useMetricUnits);
-    else return 0.0;
-}
-
 
 // working with PMC data series
 PMCData *

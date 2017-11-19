@@ -529,7 +529,7 @@ class AthleteWeight : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         // body measures first
-        double weight = item->context->athlete->getBodyMeasure(item->dateTime.date());
+        double weight = item->getWeight();
 
         // from metadata
         if (!weight) weight = item->getText("Weight", "0.0").toDouble();
@@ -577,11 +577,7 @@ class AthleteFat : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        BodyMeasure here;
-
-        // body measures first
-        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
-        setValue(here.fatkg);
+        setValue(item->getWeight(BodyMeasure::FatKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -617,12 +613,7 @@ class AthleteBones : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-
-        BodyMeasure here;
-
-        // body measures first
-        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
-        setValue(here.boneskg);
+        setValue(item->getWeight(BodyMeasure::BonesKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -658,12 +649,7 @@ class AthleteMuscles : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-
-        BodyMeasure here;
-
-        // body measures first
-        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
-        setValue(here.musclekg);
+        setValue(item->getWeight(BodyMeasure::MuscleKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -699,12 +685,7 @@ class AthleteLean : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-
-        BodyMeasure here;
-
-        // body measures first
-        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
-        setValue(here.leankg);
+        setValue(item->getWeight(BodyMeasure::LeanKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -739,12 +720,7 @@ class AthleteFatP : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-
-        BodyMeasure here;
-
-        // body measures first
-        item->context->athlete->getBodyMeasure(item->dateTime.date(), here);
-        setValue(here.fatpercent);
+        setValue(item->getWeight(BodyMeasure::FatPercent));
     }
 
     MetricClass classification() const { return Undefined; }
