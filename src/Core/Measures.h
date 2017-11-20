@@ -19,11 +19,40 @@
 #ifndef _Gc_Measures_h
 #define _Gc_Measures_h
 
+#include "GoldenCheetah.h"
 
 #include <QDate>
 #include <QDir>
 #include <QString>
 #include <QStringList>
+
+class Measure {
+    Q_DECLARE_TR_FUNCTIONS(Measure)
+public:
+
+    enum measuresource { Manual, Withings, TodaysPlan, CSV };
+    typedef enum measuresource MeasureSource;
+
+    Measure() : when(QDateTime()), comment("") {}
+    virtual ~Measure() {}
+
+    QDateTime when;         // when was this reading taken
+    QString comment;        // user commentary regarding this measurement
+
+    MeasureSource source;
+    QString originalSource; // if delivered from the cloud service
+
+    // used by qSort()
+    bool operator< (Measure right) const {
+        return (when < right.when);
+    }
+    // calculate a CRC for the Measure data - used to see if
+    // data is changed in Configuration pages
+    virtual quint16 getFingerprint() const;
+
+    // getdescription text for source
+    virtual QString getSourceDescription() const;
+};
 
 class MeasuresGroup {
 

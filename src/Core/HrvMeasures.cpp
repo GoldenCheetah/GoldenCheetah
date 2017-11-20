@@ -32,7 +32,6 @@ HrvMeasure::getFingerprint() const
 {
     quint64 x = 0;
 
-    x += when.date().toJulianDay();
     x += hr;
     x += avnn;
     x += sdnn;
@@ -44,21 +43,9 @@ HrvMeasure::getFingerprint() const
 
     QByteArray ba = QByteArray::number(x);
 
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba, ba.length()) + Measure::getFingerprint();
 }
 
-QString
-HrvMeasure::getSourceDescription() const {
-
-    switch(source) {
-    case HrvMeasure::Manual:
-        return tr("Manual entry");
-    case HrvMeasure::CSV:
-        return tr("CSV Upload");
-    default:
-        return tr("Unknown");
-    }
-}
 
 bool
 HrvMeasureParser::serialize(QString filename, QList<HrvMeasure> &data) {
@@ -154,7 +141,7 @@ HrvMeasureParser::unserialize(QFile &file, QList<HrvMeasure> &data) {
         m.lf = measure["lf"].toDouble();
         m.hf = measure["hf"].toDouble();
         m.recovery_points = measure["recovery_points"].toDouble();
-        m.source = static_cast<HrvMeasure::HrvMeasureSource>(measure["source"].toInt());
+        m.source = static_cast<Measure::MeasureSource>(measure["source"].toInt());
         m.originalSource = measure["originalsource"].toString();
         data.append(m);
     }

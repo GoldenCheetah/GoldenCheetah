@@ -20,6 +20,36 @@
 #include "BodyMeasures.h"
 #include "HrvMeasures.h"
 
+quint16
+Measure::getFingerprint() const
+{
+    quint64 x = 0;
+
+    x += when.date().toJulianDay();
+
+    QByteArray ba = QByteArray::number(x);
+    ba.append(comment);
+
+    return qChecksum(ba, ba.length());
+}
+
+QString
+Measure::getSourceDescription() const {
+
+    switch(source) {
+    case Measure::Manual:
+        return tr("Manual entry");
+    case Measure::Withings:
+        return tr("Withings");
+    case Measure::TodaysPlan:
+        return tr("Today's Plan");
+    case Measure::CSV:
+        return tr("CSV Upload");
+    default:
+        return tr("Unknown");
+    }
+}
+
 Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData) {
     // load in MeasuresGroupType order!
     groups.append(new BodyMeasures(dir, withData));

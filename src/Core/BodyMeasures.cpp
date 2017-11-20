@@ -32,7 +32,6 @@ BodyMeasure::getFingerprint() const
 {
     quint64 x = 0;
 
-    x += when.date().toJulianDay();
     x += weightkg;
     x += fatkg;
     x += musclekg;
@@ -41,27 +40,10 @@ BodyMeasure::getFingerprint() const
     x += fatpercent;
 
     QByteArray ba = QByteArray::number(x);
-    ba.append(comment);
 
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba, ba.length()) + Measure::getFingerprint();
 }
 
-QString
-BodyMeasure::getSourceDescription() const {
-
-    switch(source) {
-    case BodyMeasure::Manual:
-        return tr("Manual entry");
-    case BodyMeasure::Withings:
-        return tr("Withings");
-    case BodyMeasure::TodaysPlan:
-        return tr("Today's Plan");
-    case BodyMeasure::CSV:
-        return tr("CSV Upload");
-    default:
-        return tr("Unknown");
-    }
-}
 
 bool
 BodyMeasureParser::serialize(QString filename, QList<BodyMeasure> &data) {
@@ -155,7 +137,7 @@ BodyMeasureParser::unserialize(QFile &file, QList<BodyMeasure> &data) {
         m.musclekg = measure["musclekg"].toDouble();
         m.leankg = measure["leankg"].toDouble();
         m.fatpercent = measure["fatpercent"].toDouble();
-        m.source = static_cast<BodyMeasure::BodyMeasureSource>(measure["source"].toInt());
+        m.source = static_cast<Measure::MeasureSource>(measure["source"].toInt());
         m.originalSource = measure["originalsource"].toString();
         data.append(m);
     }
