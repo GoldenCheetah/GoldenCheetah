@@ -1399,6 +1399,11 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     recovery_points->setDecimals(1);
     recovery_points->setValue(0.0);
 
+    QString commenttext = tr("Comment");
+    commentlabel = new QLabel(commenttext);
+    comment = new QLineEdit(this);
+    comment->setText("");
+
     measuresGrid->addWidget(dateLabel, 1, 0, alignment);
     measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
 
@@ -1425,6 +1430,9 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
 
     measuresGrid->addWidget(recovery_pointslabel, 9, 0, alignment);
     measuresGrid->addWidget(recovery_points, 9, 1, alignment);
+
+    measuresGrid->addWidget(commentlabel, 10, 0, alignment);
+    measuresGrid->addWidget(comment, 10, 1, alignment);
 
     all->addLayout(measuresGrid);
 
@@ -1471,10 +1479,12 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     hrvTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
     hrvTree->headerItem()->setText(8, recovery_pointstext);
     hrvTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(9, tr("Source"));
+    hrvTree->headerItem()->setText(9, commenttext);
     hrvTree->header()->setSectionResizeMode(9, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(10, tr("Original Source"));
-    hrvTree->setColumnCount(11);
+    hrvTree->headerItem()->setText(10, tr("Source"));
+    hrvTree->header()->setSectionResizeMode(10, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(11, tr("Original Source"));
+    hrvTree->setColumnCount(12);
     hrvTree->setSelectionMode(QAbstractItemView::SingleSelection);
     hrvTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     hrvTree->setUniformRowHeights(true);
@@ -1493,7 +1503,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
         // date & time
         add->setText(0, hrvMeasures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
-        // weight
+        // hrv data
         add->setText(1, QString("%1").arg(hrvMeasures[i].rmssd, 0, 'f', 1));
         add->setText(2, QString("%1").arg(hrvMeasures[i].hr, 0, 'f', 1));
         add->setText(3, QString("%1").arg(hrvMeasures[i].avnn, 0, 'f', 1));
@@ -1502,9 +1512,10 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
         add->setText(6, QString("%1").arg(hrvMeasures[i].lf, 0, 'f', 4));
         add->setText(7, QString("%1").arg(hrvMeasures[i].hf, 0, 'f', 4));
         add->setText(8, QString("%1").arg(hrvMeasures[i].recovery_points, 0, 'f', 1));
+        add->setText(9, hrvMeasures[i].comment);
         // source
-        add->setText(9, hrvMeasures[i].getSourceDescription());
-        add->setText(10, hrvMeasures[i].originalSource);
+        add->setText(10, hrvMeasures[i].getSourceDescription());
+        add->setText(11, hrvMeasures[i].originalSource);
     }
 
     all->addWidget(hrvTree);
@@ -1531,6 +1542,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     connect(lf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(hf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(recovery_points, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(comment, SIGNAL(textEdited(QString)), this, SLOT(rangeEdited()));
 
     // button connect
     connect(updateButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
@@ -1601,6 +1613,7 @@ HrvPage::addOReditClicked()
     addHrv.lf = lf->value();
     addHrv.hf = hf->value();
     addHrv.recovery_points = recovery_points->value();
+    addHrv.comment = comment->text();
     addHrv.source = HrvMeasure::Manual;
     addHrv.originalSource = "";
     hrvMeasures.insert(index, addHrv);
@@ -1616,8 +1629,9 @@ HrvPage::addOReditClicked()
     add->setText(6, QString("%1").arg(lf->value()));
     add->setText(7, QString("%1").arg(hf->value()));
     add->setText(8, QString("%1").arg(recovery_points->value()));
-    add->setText(9, QString("%1").arg(tr("Manual entry")));
-    add->setText(10, ""); // Original Source
+    add->setText(9, QString("%1").arg(comment->text()));
+    add->setText(10, QString("%1").arg(tr("Manual entry")));
+    add->setText(11, ""); // Original Source
 
     updateButton->hide();
 }
@@ -1657,6 +1671,8 @@ HrvPage::rangeEdited()
         double ohf = hrvMeasures[index].hf;
         double nrecovery_points = recovery_points->value();
         double orecovery_points = hrvMeasures[index].recovery_points;
+        QString ncomment = comment->text();
+        QString ocomment = hrvMeasures[index].comment;
 
         if (dateTime == odateTime && (nrmssd != ormssd ||
                                       nhr != ohr ||
@@ -1665,7 +1681,8 @@ HrvPage::rangeEdited()
                                       npnn50 != opnn50 ||
                                       nlf != olf ||
                                       nhf != ohf ||
-                                      nrecovery_points != orecovery_points))
+                                      nrecovery_points != orecovery_points ||
+                                      ncomment != ocomment))
             updateButton->show();
         else
             updateButton->hide();
@@ -1690,6 +1707,7 @@ HrvPage::rangeSelectionChanged()
         lf->setValue(current.lf);
         hf->setValue(current.hf);
         recovery_points->setValue(current.recovery_points);
+        comment->setText(current.comment);
 
         updateButton->hide();
     }

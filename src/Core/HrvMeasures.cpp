@@ -70,6 +70,7 @@ HrvMeasureParser::serialize(QString filename, QList<HrvMeasure> &data) {
         m = &data[i];
         QJsonObject measure;
         measure.insert("when", m->when.toMSecsSinceEpoch()/1000);
+        measure.insert("comment", m->comment);
         measure.insert("hr", m->hr);
         measure.insert("avnn", m->avnn);
         measure.insert("sdnn", m->sdnn);
@@ -133,6 +134,7 @@ HrvMeasureParser::unserialize(QFile &file, QList<HrvMeasure> &data) {
         QJsonObject measure = measures.at(i).toObject();
         HrvMeasure m;
         m.when = QDateTime::fromMSecsSinceEpoch(measure["when"].toDouble()*1000);
+        m.comment = measure["comment"].toString();
         m.hr = measure["hr"].toDouble();
         m.avnn = measure["avnn"].toDouble();
         m.sdnn = measure["sdnn"].toDouble();
