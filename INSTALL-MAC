@@ -223,6 +223,17 @@ $ open src/GoldenCheetah.app
 
 And you're up and running.
 
+Now, if you would like to use XCode to debug the project, you can generate 
+the necessary project file. 
+$ qmake --recursive -spec macx-xcode
+
+This will create a project as: build.xcodeproj Please be sure to build via 
+the standard method before checkin to prevent build errors. If the build
+fails to launch with "couldn't be opened because you don't have permission 
+to view it" Then a work around would be to open the project and attach
+the debugger. 
+$ open src/GoldenCheetah.app
+
 2. ADDING OPTIONAL DEPENDENCIES
 ===============================
 
