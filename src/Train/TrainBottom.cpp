@@ -206,7 +206,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(m_trainSidebar->context, SIGNAL(stop()), this, SLOT(updatePlayButtonIcon()));
     //connect(hideOnIdle, SIGNAL(stateChanged(int)), this, SLOT(autoHideCheckboxChanged(int)));
     connect(m_trainSidebar, SIGNAL(statusChanged(int)), this, SLOT(statusChanged(int)));
-    connect(m_connectButton, SIGNAL(clicked()), m_trainSidebar, SLOT(toggleConnect()));
+    connect(m_connectButton, SIGNAL(released()), m_trainSidebar, SLOT(toggleConnect()));
     connect(cal, SIGNAL(clicked()), m_trainSidebar, SLOT(Calibrate()));
 
     connect(loadUp, SIGNAL(clicked()), m_trainSidebar, SLOT(Higher()));

@@ -41,6 +41,7 @@
 #include <QElapsedTimer>
 #include <QProgressDialog>
 #include <QFile>
+#include <QSemaphore>
 
 //
 // Time
@@ -672,7 +673,7 @@ public:
     qint64 getElapsedTime();
 
 private:
-
+    QSemaphore portInitDone;
     void run();
 
     RealtimeData telemetry;
