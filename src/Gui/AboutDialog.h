@@ -1,6 +1,7 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 #include "GoldenCheetah.h"
+// Test Appveyor 2
 
 #include "Pages.h"
 #include <QDialog>
