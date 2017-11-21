@@ -19,8 +19,7 @@
 #ifndef _GC_Athlete_h
 #define _GC_Athlete_h 1
 
-#include "BodyMeasures.h"
-#include "HrvMeasures.h"
+#include "Measures.h"
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -100,8 +99,7 @@ class Athlete : public QObject
         Routes *routes;
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;
-        QList<BodyMeasure> bodyMeasures_;
-        QList<HrvMeasure> hrvMeasures_;
+        Measures *measures;
 
         // cloud download
         CloudServiceAutoDownload *cloudAutoDownload;
@@ -143,30 +141,6 @@ class Athlete : public QObject
         NamedSearches *namedSearches;
 
         Context *context;
-
-        // work with weight data from Withings, and other sources
-        void setBodyMeasures(QList<BodyMeasure>&x);
-
-        QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
-        double getBodyMeasure(QDate date, int field=BodyMeasure::WeightKg, bool useMetricUnits=true);
-        void getBodyMeasure(QDate date,BodyMeasure&);
-
-        // work with HRV data from HRV4Training, and other sources
-        void setHrvMeasures(QList<HrvMeasure>&x);
-
-        QList<HrvMeasure>& hrvMeasures() { return hrvMeasures_; }
-        double getHrvMeasure(QDate date, int field=HrvMeasure::RMSSD, bool useMetricUnits=true);
-        void getHrvMeasure(QDate date, HrvMeasure&);
-
-        // Common access to Measures
-        static QStringList getMeasureGroupSymbols();
-        static QStringList getMeasureGroupNames();
-        static QStringList getMeasureFieldSymbols(int group);
-        static QStringList getMeasureFieldNames(int group);
-        static QString getMeasureUnits(int group, int field, bool useMetricUnits=true);
-        QDate getMeasureGroupStart(int group);
-        QDate getMeasureGroupEnd(int group);
-        double getMeasureValue(QDate date, int group, int field, bool useMetricUnits=true);
 
         // ride collection
         void selectRideFile(QString);

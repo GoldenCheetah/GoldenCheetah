@@ -188,7 +188,8 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
                   error = tr("Invalid 'HRV4T_Recovery_Points' - in line %1").arg(lineNo);
                   goto error;
               }
-
+          } else if (h == "note") {
+              m.comment = i.trimmed();
           }
       }
       // only append if we have a good date & rMSSD

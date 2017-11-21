@@ -914,7 +914,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     dateTimeEdit->setCalendarPopup(true);
 
-    QString weighttext = tr("Weight");
+    QString weighttext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::WeightKg);
     weightlabel = new QLabel(weighttext);
     weight = new QDoubleSpinBox(this);
     weight->setMaximum(999.9);
@@ -923,7 +923,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     weight->setValue(defaultWeight->value());
     weight->setSuffix(weightUnits);
 
-    QString fatkgtext = tr("Fat");
+    QString fatkgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::FatKg);
     fatkglabel = new QLabel(fatkgtext);
     fatkg = new QDoubleSpinBox(this);
     fatkg->setMaximum(999.9);
@@ -932,7 +932,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     fatkg->setValue(0.0);
     fatkg->setSuffix(weightUnits);
 
-    QString musclekgtext = tr("Muscle");
+    QString musclekgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::MuscleKg);
     musclekglabel = new QLabel(musclekgtext);
     musclekg = new QDoubleSpinBox(this);
     musclekg->setMaximum(999.9);
@@ -941,7 +941,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     musclekg->setValue(0.0);
     musclekg->setSuffix(weightUnits);
 
-    QString boneskgtext = tr("Bones");
+    QString boneskgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::BonesKg);
     boneskglabel = new QLabel(boneskgtext);
     boneskg = new QDoubleSpinBox(this);
     boneskg->setMaximum(999.9);
@@ -950,7 +950,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     boneskg->setValue(0.0);
     boneskg->setSuffix(weightUnits);
 
-    QString leankgtext = tr("Lean");
+    QString leankgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::LeanKg);
     leankglabel = new QLabel(leankgtext);
     leankg = new QDoubleSpinBox(this);
     leankg->setMaximum(999.9);
@@ -959,7 +959,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     leankg->setValue(0.0);
     leankg->setSuffix(weightUnits);
 
-    QString fatpercenttext = tr("Fat%");
+    QString fatpercenttext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::FatPercent);
     fatpercentlabel = new QLabel(fatpercenttext);
     fatpercent = new QDoubleSpinBox(this);
     fatpercent->setMaximum(100.0);
@@ -1174,12 +1174,11 @@ RiderPhysPage::saveClicked()
         fingerprint += bm.getFingerprint();
     }
     if (fingerprint != b4.fingerprint) {
-        // date order
-        qSort(bodyMeasures);
-        // now save data away if we actually got something !
-        BodyMeasureParser::serialize(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()), bodyMeasures);
         // store in athlete
-        context->athlete->setBodyMeasures(bodyMeasures);
+        BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
+        pBodyMeasures->setBodyMeasures(bodyMeasures);
+        // now save data away if we actually got something !
+        pBodyMeasures->write();
         state += CONFIG_ATHLETE;
     }
 
@@ -1336,7 +1335,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     dateTimeEdit->setCalendarPopup(true);
 
-    QString rmssdtext = tr("rMSSD");
+    QString rmssdtext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::RMSSD);
     rmssdlabel = new QLabel(rmssdtext);
     rmssd = new QDoubleSpinBox(this);
     rmssd->setMaximum(999.9);
@@ -1344,7 +1343,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     rmssd->setDecimals(1);
     rmssd->setValue(0.0);
 
-    QString hrtext = tr("HR");
+    QString hrtext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::HR);
     hrlabel = new QLabel(hrtext);
     hr = new QDoubleSpinBox(this);
     hr->setMaximum(999.9);
@@ -1352,7 +1351,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     hr->setDecimals(1);
     hr->setValue(0.0);
 
-    QString avnntext = tr("AVNN");
+    QString avnntext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::AVNN);
     avnnlabel = new QLabel(avnntext);
     avnn = new QDoubleSpinBox(this);
     avnn->setMaximum(9999.9);
@@ -1360,7 +1359,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     avnn->setDecimals(1);
     avnn->setValue(0.0);
 
-    QString sdnntext = tr("SDNN");
+    QString sdnntext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::SDNN);
     sdnnlabel = new QLabel(sdnntext);
     sdnn = new QDoubleSpinBox(this);
     sdnn->setMaximum(999.9);
@@ -1368,7 +1367,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     sdnn->setDecimals(1);
     sdnn->setValue(0.0);
 
-    QString pnn50text = tr("pNN50");
+    QString pnn50text = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::PNN50);
     pnn50label = new QLabel(pnn50text);
     pnn50 = new QDoubleSpinBox(this);
     pnn50->setMaximum(100.0);
@@ -1376,7 +1375,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     pnn50->setDecimals(1);
     pnn50->setValue(0.0);
 
-    QString lftext = tr("LF");
+    QString lftext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::LF);
     lflabel = new QLabel(lftext);
     lf = new QDoubleSpinBox(this);
     lf->setMaximum(1.0);
@@ -1384,7 +1383,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     lf->setDecimals(4);
     lf->setValue(0.0);
 
-    QString hftext = tr("HF");
+    QString hftext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::HF);
     hflabel = new QLabel(hftext);
     hf = new QDoubleSpinBox(this);
     hf->setMaximum(1.0);
@@ -1392,13 +1391,18 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     hf->setDecimals(4);
     hf->setValue(0.0);
 
-    QString recovery_pointstext = tr("Rec.Points");
+    QString recovery_pointstext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::RECOVERY_POINTS);
     recovery_pointslabel = new QLabel(recovery_pointstext);
     recovery_points = new QDoubleSpinBox(this);
     recovery_points->setMaximum(10.0);
     recovery_points->setMinimum(0.0);
     recovery_points->setDecimals(1);
     recovery_points->setValue(0.0);
+
+    QString commenttext = tr("Comment");
+    commentlabel = new QLabel(commenttext);
+    comment = new QLineEdit(this);
+    comment->setText("");
 
     measuresGrid->addWidget(dateLabel, 1, 0, alignment);
     measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
@@ -1426,6 +1430,9 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
 
     measuresGrid->addWidget(recovery_pointslabel, 9, 0, alignment);
     measuresGrid->addWidget(recovery_points, 9, 1, alignment);
+
+    measuresGrid->addWidget(commentlabel, 10, 0, alignment);
+    measuresGrid->addWidget(comment, 10, 1, alignment);
 
     all->addLayout(measuresGrid);
 
@@ -1472,10 +1479,12 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     hrvTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
     hrvTree->headerItem()->setText(8, recovery_pointstext);
     hrvTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(9, tr("Source"));
+    hrvTree->headerItem()->setText(9, commenttext);
     hrvTree->header()->setSectionResizeMode(9, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(10, tr("Original Source"));
-    hrvTree->setColumnCount(11);
+    hrvTree->headerItem()->setText(10, tr("Source"));
+    hrvTree->header()->setSectionResizeMode(10, QHeaderView::ResizeToContents);
+    hrvTree->headerItem()->setText(11, tr("Original Source"));
+    hrvTree->setColumnCount(12);
     hrvTree->setSelectionMode(QAbstractItemView::SingleSelection);
     hrvTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     hrvTree->setUniformRowHeights(true);
@@ -1494,7 +1503,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
         // date & time
         add->setText(0, hrvMeasures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
-        // weight
+        // hrv data
         add->setText(1, QString("%1").arg(hrvMeasures[i].rmssd, 0, 'f', 1));
         add->setText(2, QString("%1").arg(hrvMeasures[i].hr, 0, 'f', 1));
         add->setText(3, QString("%1").arg(hrvMeasures[i].avnn, 0, 'f', 1));
@@ -1503,9 +1512,10 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
         add->setText(6, QString("%1").arg(hrvMeasures[i].lf, 0, 'f', 4));
         add->setText(7, QString("%1").arg(hrvMeasures[i].hf, 0, 'f', 4));
         add->setText(8, QString("%1").arg(hrvMeasures[i].recovery_points, 0, 'f', 1));
+        add->setText(9, hrvMeasures[i].comment);
         // source
-        add->setText(9, hrvMeasures[i].getSourceDescription());
-        add->setText(10, hrvMeasures[i].originalSource);
+        add->setText(10, hrvMeasures[i].getSourceDescription());
+        add->setText(11, hrvMeasures[i].originalSource);
     }
 
     all->addWidget(hrvTree);
@@ -1532,6 +1542,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     connect(lf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(hf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(recovery_points, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(comment, SIGNAL(textEdited(QString)), this, SLOT(rangeEdited()));
 
     // button connect
     connect(updateButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
@@ -1559,12 +1570,11 @@ HrvPage::saveClicked()
         fingerprint += hrv.getFingerprint();
     }
     if (fingerprint != b4.fingerprint) {
-        // date order
-        qSort(hrvMeasures);
-        // now save data away if we actually got something !
-        HrvMeasureParser::serialize(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()), hrvMeasures);
         // store in athlete
-        context->athlete->setHrvMeasures(hrvMeasures);
+        HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
+        pHrvMeasures->setHrvMeasures(hrvMeasures);
+        // now save data away if we actually got something !
+        pHrvMeasures->write();
         state += CONFIG_ATHLETE;
     }
 
@@ -1603,6 +1613,7 @@ HrvPage::addOReditClicked()
     addHrv.lf = lf->value();
     addHrv.hf = hf->value();
     addHrv.recovery_points = recovery_points->value();
+    addHrv.comment = comment->text();
     addHrv.source = HrvMeasure::Manual;
     addHrv.originalSource = "";
     hrvMeasures.insert(index, addHrv);
@@ -1618,8 +1629,9 @@ HrvPage::addOReditClicked()
     add->setText(6, QString("%1").arg(lf->value()));
     add->setText(7, QString("%1").arg(hf->value()));
     add->setText(8, QString("%1").arg(recovery_points->value()));
-    add->setText(9, QString("%1").arg(tr("Manual entry")));
-    add->setText(10, ""); // Original Source
+    add->setText(9, QString("%1").arg(comment->text()));
+    add->setText(10, QString("%1").arg(tr("Manual entry")));
+    add->setText(11, ""); // Original Source
 
     updateButton->hide();
 }
@@ -1659,6 +1671,8 @@ HrvPage::rangeEdited()
         double ohf = hrvMeasures[index].hf;
         double nrecovery_points = recovery_points->value();
         double orecovery_points = hrvMeasures[index].recovery_points;
+        QString ncomment = comment->text();
+        QString ocomment = hrvMeasures[index].comment;
 
         if (dateTime == odateTime && (nrmssd != ormssd ||
                                       nhr != ohr ||
@@ -1667,7 +1681,8 @@ HrvPage::rangeEdited()
                                       npnn50 != opnn50 ||
                                       nlf != olf ||
                                       nhf != ohf ||
-                                      nrecovery_points != orecovery_points))
+                                      nrecovery_points != orecovery_points ||
+                                      ncomment != ocomment))
             updateButton->show();
         else
             updateButton->hide();
@@ -1692,6 +1707,7 @@ HrvPage::rangeSelectionChanged()
         lf->setValue(current.lf);
         hf->setValue(current.hf);
         recovery_points->setValue(current.recovery_points);
+        comment->setText(current.comment);
 
         updateButton->hide();
     }

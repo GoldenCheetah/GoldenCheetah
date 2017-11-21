@@ -3557,7 +3557,7 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = context->athlete->getMeasureValue(date, metricDetail.measureGroup, metricDetail.measureField, context->athlete->useMetricUnits);
+        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, context->athlete->useMetricUnits);
 
         if (value || wantZero) {
             unsigned long seconds = 1;

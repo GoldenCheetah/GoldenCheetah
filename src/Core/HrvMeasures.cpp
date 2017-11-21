@@ -32,7 +32,6 @@ HrvMeasure::getFingerprint() const
 {
     quint64 x = 0;
 
-    x += when.date().toJulianDay();
     x += hr;
     x += avnn;
     x += sdnn;
@@ -44,40 +43,9 @@ HrvMeasure::getFingerprint() const
 
     QByteArray ba = QByteArray::number(x);
 
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba, ba.length()) + Measure::getFingerprint();
 }
 
-QString
-HrvMeasure::getSourceDescription() const {
-
-    switch(source) {
-    case HrvMeasure::Manual:
-        return tr("Manual entry");
-    case HrvMeasure::CSV:
-        return tr("CSV Upload");
-    default:
-        return tr("Unknown");
-    }
-}
-
-QStringList
-HrvMeasure::getFieldSymbols() {
-    static const QStringList symbols = QStringList()<<"HR"<<"AVNN"<<"SDNN"<<"RMSSD"<<"PNN50"<<"LF"<<"HF"<<"RecoveryPoints";
-    return symbols;
-}
-
-QStringList
-HrvMeasure::getFieldNames() {
-    static const QStringList names = QStringList()<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("RMSSD")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points");
-    return names;
-}
-
-QString
-HrvMeasure::getFieldUnits(int field, bool useMetricUnits) {
-    Q_UNUSED(useMetricUnits);
-    static const QStringList units = QStringList()<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points");
-    return units.value(field);
-}
 
 bool
 HrvMeasureParser::serialize(QString filename, QList<HrvMeasure> &data) {
@@ -102,6 +70,7 @@ HrvMeasureParser::serialize(QString filename, QList<HrvMeasure> &data) {
         m = &data[i];
         QJsonObject measure;
         measure.insert("when", m->when.toMSecsSinceEpoch()/1000);
+        measure.insert("comment", m->comment);
         measure.insert("hr", m->hr);
         measure.insert("avnn", m->avnn);
         measure.insert("sdnn", m->sdnn);
@@ -165,6 +134,7 @@ HrvMeasureParser::unserialize(QFile &file, QList<HrvMeasure> &data) {
         QJsonObject measure = measures.at(i).toObject();
         HrvMeasure m;
         m.when = QDateTime::fromMSecsSinceEpoch(measure["when"].toDouble()*1000);
+        m.comment = measure["comment"].toString();
         m.hr = measure["hr"].toDouble();
         m.avnn = measure["avnn"].toDouble();
         m.sdnn = measure["sdnn"].toDouble();
@@ -173,7 +143,7 @@ HrvMeasureParser::unserialize(QFile &file, QList<HrvMeasure> &data) {
         m.lf = measure["lf"].toDouble();
         m.hf = measure["hf"].toDouble();
         m.recovery_points = measure["recovery_points"].toDouble();
-        m.source = static_cast<HrvMeasure::HrvMeasureSource>(measure["source"].toInt());
+        m.source = static_cast<Measure::MeasureSource>(measure["source"].toInt());
         m.originalSource = measure["originalsource"].toString();
         data.append(m);
     }
@@ -181,3 +151,104 @@ HrvMeasureParser::unserialize(QFile &file, QList<HrvMeasure> &data) {
     return true;
 }
 
+HrvMeasures::HrvMeasures(QDir dir, bool withData) : dir(dir), withData(withData) {
+    // don't load data if not requested
+    if (!withData) return;
+
+    // get hrv measurements if the file exists
+    QFile hrvFile(QString("%1/hrvmeasures.json").arg(dir.canonicalPath()));
+    if (hrvFile.exists()) {
+        QList<HrvMeasure> hrvData;
+        if (HrvMeasureParser::unserialize(hrvFile, hrvData)){
+            setHrvMeasures(hrvData);
+        }
+    }
+}
+
+void
+HrvMeasures::write() {
+    // Nothing to do if data not loaded
+    if (!withData) return;
+
+    // now save data away
+    HrvMeasureParser::serialize(QString("%1/hrvmeasures.json").arg(dir.canonicalPath()), hrvMeasures_);
+}
+
+void
+HrvMeasures::setHrvMeasures(QList<HrvMeasure>&x)
+{
+    hrvMeasures_ = x;
+    qSort(hrvMeasures_); // date order
+}
+
+QStringList
+HrvMeasures::getFieldSymbols() const {
+    static const QStringList symbols = QStringList()<<"HR"<<"AVNN"<<"SDNN"<<"RMSSD"<<"PNN50"<<"LF"<<"HF"<<"RecoveryPoints";
+    return symbols;
+}
+
+QStringList
+HrvMeasures::getFieldNames() const {
+    static const QStringList names = QStringList()<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("RMSSD")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points");
+    return names;
+}
+
+QDate
+HrvMeasures::getStartDate() const {
+    if (!hrvMeasures_.isEmpty())
+        return hrvMeasures_.first().when.date();
+    else
+        return QDate();
+}
+
+QDate
+HrvMeasures::getEndDate() const {
+    if (!hrvMeasures_.isEmpty())
+        return hrvMeasures_.last().when.date();
+    else
+        return QDate();
+}
+
+QString
+HrvMeasures::getFieldUnits(int field, bool useMetricUnits) const {
+    Q_UNUSED(useMetricUnits);
+    static const QStringList units = QStringList()<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points");
+    return units.value(field);
+}
+
+void
+HrvMeasures::getHrvMeasure(QDate date, HrvMeasure &here) const {
+    // always set to not found before searching
+    here = HrvMeasure();
+
+    // loop
+    foreach(HrvMeasure x, hrvMeasures_) {
+
+        if (x.when.date() <= date) here = x;
+        if (x.when.date() > date) break;
+    }
+
+    // will be empty if none found
+    return;
+}
+
+double
+HrvMeasures::getFieldValue(QDate date, int field, bool useMetricUnits) const {
+    Q_UNUSED(useMetricUnits);
+    HrvMeasure hrv;
+    getHrvMeasure(date, hrv);
+
+    // return what was asked for!
+    switch(field) {
+
+        default:
+        case HrvMeasure::HR : return hrv.hr;
+        case HrvMeasure::AVNN : return hrv.avnn;
+        case HrvMeasure::SDNN : return hrv.sdnn;
+        case HrvMeasure::RMSSD : return hrv.rmssd;
+        case HrvMeasure::PNN50 : return hrv.pnn50;
+        case HrvMeasure::LF : return hrv.lf;
+        case HrvMeasure::HF : return hrv.hf;
+        case HrvMeasure::RECOVERY_POINTS : return hrv.recovery_points;
+    }
+}

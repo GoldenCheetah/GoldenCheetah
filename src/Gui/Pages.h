@@ -228,6 +228,8 @@ class HrvPage : public QWidget
         QDoubleSpinBox *hf;
         QLabel *recovery_pointslabel;
         QDoubleSpinBox *recovery_points;
+        QLabel *commentlabel;
+        QLineEdit *comment;
 
         QTreeWidget *hrvTree;
         QPushButton *addButton, *updateButton, *deleteButton;

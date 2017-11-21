@@ -20,27 +20,22 @@
 #define _Gc_BodyMeasures_h
 
 #include "Context.h"
+#include "Measures.h"
 
 #include <QString>
 #include <QStringList>
 #include <QDateTime>
 
-class BodyMeasure {
+class BodyMeasure : public Measure {
     Q_DECLARE_TR_FUNCTIONS(BodyMeasure)
 public:
 
     enum bodymeasuretype { WeightKg = 0, FatKg = 1, MuscleKg = 2, BonesKg = 3, LeanKg = 4, FatPercent = 5 };
     typedef enum bodymeasuretype BodyMeasureType;
 
-    enum bodymeasuresource { Manual, Withings, TodaysPlan, CSV };
-    typedef enum bodymeasuresource BodyMeasureSource;
-
-    BodyMeasure() : when(QDateTime()), comment(""), weightkg(0), fatkg(0), musclekg(0), boneskg(0), leankg(0), fatpercent(0) {}
+    BodyMeasure() : weightkg(0), fatkg(0), musclekg(0), boneskg(0), leankg(0), fatpercent(0) {}
 
     // depending on datasource not all fields may be filled with actual values
-
-    QDateTime when;         // when was this reading taken
-    QString comment;        // user commentary regarding this measurement
 
     double  weightkg,       // weight in Kilograms
             fatkg,          // fat in Kilograms
@@ -49,26 +44,9 @@ public:
             leankg,         // lean mass in Kilograms
             fatpercent;     // body fat as a percentage of weight
 
-    BodyMeasureSource source;
-    QString originalSource; // if delivered from the cloud service
-
-    // used by qSort()
-    bool operator< (BodyMeasure right) const {
-        return (when < right.when);
-    }
     // calculate a CRC for the BodyMeasure data - used to see if
     // data is changed in Configuration pages
     quint16 getFingerprint() const;
-
-    // getdescription text for source
-    QString getSourceDescription() const;
-
-    // get Field Symbols/Names in BodyMeasureType order
-    static QStringList getFieldSymbols();
-    static QStringList getFieldNames();
-
-    // get Units for field and metrics
-    static QString getFieldUnits(int field, bool useMetricUnits);
 };
 
 class BodyMeasureParser  {
@@ -76,6 +54,34 @@ class BodyMeasureParser  {
 public:
     static bool serialize(QString, QList<BodyMeasure> &);
     static bool unserialize(QFile &, QList<BodyMeasure> &);
+};
+
+
+class BodyMeasures : public MeasuresGroup {
+    Q_DECLARE_TR_FUNCTIONS(BodyMeasures)
+public:
+    // Default constructor intended to access metadata,
+    // directory and withData must be provided to access data.
+    BodyMeasures(QDir dir=QDir(), bool withData=false);
+    ~BodyMeasures() {}
+    void write();
+    QList<BodyMeasure>& bodyMeasures() { return bodyMeasures_; }
+    void setBodyMeasures(QList<BodyMeasure>&x);
+    void getBodyMeasure(QDate date, BodyMeasure&) const;
+
+    QString getSymbol() const { return "Body"; }
+    QString getName() const { return tr("Body"); }
+    QStringList getFieldSymbols() const ;
+    QStringList getFieldNames() const;
+    QDate getStartDate() const;
+    QDate getEndDate() const;
+    QString getFieldUnits(int field, bool useMetricUnits=true) const;
+    double getFieldValue(QDate date, int field=BodyMeasure::WeightKg, bool useMetricUnits=true) const;
+
+private:
+    QDir dir;
+    bool withData;
+    QList<BodyMeasure> bodyMeasures_;
 };
 
 

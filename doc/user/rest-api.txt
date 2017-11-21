@@ -31,3 +31,8 @@ http://localhost:12021              Default base URL
                                     before=yyyy/mm/dd
                                     series=xxx where xxx is one of watts,hr,cad,speed,nm,vam.xPower,NP
                                     Returns an aggregate of the best mean maximal values over the date range
+
+/<athlete>/measures                 List supported measures groups (Body/Hrv for now) 
+/<athlete>/measures/<group>         Fetch Measures from <group> for a Date Range
+                                    since=yyyy/mm/dd
+                                    before=yyyy/mm/dd

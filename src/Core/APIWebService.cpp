@@ -29,6 +29,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+#include "Measures.h"
 
 #include <QTemporaryFile>
 #include <QFile>
@@ -98,6 +99,15 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
             return;
         }
 
+        // GET Measures
+        if (paths[0] == "measures") {
+
+            // http://localhost:12021/athlete/measures
+            paths.removeFirst();
+            listMeasures(athlete, paths, request, response);
+            return;
+        }
+
     } else if (paths.count() == 3) {
 
         QString athlete = paths[0];
@@ -128,6 +138,16 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
             //    ?series=<xx>  xx=1 of (cad, speed, vam, NP, xPower, nm)
             paths.removeFirst();
             listMMP(athlete, paths, request, response);
+            return;
+        }
+
+        // GET Measures
+        if (paths[0] == "measures") {
+
+            // http://localhost:12021/athlete/measures/Body
+            // http://localhost:12021/athlete/measures/Hrv
+            paths.removeFirst();
+            listMeasures(athlete, paths, request, response);
             return;
         }
 
@@ -605,4 +625,64 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
         response.write("unable to read/parse the athlete's swim-pace.zones file.\n");
         return;
     }
+}
+
+void
+APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
+{
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+
+    if (paths.isEmpty()) {
+
+        foreach (QString group, Measures().getGroupSymbols()) {
+            response.write(group.toLocal8Bit());
+            response.write("\n");
+        }
+        return;
+    }
+
+    Measures measures = Measures(QDir(home.absolutePath() + "/" + athlete + "/config"), true);
+    int group_index = measures.getGroupSymbols().indexOf(paths[0]);
+    MeasuresGroup* measuresGroup = measures.getGroup(group_index);
+    if (group_index < 0 || measuresGroup == NULL) {
+
+        // unknown group
+        response.setStatus(500);
+        response.write("unknown measures group requested.\n");
+        return;
+    }
+
+    response.write("Date");
+    QStringList field_symbols = measuresGroup->getFieldSymbols();
+    for (int i=0; i<field_symbols.count(); i++) {
+        response.write(", ");
+        response.write(field_symbols[i].toLocal8Bit());
+    }
+
+    // honour the since parameter
+    QString sincep(request.getParameter("since"));
+    QDate since(1900,01,01);
+    if (sincep != "") since = QDate::fromString(sincep,"yyyy/MM/dd");
+    QDate date = measuresGroup->getStartDate();
+    if (since > date) date = since;
+
+    // before parameter
+    QString beforep(request.getParameter("before"));
+    QDate before(3000,01,01);
+    if (beforep != "") before = QDate::fromString(beforep,"yyyy/MM/dd");
+    QDate endDate = measuresGroup->getEndDate();
+    if (before < endDate) endDate = before;
+
+    while (date <= endDate) {
+        response.write("\n");
+        response.write(date.toString("yyyy/MM/dd").toLocal8Bit());
+
+        for (int i=0; i<field_symbols.count(); i++)
+            response.write(QString(", %1").arg(measuresGroup->getFieldValue(date, i)).toLocal8Bit());
+
+        date = date.addDays(1);
+    }
+    response.write("\n");
+
 }

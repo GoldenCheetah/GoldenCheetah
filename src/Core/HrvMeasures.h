@@ -21,26 +21,22 @@
 #define _Gc_HrvMeasures_h
 
 #include "Context.h"
+#include "Measures.h"
 
 #include <QString>
 #include <QStringList>
 #include <QDateTime>
 
-class HrvMeasure {
+class HrvMeasure : public Measure {
     Q_DECLARE_TR_FUNCTIONS(HrvMeasure)
 public:
 
     enum hrvmeasuretype { HR = 0, AVNN = 1, SDNN = 2, RMSSD = 3, PNN50 = 4, LF = 5, HF = 6, RECOVERY_POINTS = 7 };
     typedef enum hrvmeasuretype HrvMeasureType;
 
-    enum hrvmeasuresource { Manual, CSV };
-    typedef enum hrvmeasuresource HrvMeasureSource;
-
-    HrvMeasure() : when(QDateTime()), hr(0), avnn(0), sdnn(0), rmssd(0), pnn50(0), lf(0), hf(0), recovery_points(0) {}
+    HrvMeasure() : hr(0), avnn(0), sdnn(0), rmssd(0), pnn50(0), lf(0), hf(0), recovery_points(0) {}
 
     // depending on datasource not all fields may be filled with actual values
-
-    QDateTime when;         // when was this reading taken
 
     double  hr,             // Average heart rate
             avnn,           // Average of all NN intervals
@@ -51,26 +47,9 @@ public:
             hf,             // Power in High Frequency range
             recovery_points;// Log transform of rMSSD
 
-    HrvMeasureSource source;
-    QString originalSource; // if delivered from the cloud service
-
-    // used by qSort()
-    bool operator< (HrvMeasure right) const {
-        return (when < right.when);
-    }
     // calculate a CRC for the HrvMeasure data - used to see if
     // data is changed in Configuration pages
     quint16 getFingerprint() const;
-
-    // getdescription text for source
-    QString getSourceDescription() const;
-
-    // get Field Symbols/Names in HrvMeasureType order
-    static QStringList getFieldSymbols();
-    static QStringList getFieldNames();
-
-    // get Units for field and metrics
-    static QString getFieldUnits(int field, bool useMetricUnits);
 };
 
 class HrvMeasureParser  {
@@ -80,5 +59,31 @@ public:
     static bool unserialize(QFile &, QList<HrvMeasure> &);
 };
 
+class HrvMeasures : public MeasuresGroup {
+    Q_DECLARE_TR_FUNCTIONS(HrvMeasures)
+public:
+    // Default constructor intended to access metadata,
+    // directory and withData must be provided to access data.
+    HrvMeasures(QDir dir=QDir(), bool withData=false);
+    ~HrvMeasures() {}
+    void write();
+    QList<HrvMeasure>& hrvMeasures() { return hrvMeasures_; }
+    void setHrvMeasures(QList<HrvMeasure>&x);
+    void getHrvMeasure(QDate date, HrvMeasure&) const;
+
+    QString getSymbol() const { return "Hrv"; }
+    QString getName() const { return tr("Hrv"); }
+    QStringList getFieldSymbols() const ;
+    QStringList getFieldNames() const;
+    QDate getStartDate() const;
+    QDate getEndDate() const;
+    QString getFieldUnits(int field, bool useMetricUnits=true) const;
+    double getFieldValue(QDate date, int field, bool useMetricUnits=true) const;
+
+private:
+    QDir dir;
+    bool withData;
+    QList<HrvMeasure> hrvMeasures_;
+};
 
 #endif

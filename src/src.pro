@@ -694,17 +694,18 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 }
 
 # cloud services
-HEADERS += Cloud/BodyMeasures.h Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h Cloud/LocalFileStore.h \
+HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h Cloud/LocalFileStore.h \
            Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h Cloud/WithingsDownload.h \
            Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h Cloud/TrainingsTageBuch.h \
            Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h Cloud/AddCloudWizard.h \
-           Cloud/Withings.h Cloud/HrvMeasures.h Cloud/HrvMeasuresDownload.h
+           Cloud/Withings.h Cloud/HrvMeasuresDownload.h
 
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
-           Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h
+           Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
+           Core/Measures.h Core/BodyMeasures.h Core/HrvMeasures.h
 
 # device and file IO or edit
 HEADERS += FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h FileIO/BodyMeasuresCsvImport.h FileIO/CommPort.h \
@@ -785,17 +786,18 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 }
 
 ## Cloud Services / Web resources
-SOURCES += Cloud/BodyMeasures.cpp Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp Cloud/LocalFileStore.cpp \
+SOURCES += Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp Cloud/LocalFileStore.cpp \
            Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp Cloud/WithingsDownload.cpp \
            Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp Cloud/TrainingsTageBuch.cpp \
            Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp Cloud/AddCloudWizard.cpp \
-           Cloud/Withings.cpp Cloud/HrvMeasures.cpp Cloud/HrvMeasuresDownload.cpp
+           Cloud/Withings.cpp Cloud/HrvMeasuresDownload.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
-           Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp 
+           Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
+           Core/Measures.cpp Core/BodyMeasures.cpp Core/HrvMeasures.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp FileIO/BodyMeasuresCsvImport.cpp FileIO/CommPort.cpp \

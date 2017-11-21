@@ -157,9 +157,10 @@ DataFilter::builtins()
         } else if (i == 41) {
             returning << "XDATA_UNITS(\"xdata\", \"series\")";
         } else if (i == 42) {
-            QStringList groupSymbols = Athlete::getMeasureGroupSymbols();
+            Measures measures = Measures();
+            QStringList groupSymbols = measures.getGroupSymbols();
             for (int g=0; g<groupSymbols.count(); g++)
-                foreach (QString fieldSymbol, Athlete::getMeasureFieldSymbols(g))
+                foreach (QString fieldSymbol, measures.getFieldSymbols(g))
                     returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
         } else {
             function = DataFilterFunctions[i].name + "(";
@@ -2488,16 +2489,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                     if (leaf->fparms[1]->type != String) return Result(0);
                     QString group_symbol = *(leaf->fparms[1]->lvalue.s);
-                    int group = m->context->athlete->getMeasureGroupSymbols().indexOf(group_symbol);
+                    int group = m->context->athlete->measures->getGroupSymbols().indexOf(group_symbol);
                     if (group < 0) return Result(0); // unknown group
 
                     if (leaf->fparms[2]->type != String) return Result(0);
                     QString field_symbol = *(leaf->fparms[2]->lvalue.s);
-                    int field = m->context->athlete->getMeasureFieldSymbols(group).indexOf(field_symbol);
+                    int field = m->context->athlete->measures->getFieldSymbols(group).indexOf(field_symbol);
                     if (field < 0) return Result(0); // unknown field
 
                     // retrieve measure value
-                    double value = m->context->athlete->getMeasureValue(date, group, field);
+                    double value = m->context->athlete->measures->getFieldValue(group, date, field);
                     return Result(value);
                 }
                 break;

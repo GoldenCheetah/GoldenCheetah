@@ -3237,13 +3237,13 @@ RTool::measures(SEXP pAll, SEXP pGroup)
         DateRange range(rtool->context->currentDateRange());
 
         // convert the group symbol to an index, default to Body=0
-        int groupIdx = Athlete::getMeasureGroupSymbols().indexOf(groupSymbol);
+        int groupIdx = rtool->context->athlete->measures->getGroupSymbols().indexOf(groupSymbol);
         if (groupIdx < 0) groupIdx = 0;
 
         // Update range for all
         if (all) {
-            range.from = rtool->context->athlete->getMeasureGroupStart(groupIdx);
-            range.to = rtool->context->athlete->getMeasureGroupEnd(groupIdx);
+            range.from = rtool->context->athlete->measures->getStartDate(groupIdx);
+            range.to = rtool->context->athlete->measures->getEndDate(groupIdx);
         }
 
         // how many entries ?
@@ -3257,7 +3257,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
         // returning a dataframe with
         // date, field1, field2, ...
         SEXP ans, names;
-        QStringList fieldSymbols = Athlete::getMeasureFieldSymbols(groupIdx);
+        QStringList fieldSymbols = rtool->context->athlete->measures->getFieldSymbols(groupIdx);
 
         // date, field1, field2, ...
         PROTECT(ans=Rf_allocVector(VECSXP, fieldSymbols.count() + 1));
@@ -3296,7 +3296,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
             if (day >= from && day <= to) {
 
                 for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
-                    REAL(fields[fieldIdx])[index] = rtool->context->athlete->getMeasureValue(d1970.addDays(day), groupIdx, fieldIdx);
+                    REAL(fields[fieldIdx])[index] = rtool->context->athlete->measures->getFieldValue(groupIdx, d1970.addDays(day), fieldIdx);
                 index++;
             }
             day++;

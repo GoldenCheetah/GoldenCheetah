@@ -131,7 +131,8 @@ HrvMeasuresDownload::download() {
    progressBar->setValue(0);
 
    // do the job
-   QList<HrvMeasure> current = context->athlete->hrvMeasures();
+   HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
+   QList<HrvMeasure> current = pHrvMeasures->hrvMeasures();
    QList<HrvMeasure> hrvMeasures;
    QDateTime fromDate;
    QDateTime toDate;
@@ -259,7 +260,8 @@ HrvMeasuresDownload::updateMeasures(Context *context,
                                     QList<HrvMeasure>&hrvMeasures,
                                     bool discardExisting) {
 
-   QList<HrvMeasure> current = context->athlete->hrvMeasures();
+   HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
+   QList<HrvMeasure> current = pHrvMeasures->hrvMeasures();
 
    // we discard only if we have new data loaded - otherwise keep what is there
    if (discardExisting) {
@@ -289,12 +291,12 @@ HrvMeasuresDownload::updateMeasures(Context *context,
    context->athlete->rideCache->cancel();
 
    // store in athlete
-   context->athlete->setHrvMeasures(hrvMeasures);
+   pHrvMeasures->setHrvMeasures(hrvMeasures);
 
    // now save data away if we actually got something !
    // doing it here means we don't overwrite previous responses
    // when we fail to get any data (e.g. errors / network problems)
-   HrvMeasureParser::serialize(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()), context->athlete->hrvMeasures());
+   pHrvMeasures->write();
 
    // do a refresh, it will check if needed
    context->athlete->rideCache->refresh();
