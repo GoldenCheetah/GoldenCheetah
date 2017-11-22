@@ -72,6 +72,10 @@
 #include "Rversion.h"
 #endif
 
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
+#endif
+
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
@@ -313,6 +317,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
             "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">R</td><td>%17</td></tr>"
+            "<tr><td colspan=\"2\">Python</td><td>%20</td></tr>"
             "<tr><td colspan=\"2\">WEBKIT</td><td>%18</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>%19</td></tr>"
             "</table>"
@@ -356,7 +361,11 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-
+#ifdef GC_HAVE_PYTHON
+            .arg(python->version.split(" ").at(0));
+#else
+            .arg("none")
+#endif
             ;
 
     QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");

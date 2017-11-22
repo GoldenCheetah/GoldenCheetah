@@ -82,7 +82,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
 ###=======================================================================
-INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./R ./Planning
+INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./R ./Python ./Planning
 QMAKE_CFLAGS_ISYSTEM =
 
 
@@ -264,6 +264,42 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
     INCLUDEPATH += $${LMFIT_INCLUDE}
     LIBS        += $${LMFIT_LIBS}
     DEFINES     += GC_HAVE_LMFIT
+}
+
+###=========================
+### OPTIONAL => Embed Python
+###=========================
+
+notsupported = "INFO: Embedded Python requires version QT >= 5.9, no support for"
+notsupported += $${QT_VERSION}
+
+contains(DEFINES, "GC_WANT_PYTHON") {
+
+    greaterThan(QT_MAJOR_VERSION, 4) {
+
+        greaterThan(QT_MINOR_VERSION, 8) {
+
+            DEFINES += GC_PYTHONHEADER=$${PYTHONHEADER}
+            !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
+            LIBS += $${PYTHONLIBS}
+
+            ## Python integration
+            HEADERS += Python/PythonEmbed.h
+            SOURCES += Python/PythonEmbed.cpp
+
+            DEFINES += GC_HAVE_PYTHON
+
+         } else {
+            # QT5 but not 5.5 or higher
+            message($$notsupported)
+        }
+
+    } else {
+
+        # QT5 but not 5.5 or higher
+        message($$notsupported)
+    }
+
 }
 
 ###====================

@@ -17,6 +17,15 @@
 # can be run to install these packages; see it for more info.
 #DEFINES += GC_WANT_R
 
+# Uncomment below if you want Python charting / ML etc
+# You will need Python Development tools installed
+# PYTHONHEADER goes directly into the header file so
+# make sure you escape the braces etc
+#DEFINES += GC_WANT_PYTHON
+#PYTHONHEADER = \<python3.6/Python.h\>
+##PYTHONINCLUDES = -I/usr/include
+#PYTHONLIBS = -L/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu -lpython3.6m
+
 # put output into a separate dir
 # to keep main directory clear
 #DESTDIR = .

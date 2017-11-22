@@ -42,6 +42,9 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
 #endif
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
+#endif
 #include <signal.h>
 
 
@@ -295,6 +298,9 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
     rtool = NULL;
 #endif
+#ifdef GC_WANT_PYTHON
+    python = NULL;
+#endif
 
     // numerous bugs related to autoscaling and opengl that have persisted since Qt5.6 on and off
     // now we support hidpi natively we will unset scaling factors and use our own scaling ratios
@@ -418,6 +424,11 @@ main(int argc, char *argv[])
             if (rtool->failed == true) rtool=NULL;
         }
 #endif
+
+#ifdef GC_WANT_PYTHON
+        if (python == NULL) python = new PythonEmbed(); // initialise python in this thread ?
+#endif
+
         //this is the path within the current directory where GC will look for
         //files to allow USB stick support
         QString localLibraryPath="Library/GoldenCheetah";
