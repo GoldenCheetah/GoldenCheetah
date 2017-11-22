@@ -23,6 +23,12 @@
 #include "Colors.h"
 #include "TabView.h"
 
+// always pull in after all QT headers
+#ifdef slots
+#undef slots
+#endif
+#include GC_PYTHONHEADER
+
 // unique identifier for each chart
 static int id=0;
 
@@ -173,9 +179,8 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
 
             // lets run it
             //qDebug()<<"RUN:" << line;
-#if 0
-            // set the context for the call - used by all the
-            // R functions to access the athlete data/model etc
+
+            // set the context for the call
             python->context = context;
             python->canvas = parent->canvas;
             python->chart = parent;
@@ -185,35 +190,26 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 // replace $$ with chart identifier (to avoid shared data)
                 line = line.replace("$$", chartid);
 
-                // we always get an array of strings
-                // so only print it out if its actually been set
-                SEXP ret = NULL;
-
                 python->cancelled = false;
-                int rc = python->parseEval(line, ret);
+                python->runline(line);
 
-                // if this isn't an assignment then print the result
-                // bit hacky, there must be a better way!
-                if(rc == 0 && ret != NULL && !Rf_isNull(ret) && !line.contains("<-") && !line.contains("print"))
-                    Rf_PrintValue(ret);
-
+                // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));
                 python->messages.clear();
 
             } catch(std::exception& ex) {
 
                 putData(QColor(Qt::red), QString("%1\n").arg(QString(ex.what())));
-                putData(QColor(Qt::red), python->messages.join(""));
+                putData(QColor(Qt::red), python->messages.join("\n"));
                 python->messages.clear();
 
             } catch(...) {
 
                 putData(QColor(Qt::red), "error: general exception.\n");
-                putData(QColor(Qt::red), python->messages.join(""));
+                putData(QColor(Qt::red), python->messages.join("\n"));
                 python->messages.clear();
 
             }
- #endif
 
             // clear context
             python->context = NULL;

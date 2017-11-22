@@ -37,6 +37,13 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
+    // catch and clear output
+    void *catcher;
+    void *clear;
+
+    // run a single line from console
+    void runline(QString);
+
     // stop current execution
     void cancel();
 
@@ -47,6 +54,7 @@ class PythonEmbed {
 
     // the program being constructed/parsed
     QStringList program;
+    QStringList messages;
 
     QString name;
     QString version;

@@ -61,7 +61,53 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     fprintf(stderr, "Python loaded [%s]\n", version.toStdString().c_str());
 
+    // our base code - currently just traps stdout
+    std::string stdOutErr = ("import sys\n"
+                             "class CatchOutErr:\n"
+                             "    def __init__(self):\n"
+                             "        self.value = ''\n"
+                             "    def write(self, txt):\n"
+                             "        self.value += txt\n"
+                             "catchOutErr = CatchOutErr()\n"
+                             "sys.stdout = catchOutErr\n"
+                             "sys.stderr = catchOutErr\n");
+
+    PyRun_SimpleString(stdOutErr.c_str()); //invoke code to redirect
+
+    // our own module
+    PyObject *pModule = PyImport_AddModule("__main__"); //create main module
+    catcher = static_cast<void*>(PyObject_GetAttrString(pModule,"catchOutErr"));
+    clear = static_cast<void*>(PyObject_GetAttrString(static_cast<PyObject*>(catcher), "__init__"));
+    PyErr_Print(); //make python print any errors
+    PyErr_Clear(); //and clear them !
+
     loaded = true;
+}
+
+void PythonEmbed::runline(QString line)
+{
+    // run and generate errors etc
+    messages.clear();
+    PyRun_SimpleString(line.toStdString().c_str());
+    PyErr_Print();
+    PyErr_Clear(); //and clear them !
+
+    // capture results
+    PyObject *output = PyObject_GetAttrString(static_cast<PyObject*>(catcher),"value"); //get the stdout and stderr from our catchOutErr object
+    if (output) {
+        // allocated as unicodeA
+        Py_ssize_t size;
+        wchar_t *string = PyUnicode_AsWideCharString(output, &size);
+        if (string) {
+            if (size) messages = QString::fromWCharArray(string).split("\n");
+            PyMem_Free(string);
+            if (messages.count()) messages << "\n"; // always add a newline after anything
+        }
+
+        // clear results
+        PyObject_CallFunction(static_cast<PyObject*>(clear), NULL);
+    }
+
 }
 
 void
