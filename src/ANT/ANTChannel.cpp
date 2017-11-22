@@ -668,7 +668,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                             parent->setTE(0,0);
                         }
                         // provide valid values only and handle single and combined PS option (which is allowed in 0x13)
-                        if (antMessage.leftOrCombinedPedalSmoothness != 0xFF && antMessage.rightTorqueEffectiveness != 0xFF) {
+                        if (antMessage.leftOrCombinedPedalSmoothness != 0xFF && antMessage.rightPedalSmoothness != 0xFF) {
                             if (antMessage.rightPedalSmoothness == 0xFE) {
                                 parent->setPS((antMessage.leftOrCombinedPedalSmoothness / 2), 0);
                             } else {
