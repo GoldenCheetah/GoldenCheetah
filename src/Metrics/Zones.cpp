@@ -151,8 +151,9 @@ bool Zones::read(QFile &file)
         QString line = fileStream.readLine();
         int pos = commentrx.indexIn(line, 0);
         if (pos != -1)
-            line = line.left(pos); if (blankrx.indexIn(line, 0) == 0)
-            goto next_line;
+            line = line.left(pos);
+        if (blankrx.indexIn(line, 0) == 0)
+            continue;
         // check for default zone range definition (may be followed by zone definitions)
         if (zonedefaultsx.indexIn(line, 0) != -1) {
             zones_are_defaults = true;
@@ -169,7 +170,7 @@ bool Zones::read(QFile &file)
                 return false;
             }
 
-            goto next_line;
+            continue;
         }
 
         // check for range specification (may be followed by zone definitions)

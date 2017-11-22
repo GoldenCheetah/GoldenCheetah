@@ -299,9 +299,10 @@ void XDataSettingsDialog::okClicked()
 
     series.valuename.clear();
     for(int i=0; i<8; i++) {
-        if (xdataSeriesName[i]->text() != "")
+        if (xdataSeriesName[i]->text() != "") {
             series.valuename << xdataSeriesName[i]->text();
             series.unitname << xdataUnitName[i]->text();
+        }
     }
 
     if (series.valuename.count() >0) accept();

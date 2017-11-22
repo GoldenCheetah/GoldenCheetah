@@ -1758,7 +1758,7 @@ HrvPage::rangeEdited()
         if (dateTime == odateTime && (nrmssd != ormssd ||
                                       nhr != ohr ||
                                       navnn != oavnn ||
-                                      sdnn != sdnn ||
+                                      nsdnn != osdnn ||
                                       npnn50 != opnn50 ||
                                       nlf != olf ||
                                       nhf != ohf ||

@@ -248,7 +248,8 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
             valueLabel->setText("N/A");
             break;
         }
-        // intentional fall-through to standard distance rendering
+        // intentional fall-through
+        // to standard distance rendering
 
     case RealtimeData::Distance:
     case RealtimeData::LapDistance:

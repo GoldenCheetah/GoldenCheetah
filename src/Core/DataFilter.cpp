@@ -149,8 +149,6 @@ DataFilter::builtins()
 
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
 
-        QString function;
-
         if (i == 30) { // special case 'estimate' we describe it
 
             foreach(QString model, pdmodels())
@@ -171,6 +169,7 @@ DataFilter::builtins()
                 foreach (QString fieldSymbol, measures.getFieldSymbols(g))
                     returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
         } else {
+            QString function;
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
                 if (j) function += ", ";
@@ -178,8 +177,8 @@ DataFilter::builtins()
             }
             if (DataFilterFunctions[i].parameters) function += ")";
             else function += "...)";
+            returning << function;
         }
-        returning << function;
     }
     return returning;
 }
@@ -222,34 +221,29 @@ Leaf::isDynamic(Leaf *leaf)
     switch(leaf->type) {
     default:
     case Leaf::Symbol :
-                    return leaf->dynamic;
-                    break;
-
-    case Leaf::Logical  :
-                    if (leaf->op == 0) return leaf->isDynamic(leaf->lvalue.l);
+        return leaf->dynamic;
     case Leaf::UnaryOperation :
-                    return leaf->isDynamic(leaf->lvalue.l);
-                    break;
+        return leaf->isDynamic(leaf->lvalue.l);
+    case Leaf::Logical  :
+        if (leaf->op == 0)
+            return leaf->isDynamic(leaf->lvalue.l);
+        // intentional fallthrough
     case Leaf::Operation :
     case Leaf::BinaryOperation :
-                    return leaf->isDynamic(leaf->lvalue.l) || leaf->isDynamic(leaf->rvalue.l);
-                    break;
+        return (leaf->isDynamic(leaf->lvalue.l) ||
+                leaf->isDynamic(leaf->rvalue.l));
     case Leaf::Function :
-                    if (leaf->series && leaf->lvalue.l) return leaf->isDynamic(leaf->lvalue.l);
-                    else return leaf->dynamic;
-                    break;
-        break;
+        if (leaf->series && leaf->lvalue.l)
+            return leaf->isDynamic(leaf->lvalue.l);
+        else
+            return leaf->dynamic;
     case Leaf::Conditional :
-        {
-                    return leaf->isDynamic(leaf->cond.l) ||
-                           leaf->isDynamic(leaf->lvalue.l) ||
-                           (leaf->rvalue.l && leaf->isDynamic(leaf->rvalue.l));
-                    break;
-        }
+        return (leaf->isDynamic(leaf->cond.l) ||
+                leaf->isDynamic(leaf->lvalue.l) ||
+                (leaf->rvalue.l && leaf->isDynamic(leaf->rvalue.l)));
     case Leaf::Script :
     case Leaf::Vector :
         return true;
-        break;
 
     }
     return false;
@@ -914,6 +908,7 @@ void Leaf::print(Leaf *leaf, int level, DataFilterRuntime *df)
                     leaf->print(leaf->lvalue.l, level+1, df);
                     leaf->print(leaf->fparms[0], level+1, df);
                     leaf->print(leaf->fparms[1], level+1, df);
+                    break;
     case Leaf::Conditional : qDebug()<<"cond"<<op;
         {
                     leaf->print(leaf->cond.l, level+1, df);

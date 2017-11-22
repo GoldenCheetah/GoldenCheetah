@@ -205,22 +205,22 @@ static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType seri
     long offset = 0;
 
     switch (series) {
-    case RideFile::aPowerKg : offset += head.aPowerMeanMaxCount * sizeof(float);
-    case RideFile::aPower : offset += head.vamMeanMaxCount * sizeof(float);
-    case RideFile::vam : offset += head.npMeanMaxCount * sizeof(float);
-    case RideFile::IsoPower : offset += head.xPowerMeanMaxCount * sizeof(float);
-    case RideFile::xPower : offset += head.kphMeanMaxCount * sizeof(float);
-    case RideFile::hrd : offset += head.hrdMeanMaxCount * sizeof(float);
-    case RideFile::nmd : offset += head.nmdMeanMaxCount * sizeof(float);
-    case RideFile::cadd : offset += head.caddMeanMaxCount * sizeof(float);
-    case RideFile::wattsd : offset += head.wattsdMeanMaxCount * sizeof(float);
-    case RideFile::kphd : offset += head.kphdMeanMaxCount * sizeof(float);
-    case RideFile::kph : offset += head.nmMeanMaxCount * sizeof(float);
-    case RideFile::nm : offset += head.cadMeanMaxCount * sizeof(float);
-    case RideFile::cad : offset += head.hrMeanMaxCount * sizeof(float);
-    case RideFile::hr : offset += head.wattsKgMeanMaxCount * sizeof(float);
-    case RideFile::wattsKg : offset += head.wattsMeanMaxCount * sizeof(float);
-    case RideFile::watts : offset += 0;
+    case RideFile::aPowerKg : offset += head.aPowerMeanMaxCount * sizeof(float); // intentional fallthrough
+    case RideFile::aPower : offset += head.vamMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::vam : offset += head.npMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::IsoPower : offset += head.xPowerMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::xPower : offset += head.kphMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::hrd : offset += head.hrdMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::nmd : offset += head.nmdMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::cadd : offset += head.caddMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::wattsd : offset += head.wattsdMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::kphd : offset += head.kphdMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::kph : offset += head.nmMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::nm : offset += head.cadMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::cad : offset += head.hrMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::hr : offset += head.wattsKgMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::wattsKg : offset += head.wattsMeanMaxCount * sizeof(float);  // intentional fallthrough
+    case RideFile::watts : offset += 0;  // intentional fallthrough
     default:
         break;
     }
