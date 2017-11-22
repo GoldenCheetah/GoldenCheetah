@@ -59,6 +59,9 @@
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
+#ifdef GC_WANT_PYTHON
+#include "PythonChart.h"
+#endif
 #include "PlanningWindow.h"
 #ifdef GC_HAVE_OVERVIEW
 #include "OverviewWindow.h"
@@ -78,7 +81,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[33] = {
+  static GcWindowRegistry GcWindowsInit[34] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
@@ -100,6 +103,7 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Map"),GcWindowTypes::RideMapWindow },
     { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
     { VIEW_HOME, tr("R Chart "),GcWindowTypes::RConsoleSeason },
+    { VIEW_ANALYSIS|VIEW_HOME, tr("Python Chart"),GcWindowTypes::Python },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
@@ -176,6 +180,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #else
     case GcWindowTypes::RConsole: returning = new GcChartWindow(context); break;
     case GcWindowTypes::RConsoleSeason: returning = new GcChartWindow(context); break;
+#endif
+#ifdef GC_WANT_PYTHON
+    case GcWindowTypes::Python: returning = new PythonChart(context, true); break;
+#else
+    case GcWindowTypes::Python: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
     case GcWindowTypes::PerformanceManager: 

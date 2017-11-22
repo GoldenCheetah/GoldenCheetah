@@ -1,11 +1,8 @@
 /*
- * Copyright (c) 2016 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
  *
  * Additionally, for the original source used as a basis for this (RInside.cpp)
  * Released under the same GNU public license.
- *
- * Copyright (C) 2009         Dirk Eddelbuettel
- * Copyright (C) 2010 - 2012  Dirk Eddelbuettel and Romain Francois
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -65,4 +62,9 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     fprintf(stderr, "Python loaded [%s]\n", version.toStdString().c_str());
 
     loaded = true;
+}
+
+void
+PythonEmbed::cancel()
+{
 }

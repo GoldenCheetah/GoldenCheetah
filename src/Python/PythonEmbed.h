@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,8 +19,12 @@
 #ifndef GC_PYTHONEMBED_H
 #define GC_PYTHONEMBED_H
 
+#include <QWidget>
 #include <QString>
 #include <QStringList>
+
+class Context;
+class PythonChart;
 
 class PythonEmbed;
 extern PythonEmbed *python;
@@ -33,6 +37,14 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
+    // stop current execution
+    void cancel();
+
+    // context for caller
+    Context *context;
+    PythonChart *chart;
+    QWidget *canvas;
+
     // the program being constructed/parsed
     QStringList program;
 
@@ -41,6 +53,7 @@ class PythonEmbed {
 
     bool verbose;
     bool interactive;
+    bool cancelled;
 
     bool loaded;
 };
