@@ -3273,7 +3273,7 @@ RideFileIterator::RideFileIterator(RideFile *f, Specification spec, IterationSpe
         // ok, so lets work out the begin and end index
         double stopsecs = spec.secsEnd();
         if (stopsecs < 0) stop = f->dataPoints().count()-1;
-        else stop = f->timeIndex(stopsecs)-1;
+        else stop = f->timeIndex(stopsecs); // dgr was f->timeIndex(stopsecs)-1
 
         // check!
         if (stop >= f->dataPoints().count()) stop = -1;
