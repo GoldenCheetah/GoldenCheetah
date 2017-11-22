@@ -2866,6 +2866,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
                 switch (type) {
                 case RideMetric::Total:
+                case RideMetric::RunningTotal:
                     y[n] += value;
                     break;
                 case RideMetric::Average:
