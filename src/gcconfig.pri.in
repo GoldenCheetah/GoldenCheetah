@@ -21,6 +21,10 @@
 # You will need Python Development tools installed
 # PYTHONHEADER goes directly into the header file so
 # make sure you escape the braces etc
+#
+# Libs needed can typically be found by calling e.g
+# python3.6-config --libs
+#
 #DEFINES += GC_WANT_PYTHON
 #PYTHONHEADER = \<python3.6/Python.h\>
 ##PYTHONINCLUDES = -I/usr/include

@@ -34,6 +34,7 @@
 
 // global instance of embedded python
 PythonEmbed *python;
+PyThreadState *mainThreadState;
 
 PythonEmbed::~PythonEmbed()
 {
@@ -81,11 +82,19 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     PyErr_Print(); //make python print any errors
     PyErr_Clear(); //and clear them !
 
+    // prepare for threaded processing
+    PyEval_InitThreads();
+    mainThreadState = PyEval_SaveThread();
+
     loaded = true;
 }
 
+// run on called thread
 void PythonEmbed::runline(QString line)
 {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     // run and generate errors etc
     messages.clear();
     PyRun_SimpleString(line.toStdString().c_str());
@@ -107,7 +116,7 @@ void PythonEmbed::runline(QString line)
         // clear results
         PyObject_CallFunction(static_cast<PyObject*>(clear), NULL);
     }
-
+    PyGILState_Release(gstate);
 }
 
 void

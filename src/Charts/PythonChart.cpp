@@ -23,6 +23,8 @@
 #include "Colors.h"
 #include "TabView.h"
 
+#include <QtConcurrent>
+
 // always pull in after all QT headers
 #ifdef slots
 #undef slots
@@ -96,12 +98,6 @@ void PythonConsole::setLocalEchoEnabled(bool set)
 
 void PythonConsole::keyPressEvent(QKeyEvent *e)
 {
-    // if running a script we only process ESC
-    if (python && python->canvas) {
-        if (e->type() != QKeyEvent::KeyPress || e->key() != Qt::Key_Escape) return;
-    }
-
-    // otherwise lets go
     switch (e->key()) {
     case Qt::Key_Up:
         if (hpos) {
@@ -131,6 +127,9 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Escape: // R typically uses ESC to cancel
     case Qt::Key_C:
         {
+
+            fprintf(stderr, "ESC PRESSED\n");
+
             Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(e)->modifiers();
             bool ctrl = (kmod & Qt::ControlModifier) != 0;
 
@@ -387,6 +386,7 @@ PythonChart::eventFilter(QObject *, QEvent *e)
     // is it an ESC key?
     if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
         // stop!
+        fprintf(stderr, "ESC hit!\n");
         python->cancel();
         return true;
     }
@@ -453,6 +453,27 @@ PythonChart::setState(QString)
     //if (python && splitter && b != "") splitter->restoreState(QByteArray(b.toLatin1()));
 }
 
+// from PythonEmbed
+extern PyThreadState *mainThreadState;
+
+void
+PythonChart::execScript(PythonChart *chart)
+{
+    //PyGILState_STATE gstate;
+    //gstate = PyGILState_Ensure();
+    //PyThreadState *myThreadState = PyThreadState_New(mainThreadState->interp);
+
+    // switch to me
+    //PyEval_RestoreThread(myThreadState);
+
+    // exec
+    python->runline(chart->script->toPlainText());
+
+    // save my state and release lock
+    // we discard return as we're about to give up anyway
+    //PyEval_SaveThread();
+    //PyGILState_Release(gstate);
+}
 
 void
 PythonChart::runScript()
@@ -478,8 +499,6 @@ PythonChart::runScript()
 
         // set to defaults with gc applied
         python->cancelled = false;
- #if 0
-        python->R->parseEvalQNT("par(par.gc)\n");
 
         QString line = script->toPlainText();
 
@@ -489,12 +508,18 @@ PythonChart::runScript()
             line = line.replace("$$", console->chartid);
 
             // run it
-            python->R->parseEval(line);
+            QFutureWatcher<void>watcher;
+            QFuture<void>f= QtConcurrent::run(execScript,this);
+
+            // wait for it to finish -- remember ESC can be pressed to cancel
+            watcher.setFuture(f);
+            QEventLoop loop;
+            connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
 
             // output on console
             if (python->messages.count()) {
-                console->putData("\n");
-                console->putData(GColor(CPLOTMARKER), python->messages.join(""));
+                console->putData(GColor(CPLOTMARKER), python->messages.join("\n"));
                 python->messages.clear();
             }
 
@@ -504,19 +529,14 @@ PythonChart::runScript()
             console->putData(QColor(Qt::red), python->messages.join(""));
             python->messages.clear();
 
-            // clear
-            canvas->newPage();
-
         } catch(...) {
 
             console->putData(QColor(Qt::red), "\nerror: general exception.\n");
             console->putData(QColor(Qt::red), python->messages.join(""));
             python->messages.clear();
 
-            // clear
-            canvas->newPage();
         }
-#endif
+
         // turn off updates for a sec
         setUpdatesEnabled(true);
 

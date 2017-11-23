@@ -111,6 +111,7 @@ class PythonChart : public GcChartWindow {
         void configChanged(qint32);
         void showConChanged(int state);
         void runScript();
+        static void execScript(PythonChart *);
 
     protected:
         // enable stopping long running scripts
