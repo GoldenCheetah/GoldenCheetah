@@ -54,7 +54,7 @@
 
 #define mark() \
 { \
-    addInterval(RideFileInterval::USER, start, previous->secs + recIntSecs_, \
+    addInterval(RideFileInterval::USER, start, previous->secs, \
                 QString("%1").arg(interval)); \
     interval = point->interval; \
     start = point->secs; \
