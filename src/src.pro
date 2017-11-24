@@ -32,11 +32,11 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 
 ###======================================================
-### QT MODULES [we officially support QT4.8.6+ or QT5.6+]
+### QT MODULES [we officially support QT4.8.6+ or QT5.8+]
 ###======================================================
 
 # always
-QT += xml sql network svg concurrent
+QT += xml sql network svg
 
 lessThan(QT_MAJOR_VERSION, 5) {
 
@@ -82,7 +82,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
 ###=======================================================================
-INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./R ./Python ./Planning
+INCLUDEPATH += ./ANT ./Train ./FileIO ./Cloud ./Charts ./Metrics ./Gui ./Core ./Planning
 QMAKE_CFLAGS_ISYSTEM =
 
 
@@ -279,6 +279,9 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
         greaterThan(QT_MINOR_VERSION, 8) {
 
+            # add Python subdirectory to include path
+            INCLUDEPATH += ./Python
+
             DEFINES += GC_PYTHONHEADER=$${PYTHONHEADER}
             !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
             LIBS += $${PYTHONLIBS}
@@ -312,6 +315,9 @@ contains(DEFINES, "GC_WANT_R") {
     # This is not likely to be very soon, they are heavily dependant on GCC
     # see: http://dirk.eddelbuettel.com/blog/2011/03/25/#rinside_and_qt
     isEmpty(R_HOME){ R_HOME = $$system(R RHOME) }
+
+    # add R subdirectory to include path
+    INCLUDEPATH += ./R
 
     ## include headers and libraries for R
     win32  { QMAKE_CXXFLAGS += -I$$R_HOME/include
