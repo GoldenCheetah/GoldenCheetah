@@ -43,6 +43,7 @@ PythonEmbed::~PythonEmbed()
 PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(verbose), interactive(interactive)
 {
     loaded = false;
+    threadid=-1;
     name = QString("GoldenCheetah");
 
     // tell python our program name
@@ -95,6 +96,14 @@ void PythonEmbed::runline(QString line)
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
+    // Get current thread ID via Python thread functions
+    PyObject* thread = PyImport_ImportModule("_thread");
+    PyObject* get_ident = PyObject_GetAttrString(thread, "get_ident");
+    PyObject* ident = PyObject_CallObject(get_ident, 0);
+    Py_DECREF(get_ident);
+    threadid = PyLong_AsLong(ident);
+    Py_DECREF(ident);
+
     // run and generate errors etc
     messages.clear();
     PyRun_SimpleString(line.toStdString().c_str());
@@ -117,9 +126,19 @@ void PythonEmbed::runline(QString line)
         PyObject_CallFunction(static_cast<PyObject*>(clear), NULL);
     }
     PyGILState_Release(gstate);
+    threadid=-1;
 }
 
 void
 PythonEmbed::cancel()
 {
+    if (chart!=NULL && threadid != -1) {
+        PyGILState_STATE gstate;
+        gstate = PyGILState_Ensure();
+
+        // raise an exception to cancel the execution
+        PyThreadState_SetAsyncExc(threadid, PyExc_KeyboardInterrupt);
+
+        PyGILState_Release(gstate);
+    }
 }

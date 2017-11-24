@@ -64,6 +64,7 @@ class PythonEmbed {
     bool cancelled;
 
     bool loaded;
+    long threadid;
 };
 
 #endif
