@@ -270,14 +270,14 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 ### OPTIONAL => Embed Python
 ###=========================
 
-notsupported = "INFO: Embedded Python requires version QT >= 5.9, no support for"
+notsupported = "INFO: Embedded Python requires version QT >= 5.8, no support for"
 notsupported += $${QT_VERSION}
 
 contains(DEFINES, "GC_WANT_PYTHON") {
 
     greaterThan(QT_MAJOR_VERSION, 4) {
 
-        greaterThan(QT_MINOR_VERSION, 8) {
+        greaterThan(QT_MINOR_VERSION, 7) {
 
             # add Python subdirectory to include path
             INCLUDEPATH += ./Python
