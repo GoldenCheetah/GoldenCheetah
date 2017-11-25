@@ -18,7 +18,7 @@
 
 #include "PythonChart.h"
 #include "PythonEmbed.h"
-//#include "PythonSyntax.h"
+#include "PythonSyntax.h"
 
 #include "Colors.h"
 #include "TabView.h"
@@ -427,7 +427,7 @@ PythonChart::setScript(QString string)
 {
     if (python && script) {
         script->setText(string);
-        //new RSyntax(script->document());
+        new PythonSyntax(script->document());
     }
     text = string;
 }
@@ -462,6 +462,9 @@ PythonChart::runScript()
     if (!isVisible()) return;
 
     if (script->toPlainText() != "") {
+
+        // if it is running another for us?
+        if (python->chart == this) python->cancel();
 
         // hourglass .. for long running ones this helps user know its busy
         QApplication::setOverrideCursor(Qt::WaitCursor);

@@ -287,8 +287,8 @@ contains(DEFINES, "GC_WANT_PYTHON") {
             LIBS += $${PYTHONLIBS}
 
             ## Python integration
-            HEADERS += Python/PythonEmbed.h Charts/PythonChart.h
-            SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp
+            HEADERS += Python/PythonEmbed.h Charts/PythonChart.h Python/PythonSyntax.h
+            SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp Python/PythonSyntax.cpp
 
             DEFINES += GC_HAVE_PYTHON
 
