@@ -3195,7 +3195,7 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     // 1. timestamp (253)
     int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
     if (ride->dataPoints().last()) {
-        value += ride->dataPoints().last()->secs+1;
+        value += ride->dataPoints().last()->secs+ride->recIntSecs();
     }
     write_int32(array, value, true);
 
@@ -3251,7 +3251,7 @@ void write_lap(QByteArray *array, const RideFile *ride) {
     // 1. timestamp
     int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
     if (ride->dataPoints().last()) {
-        value += ride->dataPoints().last()->secs;
+        value += ride->dataPoints().last()->secs+ride->recIntSecs();
     }
     write_int32(array, value, true);
 
@@ -3363,9 +3363,9 @@ void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideM
     write_int8(array, record_header);
 
     // 1. timestamp
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
+    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
     if (ride->dataPoints().last()) {
-        value += ride->dataPoints().last()->secs;
+        value += ride->dataPoints().last()->secs+ride->recIntSecs();
     }
     write_int32(array, value, true);
 
