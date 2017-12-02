@@ -43,7 +43,7 @@ PythonConsole::PythonConsole(Context *context, PythonChart *parent)
     setAcceptRichText(false);
     document()->setMaximumBlockCount(512); // lets not get carried away!
     putData(GColor(CPLOTMARKER), QString(tr("Python Console (%1)").arg(python->version)));
-    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
+    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n>>> ");
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rMessage(QString)), this, SLOT(rMessage(QString)));
@@ -145,7 +145,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
 
                 // new prompt
                 putData("\n");
-                putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+                putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>> ");
 
             } else {
                 // normal C just do the usual
@@ -162,7 +162,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
         setTextCursor(move);
 
         QString line = currentLine();
-        if (line.length() > 1) line = line.mid(2, line.length()-2);
+        if (line.length() > 4) line = line.mid(4, line.length()-4);
         else line = "";
 
         putData("\n");
@@ -213,7 +213,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
         }
 
         // prompt ">"
-        putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+        putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>> ");
     }
     break;
 
@@ -233,7 +233,7 @@ PythonConsole::setCurrentLine(QString p)
 
     select.select(QTextCursor::LineUnderCursor);
     select.removeSelectedText();
-    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>> ");
     putData(p);
 }
 
