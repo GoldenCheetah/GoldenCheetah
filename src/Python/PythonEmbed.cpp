@@ -30,11 +30,16 @@
 #ifdef slots // clashes with python headers
 #undef slots
 #endif
-#include GC_PYTHONHEADER
+#include <Python.h>
 
 // global instance of embedded python
 PythonEmbed *python;
 PyThreadState *mainThreadState;
+
+// SIP module with GoldenCheetah Bindings
+extern "C" {
+extern PyObject *PyInit_goldencheetah(void);
+};
 
 PythonEmbed::~PythonEmbed()
 {
@@ -48,6 +53,10 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     // tell python our program name
     Py_SetProgramName((wchar_t*) name.toStdString().c_str());
+
+    // our own module
+    int rc= PyImport_AppendInittab("goldencheetah", PyInit_goldencheetah);
+    fprintf(stderr, "Add import module GoldenCheetah rc=%d\n", rc);
 
     // need to load the interpreter etc
     Py_InitializeEx(0);
@@ -63,7 +72,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     fprintf(stderr, "Python loaded [%s]\n", version.toStdString().c_str());
 
-    // our base code - currently just traps stdout
+    // our base code - traps stdout and loads goldencheetan module
+    // mapping all the bindings to a GC object.
     std::string stdOutErr = ("import sys\n"
                              "class CatchOutErr:\n"
                              "    def __init__(self):\n"
@@ -72,11 +82,14 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
                              "        self.value += txt\n"
                              "catchOutErr = CatchOutErr()\n"
                              "sys.stdout = catchOutErr\n"
-                             "sys.stderr = catchOutErr\n");
+                             "sys.stderr = catchOutErr\n"
+                             "import goldencheetah\n"
+                             "GC=goldencheetah.Bindings()\n");
 
     PyRun_SimpleString(stdOutErr.c_str()); //invoke code to redirect
 
-    // our own module
+
+    // setup trapping of output
     PyObject *pModule = PyImport_AddModule("__main__"); //create main module
     catcher = static_cast<void*>(PyObject_GetAttrString(pModule,"catchOutErr"));
     clear = static_cast<void*>(PyObject_GetAttrString(static_cast<PyObject*>(catcher), "__init__"));

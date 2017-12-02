@@ -25,13 +25,12 @@
 # Libs needed can typically be found by calling e.g
 # python3.6-config --libs
 #
-#DEFINES += GC_WANT_PYTHON
 # below 3 lines work well on Linux style OS
-#PYTHONHEADER = \<python3.6/Python.h\>
-##PYTHONINCLUDES = -I/usr/include
+#DEFINES += GC_WANT_PYTHON
+#PYTHONINCLUDES = -I/usr/include/python3.6
 #PYTHONLIBS = -L/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu -lpython3.6m
 # below 3 lines work well on Windows
-#PYTHONHEADER = \"<Python.h>\"
+#DEFINES += GC_WANT_PYTHON
 #PYTHONINCLUDES = -I\"C:\Program Files\Python36\include\"
 #PYTHONLIBS = -L\"C:\Program Files\Python36\libs\" -lpython36
 

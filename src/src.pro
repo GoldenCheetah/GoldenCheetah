@@ -282,13 +282,17 @@ contains(DEFINES, "GC_WANT_PYTHON") {
             # add Python subdirectory to include path
             INCLUDEPATH += ./Python
 
-            DEFINES += GC_PYTHONHEADER=$${PYTHONHEADER}
+            DEFINES += SIP_STATIC_MODULE
             !isEmpty(PYTHONINCLUDES) QMAKE_CXXFLAGS += $${PYTHONINCLUDES}
             LIBS += $${PYTHONLIBS}
 
             ## Python integration
             HEADERS += Python/PythonEmbed.h Charts/PythonChart.h Python/PythonSyntax.h
             SOURCES += Python/PythonEmbed.cpp Charts/PythonChart.cpp Python/PythonSyntax.cpp
+
+            ## Python SIP generated module
+            SOURCES += Python/SIP/sipgoldencheetahBindings.cpp Python/SIP/sipgoldencheetahcmodule.cpp
+            SOURCES += Python/SIP/Bindings.cpp
 
             DEFINES += GC_HAVE_PYTHON
 

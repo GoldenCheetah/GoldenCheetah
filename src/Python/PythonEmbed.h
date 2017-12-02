@@ -37,7 +37,11 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
-    // catch and clear output
+    // catch and clear output - we use void* because we cannot
+    // include the python headers here as they redefine the slots
+    // mechanism that QT needs in header files. As a result they
+    // are cast to PyObject* the CPP source code (which are in turn
+    // typedefs so we can't even declare the class type here).
     void *catcher;
     void *clear;
 
