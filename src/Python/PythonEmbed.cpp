@@ -55,8 +55,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     Py_SetProgramName((wchar_t*) name.toStdString().c_str());
 
     // our own module
-    int rc= PyImport_AppendInittab("goldencheetah", PyInit_goldencheetah);
-    fprintf(stderr, "Add import module GoldenCheetah rc=%d\n", rc);
+    PyImport_AppendInittab("goldencheetah", PyInit_goldencheetah);
 
     // need to load the interpreter etc
     Py_InitializeEx(0);
