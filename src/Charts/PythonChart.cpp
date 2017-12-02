@@ -29,7 +29,7 @@
 #ifdef slots
 #undef slots
 #endif
-#include GC_PYTHONHEADER
+#include <Python.h>
 
 // unique identifier for each chart
 static int id=0;
