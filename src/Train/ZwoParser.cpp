@@ -48,22 +48,28 @@ bool ZwoParser::endElement( const QString&, const QString&, const QString &qName
 bool
 ZwoParser::startElement(const QString &, const QString &, const QString &qName, const QXmlAttributes &attrs)
 {
-    int Duration = attrs.value("Duration").toInt();
+    int Duration = qRound(attrs.value("Duration").toDouble());
     double PowerLow = attrs.value("PowerLow").toDouble();
     double PowerHigh = attrs.value("PowerHigh").toDouble();
+    double Power = attrs.value("Power").toDouble();
 
+    // Either Power or PowerLow / PowerHigh are available
     // PowerHigh may be optional and should be same as low.
     // e.g. steadystate interval doesn't need both and may not
     // get both in future iterations of the format
-    if (PowerHigh == 0) PowerHigh = PowerLow;
+    if (Power > 0) {
+        PowerHigh = PowerLow = Power;
+    } else if (PowerHigh == 0.0) {
+        PowerHigh = PowerLow;
+    }
 
     // POINTS
 
     // basic from/to, with different names for some odd reason
-    if (qName == "Warmup" || qName == "SteadyState"  || qName == "Cooldown" || qName == "Freeride") {
+    if (qName == "Warmup" || qName == "SteadyState"  || qName == "Cooldown" || qName == "FreeRide") {
 
-        int from = 100.0 * PowerLow;
-        int to = 100.0 * PowerHigh;
+        int from = int(100.0 * PowerLow);
+        int to = int(100.0 * PowerHigh);
 
         // some kind of old kludge, should be flat, but isn't always
         if (qName == "SteadyState") {
@@ -71,7 +77,7 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
             from = to = ap;
         }
 
-        if (qName == "Freeride") {
+        if (qName == "FreeRide") {
             if (watts == 0) from = to = 70;
             else from = to = watts; // whatever we were just doing keep doing it
         }
@@ -93,14 +99,31 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
         if (count == 0) count = 1;
 
         // effort on
-        int onDuration = attrs.value("OnDuration").toInt();
+        int onDuration = qRound(attrs.value("OnDuration").toDouble()); // duration may be double
         int onLow = attrs.value("PowerOnLow").toDouble() * 100.0;
         int onHigh = attrs.value("PowerOnHigh").toDouble() * 100.0;
+        int onPower = attrs.value("OnPower").toDouble() * 100.0;
 
         // effort off
-        int offDuration = attrs.value("OffDuration").toInt();
+        int offDuration = qRound(attrs.value("OffDuration").toDouble()); // duration may be double
         int offLow = attrs.value("PowerOffLow").toDouble() * 100.0;
         int offHigh = attrs.value("PowerOffHigh").toDouble() * 100.0;
+        int offPower = attrs.value("OffPower").toDouble() * 100.0;
+
+        if (onPower > 0) {
+            onHigh = onLow = onPower;
+        } else if (onHigh == 0.0) {
+            onHigh = onLow;
+        }
+
+        if (offPower > 0) {
+            offHigh = offLow = offPower;
+        } else if (offHigh == 0.0) {
+            offHigh = offLow;
+        }
+
+
+
 
         while (count--) {
 
@@ -113,14 +136,18 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
             points << ErgFilePoint(secs * 1000, onHigh, onHigh);
             watts = onHigh;
 
-            // recovery interval
-            if (watts != offLow) {
-                points << ErgFilePoint(secs * 1000, offLow, offLow);
-                watts = offLow;
+            // recovery interval (if defined)
+            if (offDuration > 0) {
+                if (watts != offLow) {
+                    points << ErgFilePoint(secs * 1000, offLow, offLow);
+                    watts = offLow;
+                }
+
+                secs += offDuration;
+                points << ErgFilePoint(secs * 1000, offHigh, offHigh);
+                watts = offHigh;
+
             }
-            secs += offDuration;
-            points << ErgFilePoint(secs * 1000, offHigh, offHigh);
-            watts = offHigh;
 
         }
 
