@@ -115,8 +115,8 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
     { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
-    { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },
-    { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow },
+    // { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },               // DEPRECATED for now
+    // { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow }, // DEPRECATED for now, since it causes problems and memory leaks
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { VIEW_ANALYSIS|VIEW_HOME|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
@@ -234,7 +234,6 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::MapWindow:
     case GcWindowTypes::StreetViewWindow:
         returning = new GcChartWindow(context); break;
-        break;
 #else
     case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
