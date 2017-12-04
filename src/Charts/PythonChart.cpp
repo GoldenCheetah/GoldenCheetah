@@ -121,7 +121,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
     // you can only delete or move left from past first character
     case Qt::Key_Left:
     case Qt::Key_Backspace:
-        if (textCursor().position() - textCursor().block().position() > 2) QTextEdit::keyPressEvent(e);
+        if (textCursor().position() - textCursor().block().position() > 4) QTextEdit::keyPressEvent(e);
         break;
 
     case Qt::Key_Escape: // R typically uses ESC to cancel
