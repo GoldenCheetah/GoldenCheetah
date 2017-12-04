@@ -15,10 +15,14 @@
  */
 #define sipNameNr_goldencheetah 0
 #define sipName_goldencheetah &sipStrings_goldencheetah[0]
-#define sipNameNr_getValue 14
-#define sipName_getValue &sipStrings_goldencheetah[14]
+#define sipNameNr_threadid 14
+#define sipName_threadid &sipStrings_goldencheetah[14]
 #define sipNameNr_Bindings 23
 #define sipName_Bindings &sipStrings_goldencheetah[23]
+#define sipNameNr_athlete 32
+#define sipName_athlete &sipStrings_goldencheetah[32]
+#define sipNameNr_QString 40
+#define sipName_QString &sipStrings_goldencheetah[40]
 
 #define sipMalloc                   sipAPI_goldencheetah->api_malloc
 #define sipFree                     sipAPI_goldencheetah->api_free
@@ -192,6 +196,10 @@ extern const char sipStrings_goldencheetah[];
 #define sipClass_Bindings sipExportedTypes_goldencheetah[0]->u.td_wrapper_type
 
 extern sipClassTypeDef sipTypeDef_goldencheetah_Bindings;
+
+#define sipType_QString sipExportedTypes_goldencheetah[1]
+
+extern sipMappedTypeDef sipTypeDef_goldencheetah_QString;
 
 /* The SIP API, this module's API and the APIs of any imported modules. */
 extern const sipAPIDef *sipAPI_goldencheetah;

@@ -1,6 +1,8 @@
+#include <QString>
 
 class Bindings {
 
     public:
-        int getValue() const;
+        long threadid() const;
+        QString athlete() const;
 };

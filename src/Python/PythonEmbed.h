@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QMap>
 #include <QStringList>
 
 class Context;
@@ -46,13 +47,13 @@ class PythonEmbed {
     void *clear;
 
     // run a single line from console
-    void runline(QString);
+    void runline(Context *, QString);
 
     // stop current execution
     void cancel();
 
-    // context for caller
-    Context *context;
+    // context for caller - can be called in a thread
+    QMap<long,Context *> contexts;
     PythonChart *chart;
     QWidget *canvas;
 

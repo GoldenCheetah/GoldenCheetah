@@ -294,6 +294,8 @@ contains(DEFINES, "GC_WANT_PYTHON") {
             SOURCES += Python/SIP/sipgoldencheetahBindings.cpp Python/SIP/sipgoldencheetahcmodule.cpp
             SOURCES += Python/SIP/Bindings.cpp
 
+            ## SIP type conversion
+            SOURCES += Python/SIP/sipgoldencheetahQString.cpp
             DEFINES += GC_HAVE_PYTHON
 
          } else {

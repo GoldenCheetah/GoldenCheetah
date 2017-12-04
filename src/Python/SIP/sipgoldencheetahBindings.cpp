@@ -6,14 +6,17 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 6 "goldencheetah.sip"
+#line 21 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahBindings.cpp"
 
+#line 6 "goldencheetah.sip"
+#include <qstring.h>
+#line 16 "./sipgoldencheetahBindings.cpp"
 
 
-extern "C" {static PyObject *meth_Bindings_getValue(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_getValue(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_threadid(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_threadid(PyObject *sipSelf, PyObject *sipArgs)
 {
     PyObject *sipParseErr = NULL;
 
@@ -22,16 +25,41 @@ static PyObject *meth_Bindings_getValue(PyObject *sipSelf, PyObject *sipArgs)
 
         if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
         {
-            int sipRes;
+            long sipRes;
 
-            sipRes = sipCpp->getValue();
+            sipRes = sipCpp->threadid();
 
-            return SIPLong_FromLong(sipRes);
+            return PyLong_FromLong(sipRes);
         }
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_getValue, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_threadid, NULL);
+
+    return NULL;
+}
+
+
+extern "C" {static PyObject *meth_Bindings_athlete(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        const  ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
+        {
+             ::QString*sipRes;
+
+            sipRes = new  ::QString(sipCpp->athlete());
+
+            return sipConvertFromNewType(sipRes,sipType_QString,NULL);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_athlete, NULL);
 
     return NULL;
 }
@@ -106,7 +134,8 @@ static void *init_type_Bindings(sipSimpleWrapper *, PyObject *sipArgs, PyObject 
 
 
 static PyMethodDef methods_Bindings[] = {
-    {SIP_MLNAME_CAST(sipName_getValue), meth_Bindings_getValue, METH_VARARGS, NULL}
+    {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL}
 };
 
 
@@ -123,7 +152,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        1, methods_Bindings,
+        2, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

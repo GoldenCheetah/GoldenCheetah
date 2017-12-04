@@ -3,7 +3,9 @@
 # at some point later we will integrate into src.pro
 #
 
-SRC= sipgoldencheetahBindings.cpp sipgoldencheetahcmodule.cpp sipAPIgoldencheetah.h
+SRC= sipgoldencheetahBindings.cpp sipgoldencheetahcmodule.cpp sipAPIgoldencheetah.h \
+     sipgoldencheetahQString.cpp sipgoldencheetahQStringRef.cpp
+
 DEPS= goldencheetah.sip
 
 $(SRC): $(DEPS)

@@ -176,7 +176,6 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             //qDebug()<<"RUN:" << line;
 
             // set the context for the call
-            python->context = context;
             python->canvas = parent->canvas;
             python->chart = parent;
 
@@ -186,7 +185,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 line = line.replace("$$", chartid);
 
                 python->cancelled = false;
-                python->runline(line);
+                python->runline(context, line);
 
                 // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));
@@ -207,7 +206,6 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             }
 
             // clear context
-            python->context = NULL;
             python->canvas = NULL;
             python->chart = NULL;
         }
@@ -452,7 +450,7 @@ PythonChart::setState(QString)
 void
 PythonChart::execScript(PythonChart *chart)
 {
-    python->runline(chart->script->toPlainText());
+    python->runline(chart->context, chart->script->toPlainText());
 }
 
 void
@@ -473,7 +471,6 @@ PythonChart::runScript()
         setUpdatesEnabled(false);
 
         // run it !!
-        python->context = context;
         python->canvas = canvas;
         python->chart = this;
 
@@ -534,7 +531,6 @@ PythonChart::runScript()
         //canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
 
         // clear context
-        python->context = NULL;
         python->canvas = NULL;
         python->chart = NULL;
     }

@@ -90,7 +90,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     // detach source require
     commonFunctionFormat.setForeground(QColor(40,255,40));
     QStringList commonFunctionPatterns;
-    commonFunctionPatterns << "\\bdef\\b" << "\\bself\\b";
+    commonFunctionPatterns << "\\bGC\\b" << "\\bdef\\b" << "\\bself\\b";
     foreach (QString pattern, commonFunctionPatterns) {
         rule.pattern = QRegExp(pattern);
         rule.format = commonFunctionFormat;
