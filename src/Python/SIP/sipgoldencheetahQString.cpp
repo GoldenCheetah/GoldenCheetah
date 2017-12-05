@@ -50,7 +50,8 @@ static int convertTo_QString(PyObject *sipPy,void **sipCppPtrV,int *,PyObject *s
 #line 10 "goldencheetah.sip"
 //*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
 //return sipGetState(sipTransferObj);
-#line 54 "./sipgoldencheetahQString.cpp"
+return 0;
+#line 55 "./sipgoldencheetahQString.cpp"
 }
 
 
@@ -59,9 +60,9 @@ static PyObject *convertFrom_QString(void *sipCppV, PyObject *)
 {
     ::QString *sipCpp = reinterpret_cast< ::QString *>(sipCppV);
 
-#line 14 "goldencheetah.sip"
+#line 15 "goldencheetah.sip"
     return PyUnicode_FromString(sipCpp->toLatin1().data());
-#line 65 "./sipgoldencheetahQString.cpp"
+#line 66 "./sipgoldencheetahQString.cpp"
 }
 
 

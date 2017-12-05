@@ -9,6 +9,7 @@
 %ConvertToTypeCode
 //*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
 //return sipGetState(sipTransferObj);
+return 0;
 %End
 %ConvertFromTypeCode
     return PyUnicode_FromString(sipCpp->toLatin1().data());
@@ -24,5 +25,7 @@ class Bindings {
 public:
     long threadid() const;
     QString athlete() const;
+    int build() const;
+    QString version() const;
 };
 

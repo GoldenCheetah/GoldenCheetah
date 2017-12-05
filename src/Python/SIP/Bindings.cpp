@@ -2,6 +2,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "Bindings.h"
+#include "GcUpgrade.h"
 
 #undef slots
 #include <Python.h>
@@ -22,4 +23,14 @@ QString Bindings::athlete() const
 {
     Context *context = python->contexts.value(threadid());
     return context->athlete->cyclist;
+}
+
+long Bindings::build() const
+{
+    return VERSION_LATEST;
+}
+
+QString Bindings::version() const
+{
+    return VERSION_STRING;
 }

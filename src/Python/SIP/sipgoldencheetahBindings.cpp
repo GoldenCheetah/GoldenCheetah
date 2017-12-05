@@ -6,7 +6,7 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 21 "goldencheetah.sip"
+#line 22 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahBindings.cpp"
 
@@ -60,6 +60,56 @@ static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
 
     /* Raise an exception if the arguments couldn't be parsed. */
     sipNoMethod(sipParseErr, sipName_Bindings, sipName_athlete, NULL);
+
+    return NULL;
+}
+
+
+extern "C" {static PyObject *meth_Bindings_build(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_build(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        const  ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
+        {
+            int sipRes;
+
+            sipRes = sipCpp->build();
+
+            return SIPLong_FromLong(sipRes);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_build, NULL);
+
+    return NULL;
+}
+
+
+extern "C" {static PyObject *meth_Bindings_version(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_version(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        const  ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
+        {
+             ::QString*sipRes;
+
+            sipRes = new  ::QString(sipCpp->version());
+
+            return sipConvertFromNewType(sipRes,sipType_QString,NULL);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_version, NULL);
 
     return NULL;
 }
@@ -135,7 +185,9 @@ static void *init_type_Bindings(sipSimpleWrapper *, PyObject *sipArgs, PyObject 
 
 static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL}
+    {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_version), meth_Bindings_version, METH_VARARGS, NULL}
 };
 
 
@@ -152,7 +204,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        2, methods_Bindings,
+        4, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

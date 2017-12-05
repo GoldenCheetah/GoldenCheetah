@@ -19,10 +19,14 @@
 #define sipName_threadid &sipStrings_goldencheetah[14]
 #define sipNameNr_Bindings 23
 #define sipName_Bindings &sipStrings_goldencheetah[23]
-#define sipNameNr_athlete 32
-#define sipName_athlete &sipStrings_goldencheetah[32]
-#define sipNameNr_QString 40
-#define sipName_QString &sipStrings_goldencheetah[40]
+#define sipNameNr_version 32
+#define sipName_version &sipStrings_goldencheetah[32]
+#define sipNameNr_athlete 40
+#define sipName_athlete &sipStrings_goldencheetah[40]
+#define sipNameNr_QString 48
+#define sipName_QString &sipStrings_goldencheetah[48]
+#define sipNameNr_build 56
+#define sipName_build &sipStrings_goldencheetah[56]
 
 #define sipMalloc                   sipAPI_goldencheetah->api_malloc
 #define sipFree                     sipAPI_goldencheetah->api_free
