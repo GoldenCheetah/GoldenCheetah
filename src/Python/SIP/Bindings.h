@@ -1,6 +1,8 @@
 #include <QString>
 #include "RideFile.h"
 
+#include <pyport.h> // for Py_ssize_t
+
 class PythonDataSeries {
 
     public:
@@ -10,7 +12,7 @@ class PythonDataSeries {
         ~PythonDataSeries();
 
         RideFile::SeriesType series;
-        long count;
+        Py_ssize_t count;
         double *data;
 };
 
