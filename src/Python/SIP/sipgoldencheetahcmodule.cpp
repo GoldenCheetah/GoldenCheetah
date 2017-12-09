@@ -6,10 +6,10 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 48 "goldencheetah.sip"
+#line 49 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahcmodule.cpp"
-#line 89 "goldencheetah.sip"
+#line 100 "goldencheetah.sip"
 //#include "Bindings.h"
 #line 15 "./sipgoldencheetahcmodule.cpp"
 
@@ -18,6 +18,7 @@ const char sipStrings_goldencheetah[] = {
     'P', 'y', 't', 'h', 'o', 'n', 'D', 'a', 't', 'a', 'S', 'e', 'r', 'i', 'e', 's', 0,
     's', 'e', 'r', 'i', 'e', 's', 'P', 'r', 'e', 's', 'e', 'n', 't', 0,
     'g', 'o', 'l', 'd', 'e', 'n', 'c', 'h', 'e', 'e', 't', 'a', 'h', 0,
+    '_', '_', 'g', 'e', 't', 'i', 't', 'e', 'm', '_', '_', 0,
     's', 'e', 'r', 'i', 'e', 's', 'L', 'a', 's', 't', 0,
     's', 'e', 'r', 'i', 'e', 's', 'N', 'a', 'm', 'e', 0,
     't', 'h', 'r', 'e', 'a', 'd', 'i', 'd', 0,

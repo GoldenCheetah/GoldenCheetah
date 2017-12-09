@@ -29,6 +29,7 @@
 %End
 
 %ConvertToTypeCode
+    Q_UNUSED(sipPy);
     //*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
     //return sipGetState(sipTransferObj);
     Q_UNUSED(sipTransferObj);
@@ -77,6 +78,16 @@ public:
     SIP_SSIZE_T __len__();
         %MethodCode
         sipRes = sipCpp->count;
+        %End
+    double __getitem__(long);
+        %MethodCode
+        if (a0 < 0) a0 += sipCpp->count;
+        if (a0 >= 0 && a0 < sipCpp->count) {
+            sipRes = sipCpp->data[a0];
+        } else {
+            PyErr_SetString(PyExc_IndexError, "Index out of range");
+            sipError = sipErrorFail;
+        }
         %End
 };
 
