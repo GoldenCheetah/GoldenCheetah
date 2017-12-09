@@ -6,7 +6,7 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 6 "goldencheetah.sip"
+#line 28 "goldencheetah.sip"
 #include <qstring.h>
 #line 12 "./sipgoldencheetahQString.cpp"
 
@@ -47,11 +47,12 @@ static int convertTo_QString(PyObject *sipPy,void **sipCppPtrV,int *,PyObject *s
 {
      ::QString **sipCppPtr = reinterpret_cast< ::QString **>(sipCppPtrV);
 
-#line 10 "goldencheetah.sip"
-//*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
-//return sipGetState(sipTransferObj);
-return 0;
-#line 55 "./sipgoldencheetahQString.cpp"
+#line 32 "goldencheetah.sip"
+    //*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
+    //return sipGetState(sipTransferObj);
+    Q_UNUSED(sipTransferObj);
+    return 0;
+#line 56 "./sipgoldencheetahQString.cpp"
 }
 
 
@@ -60,9 +61,9 @@ static PyObject *convertFrom_QString(void *sipCppV, PyObject *)
 {
     ::QString *sipCpp = reinterpret_cast< ::QString *>(sipCppV);
 
-#line 15 "goldencheetah.sip"
+#line 38 "goldencheetah.sip"
     return PyUnicode_FromString(sipCpp->toLatin1().data());
-#line 66 "./sipgoldencheetahQString.cpp"
+#line 67 "./sipgoldencheetahQString.cpp"
 }
 
 

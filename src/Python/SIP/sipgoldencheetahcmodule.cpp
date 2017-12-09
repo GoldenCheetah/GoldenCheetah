@@ -6,18 +6,28 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 22 "goldencheetah.sip"
+#line 48 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahcmodule.cpp"
+#line 89 "goldencheetah.sip"
+//#include "Bindings.h"
+#line 15 "./sipgoldencheetahcmodule.cpp"
 
 /* Define the strings used by this module. */
 const char sipStrings_goldencheetah[] = {
+    'P', 'y', 't', 'h', 'o', 'n', 'D', 'a', 't', 'a', 'S', 'e', 'r', 'i', 'e', 's', 0,
+    's', 'e', 'r', 'i', 'e', 's', 'P', 'r', 'e', 's', 'e', 'n', 't', 0,
     'g', 'o', 'l', 'd', 'e', 'n', 'c', 'h', 'e', 'e', 't', 'a', 'h', 0,
+    's', 'e', 'r', 'i', 'e', 's', 'L', 'a', 's', 't', 0,
+    's', 'e', 'r', 'i', 'e', 's', 'N', 'a', 'm', 'e', 0,
     't', 'h', 'r', 'e', 'a', 'd', 'i', 'd', 0,
     'B', 'i', 'n', 'd', 'i', 'n', 'g', 's', 0,
     'v', 'e', 'r', 's', 'i', 'o', 'n', 0,
     'a', 't', 'h', 'l', 'e', 't', 'e', 0,
+    '_', '_', 'l', 'e', 'n', '_', '_', 0,
+    '_', '_', 's', 't', 'r', '_', '_', 0,
     'Q', 'S', 't', 'r', 'i', 'n', 'g', 0,
+    's', 'e', 'r', 'i', 'e', 's', 0,
     'b', 'u', 'i', 'l', 'd', 0,
 };
 
@@ -27,6 +37,7 @@ const char sipStrings_goldencheetah[] = {
  */
 sipTypeDef *sipExportedTypes_goldencheetah[] = {
     &sipTypeDef_goldencheetah_Bindings.ctd_base,
+    &sipTypeDef_goldencheetah_PythonDataSeries.ctd_base,
     &sipTypeDef_goldencheetah_QString.mtd_base,
 };
 
@@ -40,7 +51,7 @@ sipExportedModuleDef sipModuleAPI_goldencheetah = {
     sipStrings_goldencheetah,
     NULL,
     NULL,
-    2,
+    3,
     sipExportedTypes_goldencheetah,
     NULL,
     0,

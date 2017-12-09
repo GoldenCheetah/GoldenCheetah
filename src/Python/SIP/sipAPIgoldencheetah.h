@@ -13,20 +13,34 @@
  * Convenient names to refer to various strings defined in this module.
  * Only the class names are part of the public API.
  */
-#define sipNameNr_goldencheetah 0
-#define sipName_goldencheetah &sipStrings_goldencheetah[0]
-#define sipNameNr_threadid 14
-#define sipName_threadid &sipStrings_goldencheetah[14]
-#define sipNameNr_Bindings 23
-#define sipName_Bindings &sipStrings_goldencheetah[23]
-#define sipNameNr_version 32
-#define sipName_version &sipStrings_goldencheetah[32]
-#define sipNameNr_athlete 40
-#define sipName_athlete &sipStrings_goldencheetah[40]
-#define sipNameNr_QString 48
-#define sipName_QString &sipStrings_goldencheetah[48]
-#define sipNameNr_build 56
-#define sipName_build &sipStrings_goldencheetah[56]
+#define sipNameNr_PythonDataSeries 0
+#define sipName_PythonDataSeries &sipStrings_goldencheetah[0]
+#define sipNameNr_seriesPresent 17
+#define sipName_seriesPresent &sipStrings_goldencheetah[17]
+#define sipNameNr_goldencheetah 31
+#define sipName_goldencheetah &sipStrings_goldencheetah[31]
+#define sipNameNr_seriesLast 45
+#define sipName_seriesLast &sipStrings_goldencheetah[45]
+#define sipNameNr_seriesName 56
+#define sipName_seriesName &sipStrings_goldencheetah[56]
+#define sipNameNr_threadid 67
+#define sipName_threadid &sipStrings_goldencheetah[67]
+#define sipNameNr_Bindings 76
+#define sipName_Bindings &sipStrings_goldencheetah[76]
+#define sipNameNr_version 85
+#define sipName_version &sipStrings_goldencheetah[85]
+#define sipNameNr_athlete 93
+#define sipName_athlete &sipStrings_goldencheetah[93]
+#define sipNameNr___len__ 101
+#define sipName___len__ &sipStrings_goldencheetah[101]
+#define sipNameNr___str__ 109
+#define sipName___str__ &sipStrings_goldencheetah[109]
+#define sipNameNr_QString 117
+#define sipName_QString &sipStrings_goldencheetah[117]
+#define sipNameNr_series 125
+#define sipName_series &sipStrings_goldencheetah[125]
+#define sipNameNr_build 132
+#define sipName_build &sipStrings_goldencheetah[132]
 
 #define sipMalloc                   sipAPI_goldencheetah->api_malloc
 #define sipFree                     sipAPI_goldencheetah->api_free
@@ -196,12 +210,17 @@
 /* The strings used by this module. */
 extern const char sipStrings_goldencheetah[];
 
+#define sipType_PythonDataSeries sipExportedTypes_goldencheetah[1]
+#define sipClass_PythonDataSeries sipExportedTypes_goldencheetah[1]->u.td_wrapper_type
+
+extern sipClassTypeDef sipTypeDef_goldencheetah_PythonDataSeries;
+
 #define sipType_Bindings sipExportedTypes_goldencheetah[0]
 #define sipClass_Bindings sipExportedTypes_goldencheetah[0]->u.td_wrapper_type
 
 extern sipClassTypeDef sipTypeDef_goldencheetah_Bindings;
 
-#define sipType_QString sipExportedTypes_goldencheetah[1]
+#define sipType_QString sipExportedTypes_goldencheetah[2]
 
 extern sipMappedTypeDef sipTypeDef_goldencheetah_QString;
 
