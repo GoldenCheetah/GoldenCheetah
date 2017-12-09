@@ -75,6 +75,7 @@ private:
     Context *context;
     bool localEchoEnabled;
     PythonChart *parent;
+    int promptStartIndex = 4;
 };
 
 // the chart
