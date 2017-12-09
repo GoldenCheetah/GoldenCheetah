@@ -922,5 +922,6 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 ###====================
 
 OTHER_FILES += Resources/web/Rider.js Resources/web/ride.js Resources/web/jquery-1.6.4.min.js \
-               Resources/web/MapWindow.html Resources/web/StreetViewWindow.html Resources/web/Window.css
+               Resources/web/MapWindow.html Resources/web/StreetViewWindow.html Resources/web/Window.css \
+               Resources/python/library.py Python/SIP/goldencheetah.sip
 

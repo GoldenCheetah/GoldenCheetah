@@ -87,6 +87,14 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     PyRun_SimpleString(stdOutErr.c_str()); //invoke code to redirect
 
+    // now load the library
+    QFile lib(":python/library.py");
+    if (lib.open(QFile::ReadOnly)) {
+        QString libstring=lib.readAll();
+        lib.close();
+        PyRun_SimpleString(libstring.toLatin1().constData());
+    }
+
 
     // setup trapping of output
     PyObject *pModule = PyImport_AddModule("__main__"); //create main module

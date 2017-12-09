@@ -178,5 +178,6 @@
         <file>images/services/velohero.png</file>
         <file>images/services/polarflow.png</file>
         <file>images/services/sporttracks.png</file>
+        <file>python/library.py</file>
     </qresource>
 </RCC>
