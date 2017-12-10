@@ -62,9 +62,10 @@ static PyObject *convertFrom_QString(void *sipCppV, PyObject *)
 {
     ::QString *sipCpp = reinterpret_cast< ::QString *>(sipCppV);
 
-#line 39 "goldencheetah.sip"
-    return PyUnicode_FromString(sipCpp->toLatin1().data());
-#line 68 "./sipgoldencheetahQString.cpp"
+#line 38 "goldencheetah.sip"
+    return PyUnicode_FromString(sipCpp->toUtf8().data());
+#line 67 "./sipgoldencheetahQString.cpp"
+
 }
 
 
