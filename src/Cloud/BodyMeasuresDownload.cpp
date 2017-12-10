@@ -51,7 +51,6 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     dateRangeAll = new QRadioButton(tr("From date of first recorded activity to today"));
     dateRangeLastMeasure = new QRadioButton(tr("From date of last downloaded measurement to today"));
     dateRangeManual = new QRadioButton(tr("Enter manually:"));
-    dateRangeAll->setChecked(true);
     QVBoxLayout *vbox2 = new QVBoxLayout;
     vbox2->addWidget(dateRangeAll);
     vbox2->addWidget(dateRangeLastMeasure);
@@ -104,6 +103,10 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     connect(dateRangeLastMeasure, SIGNAL(toggled(bool)), this, SLOT(dateRangeLastSettingChanged(bool)));
     connect(dateRangeManual, SIGNAL(toggled(bool)), this, SLOT(dateRangeManualSettingChanged(bool)));
 
+    connect(downloadWithings, SIGNAL(toggled(bool)), this, SLOT(downloadWithingsSettingChanged(bool)));
+    connect(downloadTP, SIGNAL(toggled(bool)), this, SLOT(downloadTPSettingChanged(bool)));
+    connect(downloadCSV, SIGNAL(toggled(bool)), this, SLOT(downloadCSVSettingChanged(bool)));
+
     // don't allow options which are not authorized
     QString strToken =appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN, "").toString();
     QString strSecret= appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_SECRET, "").toString();
@@ -116,15 +119,45 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     if (token == "") {
         downloadTP->setEnabled(false);
     }
-    // select the default checked
+
+
+    // select the default checked / based on available properties and last selection
+    int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
+    bool done = false;
     if (downloadWithings->isEnabled()) {
-        downloadWithings->setChecked(true);
-    } else if (downloadTP->isEnabled()) {
-        downloadTP->setChecked(true);
-    } else {
+        if (last_selection == 0 || last_selection == WITHINGS) {
+            downloadWithings->setChecked(true);
+            done = true;
+        }
+    }
+    if (!done && downloadTP->isEnabled()) {
+        if (last_selection == 0 || last_selection == TP) {
+            downloadTP->setChecked(true);
+            done = true;
+        }
+    }
+    if (!done) {
         downloadCSV->setChecked(true);
     }
 
+
+    // set the default from "last"
+    int last_timeframe = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, ALL).toInt();
+    switch (last_timeframe) {
+    case ALL:
+        dateRangeAll->setChecked(true);
+        break;
+    case LAST:
+        dateRangeLastMeasure->setChecked(true);
+        break;
+    case MANUAL:
+        dateRangeManual->setChecked(true);
+        manualFromDate->setEnabled(true);
+        manualToDate->setEnabled(true);
+        break;
+    default:
+        dateRangeAll->setChecked(true);
+    }
     // initialize the downloader
     withingsDownload = new WithingsDownload(context);
     todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
@@ -293,6 +326,7 @@ BodyMeasuresDownload::dateRangeAllSettingChanged(bool checked) {
     if (checked) {
         manualFromDate->setEnabled(false);
         manualToDate->setEnabled(false);
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, ALL);
     }
 }
 
@@ -303,6 +337,7 @@ BodyMeasuresDownload::dateRangeLastSettingChanged(bool checked) {
     if (checked) {
         manualFromDate->setEnabled(false);
         manualToDate->setEnabled(false);
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, LAST);
     }
 }
 
@@ -312,8 +347,34 @@ BodyMeasuresDownload::dateRangeManualSettingChanged(bool checked) {
     if (checked) {
         manualFromDate->setEnabled(true);
         manualToDate->setEnabled(true);
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, MANUAL);
     }
 }
+
+void
+BodyMeasuresDownload::downloadWithingsSettingChanged(bool checked) {
+
+    if (checked) {
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, WITHINGS);
+    }
+}
+
+void
+BodyMeasuresDownload::downloadTPSettingChanged(bool checked) {
+
+    if (checked) {
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, TP);
+    }
+}
+
+void
+BodyMeasuresDownload::downloadCSVSettingChanged(bool checked) {
+
+    if (checked) {
+        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, CSV);
+    }
+}
+
 
 void
 BodyMeasuresDownload::downloadProgressStart(int total) {
