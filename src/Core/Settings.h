@@ -276,6 +276,10 @@
 #define GC_OSM_TS_B                     "<athlete-preferences>osmts/b"
 #define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
 
+// BodyMeasures Download
+#define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"
+#define GC_BM_LAST_TIMEFRAME            "<athlete-preferences>bm/last_timeframe"
+
 
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"

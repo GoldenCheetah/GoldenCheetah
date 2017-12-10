@@ -70,12 +70,29 @@ private:
      // Progress Bar
      QProgressBar *progressBar;
 
+
+     enum source { WITHINGS = 1,
+                   TP = 2,
+                   CSV = 3
+                 } ;
+
+     enum timeframe { ALL = 1,
+                      LAST = 2,
+                      MANUAL = 3
+                    } ;
+
+
 private slots:
      void download();
      void close();
      void dateRangeAllSettingChanged(bool);
      void dateRangeLastSettingChanged(bool);
      void dateRangeManualSettingChanged(bool);
+
+     void downloadWithingsSettingChanged(bool);
+     void downloadTPSettingChanged(bool);
+     void downloadCSVSettingChanged(bool);
+
 
      void downloadProgressStart(int);
      void downloadProgress(int);
