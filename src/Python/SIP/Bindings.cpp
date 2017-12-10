@@ -54,7 +54,7 @@ Bindings::seriesLast() const
 QString
 Bindings::seriesName(int type) const
 {
-    return RideFile::seriesName(static_cast<RideFile::SeriesType>(type));
+    return RideFile::seriesName(static_cast<RideFile::SeriesType>(type), true);
 }
 
 bool

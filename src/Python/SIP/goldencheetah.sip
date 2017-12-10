@@ -36,7 +36,7 @@
     return 0;
 %End
 %ConvertFromTypeCode
-    return PyUnicode_FromString(sipCpp->toLatin1().data());
+    return PyUnicode_FromString(sipCpp->toUtf8().data());
 %End
 };
 
