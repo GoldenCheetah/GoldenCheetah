@@ -6,13 +6,60 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 48 "goldencheetah.sip"
+#line 49 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahPythonDataSeries.cpp"
 
 #line 28 "goldencheetah.sip"
 #include <qstring.h>
 #line 16 "./sipgoldencheetahPythonDataSeries.cpp"
+
+
+extern "C" {static PyObject *slot_PythonDataSeries___getitem__(PyObject *,PyObject *);}
+static PyObject *slot_PythonDataSeries___getitem__(PyObject *sipSelf,PyObject *sipArg)
+{
+     ::PythonDataSeries *sipCpp = reinterpret_cast< ::PythonDataSeries *>(sipGetCppPtr((sipSimpleWrapper *)sipSelf,sipType_PythonDataSeries));
+
+    if (!sipCpp)
+        return 0;
+
+    PyObject *sipParseErr = NULL;
+
+    {
+        long a0;
+
+        if (sipParseArgs(&sipParseErr, sipArg, "1l", &a0))
+        {
+            double sipRes = 0;
+            sipErrorState sipError = sipErrorNone;
+
+#line 84 "goldencheetah.sip"
+        if (a0 < 0) a0 += sipCpp->count;
+        if (a0 >= 0 && a0 < sipCpp->count) {
+            sipRes = sipCpp->data[a0];
+        } else {
+            PyErr_SetString(PyExc_IndexError, "Index out of range");
+            sipError = sipErrorFail;
+        }
+#line 45 "./sipgoldencheetahPythonDataSeries.cpp"
+
+            if (sipError == sipErrorFail)
+                return 0;
+
+            if (sipError == sipErrorNone)
+            {
+            return PyFloat_FromDouble(sipRes);
+            }
+
+            sipAddException(sipError, &sipParseErr);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_PythonDataSeries, sipName___getitem__, NULL);
+
+    return 0;
+}
 
 
 extern "C" {static SIP_SSIZE_T slot_PythonDataSeries___len__(PyObject *);}
@@ -28,9 +75,9 @@ static SIP_SSIZE_T slot_PythonDataSeries___len__(PyObject *sipSelf)
         {
             SIP_SSIZE_T sipRes = 0;
 
-#line 79 "goldencheetah.sip"
+#line 80 "goldencheetah.sip"
         sipRes = sipCpp->count;
-#line 34 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 81 "./sipgoldencheetahPythonDataSeries.cpp"
 
             return sipRes;
         }
@@ -53,9 +100,9 @@ static PyObject *slot_PythonDataSeries___str__(PyObject *sipSelf)
         {
              ::QString*sipRes = 0;
 
-#line 75 "goldencheetah.sip"
+#line 76 "goldencheetah.sip"
         sipRes = new QString(RideFile::seriesName(sipCpp->series));
-#line 59 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 106 "./sipgoldencheetahPythonDataSeries.cpp"
 
             return sipConvertFromNewType(sipRes,sipType_QString,NULL);
         }
@@ -80,7 +127,7 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
      ::PythonDataSeries *sipCpp = reinterpret_cast< ::PythonDataSeries *>(sipCppV);
     int sipRes;
 
-#line 52 "goldencheetah.sip"
+#line 53 "goldencheetah.sip"
     sipBuffer->obj = sipSelf;
     sipBuffer->buf = (void*)sipCpp->data;
     sipBuffer->len = sipCpp->count * sizeof(double);
@@ -95,7 +142,7 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
 
     Py_INCREF(sipSelf);  // need to increase the reference count
     sipRes = 0;
-#line 99 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 146 "./sipgoldencheetahPythonDataSeries.cpp"
 
     return sipRes;
 }
@@ -106,9 +153,9 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
 extern "C" {static void releasebuffer_PythonDataSeries(PyObject *, void *, Py_buffer *);}
 static void releasebuffer_PythonDataSeries(PyObject *, void *, Py_buffer *)
 {
-#line 69 "goldencheetah.sip"
+#line 70 "goldencheetah.sip"
     // we do not require any special release function
-#line 112 "./sipgoldencheetahPythonDataSeries.cpp"
+#line 159 "./sipgoldencheetahPythonDataSeries.cpp"
 }
 #endif
 
@@ -175,6 +222,7 @@ static void *init_type_PythonDataSeries(sipSimpleWrapper *, PyObject *sipArgs, P
 
 /* Define this type's Python slots. */
 static sipPySlotDef slots_PythonDataSeries[] = {
+    {(void *)slot_PythonDataSeries___getitem__, getitem_slot},
     {(void *)slot_PythonDataSeries___len__, len_slot},
     {(void *)slot_PythonDataSeries___str__, str_slot},
     {0, (sipPySlotType)0}

@@ -6,11 +6,11 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 89 "goldencheetah.sip"
+#line 100 "goldencheetah.sip"
 //#include "Bindings.h"
 #line 12 "./sipgoldencheetahBindings.cpp"
 
-#line 48 "goldencheetah.sip"
+#line 49 "goldencheetah.sip"
 #include "Bindings.h"
 #line 16 "./sipgoldencheetahBindings.cpp"
 #line 28 "goldencheetah.sip"
