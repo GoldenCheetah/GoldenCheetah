@@ -80,37 +80,31 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
-    osmCustomTSTitle = new QLabel(tr("Open Street Map - Custom Tile Server settings"));
-    osmCustomTSTitle->setStyleSheet("font-weight: bold;");
-    osmCustomTSLabel = new QLabel(tr("Tile server"));
-    osmCustomTSUrlLabel = new QLabel(tr("Tile server URL"));
+    osmTSTitle = new QLabel(tr("Open Street Map - Custom Tile Server settings"));
+    osmTSTitle->setStyleSheet("font-weight: bold;");
+    osmTSLabel = new QLabel(tr("Tile server"));
+    osmTSUrlLabel = new QLabel(tr("Tile server URL"));
 
     // tile choice
     tileCombo= new QComboBox(this);
     tileCombo->addItem(tr("OpenStreetMap (default)"), QVariant(0));
-    tileCombo->addItem(tr("OpenCycleMap"), QVariant(10));
-    //tileCombo->addItem(tr("OpenCycleMap B"), QVariant(11));
-    tileCombo->addItem(tr("Mapquest"), QVariant(20));
-    tileCombo->addItem(tr("Custom"), QVariant(1000));
+    tileCombo->addItem(tr("Custom Tile Server A"), QVariant(10));
+    tileCombo->addItem(tr("Custom Tile Server B"), QVariant(20));
+    tileCombo->addItem(tr("Custom Tile Server C"), QVariant(30));
 
 
-    osmCustomTSUrl = new QLineEdit("");
-    osmCustomTSUrl->setFixedWidth(250);
-    osmCustomTSUrl->setText(QString("http://tile.openstreetmap.org"));
+    osmTSUrl = new QLineEdit("");
+    osmTSUrl->setFixedWidth(250);
 
-    osmCustomTSUrl->setVisible(false);
-    osmCustomTSUrlLabel->setVisible(false);
-
-    commonLayout->addRow(osmCustomTSTitle);
-    commonLayout->addRow(osmCustomTSLabel, tileCombo);
-    commonLayout->addRow(osmCustomTSUrlLabel, osmCustomTSUrl);
+    commonLayout->addRow(osmTSTitle);
+    commonLayout->addRow(osmTSLabel, tileCombo);
+    commonLayout->addRow(osmTSUrlLabel, osmTSUrl);
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
     connect(showInt, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
-    connect(osmCustomTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
-    connect(osmCustomTSUrl, SIGNAL(textChanged(QString)), this, SLOT(osmCustomTSURLTextChanged(QString)));
+    connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
     setControls(settingsWidget);
@@ -202,37 +196,44 @@ RideMapWindow::mapTypeSelected(int x)
 void
 RideMapWindow::setCustomTSWidgetVisible(bool value)
 {
-    osmCustomTSTitle->setVisible(value);
-    osmCustomTSLabel->setVisible(value);
-    osmCustomTSUrlLabel->setVisible(value);
-    osmCustomTSUrl->setVisible(value);
+    osmTSTitle->setVisible(value);
+    osmTSLabel->setVisible(value);
+    osmTSUrlLabel->setVisible(value);
+    osmTSUrl->setVisible(value);
     tileCombo->setVisible(value);
 }
 
 void
 RideMapWindow::setTileServerUrlForTileType(int x)
 {
-    osmCustomTSUrl->setVisible(false);
-    osmCustomTSUrlLabel->setVisible(false);
-    if (x == 0)
-        osmCustomTSUrl->setText("http://tile.openstreetmap.org");
-    else if (x == 10)
-        osmCustomTSUrl->setText("http://a.tile.opencyclemap.org/cycle");
-    else if (x == 11)
-        osmCustomTSUrl->setText("http://b.tile.opencyclemap.org/cycle");
-    else if (x == 20)
-        osmCustomTSUrl->setText("http://otile1.mqcdn.com/tiles/1.0.0/osm");
-    else if (x == 1000) {
-        osmCustomTSUrlLabel->setVisible(true);
-        osmCustomTSUrl->setVisible(true);
+    QString ts = "";
+    switch (x)
+    {
+    case 0:
+        ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, "").toString();
+        // set/save the default if necessary
+        if (ts.isEmpty()) {
+           ts = "http://tile.openstreetmap.org";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, ts);
+        }
+        break;
+    case 10:
+        ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_A, "").toString();
+        break;
+    case 20:
+        ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_B, "").toString();
+        break;
+    case 30:
+        ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_C, "").toString();
+        break;
     }
+    osmTSUrl->setText(ts);
 }
 
 void
 RideMapWindow::tileTypeSelected(int x)
 {
-    int type = tileCombo->itemData(x).toInt();
-    setTileServerUrlForTileType(type);
+    setTileServerUrlForTileType(tileCombo->itemData(x).toInt());
     forceReplot();
 }
 
@@ -256,18 +257,28 @@ RideMapWindow::showFullPlotChanged(int value)
     smallPlot->setVisible(value != 0);
 }
 
-void
-RideMapWindow::osmCustomTSURLTextChanged(QString text)
-{
-    if (text.length() > 0 && osmCustomTSUrl->text() != text) {
-       osmCustomTSUrl->setText(text);
-       forceReplot();
-    }
-}
 
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
+
+    // just store the text - even if not changed
+    switch (tileCombo->currentData().toInt())
+    {
+    case 0:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, osmTSUrl->text());
+        break;
+    case 10:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_A, osmTSUrl->text());
+        break;
+    case 20:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_B, osmTSUrl->text());
+        break;
+    case 30:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_C, osmTSUrl->text());
+        break;
+    }
+
     forceReplot();
 }
 
@@ -635,7 +646,7 @@ void RideMapWindow::createHtml()
                 "       } \n"
                         // Wrap y (latitude) in a like manner if you want to enable vertical infinite scroll
 
-                "       return \""+osmCustomTSUrl->text()+"/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
+                "       return \""+osmTSUrl->text()+"/\" + zoom + \"/\" + x + \"/\" + coord.y + \".png\"; \n"
                 "    }, \n"
                 "    tileSize: new google.maps.Size(256, 256), \n"
                 "    name: \"OpenStreetMap\", \n"
