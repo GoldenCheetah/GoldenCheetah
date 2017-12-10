@@ -127,8 +127,6 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString styleoptions READ getStyleOptions WRITE setStyleOptions  USER false)
-    Q_PROPERTY(QString osmtsurl READ osmTSUrl WRITE setOsmTSUrl USER true)
-
 
     public:
         typedef enum {
@@ -160,12 +158,8 @@ class RideMapWindow : public GcChartWindow
 
         int osmTS() const { return ( tileCombo->itemData(tileCombo->currentIndex()).toInt()); }
         void setOsmTS(int x) {
-            tileCombo->setCurrentIndex(tileCombo->findData(x)); /*setTileServerUrlForTileType(x);*/
-        }
-
-        QString osmTSUrl() const { return osmCustomTSUrl->text(); }
-        void setOsmTSUrl(QString x) {
-            osmCustomTSUrl->setText(x);
+            tileCombo->setCurrentIndex(tileCombo->findData(x));
+            setTileServerUrlForTileType(x);
         }
 
         QString getStyleOptions() const { return styleoptions; }
@@ -178,7 +172,6 @@ class RideMapWindow : public GcChartWindow
         void showFullPlotChanged(int value);
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
-        void osmCustomTSURLTextChanged(QString text);
 
 
         void forceReplot();
@@ -198,8 +191,8 @@ class RideMapWindow : public GcChartWindow
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
-        QLabel *osmCustomTSTitle, *osmCustomTSLabel, *osmCustomTSUrlLabel;
-        QLineEdit *osmCustomTSUrl;
+        QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
+        QLineEdit *osmTSUrl;
 
         Context *context;
         QVBoxLayout *layout;

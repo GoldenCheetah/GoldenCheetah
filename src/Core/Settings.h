@@ -270,6 +270,13 @@
 // Default view on Diary
 #define GC_DIARY_VIEW                   "<athlete-preferences>diaryview"
 
+// OSM Tileserver
+#define GC_OSM_TS_DEFAULT               "<athlete-preferences>osmts/default"
+#define GC_OSM_TS_A                     "<athlete-preferences>osmts/a"
+#define GC_OSM_TS_B                     "<athlete-preferences>osmts/b"
+#define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
+
+
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
