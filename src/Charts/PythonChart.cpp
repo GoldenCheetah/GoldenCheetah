@@ -313,7 +313,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         splitter->addWidget(leftsplitter);
 
-        canvas = new QWidget(this);
+        canvas = new QWebEngineView(this);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->addWidget(canvas);
 

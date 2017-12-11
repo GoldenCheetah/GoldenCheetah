@@ -121,5 +121,8 @@ public:
     QString seriesName(int type=10) const;
     int seriesLast() const;
     PythonDataSeries series(int type=10) /TransferBack/;
+
+    // working with the web view
+    int webpage(QString url) const;
 };
 

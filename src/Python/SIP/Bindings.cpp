@@ -4,6 +4,9 @@
 #include "Athlete.h"
 #include "Bindings.h"
 #include "GcUpgrade.h"
+#include "PythonChart.h"
+#include <QWebEngineView>
+#include <QUrl>
 
 #undef slots
 #include <Python.h>
@@ -87,4 +90,12 @@ PythonDataSeries::~PythonDataSeries()
 {
     if (data) delete[] data;
     data=NULL;
+}
+
+int
+Bindings::webpage(QString url) const
+{
+    //fprintf(stderr, "URL=%s", url.toStdString().c_str());
+    //python->chart->canvas->setUrl(QUrl(url));
+    return 0;
 }

@@ -30,6 +30,7 @@
 #include <QSplitter>
 #include <QByteArray>
 #include <string.h>
+#include <QWebEngineView>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
@@ -96,7 +97,7 @@ class PythonChart : public GcChartWindow {
         // receives all the events
         QTextEdit *script;
         PythonConsole *console;
-        QWidget *canvas; // not yet!!
+        QWebEngineView *canvas; // not yet!!
 
         bool showConsole() const { return (showCon ? showCon->isChecked() : true); }
         void setConsole(bool);

@@ -29,4 +29,7 @@ class Bindings {
         int seriesLast() const;
         QString seriesName(int type) const;
         PythonDataSeries *series(int type) const;
+
+        // working with the web view
+        int webpage(QString url) const;
 };
