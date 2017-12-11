@@ -29,10 +29,20 @@
 %End
 
 %ConvertToTypeCode
-    Q_UNUSED(sipPy);
-    //*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
-    //return sipGetState(sipTransferObj);
-    Q_UNUSED(sipTransferObj);
+    if (sipIsErr == NULL) return PyUnicode_Check(sipPy);
+    if (sipPy == Py_None) {
+        *sipCppPtr = new QString();
+        return 1;
+    }
+    if (PyUnicode_Check(sipPy)) {
+        Py_ssize_t size;
+        wchar_t *string = PyUnicode_AsWideCharString(sipPy, &size);
+        if (string) {
+            if (size) *sipCppPtr = new QString(QString::fromWCharArray(string));
+            else *sipCppPtr = new QString();
+        }
+        return 1;
+    }
     return 0;
 %End
 %ConvertFromTypeCode

@@ -2,6 +2,11 @@
 # Python class library loaded when the interpreter
 # is installed by PythonEmbed
 
+#--------------------------------------------------
+# API for accessing GC data
+#--------------------------------------------------
+
+# basic activity data
 def __GCactivity():
    rd={}
    for x in range(0,GC.seriesLast()):
@@ -11,4 +16,3 @@ def __GCactivity():
 
 # add to main GC entrypoint
 GC.activity=__GCactivity
-   

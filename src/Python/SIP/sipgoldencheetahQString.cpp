@@ -43,17 +43,27 @@ static void release_QString(void *ptr, int)
 
 
 extern "C" {static int convertTo_QString(PyObject *, void **, int *, PyObject *);}
-static int convertTo_QString(PyObject *sipPy,void **sipCppPtrV,int *,PyObject *sipTransferObj)
+static int convertTo_QString(PyObject *sipPy,void **sipCppPtrV,int *sipIsErr,PyObject *)
 {
      ::QString **sipCppPtr = reinterpret_cast< ::QString **>(sipCppPtrV);
 
 #line 32 "goldencheetah.sip"
-    Q_UNUSED(sipPy);
-    //*sipCppPtr = new QString(qpycore_PyObject_AsQString(sipPy));
-    //return sipGetState(sipTransferObj);
-    Q_UNUSED(sipTransferObj);
+    if (sipIsErr == NULL) return PyUnicode_Check(sipPy);
+    if (sipPy == Py_None) {
+        *sipCppPtr = new QString();
+        return 1;
+    }
+    if (PyUnicode_Check(sipPy)) {
+        Py_ssize_t size;
+        wchar_t *string = PyUnicode_AsWideCharString(sipPy, &size);
+        if (string) {
+            if (size) *sipCppPtr = new QString(QString::fromWCharArray(string));
+            else *sipCppPtr = new QString();
+        }
+        return 1;
+    }
     return 0;
-#line 57 "./sipgoldencheetahQString.cpp"
+#line 67 "./sipgoldencheetahQString.cpp"
 }
 
 
@@ -62,9 +72,9 @@ static PyObject *convertFrom_QString(void *sipCppV, PyObject *)
 {
     ::QString *sipCpp = reinterpret_cast< ::QString *>(sipCppV);
 
-#line 39 "goldencheetah.sip"
+#line 49 "goldencheetah.sip"
     return PyUnicode_FromString(sipCpp->toUtf8().data());
-#line 68 "./sipgoldencheetahQString.cpp"
+#line 78 "./sipgoldencheetahQString.cpp"
 }
 
 

@@ -6,7 +6,7 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 49 "goldencheetah.sip"
+#line 59 "goldencheetah.sip"
 #include "Bindings.h"
 #line 12 "./sipgoldencheetahPythonDataSeries.cpp"
 
@@ -33,7 +33,7 @@ static PyObject *slot_PythonDataSeries___getitem__(PyObject *sipSelf,PyObject *s
             double sipRes = 0;
             sipErrorState sipError = sipErrorNone;
 
-#line 84 "goldencheetah.sip"
+#line 94 "goldencheetah.sip"
         if (a0 < 0) a0 += sipCpp->count;
         if (a0 >= 0 && a0 < sipCpp->count) {
             sipRes = sipCpp->data[a0];
@@ -75,7 +75,7 @@ static SIP_SSIZE_T slot_PythonDataSeries___len__(PyObject *sipSelf)
         {
             SIP_SSIZE_T sipRes = 0;
 
-#line 80 "goldencheetah.sip"
+#line 90 "goldencheetah.sip"
         sipRes = sipCpp->count;
 #line 81 "./sipgoldencheetahPythonDataSeries.cpp"
 
@@ -100,7 +100,7 @@ static PyObject *slot_PythonDataSeries___str__(PyObject *sipSelf)
         {
              ::QString*sipRes = 0;
 
-#line 76 "goldencheetah.sip"
+#line 86 "goldencheetah.sip"
         sipRes = new QString(RideFile::seriesName(sipCpp->series));
 #line 106 "./sipgoldencheetahPythonDataSeries.cpp"
 
@@ -127,7 +127,7 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
      ::PythonDataSeries *sipCpp = reinterpret_cast< ::PythonDataSeries *>(sipCppV);
     int sipRes;
 
-#line 53 "goldencheetah.sip"
+#line 63 "goldencheetah.sip"
     sipBuffer->obj = sipSelf;
     sipBuffer->buf = (void*)sipCpp->data;
     sipBuffer->len = sipCpp->count * sizeof(double);
@@ -153,7 +153,7 @@ static int getbuffer_PythonDataSeries(PyObject *sipSelf, void *sipCppV, Py_buffe
 extern "C" {static void releasebuffer_PythonDataSeries(PyObject *, void *, Py_buffer *);}
 static void releasebuffer_PythonDataSeries(PyObject *, void *, Py_buffer *)
 {
-#line 70 "goldencheetah.sip"
+#line 80 "goldencheetah.sip"
     // we do not require any special release function
 #line 159 "./sipgoldencheetahPythonDataSeries.cpp"
 }
