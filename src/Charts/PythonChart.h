@@ -31,6 +31,7 @@
 #include <QByteArray>
 #include <string.h>
 #include <QWebEngineView>
+#include <QUrl>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
@@ -99,6 +100,8 @@ class PythonChart : public GcChartWindow {
         PythonConsole *console;
         QWebEngineView *canvas; // not yet!!
 
+        void emitUrl(QUrl x) { emit setUrl(x); }
+
         bool showConsole() const { return (showCon ? showCon->isChecked() : true); }
         void setConsole(bool);
 
@@ -108,10 +111,14 @@ class PythonChart : public GcChartWindow {
         QString getState() const;
         void setState(QString);
 
+    signals:
+        void setUrl(QUrl);
+
     public slots:
         void configChanged(qint32);
         void showConChanged(int state);
         void runScript();
+        void webpage(QUrl);
         static void execScript(PythonChart *);
 
     protected:

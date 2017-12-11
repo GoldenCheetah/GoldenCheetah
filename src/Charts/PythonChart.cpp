@@ -263,7 +263,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(2,0,2,2);
+    mainLayout->setContentsMargins(0,0,0,0);
     setChartLayout(mainLayout);
 
     // if we failed to startup embedded R properly
@@ -314,6 +314,9 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         splitter->addWidget(leftsplitter);
 
         canvas = new QWebEngineView(this);
+        canvas->setContentsMargins(0,0,0,0);
+        canvas->page()->view()->setContentsMargins(0,0,0,0);
+        canvas->setZoomFactor(dpiXFactor);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         splitter->addWidget(canvas);
 
@@ -321,6 +324,8 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         QList<int> sizes;
         sizes << 300 << 500;
         splitter->setSizes(sizes);
+
+        connect(this, SIGNAL(setUrl(QUrl)), this, SLOT(webpage(QUrl)));
 
         if (ridesummary) {
             connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
@@ -534,4 +539,10 @@ PythonChart::runScript()
         python->canvas = NULL;
         python->chart = NULL;
     }
+}
+
+void
+PythonChart::webpage(QUrl url)
+{
+    canvas->setUrl(url);
 }

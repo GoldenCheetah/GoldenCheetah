@@ -95,7 +95,12 @@ PythonDataSeries::~PythonDataSeries()
 int
 Bindings::webpage(QString url) const
 {
-    //fprintf(stderr, "URL=%s", url.toStdString().c_str());
-    //python->chart->canvas->setUrl(QUrl(url));
+#ifdef Q_OS_WIN
+    url = url.replace("://C:", ":///C:"); // plotly fails to use enough slashes
+    url = url.replace("\\", "/");
+#endif
+
+    QUrl p(url);
+    python->chart->emitUrl(p);
     return 0;
 }
