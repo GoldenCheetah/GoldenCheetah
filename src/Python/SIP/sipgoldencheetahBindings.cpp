@@ -221,6 +221,31 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
+extern "C" {static PyObject *meth_Bindings_activityMetrics(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->activityMetrics();
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_activityMetrics, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *);}
 static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -318,6 +343,7 @@ static void *init_type_Bindings(sipSimpleWrapper *, PyObject *sipArgs, PyObject 
 
 
 static PyMethodDef methods_Bindings[] = {
+    {SIP_MLNAME_CAST(sipName_activityMetrics), meth_Bindings_activityMetrics, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_series), meth_Bindings_series, METH_VARARGS, NULL},
@@ -343,7 +369,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        9, methods_Bindings,
+        10, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

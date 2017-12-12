@@ -122,6 +122,9 @@ public:
     int seriesLast() const;
     PythonDataSeries series(int type=10) /TransferBack/;
 
+    // working with metrics
+    PyObject* activityMetrics() /TransferBack/;
+
     // working with the web view
     int webpage(QString url) const;
 };
