@@ -8,6 +8,7 @@
 
 #include <QWebEngineView>
 #include <QUrl>
+#include <datetime.h> // for Python datetime macros
 
 long Bindings::threadid() const
 {
@@ -101,6 +102,15 @@ Bindings::activityMetrics() const
 
     RideItem *item = const_cast<RideItem*>(context->currentRideItem());
     const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    //
+    // Date and Time
+    //
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
+    QDate d = item->dateTime.date();
+    PyDict_SetItemString(dict, "Date", PyDate_FromDate(d.year(), d.month(), d.day()));
+    QTime t = item->dateTime.time();
+    PyDict_SetItemString(dict, "Time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()));
 
     //
     // METRICS
