@@ -2,14 +2,12 @@
 #include "Context.h"
 #include "RideItem.h"
 #include "Athlete.h"
-#include "Bindings.h"
 #include "GcUpgrade.h"
 #include "PythonChart.h"
+#include "Bindings.h"
+
 #include <QWebEngineView>
 #include <QUrl>
-
-#undef slots
-#include <Python.h>
 
 long Bindings::threadid() const
 {
@@ -90,6 +88,52 @@ PythonDataSeries::~PythonDataSeries()
 {
     if (data) delete[] data;
     data=NULL;
+}
+
+PyObject*
+Bindings::activityMetrics() const
+{
+    PyObject* dict = PyDict_New();
+    if (dict == NULL) return dict;
+
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL || context->currentRideItem()==NULL) return dict;
+
+    RideItem *item = const_cast<RideItem*>(context->currentRideItem());
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    //
+    // METRICS
+    //
+    for(int i=0; i<factory.metricCount();i++) {
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        bool useMetricUnits = context->athlete->useMetricUnits;
+        double value = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
+
+        // add to the dict
+        PyDict_SetItemString(dict, name.toUtf8().constData(), PyFloat_FromDouble(value));
+    }
+
+    //
+    // META
+    //
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+
+        // don't add incomplete meta definitions or metric override fields
+        if (field.name == "" || field.tab == "" ||
+            context->specialFields.isMetric(field.name)) continue;
+
+        // add to the dict
+        PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
+    }
+
+    return dict;
 }
 
 int

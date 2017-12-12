@@ -1,7 +1,9 @@
 #include <QString>
 #include "RideFile.h"
 
-#include <pyport.h> // for Py_ssize_t
+#undef slots
+#include <Python.h>
+
 
 class PythonDataSeries {
 
@@ -29,6 +31,9 @@ class Bindings {
         int seriesLast() const;
         QString seriesName(int type) const;
         PythonDataSeries *series(int type) const;
+
+        // working with metrics
+        PyObject* activityMetrics() const;
 
         // working with the web view
         int webpage(QString url) const;
