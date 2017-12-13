@@ -4,6 +4,8 @@
 #include "Athlete.h"
 #include "GcUpgrade.h"
 #include "PythonChart.h"
+#include "Colors.h"
+
 #include "Bindings.h"
 
 #include <QWebEngineView>
@@ -150,9 +152,9 @@ Bindings::activityMetrics(RideItem* item) const
     //
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
     QDate d = item->dateTime.date();
-    PyDict_SetItemString(dict, "Date", PyDate_FromDate(d.year(), d.month(), d.day()));
+    PyDict_SetItemString(dict, "date", PyDate_FromDate(d.year(), d.month(), d.day()));
     QTime t = item->dateTime.time();
-    PyDict_SetItemString(dict, "Time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()));
+    PyDict_SetItemString(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()));
 
     //
     // METRICS
@@ -184,6 +186,27 @@ Bindings::activityMetrics(RideItem* item) const
         // add to the dict
         PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
     }
+
+    //
+    // add Color
+    //
+    QString color;
+
+    // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+    if (item->color == QColor(1,1,1,1)) {
+
+        // use the inverted color, not plot marker as that hideous
+        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
+        // white is jarring on a dark background!
+        if (col==QColor(Qt::white)) col=QColor(127,127,127);
+
+        color = col.name();
+    } else
+        color = item->color.name();
+
+    // add to the dict
+    PyDict_SetItemString(dict, "color", PyUnicode_FromString(color.toUtf8().constData()));
 
     return dict;
 }
