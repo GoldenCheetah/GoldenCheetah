@@ -101,7 +101,7 @@ static PyObject *slot_PythonDataSeries___str__(PyObject *sipSelf)
              ::QString*sipRes = 0;
 
 #line 86 "goldencheetah.sip"
-        sipRes = new QString(RideFile::seriesName(sipCpp->series));
+        sipRes = new QString(sipCpp->name);
 #line 106 "./sipgoldencheetahPythonDataSeries.cpp"
 
             return sipConvertFromNewType(sipRes,sipType_QString,NULL);

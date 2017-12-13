@@ -46,7 +46,12 @@ Bindings::series(int type) const
 {
     Context *context = python->contexts.value(threadid());
     if (context == NULL || context->currentRideItem()==NULL) return NULL;
-    return new PythonDataSeries(const_cast<RideItem*>(context->currentRideItem())->ride(), static_cast<RideFile::SeriesType>(type));
+
+    RideFile* f = const_cast<RideItem*>(context->currentRideItem())->ride();
+    PythonDataSeries* ds = new PythonDataSeries(seriesName(type), f->dataPoints().count());
+    for(int i=0; i<ds->count; i++) ds->data[i] = f->dataPoints()[i]->value(static_cast<RideFile::SeriesType>(type));
+
+    return ds;
 }
 
 int
@@ -70,18 +75,13 @@ Bindings::seriesPresent(int type) const
     return const_cast<RideItem*>(context->currentRideItem())->ride()->isDataPresent(static_cast<RideFile::SeriesType>(type));
 }
 
-PythonDataSeries::PythonDataSeries(const RideFile *f, RideFile::SeriesType type)
+PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count) : name(name), count(count), data(NULL)
 {
-    if (f) {
-        count = f->dataPoints().count();
-        data = new double[count];
-        series = type;
-        for(int i=0; i<count; i++) data[i] = f->dataPoints()[i]->value(type);
-    }
+    if (count > 0) data = new double[count];
 }
 
 // default constructor and copy constructor
-PythonDataSeries::PythonDataSeries() : series(RideFile::none), count(0), data(NULL) {}
+PythonDataSeries::PythonDataSeries() : name(QString()), count(0), data(NULL) {}
 PythonDataSeries::PythonDataSeries(PythonDataSeries *clone)
 {
     *this = *clone;

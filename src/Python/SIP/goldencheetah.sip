@@ -83,7 +83,7 @@ class PythonDataSeries {
 public:
     QString __str__();
         %MethodCode
-        sipRes = new QString(RideFile::seriesName(sipCpp->series));
+        sipRes = new QString(sipCpp->name);
         %End
     SIP_SSIZE_T __len__();
         %MethodCode

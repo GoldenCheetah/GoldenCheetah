@@ -8,12 +8,12 @@
 class PythonDataSeries {
 
     public:
-        PythonDataSeries(const RideFile *f, RideFile::SeriesType series);
+        PythonDataSeries(QString name, Py_ssize_t count);
         PythonDataSeries(PythonDataSeries*);
         PythonDataSeries();
         ~PythonDataSeries();
 
-        RideFile::SeriesType series;
+        QString name;
         Py_ssize_t count;
         double *data;
 };
