@@ -92,15 +92,57 @@ PythonDataSeries::~PythonDataSeries()
 }
 
 PyObject*
-Bindings::activityMetrics() const
+Bindings::activityMetrics(bool compare) const
 {
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    if (compare && context->isCompareIntervals) {
+
+        // compare mode, return a list with compared intervals
+        int count = 0; // how many to return?
+        foreach(CompareInterval p, context->compareIntervals) if (p.isChecked()) count++;
+        PyObject* list = PyList_New(count);
+
+        // create a data.frame for each and add to list (metrics, color)
+        long idx = 0;
+        foreach(CompareInterval p, context->compareIntervals) {
+            if (p.isChecked()) {
+                PyObject* tuple = Py_BuildValue("(Os)", activityMetrics(p.rideItem), p.color.name().toUtf8().constData());
+                PyList_SET_ITEM(list, idx++, tuple);
+            }
+        }
+
+        return list;
+    } else if (compare && !context->isCompareIntervals) {
+
+        // not compare mode, return 1 element list with current activity metrics
+        if (context->currentRideItem()==NULL) return NULL;
+        RideItem *item = const_cast<RideItem*>(context->currentRideItem());
+        PyObject* list = PyList_New(1);
+
+        PyObject* tuple = Py_BuildValue("(Os)", activityMetrics(item), "#FF00FF");
+        PyList_SET_ITEM(list, 0, tuple);
+
+        return list;
+    } else {
+
+        // not compare, so just return a dict
+        RideItem *item = const_cast<RideItem*>(context->currentRideItem());
+
+        return activityMetrics(item);
+    }
+}
+
+PyObject*
+Bindings::activityMetrics(RideItem* item) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
     PyObject* dict = PyDict_New();
     if (dict == NULL) return dict;
 
-    Context *context = python->contexts.value(threadid());
-    if (context == NULL || context->currentRideItem()==NULL) return dict;
-
-    RideItem *item = const_cast<RideItem*>(context->currentRideItem());
     const RideMetricFactory &factory = RideMetricFactory::instance();
 
     //

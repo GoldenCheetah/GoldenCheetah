@@ -227,13 +227,14 @@ static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipA
     PyObject *sipParseErr = NULL;
 
     {
+        bool a0 = 0;
          ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
+        if (sipParseArgs(&sipParseErr, sipArgs, "B|b", &sipSelf, sipType_Bindings, &sipCpp, &a0))
         {
             PyObject * sipRes;
 
-            sipRes = sipCpp->activityMetrics();
+            sipRes = sipCpp->activityMetrics(a0);
 
             return sipRes;
         }

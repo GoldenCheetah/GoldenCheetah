@@ -33,8 +33,13 @@ class Bindings {
         PythonDataSeries *series(int type) const;
 
         // working with metrics
-        PyObject* activityMetrics() const;
+        PyObject* activityMetrics(bool compare=false) const;
 
         // working with the web view
         int webpage(QString url) const;
+
+    private:
+        // get a dict populated with metrics and metadata for an activity
+        PyObject* activityMetrics(RideItem* item) const;
+
 };
