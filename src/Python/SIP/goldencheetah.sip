@@ -124,6 +124,7 @@ public:
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;
+    PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
 
     // working with the web view
     int webpage(QString url) const;

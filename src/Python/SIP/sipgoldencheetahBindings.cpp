@@ -247,6 +247,37 @@ static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipA
 }
 
 
+extern "C" {static PyObject *meth_Bindings_seasonMetrics(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seasonMetrics(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        bool a0 = 0;
+         ::QString a1def = QString();
+         ::QString* a1 = &a1def;
+        int a1State = 0;
+        bool a2 = 0;
+         ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "B|bJ1b", &sipSelf, sipType_Bindings, &sipCpp, &a0, sipType_QString,&a1, &a1State, &a2))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->seasonMetrics(a0,*a1,a2);
+            sipReleaseType(a1,sipType_QString,a1State);
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_seasonMetrics, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *);}
 static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -347,6 +378,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_activityMetrics), meth_Bindings_activityMetrics, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_seasonMetrics), meth_Bindings_seasonMetrics, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_series), meth_Bindings_series, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesLast), meth_Bindings_seriesLast, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesName), meth_Bindings_seriesName, METH_VARARGS, NULL},
@@ -370,7 +402,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        10, methods_Bindings,
+        11, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

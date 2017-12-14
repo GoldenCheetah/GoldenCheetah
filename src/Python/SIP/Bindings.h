@@ -34,6 +34,7 @@ class Bindings {
 
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
+        PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
 
         // working with the web view
         int webpage(QString url) const;
@@ -41,5 +42,7 @@ class Bindings {
     private:
         // get a dict populated with metrics and metadata for an activity
         PyObject* activityMetrics(RideItem* item) const;
+        // get a dict populated with metrics and metadata for activities in Date Range passing filter
+        PyObject* seasonMetrics(bool all, DateRange range, QString filter) const;
 
 };
