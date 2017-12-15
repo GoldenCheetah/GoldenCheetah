@@ -103,7 +103,8 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Map"),GcWindowTypes::RideMapWindow },
     { VIEW_ANALYSIS, tr("R Chart"),GcWindowTypes::RConsole },
     { VIEW_HOME, tr("R Chart "),GcWindowTypes::RConsoleSeason },
-    { VIEW_ANALYSIS|VIEW_HOME, tr("Python Chart"),GcWindowTypes::Python },
+    { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
+    { VIEW_HOME, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
@@ -183,7 +184,9 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #endif
 #ifdef GC_WANT_PYTHON
     case GcWindowTypes::Python: returning = new PythonChart(context, true); break;
+    case GcWindowTypes::PythonSeason: returning = new PythonChart(context, false); break;
 #else
+    case GcWindowTypes::PythonSeason:
     case GcWindowTypes::Python: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;

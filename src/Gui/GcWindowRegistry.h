@@ -69,7 +69,9 @@ enum gcwinid {
         SeasonPlan = 40,
         WebPageWindow = 41,
         Overview = 42,
-        Python = 43
+        Python = 43,
+        PythonSeason = 44
+
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
