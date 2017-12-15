@@ -118,8 +118,8 @@ static PyObject *meth_Bindings_version(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
-extern "C" {static PyObject *meth_Bindings_seriesPresent(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_seriesPresent(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -127,7 +127,11 @@ static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArg
         int a0 = 10;
         const  ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "B|i", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        static const char *sipKwdList[] = {
+            sipName_type,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|i", &sipSelf, sipType_Bindings, &sipCpp, &a0))
         {
             bool sipRes;
 
@@ -144,8 +148,8 @@ static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArg
 }
 
 
-extern "C" {static PyObject *meth_Bindings_seriesName(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_seriesName(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_seriesName(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seriesName(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -153,7 +157,11 @@ static PyObject *meth_Bindings_seriesName(PyObject *sipSelf, PyObject *sipArgs)
         int a0 = 10;
         const  ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "B|i", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        static const char *sipKwdList[] = {
+            sipName_type,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|i", &sipSelf, sipType_Bindings, &sipCpp, &a0))
         {
              ::QString*sipRes;
 
@@ -195,8 +203,8 @@ static PyObject *meth_Bindings_seriesLast(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
-extern "C" {static PyObject *meth_Bindings_series(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_series(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -204,7 +212,11 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs)
         int a0 = 10;
          ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "B|i", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        static const char *sipKwdList[] = {
+            sipName_type,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|i", &sipSelf, sipType_Bindings, &sipCpp, &a0))
         {
              ::PythonDataSeries*sipRes;
 
@@ -221,8 +233,8 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
-extern "C" {static PyObject *meth_Bindings_activityMetrics(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_activityMetrics(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -230,7 +242,11 @@ static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipA
         bool a0 = 0;
          ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "B|b", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        static const char *sipKwdList[] = {
+            sipName_compare,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|b", &sipSelf, sipType_Bindings, &sipCpp, &a0))
         {
             PyObject * sipRes;
 
@@ -247,8 +263,8 @@ static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipA
 }
 
 
-extern "C" {static PyObject *meth_Bindings_seasonMetrics(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_seasonMetrics(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_seasonMetrics(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seasonMetrics(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -260,7 +276,13 @@ static PyObject *meth_Bindings_seasonMetrics(PyObject *sipSelf, PyObject *sipArg
         bool a2 = 0;
          ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "B|bJ1b", &sipSelf, sipType_Bindings, &sipCpp, &a0, sipType_QString,&a1, &a1State, &a2))
+        static const char *sipKwdList[] = {
+            sipName_all,
+            sipName_filter,
+            sipName_compare,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|bJ1b", &sipSelf, sipType_Bindings, &sipCpp, &a0, sipType_QString,&a1, &a1State, &a2))
         {
             PyObject * sipRes;
 
@@ -278,8 +300,8 @@ static PyObject *meth_Bindings_seasonMetrics(PyObject *sipSelf, PyObject *sipArg
 }
 
 
-extern "C" {static PyObject *meth_Bindings_metrics(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_metrics(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_metrics(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_metrics(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -292,7 +314,13 @@ static PyObject *meth_Bindings_metrics(PyObject *sipSelf, PyObject *sipArgs)
         int a2State = 0;
          ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "BJ1|bJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, sipType_QString,&a2, &a2State))
+        static const char *sipKwdList[] = {
+            sipName_metric,
+            sipName_all,
+            sipName_filter,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1|bJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, sipType_QString,&a2, &a2State))
         {
              ::PythonDataSeries*sipRes;
 
@@ -311,8 +339,8 @@ static PyObject *meth_Bindings_metrics(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
-extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs)
+extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -321,7 +349,11 @@ static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs)
         int a0State = 0;
         const  ::Bindings *sipCpp;
 
-        if (sipParseArgs(&sipParseErr, sipArgs, "BJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State))
+        static const char *sipKwdList[] = {
+            sipName_url,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State))
         {
             int sipRes;
 
@@ -408,18 +440,18 @@ static void *init_type_Bindings(sipSimpleWrapper *, PyObject *sipArgs, PyObject 
 
 
 static PyMethodDef methods_Bindings[] = {
-    {SIP_MLNAME_CAST(sipName_activityMetrics), meth_Bindings_activityMetrics, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_activityMetrics), (PyCFunction)meth_Bindings_activityMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_metrics), meth_Bindings_metrics, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_seasonMetrics), meth_Bindings_seasonMetrics, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_series), meth_Bindings_series, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_metrics), (PyCFunction)meth_Bindings_metrics, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_seasonMetrics), (PyCFunction)meth_Bindings_seasonMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_series), (PyCFunction)meth_Bindings_series, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesLast), meth_Bindings_seriesLast, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_seriesName), meth_Bindings_seriesName, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_seriesPresent), meth_Bindings_seriesPresent, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_seriesName), (PyCFunction)meth_Bindings_seriesName, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_seriesPresent), (PyCFunction)meth_Bindings_seriesPresent, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_version), meth_Bindings_version, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_webpage), meth_Bindings_webpage, METH_VARARGS, NULL}
+    {SIP_MLNAME_CAST(sipName_webpage), (PyCFunction)meth_Bindings_webpage, METH_VARARGS|METH_KEYWORDS, NULL}
 };
 
 
