@@ -35,6 +35,7 @@ class Bindings {
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
         PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
+        PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) const;
 
         // working with the web view
         int webpage(QString url) const;

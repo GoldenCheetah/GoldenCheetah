@@ -278,6 +278,39 @@ static PyObject *meth_Bindings_seasonMetrics(PyObject *sipSelf, PyObject *sipArg
 }
 
 
+extern "C" {static PyObject *meth_Bindings_metrics(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_metrics(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+        bool a1 = 0;
+         ::QString a2def = QString();
+         ::QString* a2 = &a2def;
+        int a2State = 0;
+         ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "BJ1|bJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, sipType_QString,&a2, &a2State))
+        {
+             ::PythonDataSeries*sipRes;
+
+            sipRes = sipCpp->metrics(*a0,a1,*a2);
+            sipReleaseType(a0,sipType_QString,a0State);
+            sipReleaseType(a2,sipType_QString,a2State);
+
+            return sipConvertFromType(sipRes,sipType_PythonDataSeries,Py_None);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_metrics, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *);}
 static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -378,6 +411,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_activityMetrics), meth_Bindings_activityMetrics, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_metrics), meth_Bindings_metrics, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMetrics), meth_Bindings_seasonMetrics, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_series), meth_Bindings_series, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesLast), meth_Bindings_seriesLast, METH_VARARGS, NULL},
@@ -402,7 +436,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        11, methods_Bindings,
+        12, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

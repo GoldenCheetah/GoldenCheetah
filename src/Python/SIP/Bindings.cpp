@@ -411,6 +411,72 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
     return dict;
 }
 
+PythonDataSeries*
+Bindings::metrics(QString metric, bool all, QString filter) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
+
+    // how many rides to return if we're limiting to the
+    // currently selected date range ?
+    DateRange range = context->currentDateRange();
+
+    // apply any global filters
+    Specification specification;
+    FilterSet fs;
+    fs.addFilter(context->isfiltered, context->filters);
+    fs.addFilter(context->ishomefiltered, context->homeFilters);
+
+    // did call contain a filter?
+    if (filter != "") {
+
+        DataFilter dataFilter(python->chart, context);
+        QStringList files;
+        dataFilter.parseFilter(context, filter, &files);
+        fs.addFilter(true, files);
+    }
+
+    specification.setFilterSet(fs);
+
+    // we need to count rides that are in range...
+    int rides = 0;
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (all || range.pass(ride->dateTime.date())) rides++;
+    }
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    bool useMetricUnits = context->athlete->useMetricUnits;
+    for(int i=0; i<factory.metricCount();i++) {
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *m = factory.rideMetric(symbol);
+        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        if (name == metric) {
+
+            // found, set an array of metric values
+            PythonDataSeries* pds = new PythonDataSeries(name, rides);
+
+            int idx = 0;
+            foreach(RideItem *item, context->athlete->rideCache->rides()) {
+                if (!specification.pass(item)) continue;
+                if (all || range.pass(item->dateTime.date())) {
+                    pds->data[idx++] = item->metrics()[i] * (useMetricUnits ? 1.0f : m->conversion()) + (useMetricUnits ? 0.0f : m->conversionSum());
+                }
+            }
+
+            // Done, return the series
+            return pds;
+        }
+    }
+
+    // Not found, nothing to return
+    return NULL;
+}
+
 int
 Bindings::webpage(QString url) const
 {
