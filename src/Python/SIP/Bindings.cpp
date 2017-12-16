@@ -483,9 +483,45 @@ Bindings::activityMeanmax(bool compare) const
     Context *context = python->contexts.value(threadid());
     if (context == NULL) return NULL;
 
-    // TODO: compare mode
+    // want a list of compares
+    if (compare) {
 
-    return activityMeanmax(context->currentRideItem());
+        // only return compares if its actually active
+        if (context->isCompareIntervals) {
+
+            // how many to return?
+            int count = 0;
+            foreach(CompareInterval p, context->compareIntervals) if (p.isChecked()) count++;
+            PyObject* list = PyList_New(count);
+
+            // create a dict for each and add to list as tuple (meanmax, color)
+            long idx = 0;
+            foreach(CompareInterval p, context->compareIntervals) {
+                if (p.isChecked()) {
+
+                    // create a tuple (meanmax, color)
+                    PyObject* tuple = Py_BuildValue("(Os)", activityMeanmax(p.rideItem), p.color.name().toUtf8().constData());
+                    PyList_SET_ITEM(list, idx++, tuple);
+                }
+            }
+
+            return list;
+        } else { // compare isn't active...
+
+            // otherwise return the current meanmax in a compare list
+            if (context->currentRideItem()==NULL) return NULL;
+            PyObject* list = PyList_New(1);
+
+            PyObject* tuple = Py_BuildValue("(Os)", activityMeanmax(context->currentRideItem()), "#FF00FF");
+            PyList_SET_ITEM(list, 0, tuple);
+
+            return list;
+        }
+    } else {
+
+        // not compare, so just return a dict
+        return activityMeanmax(context->currentRideItem());
+    }
 }
 
 PyObject*
@@ -494,10 +530,54 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
     Context *context = python->contexts.value(threadid());
     if (context == NULL) return NULL;
 
-    // TODO: compare mode
+    // want a list of compares
+    if (compare && context) {
 
-    DateRange range = context->currentDateRange();
-    return seasonMeanmax(all, range, filter);
+        // only return compares if its actually active
+        if (context->isCompareDateRanges) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+
+            // cool we can return a list of meanaxes to compare
+            PyObject* list = PyList_New(count);
+            int idx = 0;
+
+            // create a dict for each and add to list
+            foreach(CompareDateRange p, context->compareDateRanges) {
+                if (p.isChecked()) {
+
+                    // create a tuple (meanmax, color)
+                    PyObject* tuple = Py_BuildValue("(Os)", seasonMeanmax(all, DateRange(p.start, p.end), filter), p.color.name().toUtf8().constData());
+                    // add to back and move on
+                    PyList_SET_ITEM(list, idx++, tuple);
+                }
+            }
+
+            return list;
+
+        } else { // compare isn't active...
+
+            // otherwise return the current season meanmax in a compare list
+            PyObject* list = PyList_New(1);
+
+            // create a tuple (meanmax, color)
+            DateRange range = context->currentDateRange();
+            PyObject* tuple = Py_BuildValue("(Os)", seasonMeanmax(all, range, filter), "#FF00FF");
+            // add to back and move on
+            PyList_SET_ITEM(list, 0, tuple);
+
+            return list;
+        }
+
+    } else {
+
+        // just a datafram of meanmax
+        DateRange range = context->currentDateRange();
+
+        return seasonMeanmax(all, range, filter);
+    }
 }
 
 PyObject*
