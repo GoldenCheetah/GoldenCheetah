@@ -477,6 +477,136 @@ Bindings::metrics(QString metric, bool all, QString filter) const
     return NULL;
 }
 
+PyObject*
+Bindings::activityMeanmax(bool compare) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    // TODO: compare mode
+
+    return activityMeanmax(context->currentRideItem());
+}
+
+PyObject*
+Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    // TODO: compare mode
+
+    DateRange range = context->currentDateRange();
+    return seasonMeanmax(all, range, filter);
+}
+
+PyObject*
+Bindings::seasonMeanmax(bool all, DateRange range, QString filter) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    // construct the date range and then get a ridefilecache
+    if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
+
+    // did call contain any filters?
+    QStringList filelist;
+    bool filt=false;
+
+    // if not empty write a filter
+    if (filter != "") {
+
+        DataFilter dataFilter(python->chart, context);
+        dataFilter.parseFilter(context, filter, &filelist);
+        filt=true;
+    }
+
+    // RideFileCache for a date range with our filters (if any)
+    RideFileCache cache(context, range.from, range.to, filt, filelist, false, NULL);
+
+    return rideFileCacheMeanmax(&cache);
+}
+
+PyObject*
+Bindings::activityMeanmax(const RideItem* item) const
+{
+    return rideFileCacheMeanmax(const_cast<RideItem*>(item)->fileCache());
+}
+
+PyObject*
+Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
+{
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
+
+    // how many series and how big are they?
+    unsigned int seriescount=0, size=0;
+
+    // get the meanmax array
+    if (cache != NULL) {
+        // how many points in the ridefilecache and how many series to return
+        foreach(RideFile::SeriesType series, cache->meanMaxList()) {
+            QVector <double> values = cache->meanMaxArray(series);
+            if (values.count()) {
+                if (static_cast<unsigned int>(values.count()) > size) size = values.count();
+                seriescount++;
+            }
+            if (series==RideFile::watts) {
+                seriescount++; // add powerdate
+            }
+        }
+
+    } else {
+
+        // fail
+        return NULL;
+    }
+
+    // we return a dict
+    PyObject* ans = PyDict_New();
+
+    //
+    // Now we need to add lists to the ans dict...
+    //
+
+    foreach(RideFile::SeriesType series, cache->meanMaxList()) {
+
+        QVector <double> values = cache->meanMaxArray(series);
+
+        // don't add empty ones
+        if (values.count()==0) continue;
+
+
+        // set a list
+        PyObject* list = PyList_New(values.count());
+
+        // will have different sizes e.g. when a daterange
+        // since longest ride with e.g. power may be different
+        // to longest ride with heartrate
+        for(int j=0; j<values.count(); j++) PyList_SET_ITEM(list, j, PyFloat_FromDouble(values[j]));
+
+        // add to the dict
+        PyDict_SetItemString(ans, RideFile::seriesName(series, true).toUtf8().constData(), list);
+
+        // if is power add the dates
+        if(series == RideFile::watts) {
+
+            // dates
+            QVector<QDate> dates = cache->meanMaxDates(series);
+            PyObject* datelist = PyList_New(dates.count());
+            // will have different sizes e.g. when a daterange
+            // since longest ride with e.g. power may be different
+            // to longest ride with heartrate
+            for(int j=0; j<dates.count(); j++) PyList_SET_ITEM(datelist, j, PyDate_FromDate(dates[j].year(), dates[j].month(), dates[j].day()));
+
+            // add to the dict
+            PyDict_SetItemString(ans, "power_date", datelist);
+        }
+    }
+
+    // return a valid result
+    return ans;
+}
+
 int
 Bindings::webpage(QString url) const
 {

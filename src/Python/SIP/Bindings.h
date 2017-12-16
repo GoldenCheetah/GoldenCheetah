@@ -1,5 +1,6 @@
 #include <QString>
 #include "RideFile.h"
+#include "RideFileCache.h"
 
 #undef slots
 #include <Python.h>
@@ -37,13 +38,20 @@ class Bindings {
         PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
         PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) const;
 
+        // working with meanmax data
+        PyObject* activityMeanmax(bool compare=false) const;
+        PyObject* seasonMeanmax(bool all=false, QString filter=QString(), bool compare=false) const;
+
         // working with the web view
         int webpage(QString url) const;
 
     private:
-        // get a dict populated with metrics and metadata for an activity
+        // get a dict populated with metrics and metadata
         PyObject* activityMetrics(RideItem* item) const;
-        // get a dict populated with metrics and metadata for activities in Date Range passing filter
         PyObject* seasonMetrics(bool all, DateRange range, QString filter) const;
+        // get a dict populated with meanmax data
+        PyObject* activityMeanmax(const RideItem* item) const;
+        PyObject* seasonMeanmax(bool all, DateRange range, QString filter) const;
+        PyObject* rideFileCacheMeanmax(RideFileCache* cache) const;
 
 };

@@ -127,6 +127,10 @@ public:
     PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
     PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) /TransferBack/;
 
+    // working with meanmax data
+    PyObject* activityMeanmax(bool compare=false) /TransferBack/;
+    PyObject* seasonMeanmax(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
+
     // working with the web view
     int webpage(QString url) const;
 };
