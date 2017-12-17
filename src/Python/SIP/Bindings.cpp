@@ -759,7 +759,6 @@ Bindings::pmc(bool all, QString metric) const
         } else {
 
             unsigned int index=0;
-            QDate start = pmcData.start();
             for(int k=0; k < pmcData.days(); k++) {
 
                 // day today
@@ -781,6 +780,79 @@ Bindings::pmc(bool all, QString metric) const
         PyDict_SetItemString(ans, "sts", sts);
         PyDict_SetItemString(ans, "sb", sb);
         PyDict_SetItemString(ans, "rr", rr);
+
+        // return it
+        return ans;
+    }
+
+    // nothing to return
+    return NULL;
+}
+
+PyObject*
+Bindings::measures(bool all, QString group) const
+{
+    Context *context = python->contexts.value(threadid());
+
+    // return a dict with Measures data for all or the current season
+    if (context && context->athlete && context->athlete->measures) {
+
+        // import datetime if necessary
+        if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;
+
+        // get the currently selected date range
+        DateRange range(context->currentDateRange());
+
+        // convert the group symbol to an index, default to Body=0
+        int groupIdx = context->athlete->measures->getGroupSymbols().indexOf(group);
+        if (groupIdx < 0) groupIdx = 0;
+
+        // Update range for all
+        if (all) {
+            range.from = context->athlete->measures->getStartDate(groupIdx);
+            range.to = context->athlete->measures->getEndDate(groupIdx);
+        }
+
+        // how many entries ?
+        unsigned int size = range.from.daysTo(range.to) + 1;
+
+        // returning a dict with
+        // date, field1, field2, ...
+        PyObject* ans = PyDict_New();
+
+        // DATE - 1 a day from start
+        PyObject* datelist = PyList_New(size);
+        QDate start = range.from;
+        for(unsigned int k=0; k<size; k++) {
+            QDate d = start.addDays(k);
+            PyList_SET_ITEM(datelist, k, PyDate_FromDate(d.year(), d.month(), d.day()));
+        }
+
+        // add to the dict
+        PyDict_SetItemString(ans, "date", datelist);
+
+        // MEASURES DATA
+        QStringList fieldSymbols = context->athlete->measures->getFieldSymbols(groupIdx);
+        QVector<PyObject*> fields(fieldSymbols.count());
+        for (int i=0; i<fieldSymbols.count(); i++)
+            fields[i] = PyList_New(size);
+
+        unsigned int index = 0;
+        for(int k=0; k < size; k++) {
+
+            // day today
+            if (start.addDays(k) >= range.from && start.addDays(k) <= range.to) {
+
+                for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
+                    PyList_SET_ITEM(fields[fieldIdx], index, PyFloat_FromDouble(context->athlete->measures->getFieldValue(groupIdx, start.addDays(k), fieldIdx)));
+
+                index++;
+            }
+        }
+
+        // add to the dict
+        for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
+            PyDict_SetItemString(ans, fieldSymbols[fieldIdx].toUtf8().constData(), fields[fieldIdx]);
 
         // return it
         return ans;

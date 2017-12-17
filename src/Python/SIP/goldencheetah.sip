@@ -127,6 +127,7 @@ public:
     PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
     PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) /TransferBack/;
     PyObject* pmc(bool all=false, QString metric=QString("TSS")) /TransferBack/;
+    PyObject* measures(bool all=false, QString group=QString("Body")) /TransferBack/;
 
     // working with meanmax data
     PyObject* activityMeanmax(bool compare=false) /TransferBack/;

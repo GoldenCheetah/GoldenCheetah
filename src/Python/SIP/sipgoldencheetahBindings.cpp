@@ -374,6 +374,41 @@ static PyObject *meth_Bindings_pmc(PyObject *sipSelf, PyObject *sipArgs, PyObjec
 }
 
 
+extern "C" {static PyObject *meth_Bindings_measures(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_measures(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        bool a0 = 0;
+         ::QString a1def = QString("Body");
+         ::QString* a1 = &a1def;
+        int a1State = 0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_all,
+            sipName_group,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|bJ1", &sipSelf, sipType_Bindings, &sipCpp, &a0, sipType_QString,&a1, &a1State))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->measures(a0,*a1);
+            sipReleaseType(a1,sipType_QString,a1State);
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_measures, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_activityMeanmax(PyObject *, PyObject *, PyObject *);}
 static PyObject *meth_Bindings_activityMeanmax(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
@@ -546,6 +581,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_activityMetrics), (PyCFunction)meth_Bindings_activityMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_measures), (PyCFunction)meth_Bindings_measures, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_metrics), (PyCFunction)meth_Bindings_metrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_pmc), (PyCFunction)meth_Bindings_pmc, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMeanmax), (PyCFunction)meth_Bindings_seasonMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -573,7 +609,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        15, methods_Bindings,
+        16, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
