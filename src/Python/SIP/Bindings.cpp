@@ -7,6 +7,7 @@
 #include "Colors.h"
 #include "RideCache.h"
 #include "DataFilter.h"
+#include "PMCData.h"
 
 #include "Bindings.h"
 
@@ -685,6 +686,108 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
 
     // return a valid result
     return ans;
+}
+
+PyObject*
+Bindings::pmc(bool all, QString metric) const
+{
+    Context *context = python->contexts.value(threadid());
+
+    // return a dict with PMC data for all or the current season
+    // XXX uses the default half-life
+    if (context) {
+
+        // import datetime if necessary
+        if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;
+
+        // get the currently selected date range
+        DateRange range(context->currentDateRange());
+
+        // convert the name to a symbol, if not found just leave as it is
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        for (int i=0; i<factory.metricCount(); i++) {
+            QString symbol = factory.metricName(i);
+            QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            name.replace(" ","_");
+
+            if (name == metric) {
+                metric = symbol;
+                break;
+            }
+        }
+
+        // create the data
+        PMCData pmcData(context, Specification(), metric);
+
+        // how many entries ?
+        unsigned int size = all ? pmcData.days() : range.from.daysTo(range.to) + 1;
+        // returning a dict with
+        // date, stress, lts, sts, sb, rr
+        PyObject* ans = PyDict_New();
+
+        // DATE - 1 a day from start
+        PyObject* datelist = PyList_New(size);
+        QDate start = all ? pmcData.start() : range.from;
+        for(unsigned int k=0; k<size; k++) {
+            QDate d = start.addDays(k);
+            PyList_SET_ITEM(datelist, k, PyDate_FromDate(d.year(), d.month(), d.day()));
+        }
+
+        // add to the dict
+        PyDict_SetItemString(ans, "date", datelist);
+
+        // PMC DATA
+
+        PyObject* stress = PyList_New(size);
+        PyObject* lts = PyList_New(size);
+        PyObject* sts = PyList_New(size);
+        PyObject* sb = PyList_New(size);
+        PyObject* rr = PyList_New(size);
+
+        if (all) {
+
+            // just copy
+            for(unsigned int k=0; k<size; k++) {
+
+                PyList_SET_ITEM(stress, k, PyFloat_FromDouble(pmcData.stress()[k]));
+                PyList_SET_ITEM(lts, k, PyFloat_FromDouble(pmcData.lts()[k]));
+                PyList_SET_ITEM(sts, k, PyFloat_FromDouble(pmcData.sts()[k]));
+                PyList_SET_ITEM(sb, k, PyFloat_FromDouble(pmcData.sb()[k]));
+                PyList_SET_ITEM(rr, k, PyFloat_FromDouble(pmcData.rr()[k]));
+            }
+
+        } else {
+
+            unsigned int index=0;
+            QDate start = pmcData.start();
+            for(int k=0; k < pmcData.days(); k++) {
+
+                // day today
+                if (start.addDays(k) >= range.from && start.addDays(k) <= range.to) {
+
+                    PyList_SET_ITEM(stress, index, PyFloat_FromDouble(pmcData.stress()[k]));
+                    PyList_SET_ITEM(lts, index, PyFloat_FromDouble(pmcData.lts()[k]));
+                    PyList_SET_ITEM(sts, index, PyFloat_FromDouble(pmcData.sts()[k]));
+                    PyList_SET_ITEM(sb, index, PyFloat_FromDouble(pmcData.sb()[k]));
+                    PyList_SET_ITEM(rr, index, PyFloat_FromDouble(pmcData.rr()[k]));
+                    index++;
+                }
+            }
+        }
+
+        // add to the dict
+        PyDict_SetItemString(ans, "stress", stress);
+        PyDict_SetItemString(ans, "lts", lts);
+        PyDict_SetItemString(ans, "sts", sts);
+        PyDict_SetItemString(ans, "sb", sb);
+        PyDict_SetItemString(ans, "rr", rr);
+
+        // return it
+        return ans;
+    }
+
+    // nothing to return
+    return NULL;
 }
 
 int

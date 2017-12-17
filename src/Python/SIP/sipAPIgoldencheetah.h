@@ -65,8 +65,10 @@
 #define sipName_type &sipStrings_goldencheetah[248]
 #define sipNameNr_url 253
 #define sipName_url &sipStrings_goldencheetah[253]
-#define sipNameNr_all 257
-#define sipName_all &sipStrings_goldencheetah[257]
+#define sipNameNr_pmc 257
+#define sipName_pmc &sipStrings_goldencheetah[257]
+#define sipNameNr_all 261
+#define sipName_all &sipStrings_goldencheetah[261]
 
 #define sipMalloc                   sipAPI_goldencheetah->api_malloc
 #define sipFree                     sipAPI_goldencheetah->api_free
