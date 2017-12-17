@@ -116,6 +116,9 @@ public:
     int build() const;
     QString version() const;
 
+    // working with activities
+    PyObject* activities(QString filter=QString()) /TransferBack/;
+
     // working with series
     bool seriesPresent(int type=10) const;
     QString seriesName(int type=10) const;

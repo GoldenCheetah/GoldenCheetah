@@ -27,6 +27,9 @@ class Bindings {
         long build() const;
         QString version() const;
 
+        // working with activities
+        PyObject* activities(QString filter=QString()) const;
+
         // working with data series
         bool seriesPresent(int type) const;
         int seriesLast() const;

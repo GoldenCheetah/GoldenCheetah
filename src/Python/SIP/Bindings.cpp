@@ -43,6 +43,65 @@ QString Bindings::version() const
     return VERSION_STRING;
 }
 
+// get a list of activities (Date&Time)
+PyObject*
+Bindings::activities(QString filter) const
+{
+    Context *context = python->contexts.value(threadid());
+
+    if (context && context->athlete && context->athlete->rideCache) {
+
+        // import datetime if necessary
+        if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;
+
+        // filters
+        // apply any global filters
+        Specification specification;
+        FilterSet fs;
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+
+        // did call contain any filters?
+        if (filter != "") {
+
+            DataFilter dataFilter(python->chart, context);
+            QStringList files;
+            dataFilter.parseFilter(context, filter, &files);
+            fs.addFilter(true, files);
+        }
+        specification.setFilterSet(fs);
+
+        // how many pass?
+        int count = 0;
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+            // apply filters
+            if (!specification.pass(item)) continue;
+            count++;
+        }
+
+        // allocate space for a list of dates
+        PyObject* dates = PyList_New(count);
+
+        // fill with values for date and class
+        int idx = 0;
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+            // apply filters
+            if (!specification.pass(item)) continue;
+
+            // add datetime to the list
+            QDate d = item->dateTime.date();
+            QTime t = item->dateTime.time();
+            PyList_SET_ITEM(dates, idx++, PyDateTime_FromDateAndTime(d.year(), d.month(), d.day(), t.hour(), t.minute(), t.second(), t.msec()));
+        }
+
+        return dates;
+    }
+
+    return NULL;
+}
+
 // get the data series for the currently selected ride
 PythonDataSeries*
 Bindings::series(int type) const

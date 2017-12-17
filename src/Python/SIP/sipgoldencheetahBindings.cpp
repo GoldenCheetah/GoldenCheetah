@@ -118,6 +118,39 @@ static PyObject *meth_Bindings_version(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
+extern "C" {static PyObject *meth_Bindings_activities(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_activities(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString a0def = QString();
+         ::QString* a0 = &a0def;
+        int a0State = 0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_filter,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|J1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->activities(*a0);
+            sipReleaseType(a0,sipType_QString,a0State);
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_activities, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_seriesPresent(PyObject *, PyObject *, PyObject *);}
 static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
@@ -577,6 +610,7 @@ static void *init_type_Bindings(sipSimpleWrapper *, PyObject *sipArgs, PyObject 
 
 
 static PyMethodDef methods_Bindings[] = {
+    {SIP_MLNAME_CAST(sipName_activities), (PyCFunction)meth_Bindings_activities, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityMeanmax), (PyCFunction)meth_Bindings_activityMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityMetrics), (PyCFunction)meth_Bindings_activityMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
@@ -609,7 +643,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        16, methods_Bindings,
+        17, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
