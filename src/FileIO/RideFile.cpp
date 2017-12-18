@@ -771,8 +771,23 @@ static QByteArray gUncompress(const QByteArray &data)
 RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                                            QStringList &errors, QList<RideFile*> *rideList) const
 {
-    // is it compressed with gzip?
-    QString suffix = QFileInfo(file).completeSuffix();
+
+    // since some file names contain "." as separator, not only for suffixes
+    // find the file-type suffix and the compression type in a 2 step approach
+    QStringList allNameParts = QFileInfo(file).fileName().split(".");
+    QString compression;
+    QString suffix;
+    if (!allNameParts.isEmpty()) {
+        if (allNameParts.last().toLower() == "zip" ||
+            allNameParts.last().toLower() == "gz") {
+            // gz/zip are handled by openRideFile
+            compression = allNameParts.last();
+            allNameParts.removeLast();
+        }
+        if (!allNameParts.isEmpty()) {
+            suffix = allNameParts.last();
+        }
+    }
 
     // did we uncompress?
     QByteArray data;
@@ -782,8 +797,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
     RideFile *result;
 
     // decompress if its compressed data
-    if (suffix.endsWith(".zip", Qt::CaseInsensitive)) {
-        suffix.replace(".zip","", Qt::CaseInsensitive);
+    if (compression == "zip") {
 
         // open zip and uncompress
         ZipReader reader(file.fileName());
@@ -795,8 +809,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
     }
 
     // decompress
-    if (suffix.endsWith(".gz", Qt::CaseInsensitive)) {
-        suffix.replace(".gz","", Qt::CaseInsensitive);
+    if (compression == "gz") {
 
         // read and uncompress
         file.open(QFile::ReadOnly);

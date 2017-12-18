@@ -455,9 +455,20 @@ RideImportWizard::process()
             suffixes.setCaseSensitivity(Qt::CaseInsensitive);
 
             // strip off gz or zip as openRideFile will sort that for us
-            QString suffix = thisfile.completeSuffix();
-            suffix.replace(".zip","", Qt::CaseInsensitive);
-            suffix.replace(".gz","", Qt::CaseInsensitive);
+            // since some file names contain "." as separator, not only for suffixes,
+            // find the file-type suffix in a 2 step approach
+            QStringList allNameParts = thisfile.fileName().split(".");
+            QString suffix = tr("undefined");
+            if (!allNameParts.isEmpty()) {
+                if (allNameParts.last().toLower() == "zip" ||
+                    allNameParts.last().toLower() == "gz") {
+                    // gz/zip are handled by openRideFile
+                    allNameParts.removeLast();
+                }
+                if (!allNameParts.isEmpty()) {
+                    suffix = allNameParts.last();
+                }
+            }
 
             if (suffixes.exactMatch(suffix)) {
 
