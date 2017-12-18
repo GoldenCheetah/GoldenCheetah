@@ -120,10 +120,10 @@ public:
     PyObject* activities(QString filter=QString()) /TransferBack/;
 
     // working with series
-    bool seriesPresent(int type=10) const;
+    bool seriesPresent(int type=10, PyObject* activity=NULL) const;
     QString seriesName(int type=10) const;
     int seriesLast() const;
-    PythonDataSeries series(int type=10) /TransferBack/;
+    PythonDataSeries series(int type=10, PyObject* activity=NULL) /TransferBack/;
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;

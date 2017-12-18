@@ -7,11 +7,11 @@
 #--------------------------------------------------
 
 # basic activity data
-def __GCactivity():
+def __GCactivity(activity=None):
    rd={}
    for x in range(0,GC.seriesLast()):
-      if (GC.seriesPresent(x)):
-         rd[GC.seriesName(x)] = GC.series(x)
+      if (GC.seriesPresent(x, activity)):
+         rd[GC.seriesName(x)] = GC.series(x, activity)
    return rd
 
 # add to main GC entrypoint

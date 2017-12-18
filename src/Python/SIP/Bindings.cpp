@@ -93,7 +93,7 @@ Bindings::activities(QString filter) const
             // add datetime to the list
             QDate d = item->dateTime.date();
             QTime t = item->dateTime.time();
-            PyList_SET_ITEM(dates, idx++, PyDateTime_FromDateAndTime(d.year(), d.month(), d.day(), t.hour(), t.minute(), t.second(), t.msec()));
+            PyList_SET_ITEM(dates, idx++, PyDateTime_FromDateAndTime(d.year(), d.month(), d.day(), t.hour(), t.minute(), t.second(), t.msec()*10));
         }
 
         return dates;
@@ -102,14 +102,41 @@ Bindings::activities(QString filter) const
     return NULL;
 }
 
-// get the data series for the currently selected ride
-PythonDataSeries*
-Bindings::series(int type) const
+RideItem*
+Bindings::fromDateTime(PyObject* activity) const
 {
     Context *context = python->contexts.value(threadid());
-    if (context == NULL || context->currentRideItem()==NULL) return NULL;
 
-    RideFile* f = const_cast<RideItem*>(context->currentRideItem())->ride();
+    // import datetime if necessary
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;
+
+    if (context !=NULL && activity != NULL && PyDate_Check(activity)) {
+
+        // convert PyDateTime to QDateTime
+        QDateTime dateTime(QDate(PyDateTime_GET_YEAR(activity), PyDateTime_GET_MONTH(activity), PyDateTime_GET_DAY(activity)),
+                           QTime(PyDateTime_DATE_GET_HOUR(activity), PyDateTime_DATE_GET_MINUTE(activity), PyDateTime_DATE_GET_SECOND(activity), PyDateTime_DATE_GET_MICROSECOND(activity)/10));
+
+        // search the RideCache
+        foreach(RideItem*item, context->athlete->rideCache->rides())
+            if (item->dateTime.toUTC() == dateTime.toUTC())
+                return const_cast<RideItem*>(item);
+    }
+
+    return NULL;
+}
+
+// get the data series for the currently selected ride
+PythonDataSeries*
+Bindings::series(int type, PyObject* activity) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return NULL;
+
+    RideFile* f = item->ride();
     PythonDataSeries* ds = new PythonDataSeries(seriesName(type), f->dataPoints().count());
     for(int i=0; i<ds->count; i++) ds->data[i] = f->dataPoints()[i]->value(static_cast<RideFile::SeriesType>(type));
 
@@ -129,12 +156,17 @@ Bindings::seriesName(int type) const
 }
 
 bool
-Bindings::seriesPresent(int type) const
+Bindings::seriesPresent(int type, PyObject* activity) const
 {
 
     Context *context = python->contexts.value(threadid());
-    if (context == NULL || context->currentRideItem()==NULL) return false;
-    return const_cast<RideItem*>(context->currentRideItem())->ride()->isDataPresent(static_cast<RideFile::SeriesType>(type));
+    if (context == NULL) return false;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return NULL;
+
+    return item->ride()->isDataPresent(static_cast<RideFile::SeriesType>(type));
 }
 
 PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count) : name(name), count(count), data(NULL)
@@ -223,7 +255,7 @@ Bindings::activityMetrics(RideItem* item) const
     QDate d = item->dateTime.date();
     PyDict_SetItemString(dict, "date", PyDate_FromDate(d.year(), d.month(), d.day()));
     QTime t = item->dateTime.time();
-    PyDict_SetItemString(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()));
+    PyDict_SetItemString(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
     //
     // METRICS
@@ -389,7 +421,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
             PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
 
             QTime t = ride->dateTime.time();
-            PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()));
+            PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
             // apply item color, remembering that 1,1,1 means use default (reverse in this case)
             QString color;

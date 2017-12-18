@@ -31,10 +31,10 @@ class Bindings {
         PyObject* activities(QString filter=QString()) const;
 
         // working with data series
-        bool seriesPresent(int type) const;
+        bool seriesPresent(int type, PyObject* activity=NULL) const;
         int seriesLast() const;
         QString seriesName(int type) const;
-        PythonDataSeries *series(int type) const;
+        PythonDataSeries *series(int type, PyObject* activity=NULL) const;
 
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
@@ -51,6 +51,9 @@ class Bindings {
         int webpage(QString url) const;
 
     private:
+        // find a RideItem by DateTime
+        RideItem* fromDateTime(PyObject* activity=NULL) const;
+
         // get a dict populated with metrics and metadata
         PyObject* activityMetrics(RideItem* item) const;
         PyObject* seasonMetrics(bool all, DateRange range, QString filter) const;
