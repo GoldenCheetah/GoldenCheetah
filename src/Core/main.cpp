@@ -182,6 +182,9 @@ main(int argc, char *argv[])
     // and only keep non-switch args in the args string list
     QStringList sargs, args;
     for (int i=0; i<argc; i++) sargs << argv[i];
+#ifdef GC_WANT_PYTHON
+    bool noPy=false;
+#endif
 #ifdef GC_WANT_R
     bool noR=false;
 #endif
@@ -214,6 +217,9 @@ main(int argc, char *argv[])
 #ifdef GC_HAS_CLOUD_DB
             fprintf(stderr, "--clouddbcurator    to add CloudDB curator specific functions to the menus\n");
 #endif
+#ifdef GC_WANT_PYTHON
+            fprintf(stderr, "--no-python         to disable Python startup\n");
+#endif
 #ifdef GC_WANT_R
             fprintf(stderr, "--no-r              to disable R startup\n");
 #endif
@@ -228,6 +234,11 @@ main(int argc, char *argv[])
                 exit(1);
 #endif
 
+#ifdef GC_WANT_PYTHON
+        } else if (arg == "--no-python") {
+
+            noPy = true;
+#endif
 #ifdef GC_WANT_R
         } else if (arg == "--no-r") {
 
@@ -426,7 +437,7 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef GC_WANT_PYTHON
-        if (python == NULL) python = new PythonEmbed(); // initialise python in this thread ?
+        if (noPy == false && python == NULL) python = new PythonEmbed(); // initialise python in this thread ?
 #endif
 
         //this is the path within the current directory where GC will look for
