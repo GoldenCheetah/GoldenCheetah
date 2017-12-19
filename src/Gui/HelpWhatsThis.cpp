@@ -169,6 +169,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
                                                   " and cadence into the Moxy series"));
     case MenuBar_Edit_FilterHrv:
         return text.arg("Menu%20Bar_Edit").arg(tr("Filter R-R outliers"));
+    case MenuBar_Edit_FixSmO2:
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix SmO2/tHb outliers"));
     case MenuBar_View:
         return text.arg("Menu%20Bar_View").arg(tr("Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings"));
     case MenuBar_Help:

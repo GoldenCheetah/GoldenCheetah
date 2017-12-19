@@ -88,6 +88,8 @@ Q_OBJECT
                  MenuBar_Edit_FixFreewheeling,
                  MenuBar_Edit_FixMoxy,
                  MenuBar_Edit_FilterHrv,
+                 MenuBar_Edit_FixSmO2,
+
 
                  MenuBar_View,
                  MenuBar_Help,

@@ -180,15 +180,18 @@
 #define GC_DPDP_DRAFTM                  "<global-general>dataprocess/fixderivepower/draftm"
 #define GC_DPRP_EQUIPWEIGHT             "<global-general>dataprocess/fixrunningpower/equipwheight"
 #define GC_DPDR_DRAFTM                  "<global-general>dataprocess/fixrunningpower/draftm"
-#define GC_DPFV_MA                     "<global-general>dataprocess/fixspeed/ma"
+#define GC_DPFV_MA                      "<global-general>dataprocess/fixspeed/ma"
 #define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
-#define GC_SPD2THB			"<global-general>dataprocess/fixmoxy/spd2thb"
+#define GC_SPD2THB		            	"<global-general>dataprocess/fixmoxy/spd2thb"
 #define GC_DPFLS_PL                     "<global-general>dataprocess/fixlapswim/pool_length"
 #define GC_RR_MAX                       "<global-general>dataprocess/filterhrv/rr_max"                 //
 #define GC_RR_MIN                       "<global-general>dataprocess/filterhrv/rr_min"                 //
 #define GC_RR_FILT                      "<global-general>dataprocess/filterhrv/rr_filt"                 //
 #define GC_RR_WINDOW                    "<global-general>dataprocess/filterhrv/rr_window"
 #define GC_RR_SET_REST_HRV              "<global-general>dataprocess/filterhrv/rr_set_rest_hrv"
+#define GC_MOXY_FIX_SMO2                "<global-general>dataprocess/fixmoxydata/fix_smo2"
+#define GC_MOXY_FIX_THB                 "<global-general>dataprocess/fixmoxydata/fix_thb"
+#define GC_MOXY_FIX_THB_MAX             "<global-general>dataprocess/fixmoxydata/fix_thb_max"
 
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended

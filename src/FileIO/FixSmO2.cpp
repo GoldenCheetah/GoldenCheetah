@@ -33,12 +33,37 @@ class FixSmO2Config : public DataProcessorConfig
     friend class ::FixSmO2;
     protected:
         QHBoxLayout *layout;
+        QCheckBox *fixSmO2Box, *fixtHbBox;
+        QLabel *maxtHbLabel;
+        QDoubleSpinBox *maxtHbInput;
 
     public:
         FixSmO2Config(QWidget *parent) : DataProcessorConfig(parent) {
 
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixSmO2));
 
+            layout = new QHBoxLayout(this);
 
+            layout->setContentsMargins(0,0,0,0);
+            setContentsMargins(0,0,0,0);
+
+            fixSmO2Box = new QCheckBox(tr("Fix SmO2"));
+            fixtHbBox = new QCheckBox(tr("Fix tHb"));
+            maxtHbLabel = new QLabel(tr("Max. tHb"));
+
+            maxtHbInput = new QDoubleSpinBox();
+            maxtHbInput->setMaximum(100);
+            maxtHbInput->setMinimum(0);
+            maxtHbInput->setSingleStep(1);
+            maxtHbInput->setDecimals(2);
+
+            layout->addWidget(fixSmO2Box);
+            layout->addWidget(fixtHbBox);
+            layout->addWidget(maxtHbLabel);
+            layout->addWidget(maxtHbInput);
+
+            layout->addStretch();
 
         }
 
@@ -46,22 +71,40 @@ class FixSmO2Config : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         QString explain() {
-            return(QString(tr("Occasionally SmO2 (%) will erroneously "
-                           "report high values (0% or >100%).\n\n"
-                           "This function will look for spikes/anomalies "
-                           "in SmO2 data and replace the erroneous data "
+            return(QString(tr("Occasionally SmO2 (%) and/or tHb (%) will erroneously "
+                           "report missing or high values (SmO2: 0% or >100% / tHb: 0% or > max. tHb parameter). \n\n "
+                           "This function will look for those anomalies "
+                           "in SmO2 and tHb data and depending on the configuration replace the erroneous data "
                            "by smoothing/interpolating the data from either "
-                           "side of the 3 points in question")));
+                           "side of the 3 points in question. It takes the following parameters:\n\n"
+                           "Fix SmO2 - check to fix anomalies in SmO2 data \n"
+                           "Fix tHb - check to fix anomalies in tHb data \n"
+                           "Max. tHb - any tHb above is considered an outlier \n")));
+
+
         }
 
-        void readConfig() { }
-        void saveConfig() { }
+        void readConfig() {
+            bool fixSmO2 = appsettings->value(NULL, GC_MOXY_FIX_SMO2, Qt::Checked).toBool();
+            bool fixtHb = appsettings->value(NULL, GC_MOXY_FIX_THB, Qt::Checked).toBool();
+            double maxtHb = appsettings->value(NULL, GC_MOXY_FIX_THB_MAX, "25.0").toDouble();
+            fixSmO2Box->setCheckState(fixSmO2 ? Qt::Checked : Qt::Unchecked);
+            fixtHbBox->setCheckState(fixtHb ? Qt::Checked : Qt::Unchecked);
+            maxtHbInput->setValue(maxtHb);
+
+
+        }
+        void saveConfig() {
+            appsettings->setValue(GC_MOXY_FIX_SMO2, fixSmO2Box->checkState());
+            appsettings->setValue(GC_MOXY_FIX_THB, fixtHbBox->checkState());
+            appsettings->setValue(GC_MOXY_FIX_THB_MAX, maxtHbInput->value());
+        }
 
 };
 
 
 class FixSmO2 : public DataProcessor {
-    Q_DECLARE_TR_FUNCTIONS(FixSpikes)
+    Q_DECLARE_TR_FUNCTIONS(FixSmO2)
 
     public:
         FixSmO2() {}
@@ -77,100 +120,145 @@ class FixSmO2 : public DataProcessor {
 
         // Localized Name
         QString name() {
-            return (tr("Fix SmO2 Anomaly"));
+            return (tr("Fix SmO2 and/or tHb Anomaly"));
         }
 };
 
-static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(QString("Fix SmO2 Anomaly"), new FixSmO2());
+static bool fixSmO2Added = DataProcessorFactory::instance().registerProcessor(QString("Fix SmO2/tHb Anomaly"), new FixSmO2());
 
 bool
 FixSmO2::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
     
-    // does this ride have power?
-    if (ride->areDataPresent()->watts == false) return false;
-
     // get settings
-    double max = 100;
+    bool fixSmO2;
+    bool fixtHb;
+    double maxtHb;
 
-    int windowsize = 30 / ride->recIntSecs();
 
-    // We use a window size of 30s to find spikes
-    // if the ride is shorter, don't bother
-    // is no way of post processing anyway (e.g. manual workouts)
-    if (windowsize > ride->dataPoints().count()) return false;
+    if (config == NULL) { // being called automatically
+        fixSmO2 = appsettings->value(NULL, GC_MOXY_FIX_SMO2, Qt::Checked).toBool();
+        fixtHb = appsettings->value(NULL, GC_MOXY_FIX_THB, Qt::Checked).toBool();
+        maxtHb = appsettings->value(NULL, GC_MOXY_FIX_THB_MAX, "50.0").toDouble();
 
-    // Find the power outliers
-
-    int spikes = 0;
-
-    // create a data array for the outlier algorithm
-    QVector<double> smo2;
-    QVector<double> secs;
-
-    foreach (RideFilePoint *point, ride->dataPoints()) {
-        smo2.append(point->smo2);
-        secs.append(point->secs);
+    } else { // being called manually
+        fixSmO2 = ((FixSmO2Config*)(config))->fixSmO2Box->isChecked();
+        fixtHb = ((FixSmO2Config*)(config))->fixtHbBox->isChecked();
+        maxtHb = ((FixSmO2Config*)(config))->maxtHbInput->value();
     }
 
+    int smO2spikes = 0;
+    int tHbspikes = 0;
 
-    // TODO If we kept only min max value we don't need to use LTMOutliers
-    LTMOutliers *outliers = new LTMOutliers(secs.data(), smo2.data(), smo2.count(), windowsize, false);
-    ride->command->startLUW("Fix SmO2 in Recording");
+    // we have SmO2 and want to fix it
+    if (ride->areDataPresent()->smo2 && fixSmO2) {
 
-    for (int i=0; i<secs.count(); i++) {
+        // get settings
+        double min = 0;
+        double max = 100;
 
-        // ok, so its highly variant but is it over
-        // the max value we are willing to accept?
-        if (outliers->getYForRank(i) < max && outliers->getYForRank(i)>0) continue;
+        ride->command->startLUW("Fix SmO2 in Recording");
 
+        for (int i=0; i<ride->dataPoints().count(); i++) {
 
-        //qDebug() << "spike at " << outliers->getXForRank(i) << outliers->getYForRank(i);
+            // the min/max range value we are willing to accept?
+            if (ride->dataPoints()[i]->smo2 > min && ride->dataPoints()[i]->smo2 < max) continue;
 
-        // Houston, we have a spike
+            // Value is 0 or > 100
 
-        // which one is it
-        int pos = outliers->getIndexForRank(i);
-        double left=0.0, right=0.0;
+            // which one is it
+            double left=0.0, right=0.0;
 
-        if (pos > 2)  {
-            int nb = 0;
-            for (int j=1; j<4; j++) {
-                if (ride->dataPoints()[pos-j]->smo2>0 && ride->dataPoints()[pos-j]->smo2<100) {
-                    left += ride->dataPoints()[pos-j]->smo2;
-                    nb++;
+            if (i >= 0)  {
+                int nb = 0;
+                for (int j=1; j<4 && i-j >= 0; j++) {
+                    if (ride->dataPoints()[i-j]->smo2 > min && ride->dataPoints()[i-j]->smo2 < max) {
+                        left += ride->dataPoints()[i-j]->smo2;
+                        nb++;
+                    }
                 }
+                if (nb > 0)
+                    left = left / nb;
             }
-            if (nb > 0)
-                left = left / nb;
-        }
-        if (pos < (ride->dataPoints().count()))  {
-            int nb = 0;
-            for (int j = 1; j < 4 && pos + j < ride->dataPoints().count();
-                 j++) {
-                if (ride->dataPoints()[pos + j]->smo2 > 0 &&
-                    ride->dataPoints()[pos + j]->smo2 < 100) {
-                    right = ride->dataPoints()[pos + j]->smo2;
-                    nb++;
+            if (i < (ride->dataPoints().count()))  {
+                int nb = 0;
+                for (int j = 1; j < 4 && i + j < ride->dataPoints().count(); j++) {
+                    if (ride->dataPoints()[i + j]->smo2 > min && ride->dataPoints()[i + j]->smo2 < max) {
+                        right += ride->dataPoints()[i + j]->smo2;
+                        nb++;
+                    }
                 }
+                if (nb > 0)
+                    right = right / nb;
             }
-            if (nb > 0)
-                right = right / nb;
+
+            if (left != 0.0 && right != 0.0 && (left+right)/2.0 != ride->dataPoints()[i]->smo2) {
+                smO2spikes++;
+                ride->command->setPointValue(i, RideFile::smo2, (left+right)/2.0);
+
+            }
         }
+        ride->command->endLUW();
 
-        if (left != 0 && right != 0 && (left+right)/2.0 != outliers->getYForRank(i)) {
-            spikes++;
+    } // end smO2
 
-            ride->command->setPointValue(pos, RideFile::smo2, (left+right)/2.0);
-            //qDebug() << "replace by "<< (left+right)/2.0;
+    // we have tHb and want to fix it
+    if (ride->areDataPresent()->thb && fixtHb) {
+
+        // get settings
+        double min = 0;
+        double max = maxtHb;
+
+        ride->command->startLUW("Fix tHb in Recording");
+
+        for (int i=0; i<ride->dataPoints().count(); i++) {
+
+            // the min/max range value we are willing to accept?
+            if (ride->dataPoints()[i]->thb > min && ride->dataPoints()[i]->thb < max) continue;
+
+            // Value is 0 or > maxtHb
+
+            // which one is it
+            double left=0.0, right=0.0;
+
+            if (i >= 0)  {
+                int nb = 0;
+                for (int j=1; j<4 && i-j >= 0; j++) {
+                    if (ride->dataPoints()[i-j]->thb>min && ride->dataPoints()[i-j]->thb<max) {
+                        left += ride->dataPoints()[i-j]->thb;
+                        nb++;
+                    }
+                }
+                if (nb > 0)
+                    left = left / nb;
+            }
+            if (i < (ride->dataPoints().count()))  {
+                int nb = 0;
+                for (int j = 1; j < 4 && i + j < ride->dataPoints().count();
+                     j++) {
+                    if (ride->dataPoints()[i + j]->thb > min &&
+                            ride->dataPoints()[i + j]->thb < max) {
+                        right += ride->dataPoints()[i + j]->thb;
+                        nb++;
+                    }
+                }
+                if (nb > 0)
+                    right = right / nb;
+            }
+
+            if (left != 0.0 && right != 0.0 && (left+right)/2.0 != ride->dataPoints()[i]->thb) {
+                tHbspikes++;
+                ride->command->setPointValue(i, RideFile::thb, (left+right)/2.0);
+
+            }
         }
-    }
-    ride->command->endLUW();
+        ride->command->endLUW();
 
-    delete outliers;
 
-    if (spikes) return true;
+    } // end tHb
+
+
+    if (smO2spikes > 0 || tHbspikes > 0) return true;
     else return false;
 }
