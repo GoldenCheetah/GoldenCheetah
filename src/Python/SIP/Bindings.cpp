@@ -710,28 +710,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
 {
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
 
-    // how many series and how big are they?
-    unsigned int seriescount=0, size=0;
-
-    // get the meanmax array
-    if (cache != NULL) {
-        // how many points in the ridefilecache and how many series to return
-        foreach(RideFile::SeriesType series, cache->meanMaxList()) {
-            QVector <double> values = cache->meanMaxArray(series);
-            if (values.count()) {
-                if (static_cast<unsigned int>(values.count()) > size) size = values.count();
-                seriescount++;
-            }
-            if (series==RideFile::watts) {
-                seriescount++; // add powerdate
-            }
-        }
-
-    } else {
-
-        // fail
-        return NULL;
-    }
+    if (cache == NULL) return NULL;
 
     // we return a dict
     PyObject* ans = PyDict_New();
@@ -739,7 +718,6 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
     //
     // Now we need to add lists to the ans dict...
     //
-
     foreach(RideFile::SeriesType series, cache->meanMaxList()) {
 
         QVector <double> values = cache->meanMaxArray(series);
