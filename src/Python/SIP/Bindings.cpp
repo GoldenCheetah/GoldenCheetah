@@ -744,8 +744,8 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
 
         QVector <double> values = cache->meanMaxArray(series);
 
-        // don't add empty ones
-        if (values.count()==0) continue;
+        // don't add empty ones but we always add power
+        if (series != RideFile::watts && values.count()==0) continue;
 
 
         // set a list
@@ -768,7 +768,12 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
             // will have different sizes e.g. when a daterange
             // since longest ride with e.g. power may be different
             // to longest ride with heartrate
-            for(int j=0; j<dates.count(); j++) PyList_SET_ITEM(datelist, j, PyDate_FromDate(dates[j].year(), dates[j].month(), dates[j].day()));
+            for(int j=0; j<dates.count(); j++) {
+
+                // make sure its a valid date
+                if (!dates[j].year() || !dates[j].month() || dates[j].day()) dates[j] = QDate::currentDate();
+                PyList_SET_ITEM(datelist, j, PyDate_FromDate(dates[j].year(), dates[j].month(), dates[j].day()));
+            }
 
             // add to the dict
             PyDict_SetItemString(ans, "power_date", datelist);
