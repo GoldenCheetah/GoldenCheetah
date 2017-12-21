@@ -119,6 +119,9 @@ public:
     // working with activities
     PyObject* activities(QString filter=QString()) /TransferBack/;
 
+    // working with seasons
+    PyObject* season(bool all=false, bool compare=false) /TransferBack/;
+
     // working with series
     bool seriesPresent(int type=10, PyObject* activity=NULL) const;
     QString seriesName(int type=10) const;

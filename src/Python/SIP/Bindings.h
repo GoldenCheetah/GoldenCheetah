@@ -30,6 +30,9 @@ class Bindings {
         // working with activities
         PyObject* activities(QString filter=QString()) const;
 
+        // working with seasons
+        PyObject* season(bool all=false, bool compare=false) const;
+
         // working with data series
         bool seriesPresent(int type, PyObject* activity=NULL) const;
         int seriesLast() const;

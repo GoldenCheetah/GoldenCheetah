@@ -151,6 +151,38 @@ static PyObject *meth_Bindings_activities(PyObject *sipSelf, PyObject *sipArgs, 
 }
 
 
+extern "C" {static PyObject *meth_Bindings_season(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_season(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        bool a0 = 0;
+        bool a1 = 0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_all,
+            sipName_compare,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|bb", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->season(a0,a1);
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_season, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_seriesPresent(PyObject *, PyObject *, PyObject *);}
 static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
@@ -622,6 +654,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_measures), (PyCFunction)meth_Bindings_measures, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_metrics), (PyCFunction)meth_Bindings_metrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_pmc), (PyCFunction)meth_Bindings_pmc, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_season), (PyCFunction)meth_Bindings_season, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMeanmax), (PyCFunction)meth_Bindings_seasonMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMetrics), (PyCFunction)meth_Bindings_seasonMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_series), (PyCFunction)meth_Bindings_series, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -647,7 +680,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        17, methods_Bindings,
+        18, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

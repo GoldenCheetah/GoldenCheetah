@@ -8,6 +8,7 @@
 #include "RideCache.h"
 #include "DataFilter.h"
 #include "PMCData.h"
+#include "Season.h"
 
 #include "Bindings.h"
 
@@ -934,6 +935,73 @@ Bindings::measures(bool all, QString group) const
 
     // nothing to return
     return NULL;
+}
+
+PyObject*
+Bindings::season(bool all, bool compare) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    // import datetime if necessary
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;
+
+    // dict for season: color, name, start, end
+    // XXX TODO type needs adding, but we need to unpick the
+    //          phase/season object model first, will do later
+    PyObject* ans = PyDict_New();
+
+    // worklist of date ranges to return
+    // XXX TODO use a Season worklist one the phase/season
+    //          object model is fixed
+    QList<DateRange> worklist;
+
+    if (compare) {
+        // return a list, even if just one
+        if (context->isCompareDateRanges) {
+            foreach(CompareDateRange p, context->compareDateRanges)
+                worklist << DateRange(p.start, p.end, p.name, p.color);
+        } else {
+            // if compare not active just return current selection
+            worklist << context->currentDateRange();
+        }
+
+    } else if (all) {
+        // list all seasons
+        foreach(Season season, context->athlete->seasons->seasons) {
+            worklist << DateRange(season.start, season.end, season.name, QColor(127,127,127));
+        }
+
+    } else {
+
+        // just the currently selected season please
+        worklist << context->currentDateRange();
+    }
+
+    PyObject* start = PyList_New(worklist.count());
+    PyObject* end = PyList_New(worklist.count());
+    PyObject* name = PyList_New(worklist.count());
+    PyObject* color = PyList_New(worklist.count());
+
+    int index=0;
+
+    foreach(DateRange p, worklist){
+
+        PyList_SET_ITEM(start, index, PyDate_FromDate(p.from.year(), p.from.month(), p.from.day()));
+        PyList_SET_ITEM(end, index, PyDate_FromDate(p.to.year(), p.to.month(), p.to.day()));
+        PyList_SET_ITEM(name, index, PyUnicode_FromString(p.name.toUtf8().constData()));
+        PyList_SET_ITEM(color, index, PyUnicode_FromString(p.color.name().toUtf8().constData()));
+        index++;
+    }
+
+    // list into a data.frame
+    PyDict_SetItemString(ans, "start", start);
+    PyDict_SetItemString(ans, "end", end);
+    PyDict_SetItemString(ans, "name", name);
+    PyDict_SetItemString(ans, "color", color);
+
+    // return it
+    return ans;
 }
 
 int
