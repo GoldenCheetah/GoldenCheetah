@@ -65,8 +65,8 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_CombineRides));
 
-    setFixedHeight(530 *dpiXFactor);
-    setFixedWidth(550 *dpiYFactor);
+    setMinimumHeight(600 *dpiXFactor);
+    setMinimumWidth(550 *dpiYFactor);
 
     // initialise before setRide since it checks
     // to see if memory needs to be freed first
@@ -707,9 +707,6 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     files->headerItem()->setText(2, tr("Time"));
 
     files->setColumnCount(3);
-    files->setColumnWidth(0, 190 *dpiXFactor); // filename
-    files->setColumnWidth(1, 95 *dpiXFactor); // date
-    files->setColumnWidth(2, 90 *dpiXFactor); // time
     files->setSelectionMode(QAbstractItemView::SingleSelection);
     files->setUniformRowHeights(true);
     files->setIndentation(0);
@@ -725,6 +722,9 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
         add->setText(1, rideItem->dateTime.toString(tr("dd MMM yyyy")));
         add->setText(2, rideItem->dateTime.toString("hh:mm:ss"));
     }
+
+    for(int i = 0; i < 3; i++)
+        files->resizeColumnToContents(i);
 
     // Sort by date descending
     files->invisibleRootItem()->sortChildren(0, Qt::DescendingOrder);
@@ -1090,15 +1090,22 @@ MergeSelect::MergeSelect(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     QFont def;
     def.setWeight(QFont::Bold);
 
+    QHBoxLayout *namesHeader = new QHBoxLayout;
+    leftNameHeader = new QLabel(tr("Target activity"), this);
+    rightNameHeader = new QLabel(tr("Source of additional data series"), this);
+    leftNameHeader->setFont(def);
+    leftNameHeader->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    rightNameHeader->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    rightNameHeader->setFont(def);
+    namesHeader->addWidget(leftNameHeader);
+    namesHeader->addWidget(rightNameHeader);
+    mainlayout->addLayout(namesHeader);
+
     QHBoxLayout *names = new QHBoxLayout;
-    leftName = new QLabel("Current Selection", this);
-    rightName = new QLabel("right", this);
-    leftName->setFixedHeight(20);
-    leftName->setFont(def);
-    leftName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    rightName->setFixedHeight(20);
-    rightName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    rightName->setFont(def);
+    leftName = new QLabel("", this);
+    rightName = new QLabel("", this);
+    leftName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    rightName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     names->addWidget(leftName);
     names->addWidget(rightName);
     mainlayout->addLayout(names);
@@ -1139,7 +1146,10 @@ MergeSelect::MergeSelect(MergeActivityWizard *parent) : QWizardPage(parent), wiz
 void
 MergeSelect::initializePage()
 {
-    rightName->setText(QString("%1 (%2)").arg(wizard->ride2->startTime().toString("d MMM yy hh:mm:ss"))
+    leftName->setText(QString("%1 (%2)").arg(wizard->ride1->startTime().toString(tr("d MMM yy hh:mm:ss")))
+                                         .arg(wizard->ride1->deviceType()));
+
+    rightName->setText(QString("%1 (%2)").arg(wizard->ride2->startTime().toString(tr("d MMM yy hh:mm:ss")))
                                          .arg(wizard->ride2->deviceType()));
 
     // create a checkbox for each series present in 
