@@ -285,7 +285,7 @@ class MergeSelect : public QWizardPage
     private:
         MergeActivityWizard *wizard;
 
-        QLabel *leftName, *rightName;
+        QLabel *leftNameHeader, *rightNameHeader, *leftName, *rightName;
         QVBoxLayout *leftLayout, *rightLayout;
 };
 
