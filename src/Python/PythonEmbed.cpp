@@ -74,6 +74,10 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     // our base code - traps stdout and loads goldencheetan module
     // mapping all the bindings to a GC object.
     std::string stdOutErr = ("import sys\n"
+ #ifdef Q_OS_LINUX
+                             "import os\n"
+                             "sys.setdlopenflags(os.RTLD_NOW | os.RTLD_DEEPBIND)\n"
+ #endif
                              "class CatchOutErr:\n"
                              "    def __init__(self):\n"
                              "        self.value = ''\n"
