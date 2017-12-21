@@ -537,7 +537,7 @@ unix:!macx {
 
         # we will work out the rest if you tell use where it is installed
         isEmpty(VLC_INCLUDE) { VLC_INCLUDE = $${VLC_INSTALL}/include }
-        isEmpty(VLC_LIBS)    { VLC_LIBS    = -L$${VLC_INSTALL}/lib -lvlc -lvlccore }
+        isEmpty(VLC_LIBS)    { VLC_LIBS    = -L$${VLC_INSTALL}/lib -lvlc }
 
         DEFINES     += GC_HAVE_VLC
         INCLUDEPATH += $${VLC_INCLUDE}
