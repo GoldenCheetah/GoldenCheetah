@@ -211,9 +211,9 @@
 # This will automatically set (Windows and Unix):
 # VLC_INCLUDE = $${VLC_INSTALL}/include 
 # For Windows
-# VLC_LIBS    = $${VLC_INSTALL}/lib/libvlc.dll.a $${VLC_INSTALL}/lib/libvlccore.dll.a
+# VLC_LIBS    = $${VLC_INSTALL}/lib/libvlc.dll.a
 # For Unix
-# VLC_LIBS    = -lvlc -lvlccore
+# VLC_LIBS    = -lvlc
 # You may override the INCLUDE and LIB files if you like.
 # You *must* define VLC_INSTALL to use this feature.
 #VLC_INSTALL = 
