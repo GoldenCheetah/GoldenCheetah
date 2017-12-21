@@ -160,6 +160,9 @@ class AddAuth : public QWizardPage
         QPushButton *auth;
         QLabel *tokenLabel;
         QLabel *token;
+        QLabel *messageLabel;
+        QLabel *message;
+
 };
 
 class AddAthlete : public QWizardPage

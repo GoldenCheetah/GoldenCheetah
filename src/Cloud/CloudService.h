@@ -199,6 +199,8 @@ class CloudService : public QObject {
         bool useMetric; // CloudService know distance or duration metadata (eg Today's Plan)
         bool useEndDate; // Dates for file entries use end date time not start (weird, I know, but thats how SixCycle work)
 
+        QString message;
+
     signals:
         void writeComplete(QString id, QString message);
         void readComplete(QByteArray *data, QString id, QString message);

@@ -274,6 +274,8 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     token = new QLabel(this);
     token->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    message = new QLabel(this);
+    message->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     // labels
     comboLabel = new QLabel("");
@@ -283,6 +285,7 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     passLabel = new QLabel(tr("Password"));
     authLabel = new QLabel(tr("Authorise"));
     tokenLabel = new QLabel(tr("Token"));
+    messageLabel = new QLabel(tr("Message"));
 
     layout->addRow(comboLabel, combo);
     layout->addRow(urlLabel, url);
@@ -290,6 +293,7 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     layout->addRow(userLabel, user);
     layout->addRow(passLabel, pass);
     layout->addRow(authLabel, auth);
+    layout->addRow(messageLabel, message);
     layout->addRow(tokenLabel, token);
 
     connect(auth, SIGNAL(clicked(bool)), this, SLOT(doAuth()));
@@ -317,6 +321,14 @@ AddAuth::doAuth()
         oauthDialog->setWindowModality(Qt::ApplicationModal);
         oauthDialog->exec();
         token->setText(wizard->cloudService->getSetting(cname, "").toString());
+
+        QString msg = wizard->cloudService->message;
+        if (msg != "") {
+            message->setText(msg);
+            messageLabel->show();
+            message->show();
+            wizard->cloudService->message = "";
+        }
     }
 
 }
@@ -335,6 +347,7 @@ AddAuth::initializePage()
     user->hide();
     pass->hide();
     auth->hide();
+    message->hide();
     token->hide();
     comboLabel->hide();
     urlLabel->hide();
@@ -342,6 +355,7 @@ AddAuth::initializePage()
     userLabel->hide();
     passLabel->hide();
     authLabel->hide();
+    messageLabel->hide();
     tokenLabel->hide();
 
     // clone to do next few steps!

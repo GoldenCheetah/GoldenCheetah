@@ -52,6 +52,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Withings") site = this->site = WITHINGS;
         if (service->id() == "PolarFlow") site = this->site = POLAR;
         if (service->id() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
+        if (service->id() == "Xert") site = this->site = XERT;
     }
 
     // check if SSL is available - if not - message and end
@@ -203,6 +204,8 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         oauthManager->executeRequest(oauthRequest);
 #endif
 
+    } else if (site == XERT) {
+        urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
     }
 
     //
@@ -346,7 +349,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -429,6 +432,14 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("grant_type", "authorization_code");
                 params.addQueryItem("redirect_uri", "https://goldencheetah.github.io/blank.html");
 
+            }  else if (site == XERT) {
+
+                urlstr = QString("https://www.xertonline.com/oauth/token");
+                params.addQueryItem("username", service->getSetting(GC_XERTUSER, "").toString());
+                params.addQueryItem("password", service->getSetting(GC_XERTPASS, "").toString());
+                params.addQueryItem("grant_type", "password");
+
+                authheader = QString("%1:%1").arg("xert_public");
             }
 
             // all services will need us to send the temporary code received
@@ -446,8 +457,8 @@ OAuthDialog::urlChanged(const QUrl &url)
             QNetworkRequest request = QNetworkRequest(url);
             request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
-            // client id and secret are encoded and sent in the header for POLAR
-            if (site == POLAR)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
+            // client id and secret are encoded and sent in the header for POLAR and XERT
+            if (site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
@@ -687,6 +698,19 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QString info = QString(tr("Today's Plan authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
+        } else if (site == XERT) {
+
+            service->setSetting(GC_XERT_TOKEN, access_token);
+            service->setSetting(GC_XERT_REFRESH_TOKEN, refresh_token);
+
+            // Try without Message Box
+
+            //QString info = QString(tr("Xert authorization was successful."));
+            //QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            //information.exec();
+
+            service->message = "Xert authorization was successful.";
+
         }
 
     } else {

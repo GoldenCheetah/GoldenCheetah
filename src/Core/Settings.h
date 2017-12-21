@@ -354,7 +354,12 @@
 #define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
 #define GC_SPORTTRACKS_REFRESH_TOKEN   "<athlete-private>sporttracks/refresh_token"
 #define GC_SPORTTRACKS_LAST_REFRESH    "<athlete-private>sporttracks/last_refresh"
-
+// Xert
+#define GC_XERTUSER                    "<athlete-private>xert/user"
+#define GC_XERTPASS                    "<athlete-private>xert/pass"
+#define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
+#define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
+#define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>
