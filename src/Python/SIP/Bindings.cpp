@@ -750,7 +750,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
             for(int j=0; j<dates.count(); j++) {
 
                 // make sure its a valid date
-                if (!dates[j].year() || !dates[j].month() || dates[j].day()) dates[j] = QDate::currentDate();
+                if (j==0) dates[j] = QDate::currentDate();
                 PyList_SET_ITEM(datelist, j, PyDate_FromDate(dates[j].year(), dates[j].month(), dates[j].day()));
             }
 
