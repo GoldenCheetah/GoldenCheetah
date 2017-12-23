@@ -33,7 +33,7 @@
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
-    if (TODAYSPLAN_DEBUG) {                                 \
+    if (XERT_DEBUG) {                                 \
         printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
                __FUNCTION__, __VA_ARGS__);                    \
         fflush(stdout);                                       \
