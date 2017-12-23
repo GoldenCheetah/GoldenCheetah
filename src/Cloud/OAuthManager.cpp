@@ -182,7 +182,7 @@ OAuthManager::authorize()
 #endif
 
     } else if (site == XERT) {
-        urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
+        getTokenWithCode("");
     }
 
     //

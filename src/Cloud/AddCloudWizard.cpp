@@ -324,7 +324,7 @@ AddAuth::doAuth()
                 messageLabel->show();
                 message->show();
                 message->setText(QString("Connecting with %1...").arg(wizard->cloudService->id()));
-                oauthManager->exec();
+                oauthManager->authorize();
                 token->setText(wizard->cloudService->getSetting(cname, "").toString());
 
                 QString msg = wizard->cloudService->message;
