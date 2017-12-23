@@ -185,13 +185,20 @@ DownloadRideDialog::updatePort()
         }
     }
 
-    if( ! haveExclusivePort ){
+    if( ! haveExclusivePort ) {
         QString defaultPort = appsettings->value( NULL, GC_LAST_DOWNLOAD_PORT ).toString();
         int idx = portCombo->findText( defaultPort );
         if( idx >= 0 )
             portCombo->setCurrentIndex( idx );
     }
 
+    if (portCombo->count() == 1) {
+        if (portCombo->currentText().contains("Joule")) {
+            int idx = deviceCombo->findText("Joule 1.0, GPS or GPS+");
+            if( idx >= 0 )
+                deviceCombo->setCurrentIndex( idx );
+        }
+    }
     setReadyInstruct();
 }
 
