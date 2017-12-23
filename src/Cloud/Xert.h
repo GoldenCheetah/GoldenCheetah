@@ -40,7 +40,7 @@ class Xert : public CloudService {
         QImage logo() const { return QImage(":images/services/xert.png"); }
 
         // now upload only and authenticates with a user and password
-        int capabilities() const { return UserPass | Upload; }
+        int capabilities() const { return UserPass | OAuth | Upload; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);

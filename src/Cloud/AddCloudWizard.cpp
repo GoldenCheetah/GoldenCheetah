@@ -25,6 +25,7 @@
 #include "Colors.h"
 #include "CloudService.h"
 #include "OAuthDialog.h"
+#include "OAuthManager.h"
 
 #include <QMessageBox>
 #include <QRegExp>
@@ -314,20 +315,42 @@ AddAuth::doAuth()
     // so they are up-to-date before we perform an OAUTH process
     updateServiceSettings();
 
-    OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
-    if (oauthDialog->sslLibMissing()) {
-        delete oauthDialog;
-    } else {
-        oauthDialog->setWindowModality(Qt::ApplicationModal);
-        oauthDialog->exec();
-        token->setText(wizard->cloudService->getSetting(cname, "").toString());
+    if (wizard->cloudService->capabilities() & CloudService::OAuth) {
+        if (wizard->cloudService->capabilities() & CloudService::UserPass) {
+            OAuthManager *oauthManager = new OAuthManager(wizard->context, OAuthManager::NONE, wizard->cloudService);
+            if (oauthManager->sslLibMissing()) {
+                delete oauthManager;
+            } else {
+                messageLabel->show();
+                message->show();
+                message->setText(QString("Connecting with %1...").arg(wizard->cloudService->id()));
+                oauthManager->exec();
+                token->setText(wizard->cloudService->getSetting(cname, "").toString());
 
-        QString msg = wizard->cloudService->message;
-        if (msg != "") {
-            message->setText(msg);
-            messageLabel->show();
-            message->show();
-            wizard->cloudService->message = "";
+                QString msg = wizard->cloudService->message;
+                if (msg != "") {
+                    message->setText(msg);
+
+                    wizard->cloudService->message = "";
+                }
+            }
+        } else {
+            OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
+            if (oauthDialog->sslLibMissing()) {
+                delete oauthDialog;
+            } else {
+                oauthDialog->setWindowModality(Qt::ApplicationModal);
+                oauthDialog->exec();
+                token->setText(wizard->cloudService->getSetting(cname, "").toString());
+
+                QString msg = wizard->cloudService->message;
+                if (msg != "") {
+                    message->setText(msg);
+                    messageLabel->show();
+                    message->show();
+                    wizard->cloudService->message = "";
+                }
+            }
         }
     }
 
