@@ -40,14 +40,14 @@ class Xert : public CloudService {
         QImage logo() const { return QImage(":images/services/xert.png"); }
 
         // now upload only and authenticates with a user and password
-        int capabilities() const { return UserPass | OAuth | Upload; }
+        int capabilities() const { return UserPass | OAuth | Upload | Query; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
         bool close();
 
         // read a file
-        //bool readFile(QByteArray *data, QString remotename, QString remoteid);
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
 
         // write a file
         bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
@@ -58,8 +58,12 @@ class Xert : public CloudService {
 
     public slots:
 
+        // getting data
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
+
         // sending data
-        void writeFileCompleted();
+        void writeFileCompleted();  
 
     private:
         Context *context;
@@ -73,6 +77,6 @@ class Xert : public CloudService {
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
         QString getRideName(RideFile *ride);
-        CloudServiceEntry* readdirdetail(QString path);
+        QJsonObject readActivityDetail(QString path, bool withSessionData);
 };
 #endif

@@ -20,6 +20,7 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
+#include "JsonRideFile.h"
 #include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
@@ -238,17 +239,21 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
                 //      "activity_type":"Cycling"
                 // }
 
-                add->name = QDateTime::fromString(activity["start_date"].toObject()["date"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
-                //add->distance = activity["total_distance"].toString().toDouble() / 1000.0f;
-                //add->duration = activity["duration"].toString().toDouble();
+                QDateTime startDate = QDateTime::fromString(activity["start_date"].toObject()["date"].toString(), Qt::ISODate);
+                startDate.setTimeSpec(Qt::UTC);
+                startDate = startDate.toLocalTime();
+
+                add->name = startDate.toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                add->distance = activity["distance"].toDouble() / 1000.0f;
+                add->duration = activity["duration"].toDouble();
                 add->id = activity["path"].toString();
                 add->label = activity["name"].toString();
                 add->isDir = false;
 
-
                 // Details
-                readdirdetail(add->id);
-
+                QJsonObject detail = readActivityDetail(add->id, false);
+                add->distance = detail["summary"].toObject()["distance"].toDouble();
+                add->duration = detail["summary"].toObject()["duration"].toDouble();
 
                 printd("item: %s\n", add->name.toStdString().c_str());
 
@@ -285,11 +290,14 @@ Xert::getRideName(RideFile *ride)
     return name;
 }
 
-CloudServiceEntry*
-Xert::readdirdetail(QString path)
+QJsonObject
+Xert::readActivityDetail(QString path, bool withSessionData)
 {
+    printd("Xert::readDetail(%s)\n", path.toStdString().c_str());
+
     QString urlstr("https://www.xertonline.com/oauth/activity/"+path);
-    //?include_session_data=1
+    if (withSessionData)
+        urlstr += "?include_session_data=1";
     QUrl url = QUrl( urlstr );
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", QString("Bearer %1").arg(getSetting(GC_XERT_TOKEN,"").toString()).toLatin1());
@@ -311,21 +319,163 @@ Xert::readdirdetail(QString path)
     if (reply->error() == 0) {
 
         // get the data
-        QByteArray r = reply->readAll();
+        QByteArray data = reply->readAll();
 
-        printd("page : %s\n", r.toStdString().c_str());
+        printd("page : %s\n", data.toStdString().c_str());
 
         // parse JSON payload
         QJsonParseError parseError;
-        QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+        QJsonDocument document = QJsonDocument::fromJson(data, &parseError);
 
         printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
         if (parseError.error == QJsonParseError::NoError) {
 
-            QJsonArray session = document.object()["session_data"].toArray();
+            return document.object();
 
         }
     }
+}
+
+// read a file at location (relative to home) into passed array
+bool
+Xert::readFile(QByteArray *data, QString remotename, QString remoteid)
+{
+    printd("Xert::readFile(%s, %s)\n", remotename.toStdString().c_str(), remoteid.toStdString().c_str());
+
+    // do we have a token ?
+    QString token = getSetting(GC_XERT_TOKEN, "").toString();
+    if (token == "") return false;
+
+    QString url("https://www.xertonline.com/oauth/activity/"+remoteid+"?include_session_data=1");
+
+    printd("url:%s\n", url.toStdString().c_str());
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->get(request);
+
+    // remember
+    mapReply(reply,remotename);
+    buffers.insert(reply,data);
+
+    // catch finished signal
+    connect(reply, SIGNAL(finished()), this, SLOT(readFileCompleted()));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
+
+    return true;
+}
+
+void
+Xert::readyRead()
+{
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+    buffers.value(reply)->append(reply->readAll());
+}
+
+// SportTracks workouts are delivered back as JSON, the original is lost
+// so we need to parse the response and turn it into a JSON file to
+// import. The description of the format is here:
+// https://sporttracks.mobi/api/doc/data-structures
+void
+Xert::readFileCompleted()
+{
+    printd("Xert::readFileCompleted\n");
+
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+
+    printd("reply:%s ...\n", buffers.value(reply)->toStdString().substr(0,900).c_str());
+    QByteArray *returning = buffers.value(reply);
+
+    // we need to parse the JSON and create a ridefile from it
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(*buffers.value(reply), &parseError);
+
+    printd("parse (%d): %s\n", parseError.error, parseError.errorString().toStdString().c_str());
+    if (parseError.error == QJsonParseError::NoError) {
+
+        QJsonObject ride = document.object();
+        QDateTime starttime = QDateTime::fromString(ride["start_date"].toString(), Qt::ISODate);
+        starttime.setTimeSpec(Qt::UTC);
+        starttime = starttime.toLocalTime();
+
+        // 1s samples with start time as UTC
+        RideFile *ret = new RideFile(starttime, 1.0f);
+
+        // what sport?
+        if (!ride["summary"].toObject()["activity_type"].isNull()) {
+            QString stype = ride["summary"].toObject()["activity_type"].toString();
+            if (stype == "Cycling") ret->setTag("Sport", "Bike");
+            else if (stype == "Running") ret->setTag("Sport", "Run");
+            else if (stype == "Swimming") ret->setTag("Sport", "Swim");
+            else ret->setTag("Sport", stype);
+        }
+
+        // location => route
+        if (!ride["name"].isNull()) ret->setTag("Objectives", ride["name"].toString());
+        if (!ride["notes"].isNull()) ret->setTag("Notes", ride["description"].toString());
+
+        // SAMPLES DATA
+        //
+
+        QJsonArray sessionData = ride["session_data"].toArray();
+
+        long unix_starttime=0;
+
+        for (int i = 0; i< sessionData.count(); i++) {
+            QJsonObject data = sessionData.at(i).toObject();
+            RideFilePoint add;
+
+
+            if (!data["unix_time"].isNull()) {
+                if (unix_starttime == 0)
+                    unix_starttime = data["unix_time"].toDouble();
+                add.secs = (data["unix_time"].toDouble()-unix_starttime) / 1000;
+            }
+
+            if (!data["power"].isNull())
+                add.watts = data["power"].toDouble();
+
+            if (!data["hr"].isNull())
+                add.hr = data["hr"].toInt();
+
+            if (!data["alt"].isNull())
+                add.alt = data["alt"].toInt();
+
+            if (!data["spd"].isNull())
+                add.kph = data["spd"].toInt() / 1000.0;
+
+            if (!data["dist"].isNull())
+                add.km = data["dist"].toDouble() / 1000.0;
+
+            if (!data["lat"].isNull())
+                add.lat = data["lat"].toDouble();
+
+            if (!data["lng"].isNull())
+                add.lon = data["lng"].toDouble();
+
+            ret->appendPoint(add);
+
+        }
+
+
+        // create a response
+        JsonFileReader reader;
+        returning->clear();
+        returning->append(reader.toByteArray(context, ret, true, true, true, true));
+
+        // temp ride not needed anymore
+        delete ret;
+
+    } else {
+
+        returning->clear();
+    }
+
+    // return
+    notifyReadComplete(returning, replyName(reply), tr("Completed."));
 }
 
 bool
@@ -384,8 +534,6 @@ Xert::writeFileCompleted()
 
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
 
-    printd("reply:%s\n", reply->readAll().toStdString().c_str());
-
     bool uploadSuccessful = false;
 
     bool success;
@@ -395,6 +543,8 @@ Xert::writeFileCompleted()
 
         // parse the response
         QString response = reply->readAll();
+        printd("reply:%s\n", response.toStdString().c_str());
+
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get values
