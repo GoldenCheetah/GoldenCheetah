@@ -531,7 +531,7 @@ void RGraphicsDevice::onBeforeExecute()
 
 void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
 {
-    double pointsize = 12;
+    double pointsize = 12 / dpiXFactor;
     double xoff=0, yoff=0, width=7, height=7;
 
     pDev->startps = pointsize;
