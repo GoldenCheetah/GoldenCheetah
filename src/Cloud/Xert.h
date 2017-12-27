@@ -36,7 +36,7 @@ class Xert : public CloudService {
 
         QString id() const { return "Xert"; }
         QString uiName() const { return tr("Xert"); }
-        QString description() const { return(tr("The innovativie platform for comprehensive fitness monitoring, tracking, and planning.")); }
+        QString description() const { return(tr("Sync with the innovative site for fitness monitoring, tracking, and planning.")); }
         QImage logo() const { return QImage(":images/services/xert.png"); }
 
         // now upload only and authenticates with a user and password
