@@ -2297,6 +2297,7 @@ EditMetricDetailDialog::measureName()
         .arg(context->athlete->measures->getFieldNames(measureGroup).value(measureField));
     userName->setText(desc);
     userUnits->setText(context->athlete->measures->getFieldUnits(measureGroup, measureField));
+    metricDetail->symbol = desc.replace(" ", "_");
 }
 
 void
