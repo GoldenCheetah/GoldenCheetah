@@ -17,7 +17,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1110"/>
         <source>Average altitude power. Recorded power adjusted to take into account the effect of altitude on vo2max and thus power output.</source>
-        <translation>Medeleffekt korrigerad för höjd-över-havet. Inkluderar höjdpåverkan på VO2max och därmed utvecklad effekt.</translation>
+        <translation>Medeleffekt korrigerad för höjd. Inkluderar höjdpåverkan på VO2max och därmed utvecklad effekt.</translation>
     </message>
     <message>
         <source>Average altitude power. Recorded power ajusted to take into account the effect of altitude on vo2max and thus power output.</source>
@@ -60,7 +60,7 @@
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="37"/>
         <source>Version</source>
-        <translation>Verision</translation>
+        <translation>Version</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="39"/>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="62"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Mjukvara för Effektanalys&lt;br&gt;för Linux, Mac och Windows&lt;p&gt;GoldenCheetah är licensierat under&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Källkoden kan laddas ner från&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Motionspassdata och annan informaiton lagras i&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Använda Varumärken&lt;br&gt;BikeScore, xPower, SwimScore med tillåtelse av &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed med tillåtelse av Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Mjukvarumodulen för kroppstemperatur utvecklades av &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; och är patentsökt&lt;br&gt;&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Mjukvara för Effektanalys&lt;br&gt;för Linux, Mac och Windows&lt;p&gt;GoldenCheetah är licensierat under&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Källkoden kan laddas ner från&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Aktivitetsdata och annan informaiton lagras i&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Använda Varumärken&lt;br&gt;BikeScore, xPower, SwimScore med tillåtelse av &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed med tillåtelse av Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Mjukvarumodulen för kroppstemperatur utvecklades av &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; och är patentsökt&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -231,7 +231,7 @@
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="367"/>
         <source>Save Workout</source>
-        <translation>Spara Träningspassplan</translation>
+        <translation>Spara Träningspass</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="368"/>
@@ -249,7 +249,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3710"/>
         <source>A checksum for the activity, can be used to trigger cache refresh in R scripts.</source>
-        <translation>Träningspassets kontrollsumma kan användas tör att starta en cache förnyelse av R skripten.</translation>
+        <translation>Aktivitetens kontrollsumma kan användas tör att starta en cache förnyelse av R skripten.</translation>
     </message>
 </context>
 <context>
@@ -262,7 +262,7 @@
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="369"/>
         <source>Select Athlete for this account</source>
-        <translation>Välj Handledda Idrottare till detta konto</translation>
+        <translation>Välj detta kontos Idrottare</translation>
     </message>
 </context>
 <context>
@@ -783,7 +783,7 @@
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1229"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1230"/>
@@ -837,7 +837,7 @@
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="558"/>
         <source>Athlete ID</source>
-        <translation>Idrottare ID</translation>
+        <translation>Idrottar ID</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="580"/>
@@ -883,13 +883,13 @@ On Linux and Apple computers you will need to extract it from the VR Software CD
 Please take care to ensure that the file is the latest version of the Firmware file.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it. </source>
-        <translation>Tacx Fortius trainer behöver en firmware fil från Tacx BV. Denna fil är Copyright-skyddad och kan inte levereras med GoldenCheetah.
+        <translation>Tacx Fortius trainer behöver en firmwarefil från Tacx BV. Denna fil är Copyrightskyddad och kan inte levereras med GoldenCheetah.
 
 På Windows hittas filen normalt i C:\Windows\system32 under namet &quot;FortiusSWPID1942Renum.hex&quot;.
 
 På Linux och Apple hittas filen på VR Software distributions CD-skivan. Filen finns i &quot;data2.cab&quot; arkivet. Filen är en &quot;Install Shield&quot; fil och kan läsas med programmet &quot;unshield&quot;.
 
-Vi rekomenderar att den senaste verisionen av denna fil används.
+Vi rekomenderar att den senaste versionen av denna fil används.
 
 Genom att välja &quot;Skapa lokal kopia&quot; kommer filen att kopieras in i GoldenCheetah installationen, annars används en länk till den angivna filen. </translation>
     </message>
@@ -959,7 +959,7 @@ Genom att välja &quot;Skapa lokal kopia&quot; kommer filen att kopieras in i Go
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="79"/>
         <source>Peak Speed</source>
-        <translation>Topphastighet</translation>
+        <translation>Toppfart</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="84"/>
@@ -1072,17 +1072,17 @@ Genom att välja &quot;Skapa lokal kopia&quot; kommer filen att kopieras in i Go
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="262"/>
         <source>&amp;Add to Activity</source>
-        <translation>&amp;Bifoga till motionspassplan</translation>
+        <translation>&amp;Bifoga till aktivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="501"/>
         <source>Select Activity</source>
-        <translation>Välj motionspassplan</translation>
+        <translation>Välj aktivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="501"/>
         <source>No activity selected!</source>
-        <translation>Ingen motionspassplan vald!</translation>
+        <translation>Ingen aktivitet vald!</translation>
     </message>
 </context>
 <context>
@@ -1395,7 +1395,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/Aerolab.cpp" line="220"/>
         <location filename="../../Charts/Aerolab.cpp" line="503"/>
         <source>Elevation (m)</source>
-        <translation>Höjd över havet (m)</translation>
+        <translation>Höjd (m ö.h.)</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="222"/>
@@ -1405,17 +1405,17 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="225"/>
         <source>V-Elevation</source>
-        <translation>virtuell höjd över havet</translation>
+        <translation>virtuell höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="226"/>
         <source>Elevation</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="511"/>
         <source>Elevation (&apos;)</source>
-        <translation>Höjd över havet (fot)</translation>
+        <translation>Höjd (fot)</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="576"/>
@@ -1445,12 +1445,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="891"/>
         <source>Altitude and Power data must be present</source>
-        <translation>Värden för höjd över havet och effekt behöver vara tillgängliga</translation>
+        <translation>Värden för höjd och effekt behöver vara tillgängliga</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="894"/>
         <source>No activity selected</source>
-        <translation>Inget motionspass är valt</translation>
+        <translation>Ingen aktivitet är vald</translation>
     </message>
 </context>
 <context>
@@ -1498,7 +1498,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="212"/>
         <source>Constant altitude (velodrome,...)</source>
-        <translation>Konstant höjd över havet (velodrom,...)</translation>
+        <translation>Konstant höjd (velodrom,...)</translation>
     </message>
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="220"/>
@@ -1547,7 +1547,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/AllPlot.cpp" line="7006"/>
         <location filename="../../Charts/AllPlot.cpp" line="7011"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2952"/>
@@ -1613,7 +1613,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/AllPlot.cpp" line="4563"/>
         <location filename="../../Charts/AllPlot.cpp" line="4567"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3865"/>
@@ -1716,7 +1716,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/AllPlot.cpp" line="4569"/>
         <location filename="../../Charts/AllPlot.cpp" line="4573"/>
         <source>Alt/Slope</source>
-        <translation>Höjd över havet/Lutning</translation>
+        <translation>Höjd/Lutning</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3881"/>
@@ -1801,62 +1801,62 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/AllPlot.cpp" line="4714"/>
         <location filename="../../Charts/AllPlot.cpp" line="4717"/>
         <source>Left Pedal Smoothness</source>
-        <translation>Vänster Tramptag Jämnhet</translation>
+        <translation>Vä Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3985"/>
         <location filename="../../Charts/AllPlot.cpp" line="4723"/>
         <location filename="../../Charts/AllPlot.cpp" line="4726"/>
         <source>Right Pedal Smoothness</source>
-        <translation>Höger Tramptag Jämnhet</translation>
+        <translation>Hö Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3993"/>
         <location filename="../../Charts/AllPlot.cpp" line="4732"/>
         <location filename="../../Charts/AllPlot.cpp" line="4735"/>
         <source>Left Torque Efficiency</source>
-        <translation>Vänster Vridmomentseffektivitet</translation>
+        <translation>Vä Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4001"/>
         <location filename="../../Charts/AllPlot.cpp" line="4741"/>
         <location filename="../../Charts/AllPlot.cpp" line="4744"/>
         <source>Right Torque Efficiency</source>
-        <translation>Höger Vridmomentseffektivitet</translation>
+        <translation>Hö Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4012"/>
         <location filename="../../Charts/AllPlot.cpp" line="4757"/>
         <source>Left/Right Pedal Center Offset</source>
-        <translation>Vänster/Höger Pedal Tryckcentrumoffset</translation>
+        <translation>Vä/Hö PCO</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4020"/>
         <location filename="../../Charts/AllPlot.cpp" line="4764"/>
         <location filename="../../Charts/AllPlot.cpp" line="4766"/>
         <source>Left Power Phase</source>
-        <translation>Vänster Effektfas</translation>
+        <translation>Vä Kraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4028"/>
         <location filename="../../Charts/AllPlot.cpp" line="4773"/>
         <location filename="../../Charts/AllPlot.cpp" line="4775"/>
         <source>Right Power Phase</source>
-        <translation>Höger Effektfas</translation>
+        <translation>Hö Kraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4036"/>
         <location filename="../../Charts/AllPlot.cpp" line="4782"/>
         <location filename="../../Charts/AllPlot.cpp" line="4784"/>
         <source>Left Peak Power Phase</source>
-        <translation>Vänster Toppeffektfas</translation>
+        <translation>Vä Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4044"/>
         <location filename="../../Charts/AllPlot.cpp" line="4791"/>
         <location filename="../../Charts/AllPlot.cpp" line="4793"/>
         <source>Right Peak Power Phase</source>
-        <translation>HögerToppeffektfas</translation>
+        <translation>Hö  Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4054"/>
@@ -1880,22 +1880,22 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4751"/>
         <source>Left Pedal Center Offset</source>
-        <translation>Vänster Pedal Tryckcentrumoffset</translation>
+        <translation>Vä PCO</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4754"/>
         <source>Right Pedal Center Offset</source>
-        <translation>Höger Pedal Tryckcentrumoffset</translation>
+        <translation>Hö PCO</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4799"/>
         <source>Left Balance</source>
-        <translation>Vänster Balans</translation>
+        <translation>Vä Balans</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4801"/>
         <source>Right Balance</source>
-        <translation>Höger Balans</translation>
+        <translation>Hö Balans</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="7008"/>
@@ -1953,7 +1953,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2849"/>
         <source>Watts</source>
-        <translation>Éffekt [W]</translation>
+        <translation>Effekt [W]</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2868"/>
@@ -1968,12 +1968,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2986"/>
         <source>KPH</source>
-        <translation>Hastighet [km/h]</translation>
+        <translation>Fart [km/h]</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2986"/>
         <source>MPH</source>
-        <translation>Hastighet [mile/h]</translation>
+        <translation>Fart [mile/h]</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3015"/>
@@ -1988,12 +1988,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3064"/>
         <source>Meters</source>
-        <translation>Höjd över havet [m]</translation>
+        <translation>m ö.h.</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3064"/>
         <source>Feet</source>
-        <translation>Höjd över havet [Fuß]</translation>
+        <translation>Fot</translation>
     </message>
 </context>
 <context>
@@ -2026,7 +2026,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="311"/>
         <source>Run Cadence</source>
-        <translation>Stegfrekuens</translation>
+        <translation>Stegfrekvens</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="315"/>
@@ -2111,7 +2111,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="381"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="385"/>
@@ -2121,12 +2121,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="389"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="395"/>
         <source>Alt/Slope</source>
-        <translation>Höjd över havet/Lutning</translation>
+        <translation>Höjd/Lutning</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="401"/>
@@ -2151,62 +2151,62 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="420"/>
         <source>Left Balance</source>
-        <translation>Vänster Balansl</translation>
+        <translation>Vä Balans</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="424"/>
         <source>Right Balance</source>
-        <translation>Höger Balansl</translation>
+        <translation>Hö Balans</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="428"/>
         <source>Left Torque Efficiency</source>
-        <translation>Vänster Vridmomentseffektivitet</translation>
+        <translation>Vä Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="432"/>
         <source>Right Torque Efficiency</source>
-        <translation>Höger Vridmomentseffektivitet</translation>
+        <translation>Hö Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="436"/>
         <source>Left Pedal Smoothness</source>
-        <translation>Vänster Tramptag Jämnhet</translation>
+        <translation>Vä Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="440"/>
         <source>Right Pedal Smoothness</source>
-        <translation>Höger Tramptag Jämnhet</translation>
+        <translation>Hö Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="444"/>
         <source>Left Pedal Center Offset</source>
-        <translation>Vänster Pedal Tryckcentrumoffset</translation>
+        <translation>Vä PCO</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="448"/>
         <source>Right Pedal Center Offset</source>
-        <translation>Höger Pedal Tryckcentrumoffset</translation>
+        <translation>Hö PCO</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="452"/>
         <source>Left Pedal Power Phase</source>
-        <translation>Vänster Trampleffektfas</translation>
+        <translation>Vä Kraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="455"/>
         <source>Right Pedal Power Phase</source>
-        <translation>Höger Trampefffektfas</translation>
+        <translation>Hö Kraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="458"/>
         <source>Left Peak Pedal Power Phase</source>
-        <translation>Vänster Topptrampeffektsfas</translation>
+        <translation>Vä Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="461"/>
         <source>Right Peak Pedal Power Phase</source>
-        <translation>Höger Topptrampeffektsfas</translation>
+        <translation>Hö Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="464"/>
@@ -2336,7 +2336,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="295"/>
         <source>Torque Effectiveness</source>
-        <translation>Vridmomentseffektivitet</translation>
+        <translation>Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="299"/>
@@ -2346,12 +2346,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="303"/>
         <source>Pedal Center Offset</source>
-        <translation>Pedal Tryckcentrumoffset</translation>
+        <translation>PCO</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="311"/>
         <source>Peak Power Phase</source>
-        <translation>Toppeffektsfas</translation>
+        <translation>Toppkraftsfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="319"/>
@@ -2416,7 +2416,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="362"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="327"/>
@@ -2469,12 +2469,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="307"/>
         <source>Power Phase</source>
-        <translation>Effektfas</translation>
+        <translation>Kraftfas</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="370"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="374"/>
@@ -2504,7 +2504,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="397"/>
         <source>No Alt/Slope</source>
-        <translation>Ingen Höjd över havet/Lutning</translation>
+        <translation>Ingen Höjd/Lutning</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="398"/>
@@ -2525,7 +2525,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/AllPlotWindow.cpp" line="401"/>
         <location filename="../../Charts/AllPlotWindow.cpp" line="1530"/>
         <source>Alt/Slope</source>
-        <translation>Höjd över havet/Lutning</translation>
+        <translation>Höjd/Lutning</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="406"/>
@@ -2644,17 +2644,17 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="387"/>
         <source>Revert to Saved version</source>
-        <translation>Återgå till Sparad verision</translation>
+        <translation>Återgå till Sparad version</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="390"/>
         <source>Delete Activity</source>
-        <translation>Radera Träningspass</translation>
+        <translation>Radera Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="393"/>
         <source>Split Activity</source>
-        <translation>Dela upp Träningspass</translation>
+        <translation>Dela upp Aktivitet</translation>
     </message>
     <message>
         <source>Upload Activity to Calendar</source>
@@ -2713,12 +2713,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="631"/>
         <source>No activity selected</source>
-        <translation>Inget träningspass valt</translation>
+        <translation>Ingen aktivitet vald</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="633"/>
         <source>Current activity contains no data</source>
-        <translation>Aktuellt träningspass är tomt</translation>
+        <translation>Aktuell aktivitet är tom</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="763"/>
@@ -2815,7 +2815,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="576"/>
         <source>Suspiciously high speed</source>
-        <translation>Orimligt hög hastighet</translation>
+        <translation>Orimligt hög fart</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="580"/>
@@ -2841,7 +2841,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2961"/>
         <source>Anomalies</source>
-        <translation>Anomali</translation>
+        <translation>Fel</translation>
     </message>
 </context>
 <context>
@@ -2870,7 +2870,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="302"/>
         <source>Athlete Weight</source>
-        <translation>Idrottare Vikt</translation>
+        <translation>Idrottarvikt</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="306"/>
@@ -2890,12 +2890,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="309"/>
         <source>KPI Tracker</source>
-        <translation>Nyckeltal (KPI)</translation>
+        <translation>Nyckeltal</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="310"/>
         <source>Critical Power Trend</source>
-        <translation>Baskraft (CP) Utveckling</translation>
+        <translation>Critical Power (CP) Utveckling</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="311"/>
@@ -2920,7 +2920,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="315"/>
         <source>Power &amp; Speed Trend</source>
-        <translation>Effekt- och Hastighetsutveckling</translation>
+        <translation>Effekt- och Fartutveckling</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="316"/>
@@ -2945,12 +2945,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="105"/>
         <source>Zones File %1 Error</source>
-        <translation>Zon-fili: %1 Fel</translation>
+        <translation>Zon-fil: %1 Fel</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="107"/>
         <source>Reading Zones File %1</source>
-        <translation>Läser Zon-fili: %1</translation>
+        <translation>Läser Zon-fil: %1</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="124"/>
@@ -2960,7 +2960,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="126"/>
         <source>Reading HR Zones File %1</source>
-        <translation>Läser HF-Zon fili: %1</translation>
+        <translation>Läser HF-Zon fil: %1</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="304"/>
@@ -2970,7 +2970,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="305"/>
         <source>Time in W&apos; Zone</source>
-        <translation>Tid i W&apos; Zon</translation>
+        <translation>Tid i W&apos;-Zon</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="319"/>
@@ -3035,12 +3035,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="331"/>
         <source>CP History</source>
-        <translation>Baskraft (CP) Historik</translation>
+        <translation>CP Historik</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="332"/>
         <source>CP Analysis</source>
-        <translation>Baskraft (CP) Analys</translation>
+        <translation>CP Analys</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="333"/>
@@ -3050,17 +3050,17 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="334"/>
         <source>Time in Pace Zones</source>
-        <translation>Tid i Tempo Zon</translation>
+        <translation>Tid i Tempozon</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="335"/>
         <source>Run Pace</source>
-        <translation>Löp Tempo</translation>
+        <translation>Löptempo</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="336"/>
         <source>Swim Pace</source>
-        <translation>Sim Tempo</translation>
+        <translation>Simtempo</translation>
     </message>
 </context>
 <context>
@@ -3295,7 +3295,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="526"/>
         <source>Weight in kg or lbs: first from downloaded Body Measure data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation>Vikt i kg eller lbm: först från nedladdade kroppsmätetal, sedan från aktivitetsmetadata och sist från Idrottarinställningarna som har 75kg förinställt</translation>
+        <translation>Vikt i kg eller lbm: först från nedladdade kroppsmätetal, sedan från aktivitetsmetadata och sist från Idrottarinställningar där 75kg är default</translation>
     </message>
     <message>
         <source>Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
@@ -3436,7 +3436,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2889"/>
         <source>Average Left Pedal Center Offset</source>
-        <translation>Genomsnittling Tryckcentrumoffset Vänster Pedal</translation>
+        <translation>Vä PCO Medel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2890"/>
@@ -3451,7 +3451,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2895"/>
         <source>Platform center offset is the location on the left pedal platform where you apply force, on average.</source>
-        <translation>Genomsnittling Tryckcentrumsoffset är positionen på pedalen där applicerat tryck är centrerat.</translation>
+        <translation>Platform Center Offset, PCO, är positionen på pedalen där fotens tryck är centrerat i medel.</translation>
     </message>
 </context>
 <context>
@@ -3459,7 +3459,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3423"/>
         <source>Average Left Power Phase Length</source>
-        <translation>Vänster Genomsnittlig Båglängd Effekttillförselfas</translation>
+        <translation>Vä Kraftfas Medelbåglängd</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3424"/>
@@ -3469,7 +3469,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3427"/>
         <source>It is the left pedal stroke region length where you produce positive power, on average.</source>
-        <translation>Den genomsnittliga båglängden mätt i grader där effekt tillförs av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga båglängden då effekt tillförs av cyklisten under tramptaget.</translation>
     </message>
 </context>
 <context>
@@ -3477,7 +3477,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2998"/>
         <source>Average Left Power Phase Start</source>
-        <translation>Vänster Genomsnittlig Startvinkel  Effekttillförselfas</translation>
+        <translation>Vä Kraftfas Medelstartvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2999"/>
@@ -3487,7 +3487,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3002"/>
         <source>It is the left pedal stroke angle where you start producing positive power, on average.</source>
-        <translation>Den genomsnittliga startvinkeln där effekt börjar tillföras av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga vinkeln där effekt börjar tillföras av cyklisten under tramptaget.</translation>
     </message>
 </context>
 <context>
@@ -3495,7 +3495,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3104"/>
         <source>Average Left Power Phase End</source>
-        <translation>Vänster Genomsnittlig Slutvinkel  Effekttillförselfas</translation>
+        <translation>Vä Kraftfas Medelslutvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3105"/>
@@ -3505,7 +3505,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3108"/>
         <source>It is the left pedal stroke angle where you end producing positive power, on average.</source>
-        <translation>Den genomsnittliga slutvinkeln där effekt slutar tillföras av cyklisten under tramptaget.</translation>
+        <translation>Medelvinkeln där effekt slutar tillföras av cyklisten under tramptaget.</translation>
     </message>
 </context>
 <context>
@@ -3513,7 +3513,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3513"/>
         <source>Average Left Peak Power Phase Length</source>
-        <translation>Vänster Genomsnittlig Båglängd Toppeffekttillförselfas</translation>
+        <translation>Vä Toppkraftfas Medelbåglängd</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3514"/>
@@ -3523,7 +3523,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3517"/>
         <source>It is the left pedal stroke region length where you produce peak power, on average.</source>
-        <translation>Den genomsnittliga båglängden mätt i grader där toppeffekt tillförs av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga båglängden för den del av tramptaget då toppeffekt tillförs.</translation>
     </message>
 </context>
 <context>
@@ -3531,7 +3531,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3209"/>
         <source>Average Left Peak Power Phase Start</source>
-        <translation>Vänster Genomsnittlig Startvinkel Toppeffekttillförselfas</translation>
+        <translation>Vä Toppkraftfas Genomsnittlig Startvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3210"/>
@@ -3549,7 +3549,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3316"/>
         <source>Average Left Peak Power Phase End</source>
-        <translation>Vänster Genomsnittlig Slutvinkel Toppeffekttillförselfas</translation>
+        <translation>Vä Toppkraftfas Genomsnittlig Slutvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3317"/>
@@ -3567,7 +3567,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2782"/>
         <source>Average Left Pedal Smoothness</source>
-        <translation>Vänster Genomsnittligt Tramptag Jämnhet</translation>
+        <translation>Vä Genomsnittlig Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2783"/>
@@ -3586,7 +3586,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2673"/>
         <source>Average Left Torque Effectiveness</source>
-        <translation>Vänster Genomsnittling Vridmomentseffektivitet</translation>
+        <translation>Vä Medel Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2674"/>
@@ -3624,7 +3624,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2944"/>
         <source>Average Right Pedal Center Offset</source>
-        <translation>Genomsnittling Tryckcentrumoffset Höger Pedal</translation>
+        <translation>Hö PCO Medel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2945"/>
@@ -3639,7 +3639,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2950"/>
         <source>Platform center offset is the location on the right pedal platform where you apply force, on average.</source>
-        <translation>Genomsnittling Tryckcentrumsoffset är positionen på pedalen där applicerat tryck är centrerat.</translation>
+        <translation>Platform Center Offset, PCO, är positionen på pedalen där fotens tryck är centrerat i medel.</translation>
     </message>
 </context>
 <context>
@@ -3647,7 +3647,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3469"/>
         <source>Average Right Power Phase Length</source>
-        <translation>Höger Genomsnittlig Båglängd Effekttillförselfas</translation>
+        <translation>Hö Kraftfas Medelbåglängd</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3470"/>
@@ -3665,7 +3665,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3156"/>
         <source>Average Right Power Phase End</source>
-        <translation>Höger Genomsnittlig Slutvinkel  Effekttillförselfas</translation>
+        <translation>Hö Kraftfas Medelslutvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3157"/>
@@ -3675,7 +3675,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3160"/>
         <source>It is the right pedal stroke angle where you end producing positive power, on average.</source>
-        <translation>Den genomsnittliga slutvinkeln där effekt slutar tillföras av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga vinkeln där effekt slutar tillföras av cyklisten under tramptaget.</translation>
     </message>
 </context>
 <context>
@@ -3683,7 +3683,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3559"/>
         <source>Average Right Peak Power Phase Length</source>
-        <translation>Höger Genomsnittlig Båglängd Toppeffekttillförselfas</translation>
+        <translation>Hö Toppkraftfas Medelbåglängd</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3560"/>
@@ -3693,7 +3693,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3563"/>
         <source>It is the right pedal stroke region length where you produce peak power, on average.</source>
-        <translation>Den genomsnittliga båglängden mätt i grader där toppeffekt tillförs av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga båglängden för den del av tramptaget då toppeffekt tillförs.</translation>
     </message>
 </context>
 <context>
@@ -3701,7 +3701,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3262"/>
         <source>Average Right Peak Power Phase Start</source>
-        <translation>Höger Genomsnittlig Startvinkel Toppeffekttillförselfas</translation>
+        <translation>Hö Toppkraftfas Medelstartvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3263"/>
@@ -3711,7 +3711,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3266"/>
         <source>It is the right pedal stroke angle where you start producing peak power, on average.</source>
-        <translation>Den genomsnittliga startvinkeln mätt i grader där toppeffekt börjar tillföras av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga vinkeln mätt i grader där toppeffekt börjar tillföras av cyklisten under tramptaget.</translation>
     </message>
 </context>
 <context>
@@ -3719,7 +3719,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3368"/>
         <source>Average Right Peak Power Phase End</source>
-        <translation>Höger Genomsnittlig Slutvinkel Toppeffekttillförselfas</translation>
+        <translation>Hö Toppkraftsfas Medelslutvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3369"/>
@@ -3729,7 +3729,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3372"/>
         <source>It is the right pedal stroke angle where you end producing peak power, on average.</source>
-        <translation>Den genomsnittliga slutvinkeln mätt i grader där toppeffekt slutar tillföras av cyklisten under tramptaget.</translation>
+        <translation>Den genomsnittliga vinkeln mätt i grader där toppeffekt slutar tillföras av cyklisten under tramptaget.</translation>
     </message>
 </context>
 <context>
@@ -3737,7 +3737,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2836"/>
         <source>Average Right Pedal Smoothness</source>
-        <translation>Höger Genomsnittligt Tramptag Jämnhet</translation>
+        <translation>Hö Genomsnittlig Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2837"/>
@@ -3756,7 +3756,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2728"/>
         <source>Average Right Torque Effectiveness</source>
-        <translation>Vänster Genomsnittling Vridmomentseffektivitet</translation>
+        <translation>Hö Medel Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2729"/>
@@ -3775,7 +3775,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3050"/>
         <source>Average Right Power Phase Start</source>
-        <translation>Höger Genomsnittlig Startvinkel  Effekttillförselfas</translation>
+        <translation>Hö Kraftfas Medelstartvinkel</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3051"/>
@@ -3865,7 +3865,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="877"/>
         <source>Average Speed</source>
-        <translation>Medelhastighet</translation>
+        <translation>Medelfart</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="878"/>
@@ -3880,7 +3880,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="883"/>
         <source>Average Speed in kph or mph, computed from distance over time when speed not zero</source>
-        <translation>Medelhastighet i km/h eller mph, beräknat genom sträcka delat med tid då man inte står still</translation>
+        <translation>Medefart i km/h eller mph, beräknat genom sträcka delat med tid då man inte står still</translation>
     </message>
 </context>
 <context>
@@ -3922,7 +3922,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1695"/>
         <source>Average Temp from activity data</source>
-        <translation>Medeltemperatur från träningspassdata</translation>
+        <translation>Medeltemperatur från aktivitetsdata</translation>
     </message>
 </context>
 <context>
@@ -3977,7 +3977,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="33"/>
         <source>Activity Batch Export</source>
-        <translation>Träningspass batch export</translation>
+        <translation>Aktiviteter batch export</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="46"/>
@@ -4065,7 +4065,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="186"/>
         <source>%1 activities exported, %2 failed or skipped.</source>
-        <translation>%1 träningspass exporterade, %2 misslyckades eller hoppades över.</translation>
+        <translation>%1 aktiviteter exporterade, %2 misslyckades eller hoppades över.</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="187"/>
@@ -4498,7 +4498,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="404"/>
         <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to TSS it can be computed as 100 * hours * (Relative Intensity)^2</source>
-        <translation>Skibas stress score beaktar både intensitet och längd på träningspasset, liknande TSS kan det beräknas som 100 * tid-i-timmar * (Relativ Intensitet)^2</translation>
+        <translation>Skibas stress score beaktar både intensitet och längd på aktiviteten, liknande TSS kan det beräknas som 100 * tid-i-timmar * (Relativ Intensitet)^2</translation>
     </message>
 </context>
 <context>
@@ -4558,7 +4558,7 @@ Låt oss börja med ett exempel.</translation>
         <location filename="../../Charts/BlankState.cpp" line="204"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
-        <translation>Inga träningsdata?
+        <translation>Inga aktivitetsdata?
 Låt oss börja med ett exempel.</translation>
     </message>
     <message>
@@ -4593,7 +4593,7 @@ Låt oss börja med ett exempel.</translation>
         <location filename="../../Charts/BlankState.cpp" line="175"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
-        <translation>Inga träningsdata?
+        <translation>Inga aktivitetsdata?
 Låt oss starta med ett exempel.</translation>
     </message>
     <message>
@@ -4808,7 +4808,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="51"/>
         <source>From date of first recorded activity to today</source>
-        <translation>Från första aktivitetens datum tills idag</translation>
+        <translation>Från första aktivitets datum tills idag</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="52"/>
@@ -5003,7 +5003,7 @@ Går till inställningar.</translation>
         <location filename="../../Charts/CPPlot.cpp" line="71"/>
         <location filename="../../Charts/CPPlot.cpp" line="307"/>
         <source>Interval Length</source>
-        <translation>Intervallängd</translation>
+        <translation>Tid till Utmattning</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="85"/>
@@ -5123,7 +5123,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="234"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="235"/>
@@ -5175,7 +5175,7 @@ Går till inställningar.</translation>
         <location filename="../../Charts/CPPlot.cpp" line="265"/>
         <location filename="../../Charts/CPPlot.cpp" line="275"/>
         <source>w/lb</source>
-        <translation>W/lb</translation>
+        <translation>W/lbm</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="271"/>
@@ -5195,7 +5195,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="281"/>
         <source>m/hour</source>
-        <translation>m/Stunde</translation>
+        <translation>m/timme</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="301"/>
@@ -5321,7 +5321,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="665"/>
         <source>yd</source>
-        <translation>yd</translation>
+        <translation>yard</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="672"/>
@@ -5364,13 +5364,13 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Charts/CPPlot.cpp" line="737"/>
         <location filename="../../Charts/CPPlot.cpp" line="1557"/>
         <source>Percent of Best / Heat Activities</source>
-        <translation>Procent av Personbästa / &quot;Heat&quot; Träningspass</translation>
+        <translation>Procent av Personbästa / &quot;Heat&quot; Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="738"/>
         <location filename="../../Charts/CPPlot.cpp" line="1568"/>
         <source>Heat Activities</source>
-        <translation>Heat Träningspass</translation>
+        <translation>Heat Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1739"/>
@@ -5381,13 +5381,15 @@ ddd, dd.MMM yyyy</translation>
         <location filename="../../Charts/CPPlot.cpp" line="1752"/>
         <source>
 %1 m %2 yd</source>
-        <translation></translation>
+        <translation>
+%1 m %2 yard</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1755"/>
         <source>
 %1 km %2 mi</source>
-        <translation></translation>
+        <translation>
+%1 km %2 mile</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2199"/>
@@ -5583,7 +5585,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Cloud/CalendarDownload.cpp" line="82"/>
         <source>Remote Calendar not available, reverting to cached workouts.</source>
-        <translation>Extern kalender kan inte nås, använderl lokalt sparade träningspass istället.</translation>
+        <translation>Extern kalender kan inte nås, använderl lokalt sparade aktiviteter istället.</translation>
     </message>
 </context>
 <context>
@@ -6554,12 +6556,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1725"/>
         <source>Activity Scrollbar</source>
-        <translation>Träningspass Rullningslist</translation>
+        <translation>Aktivitetsrullningslist</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1728"/>
         <source>Activity Headings</source>
-        <translation>Träningspass Titlar</translation>
+        <translation>Aktivitet Titlar</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1739"/>
@@ -7074,12 +7076,12 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="245"/>
         <source>No Activity</source>
-        <translation>Inget Träningspass</translation>
+        <translation>Ingen Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="248"/>
         <source>Current Activity</source>
-        <translation>Aktuellt Träningspass</translation>
+        <translation>Aktuell Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="253"/>
@@ -7292,7 +7294,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1459"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1460"/>
@@ -7466,7 +7468,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="1102"/>
         <source>CyclingAnalytics support isn&apos;t enabled in this build</source>
-        <translation>Cycling Analytics stöds inte i denna programverision</translation>
+        <translation>Cycling Analytics stöds inte i denna programversion</translation>
     </message>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="1125"/>
@@ -7789,12 +7791,12 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="36"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM och Powertap effektmätare, hjärtfrekvensband, hastighets- och kadenssensorer via ANT USB1 eller USB2 stickor</translation>
+        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM och Powertap effektmätare, hjärtfrekvensband, fart- och kadenssensorer via ANT USB1 eller USB2 stickor</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="41"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM, Powertap or Quarq power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM Powertap eller Quarq effektmätare, hjärtfrekvensband, hastighets- och kadenssensorer via ANT USB1 eller USB2 stickor</translation>
+        <translation>ANT+ enheter och Trainers så som. Kickr, NEO, Muin, SRM Powertap eller Quarq effektmätare, hjärtfrekvensband, fart- och kadenssensorer via ANT USB1 eller USB2 stickor</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="48"/>
@@ -7855,7 +7857,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="94"/>
         <source>Day Summary</source>
-        <translation>Sammanfattnig för dag</translation>
+        <translation>Sammanfattning för dag</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="95"/>
@@ -8007,7 +8009,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="460"/>
         <source>The activity %1 could not be converted to GoldenCheetah .JSON file format.</source>
-        <translation>Träningspasset %1 kunde inte konverteras till GoldenCheetah .JSON format.</translation>
+        <translation>Aktiviteten %1 kunde inte konverteras till GoldenCheetah .JSON format.</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="325"/>
@@ -8027,12 +8029,12 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="371"/>
         <source>Activity Already Downloaded</source>
-        <translation>Träningspasset Redan Inläst</translation>
+        <translation>Aktivitet Redan Inläst</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="372"/>
         <source>The activity starting at %1 appears to have already been downloaded.  Do you want to overwrite the previous download?</source>
-        <translation>Träningspasset med start %1 verkar redam ha lästs in. Skall befintliga data skrivas över?</translation>
+        <translation>Aktiviteten med start %1 verkar redan ha lästs in. Skall befintliga data skrivas över?</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="413"/>
@@ -8533,7 +8535,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2004"/>
         <source>Highlight Outliers</source>
-        <translation>Framhäv utstickare</translation>
+        <translation>Framhäv Outliers</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2012"/>
@@ -9008,7 +9010,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="346"/>
         <source>Efficiency Index : average speed by average power</source>
-        <translation>Effektivitetsindex: genomsnittlig hastighet relaterat till medeleffekt</translation>
+        <translation>Effektivitetsindex: genomsnittlig fart relaterat till medeleffekt</translation>
     </message>
 </context>
 <context>
@@ -9783,7 +9785,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="232"/>
         <source>Filter R-R Outliers</source>
-        <translation>Filtrera R-R Utstickare</translation>
+        <translation>Filtrera R-R Outliers</translation>
     </message>
 </context>
 <context>
@@ -9815,7 +9817,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
   - &quot;Filter range&quot; of the average within a window (flag 0)
   - &quot;Filter window size&quot; distance on either side of the current interval
 </source>
-        <translation>Filter R-R utstickare (se &quot;R-R flag&quot; i HRV Xdata). Icke utstickare markeras med &quot;1&quot;.
+        <translation>Filter R-R outliers (se &quot;R-R flag&quot; i HRV Xdata). Icke outliers markeras med &quot;1&quot;.
   - &quot;R-R min och maximum&quot; exkluderar samples utanför (markeras &quot;-1&quot;). Även exkluderad då område filtreras.
   - &quot;Filter område&quot; medelvärde med fönster (markeras &quot;0&quot;)
   - &quot;Filter fönsterstorlek&quot; avstånd på var sida av nuvarande intervall
@@ -9935,7 +9937,7 @@ Some unit doesn&apos;t record distance without a speedometer but record position
 </source>
         <translation>Beräkna distans från GPS positionsbestämningar
 
-Vissa GPS-er beräknar inte distans utan hastighetsmätare, men sparar positioner (tex Timex Cycle Trainer)
+Vissa GPS-er beräknar inte distans utan fartmätare, men sparar positioner (tex Timex Cycle Trainer)
 
 </translation>
     </message>
@@ -10002,11 +10004,11 @@ wind speed shall be indicated in kph
 wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the ride file already contain wind data
       it will be overridden if wind is entered manually</source>
-        <translation>Beräkna effektvärden baserat på hastighet, höjd över havet, vikt mm.
+        <translation>Beräkna effektvärden baserat på fart, höjd, vikt mm.
 
 Summan av parametrarna cykelvikt och idrottarevikt ger totalvikten,ta med vikten av allt kläder, skor, väskor, osv.
 
-Parametern CRR rullmotståndskoefficienten, beror på däck och vägytan
+Parametern Crr, rullmotståndskoefficienten, beror på däck och vägytan
 Vindhastighet anges i km/h
 Vindriktning anges i grader från -179 till +180 (-90=W, 0=N, 90=E, 180=S)
 Notera: om träningpassfilen redan innehåller vind information
@@ -10034,7 +10036,7 @@ Notera: om träningpassfilen redan innehåller vind information
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="95"/>
         <source>Fix Elevation errors</source>
-        <translation>Korrigera höjd över havet fel</translation>
+        <translation>Korrigera höjd fel</translation>
     </message>
 </context>
 <context>
@@ -10128,7 +10130,7 @@ Stopp - detta är största längden (i sekunder) som kommer att fyllas med uppsk
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="115"/>
         <source>Fix HR Spikes</source>
-        <translation>Korrigera HF-utstickare</translation>
+        <translation>Korrigera HF-spikar</translation>
     </message>
 </context>
 <context>
@@ -10185,7 +10187,7 @@ Poollängd (i Meter) omräkning sker då värdet sätts till ett tal större än
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="109"/>
         <source>Set SmO2/tHb from Speed and Cadence</source>
-        <translation>Bestäm syremättnad SmO2/tHb utifrån hastighet och kadens</translation>
+        <translation>Bestäm syremättnad SmO2/tHb utifrån fart och kadens</translation>
     </message>
 </context>
 <context>
@@ -10203,12 +10205,12 @@ Poollängd (i Meter) omräkning sker då värdet sätts till ett tal större än
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="55"/>
         <source>Speed to tHb</source>
-        <translation>Hastighet till tHb</translation>
+        <translation>Fart till tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="67"/>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation>När syresaturationsmätare används i hastighets/kadens mode lagras SmO2 och tHb som kadens respektive hastighet. Detta verktyg flyttar data från  kadens och hastighet till SmO2 och tHb.</translation>
+        <translation>När syresaturationsmätare används i fart/kadens mode lagras SmO2 och tHb som kadens respektive fart. Detta verktyg flyttar data från  kadens och fart till SmO2 och tHb.</translation>
     </message>
 </context>
 <context>
@@ -10300,7 +10302,7 @@ Draft Mult. parameter is the multiplier to adjust for drafting, 1 is no drafting
 wind speed shall be indicated in kph
 wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the file already contain wind data it will be overridden if wind is entered</source>
-        <translation>Beräknar löpeffekt utifrån &apos;di Prampero&apos; koefficienterna och data om hastighet, höjdförändringar, vikt mm
+        <translation>Beräknar löpeffekt utifrån &apos;di Prampero&apos; koefficienterna och data om fart, höjdförändringar, vikt mm
 
 Utrustningsvikt (kläder, skor, elektronik, näring, vätska, etc) läggs till idrottarens vikt för att beräkna totalvikten.
 
@@ -10321,7 +10323,7 @@ Notera: om aktivitetsfilen redan har vind information kommer detta att skrivas �
 This function will look for spikes/anomalies in SmO2 data and replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question</source>
         <translation>Ibland kommer Sm2O2 (%) värden att vara felaktiga (0% eller &gt; 100%).
 
-Denna funktion identifierar utstickare/fel i SmO2 datat och byter ut dem mot uppskattningar utifrån värdena före och efter felet</translation>
+Denna funktion identifierar outliers/fel i SmO2 datat och byter ut dem mot uppskattningar utifrån värdena före och efter felet</translation>
     </message>
 </context>
 <context>
@@ -10329,7 +10331,7 @@ Denna funktion identifierar utstickare/fel i SmO2 datat och byter ut dem mot upp
     <message>
         <location filename="../../FileIO/FixSpeed.cpp" line="106"/>
         <source>Fix Speed from Distance</source>
-        <translation>Korrigera hastighet utifrån sträcka</translation>
+        <translation>Korrigera fart utifrån sträcka</translation>
     </message>
 </context>
 <context>
@@ -10345,10 +10347,10 @@ Denna funktion identifierar utstickare/fel i SmO2 datat och byter ut dem mot upp
 This tool replaces the existing speed channel, or creates a new one if not present, based on travelled distance
 
 Moving Average Seconds parameter allows to set the seconds of the MA filter to smooth speed spikes</source>
-        <translation>Vissa kombinationer av sensorer och insamligsenheter skapar data där hastighet och avverkad sträcka som inte passar ihop . tex.då en stegsensor ger hastighet och en GPS ger avverkad sträcka.
-Detta verktyg skapar hastighetsdata utifrån avverkad sträcka. Tidigare hastighetsdata skrivs över
+        <translation>Vissa kombinationer av sensorer och insamligsenheter skapar data där fart och avverkad sträcka som inte passar ihop . tex.då en stegsensor ger fart och en GPS ger avverkad sträcka.
+Detta verktyg skapar fartdata utifrån avverkad sträcka. Tidigare fartdata skrivs över
 
-Parametern &apos;Tidskonstant[s] (glidande medelvärde)&apos; styr hur mycket det nya hastighetsvärdena jämnas till för att trycka ner utstickare</translation>
+Parametern &apos;Tidskonstant[s] (glidande medelvärde)&apos; styr hur mycket det nya fartvärdena jämnas till för att trycka ner outliers</translation>
     </message>
 </context>
 <context>
@@ -10356,7 +10358,7 @@ Parametern &apos;Tidskonstant[s] (glidande medelvärde)&apos; styr hur mycket de
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="131"/>
         <source>Fix Power Spikes</source>
-        <translation>Korrigera Effektutstickare</translation>
+        <translation>Korrigera Effektspikar</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="80"/>
@@ -10389,13 +10391,13 @@ Absolute Max - this defines an absolute value for watts, and will smooth any val
 Variance (%) - this will smooth any values which are higher than this percentage of the rolling average wattage for the 30 seconds leading up to the spike.</source>
         <translation>Ibland rapporteras orimligt höga värden av effektmätare.
 
-Denna funktion identifierar utstickare och andra fel i effektdatat och byter ut dessa mot uppskattningar baserade på data innan och efterfelet (interpolation).
+Denna funktion identifierar spikar och andra fel i effektdatat och byter ut dessa mot uppskattningar baserade på data innan och efterfelet (interpolation).
 
 Inparametrar:
 
-Max - Alla effektvärden större än denna parameter kommer att betraktas som utstickare och ersätts med uppskattningar.
+Max - Alla effektvärden större än denna parameter kommer att betraktas som spikar och ersätts med uppskattningar.
 
-Varians (%) - Alla effektvärden större än en glidande tröskel kommer att betraktas som utstickare och ersätts med uppskattningar. 
+Varians (%) - Alla effektvärden större än en glidande tröskel kommer att betraktas som spikar och ersätts med uppskattningar. 
 Den glidande tröskeln bestäms av medelvärdet av föregående 30 sekunder vilken ökas på med Varians (%).</translation>
     </message>
 </context>
@@ -10545,7 +10547,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="142"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="143"/>
@@ -10590,12 +10592,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="151"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="152"/>
         <source>Altitude Shading</source>
-        <translation>Höjd över havet Skuggning</translation>
+        <translation>Höjd Skuggning</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="153"/>
@@ -10795,7 +10797,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="193"/>
         <source>Aerolab Elevation</source>
-        <translation>Aerolab Höjd över havet</translation>
+        <translation>Aerolab Höjd</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="194"/>
@@ -10815,12 +10817,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="197"/>
         <source>Calendar Actual Workout</source>
-        <translation>Kalender: Genomförda Träningspass</translation>
+        <translation>Kalender: Genomförda Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="198"/>
         <source>Calendar Planned Workout</source>
-        <translation>Kalender: Planerade Träningspass</translation>
+        <translation>Kalender: Planerade Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="199"/>
@@ -10885,22 +10887,22 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="217"/>
         <source>Left Torque Effectiveness</source>
-        <translation>Vridmomentseffektivitet Vänster</translation>
+        <translation>Vä Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="218"/>
         <source>Right Torque Effectiveness</source>
-        <translation>Vridmomentseffektivitet Höger</translation>
+        <translation>Hö Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="219"/>
         <source>Left Pedal Smoothness</source>
-        <translation>Tramprörelsejämnhet Vänster</translation>
+        <translation>Vä Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="220"/>
         <source>Right Pedal Smoothness</source>
-        <translation>Tramprörelsejämnhet Höger</translation>
+        <translation>Hö Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="222"/>
@@ -10933,7 +10935,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="205"/>
         <source>Activity History Group</source>
-        <translation>Träningspass: Historik Grupp</translation>
+        <translation>Aktiviter Historik Grupp</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="207"/>
@@ -10958,12 +10960,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="211"/>
         <source>Left Balance</source>
-        <translation>Vänster Balans</translation>
+        <translation>Vä Balans</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="212"/>
         <source>Right Balance</source>
-        <translation>Höger Balans</translation>
+        <translation>Hö Balans</translation>
     </message>
 </context>
 <context>
@@ -10971,7 +10973,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="373"/>
         <source>Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation>Gravity Ordered Velocity Stress Score, TSS liknande storhet definierad av Dr. Skiba för löpning, tar hänsyn till variationer i hastighet, lutning, relativ intensitet och tidslängd</translation>
+        <translation>Gravity Ordered Velocity Stress Score, TSS liknande storhet definierad av Dr. Skiba för löpning, tar hänsyn till variationer i fart, lutning, relativ intensitet och tidslängd</translation>
     </message>
 </context>
 <context>
@@ -11317,22 +11319,22 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="508"/>
         <source>Start copying of: Activity files (.JSON / .GC)...</source>
-        <translation>Börjar kopiera: Träningspassfiler (.JSON/.GC)...</translation>
+        <translation>Börjar kopiera: Aktivitetsfiler (.JSON/.GC)...</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="520"/>
         <source>%1 activity (.JSON, .GC) files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 Träningspassfiler (.JSON/.GC) flyttades till undermapp: %2 - %3 lyckades inte</translation>
+        <translation>%1 Aktivitetsfiler (.JSON/.GC) flyttades till undermapp: %2 - %3 lyckades inte</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="527"/>
         <source>Start copying of: Activity files (.BAK)...</source>
-        <translation>Börjar kopiera: Träningspassfiler (.BAK)...</translation>
+        <translation>Börjar kopiera: Aktivitetsfiler (.BAK)...</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="539"/>
         <source>%1 activity backup (.BAK) files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 träningspassfiler (.BAK) flyttades till undermapp: %2 - %3 lyckades inte</translation>
+        <translation>%1 aktivitetsfiler (.BAK) flyttades till undermapp: %2 - %3 lyckades inte</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="545"/>
@@ -11342,17 +11344,17 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="616"/>
         <source>Start conversion of native activity files to GoldenCheetah .JSON format...</source>
-        <translation>Börjar kopiera och konvertera ursprungliga träningspassfiler till filer i GoldenCheetah .JSON format...</translation>
+        <translation>Börjar kopiera och konvertera ursprungliga aktivitetsfiler till filer i GoldenCheetah .JSON format...</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="670"/>
         <source>-&gt; Information: Activity %1 - Successfully converted to .JSON</source>
-        <translation>-&gt; Information: Skapande av .JSON fil för Träningspass %1 lyckades</translation>
+        <translation>-&gt; Information: Skapande av .JSON fil för Aktivitet %1 lyckades</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="682"/>
         <source>-&gt; Error: Activity %1 - Conversion errors: </source>
-        <translation>-&gt; Fel: Träningspassfilen %1 - Konverteringsfel: </translation>
+        <translation>-&gt; Fel: Aktivitetsfilen %1 - Konverteringsfel: </translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="684"/>
@@ -11362,22 +11364,22 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="694"/>
         <source>-&gt; Error: Activity %1 - Invalid File Name (expected format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</source>
-        <translation>-&gt; Fel: Trainingspassfil %1 - Ogiltigt Filnamn (förväntat format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</translation>
+        <translation>-&gt; Fel: Aktivitetsfil %1 - Ogiltigt Filnamn (förväntat format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="700"/>
         <source>-&gt; Error: Activity %1 - Problem reading file</source>
-        <translation>-&gt; Fel: Träningspassfil %1 - Kan inte läsa filen</translation>
+        <translation>-&gt; Fel: Aktivitetsfil %1 - Kan inte läsa filen</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="707"/>
         <source>%1 activity files converted to .JSON and stored in subdirectory: %2 - %3 failed</source>
-        <translation>%1 .JSON filer skapades från träningspassfilerna och finns i mappen: %2 - %3 lyckades inte</translation>
+        <translation>%1 .JSON filer skapades från aktivitetsfilerna och finns i mappen: %2 - %3 lyckades inte</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="710"/>
         <source>%1 converted activity source files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 konverterade träningspassfiler flyttades till undermappen: %2 - %3 lyckades inte</translation>
+        <translation>%1 konverterade aktivitetsfiler flyttades till undermappen: %2 - %3 lyckades inte</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="715"/>
@@ -11416,7 +11418,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
         <location filename="../../Core/GcUpgrade.cpp" line="845"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
         <translatorcomment>Not applicable to 3.4</translatorcomment>
-        <translation>&lt;center&gt;&lt;b&gt;Gör först en säkerhetskopia av &apos;Idrottare&apos; Datat!&lt;br&gt;&lt;b&gt;Vänligen läs igenom allt nogrannt, innan du fortsätter!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Med Version 3.2 har &apos;Idrottare&apos; mappen ändrats, genom tillägg av undermappar, som innehåller de olika typerna av GoldenCheetah filer.&lt;br&gt;&lt;br&gt;Die neue Struktur ist:&lt;br&gt;-&gt; Aktivitäten: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Konfigurationsdateien: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download Aktivitäten: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Importierte Aktivitäten: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Workout bezogene Dateien: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache Dateien: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Kalender Dateien: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log Dateien: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temporäre Dateien: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temporäre Aktivitäten: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Trainieren: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantäne: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;Der Upgrade Prozess erzeugt die neue Verzeichnisstruktur und verschiebt die vorhandenen Dateien in die entsprechenden neuen Verzeichnisse. Während des Upgrades werden alle Aktivitäten in das GoldenCheetah Dateiformat .JSON konvertiert und im Verzeichnis &lt;samp&gt;/activities &lt;/samp&gt; abgelegt. Die Originaldateien werden in das Verzeichnis &lt;samp&gt;/imports &lt;/samp&gt; verschoben.&lt;br&gt;&lt;br&gt;Ab Version 3.2 werden alle &quot;Downloads von Geräten&quot; oder &quot;Importe aus Dateien&quot; während des Downloads/Imports in das GoldenCheetah Dateiformat konvertiert. Die Originaldateien werden - abhängig von der Quelle - in &lt;samp&gt;/downloads &lt;/samp&gt; oder &lt;samp&gt;/imports &lt;/samp&gt; gespeichert.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Bitte stellen Sie sicher, dass Sie ein aktuelles Backup Ihrer Athletendaten gemacht haben, bevor Sie den Upgrade forsetzen. Wir können für den Verlust von Daten während des Prozesses keine Verantwortung übernehmen. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;Gör först en säkerhetskopia av &apos;Idrottare&apos; datat!&lt;br&gt;&lt;b&gt;Vänligen läs igenom allt noggrannt, innan du fortsätter!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Med Version 3.2 har &apos;Idrottare&apos; mappen ändrats, genom tillägg av undermappar, som innehåller de olika typerna av GoldenCheetah filer.&lt;br&gt;&lt;br&gt;Die neue Struktur ist:&lt;br&gt;-&gt; Aktivitäten: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Konfigurationsdateien: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download Aktivitäten: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Importierte Aktivitäten: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Workout bezogene Dateien: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache Dateien: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Kalender Dateien: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log Dateien: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temporäre Dateien: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temporäre Aktivitäten: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Trainieren: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantäne: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;Der Upgrade Prozess erzeugt die neue Verzeichnisstruktur und verschiebt die vorhandenen Dateien in die entsprechenden neuen Verzeichnisse. Während des Upgrades werden alle Aktivitäten in das GoldenCheetah Dateiformat .JSON konvertiert und im Verzeichnis &lt;samp&gt;/activities &lt;/samp&gt; abgelegt. Die Originaldateien werden in das Verzeichnis &lt;samp&gt;/imports &lt;/samp&gt; verschoben.&lt;br&gt;&lt;br&gt;Ab Version 3.2 werden alle &quot;Downloads von Geräten&quot; oder &quot;Importe aus Dateien&quot; während des Downloads/Imports in das GoldenCheetah Dateiformat konvertiert. Die Originaldateien werden - abhängig von der Quelle - in &lt;samp&gt;/downloads &lt;/samp&gt; oder &lt;samp&gt;/imports &lt;/samp&gt; gespeichert.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Bitte stellen Sie sicher, dass Sie ein aktuelles Backup Ihrer Athletendaten gemacht haben, bevor Sie den Upgrade forsetzen. Wir können für den Verlust von Daten während des Prozesses keine Verantwortung übernehmen. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="884"/>
@@ -11529,7 +11531,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="90"/>
         <source>Activity Summary</source>
-        <translation>Träningspassammanfattning</translation>
+        <translation>Aktivitetssammanfattning</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="91"/>
@@ -11570,7 +11572,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="98"/>
         <source>Pedal Force vs Velocity</source>
-        <translation>Pedalkraft mot Hastighet</translation>
+        <translation>Pedalkraft mot Fart</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="99"/>
@@ -11615,7 +11617,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="111"/>
         <source>Workout</source>
-        <translation>Träningspassfördelning</translation>
+        <translation>Träningspass</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="112"/>
@@ -11765,7 +11767,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Pages.cpp" line="143"/>
         <source>Elevation hysteresis (meters)</source>
-        <translation>Hysteres för höjd över havet (m)</translation>
+        <translation>Hysteres för höjd (m ö.h.)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="152"/>
@@ -12256,22 +12258,22 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/RideNavigatorProxy.h" line="253"/>
         <source>Entire Activity</source>
-        <translation>Fullständigt Träningspass</translation>
+        <translation>Fullständig Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigatorProxy.h" line="397"/>
         <source>%1: %2 (%3 activities)</source>
-        <translation>%1: %2 (%3 träningspass)</translation>
+        <translation>%1: %2 (%3 aktiviteter)</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigatorProxy.h" line="403"/>
         <source>%1 activities</source>
-        <translation>%1 Träningspass</translation>
+        <translation>%1 Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigatorProxy.h" line="494"/>
         <source>All Activities</source>
-        <translation>Alla Träningspass</translation>
+        <translation>Alla Aktiviteter</translation>
     </message>
 </context>
 <context>
@@ -12470,7 +12472,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="154"/>
         <source>Fix Elevation Errors</source>
-        <translation>Reparera höjd-över-havet fel</translation>
+        <translation>Reparera höjdfel</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="156"/>
@@ -12495,22 +12497,22 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="164"/>
         <source>Fix Speed</source>
-        <translation>Reparera Hastighet</translation>
+        <translation>Reparera Fart</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="166"/>
         <source>Fix Freewheeling from Power and Speed</source>
-        <translation>Reparera Frihjulsperioder i Effekt och Hastighetsdata</translation>
+        <translation>Reparera Frihjulsperioder i Effekt och Fartdata</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="168"/>
         <source>Fix Moxy data by moving the moxy values from speed and cadence into the Moxy series</source>
-        <translation>Skapa Moxydataserie genom att kopiera moxyvärden från hastighet och kadens dataserierna</translation>
+        <translation>Skapa Moxydataserie genom att kopiera moxyvärden från fart och kadens dataserierna</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="171"/>
         <source>Filter R-R outliers</source>
-        <translation>Filtrera R-R utstickare</translation>
+        <translation>Filtrera R-R outliers</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="173"/>
@@ -12566,7 +12568,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="213"/>
         <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
-        <translation>Editor för aktivitetens data - möjliggör identifiering av underligheter, samt ändring och reparation av värden</translation>
+        <translation>Editor för aktivitetens data - möjliggör identifiering av konstigheter, samt ändring och reparation av värden</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="216"/>
@@ -12965,7 +12967,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1529"/>
         <source>Ride Log</source>
-        <translation>Lista med Träningspass</translation>
+        <translation>Lista med Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1530"/>
@@ -13050,12 +13052,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1546"/>
         <source>Ride</source>
-        <translation>Träningspass</translation>
+        <translation>Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1547"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1548"/>
@@ -13115,23 +13117,23 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1559"/>
         <source>Scatter</source>
-        <translation>Punktdiagram</translation>
+        <translation>Spridning</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1560"/>
         <location filename="../../Charts/HomeWindow.cpp" line="1562"/>
         <source>HrPw</source>
-        <translation>HF/Effekt</translation>
+        <translation>HfEffekt</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1561"/>
         <source>Activity Log</source>
-        <translation>Träningspass</translation>
+        <translation>Aktivitetslogg</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1563"/>
         <source>Tracker</source>
-        <translation>Nyckeltal (KPI)</translation>
+        <translation>Nyckeltal</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1564"/>
@@ -14461,7 +14463,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="646"/>
         <source>Import current activity as a Gradient ride (slope based)</source>
-        <translation>Importera träningspasset som Lutningsbaserat</translation>
+        <translation>Importera nuvarande aktivitet som Lutningsbaserat träningspass</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="666"/>
@@ -14571,23 +14573,23 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="36"/>
         <source>Interval Summary</source>
-        <translation>Intervallzusammenfassung</translation>
+        <translation>Intervallsammanfattning</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="87"/>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="111"/>
         <source>select an interval for summary info</source>
-        <translation>Intervall auswählen für Intervallzusammenfassung</translation>
+        <translation>välj intervall för sammanfattning</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="259"/>
         <source>%1 selected intervals</source>
-        <translation>%1 ausgewählte Intervalle</translation>
+        <translation>%1 valda intervall</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="282"/>
         <source>Excluding %1 selected</source>
-        <translation>Ausser %1 ausgewählt</translation>
+        <translation>Inte %1 valda</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="336"/>
@@ -14619,7 +14621,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="149"/>
         <source>Read detail for activity %1/%2</source>
-        <translation>Läs detaijer för träningspass %1/%2</translation>
+        <translation>Läs aktivitetsdetaljer %1/%2</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="163"/>
@@ -14639,7 +14641,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="280"/>
         <source>Get Unit Software Version...</source>
-        <translation>Hämtar enhetens mjukvaruverision...</translation>
+        <translation>Hämtar enhetens mjukvaruversion...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="299"/>
@@ -14664,12 +14666,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="394"/>
         <source>%1 detailed activities</source>
-        <translation>%1 detaljerade träningspass</translation>
+        <translation>%1 detaljerade aktiviteter</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="420"/>
         <source>Delete detail for activity %1/%2</source>
-        <translation>Radera detaljer för träningspass %1/%2</translation>
+        <translation>Radera aktivitetsdetaljer för %1/%2</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="402"/>
@@ -15068,12 +15070,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="861"/>
         <source>%1 Top %2 Outliers</source>
-        <translation>%1 Största %2 Utstickare</translation>
+        <translation>%1 Största %2 Outliers</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="865"/>
         <source>%1 Outlier</source>
-        <translation>%1 Utstickare</translation>
+        <translation>%1 outlier</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="953"/>
@@ -15083,7 +15085,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="956"/>
         <source>Best %1</source>
-        <translation>Besta %1</translation>
+        <translation>Bästa %1</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="1330"/>
@@ -15131,7 +15133,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="1982"/>
         <source>%1 %2 Outliers</source>
-        <translation>%1 %2 Utstickare</translation>
+        <translation>%1 %2 outliers</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="2070"/>
@@ -15197,13 +15199,13 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="50"/>
         <source>No activity Selected</source>
-        <translation>Inget träningspass Valt</translation>
+        <translation>Ingen aktivitet vald</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="180"/>
         <location filename="../../Charts/LTMPopup.cpp" line="345"/>
         <source>No activity selected</source>
-        <translation>Inget träningspass Valt</translation>
+        <translation>Ingen aktivitet vald</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="200"/>
@@ -15241,12 +15243,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="352"/>
         <source> (%1 activities)</source>
-        <translation> (%1 träningspass)</translation>
+        <translation> (%1 aktiviteter)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="355"/>
         <source> / non activity-related metrics skipped</source>
-        <translation> / ignorerade icke träningpassrelaterade storheter</translation>
+        <translation> / ignorerade icke aktivitetsrelaterade mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="418"/>
@@ -16528,7 +16530,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/LeftRightBalance.cpp" line="41"/>
         <source>Left/Right Balance</source>
-        <translation>Vänster/Höger Balans</translation>
+        <translation>V/H-Balans</translation>
     </message>
     <message>
         <location filename="../../Metrics/LeftRightBalance.cpp" line="42"/>
@@ -16924,7 +16926,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="402"/>
         <source>&amp;Quit All Windows</source>
-        <translation>Avsluta alla fönster &amp;Q</translation>
+        <translation>Avsluta alla &amp;fönster</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="408"/>
@@ -16968,7 +16970,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="419"/>
         <source>Split &amp;activity...</source>
-        <translation>Dela u&amp;pp aktvitet...</translation>
+        <translation>Dela upp &amp;aktvitet...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="420"/>
@@ -17158,7 +17160,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="392"/>
         <source>Backup Athlete Data</source>
-        <translation>Säkerhetskopia Idrottaredata</translation>
+        <translation>Säkerhetskopia Idrottardata</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="400"/>
@@ -17168,7 +17170,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="401"/>
         <source>&amp;Close Tab</source>
-        <translation>Stäng Flik &amp;C</translation>
+        <translation>&amp;Stäng Flik</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="428"/>
@@ -17318,7 +17320,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
-        <translation>Träningspass mappen är antingen inte konfigurerad eller har försvunnit.
+        <translation>Träningspassmappen är antingen inte konfigurerad eller har försvunnit.
 
 Vänligen kontrollera inställningarna.</translation>
     </message>
@@ -17345,12 +17347,12 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="451"/>
         <source>&amp;Tools</source>
-        <translation>Verk&amp;tyg</translation>
+        <translation>&amp;Verktyg</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="490"/>
         <source>&amp;Options...</source>
-        <translation>Inst&amp;ällningar...</translation>
+        <translation>&amp;Inställningar...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="523"/>
@@ -17431,7 +17433,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="573"/>
         <source>&amp;User Guide</source>
-        <translation>Br&amp;uksanvisning</translation>
+        <translation>&amp;Bruksanvisning</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="574"/>
@@ -17544,7 +17546,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="172"/>
         <source>Workout Code:</source>
-        <translation>Träningspass kod:</translation>
+        <translation>Aktivitetskod:</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="176"/>
@@ -17569,7 +17571,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="217"/>
         <source>Average Speed:</source>
-        <translation>Medelhastighet:</translation>
+        <translation>Medelfart:</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="226"/>
@@ -17822,7 +17824,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1794"/>
         <source>Maximum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen.</source>
-        <translation>Maximum Muskel Syresaturation, del av hemoglobinet som bär oxygen.</translation>
+        <translation>Maximum Muskelsyremättnad, del av hemoglobinet som bär oxygen.</translation>
     </message>
 </context>
 <context>
@@ -17830,7 +17832,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2137"/>
         <source>Max Speed</source>
-        <translation>Maxhastighet</translation>
+        <translation>Maxfart</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2138"/>
@@ -17845,7 +17847,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2143"/>
         <source>Maximum Speed</source>
-        <translation>Maximum Hastighet</translation>
+        <translation>Maximum Fart</translation>
     </message>
 </context>
 <context>
@@ -18022,7 +18024,7 @@ Om du inte vill göra detta nu , så kan man antingen backa för att göra ändr
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="574"/>
         <source>Download Activity to Combine</source>
-        <translation>Ladda ner en Aktivitet att Kombinera</translation>
+        <translation>Ladda ner en Aktivitet för att Kombinera</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="627"/>
@@ -18060,7 +18062,7 @@ Om du inte vill göra detta nu , så kan man antingen backa för att göra ändr
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="755"/>
         <source>Append the data to the end of the current activity  to create a longer activity that was recorded in multiple parts.</source>
-        <translation>Nuvarande aktiviteten förlängs med mer data. Kan tex användas då motionspasset sparades i flera på varandra följande filer.</translation>
+        <translation>Nuvarande aktiviteten förlängs med mer data. Kan tex användas då aktiviteten sparades i flera på varandra följande filer.</translation>
     </message>
 </context>
 <context>
@@ -18295,7 +18297,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1889"/>
         <source>Minimum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen.</source>
-        <translation>Minimum Muscle Oxygen Saturation, procent av hemoglobinet som bär på oxygen.</translation>
+        <translation>Minimum muskelsyremättnad, procent av hemoglobinet som bär på oxygen.</translation>
     </message>
 </context>
 <context>
@@ -18379,22 +18381,22 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="271"/>
         <source>Speed (kph)</source>
-        <translation>Hastighet (km/h)</translation>
+        <translation>Fart (km/h)</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="273"/>
         <source>Speed (mph)</source>
-        <translation>Hastighet (mph)</translation>
+        <translation>Fart (mph)</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="277"/>
         <source>Altitude (meters)</source>
-        <translation>Höjd över havet (m)</translation>
+        <translation>Höjd (m ö.h.)</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="279"/>
         <source>Altitude (feet)</source>
-        <translation>Höjd över havet (Fuß)</translation>
+        <translation>Höjd (fot)</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="281"/>
@@ -18482,7 +18484,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="304"/>
         <source>Muscle Oxygen</source>
-        <translation>Muskel Syre</translation>
+        <translation>Muskelsyresättning</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="305"/>
@@ -18517,12 +18519,12 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="315"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="316"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelPlot.cpp" line="317"/>
@@ -18645,12 +18647,12 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Charts/ModelWindow.cpp" line="39"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelWindow.cpp" line="40"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelWindow.cpp" line="41"/>
@@ -18720,7 +18722,7 @@ Du kommer få läsa in/ladda ner/välja data att lägga till och sedan välja ko
     <message>
         <location filename="../../Charts/ModelWindow.cpp" line="54"/>
         <source>Muscle Oxygen</source>
-        <translation>Muskel oxygen</translation>
+        <translation>Muskelsyresättning</translation>
     </message>
     <message>
         <location filename="../../Charts/ModelWindow.cpp" line="55"/>
@@ -18927,7 +18929,7 @@ Importerar%1 Aktivitetspass...
 No rides found to import. 
 </source>
         <translation>
-Inga Aktivitetspass att importera. 
+Inga Aktiviteter att importera. 
 </translation>
     </message>
     <message>
@@ -19495,7 +19497,7 @@ Inga Aktivitetspass att importera.
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="199"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="200"/>
@@ -19528,7 +19530,7 @@ Inga Aktivitetspass att importera.
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="297"/>
         <source>Average Speed expressed in pace units: min/km or min/mile</source>
-        <translation>Medelhastighet utryckt i endera enheten: min/km eller min/mile</translation>
+        <translation>Medeltempo utryckt i endera: min/km eller min/mile</translation>
     </message>
 </context>
 <context>
@@ -19566,7 +19568,7 @@ Inga Aktivitetspass att importera.
     <message>
         <location filename="../../Gui/Pages.cpp" line="5220"/>
         <source>Percent of CV</source>
-        <translation>Procent av kritisk hastighet (CV)</translation>
+        <translation>Procent av CV</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5265"/>
@@ -19759,7 +19761,7 @@ Inga Aktivitetspass att importera.
     <message>
         <location filename="../../Gui/Pages.cpp" line="5173"/>
         <source>Critical Velocity</source>
-        <translation>Kritisk Hastighet (CV)</translation>
+        <translation>Critical Velocity (CV)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5174"/>
@@ -20259,7 +20261,7 @@ Inga Aktivitetspass att importera.
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2729"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2730"/>
@@ -20294,7 +20296,7 @@ Inga Aktivitetspass att importera.
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2736"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2737"/>
@@ -21014,7 +21016,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="398"/>
         <source>15 sec Peak Power</source>
-        <translation>15s Toppeffekt</translation>
+        <translation>15 s Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="399"/>
@@ -21028,7 +21030,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="455"/>
         <source>1 min Peak Power</source>
-        <translation>1min Toppeffekt</translation>
+        <translation>1 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="456"/>
@@ -21042,7 +21044,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="341"/>
         <source>1 sec Peak Power</source>
-        <translation>1sek Toppeffekt</translation>
+        <translation>1 sek Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="342"/>
@@ -21056,7 +21058,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="569"/>
         <source>20 min Peak Power</source>
-        <translation>20min Toppeffekt</translation>
+        <translation>20 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="570"/>
@@ -21070,7 +21072,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="417"/>
         <source>20 sec Peak Power</source>
-        <translation>20s Toppeffekt</translation>
+        <translation>20 s Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="418"/>
@@ -21084,7 +21086,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="474"/>
         <source>2 min Peak Power</source>
-        <translation>2min Toppeffekt</translation>
+        <translation>2 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="475"/>
@@ -21098,7 +21100,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="588"/>
         <source>30 min Peak Power</source>
-        <translation>30min Toppeffekt</translation>
+        <translation>30 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="589"/>
@@ -21112,7 +21114,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="436"/>
         <source>30 sec Peak Power</source>
-        <translation>30sek Toppeffekt</translation>
+        <translation>30 sek Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="437"/>
@@ -21126,7 +21128,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="493"/>
         <source>3 min Peak Power</source>
-        <translation>3min Toppeffekt</translation>
+        <translation>3 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="494"/>
@@ -21140,7 +21142,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="512"/>
         <source>5 min Peak Power</source>
-        <translation>5min Toppeffekt</translation>
+        <translation>5 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="513"/>
@@ -21154,7 +21156,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="360"/>
         <source>5 sec Peak Power</source>
-        <translation>5sek Toppeffekt</translation>
+        <translation>5 sek Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="361"/>
@@ -21168,7 +21170,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="322"/>
         <source>60 min Peak Power</source>
-        <translation>60min Toppeffekt</translation>
+        <translation>60 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="323"/>
@@ -21182,7 +21184,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="531"/>
         <source>8 min Peak Power</source>
-        <translation>8min Toppeffekt</translation>
+        <translation>8 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="532"/>
@@ -21196,7 +21198,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="607"/>
         <source>90 min Peak Power</source>
-        <translation>90min Toppeffekt</translation>
+        <translation>90 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="608"/>
@@ -21210,7 +21212,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="721"/>
         <source>10 min Peak Power HR</source>
-        <translation>HF då 10min Toppeffekt</translation>
+        <translation>HF då 10 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="722"/>
@@ -21229,7 +21231,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="679"/>
         <source>1 min Peak Power HR</source>
-        <translation>HF då 1min Toppeffekt</translation>
+        <translation>HF då 1 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="680"/>
@@ -21248,7 +21250,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="742"/>
         <source>20 min Peak Power HR</source>
-        <translation>HF då 20min Toppeffekt</translation>
+        <translation>HF då 20 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="743"/>
@@ -21267,7 +21269,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="763"/>
         <source>30 min Peak Power HR</source>
-        <translation>HF då 30min Toppeffekt</translation>
+        <translation>HF då 30 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="764"/>
@@ -21286,7 +21288,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="700"/>
         <source>5 min Peak Power HR</source>
-        <translation>HF då 5min Toppeffekt</translation>
+        <translation>HF då 5 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="701"/>
@@ -21305,7 +21307,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="785"/>
         <source>60 min Peak Power HR</source>
-        <translation>HF då 60min Toppeffekt</translation>
+        <translation>HF då 60 min Toppeffekt</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="786"/>
@@ -21351,7 +21353,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="169"/>
         <source>10 sec Peak Power relative to Athlete Weight.</source>
-        <translation>10s Toppeffekt till Idrottarevikt.</translation>
+        <translation>10 s Toppeffekt till Idrottarevikt.</translation>
     </message>
 </context>
 <context>
@@ -21364,7 +21366,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="187"/>
         <source>15 sec Peak Power relative to Athlete Weight.</source>
-        <translation>15s Toppeffekt till Idrottarevikt.</translation>
+        <translation>15 s Toppeffekt till Idrottarevikt.</translation>
     </message>
 </context>
 <context>
@@ -21390,7 +21392,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="133"/>
         <source>1 sec Peak Power relative to Athlete Weight.</source>
-        <translation>1s Toppeffekt till Idrottarevikt.</translation>
+        <translation>1 s Toppeffekt till Idrottarevikt.</translation>
     </message>
 </context>
 <context>
@@ -21416,7 +21418,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="205"/>
         <source>20 sec Peak Power relative to Athlete Weight.</source>
-        <translation>20s Toppeffekt till Idrottarevikt.</translation>
+        <translation>20 s Toppeffekt till Idrottarevikt.</translation>
     </message>
 </context>
 <context>
@@ -21442,7 +21444,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="223"/>
         <source>30 sec Peak Power relative to Athlete Weight.</source>
-        <translation>30s Toppeffekt till Idrottarevikt.</translation>
+        <translation>30 s Toppeffekt till Idrottarevikt.</translation>
     </message>
 </context>
 <context>
@@ -21468,7 +21470,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="151"/>
         <source>5 sec Peak Power relative to Athlete Weight.</source>
-        <translation>5s Toppeffekt till Idrottarevikt.</translation>
+        <translation>5 s Toppeffekt till Idrottarevikt.</translation>
     </message>
 </context>
 <context>
@@ -21577,13 +21579,13 @@ Vill du göra detta?</translation>
         <location filename="../../Charts/PowerHist.cpp" line="88"/>
         <location filename="../../Charts/PowerHist.cpp" line="2352"/>
         <source>Time (minutes)</source>
-        <translation>Tid (Minuten)</translation>
+        <translation>Tid (Minuter)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="88"/>
         <location filename="../../Charts/PowerHist.cpp" line="2352"/>
         <source>Time (percent)</source>
-        <translation>Tid (Prozent)</translation>
+        <translation>Tid (Procent)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2307"/>
@@ -21599,7 +21601,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2317"/>
         <source>Heartrate (bpm)</source>
-        <translation>Puls (slag/min)</translation>
+        <translation>HF (slag/min)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2316"/>
@@ -21658,7 +21660,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2325"/>
         <source>Cadence (rpm)</source>
-        <translation>Kadens (1/min)</translation>
+        <translation>Kadens (varv/min)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2330"/>
@@ -21668,7 +21670,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2332"/>
         <source>Speed (%1)</source>
-        <translation>Hastighet (%1)</translation>
+        <translation>Fart (%1)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2332"/>
@@ -21806,7 +21808,7 @@ och att dess display visar &quot;Host&quot;</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="143"/>
         <source>Reading version...</source>
-        <translation>Läser Verision...</translation>
+        <translation>Läser Version...</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="145"/>
@@ -21819,12 +21821,12 @@ och att dess display visar &quot;Host&quot;</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="151"/>
         <source>Error reading version: </source>
-        <translation>Fel då verision lästes: </translation>
+        <translation>Fel då version lästes: </translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="168"/>
         <source>Unrecognized version &quot;%1&quot;</source>
-        <translation>Okänd Verision &quot;%1&quot;</translation>
+        <translation>Okänd Version &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="175"/>
@@ -22437,12 +22439,12 @@ yyyy</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="472"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="475"/>
         <source>Virtual Speed</source>
-        <translation>Virtuell Hastighet</translation>
+        <translation>Virtuell Fart</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="478"/>
@@ -22467,7 +22469,7 @@ yyyy</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="490"/>
         <source>Average Speed</source>
-        <translation>Medelhastighet</translation>
+        <translation>Medelfart</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="493"/>
@@ -22487,7 +22489,7 @@ yyyy</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="502"/>
         <source>Lap Speed</source>
-        <translation>Varv Hastighet</translation>
+        <translation>Varv Fart</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="505"/>
@@ -22502,7 +22504,7 @@ yyyy</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="511"/>
         <source>Left/Right Balance</source>
-        <translation>Vänster/Höger Balans</translation>
+        <translation>V/H-Balans</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="514"/>
@@ -22517,32 +22519,32 @@ yyyy</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="520"/>
         <source>Deoxy Hb</source>
-        <translation>Deoxy Hb</translation>
+        <translation>Hb utan syre</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="523"/>
         <source>Oxy Hb</source>
-        <translation>Oxy Hb</translation>
+        <translation>Hb med syre</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="526"/>
         <source>Left Torque Effectiveness</source>
-        <translation>Vänster Vridmomentseffektivitet</translation>
+        <translation>Vä Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="529"/>
         <source>Right Torque Effectiveness</source>
-        <translation>Höger Vridmomentseffektivitet</translation>
+        <translation>Hö Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="532"/>
         <source>Left Pedal Smoothness</source>
-        <translation>Vänster Tramptag Jämnhet</translation>
+        <translation>Vä Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="535"/>
         <source>Right Pedal Smoothness</source>
-        <translation>Höger Tramptag Jämnhet</translation>
+        <translation>Hö Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="538"/>
@@ -22565,7 +22567,7 @@ yyyy</translation>
     <message>
         <location filename="../../Train/RealtimePlotWindow.cpp" line="41"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimePlotWindow.cpp" line="45"/>
@@ -22904,7 +22906,7 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="171"/>
         <source>Anomalies</source>
-        <translation>Konstigheter</translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="315"/>
@@ -22940,7 +22942,7 @@ yyyy</translation>
         <location filename="../../Charts/RideEditor.cpp" line="320"/>
         <location filename="../../Charts/RideEditor.cpp" line="972"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="321"/>
@@ -22952,7 +22954,7 @@ yyyy</translation>
         <location filename="../../Charts/RideEditor.cpp" line="322"/>
         <location filename="../../Charts/RideEditor.cpp" line="976"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="323"/>
@@ -22988,7 +22990,7 @@ yyyy</translation>
         <location filename="../../Charts/RideEditor.cpp" line="328"/>
         <location filename="../../Charts/RideEditor.cpp" line="982"/>
         <source>Left/Right Balance</source>
-        <translation>Vänster/Höger Balans</translation>
+        <translation>V/H-Balans</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="329"/>
@@ -23083,13 +23085,13 @@ yyyy</translation>
         <location filename="../../Charts/RideEditor.cpp" line="343"/>
         <location filename="../../Charts/RideEditor.cpp" line="997"/>
         <source>SmO2</source>
-        <translation></translation>
+        <translation>SmO2</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="344"/>
         <location filename="../../Charts/RideEditor.cpp" line="998"/>
         <source>tHb</source>
-        <translation></translation>
+        <translation>tHb</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="345"/>
@@ -23143,7 +23145,7 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="794"/>
         <source>Smooth Anomaly</source>
-        <translation>Jämna till konstigheter</translation>
+        <translation>Jämna till ev. fel</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="839"/>
@@ -23239,7 +23241,7 @@ Vill du fortsätta?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="287"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="288"/>
@@ -23304,7 +23306,7 @@ Vill du fortsätta?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="300"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="301"/>
@@ -23334,52 +23336,52 @@ Vill du fortsätta?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="306"/>
         <source>Left/Right Balance</source>
-        <translation>Vänster/Höger Balans</translation>
+        <translation>V/H Balans</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="307"/>
         <source>Left Torque Efficiency</source>
-        <translation>Vänster Vridmomentseffektivitet</translation>
+        <translation>Vä Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="308"/>
         <source>Right Torque Efficiency</source>
-        <translation>Höger Vridmomentseffektivitet</translation>
+        <translation>Hö Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="309"/>
         <source>Left Pedal Smoothness</source>
-        <translation>Vänster Tramprörelse Jämnhet</translation>
+        <translation>Vä Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="311"/>
         <source>Left Platform Center Offset</source>
-        <translation>Vänster Pedal Tryckcentrumoffset</translation>
+        <translation>Vä PCO</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="312"/>
         <source>Right Platform Center Offset</source>
-        <translation>Höger Pedal Tryckcentrumoffset</translation>
+        <translation>Hö PCO</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="317"/>
         <source>Left Peak Power Phase Start</source>
-        <translation>Vänster Början Toppeffektfas</translation>
+        <translation>Vä Start Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="318"/>
         <source>Right Peak Power Phase Start</source>
-        <translation>Höger Början Toppeffektfas</translation>
+        <translation>Hö Start Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="319"/>
         <source>Left Peak Power Phase End</source>
-        <translation>Vänster Slut Toppeffektfas</translation>
+        <translation>Vä Slut Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="320"/>
         <source>Right Peak Power Phase End</source>
-        <translation>Höger Slut Toppeffektfas</translation>
+        <translation>Hö Slut Toppkraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="321"/>
@@ -23651,27 +23653,27 @@ Vill du fortsätta?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="310"/>
         <source>Right Pedal Smoothness</source>
-        <translation>Höger Tramprörelse Jämnhet</translation>
+        <translation>Hö Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="313"/>
         <source>Left Power Phase Start</source>
-        <translation>Vänster Början Effektfas</translation>
+        <translation>Vä Start Kraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="314"/>
         <source>Right Power Phase Start</source>
-        <translation>Höger Början Effektfas</translation>
+        <translation>Hö Start Kraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="315"/>
         <source>Left Power Phase End</source>
-        <translation>Vänster Slut Effektfas</translation>
+        <translation>Vä Slut Kraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="316"/>
         <source>Right Power Phase End</source>
-        <translation>Höger Slut Effektfas</translation>
+        <translation>Hö Slut Kraftfas</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="446"/>
@@ -23758,7 +23760,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="547"/>
         <source>Peak powers for cycling 1s thru 1hr</source>
-        <translation>Toppeffekter vid cykling 1s till 1h</translation>
+        <translation>Toppeffekter vid cykling 1 s till 1 h</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="548"/>
@@ -23836,12 +23838,12 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="97"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="101"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="105"/>
@@ -23871,7 +23873,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="125"/>
         <source>Left/Right Balance</source>
-        <translation>Vänster/Höger Balans</translation>
+        <translation>V/H-Balans</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="129"/>
@@ -24604,7 +24606,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="498"/>
         <source>Device Type: </source>
-        <translation>Enhetstyp: </translation>
+        <translation>Inspelningsenhet: </translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="501"/>
@@ -24858,13 +24860,13 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1249"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1255"/>
         <source> ride</source>
-        <translation> cykeltur</translation>
+        <translation> cykelpass</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1249"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1255"/>
         <source> rides</source>
-        <translation> cykelturer</translation>
+        <translation> cykelpass</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1264"/>
@@ -24891,13 +24893,13 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1349"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1355"/>
         <source> run</source>
-        <translation> löptur</translation>
+        <translation> löppass</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1349"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1355"/>
         <source> runs</source>
-        <translation> löpturer</translation>
+        <translation> löppass</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1448"/>
@@ -25325,7 +25327,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="114"/>
         <source>Cadence (rpm)</source>
-        <translation>Kadens (1/min)</translation>
+        <translation>Kadens (varv/min)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="115"/>
@@ -25335,22 +25337,22 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="118"/>
         <source>Speed (kph)</source>
-        <translation>Hastighet (km/h)</translation>
+        <translation>Fart (km/h)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="120"/>
         <source>Speed (mph)</source>
-        <translation>Hastighet (mph)</translation>
+        <translation>Fart (mph)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="124"/>
         <source>Altitude (meters)</source>
-        <translation>Höjd över havet (m)</translation>
+        <translation>Höjd (m ö.h.)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="126"/>
         <source>Altitude (feet)</source>
-        <translation>Höjd över havet (Fuß)</translation>
+        <translation>Höjd (fot)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="128"/>
@@ -25431,12 +25433,12 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="150"/>
         <source>Torque Efficiency</source>
-        <translation>Vridmomentseffektivitet</translation>
+        <translation>Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="151"/>
         <source>Pedal Smoothness</source>
-        <translation>Tramptagsjämnhet</translation>
+        <translation>Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="152"/>
@@ -25461,7 +25463,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="156"/>
         <source>Muscle Oxygen</source>
-        <translation>Muskel Oxygen</translation>
+        <translation>Muskelsyresättning</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="157"/>
@@ -25471,12 +25473,12 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="158"/>
         <source>Deoxygenated Haemoglobin</source>
-        <translation>Deoxihemoglobin (utan syre)</translation>
+        <translation>Hemoglobin utan syre</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="159"/>
         <source>Oxygenated Haemoglobin</source>
-        <translation>Oxihemoglobin (med syre)</translation>
+        <translation>Hemoglobin med syre</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="161"/>
@@ -25501,12 +25503,12 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="168"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="169"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="170"/>
@@ -25658,13 +25660,13 @@ Skall konvertering ske?
         <location filename="../../Charts/ScatterWindow.cpp" line="36"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="69"/>
         <source>Speed</source>
-        <translation>Hastighet</translation>
+        <translation>Fart</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="37"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="70"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="38"/>
@@ -25724,13 +25726,13 @@ Skall konvertering ske?
         <location filename="../../Charts/ScatterWindow.cpp" line="47"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="80"/>
         <source>L/R Torque Effectiveness</source>
-        <translation>Vä/Hö Vridmomentseffektivitet</translation>
+        <translation>Vä/Hö Rundtrampseffektivitet</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="48"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="81"/>
         <source>L/R Pedal Smoothness</source>
-        <translation>Vä/Hö Tramptagsjämnhet</translation>
+        <translation>Vä/Hö Pedaljämnhet</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="49"/>
@@ -25760,7 +25762,7 @@ Skall konvertering ske?
         <location filename="../../Charts/ScatterWindow.cpp" line="53"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="86"/>
         <source>Muscle Oxygen</source>
-        <translation>Muskeloxygen</translation>
+        <translation>Muskesyresättning</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="54"/>
@@ -25772,13 +25774,13 @@ Skall konvertering ske?
         <location filename="../../Charts/ScatterWindow.cpp" line="55"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="88"/>
         <source>Deoxygenated Hb</source>
-        <translation>Deoxihemoglobin (utan syre)</translation>
+        <translation>Hb utan syre</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="56"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="89"/>
         <source>Oxygenated Hb</source>
-        <translation>Oxihemoglobin (med syre)</translation>
+        <translation>Hemoglobin med syre</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="101"/>
@@ -26296,7 +26298,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="251"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Cloud/ShareDialog.cpp" line="252"/>
@@ -26403,7 +26405,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/SmallPlot.cpp" line="45"/>
         <source>Altitude</source>
-        <translation>Höjd över havet</translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <location filename="../../Charts/SmallPlot.cpp" line="190"/>
@@ -26572,12 +26574,12 @@ Skall konvertering ske?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
         <source>Workout Code</source>
-        <translation>Träningspasskod</translation>
+        <translation>Aktivitetskod</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
         <source>Workout Title</source>
-        <translation>Träningspasstitel</translation>
+        <translation>Aktivitetstitel</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
@@ -26625,7 +26627,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="129"/>
         <source>Workout</source>
-        <translation>Träningspass</translation>
+        <translation>Aktivitet</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="130"/>
@@ -27808,7 +27810,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="254"/>
         <source>Time with low speed and elevation gain but no power nor cadence</source>
-        <translation>Tid med låg hastighet, låg höjdökning och varken effekt eller kadens</translation>
+        <translation>Tid med låg fart, låg höjdökning och varken effekt eller kadens</translation>
     </message>
 </context>
 <context>
@@ -28032,7 +28034,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="149"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation>%1 Träningspass nerladdade, %2 gick fel eller hoppades över.</translation>
+        <translation>%1 träningspass nerladdade, %2 gick fel eller hoppades över.</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="183"/>
@@ -28481,7 +28483,7 @@ Välj Avbryt för att stänga denna dialogruta.</translation>
 Current speed %1 kph
 Increase speed to %2 kph</source>
         <translation>Kalibrerar...
-Hastighet %1 km/h
+Fart %1 km/h
 Öka den till minst %2 km/h</translation>
     </message>
     <message>
@@ -28897,7 +28899,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="45"/>
         <source>Average Speed</source>
-        <translation>Medelhastighet</translation>
+        <translation>Medelfart</translation>
     </message>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="46"/>
@@ -29028,7 +29030,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="212"/>
         <source>Avg Speed: %1 </source>
-        <translation>Medelhastighet: %1 </translation>
+        <translation>Medelfart: %1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/TwitterDialog.cpp" line="213"/>
@@ -30003,7 +30005,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="230"/>
         <source>Workout Creator</source>
-        <translation>Träningspassmakaren</translation>
+        <translation>Träningspasskapare</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="231"/>
@@ -31110,7 +31112,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Gui/Pages.cpp" line="1436"/>
         <source>Device Type</source>
-        <translation>Enhetstyp</translation>
+        <translation>Inspelningsenhet</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1438"/>
