@@ -1783,6 +1783,9 @@ void
 CriticalPowerWindow::showCSLinearChanged(int state)
 {
     cpPlot->showXAxisLinear(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
 }
 
 void 
