@@ -244,6 +244,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QLabel *shadies = new QLabel(tr("Shade Intervals"));
     cl->addRow(shadies, shadeIntervalsCheck);
 
+    showCSLinearCheck = new QCheckBox(this);
+    showCSLinearCheck->setChecked(true); // default on
+    showCSLinearLabel = new QLabel(tr("Show time scale linear"));
+    cl->addRow(showCSLinearLabel, showCSLinearCheck);
+
     ridePlotStyleCombo = new QComboBox(this);
     ridePlotStyleCombo->addItem(tr("Activity Mean Max"));
     ridePlotStyleCombo->addItem(tr("Activity Centile"));
@@ -519,6 +524,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showEffortCheck, SIGNAL(stateChanged(int)), this, SLOT(showEffortChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
+    connect(showCSLinearCheck, SIGNAL(stateChanged(int)), this, SLOT(showCSLinearChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
@@ -838,8 +844,7 @@ CriticalPowerWindow::modelParametersChanged()
     // need a helper any more ?
     if (seriesCombo->currentIndex() >= 0) {
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
-        if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
-        else helperWidget()->hide();
+        updateOptions(series);
     }
 
     // tell the plot
@@ -901,8 +906,7 @@ CriticalPowerWindow::forceReplot()
 
         // show helper if we're showing power
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
-        if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
-        else helperWidget()->hide();
+        updateOptions(series);
 
         // these are allowed outside of compare mode
         rPercent->show();
@@ -1285,8 +1289,7 @@ CriticalPowerWindow::setSeries(int index)
             CPLabel->hide();
         }
 
-        if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
-        else helperWidget()->hide();
+        updateOptions(series);
 
         if (rangemode) {
 
@@ -1538,6 +1541,25 @@ CriticalPowerWindow::addSeries()
     }
 }
 
+void
+CriticalPowerWindow::updateOptions(CriticalSeriesType series)
+{
+    if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) {
+        helperWidget()->show();
+    } else {
+        helperWidget()->hide();
+    }
+
+    if (series == kph) {
+        // speed series have option to display x-axis linear or log, others are defined fix in CPPlot::setSeries()
+        showCSLinearCheck->show();
+        showCSLinearLabel->show();
+    } else {
+        showCSLinearCheck->hide();
+        showCSLinearLabel->hide();
+    }
+}
+
 /*----------------------------------------------------------------------
  * Seasons stuff
  *--------------------------------------------------------------------*/
@@ -1755,6 +1777,15 @@ CriticalPowerWindow::showHeatChanged(int state)
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
     else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::showCSLinearChanged(int state)
+{
+    cpPlot->showXAxisLinear(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
 }
 
 void 

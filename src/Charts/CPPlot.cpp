@@ -64,6 +64,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     shadeIntervals(true), rangemode(rangemode), 
     showBest(true), filterBest(false), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
+    xAxisLinearOnSpeed(true),
 
     // curves and plot objects
     rideCurve(NULL), modelCurve(NULL), effortCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), pdModel(NULL)
@@ -235,7 +236,11 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     case CriticalPowerWindow::kph:
         series = tr("Speed");
         units = tr("kph");
-        scale = linear;
+        if (xAxisLinearOnSpeed == true) {
+            scale = linear;
+        } else {
+            scale = log;
+        }
         break;
 
     case CriticalPowerWindow::nm:
@@ -1411,8 +1416,9 @@ CPPlot::plotBests(RideItem *rideItem)
 
     // now set the scale
     QwtScaleDiv div((double)xmin, (double)xmax);
+
     if (criticalSeries == CriticalPowerWindow::work ||
-        criticalSeries == CriticalPowerWindow::kph)
+        (criticalSeries == CriticalPowerWindow::kph && xAxisLinearOnSpeed))
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
@@ -2044,6 +2050,22 @@ CPPlot::setShadeIntervals(int x)
     clearCurves();
 }
 
+void
+CPPlot::showXAxisLinear(bool x)
+{
+    xAxisLinearOnSpeed = x;
+
+    // change to linear/log on critical speed chart only
+    if (this->criticalSeries == CriticalPowerWindow::kph) {
+        lastupdate = QTime::currentTime();
+        clearCurves();
+        // redraw
+        setSeries(this->criticalSeries);
+        setRide(const_cast<RideItem*>(context->currentRideItem()));
+        calculateForDateRanges(context->compareDateRanges);
+    }
+}
+
 // model parameters!
 void
 CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant)
@@ -2578,8 +2600,9 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 
     // now set the scale
     QwtScaleDiv div((double)xmin, (double)xmax);
+
     if (criticalSeries == CriticalPowerWindow::work ||
-        criticalSeries == CriticalPowerWindow::kph)
+        (criticalSeries == CriticalPowerWindow::kph && xAxisLinearOnSpeed))
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);
@@ -2721,8 +2744,9 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 
     // now set the scale
     QwtScaleDiv div((double)xmin, (double)xmax);
+
     if (criticalSeries == CriticalPowerWindow::work ||
-        criticalSeries == CriticalPowerWindow::kph)
+        (criticalSeries == CriticalPowerWindow::kph && xAxisLinearOnSpeed))
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksVeloclinic);

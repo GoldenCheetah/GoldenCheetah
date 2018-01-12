@@ -78,6 +78,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(bool showEffort READ showEffort WRITE setShowEffort USER true)
     Q_PROPERTY(bool showHeat READ showHeat WRITE setShowHeat USER true)
     Q_PROPERTY(bool showHeatByDate READ showHeatByDate WRITE setShowHeatByDate USER true)
+    Q_PROPERTY(bool showCSLinear READ showCSLinear WRITE setShowCSLinear USER true)
     Q_PROPERTY(int shadeIntervals READ shadeIntervals WRITE setShadeIntervals USER true)
     Q_PROPERTY(int ridePlotMode READ ridePlotMode WRITE setRidePlotMode USER true)
     Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
@@ -194,6 +195,9 @@ class CriticalPowerWindow : public GcChartWindow
         bool showHeatByDate() { return showHeatByDateCheck->isChecked(); }
         void setShowHeatByDate(bool x) { return showHeatByDateCheck->setChecked(x); }
 
+        bool showCSLinear() { return showCSLinearCheck->isChecked(); }
+        void setShowCSLinear(bool x) { return showCSLinearCheck->setChecked(x); }
+
         bool showGrid() { return showGridCheck->isChecked(); }
         void setShowGrid(bool x) { return showGridCheck->setChecked(x); }
 
@@ -218,6 +222,7 @@ class CriticalPowerWindow : public GcChartWindow
         void shadingSelected(int shading);
         void showEffortChanged(int check);
         void showHeatChanged(int check);
+        void showCSLinearChanged(int state);
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
         void showBestChanged(int check);
@@ -288,6 +293,8 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *filterBestCheck;
         QCheckBox *showGridCheck;
         QCheckBox *rPercent, *rHeat, *rDelta, *rDeltaPercent;
+        QCheckBox *showCSLinearCheck;
+        QLabel *showCSLinearLabel;
         QwtPlotPicker *picker;
         QwtPlotGrid *grid;
 
@@ -306,6 +313,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *eiTitle, *eiValue;
 
         void addSeries();
+        void updateOptions(CriticalSeriesType series);
         Seasons *seasons;
         QList<Season> seasonsList;
         RideItem *currentRide;
