@@ -681,12 +681,20 @@ LTMSidebar::eventPopup()
     // events are against a selected season
     if (dateRangeTree->selectedItems().count() == 0) return; // need a season selected!
 
+    QTreeWidgetItem *item = dateRangeTree->selectedItems().at(0);
+    int seasonIdx = -1;
+
     // and the season must be user defined not temporary
-    int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
-    if (seasons->seasons[seasonindex].getType() == Season::temporary) return;
+    if (item->type() >= Season::season && item->type() < Season::temporary) {
+        seasonIdx = allDateRanges->indexOfChild(item);
+    } else if (item->type() >= Phase::phase) {
+        seasonIdx = allDateRanges->indexOfChild(item->parent());
+    }
+
+    if (seasonIdx == -1) return;
 
     // have we selected an event?
-    QTreeWidgetItem *item = NULL;
+    item = NULL;
     if (!eventTree->selectedItems().isEmpty()) item = eventTree->selectedItems().at(0);
 
     QMenu menu(eventTree);
