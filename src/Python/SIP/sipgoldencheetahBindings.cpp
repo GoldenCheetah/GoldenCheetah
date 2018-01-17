@@ -302,6 +302,36 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs, PyOb
 }
 
 
+extern "C" {static PyObject *meth_Bindings_wbal(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_wbal(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        PyObject * a0 = 0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_activity,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|P0", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        {
+             ::PythonDataSeries*sipRes;
+
+            sipRes = new  ::PythonDataSeries(sipCpp->wbal(a0));
+
+            return sipConvertFromNewType(sipRes,sipType_PythonDataSeries,Py_None);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_wbal, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_activityMetrics(PyObject *, PyObject *, PyObject *);}
 static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
@@ -663,6 +693,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_seriesPresent), (PyCFunction)meth_Bindings_seriesPresent, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_version), meth_Bindings_version, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_wbal), (PyCFunction)meth_Bindings_wbal, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_webpage), (PyCFunction)meth_Bindings_webpage, METH_VARARGS|METH_KEYWORDS, NULL}
 };
 
@@ -680,7 +711,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        18, methods_Bindings,
+        19, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

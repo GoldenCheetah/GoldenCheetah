@@ -9,6 +9,7 @@
 #include "DataFilter.h"
 #include "PMCData.h"
 #include "Season.h"
+#include "WPrime.h"
 
 #include "Bindings.h"
 
@@ -140,6 +141,30 @@ Bindings::series(int type, PyObject* activity) const
     RideFile* f = item->ride();
     PythonDataSeries* ds = new PythonDataSeries(seriesName(type), f->dataPoints().count());
     for(int i=0; i<ds->count; i++) ds->data[i] = f->dataPoints()[i]->value(static_cast<RideFile::SeriesType>(type));
+
+    return ds;
+}
+
+// get the wbal series for the currently selected ride
+PythonDataSeries*
+Bindings::wbal(PyObject* activity) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return NULL;
+
+    RideFile* f = item->ride();
+    if (f == NULL) return NULL;
+
+    f->recalculateDerivedSeries();
+    WPrime *w = f->wprimeData();
+    if (w == NULL) return NULL;
+
+    PythonDataSeries* ds = new PythonDataSeries("WBal", w->ydata().count());
+    for(int i=0; i<ds->count; i++) ds->data[i] = w->ydata()[i];
 
     return ds;
 }

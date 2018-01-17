@@ -71,14 +71,16 @@
 #define sipName_group &sipStrings_goldencheetah[278]
 #define sipNameNr_build 284
 #define sipName_build &sipStrings_goldencheetah[284]
-#define sipNameNr_type 290
-#define sipName_type &sipStrings_goldencheetah[290]
-#define sipNameNr_url 295
-#define sipName_url &sipStrings_goldencheetah[295]
-#define sipNameNr_pmc 299
-#define sipName_pmc &sipStrings_goldencheetah[299]
-#define sipNameNr_all 303
-#define sipName_all &sipStrings_goldencheetah[303]
+#define sipNameNr_wbal 290
+#define sipName_wbal &sipStrings_goldencheetah[290]
+#define sipNameNr_type 295
+#define sipName_type &sipStrings_goldencheetah[295]
+#define sipNameNr_url 300
+#define sipName_url &sipStrings_goldencheetah[300]
+#define sipNameNr_pmc 304
+#define sipName_pmc &sipStrings_goldencheetah[304]
+#define sipNameNr_all 308
+#define sipName_all &sipStrings_goldencheetah[308]
 
 #define sipMalloc                   sipAPI_goldencheetah->api_malloc
 #define sipFree                     sipAPI_goldencheetah->api_free

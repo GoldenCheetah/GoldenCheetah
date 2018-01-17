@@ -127,6 +127,7 @@ public:
     QString seriesName(int type=10) const;
     int seriesLast() const;
     PythonDataSeries series(int type=10, PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries wbal(PyObject* activity=NULL) /TransferBack/;
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;

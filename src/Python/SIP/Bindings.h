@@ -38,6 +38,7 @@ class Bindings {
         int seriesLast() const;
         QString seriesName(int type) const;
         PythonDataSeries *series(int type, PyObject* activity=NULL) const;
+        PythonDataSeries *wbal(PyObject* activity=NULL) const;
 
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
