@@ -128,6 +128,7 @@ public:
     int seriesLast() const;
     PythonDataSeries series(int type=10, PyObject* activity=NULL) /TransferBack/;
     PythonDataSeries wbal(PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries xdataseries(QString name, QString series, QString join="repeat", PyObject* activity=NULL) /TransferBack/;
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;

@@ -169,6 +169,49 @@ Bindings::wbal(PyObject* activity) const
     return ds;
 }
 
+// get the xdata series for the currently selected ride
+PythonDataSeries*
+Bindings::xdataseries(QString name, QString series, QString join, PyObject* activity) const
+{
+    // XDATA join method
+    RideFile::XDataJoin xjoin;
+    QStringList xdataValidSymbols;
+    xdataValidSymbols << "sparse" << "repeat" << "interpolate" << "resample";
+    int xx = xdataValidSymbols.indexOf(join, Qt::CaseInsensitive);
+    switch(xx) {
+        case 0: xjoin = RideFile::SPARSE; break;
+        default:
+        case 1: xjoin = RideFile::REPEAT; break;
+        case 2: xjoin = RideFile::INTERPOLATE; break;
+        case 3: xjoin = RideFile::RESAMPLE; break;
+    }
+
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return NULL;
+
+    RideFile* f = item->ride();
+    if (f == NULL) return NULL;
+
+    if (!f->xdata().contains(name)) return NULL; // No such XData series
+    XDataSeries *xds = f->xdata()[name];
+
+    if (!xds->valuename.contains(series)) return NULL; // No shuch XData name
+
+    PythonDataSeries* ds = new PythonDataSeries(name, f->dataPoints().count());
+    int idx = 0;
+    for(int i=0; i<ds->count; i++) {
+        RideFilePoint *p = f->dataPoints()[i];
+        double val = f->xdataValue(p, idx, name, series, xjoin);
+        ds->data[i] = (val == RideFile::NA) ? sqrt(-1) : val; // NA => NaN
+    }
+
+    return ds;
+}
+
 int
 Bindings::seriesLast() const
 {

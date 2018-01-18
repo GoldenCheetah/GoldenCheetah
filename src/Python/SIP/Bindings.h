@@ -39,6 +39,7 @@ class Bindings {
         QString seriesName(int type) const;
         PythonDataSeries *series(int type, PyObject* activity=NULL) const;
         PythonDataSeries *wbal(PyObject* activity=NULL) const;
+        PythonDataSeries *xdataseries(QString name, QString series, QString join="repeat", PyObject* activity=NULL) const;
 
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
