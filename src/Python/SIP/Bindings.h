@@ -23,9 +23,11 @@ class Bindings {
 
     public:
         long threadid() const;
-        QString athlete() const;
         long build() const;
         QString version() const;
+
+        // working with athlete data
+        PyObject* athlete() const;
 
         // working with activities
         PyObject* activities(QString filter=QString()) const;

@@ -29,12 +29,6 @@ long Bindings::threadid() const
     return t;
 }
 
-QString Bindings::athlete() const
-{
-    Context *context = python->contexts.value(threadid());
-    return context->athlete->cyclist;
-}
-
 long Bindings::build() const
 {
     return VERSION_LATEST;
@@ -43,6 +37,39 @@ long Bindings::build() const
 QString Bindings::version() const
 {
     return VERSION_STRING;
+}
+
+// get athlete data
+PyObject* Bindings::athlete() const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    PyObject* dict = PyDict_New();
+    if (dict == NULL) return dict;
+
+    // NAME
+    PyDict_SetItemString(dict, "name", PyUnicode_FromString(context->athlete->cyclist.toUtf8().constData()));
+
+    // HOME
+    PyDict_SetItemString(dict, "home", PyUnicode_FromString(context->athlete->home->root().absolutePath().toUtf8().constData()));
+
+    // DOB
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
+    QDate d = appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate();
+    PyDict_SetItemString(dict, "dob", PyDate_FromDate(d.year(), d.month(), d.day()));
+
+    // WEIGHT
+    PyDict_SetItemString(dict, "weight", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()));
+
+    // HEIGHT
+    PyDict_SetItemString(dict, "height", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble()));
+
+    // GENDER
+    int isfemale = appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt();
+    PyDict_SetItemString(dict, "gender", PyUnicode_FromString(isfemale ? "female" : "male"));
+
+    return dict;
 }
 
 // get a list of activities (Date&Time)

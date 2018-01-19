@@ -51,10 +51,10 @@
 #define sipName_metrics &sipStrings_goldencheetah[206]
 #define sipNameNr_compare 214
 #define sipName_compare &sipStrings_goldencheetah[214]
-#define sipNameNr_version 222
-#define sipName_version &sipStrings_goldencheetah[222]
-#define sipNameNr_athlete 230
-#define sipName_athlete &sipStrings_goldencheetah[230]
+#define sipNameNr_athlete 222
+#define sipName_athlete &sipStrings_goldencheetah[222]
+#define sipNameNr_version 230
+#define sipName_version &sipStrings_goldencheetah[230]
 #define sipNameNr___len__ 238
 #define sipName___len__ &sipStrings_goldencheetah[238]
 #define sipNameNr___str__ 246

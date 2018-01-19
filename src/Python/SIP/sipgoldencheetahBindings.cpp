@@ -43,31 +43,6 @@ static PyObject *meth_Bindings_threadid(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
-extern "C" {static PyObject *meth_Bindings_athlete(PyObject *, PyObject *);}
-static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
-{
-    PyObject *sipParseErr = NULL;
-
-    {
-        const  ::Bindings *sipCpp;
-
-        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
-        {
-             ::QString*sipRes;
-
-            sipRes = new  ::QString(sipCpp->athlete());
-
-            return sipConvertFromNewType(sipRes,sipType_QString,NULL);
-        }
-    }
-
-    /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_athlete, NULL);
-
-    return NULL;
-}
-
-
 extern "C" {static PyObject *meth_Bindings_build(PyObject *, PyObject *);}
 static PyObject *meth_Bindings_build(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -113,6 +88,31 @@ static PyObject *meth_Bindings_version(PyObject *sipSelf, PyObject *sipArgs)
 
     /* Raise an exception if the arguments couldn't be parsed. */
     sipNoMethod(sipParseErr, sipName_Bindings, sipName_version, NULL);
+
+    return NULL;
+}
+
+
+extern "C" {static PyObject *meth_Bindings_athlete(PyObject *, PyObject *);}
+static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::Bindings *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "B", &sipSelf, sipType_Bindings, &sipCpp))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->athlete();
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_athlete, NULL);
 
     return NULL;
 }
