@@ -36,6 +36,7 @@ before_install:
 - brew install libsamplerate
 - brew tap homebrew/science
 - brew install r
+- brew tap brewsci/science
 - brew install lmfit
 ## Disable KML for now
 ##- brew install --HEAD travis/libkml.rb
