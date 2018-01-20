@@ -28,6 +28,7 @@ class Bindings {
 
         // working with athlete data
         PyObject* athlete() const;
+        PyObject* zones(PyObject* date=NULL, QString sport="") const;
 
         // working with activities
         PyObject* activities(QString filter=QString()) const;

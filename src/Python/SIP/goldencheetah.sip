@@ -117,6 +117,7 @@ public:
 
     // working with athlete data
     PyObject* athlete() /TransferBack/;
+    PyObject* zones(PyObject* date=NULL, QString sport="") /TransferBack/;
 
     // working with activities
     PyObject* activities(QString filter=QString()) /TransferBack/;
