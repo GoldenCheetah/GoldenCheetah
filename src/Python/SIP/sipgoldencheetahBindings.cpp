@@ -150,8 +150,8 @@ static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
-extern "C" {static PyObject *meth_Bindings_zones(PyObject *, PyObject *, PyObject *);}
-static PyObject *meth_Bindings_zones(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+extern "C" {static PyObject *meth_Bindings_athleteZones(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_athleteZones(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -171,7 +171,7 @@ static PyObject *meth_Bindings_zones(PyObject *sipSelf, PyObject *sipArgs, PyObj
         {
             PyObject * sipRes;
 
-            sipRes = sipCpp->zones(a0,*a1);
+            sipRes = sipCpp->athleteZones(a0,*a1);
             sipReleaseType(a1,sipType_QString,a1State);
 
             return sipRes;
@@ -179,7 +179,7 @@ static PyObject *meth_Bindings_zones(PyObject *sipSelf, PyObject *sipArgs, PyObj
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_zones, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_athleteZones, NULL);
 
     return NULL;
 }
@@ -369,8 +369,8 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs, PyOb
 }
 
 
-extern "C" {static PyObject *meth_Bindings_wbal(PyObject *, PyObject *, PyObject *);}
-static PyObject *meth_Bindings_wbal(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+extern "C" {static PyObject *meth_Bindings_activityWbal(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_activityWbal(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -386,21 +386,21 @@ static PyObject *meth_Bindings_wbal(PyObject *sipSelf, PyObject *sipArgs, PyObje
         {
              ::PythonDataSeries*sipRes;
 
-            sipRes = new  ::PythonDataSeries(sipCpp->wbal(a0));
+            sipRes = new  ::PythonDataSeries(sipCpp->activityWbal(a0));
 
             return sipConvertFromNewType(sipRes,sipType_PythonDataSeries,Py_None);
         }
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_wbal, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_activityWbal, NULL);
 
     return NULL;
 }
 
 
-extern "C" {static PyObject *meth_Bindings_xdataseries(PyObject *, PyObject *, PyObject *);}
-static PyObject *meth_Bindings_xdataseries(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+extern "C" {static PyObject *meth_Bindings_activityXdata(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_activityXdata(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -426,7 +426,7 @@ static PyObject *meth_Bindings_xdataseries(PyObject *sipSelf, PyObject *sipArgs,
         {
              ::PythonDataSeries*sipRes;
 
-            sipRes = new  ::PythonDataSeries(sipCpp->xdataseries(*a0,*a1,*a2,a3));
+            sipRes = new  ::PythonDataSeries(sipCpp->activityXdata(*a0,*a1,*a2,a3));
             sipReleaseType(a0,sipType_QString,a0State);
             sipReleaseType(a1,sipType_QString,a1State);
             sipReleaseType(a2,sipType_QString,a2State);
@@ -436,7 +436,7 @@ static PyObject *meth_Bindings_xdataseries(PyObject *sipSelf, PyObject *sipArgs,
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_xdataseries, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_activityXdata, NULL);
 
     return NULL;
 }
@@ -583,8 +583,8 @@ static PyObject *meth_Bindings_metrics(PyObject *sipSelf, PyObject *sipArgs, PyO
 }
 
 
-extern "C" {static PyObject *meth_Bindings_pmc(PyObject *, PyObject *, PyObject *);}
-static PyObject *meth_Bindings_pmc(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+extern "C" {static PyObject *meth_Bindings_seasonPmc(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seasonPmc(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -604,7 +604,7 @@ static PyObject *meth_Bindings_pmc(PyObject *sipSelf, PyObject *sipArgs, PyObjec
         {
             PyObject * sipRes;
 
-            sipRes = sipCpp->pmc(a0,*a1);
+            sipRes = sipCpp->seasonPmc(a0,*a1);
             sipReleaseType(a1,sipType_QString,a1State);
 
             return sipRes;
@@ -612,14 +612,14 @@ static PyObject *meth_Bindings_pmc(PyObject *sipSelf, PyObject *sipArgs, PyObjec
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_pmc, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_seasonPmc, NULL);
 
     return NULL;
 }
 
 
-extern "C" {static PyObject *meth_Bindings_measures(PyObject *, PyObject *, PyObject *);}
-static PyObject *meth_Bindings_measures(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+extern "C" {static PyObject *meth_Bindings_seasonMeasures(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seasonMeasures(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
@@ -639,7 +639,7 @@ static PyObject *meth_Bindings_measures(PyObject *sipSelf, PyObject *sipArgs, Py
         {
             PyObject * sipRes;
 
-            sipRes = sipCpp->measures(a0,*a1);
+            sipRes = sipCpp->seasonMeasures(a0,*a1);
             sipReleaseType(a1,sipType_QString,a1State);
 
             return sipRes;
@@ -647,7 +647,7 @@ static PyObject *meth_Bindings_measures(PyObject *sipSelf, PyObject *sipArgs, Py
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_measures, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_seasonMeasures, NULL);
 
     return NULL;
 }
@@ -835,26 +835,26 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_activities), (PyCFunction)meth_Bindings_activities, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityMeanmax), (PyCFunction)meth_Bindings_activityMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityMetrics), (PyCFunction)meth_Bindings_activityMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_activityWbal), (PyCFunction)meth_Bindings_activityWbal, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_activityXdata), (PyCFunction)meth_Bindings_activityXdata, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_athleteZones), (PyCFunction)meth_Bindings_athleteZones, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_measures), (PyCFunction)meth_Bindings_measures, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_metrics), (PyCFunction)meth_Bindings_metrics, METH_VARARGS|METH_KEYWORDS, NULL},
-    {SIP_MLNAME_CAST(sipName_pmc), (PyCFunction)meth_Bindings_pmc, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_season), (PyCFunction)meth_Bindings_season, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonIntervals), (PyCFunction)meth_Bindings_seasonIntervals, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMeanmax), (PyCFunction)meth_Bindings_seasonMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_seasonMeasures), (PyCFunction)meth_Bindings_seasonMeasures, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMetrics), (PyCFunction)meth_Bindings_seasonMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonPeaks), (PyCFunction)meth_Bindings_seasonPeaks, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_seasonPmc), (PyCFunction)meth_Bindings_seasonPmc, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_series), (PyCFunction)meth_Bindings_series, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesLast), meth_Bindings_seriesLast, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesName), (PyCFunction)meth_Bindings_seriesName, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesPresent), (PyCFunction)meth_Bindings_seriesPresent, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_version), meth_Bindings_version, METH_VARARGS, NULL},
-    {SIP_MLNAME_CAST(sipName_wbal), (PyCFunction)meth_Bindings_wbal, METH_VARARGS|METH_KEYWORDS, NULL},
-    {SIP_MLNAME_CAST(sipName_webpage), (PyCFunction)meth_Bindings_webpage, METH_VARARGS|METH_KEYWORDS, NULL},
-    {SIP_MLNAME_CAST(sipName_xdataseries), (PyCFunction)meth_Bindings_xdataseries, METH_VARARGS|METH_KEYWORDS, NULL},
-    {SIP_MLNAME_CAST(sipName_zones), (PyCFunction)meth_Bindings_zones, METH_VARARGS|METH_KEYWORDS, NULL}
+    {SIP_MLNAME_CAST(sipName_webpage), (PyCFunction)meth_Bindings_webpage, METH_VARARGS|METH_KEYWORDS, NULL}
 };
 
 

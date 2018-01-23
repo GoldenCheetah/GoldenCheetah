@@ -31,7 +31,7 @@ class Bindings {
 
         // working with athlete data
         PyObject* athlete() const;
-        PyObject* zones(PyObject* date=NULL, QString sport="") const;
+        PyObject* athleteZones(PyObject* date=NULL, QString sport="") const;
 
         // working with activities
         PyObject* activities(QString filter=QString()) const;
@@ -44,16 +44,16 @@ class Bindings {
         int seriesLast() const;
         QString seriesName(int type) const;
         PythonDataSeries *series(int type, PyObject* activity=NULL) const;
-        PythonDataSeries *wbal(PyObject* activity=NULL) const;
-        PythonDataSeries *xdataseries(QString name, QString series, QString join="repeat", PyObject* activity=NULL) const;
+        PythonDataSeries *activityWbal(PyObject* activity=NULL) const;
+        PythonDataSeries *activityXdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) const;
 
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
         PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
         PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
         PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) const;
-        PyObject* pmc(bool all=false, QString metric=QString("TSS")) const;
-        PyObject* measures(bool all=false, QString group=QString("Body")) const;
+        PyObject* seasonPmc(bool all=false, QString metric=QString("TSS")) const;
+        PyObject* seasonMeasures(bool all=false, QString group=QString("Body")) const;
 
         // working with meanmax data
         PyObject* activityMeanmax(bool compare=false) const;

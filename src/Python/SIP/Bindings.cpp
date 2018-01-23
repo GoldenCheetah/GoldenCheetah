@@ -103,7 +103,7 @@ class gcZoneConfig {
 // Return a dataframe with:
 // date, sport, cp, w', pmax, ftp, lthr, rhr, hrmax, cv, zoneslow, zonescolor
 PyObject*
-Bindings::zones(PyObject* date, QString sport) const
+Bindings::athleteZones(PyObject* date, QString sport) const
 {
     Context *context = python->contexts.value(threadid());
     if (context == NULL) return NULL;
@@ -558,7 +558,7 @@ Bindings::series(int type, PyObject* activity) const
 
 // get the wbal series for the currently selected ride
 PythonDataSeries*
-Bindings::wbal(PyObject* activity) const
+Bindings::activityWbal(PyObject* activity) const
 {
     Context *context = python->contexts.value(threadid());
     if (context == NULL) return NULL;
@@ -582,7 +582,7 @@ Bindings::wbal(PyObject* activity) const
 
 // get the xdata series for the currently selected ride
 PythonDataSeries*
-Bindings::xdataseries(QString name, QString series, QString join, PyObject* activity) const
+Bindings::activityXdata(QString name, QString series, QString join, PyObject* activity) const
 {
     // XDATA join method
     RideFile::XDataJoin xjoin;
@@ -1423,7 +1423,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
 }
 
 PyObject*
-Bindings::pmc(bool all, QString metric) const
+Bindings::seasonPmc(bool all, QString metric) const
 {
     Context *context = python->contexts.value(threadid());
 
@@ -1524,7 +1524,7 @@ Bindings::pmc(bool all, QString metric) const
 }
 
 PyObject*
-Bindings::measures(bool all, QString group) const
+Bindings::seasonMeasures(bool all, QString group) const
 {
     Context *context = python->contexts.value(threadid());
 

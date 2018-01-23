@@ -120,7 +120,7 @@ public:
 
     // working with athlete data
     PyObject* athlete() /TransferBack/;
-    PyObject* zones(PyObject* date=NULL, QString sport="") /TransferBack/;
+    PyObject* athleteZones(PyObject* date=NULL, QString sport="") /TransferBack/;
 
     // working with activities
     PyObject* activities(QString filter=QString()) /TransferBack/;
@@ -133,16 +133,16 @@ public:
     QString seriesName(int type=10) const;
     int seriesLast() const;
     PythonDataSeries series(int type=10, PyObject* activity=NULL) /TransferBack/;
-    PythonDataSeries wbal(PyObject* activity=NULL) /TransferBack/;
-    PythonDataSeries xdataseries(QString name, QString series, QString join="repeat", PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries activityWbal(PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries activityXdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) /TransferBack/;
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;
     PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
     PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
     PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) /TransferBack/;
-    PyObject* pmc(bool all=false, QString metric=QString("TSS")) /TransferBack/;
-    PyObject* measures(bool all=false, QString group=QString("Body")) /TransferBack/;
+    PyObject* seasonPmc(bool all=false, QString metric=QString("TSS")) /TransferBack/;
+    PyObject* seasonMeasures(bool all=false, QString group=QString("Body")) /TransferBack/;
 
     // working with meanmax data
     PyObject* activityMeanmax(bool compare=false) /TransferBack/;
