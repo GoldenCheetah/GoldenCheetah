@@ -1,6 +1,7 @@
 #include <PythonEmbed.h>
 #include "Context.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "Athlete.h"
 #include "GcUpgrade.h"
 #include "PythonChart.h"
@@ -964,6 +965,186 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 
         // add to the dict
         PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), metalist);
+    }
+
+    return dict;
+}
+
+PyObject*
+Bindings::seasonIntervals(QString type, bool compare) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    // want a list of compares
+    if (compare) {
+
+        // only return compares if its actually active
+        if (context->isCompareDateRanges) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            PyObject* list = PyList_New(count);
+            int idx = 0;
+
+            // create a dict for each and add to list
+            foreach(CompareDateRange p, context->compareDateRanges) {
+                if (p.isChecked()) {
+
+                    // create a tuple (metrics, color)
+                    PyObject* tuple = Py_BuildValue("(Os)", seasonIntervals(DateRange(p.start, p.end), type), p.color.name().toUtf8().constData());
+                    // add to back and move on
+                    PyList_SET_ITEM(list, idx++, tuple);
+                }
+            }
+
+            return list;
+
+        } else { // compare isn't active...
+
+            // otherwise return the current metrics in a compare list
+            PyObject* list = PyList_New(1);
+
+            // create a tuple (metrics, color)
+            DateRange range = context->currentDateRange();
+            PyObject* tuple = Py_BuildValue("(Os)", seasonIntervals(range, type), "#FF00FF");
+            // add to back and move on
+            PyList_SET_ITEM(list, 0, tuple);
+
+            return list;
+        }
+
+    } else {
+
+        // just a dict of metrics
+        DateRange range = context->currentDateRange();
+        return seasonIntervals(range, type);
+    }
+}
+
+PyObject*
+Bindings::seasonIntervals(DateRange range, QString type) const
+{
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    int intervals = 0;
+
+    // how many interval to return in the currently selected date range ?
+
+    // apply any global filters
+    Specification specification;
+    FilterSet fs;
+    fs.addFilter(context->isfiltered, context->filters);
+    fs.addFilter(context->ishomefiltered, context->homeFilters);
+    specification.setFilterSet(fs);
+
+    // we need to count intervals that are in range...
+    intervals = 0;
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (!range.pass(ride->dateTime.date())) continue;
+
+        if (type.isEmpty()) intervals += ride->intervals().count();
+        else {
+            foreach(IntervalItem *item, ride->intervals())
+                if (type == RideFileInterval::typeDescription(item->type))
+                    intervals++;
+        }
+    }
+
+    PyObject* dict = PyDict_New();
+    if (dict == NULL) return dict;
+
+    //
+    // Date, Time, Name Type and Color
+    //
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
+
+    PyObject* datelist = PyList_New(intervals);
+    PyObject* timelist = PyList_New(intervals);
+    PyObject* namelist = PyList_New(intervals);
+    PyObject* typelist = PyList_New(intervals);
+    PyObject* colorlist = PyList_New(intervals);
+
+    int idx=0;
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+        if (!specification.pass(ride)) continue;
+        if (range.pass(ride->dateTime.date())) {
+            foreach(IntervalItem *item, ride->intervals())
+                if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type)) {
+
+                    // DATE
+                    QDate d = ride->dateTime.date();
+                    PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
+
+                    // TIME
+                    QTime t = ride->dateTime.time();
+                    PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
+
+                    // NAME
+                    PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
+
+                    // TYPE
+                    PyList_SET_ITEM(typelist, idx, PyUnicode_FromString(RideFileInterval::typeDescription(item->type).toUtf8().constData()));
+
+                    // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+                    QString color;
+                    if (item->color == QColor(1,1,1,1)) {
+                        // use the inverted color, not plot marker as that hideous
+                        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                        // white is jarring on a dark background!
+                        if (col==QColor(Qt::white)) col=QColor(127,127,127);
+                        color = col.name();
+                    } else
+                        color = ride->color.name();
+                    PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
+
+                    idx++;
+                }
+        }
+    }
+
+    PyDict_SetItemString(dict, "date", datelist);
+    PyDict_SetItemString(dict, "time", timelist);
+    PyDict_SetItemString(dict, "name", namelist);
+    PyDict_SetItemString(dict, "type", typelist);
+    PyDict_SetItemString(dict, "color", colorlist);
+
+    //
+    // METRICS
+    //
+    for(int i=0; i<factory.metricCount();i++) {
+
+        // set a list of metric values
+        PyObject* metriclist = PyList_New(intervals);
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        bool useMetricUnits = context->athlete->useMetricUnits;
+
+        int index=0;
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
+            if (!specification.pass(item)) continue;
+            if (range.pass(item->dateTime.date())) {
+
+                foreach(IntervalItem *interval, item->intervals()) {
+                    if (type.isEmpty() || type == RideFileInterval::typeDescription(interval->type))
+                        PyList_SET_ITEM(metriclist, index++, PyFloat_FromDouble(interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
+                }
+            }
+        }
+
+        // add to the dict
+        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
     }
 
     return dict;

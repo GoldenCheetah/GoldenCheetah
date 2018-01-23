@@ -47,6 +47,7 @@ class Bindings {
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
         PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
+        PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
         PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) const;
         PyObject* pmc(bool all=false, QString metric=QString("TSS")) const;
         PyObject* measures(bool all=false, QString group=QString("Body")) const;
@@ -65,6 +66,7 @@ class Bindings {
         // get a dict populated with metrics and metadata
         PyObject* activityMetrics(RideItem* item) const;
         PyObject* seasonMetrics(bool all, DateRange range, QString filter) const;
+        PyObject* seasonIntervals(DateRange range, QString type) const;
         // get a dict populated with meanmax data
         PyObject* activityMeanmax(const RideItem* item) const;
         PyObject* seasonMeanmax(bool all, DateRange range, QString filter) const;
