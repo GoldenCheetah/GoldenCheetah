@@ -43,6 +43,19 @@ QString Bindings::version() const
     return VERSION_STRING;
 }
 
+int
+Bindings::webpage(QString url) const
+{
+#ifdef Q_OS_WIN
+    url = url.replace("://C:", ":///C:"); // plotly fails to use enough slashes
+    url = url.replace("\\", "/");
+#endif
+
+    QUrl p(url);
+    python->chart->emitUrl(p);
+    return 0;
+}
+
 // get athlete data
 PyObject* Bindings::athlete() const
 {
@@ -1650,15 +1663,178 @@ Bindings::season(bool all, bool compare) const
     return ans;
 }
 
-int
-Bindings::webpage(QString url) const
+PyObject*
+Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bool compare) const
 {
-#ifdef Q_OS_WIN
-    url = url.replace("://C:", ":///C:"); // plotly fails to use enough slashes
-    url = url.replace("\\", "/");
-#endif
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
 
-    QUrl p(url);
-    python->chart->emitUrl(p);
-    return 0;
+    // lets get a Map of names to series
+    QMap<QString, RideFile::SeriesType> snames;
+    foreach(RideFile::SeriesType s, RideFileCache::meanMaxList()) {
+        snames.insert(RideFile::seriesName(s, true), s);
+    }
+
+    // extract as QStrings
+    QList<RideFile::SeriesType> seriesList;
+    RideFile::SeriesType stype;
+    if ((stype=snames.value(series, RideFile::none)) == RideFile::none)
+        return NULL;
+    else
+        seriesList << stype;
+
+    // extract as integers
+    QList<int>durations;
+    if (duration <= 0)
+        return NULL;
+    else
+        durations << duration;
+
+    // want a list of compares not a dataframe
+    if (compare) {
+
+        // only return compares if its actually active
+        if (context->isCompareDateRanges) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareDateRange p, context->compareDateRanges) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            PyObject* list = PyList_New(count);
+            int idx = 0;
+
+            // create a dict for each and add to list
+            foreach(CompareDateRange p, context->compareDateRanges) {
+                if (p.isChecked()) {
+
+                    // create a tuple (peaks, color)
+                    PyObject* tuple = Py_BuildValue("(Os)", seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations), p.color.name().toUtf8().constData());
+                    // add to back and move on
+                    PyList_SET_ITEM(list, idx++, tuple);
+                }
+            }
+
+            return list;
+
+        } else { // compare isn't active...
+
+            // otherwise return the current season meanmax in a compare list
+            PyObject* list = PyList_New(1);
+
+            // create a tuple (peaks, color)
+            DateRange range = context->currentDateRange();
+            PyObject* tuple = Py_BuildValue("(Os)", seasonPeaks(all, range, filter, seriesList, durations), "#FF00FF");
+            // add to back and move on
+            PyList_SET_ITEM(list, 0, tuple);
+
+            return list;
+        }
+
+    } else if (context->athlete && context->athlete->rideCache) {
+
+        // just a dict of peaks
+        DateRange range = context->currentDateRange();
+
+        return seasonPeaks(all, range, filter, seriesList, durations);
+
+    }
+
+    // fail
+    return NULL;
+}
+
+PyObject*
+Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile::SeriesType> series, QList<int> durations) const
+{
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
+
+    Context *context = python->contexts.value(threadid());
+    if (context == NULL) return NULL;
+
+    // we return a dict
+    PyObject* ans = PyDict_New();
+    if (ans == NULL) return NULL;
+
+    // how many rides ?
+    Specification specification;
+    FilterSet fs;
+    fs.addFilter(context->isfiltered, context->filters);
+    fs.addFilter(context->ishomefiltered, context->homeFilters);
+    specification.setFilterSet(fs);
+
+    // did call contain any filters?
+    if (filter != "") {
+
+        DataFilter dataFilter(python->chart, context);
+        QStringList files;
+        dataFilter.parseFilter(context, filter, &files);
+        fs.addFilter(true, files);
+    }
+    specification.setFilterSet(fs);
+
+    // how many pass?
+    int size=0;
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+        // apply filters
+        if (!specification.pass(item)) continue;
+
+        // do we want this one ?
+        if (all || range.pass(item->dateTime.date()))  size++;
+    }
+
+    // dates first
+    PyObject* datetimelist = PyList_New(size);
+
+    // fill with values for date
+    int i=0;
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+        // apply filters
+        if (!specification.pass(item)) continue;
+
+        if (all || range.pass(item->dateTime.date())) {
+            // add datetime to the list
+            QDate d = item->dateTime.date();
+            QTime t = item->dateTime.time();
+            PyList_SET_ITEM(datetimelist, i++, PyDateTime_FromDateAndTime(d.year(), d.month(), d.day(), t.hour(), t.minute(), t.second(), t.msec()*10));
+        }
+    }
+
+    // add to the dict
+    PyDict_SetItemString(ans, "datetime", datetimelist);
+
+    foreach(RideFile::SeriesType pseries, series) {
+
+        foreach(int pduration, durations) {
+
+            // set a list
+            PyObject* list = PyList_New(size);
+
+            // give it a name
+            QString name = QString("peak_%1_%2").arg(RideFile::seriesName(pseries, true)).arg(pduration);
+
+            // fill with values
+            // get the value for the series and duration requested, although this is called
+            int index=0;
+            foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+                // apply filters
+                if (!specification.pass(item)) continue;
+
+                // do we want this one ?
+                if (all || range.pass(item->dateTime.date())) {
+
+                    // for each series/duration independently its pretty quick since it lseeks to
+                    // the actual value, so /should't/ be too expensive.........
+                    PyList_SET_ITEM(list, index++, PyFloat_FromDouble(RideFileCache::best(item->context, item->fileName, pseries, pduration)));
+                }
+            }
+
+            // add to the dict
+            PyDict_SetItemString(ans, name.toUtf8().constData(), list);
+        }
+    }
+
+    return ans;
 }

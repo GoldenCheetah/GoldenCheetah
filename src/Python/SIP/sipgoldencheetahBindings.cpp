@@ -93,6 +93,38 @@ static PyObject *meth_Bindings_version(PyObject *sipSelf, PyObject *sipArgs)
 }
 
 
+extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+        const  ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_url,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State))
+        {
+            int sipRes;
+
+            sipRes = sipCpp->webpage(*a0);
+            sipReleaseType(a0,sipType_QString,a0State);
+
+            return SIPLong_FromLong(sipRes);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_webpage, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_athlete(PyObject *, PyObject *);}
 static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -688,33 +720,44 @@ static PyObject *meth_Bindings_seasonMeanmax(PyObject *sipSelf, PyObject *sipArg
 }
 
 
-extern "C" {static PyObject *meth_Bindings_webpage(PyObject *, PyObject *, PyObject *);}
-static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+extern "C" {static PyObject *meth_Bindings_seasonPeaks(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_seasonPeaks(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
     PyObject *sipParseErr = NULL;
 
     {
          ::QString* a0;
         int a0State = 0;
-        const  ::Bindings *sipCpp;
+        int a1;
+        bool a2 = 0;
+         ::QString a3def = QString();
+         ::QString* a3 = &a3def;
+        int a3State = 0;
+        bool a4 = 0;
+         ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
-            sipName_url,
+            sipName_series,
+            sipName_duration,
+            sipName_all,
+            sipName_filter,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1i|bJ1b", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, sipType_QString,&a3, &a3State, &a4))
         {
-            int sipRes;
+            PyObject * sipRes;
 
-            sipRes = sipCpp->webpage(*a0);
+            sipRes = sipCpp->seasonPeaks(*a0,a1,a2,*a3,a4);
             sipReleaseType(a0,sipType_QString,a0State);
+            sipReleaseType(a3,sipType_QString,a3State);
 
-            return SIPLong_FromLong(sipRes);
+            return sipRes;
         }
     }
 
     /* Raise an exception if the arguments couldn't be parsed. */
-    sipNoMethod(sipParseErr, sipName_Bindings, sipName_webpage, NULL);
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_seasonPeaks, NULL);
 
     return NULL;
 }
@@ -801,6 +844,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_seasonIntervals), (PyCFunction)meth_Bindings_seasonIntervals, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMeanmax), (PyCFunction)meth_Bindings_seasonMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMetrics), (PyCFunction)meth_Bindings_seasonMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_seasonPeaks), (PyCFunction)meth_Bindings_seasonPeaks, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_series), (PyCFunction)meth_Bindings_series, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesLast), meth_Bindings_seriesLast, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesName), (PyCFunction)meth_Bindings_seriesName, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -827,7 +871,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        22, methods_Bindings,
+        23, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

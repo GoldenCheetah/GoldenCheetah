@@ -26,6 +26,9 @@ class Bindings {
         long build() const;
         QString version() const;
 
+        // working with the web view
+        int webpage(QString url) const;
+
         // working with athlete data
         PyObject* athlete() const;
         PyObject* zones(PyObject* date=NULL, QString sport="") const;
@@ -55,9 +58,7 @@ class Bindings {
         // working with meanmax data
         PyObject* activityMeanmax(bool compare=false) const;
         PyObject* seasonMeanmax(bool all=false, QString filter=QString(), bool compare=false) const;
-
-        // working with the web view
-        int webpage(QString url) const;
+        PyObject* seasonPeaks(QString series, int duration, bool all=false, QString filter=QString(), bool compare=false) const;
 
     private:
         // find a RideItem by DateTime
@@ -71,5 +72,6 @@ class Bindings {
         PyObject* activityMeanmax(const RideItem* item) const;
         PyObject* seasonMeanmax(bool all, DateRange range, QString filter) const;
         PyObject* rideFileCacheMeanmax(RideFileCache* cache) const;
+        PyObject* seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile::SeriesType> series, QList<int> durations) const;
 
 };

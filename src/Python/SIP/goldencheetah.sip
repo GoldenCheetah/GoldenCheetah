@@ -115,6 +115,9 @@ public:
     int build() const;
     QString version() const;
 
+    // working with the web view
+    int webpage(QString url) const;
+
     // working with athlete data
     PyObject* athlete() /TransferBack/;
     PyObject* zones(PyObject* date=NULL, QString sport="") /TransferBack/;
@@ -144,8 +147,6 @@ public:
     // working with meanmax data
     PyObject* activityMeanmax(bool compare=false) /TransferBack/;
     PyObject* seasonMeanmax(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
-
-    // working with the web view
-    int webpage(QString url) const;
+    PyObject* seasonPeaks(QString series, int duration, bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
 };
 
