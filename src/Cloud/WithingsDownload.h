@@ -26,8 +26,8 @@
 
 #include "Context.h"
 #include "Settings.h"
-#include "WithingsParser.h"
 #include "BodyMeasures.h"
+#include "WithingsReading.h"
 
 #ifdef GC_HAVE_KQOAUTH
 #include <kqoauthmanager.h>
@@ -51,7 +51,6 @@ signals:
 private:
     Context *context;
     QNetworkAccessManager *nam;
-    WithingsParser *parser;
     QString response;
 
     #ifdef GC_HAVE_KQOAUTH
@@ -60,7 +59,8 @@ private:
     #endif
     QEventLoop loop;
 
-    void parse(QString text, QStringList &errors, QList<BodyMeasure> &bodyMeasures);
+    QJsonParseError parse(QString text, QList<BodyMeasure> &bodyMeasures);
+    QList<WithingsReading> jsonDocumentToWithingsReading(QJsonDocument withingsJson);
 
 private slots:
 
