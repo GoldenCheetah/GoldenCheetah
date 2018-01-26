@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _Gc_WithingsParser_h
-#define _Gc_WithingsParser_h
+#ifndef _Gc_WithingsReading_h
+#define _Gc_WithingsReading_h
 #include <QString>
 #include <QStringList>
 #include <QDateTime>
@@ -60,15 +60,6 @@ public:
     bool operator< (WithingsReading right) const {
         return (when < right.when);
     }
-};
-
-class WithingsParser
-{
-    public:
-        bool parse(QString &, QStringList &);
-        QList<WithingsReading> &readings() { return _readings; }
-    private:
-        QList<WithingsReading> _readings;
 };
 
 #endif

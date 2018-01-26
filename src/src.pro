@@ -708,12 +708,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 YACCSOURCES += Core/DataFilter.y \
                FileIO/JsonRideFile.y \
-               Cloud/WithingsParser.y \
                Core/RideDB.y
 
 LEXSOURCES  += Core/DataFilter.l \
                FileIO/JsonRideFile.l \
-               Cloud/WithingsParser.l \
                Core/RideDB.l
 
 
