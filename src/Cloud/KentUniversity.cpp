@@ -1008,6 +1008,7 @@ KentUniversityUploadDialog::completed(QString file, QString message)
     progress->setMaximum(1);
     progress->setValue(1);
     okcancel->setText(tr("Done"));
+    disconnect(okcancel, SIGNAL(clicked()), this, SLOT(uploadFile()));
     connect(okcancel, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
