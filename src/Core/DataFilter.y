@@ -50,7 +50,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %}
 
 // Symbol can be meta or metric name
-%token <leaf> SYMBOL
+%token <leaf> SYMBOL R PYTHON
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
@@ -77,6 +77,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
 %type <leaf> simple_statement if_clause while_clause function_def;
+%type <leaf> r_script python_script;
 %type <comp> statements
 
 %right '?' ':'
@@ -173,6 +174,26 @@ simple_statement:
                                                   $$->lvalue.l = $1;
                                                   $$->op = $2;
                                                   $$->rvalue.l = $3;
+                                                }
+        ;
+
+python_script:
+
+        PYTHON                                  { $$ = new Leaf(@1.first_column, @1.last_column);
+                                                  $$->type = Leaf::Script;
+                                                  $$->function = "python";
+                                                  QString full(DataFiltertext);
+                                                  $$->lvalue.s = new QString(full.mid(8,full.length()-10));
+                                                }
+        ;
+
+r_script:
+
+        R                                       { $$ = new Leaf(@1.first_column, @1.last_column);
+                                                  $$->type = Leaf::Script;
+                                                  $$->function = "R";
+                                                  QString full(DataFiltertext);
+                                                  $$->lvalue.s = new QString(full.mid(3,full.length()-5));
                                                 }
         ;
 
@@ -456,6 +477,8 @@ expr:
         | array                                 { $$ = $1; }
         | literal                               { $$ = $1; }
         | symbol                                { $$ = $1; }
+        | r_script                              { $$ = $1; }
+        | python_script                         { $$ = $1; }
         ;
 
 /*

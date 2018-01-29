@@ -110,7 +110,6 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     // prepare for threaded processing
     PyEval_InitThreads();
     mainThreadState = PyEval_SaveThread();
-
     loaded = true;
 }
 
@@ -152,6 +151,7 @@ void PythonEmbed::runline(Context *context, QString line)
         // clear results
         PyObject_CallFunction(static_cast<PyObject*>(clear), NULL);
     }
+
     PyGILState_Release(gstate);
     threadid=-1;
 }

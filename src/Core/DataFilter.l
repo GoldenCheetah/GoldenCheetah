@@ -52,6 +52,9 @@ int DataFiltercolumn = 1;
 %option never-interactive
 %%
 
+"#"[^\r\n]*                                 ; /* ignore single-line comments */
+"%%python"(.|[\n\r\t])*"%%"                 DataFilterlval.op = PYTHON; return PYTHON;
+"%%R"(.|[\n\r\t])*"%%"                      DataFilterlval.op = R; return R;
 "="                                         DataFilterlval.op = EQ; return EQ;
 "<>"                                        DataFilterlval.op = NEQ; return NEQ;
 "<"                                         DataFilterlval.op = LT; return LT;
@@ -112,7 +115,6 @@ int DataFiltercolumn = 1;
 "^"                                         DataFilterlval.op = POW; return POW;
 
 
-"#"[^\r\n]*                                 ; /* ignore single-line comments */
 [ \n\t\r]                                   ; /* we just ignore whitespace */
 
                                             /* any other character, typically :, { or } */

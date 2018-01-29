@@ -25,6 +25,7 @@ class Bindings {
         long threadid() const;
         long build() const;
         QString version() const;
+        void result(double);
 
         // working with the web view
         int webpage(QString url) const;

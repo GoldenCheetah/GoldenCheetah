@@ -26,12 +26,17 @@
 #include "VDOTCalculator.h"
 #include "DataProcessor.h"
 #include <QDebug>
+#include <QMutex>
+#include "PythonEmbed.h"
 
 #include "Zones.h"
 #include "PaceZones.h"
 #include "HrZones.h"
 
 #include "DataFilter_yacc.h"
+
+// control access to python runtime
+QMutex pythonMutex;
 
 // v4 functions
 static struct {
@@ -238,6 +243,7 @@ Leaf::isDynamic(Leaf *leaf)
                            (leaf->rvalue.l && leaf->isDynamic(leaf->rvalue.l));
                     break;
         }
+    case Leaf::Script :
     case Leaf::Vector :
         return true;
         break;
@@ -781,6 +787,7 @@ QString
 Leaf::toString()
 {
     switch(type) {
+    case Leaf::Script : return *lvalue.s;
     case Leaf::Float : return QString("%1").arg(lvalue.f); break;
     case Leaf::Integer : return QString("%1").arg(lvalue.i); break;
     case Leaf::String : return *lvalue.s; break;
@@ -859,6 +866,7 @@ void Leaf::print(Leaf *leaf, int level, DataFilterRuntime *df)
         return;
     }
     switch(leaf->type) {
+    case Leaf::Script: qDebug()<<leaf->lvalue.s; break;
     case Leaf::Compound: 
                         qDebug()<<"{";
                         foreach(Leaf *p, *(leaf->lvalue.b)) print(p, level+1, df);
@@ -934,6 +942,7 @@ static bool isCoggan(QString symbol)
 bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 {
     switch(leaf->type) {
+    case Leaf::Script : return true;
     case Leaf::Compound : return true; // last statement is value of block
     case Leaf::Float : return true;
     case Leaf::Integer : return true;
@@ -1015,6 +1024,10 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
     leaf->inerror = false;
 
     switch(leaf->type) {
+
+    case Leaf::Script : // just assume script is well formed...
+        return;
+
     case Leaf::Symbol :
         {
             // are the symbols correct?
@@ -1597,7 +1610,6 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
-
         // no errors just failed to finish
         if (!treeRoot) DataFiltererrors << tr("malformed expression.");
 
@@ -2509,6 +2521,17 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     break;
 
     //
+    // SCRIPT
+    //
+    case Leaf::Script :
+    {
+
+        // run a python script
+        if (leaf->function == "python")  return Result(df->runPythonScript(m->context, *leaf->lvalue.s));
+    }
+    break;
+
+    //
     // SYMBOLS
     //
     case Leaf::Symbol :
@@ -2984,4 +3007,44 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         break;
     }
     return Result(0); // false
+}
+
+double
+DataFilterRuntime::runPythonScript(Context *context, QString script)
+{
+    // get the lock
+    pythonMutex.lock();
+
+    // return result
+    double result;
+
+    // run it !!
+    python->canvas = NULL;
+    python->chart = NULL;
+    python->result = 0;
+
+    try {
+
+        // run it
+        python->runline(context, script);
+        result = python->result;
+
+    } catch(std::exception& ex) {
+
+        python->messages.clear();
+
+    } catch(...) {
+
+        python->messages.clear();
+
+    }
+
+    // clear context
+    python->canvas = NULL;
+    python->chart = NULL;
+
+    // free up the interpreter
+    pythonMutex.unlock();
+
+    return result;
 }

@@ -125,6 +125,35 @@ static PyObject *meth_Bindings_webpage(PyObject *sipSelf, PyObject *sipArgs, PyO
 }
 
 
+extern "C" {static PyObject *meth_Bindings_result(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_result(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        double a0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_value,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "Bd", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        {
+            sipCpp->result(a0);
+
+            Py_INCREF(Py_None);
+            return Py_None;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_result, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_athlete(PyObject *, PyObject *);}
 static PyObject *meth_Bindings_athlete(PyObject *sipSelf, PyObject *sipArgs)
 {
@@ -841,6 +870,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_athleteZones), (PyCFunction)meth_Bindings_athleteZones, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_metrics), (PyCFunction)meth_Bindings_metrics, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_result), (PyCFunction)meth_Bindings_result, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_season), (PyCFunction)meth_Bindings_season, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonIntervals), (PyCFunction)meth_Bindings_seasonIntervals, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seasonMeanmax), (PyCFunction)meth_Bindings_seasonMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -871,7 +901,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        23, methods_Bindings,
+        24, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

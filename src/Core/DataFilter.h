@@ -84,7 +84,7 @@ class Leaf {
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
                Function, Conditional, Vector, Index,
-               Parameters, Compound } type;
+               Parameters, Compound, Script } type;
 
         union value {
             float f;
@@ -141,6 +141,9 @@ public:
 
     // pd models for estimates
     QList <PDModel*>models;
+
+    // embedded python runtime
+    double runPythonScript(Context *context, QString script);
 };
 
 class DataFilter : public QObject

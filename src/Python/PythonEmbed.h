@@ -38,6 +38,9 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
+    // scripts can set a result value
+    double result;
+
     // catch and clear output - we use void* because we cannot
     // include the python headers here as they redefine the slots
     // mechanism that QT needs in header files. As a result they

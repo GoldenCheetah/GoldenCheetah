@@ -118,6 +118,9 @@ public:
     // working with the web view
     int webpage(QString url) const;
 
+    // sending results back (typically when working in user metric code)
+    void result(double value);
+
     // working with athlete data
     PyObject* athlete() /TransferBack/;
     PyObject* athleteZones(PyObject* date=NULL, QString sport="") /TransferBack/;

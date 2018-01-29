@@ -433,7 +433,7 @@ WorkoutWindow::saveAs()
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Workout File"),
                                                     appsettings->value(this, GC_WORKOUTDIR, "").toString(),
-                                                    "ERG workout (*.erg);;Zwift workout (*.zwo)")");
+                                                    "ERG workout (*.erg);;Zwift workout (*.zwo)");
 
     // if they didn't select, give up.
     if (filename.isEmpty()) {

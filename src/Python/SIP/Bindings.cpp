@@ -56,6 +56,12 @@ Bindings::webpage(QString url) const
     return 0;
 }
 
+void
+Bindings::result(double value)
+{
+    python->result = value;
+}
+
 // get athlete data
 PyObject* Bindings::athlete() const
 {
