@@ -144,6 +144,9 @@ public:
 
     // embedded python runtime
     double runPythonScript(Context *context, QString script);
+
+    // embedded R runtime
+    double runRScript(Context *context, QString script);
 };
 
 class DataFilter : public QObject

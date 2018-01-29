@@ -75,6 +75,9 @@ class REmbed {
     bool interactive;
 
     bool loaded;
+
+    // can be set by a script
+    double result;
 };
 
 #endif

@@ -27,7 +27,9 @@
 #include "DataProcessor.h"
 #include <QDebug>
 #include <QMutex>
+
 #include "PythonEmbed.h"
+#include "RTool.h"
 
 #include "Zones.h"
 #include "PaceZones.h"
@@ -35,8 +37,8 @@
 
 #include "DataFilter_yacc.h"
 
-// control access to python runtime
-QMutex pythonMutex;
+// control access to runtimes to avoid calls from multiple threads
+QMutex pythonMutex, RMutex;
 
 // v4 functions
 static struct {
@@ -2528,6 +2530,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
         // run a python script
         if (leaf->function == "python")  return Result(df->runPythonScript(m->context, *leaf->lvalue.s));
+        if (leaf->function == "R")  return Result(df->runRScript(m->context, *leaf->lvalue.s));
     }
     break;
 
@@ -3045,6 +3048,50 @@ DataFilterRuntime::runPythonScript(Context *context, QString script)
 
     // free up the interpreter
     pythonMutex.unlock();
+
+    return result;
+}
+
+double
+DataFilterRuntime::runRScript(Context *context, QString script)
+{
+    // get the lock
+    RMutex.lock();
+
+    double result=0;
+
+    // run it !!
+    rtool->context = context;
+    rtool->canvas = NULL;
+    rtool->chart = NULL;
+
+    try {
+
+        // run it
+        rtool->R->parseEval(script);
+
+        // ignore errors
+        rtool->messages.clear();
+
+    } catch(std::exception& ex) {
+
+        rtool->messages.clear();
+
+    } catch(...) {
+
+        rtool->messages.clear();
+    }
+
+    // if the program expects more we clear it, otherwise
+    // weird things can happen!
+    rtool->R->program.clear();
+
+    // clear context
+    rtool->context = NULL;
+
+    result = rtool->R->result;
+
+    RMutex.unlock();
 
     return result;
 }

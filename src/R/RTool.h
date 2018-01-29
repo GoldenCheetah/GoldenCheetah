@@ -47,6 +47,9 @@ class RTool {
         static SEXP windowSize();
         static SEXP pageSize(SEXP width, SEXP height);
 
+        // passing back results
+        static SEXP result(SEXP value);
+
         // athlete
         static SEXP athlete();
         static SEXP zones(SEXP date, SEXP sport);
