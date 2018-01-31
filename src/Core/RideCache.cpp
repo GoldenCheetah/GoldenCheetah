@@ -555,7 +555,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
             }
         case RideMetric::MeanSquareRoot:
             {
-                rvalue = sqrt((pow(rvalue*rcount, 2) + pow(value*count,2))/(rcount + count));
+                rvalue = sqrt((pow(rvalue, 2)*rcount + pow(value,2)*count)/(rcount + count));
                 rcount += count;
                 break;
             }
