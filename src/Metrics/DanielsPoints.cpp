@@ -19,6 +19,7 @@
 #include "RideMetric.h"
 #include "RideItem.h"
 #include "Zones.h"
+#include "PaceZones.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Specification.h"
@@ -35,6 +36,83 @@
 //               points per second = 33/3600 * (watts / FTP) ^ 4.
 
 
+
+static inline double running_grade_adjusted(double speed, double slope=0.0) {
+    // TODO: maybe move this function to separate file if using somewhere else
+    double factor;
+
+    if (slope == 0.0) {
+        factor = 1;
+    } else if (slope > 40) {
+        factor = 3.739;
+    } else if (slope < -40) {
+        factor = 1.937;
+    } else {
+        // polynom function according points from strava GAP, works between -40% and 40%
+        factor = -0.00000000340028981678083 * pow(slope, 5)
+                 -0.000000471345135734814 * pow(slope, 4)
+                 +0.000000777801576537029 * pow(slope, 3)
+                 +0.001906977 * pow(slope, 2)
+                 +0.0299822939 * slope
+                 +0.9935756154;
+    }
+    return speed * factor;
+
+    /* Running speed adjusted, according slope (grade adjusted pace model)
+     * points from strava curve https://medium.com/strava-engineering/an-improved-gap-model-8b07ae8886c3
+     * similar to research from Minetti 2002, but a little lower factor uphill and much lower downhill
+     * slope is gradient in % (100% -> 45°)
+        { -40, 1.937},
+        { -34, 1.665},
+        { -32, 1.590},
+        { -30, 1.490},
+        { -28, 1.400},
+        { -26, 1.315},
+        { -24, 1.240},
+        { -22, 1.160},
+        { -20, 1.085},
+        { -18, 1.020},
+        { -16, 0.965},
+        { -14, 0.920},
+        { -12, 0.885},
+        { -10, 0.875},
+        {  -9, 0.875},
+        {  -8, 0.875},
+        {  -7, 0.875},
+        {  -6, 0.885},
+        {  -5, 0.900},
+        {  -4, 0.910},
+        {  -3, 0.935},
+        {  -2, 0.950},
+        {  -1, 0.980},
+        {   0, 1.000},
+        {   1, 1.020},
+        {   2, 1.050},
+        {   3, 1.100},
+        {   4, 1.140},
+        {   5, 1.190},
+        {   6, 1.240},
+        {   7, 1.290},
+        {   8, 1.350},
+        {   9, 1.410},
+        {  10, 1.480},
+        {  12, 1.600},
+        {  14, 1.770},
+        {  16, 1.930},
+        {  18, 2.110},
+        {  20, 2.280},
+        {  22, 2.470},
+        {  24, 2.645},
+        {  26, 2.820},
+        {  28, 2.985},
+        {  30, 3.160},
+        {  32, 3.320},
+        {  34, 3.470},
+        {  40, 3.739}
+    */
+}
+
+
 class DanielsPoints : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(DanielsPoints)
 
@@ -43,7 +121,7 @@ class DanielsPoints : public RideMetric {
         score += K * secs * pow(watts / cp, 4);
     }
 
-    public:
+public:
 
     static const double K;
 
@@ -64,13 +142,26 @@ class DanielsPoints : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+        if (spec.isEmpty(item->ride()) || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
+        if (item->ride()->areDataPresent()->watts) {
+            computeOnPower(item, spec);
+        } else if (item->isRun || item->isSwim) {
+            // calculate danielpoints according CV for Run and Swim
+            computeOnSpeed(item, spec);
+        }
+    }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new DanielsPoints(*this); }
+
+private:
+
+    void computeOnPower(RideItem *item, Specification spec) {
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
         int loops = 0;
@@ -85,7 +176,6 @@ class DanielsPoints : public RideMetric {
 
         score = 0.0;
         double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
-
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
@@ -110,10 +200,47 @@ class DanielsPoints : public RideMetric {
         }
         setValue(score);
     }
-    MetricClass classification() const { return Undefined; }
-    MetricValidity validity() const { return Unknown; }
-    RideMetric *clone() const { return new DanielsPoints(*this); }
+
+    void computeOnSpeed(RideItem *item, Specification spec) {
+        static const double AVERAGE_WINDOW_IN_SECS = 10;
+
+        double secsDelta = 0;
+        double sampsPerWindow = 0;
+        double lastWindowSecs = 0.0;
+        double previousSecs = 0.0;
+        double weighted = 0.0;
+        double recIntSecs = item->ride()->recIntSecs();
+        double cs = item->context->athlete->paceZones(item->isSwim)->getCV(item->paceZoneRange);
+
+        score = 0.0;
+
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            // add speed for average calculation, for running adjust speed according slope (up/downwards)
+            weighted += (item->isSwim ? point->kph : running_grade_adjusted(point->kph, point->slope));
+            sampsPerWindow++;
+
+            if (point->secs > lastWindowSecs + AVERAGE_WINDOW_IN_SECS || // take average value of this window
+                point->secs > previousSecs + recIntSecs ||               // invalid recording gap, stop averaging
+                it.hasNext() == false) {                                 // last point of ride
+
+                weighted = sampsPerWindow > 0 ? (weighted / sampsPerWindow) : 0;
+                secsDelta = previousSecs - lastWindowSecs;
+                inc(secsDelta, weighted, cs);
+
+                lastWindowSecs = point->secs;
+                weighted = 0;
+                sampsPerWindow = 0;
+            }
+            previousSecs = point->secs;
+        }
+        setValue(score);
+    }
+
 };
+
 
 // Choose K such that 1 hour at FTP yields a score of 100.
 const double DanielsPoints::K = 100.0 / 3600.0;
@@ -141,7 +268,7 @@ class DanielsEquivalentPower : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+        if (item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
