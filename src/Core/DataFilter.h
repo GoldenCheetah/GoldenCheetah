@@ -142,11 +142,15 @@ public:
     // pd models for estimates
     QList <PDModel*>models;
 
+#ifdef GC_WANT_PYTHON
     // embedded python runtime
     double runPythonScript(Context *context, QString script);
+#endif
 
+#ifdef GC_WANT_R
     // embedded R runtime
     double runRScript(Context *context, QString script);
+#endif
 };
 
 class DataFilter : public QObject

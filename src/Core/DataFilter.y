@@ -50,7 +50,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %}
 
 // Symbol can be meta or metric name
-%token <leaf> SYMBOL R PYTHON
+%token <leaf> SYMBOL RSCRIPT PYTHON
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
@@ -189,7 +189,7 @@ python_script:
 
 r_script:
 
-        R                                       { $$ = new Leaf(@1.first_column, @1.last_column);
+        RSCRIPT                                 { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::Script;
                                                   $$->function = "R";
                                                   QString full(DataFiltertext);

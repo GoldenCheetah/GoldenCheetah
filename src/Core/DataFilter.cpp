@@ -28,8 +28,15 @@
 #include <QDebug>
 #include <QMutex>
 
+#ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
+QMutex pythonMutex;
+#endif
+
+#ifdef GC_WANT_R
 #include "RTool.h"
+QMutex RMutex;
+#endif
 
 #include "Zones.h"
 #include "PaceZones.h"
@@ -38,7 +45,6 @@
 #include "DataFilter_yacc.h"
 
 // control access to runtimes to avoid calls from multiple threads
-QMutex pythonMutex, RMutex;
 
 // v4 functions
 static struct {
@@ -2528,9 +2534,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     case Leaf::Script :
     {
 
-        // run a python script
+        // run a script
+ #ifdef GC_WANT_PYTHON
         if (leaf->function == "python")  return Result(df->runPythonScript(m->context, *leaf->lvalue.s));
+ #endif
+ #ifdef GC_WANT_R
         if (leaf->function == "R")  return Result(df->runRScript(m->context, *leaf->lvalue.s));
+ #endif
+        return Result(0);
     }
     break;
 
@@ -3012,6 +3023,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     return Result(0); // false
 }
 
+#ifdef GC_WANT_PYTHON
 double
 DataFilterRuntime::runPythonScript(Context *context, QString script)
 {
@@ -3051,7 +3063,9 @@ DataFilterRuntime::runPythonScript(Context *context, QString script)
 
     return result;
 }
+#endif
 
+#ifdef GC_WANT_R
 double
 DataFilterRuntime::runRScript(Context *context, QString script)
 {
@@ -3095,3 +3109,4 @@ DataFilterRuntime::runRScript(Context *context, QString script)
 
     return result;
 }
+#endif

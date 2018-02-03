@@ -54,7 +54,7 @@ int DataFiltercolumn = 1;
 
 "#"[^\r\n]*                                 ; /* ignore single-line comments */
 "%%python"(.|[\n\r\t])*"%%"                 DataFilterlval.op = PYTHON; return PYTHON;
-"%%R"(.|[\n\r\t])*"%%"                      DataFilterlval.op = R; return R;
+"%%R"(.|[\n\r\t])*"%%"                      DataFilterlval.op = RSCRIPT; return RSCRIPT;
 "="                                         DataFilterlval.op = EQ; return EQ;
 "<>"                                        DataFilterlval.op = NEQ; return NEQ;
 "<"                                         DataFilterlval.op = LT; return LT;
