@@ -501,7 +501,7 @@ GCColor::linearGradient(int size, bool active, bool alternate)
 {
     QLinearGradient returning;
 
-    QString chrome = appsettings->value(NULL, GC_CHROME, "Mac").toString();
+    QString chrome = appsettings->value(NULL, GC_CHROME, "Flat").toString();
 
     if (chrome == "Mac") {
         int shade, inshade;
