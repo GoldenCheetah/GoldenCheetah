@@ -37,22 +37,26 @@
 
 
 
-// Running Speed adjusted according slope (grade adjusted pace model)
-// Similar to research from Minetti 2002, but a little lower factor uphill and much lower downhill, see
-// points from strava curve https://medium.com/strava-engineering/an-improved-gap-model-8b07ae8886c3
-// slope is gradient in % (100% -> 45°)
-// This function works between -34% and +34% above or below these limits gives same factor,
-// steeper than 34% we usualy do not run anymore, more sliding downhills or walking uphill ;)
-
 // TODO: maybe move this function to separate file if using somewhere else
 static inline double running_grade_adjusted(double speed, double slope=0.0) {
     if (slope == 0.0) {
         return speed;
     }
 
-    double factor = 1.0;
-    const int ROWS = 45;
-    double slopefactor[ROWS][2] = {
+    // Running speed adjusted, according slope (grade adjusted pace model)
+    double factor = -0.00000000340028981678083 * pow(slope, 5)
+             -0.000000471345135734814 * pow(slope, 4)
+             +0.000000777801576537029 * pow(slope, 3)
+             +0.001906977 * pow(slope, 2)
+             +0.0299822939 * slope
+             +0.9935756154;
+
+    return speed * factor;
+    /*
+     * factor calculated with polynom function according
+     * points from strava curve https://medium.com/strava-engineering/an-improved-gap-model-8b07ae8886c3
+     * similar to research from Minetti 2002, but a little lower factor uphill and much lower downhill
+     * slope is gradient in % (100% -> 45°)
         { -34, 1.665},
         { -32, 1.590},
         { -30, 1.490},
@@ -98,25 +102,7 @@ static inline double running_grade_adjusted(double speed, double slope=0.0) {
         {  30, 3.160},
         {  32, 3.320},
         {  34, 3.470}
-    };
-
-    for(int i = 0; i < ROWS; i++) {
-        if (slope < slopefactor[i][0]) {
-            if (i == 0) {
-                // minimum slope downhill -34%, if steeper gives same factor
-                factor = slopefactor[i][1];
-            } else {
-                // calculate factor beetween to points, e.g. -11% is beetween point -10 and point -12
-                double delta = ((slope - slopefactor[i-1][0]) / (slopefactor[i][0] - slopefactor[i-1][0]));
-                factor = slopefactor[i-1][1] + delta * (slopefactor[i][1] - slopefactor[i-1][1]);
-            }
-            break;
-        } else if (i == ROWS - 1) {
-            // maximum slope, uphill +34%, if steeper gives same factor
-            factor = slopefactor[i][1];
-        }
-    }
-    return speed * factor;
+    */
 }
 
 
@@ -155,18 +141,7 @@ public:
             return;
         }
 
-        // check if there are watt values in the file
-        bool hasWattValues = false;
-        RideFileIterator it(item->ride(), spec);
-        while (it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            if (point->watts > 0) {
-                hasWattValues = true;
-                break;
-            }
-        }
-
-        if (hasWattValues) {
+        if (item->ride()->areDataPresent()->watts) {
             computeOnPower(item, spec);
         } else if (item->isRun || item->isSwim) {
             // calculate danielpoints according CV for Run and Swim
