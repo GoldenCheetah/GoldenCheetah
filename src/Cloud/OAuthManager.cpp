@@ -256,7 +256,7 @@ OAuthManager::onAccessTokenReceived(QString token, QString tokenSecret)
     if (site == WITHINGS) {
         service->setSetting(GC_WITHINGS_TOKEN, token);
         service->setSetting(GC_WITHINGS_SECRET, tokenSecret);
-        info = QString(tr("Withings authorization was successful."));
+        info = QString(tr("Nokia Health (Withings) authorization was successful."));
     }
 
 

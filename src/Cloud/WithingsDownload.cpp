@@ -151,7 +151,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
         emit downloadEnded(100);
         if (reply->error() != QNetworkReply::NoError) {
-            QMessageBox::warning(context->mainWindow, tr("Withings Data Download"), reply->errorString());
+            QMessageBox::warning(context->mainWindow, tr("Nokia Health (Withings) Data Download"), reply->errorString());
             return false;
         }
     }

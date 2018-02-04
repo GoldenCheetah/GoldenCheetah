@@ -324,7 +324,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showRGCT->setCheckState(Qt::Checked);
     seriesRight->addRow(new QLabel(""), showRGCT);
 
-    showRCad = new QCheckBox(tr("Cadence"), this);
+    // trailing space to allow different termin for translation
+    // of running and bike cadence
+    showRCad = new QCheckBox(tr("Cadence "), this);
     showRCad->setCheckState(Qt::Checked);
     seriesRight->addRow(new QLabel(""), showRCad);
 
