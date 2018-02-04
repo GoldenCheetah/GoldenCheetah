@@ -66,6 +66,9 @@ RTool::RTool()
     // setup the R runtime elements
     failed = false;
     starting = true;
+    canvas = NULL;
+    chart = NULL;
+    context = NULL;
 
     try {
 
@@ -102,7 +105,6 @@ RTool::RTool()
         R_Consolefile = NULL;
 #endif
 
-        dev = new RGraphicsDevice();
 
         // IMPORTANT: **** REMEMBER TO CHANGE BOTH WHEN ADDING NEW ROUTINES ****
         //
@@ -262,11 +264,6 @@ RTool::RTool()
 
         rtool->messages.clear();
 
-        // set the "GC" object and methods
-        context = NULL;
-        canvas = NULL;
-        chart = NULL;
-
         configChanged();
 
     } catch(std::exception& ex) {
@@ -284,6 +281,10 @@ RTool::RTool()
         qDebug() << "R Embed failed to start, RConsole disabled.";
         version = "none";
         R = NULL;
+    } else {
+
+        // setup the graphics device once all initialised successfully
+        dev = new RGraphicsDevice();
     }
     starting = false;
 }
