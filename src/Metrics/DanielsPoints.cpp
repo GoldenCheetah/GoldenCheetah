@@ -37,13 +37,19 @@
 
 
 
-// TODO: maybe move this function to separate file if using somewhere else
 static inline double running_grade_adjusted(double speed, double slope=0.0) {
-    if (slope == 0.0) {
-        return speed;
-    }
+    // TODO: maybe move this function to separate file if using somewhere else
 
     // Running speed adjusted, according slope (grade adjusted pace model)
+    // polynom function according points from strava GAP, works between -40% and 40%
+
+    if (slope == 0.0) {
+        return speed;
+    } else if (slope > 40) {
+        return speed * 3.739;
+    } else if (slope < -40) {
+        return speed * 1.937;
+    }
     double factor = -0.00000000340028981678083 * pow(slope, 5)
              -0.000000471345135734814 * pow(slope, 4)
              +0.000000777801576537029 * pow(slope, 3)
@@ -53,10 +59,10 @@ static inline double running_grade_adjusted(double speed, double slope=0.0) {
 
     return speed * factor;
     /*
-     * factor calculated with polynom function according
      * points from strava curve https://medium.com/strava-engineering/an-improved-gap-model-8b07ae8886c3
      * similar to research from Minetti 2002, but a little lower factor uphill and much lower downhill
      * slope is gradient in % (100% -> 45°)
+        { -40, 1.937},
         { -34, 1.665},
         { -32, 1.590},
         { -30, 1.490},
@@ -101,7 +107,8 @@ static inline double running_grade_adjusted(double speed, double slope=0.0) {
         {  28, 2.985},
         {  30, 3.160},
         {  32, 3.320},
-        {  34, 3.470}
+        {  34, 3.470},
+        {  40, 3.739}
     */
 }
 
