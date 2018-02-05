@@ -228,6 +228,9 @@ RTool::RTool()
             }
         }
 
+        // should be safe to setup the graphics device now
+        dev = new RGraphicsDevice();
+
         // set them up
         DllInfo *info = R_getEmbeddingDllInfo();
 
@@ -316,11 +319,6 @@ fail:
         QMessageBox warn(QMessageBox::Information, QObject::tr("R version Incompatible"),
                          dialogtext + QObject::tr("\nR has been disabled in preferences"));
         warn.exec();
-
-    } else {
-
-        // setup the graphics device once all initialised successfully
-        dev = new RGraphicsDevice();
     }
     starting = false;
 }
