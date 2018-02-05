@@ -79,7 +79,7 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
         appsettings->setValue(GC_EMBED_R, false);
         rlib.errors.append("\nR has now been disabled in options.");
 
-        QMessageBox msg(QMessageBox::Critical,
+        QMessageBox msg(QMessageBox::Information,
                     "Failed to load R library",
                     rlib.errors.join("\n"));
         msg.exec();
@@ -120,6 +120,7 @@ REmbed::REmbed(const bool verbose, const bool interactive) : verbose(verbose), i
 #endif
     Rst.R_Interactive = (Rboolean) interactive;       // sets interactive() to eval to false
     R_SetParams(&Rst);
+
     loaded = true;
 }
 

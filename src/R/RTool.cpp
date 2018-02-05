@@ -70,6 +70,9 @@ RTool::RTool()
     chart = NULL;
     context = NULL;
 
+    // if we bail we need to explain why, its in here
+    QString dialogtext;
+
     try {
 
         // yikes, self referenced during construction (!)
@@ -189,6 +192,7 @@ RTool::RTool()
 
         // dynamically loading now, so the version may not be
         // the same as the version we built with.
+        // get version just loaded from shared lib
         R->parseEvalNT("print(R.version.string)");
         QStringList strings = rtool->messages;
 
@@ -197,12 +201,35 @@ RTool::RTool()
             if (exp.exactMatch(strings[1])) version = exp.cap(1);
             else version = strings[1];
         }
-
-        // set them up
-        DllInfo *info = R_getEmbeddingDllInfo();
         QStringList nums = version.split(".");
         int majorN = nums[0].toInt();
         int minorN = nums[1].toInt();
+
+        // now check version compatibility against what we built with
+        double majorB=QString(R_MAJOR).toDouble();
+        double minorB=QString(R_MINOR).toDouble();
+        if (majorB > 3 || (majorB == 3 && minorB > 3)) {
+
+            // if we're built with 3.4 or higher we need 3.4 or higher
+            if (majorN < 3 || (majorN == 3 && minorN < 4)) {
+                // we have an older version so no go
+                failed=true;
+                dialogtext = QObject::tr("The version of R installed is too old. You must have R version 3.4 or higher.\n");
+                goto fail;
+            }
+
+        } else {
+            // if we're build with <3.4 don't support 3.4 or higher
+            if (majorN >3 || (majorN == 3 && minorN > 3)) {
+                // we have an older version so no go
+                failed=true;
+                dialogtext = QObject::tr("The version of R installed is too new. You must have R version 3.3 or older.\n");
+                goto fail;
+            }
+        }
+
+        // set them up
+        DllInfo *info = R_getEmbeddingDllInfo();
 
         // future proof, 3.4 or higher use new structure, 3.3 anything lower uses older structure
         if (majorN > 3 || (majorN == 3 && minorN > 3)) R_registerRoutines(info, (const R_CMethodDef*)(cMethods34), callMethods, NULL, NULL);
@@ -276,11 +303,20 @@ RTool::RTool()
         failed = true;
     }
 
-    // ack, disable R runtime
+fail:
     if (failed) {
+
+        // ack, disable R runtime now and in the future
         qDebug() << "R Embed failed to start, RConsole disabled.";
+        appsettings->setValue(GC_EMBED_R, false);
         version = "none";
         R = NULL;
+
+        // end embedding
+        QMessageBox warn(QMessageBox::Information, QObject::tr("R version Incompatible"),
+                         dialogtext + QObject::tr("\nR has been disabled in preferences"));
+        warn.exec();
+
     } else {
 
         // setup the graphics device once all initialised successfully
