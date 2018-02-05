@@ -106,6 +106,9 @@ class GeneralPage : public QWidget
 #ifdef GC_WANT_R
         QCheckBox *embedR;
 #endif
+#ifdef GC_WANT_PYTHON
+        QCheckBox *embedPython;
+#endif
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;

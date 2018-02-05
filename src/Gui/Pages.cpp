@@ -186,6 +186,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(embedR, SIGNAL(stateChanged(int)), this, SLOT(embedRchanged(int)));
 #endif
 
+#ifdef GC_WANT_PYTHON
+    embedPython = new QCheckBox(tr("Enable Python"), this);
+    embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
+    configLayout->addWidget(embedPython, 7+offset,1, Qt::AlignLeft);
+    offset += 1;
+#endif
+
     //
     // Athlete directory (home of athletes)
     //
@@ -304,6 +311,9 @@ GeneralPage::saveClicked()
 #endif
 #ifdef GC_WANT_R
     appsettings->setValue(GC_EMBED_R, embedR->isChecked());
+#endif
+#ifdef GC_WANT_PYTHON
+    appsettings->setValue(GC_EMBED_PYTHON, embedPython->isChecked());
 #endif
 
     qint32 state=0;

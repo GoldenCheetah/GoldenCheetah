@@ -62,6 +62,19 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     // set the module path in the same way the interpreter would
     PyObject *sys = PyImport_ImportModule("sys");
+
+    // did module import fail (python not installed)
+    if (sys == NULL) {
+
+        // abort embedding
+        QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed"),
+                    QObject::tr("Python v3.6 or higher is required for Python.\nPython disabled in preferences."));
+        appsettings->setValue(GC_EMBED_PYTHON, false);
+        loaded=false;
+        msg.exec();
+        return;
+    }
+
     PyObject *path = PyObject_GetAttrString(sys, "path");
     PyList_Append(path, PyUnicode_FromString("."));
 

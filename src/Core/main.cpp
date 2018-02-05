@@ -437,7 +437,11 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef GC_WANT_PYTHON
-        if (noPy == false && python == NULL) python = new PythonEmbed(); // initialise python in this thread ?
+        bool embed = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
+        if (embed && noPy == false && python == NULL) {
+            python = new PythonEmbed(); // initialise python in this thread ?
+            if (python->loaded == false) python=NULL;
+        }
 #endif
 
         //this is the path within the current directory where GC will look for
