@@ -150,7 +150,8 @@
 // 140 08  Apr 2017 Ale Martinez       Added Peak Pace Hr metrics
 // 141 14  Apr 2017 Joern Rischmueller Added 'Athlete Bones', 'Athlete Muscles' Body Measures metric
 // 142 25  Jul 2017 Ale Martinez       Added HRV metrics at rest (Measures)
-int DBSchemaVersion = 142;
+// 143 07  Feb 2018 Walter Buerki      Daniels Points using GAP when no power
+int DBSchemaVersion = 143;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

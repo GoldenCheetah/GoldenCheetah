@@ -142,7 +142,7 @@ public:
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || item->zoneRange < 0) {
+        if (spec.isEmpty(item->ride())) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -155,6 +155,7 @@ public:
             computeOnSpeed(item, spec);
         }
     }
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("P") || ride->isRun || ride->isSwim); }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new DanielsPoints(*this); }
@@ -174,8 +175,14 @@ private:
         double lastSecs = 0.0;
         double weighted = 0.0;
 
-        score = 0.0;
+	if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+	}
         double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+
+        score = 0.0;
 
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
@@ -210,6 +217,12 @@ private:
         double previousSecs = 0.0;
         double weighted = 0.0;
         double recIntSecs = item->ride()->recIntSecs();
+
+	if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+	}
         double cs = item->context->athlete->paceZones(item->isSwim)->getCV(item->paceZoneRange);
 
         score = 0.0;
@@ -268,7 +281,7 @@ class DanielsEquivalentPower : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (item->zoneRange < 0) {
+        if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -292,6 +305,7 @@ class DanielsEquivalentPower : public RideMetric {
 
         setValue(watts);
     }
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("P")); }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
     RideMetric *clone() const { return new DanielsEquivalentPower(*this); }
