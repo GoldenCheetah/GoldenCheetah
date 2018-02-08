@@ -33,7 +33,7 @@ before_install:
 - brew install libusb libusb-compat
 - brew install srmio
 - brew install libsamplerate
-- brew tap homebrew/science
+- brew tap brewsci/science
 - brew install r
 - brew install lmfit
 ## Disable KML for now
