@@ -175,11 +175,11 @@ private:
         double lastSecs = 0.0;
         double weighted = 0.0;
 
-	if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+        if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
-	}
+        }
         double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
 
         score = 0.0;
@@ -218,11 +218,11 @@ private:
         double weighted = 0.0;
         double recIntSecs = item->ride()->recIntSecs();
 
-	if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+        if (item->context->athlete->zones(item->isRun) == NULL || item->paceZoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
-	}
+        }
         double cs = item->context->athlete->paceZones(item->isSwim)->getCV(item->paceZoneRange);
 
         score = 0.0;
