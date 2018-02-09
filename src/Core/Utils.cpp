@@ -16,8 +16,12 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Utils.h"
 #include <QTextEdit>
+#include <QString>
+#include <QStringList>
 #include <QDebug>
+#include <QDir>
 
 namespace Utils
 {
@@ -103,6 +107,37 @@ QString jsonunprotect(const QString &string)
     return s;
 }
 
+QStringList
+searchPath(QString path, QString binary, bool isexec)
+{
+    // search the path provided for a file named binary
+    // if isexec is true it must be an executable file
+    // which means on Windows its an exe or com
+    // on Linux/Mac means it has executable bit set
+
+    QStringList returning, extend; // extensions needed
+
+#ifdef Q_OS_WIN
+    if (isexec) {
+        extend << ".exe" << ".com";
+    } else {
+        extend << "";
+    }
+#else
+    extend << "";
+#endif
+    foreach(QString dir, path.split(PATHSEP)) {
+
+        foreach(QString ext, extend) {
+            QString filename(dir + QDir::separator() + binary + ext);
+
+            // exists and executable (or not if we don't care) and not already found (dupe paths)
+            if (QFileInfo(filename).exists() && (!isexec || QFileInfo(filename).isExecutable()) && !returning.contains(filename))
+                returning << filename;
+        }
+    }
+    return returning;
+}
 
 };
 

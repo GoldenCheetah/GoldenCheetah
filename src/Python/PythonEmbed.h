@@ -38,6 +38,9 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
+    static bool pythonInstalled(QString &home, QString &pypath);
+    QString pyhome, pypath;
+
     // scripts can set a result value
     double result;
 

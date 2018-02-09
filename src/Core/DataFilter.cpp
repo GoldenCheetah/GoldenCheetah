@@ -3027,6 +3027,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 double
 DataFilterRuntime::runPythonScript(Context *context, QString script)
 {
+    if (python == NULL) return(0);
+
     // get the lock
     pythonMutex.lock();
 
@@ -3069,6 +3071,9 @@ DataFilterRuntime::runPythonScript(Context *context, QString script)
 double
 DataFilterRuntime::runRScript(Context *context, QString script)
 {
+
+    if (rtool == NULL) return(0);
+
     // get the lock
     RMutex.lock();
 

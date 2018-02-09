@@ -21,12 +21,21 @@
 
 // Common shared utility functions
 
+#ifdef Q_OS_WIN
+#define PATHSEP ";"
+#else
+#define PATHSEP ":"
+#endif
+class QString;
+class QStringList;
+
 namespace Utils
 {
     QString xmlprotect(const QString &string);
     QString unprotect(const QString &buffer);
     QString jsonprotect(const QString &buffer);
     QString jsonunprotect(const QString &buffer);
+    QStringList searchPath(QString path, QString binary, bool isexec=true);
 };
 
 
