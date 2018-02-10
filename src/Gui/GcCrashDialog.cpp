@@ -362,7 +362,7 @@ QString GcCrashDialog::versionHTML()
             .arg("none")
 #endif
 #ifdef GC_HAVE_PYTHON
-            .arg(python->version.split(" ").at(0));
+            .arg(python ? python->version.split(" ").at(0) : QString("disabled"));
 #else
             .arg("none")
 #endif

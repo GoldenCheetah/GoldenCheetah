@@ -38,8 +38,9 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
-    static bool pythonInstalled(QString &home, QString &pypath);
-    QString pyhome, pypath;
+    // find installed binary and check version and module path
+    static bool pythonInstalled(QString &pybin, QString &pypath);
+    QString pybin, pypath;
 
     // scripts can set a result value
     double result;
@@ -78,4 +79,26 @@ class PythonEmbed {
     long threadid;
 };
 
+// embed debugging via 'printd' and enable via PYTHON_DEBUG
+#ifndef PYTHON_DEBUG
+#define PYTHON_DEBUG false
+#endif
+#ifdef Q_CC_MSVC
+#define printd(fmt, ...) do {                                                \
+    if (PYTHON_DEBUG) {                                 \
+        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
+               __FUNCTION__, __VA_ARGS__);                    \
+        fflush(stdout);                                       \
+    }                                                         \
+} while(0)
+#else
+#define printd(fmt, args...)                                            \
+    do {                                                                \
+        if (PYTHON_DEBUG) {                                       \
+            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
+                   __FUNCTION__, ##args);                               \
+            fflush(stdout);                                             \
+        }                                                               \
+    } while(0)
+#endif
 #endif

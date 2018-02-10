@@ -21,7 +21,7 @@
 
 // Common shared utility functions
 
-#ifdef Q_OS_WIN
+#ifdef WIN32
 #define PATHSEP ";"
 #else
 #define PATHSEP ":"

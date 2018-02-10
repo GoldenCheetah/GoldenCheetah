@@ -47,10 +47,11 @@ PythonEmbed::~PythonEmbed()
 {
 }
 
-bool PythonEmbed::pythonInstalled(QString &pyhome, QString &pypath)
+bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath)
 {
     // where to check
     QString path = QProcessEnvironment::systemEnvironment().value("PATH", "");
+    printd("PATH=%s\n", path.toStdString().c_str());
 
     // what is is typically installed as ?
     QStringList binarynames;
@@ -65,12 +66,20 @@ bool PythonEmbed::pythonInstalled(QString &pyhome, QString &pypath)
         if (installnames.count() >0) break;
     }
 
+    printd("Binary found:%d\n", installnames.count());
     // if we failed, its not installed
     if (installnames.count()==0) return false;
 
     // lets just use the first one we found
     QString pythonbinary = installnames[0];
-    pyhome=pythonbinary;
+    pybin=pythonbinary;
+
+#ifdef WIN32
+    // ugh. QProcess doesn't like spaces or backslashes. POC.
+    pythonbinary=pythonbinary.replace("\\", "/");
+    pythonbinary="\"" + pythonbinary + "\"";
+#endif
+    printd("Running: %s\n", pythonbinary.toStdString().c_str());
 
     // get the version and path via an interaction
     QProcess py;
@@ -88,14 +97,14 @@ bool PythonEmbed::pythonInstalled(QString &pyhome, QString &pypath)
 
     // failed to start python
     if (py.waitForStarted(500) == false) {
-        fprintf(stderr, "Failed to start: %s\n", pythonbinary.toStdString().c_str());
+        printd("Failed to start: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
 
     // wait for output, should be rapid
     if (py.waitForReadyRead(2000)==false) {
-        fprintf(stderr, "Didn't get output: %s\n", pythonbinary.toStdString().c_str());
+        printd("Didn't get output: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
@@ -105,30 +114,34 @@ bool PythonEmbed::pythonInstalled(QString &pyhome, QString &pypath)
 
     // close if it didn't already
     if (py.waitForFinished(500)==false) {
-        fprintf(stderr, "forced terminate of %s\n", pythonbinary.toStdString().c_str());
+        printd("forced terminate of %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
     }
 
     // scan output
-    QRegExp contents("^ZZ(.*)ZZ\nZZ(.*)ZZ\n$");
+    QRegExp contents("^ZZ(.*)ZZ.*ZZ(.*)ZZ.*$");
     if (contents.exactMatch(output)) {
         QString vmajor=contents.cap(1);
         QString path=contents.cap(2);
 
         // check its version 3
         if (vmajor.toInt() != 3) {
-            fprintf(stderr, "%s is not version 3, it's version %d\n", pythonbinary.toStdString().c_str(), vmajor.toInt());
+            printd( "%s is not version 3, it's version %d\n", pythonbinary.toStdString().c_str(), vmajor.toInt());
             return false;
         }
 
         // now get python path
+#ifdef WIN32
+        pypath = path.replace("\\", "/");
+#else
         pypath = path;
+#endif
         return true;
 
     } else {
 
         // didn't understand !
-        fprintf(stderr, "Python output doesn't parse: %s\n", output.toStdString().c_str());
+        printd("Python output doesn't parse: %s\n", output.toStdString().c_str());
     }
 
     // by default we return false (pessimistic)
@@ -142,37 +155,46 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     name = QString("GoldenCheetah");
 
     // is python3 installed?
-    if (pythonInstalled(pyhome, pypath)) {
+    if (pythonInstalled(pybin, pypath)) {
 
-        // tell python our program name
-        Py_SetProgramName((wchar_t*) name.toStdString().c_str());
+        printd("Python is installed: %s\n", pybin.toStdString().c_str());
+
+        // tell python our program name - pretend to be the usual interpreter
+        printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str());
+        Py_SetProgramName((wchar_t*) pybin.toStdString().c_str());
 
         // our own module
+        printd("PyImport_AppendInittab: goldencheetah\n");
         PyImport_AppendInittab("goldencheetah", PyInit_goldencheetah);
 
         // need to load the interpreter etc
+        printd("PyInitializeEx(0)\n");
         Py_InitializeEx(0);
 
         // set path - allocate storage for it...
-        wchar_t *here = new wchar_t(pypath.length()+1);
-        pypath.toWCharArray(here);
-        here[pypath.length()]=0;
-        PySys_SetPath(here);
+        //printd("set path=%s\n", pypath.toStdString().c_str());
+        //wchar_t *here = new wchar_t(pypath.length()+1);
+        //pypath.toWCharArray(here);
+        //here[pypath.length()]=0;
+        //PySys_SetPath(here);
 
         // set the module path in the same way the interpreter would
+        printd("PyImportModule('sys')\n");
         PyObject *sys = PyImport_ImportModule("sys");
 
         // did module import fail (python not installed properly?)
         if (sys != NULL)  {
 
-            //PyObject *path = PyObject_GetAttrString(sys, "path");
-            //PyList_Append(path, PyUnicode_FromString("."));
+            printd("Add '.' to Path\n");
+            PyObject *path = PyObject_GetAttrString(sys, "path");
+            PyList_Append(path, PyUnicode_FromString("."));
 
             // get version
+            printd("Py_GetVersion()\n");
             version = QString(Py_GetVersion());
             version.replace("\n", " ");
 
-            fprintf(stderr, "Python loaded [%s]\n", version.toStdString().c_str());
+            fprintf(stderr, "Python loaded [%s]\n", version.toStdString().c_str()); fflush(stderr);
 
             // our base code - traps stdout and loads goldencheetan module
             // mapping all the bindings to a GC object.
@@ -192,9 +214,11 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
                                      "import goldencheetah\n"
                                      "GC=goldencheetah.Bindings()\n");
 
+            printd("Install stdio catcher\n");
             PyRun_SimpleString(stdOutErr.c_str()); //invoke code to redirect
 
             // now load the library
+            printd("Load library.py\n");
             QFile lib(":python/library.py");
             if (lib.open(QFile::ReadOnly)) {
                 QString libstring=lib.readAll();
@@ -204,6 +228,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
 
             // setup trapping of output
+            printd("Get catcher refs\n");
             PyObject *pModule = PyImport_AddModule("__main__"); //create main module
             catcher = static_cast<void*>(PyObject_GetAttrString(pModule,"catchOutErr"));
             clear = static_cast<void*>(PyObject_GetAttrString(static_cast<PyObject*>(catcher), "__init__"));
@@ -211,14 +236,18 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
             PyErr_Clear(); //and clear them !
 
             // prepare for threaded processing
+            printd("PyEval_InitThreads\n");
             PyEval_InitThreads();
             mainThreadState = PyEval_SaveThread();
             loaded = true;
+
+            printd("Embedding completes\n");
             return;
         } // sys != NULL
     } // pythonInstalled == true
 
     // if we get here loading failed
+    printd("Embedding failed\n");
     QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed or in path"),
         QObject::tr("Python v3.6 or higher is required for Python.\nPython disabled in preferences."));
     appsettings->setValue(GC_EMBED_PYTHON, false);

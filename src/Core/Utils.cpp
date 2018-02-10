@@ -132,8 +132,9 @@ searchPath(QString path, QString binary, bool isexec)
             QString filename(dir + QDir::separator() + binary + ext);
 
             // exists and executable (or not if we don't care) and not already found (dupe paths)
-            if (QFileInfo(filename).exists() && (!isexec || QFileInfo(filename).isExecutable()) && !returning.contains(filename))
+            if (QFileInfo(filename).exists() && (!isexec || QFileInfo(filename).isExecutable()) && !returning.contains(filename)) {
                 returning << filename;
+            }
         }
     }
     return returning;
