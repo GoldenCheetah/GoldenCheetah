@@ -88,6 +88,10 @@ class GeneralPage : public QWidget
     public slots:
         void browseWorkoutDir();
         void browseAthleteDir();
+#ifdef GC_WANT_PYTHON
+        void browsePythonDir();
+        void embedPythonchanged(int);
+#endif
 #ifdef GC_WANT_R
         void browseRDir();
         void embedRchanged(int);
@@ -116,6 +120,11 @@ class GeneralPage : public QWidget
         QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
 
+#ifdef GC_WANT_PYTHON
+        QPushButton *pythonBrowseButton;
+        QLineEdit *pythonDirectory;
+        QLabel *pythonLabel;
+#endif
 #ifdef GC_WANT_R
         QPushButton *rBrowseButton;
         QLineEdit *rDirectory;

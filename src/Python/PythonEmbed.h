@@ -39,7 +39,7 @@ class PythonEmbed {
     ~PythonEmbed();
 
     // find installed binary and check version and module path
-    static bool pythonInstalled(QString &pybin, QString &pypath);
+    static bool pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME=QString(""));
     QString pybin, pypath;
 
     // scripts can set a result value

@@ -45,7 +45,9 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
-
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
+#endif
 extern ConfigDialog *configdialog_ptr;
 
 //
@@ -190,6 +192,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     embedPython = new QCheckBox(tr("Enable Python"), this);
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
     configLayout->addWidget(embedPython, 7+offset,1, Qt::AlignLeft);
+    connect(embedPython, SIGNAL(stateChanged(int)), this, SLOT(embedPythonchanged(int)));
     offset += 1;
 #endif
 
@@ -249,6 +252,24 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
 #endif
+#ifdef GC_WANT_PYTHON
+    //
+    // Python Home directory
+    //
+    QVariant pythonDir = appsettings->value(this, GC_PYTHON_HOME, "");
+    // fix old bug..
+    pythonLabel = new QLabel(tr("Python Home"));
+    pythonDirectory = new QLineEdit;
+    pythonDirectory->setText(pythonDir.toString());
+    pythonBrowseButton = new QPushButton(tr("Browse"));
+
+    configLayout->addWidget(pythonLabel, 8 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(pythonDirectory, 8 + offset,1);
+    configLayout->addWidget(pythonBrowseButton, 8 + offset,2);
+    offset++;
+
+    connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
+#endif
 
     // save away initial values
     b4.unit = unitCombo->currentIndex();
@@ -267,6 +288,15 @@ GeneralPage::embedRchanged(int state)
     rBrowseButton->setVisible(state);
     rDirectory->setVisible(state);
     rLabel->setVisible(state);
+}
+#endif
+#ifdef GC_WANT_PYTHON
+void
+GeneralPage::embedPythonchanged(int state)
+{
+    pythonBrowseButton->setVisible(state);
+    pythonDirectory->setVisible(state);
+    pythonLabel->setVisible(state);
 }
 #endif
 
@@ -291,6 +321,9 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
 #ifdef GC_WANT_R
     appsettings->setValue(GC_R_HOME, rDirectory->text());
+#endif
+#ifdef GC_WANT_PYTHON
+    appsettings->setValue(GC_PYTHON_HOME, pythonDirectory->text());
 #endif
 
     // Elevation
@@ -346,6 +379,29 @@ GeneralPage::browseRDir()
     QString dir = QFileDialog::getExistingDirectory(this, tr("R Installation (R_HOME)"),
                             currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir != "") rDirectory->setText(dir);  //only overwrite current dir, if a new was selected
+}
+#endif
+#ifdef GC_WANT_PYTHON
+void
+GeneralPage::browsePythonDir()
+{
+    QString currentDir = pythonDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Python Installation (PYTHONHOME)"),
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") {
+        QString pybin, pypath;
+
+        // is it installed there?
+        bool isgood = PythonEmbed::pythonInstalled(pybin, pypath, dir);
+
+        if (!isgood) {
+            QMessageBox nope(QMessageBox::Warning, tr("Invalid Folder"), tr("Python does not appear to be installed in that location.\n"));
+            nope.exec();
+        } else {
+            pythonDirectory->setText(dir);  //only overwrite current dir, if a new was selected
+        }
+     }
 }
 #endif
 

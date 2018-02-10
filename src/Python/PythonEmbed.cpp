@@ -47,41 +47,65 @@ PythonEmbed::~PythonEmbed()
 {
 }
 
-bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath)
+bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME)
 {
-    // where to check
-    QString path = QProcessEnvironment::systemEnvironment().value("PATH", "");
-    printd("PATH=%s\n", path.toStdString().c_str());
+    QString pythonbinary;
 
-    // what is is typically installed as ?
-    QStringList binarynames;
-    binarynames << "python3" << "python";
+    if (PYTHONHOME=="") {
 
-    // what we found
-    QStringList installnames;
+        // where to check
+        QString path = QProcessEnvironment::systemEnvironment().value("PATH", "");
+        printd("PATH=%s\n", path.toStdString().c_str());
 
-    // lets search
-    foreach(QString name, binarynames) {
-        installnames = Utils::searchPath(path, name, true);
-        if (installnames.count() >0) break;
+        // what is is typically installed as ?
+        QStringList binarynames;
+        binarynames << "python3" << "python";
+
+        // what we found
+        QStringList installnames;
+
+        // lets search
+        foreach(QString name, binarynames) {
+            installnames = Utils::searchPath(path, name, true);
+            if (installnames.count() >0) break;
+        }
+
+        printd("Binary found:%d\n", installnames.count());
+        // if we failed, its not installed
+        if (installnames.count()==0) return false;
+
+        // lets just use the first one we found
+        pythonbinary = installnames[0];
+        pybin=pythonbinary;
+
+    } else {
+
+        // look for python3 or python in PYTHONHOME
+        QStringList names; names<<"python3"<<"python";
+#ifdef WIN32
+        QString ext= QString(".exe");
+#else
+        QString ext= QString("");
+#endif
+        foreach(QString name, names) {
+            QString filename = PYTHONHOME + QDir::separator() + name + ext;
+            if (QFileInfo(filename).exists() && QFileInfo(filename).isExecutable()) {
+                pythonbinary=filename;
+                break;
+            }
+        }
+        // not found give up straight away
+        if (pythonbinary == "") return false;
     }
 
-    printd("Binary found:%d\n", installnames.count());
-    // if we failed, its not installed
-    if (installnames.count()==0) return false;
-
-    // lets just use the first one we found
-    QString pythonbinary = installnames[0];
-    pybin=pythonbinary;
-
 #ifdef WIN32
-    // ugh. QProcess doesn't like spaces or backslashes. POC.
-    pythonbinary=pythonbinary.replace("\\", "/");
-    pythonbinary="\"" + pythonbinary + "\"";
+        // ugh. QProcess doesn't like spaces or backslashes. POC.
+        pythonbinary=pythonbinary.replace("\\", "/");
+        pythonbinary="\"" + pythonbinary + "\"";
 #endif
-    printd("Running: %s\n", pythonbinary.toStdString().c_str());
 
     // get the version and path via an interaction
+    printd("Running: %s\n", pythonbinary.toStdString().c_str());
     QProcess py;
     py.setProgram(pythonbinary);
 
@@ -154,8 +178,13 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     threadid=-1;
     name = QString("GoldenCheetah");
 
+    // config or environment variable
+    QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
+    if (PYTHONHOME == "") PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
+    if (PYTHONHOME !="") printd("PYTHONHOME seteting used: %s\n", PYTHONHOME.toStdString().c_str());
+
     // is python3 installed?
-    if (pythonInstalled(pybin, pypath)) {
+    if (pythonInstalled(pybin, pypath, PYTHONHOME)) {
 
         printd("Python is installed: %s\n", pybin.toStdString().c_str());
 
