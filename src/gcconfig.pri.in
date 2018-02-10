@@ -33,6 +33,10 @@
 #DEFINES += GC_WANT_PYTHON
 #PYTHONINCLUDES = -I\"C:\Program Files\Python36\include\"
 #PYTHONLIBS = -L\"C:\Program Files\Python36\libs\" -lpython36
+#Below work ok on MacOS High Sierra
+#DEFINES += GC_WANT_PYTHON
+#PYTHONINCLUDES = -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m
+#PYTHONLIBS = -L/Library/Frameworks/Python.framework/Versions/3.6/lib -lpython3.6m
 
 # put output into a separate dir
 # to keep main directory clear
