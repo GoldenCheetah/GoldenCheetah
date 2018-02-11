@@ -33,9 +33,8 @@ before_install:
 - brew install libusb libusb-compat
 - brew install srmio
 - brew install libsamplerate
-- brew tap homebrew/science
 - brew install r
-- brew install lmfit
+- brew install brewsci/science/lmfit
 ## Disable KML for now
 ##- brew install --HEAD travis/libkml.rb
 - sudo chmod -R +w /usr/local
