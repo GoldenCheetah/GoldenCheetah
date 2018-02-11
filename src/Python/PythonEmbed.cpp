@@ -49,6 +49,7 @@ PythonEmbed::~PythonEmbed()
 
 bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME)
 {
+    QStringList names; names<<"python3"<< "bin/python3" << "python" << "bin/python";
     QString pythonbinary;
 
     if (PYTHONHOME=="") {
@@ -57,15 +58,11 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
         QString path = QProcessEnvironment::systemEnvironment().value("PATH", "");
         printd("PATH=%s\n", path.toStdString().c_str());
 
-        // what is is typically installed as ?
-        QStringList binarynames;
-        binarynames << "python3" << "python";
-
         // what we found
         QStringList installnames;
 
         // lets search
-        foreach(QString name, binarynames) {
+        foreach(QString name, names) {
             installnames = Utils::searchPath(path, name, true);
             if (installnames.count() >0) break;
         }
@@ -81,7 +78,6 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
     } else {
 
         // look for python3 or python in PYTHONHOME
-        QStringList names; names<<"python3"<<"python";
 #ifdef WIN32
         QString ext= QString(".exe");
 #else
