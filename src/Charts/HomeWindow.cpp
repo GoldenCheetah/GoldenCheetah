@@ -1611,7 +1611,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Import Charts"));
     setWindowModality(Qt::ApplicationModal);
-    setMinimumWidth(450);
+    setMinimumWidth(450 * dpiXFactor);
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     table = new QTableWidget(this);
