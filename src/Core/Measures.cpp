@@ -40,7 +40,7 @@ Measure::getSourceDescription() const {
     case Measure::Manual:
         return tr("Manual entry");
     case Measure::Withings:
-        return tr("Withings");
+        return tr("Nokia Health (Withings)");
     case Measure::TodaysPlan:
         return tr("Today's Plan");
     case Measure::CSV:
