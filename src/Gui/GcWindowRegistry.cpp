@@ -29,9 +29,6 @@
 #endif
 #include "HistogramWindow.h"
 #include "LTMWindow.h"
-#ifdef GC_HAVE_QWTPLOT3D
-#include "ModelWindow.h"
-#endif
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #else
@@ -107,7 +104,6 @@ GcWindowRegistry::initialize()
     { VIEW_HOME, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
-    { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
     { VIEW_ANALYSIS, tr("Aerolab Chung Analysis"),GcWindowTypes::Aerolab },
     { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
     { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
@@ -208,11 +204,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
             }
             break;
     case GcWindowTypes::LTM: returning = new LTMWindow(context); break;
-#ifdef GC_HAVE_QWTPLOT3D
-    case GcWindowTypes::Model: returning = new ModelWindow(context); break;
-#else
     case GcWindowTypes::Model: returning = new GcChartWindow(context); break;
-#endif
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
     case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;

@@ -410,30 +410,6 @@ unix:!macx {
 }
 
 
-###==================
-### OPTIONAL => QWT3D
-###==================
-
-!isEmpty(QWT3D_INSTALL) {
-
-    # we will work out the rest if you tell use where it is installed
-    isEmpty(QWT3D_INCLUDE) { QWT3D_INCLUDE = $${QWT3D_INSTALL}/include }
-    isEmpty(QWT3D_LIBS)    { QWT3D_LIBS    = -L$${QWT3D_INSTALL}/lib -lqwtplot3d }
-
-    DEFINES     += GC_HAVE_QWTPLOT3D
-    INCLUDEPATH += $${QWT3D_INCLUDE}
-    LIBS        += $${QWT3D_LIBS}
-
-    # additional dependencies for 3d
-    unix:!macx { LIBS += -lGLU }
-    QT          += opengl
-
-    # add 3d plot
-    HEADERS     += Charts/ModelPlot.h Charts/ModelWindow.h
-    SOURCES     += Charts/ModelPlot.cpp Charts/ModelWindow.cpp
-}
-
-
 ###=====================================
 ### OPTIONAL => GOOGLE KML IMPORT EXPORT
 ###=====================================

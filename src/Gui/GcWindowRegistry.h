@@ -35,10 +35,10 @@ enum gcwinid {
         GoogleMap =5,
         Histogram =6,
         LTM =7,
-        Model =8,
+        Model =8, // deprecated
         PerformanceManager =9,
         PfPv =10,
-        Race =11,
+        Race =11, // deprecated
         RideEditor =13,
         RideSummary =14,
         Scatter =15,
@@ -54,7 +54,7 @@ enum gcwinid {
         WorkoutPlot = 25,
         MapWindow = 26,
         StreetViewWindow = 27,
-        BingMap = 28,
+        BingMap = 28, // deprecated
         RealtimeControls = 29,
         ActivityNavigator = 30,
         SpinScanPlot = 31,
