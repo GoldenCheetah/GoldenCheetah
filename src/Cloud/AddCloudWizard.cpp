@@ -96,15 +96,16 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
 
     // Activities
+    QFont font;
     QCommandLinkButton *p = new QCommandLinkButton(tr("Activities"), tr("Sync activities with services like Today's Plan, Strava, Dropbox and Google Drive"), this);
-    p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
+    p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Activities);
     layout->addWidget(p);
 
     // Measures
     p = new QCommandLinkButton(tr("Measurements"), tr("Sync measurements such as weight, body fat, HRV and sleep."));
-    p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
+    p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Measures);
     layout->addWidget(p);
@@ -112,7 +113,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
 #if 0 // DEPRECATING (?)
     // Activities
     p = new QCommandLinkButton(tr("Calendar"), tr("Sync planned workouts to WebDAV and CalDAV calendars."));
-    p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
+    p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Calendar);
     layout->addWidget(p);
@@ -167,6 +168,8 @@ AddService::initializePage()
 
     CloudServiceFactory &factory = CloudServiceFactory::instance();
 
+    QFont font; // default font size
+
     // iterate over names, as they are sorted alphabetically
     foreach(QString name, factory.serviceNames()) {
 
@@ -177,7 +180,7 @@ AddService::initializePage()
         if (s->type() != wizard->type) continue;
 
         QCommandLinkButton *p = new QCommandLinkButton(s->uiName(), s->description(), this);
-        p->setStyleSheet(QString("font-size: %1px;").arg(12 * dpiXFactor));
+        p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
         p->setFixedHeight(50 *dpiYFactor);
         connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
         mapper->setMapping(p, s->id());
