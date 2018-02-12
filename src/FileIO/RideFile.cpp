@@ -2493,7 +2493,7 @@ RideFile::recalculateDerivedSeries(bool force)
                 } else {
                     p->slope = 0;
                 }
-                if (p->slope > 20 || p->slope < -20) {
+                if (p->slope > 40 || p->slope < -40) {
                     p->slope = lastP->slope;
                 }
             }
@@ -2631,6 +2631,10 @@ RideFile::recalculateDerivedSeries(bool force)
         for (int i=dataPoints_.count()-1; i>=smoothPoints; i--) {
             double here = dataPoints_[i]->slope;
             dataPoints_[i]->slope = rtot / smoothPoints;
+            // remove rounding effect 0.01% is flat ;)
+            if (dataPoints_[i]->slope < 0.01f && dataPoints_[i]->slope > -0.01f) {
+                dataPoints_[i]->slope = 0;
+            }
             rtot -= here;
             rtot += dataPoints_[i-smoothPoints]->slope;
         }
