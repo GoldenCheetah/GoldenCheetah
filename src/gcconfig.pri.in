@@ -119,23 +119,6 @@
 #KQOAUTH_INCLUDE =
 #KQOAUTH_LIBS =
 
-# If you want 3D plotting, you need to install qwtplot3d
-#     http://qwtplot3d.sourceforge.net/
-# If you are running Linux and have font problems, download
-# the Tar ball from http://qwtplot3d.svn.sourceforge.net/viewvc/qwtplot3d/
-# Follow Branches -> Maintain_0_2_x -> qwtplot3d
-# Set path to the root of the qwtplot3d installation
-# If you installed in /usr/local/qwtplot3d then set
-# QWT3D_INSTALL = /usr/local/qwtplot3d
-# This will automatically set:
-# QWT3D_INCLUDE = $${QWT3D_INSTALL}/include 
-# QWT3D_LIBS    = $${QWT3D_INSTALL}/lib/libqwtplot3d.a
-# You may override the INCLUDE and LIB files if you like.
-# You *must* define QWT3D_INSTALL to use this feature.
-#QWT3D_INSTALL = 
-#QWT3D_INCLUDE = 
-#QWT3D_LIBS    = 
-
 # For TrainingPeaks.com upload/download you need to install the Qt Soap add-on
 #     http://qt.nokia.com/products/appdev/add-on-products/catalog/4/Utilities/qtsoap
 # If qtsoap.pri is install in /usr/local/qtsolutions/soap/ then set
