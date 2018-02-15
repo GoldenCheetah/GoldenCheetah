@@ -41,6 +41,15 @@
 #include <QWaitCondition>
 #include <QMessageBox>
 
+enum WizardTable {
+    FILENAME_COLUMN = 0,
+    DATE_COLUMN,
+    TIME_COLUMN,
+    DURATION_COLUMN,
+    DISTANCE_COLUMN,
+    STATUS_COLUMN,
+};
+
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
@@ -229,7 +238,6 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
 
 }
 
-
 void
 RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 {
@@ -280,27 +288,27 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     setWindowTitle(tr("Import Files"));
     QTableWidgetItem *filenameHeading = new QTableWidgetItem;
     filenameHeading->setText(tr("Filename"));
-    tableWidget->setHorizontalHeaderItem(0, filenameHeading);
+    tableWidget->setHorizontalHeaderItem(WizardTable::FILENAME_COLUMN, filenameHeading);
 
     QTableWidgetItem *dateHeading = new QTableWidgetItem;
     dateHeading->setText(tr("Date"));
-    tableWidget->setHorizontalHeaderItem(1, dateHeading);
+    tableWidget->setHorizontalHeaderItem(WizardTable::DATE_COLUMN, dateHeading);
 
     QTableWidgetItem *timeHeading = new QTableWidgetItem;
     timeHeading->setText(tr("Time"));
-    tableWidget->setHorizontalHeaderItem(2, timeHeading);
+    tableWidget->setHorizontalHeaderItem(WizardTable::TIME_COLUMN, timeHeading);
 
     QTableWidgetItem *durationHeading = new QTableWidgetItem;
     durationHeading->setText(tr("Duration"));
-    tableWidget->setHorizontalHeaderItem(3, durationHeading);
+    tableWidget->setHorizontalHeaderItem(WizardTable::DURATION_COLUMN, durationHeading);
 
     QTableWidgetItem *distanceHeading = new QTableWidgetItem;
     distanceHeading->setText(tr("Distance"));
-    tableWidget->setHorizontalHeaderItem(4, distanceHeading);
+    tableWidget->setHorizontalHeaderItem(WizardTable::DISTANCE_COLUMN, distanceHeading);
 
     QTableWidgetItem *statusHeading = new QTableWidgetItem;
     statusHeading->setText(tr("Import Status"));
-    tableWidget->setHorizontalHeaderItem(5, statusHeading);
+    tableWidget->setHorizontalHeaderItem(WizardTable::STATUS_COLUMN, statusHeading);
 
     // save target dir for the file import
     this->homeImports = context->athlete->home->imports();
@@ -321,38 +329,38 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
         else
             t->setText(QFileInfo(files[i]).fileName());
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,0,t);
+        tableWidget->setItem(i,WizardTable::FILENAME_COLUMN,t);
 
         // Date
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags()  | Qt::ItemIsEditable);
         t->setBackgroundColor(Qt::red);
-        tableWidget->setItem(i,1,t);
+        tableWidget->setItem(i,WizardTable::DATE_COLUMN,t);
 
         // Time
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags() | Qt::ItemIsEditable);
-        tableWidget->setItem(i,2,t);
+        tableWidget->setItem(i,WizardTable::TIME_COLUMN,t);
 
         // Duration
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,3,t);
+        tableWidget->setItem(i,WizardTable::DURATION_COLUMN,t);
 
         // Distance
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,4,t);
+        tableWidget->setItem(i,WizardTable::DISTANCE_COLUMN,t);
 
         // Import Status
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        tableWidget->setItem(i,5,t);
+        tableWidget->setItem(i,WizardTable::STATUS_COLUMN,t);
     }
 
     // put into our dialog box
@@ -381,12 +389,12 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     setLayout(contents);
 
     // adjust all the sizes to look tidy
-    tableWidget->setColumnWidth(0, 200*dpiXFactor); // filename
-    tableWidget->setColumnWidth(1, 120*dpiXFactor); // date
-    tableWidget->setColumnWidth(2, 120*dpiXFactor); // time
-    tableWidget->setColumnWidth(3, 100*dpiXFactor); // duration
-    tableWidget->setColumnWidth(4, 70*dpiXFactor); // distance
-    tableWidget->setColumnWidth(5, 250*dpiXFactor); // status
+    tableWidget->setColumnWidth(WizardTable::FILENAME_COLUMN, 200*dpiXFactor);
+    tableWidget->setColumnWidth(WizardTable::DATE_COLUMN, 120*dpiXFactor);
+    tableWidget->setColumnWidth(WizardTable::TIME_COLUMN, 120*dpiXFactor);
+    tableWidget->setColumnWidth(WizardTable::DURATION_COLUMN, 100*dpiXFactor);
+    tableWidget->setColumnWidth(WizardTable::DISTANCE_COLUMN, 70*dpiXFactor);
+    tableWidget->setColumnWidth(WizardTable::STATUS_COLUMN, 250*dpiXFactor);
     tableWidget->horizontalHeader()->setStretchLastSection(true);
 
     // max height for 16 items and a scrollbar on right if > 16 items
@@ -444,9 +452,9 @@ RideImportWizard::process()
 
         // get fullpath name for processing
         QFileInfo thisfile(filenames[i]);
-        if (!thisfile.exists())  tableWidget->item(i,5)->setText(tr("Error - File does not exist."));
-        else if (!thisfile.isFile())  tableWidget->item(i,5)->setText(tr("Error - Not a file."));
-        else if (!thisfile.isReadable())  tableWidget->item(i,5)->setText(tr("Error - File is not readable."));
+        if (!thisfile.exists())  tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - File does not exist."));
+        else if (!thisfile.isFile())  tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - Not a file."));
+        else if (!thisfile.isReadable())  tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - File is not readable."));
         else {
 
             // is it one we understand ?
@@ -473,10 +481,10 @@ RideImportWizard::process()
             if (suffixes.exactMatch(suffix)) {
 
                 // Woot. We know how to parse this baby
-                tableWidget->item(i,5)->setText(tr("Queued"));
+                tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Queued"));
 
             } else {
-                tableWidget->item(i,5)->setText(tr("Error - Unknown file type") + ": " + suffix);
+                tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - Unknown file type") + ": " + suffix);
             }
         }
         progressBar->setValue(progressBar->value()+1);
@@ -494,12 +502,12 @@ RideImportWizard::process()
 
 
         // does the status say Queued?
-        if (!tableWidget->item(i,5)->text().startsWith(tr("Error"))) {
+        if (!tableWidget->item(i,WizardTable::STATUS_COLUMN)->text().startsWith(tr("Error"))) {
 
               QStringList errors;
               QFile thisfile(filenames[i]);
 
-              tableWidget->item(i,5)->setText(tr("Parsing..."));
+              tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Parsing..."));
               tableWidget->setCurrentCell(i,5);
               QApplication::processEvents();
 
@@ -552,38 +560,38 @@ RideImportWizard::process()
                      t = new QTableWidgetItem();
                      t->setText(fulltarget);
                      t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,0,t);
+                     tableWidget->setItem(here+counter,WizardTable::FILENAME_COLUMN,t);
 
                      // Date
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags()  | Qt::ItemIsEditable);
                      t->setBackgroundColor(Qt::red);
-                     tableWidget->setItem(here+counter,1,t);
+                     tableWidget->setItem(here+counter,WizardTable::DATE_COLUMN,t);
 
                      // Time
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags() | Qt::ItemIsEditable);
-                     tableWidget->setItem(here+counter,2,t);
+                     tableWidget->setItem(here+counter,WizardTable::TIME_COLUMN,t);
 
                      // Duration
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,3,t);
+                     tableWidget->setItem(here+counter,WizardTable::DURATION_COLUMN,t);
 
                      // Distance
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,4,t);
+                     tableWidget->setItem(here+counter,WizardTable::DISTANCE_COLUMN,t);
 
                      // Import Status
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                     tableWidget->setItem(here+counter,5,t);
+                     tableWidget->setItem(here+counter,WizardTable::STATUS_COLUMN,t);
 
                      counter++;
 
@@ -608,9 +616,9 @@ RideImportWizard::process()
 
                    // ride != NULL but !errors.isEmpty() means they're just warnings
                    if (errors.isEmpty())
-                       tableWidget->item(i,5)->setText(tr("Validated"));
+                       tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Validated"));
                    else {
-                       tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(";")));
+                       tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Warning - ") + errors.join(tr(";")));
                    }
 
                    // Set Date and Time
@@ -618,19 +626,19 @@ RideImportWizard::process()
 
                        // Poo. The user needs to supply the date/time for this ride
                        blanks[i] = true;
-                       tableWidget->item(i,1)->setText(tr(""));
-                       tableWidget->item(i,2)->setText(tr(""));
+                       tableWidget->item(i,WizardTable::DATE_COLUMN)->setText(tr(""));
+                       tableWidget->item(i,WizardTable::TIME_COLUMN)->setText(tr(""));
 
                    } else {
 
                        // Cool, the date and time was extracted from the source file
                        blanks[i] = false;
-                       tableWidget->item(i,1)->setText(ride->startTime().date().toString(Qt::ISODate));
-                       tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
+                       tableWidget->item(i,WizardTable::DATE_COLUMN)->setText(ride->startTime().date().toString(Qt::ISODate));
+                       tableWidget->item(i,WizardTable::TIME_COLUMN)->setText(ride->startTime().toString("hh:mm:ss"));
                    }
 
-                   tableWidget->item(i,1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
-                   tableWidget->item(i,2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+                   tableWidget->item(i,WizardTable::DATE_COLUMN)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+                   tableWidget->item(i,WizardTable::TIME_COLUMN)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // time and distance from tags (.gc files)
                    QMap<QString,QString> lookup;
@@ -650,20 +658,20 @@ RideImportWizard::process()
                    QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
                        .arg(secs%3600/60,2,10,zero)
                        .arg(secs%60,2,10,zero);
-                   tableWidget->item(i,3)->setText(time);
-                   tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
+                   tableWidget->item(i,WizardTable::DURATION_COLUMN)->setText(time);
+                   tableWidget->item(i,WizardTable::DURATION_COLUMN)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // show distance by looking at last data point
                    QString dist = context->athlete->useMetricUnits
                        ? QString ("%1 km").arg(km, 0, 'f', 1)
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
-                   tableWidget->item(i,4)->setText(dist);
-                   tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                   tableWidget->item(i,WizardTable::DISTANCE_COLUMN)->setText(dist);
+                   tableWidget->item(i,WizardTable::DISTANCE_COLUMN)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
                    delete ride;
                } else {
                    // nope - can't handle this file
-                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(";")));
+                   tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - ") + errors.join(tr(";")));
                }
         }
         progressBar->setValue(progressBar->value()+1);
@@ -683,7 +691,7 @@ RideImportWizard::process()
     for (int i=0; i<filenames.count(); i++) {
 
         // ignore errors
-        QTableWidgetItem *t = tableWidget->item(i,5);
+        QTableWidgetItem *t = tableWidget->item(i,WizardTable::STATUS_COLUMN);
         if (t->text().startsWith(tr("Error"))) continue;
 
         if (blanks[i]) needdates++; // count the blanks tho -- these MUST be edited
@@ -761,15 +769,15 @@ RideImportWizard::activateSave()
    for (int i=0; i<filenames.count(); i++) {
 
         // ignore errors
-        QTableWidgetItem *t = tableWidget->item(i,5);
+        QTableWidgetItem *t = tableWidget->item(i,WizardTable::STATUS_COLUMN);
         if (t->text().startsWith(tr("Error"))) continue;
 
        // date needed?
-        t = tableWidget->item(i,1);
+        t = tableWidget->item(i,WizardTable::DATE_COLUMN);
         if (t->text() == "") return;
 
         // time needed?
-        t = tableWidget->item(i,2);
+        t = tableWidget->item(i,WizardTable::TIME_COLUMN);
         if (t->text() == "") return;
    }
    // if you got here then all entries that need a date have a date
@@ -799,13 +807,13 @@ RideImportWizard::todayClicked(int index)
         selectedDate = QDate().currentDate();
     } else if (index == 9) { // other date - set focus on first highlighted date
         for (int i=0; i<filenames.count(); i++) {
-            if (tableWidget->item(i,0)->isSelected() ||
-                tableWidget->item(i,1)->isSelected() ||
-                tableWidget->item(i,2)->isSelected() ||
-                tableWidget->item(i,3)->isSelected() ||
-                tableWidget->item(i,4)->isSelected() ||
-                tableWidget->item(i,5)->isSelected()) {
-                tableWidget->editItem(tableWidget->item(i,1));
+            if (tableWidget->item(i,WizardTable::FILENAME_COLUMN)->isSelected() ||
+                tableWidget->item(i,WizardTable::DATE_COLUMN)->isSelected() ||
+                tableWidget->item(i,WizardTable::TIME_COLUMN)->isSelected() ||
+                tableWidget->item(i,WizardTable::DURATION_COLUMN)->isSelected() ||
+                tableWidget->item(i,WizardTable::DISTANCE_COLUMN)->isSelected() ||
+                tableWidget->item(i,WizardTable::STATUS_COLUMN)->isSelected()) {
+                tableWidget->editItem(tableWidget->item(i,WizardTable::DATE_COLUMN));
                 return;
             }
         }
@@ -821,15 +829,15 @@ RideImportWizard::todayClicked(int index)
     int countselected = 0;
     int totalduration = 0;
     for (int i=0; i< filenames.count(); i++) {
-        if (tableWidget->item(i,0)->isSelected() ||
-            tableWidget->item(i,1)->isSelected() ||
-            tableWidget->item(i,2)->isSelected() ||
-            tableWidget->item(i,3)->isSelected() ||
-            tableWidget->item(i,4)->isSelected() ||
-            tableWidget->item(i,5)->isSelected()) {
+        if (tableWidget->item(i,WizardTable::FILENAME_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::DATE_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::TIME_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::DURATION_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::DISTANCE_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::STATUS_COLUMN)->isSelected()) {
             countselected++;
 
-            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), "hh:mm:ss");
+            QTime duration = QTime().fromString(tableWidget->item(i,WizardTable::DURATION_COLUMN)->text(), "hh:mm:ss");
             totalduration += duration.hour() * 3600 +
                              duration.minute() * 60 +
                              duration.second();
@@ -867,23 +875,23 @@ RideImportWizard::todayClicked(int index)
     // if the start time is not set set it to rstart and increment
     // by the duration of the ride.
     for (int i=0; i< filenames.count(); i++) {
-        if (tableWidget->item(i,0)->isSelected() ||
-            tableWidget->item(i,1)->isSelected() ||
-            tableWidget->item(i,2)->isSelected() ||
-            tableWidget->item(i,3)->isSelected() ||
-            tableWidget->item(i,4)->isSelected() ||
-            tableWidget->item(i,5)->isSelected()) {
+        if (tableWidget->item(i,WizardTable::FILENAME_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::DATE_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::TIME_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::DURATION_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::DISTANCE_COLUMN)->isSelected() ||
+            tableWidget->item(i,WizardTable::STATUS_COLUMN)->isSelected()) {
 
             // set the date to date selected
-            tableWidget->item(i,1)->setText(selectedDate.toString(Qt::ISODate));
+            tableWidget->item(i,WizardTable::DATE_COLUMN)->setText(selectedDate.toString(Qt::ISODate));
             // look at rides with missing start time - we need to populate those
 
             // ride duration
-            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), "hh:mm:ss");
+            QTime duration = QTime().fromString(tableWidget->item(i,WizardTable::DURATION_COLUMN)->text(), "hh:mm:ss");
 
             // ride start time
             QTime time(rstart/3600, rstart%3600/60, rstart%60);
-            tableWidget->item(i,2)->setText(time.toString("hh:mm:ss"));
+            tableWidget->item(i,WizardTable::TIME_COLUMN)->setText(time.toString("hh:mm:ss"));
             rstart += duration.hour() * 3600 +
                       duration.minute() * 60 +
                       duration.second();
@@ -892,7 +900,6 @@ RideImportWizard::todayClicked(int index)
     // phew! - repaint!
     QApplication::processEvents();
     tableWidget->repaint();
-
 }
 
 void
@@ -947,9 +954,9 @@ RideImportWizard::abortClicked()
 
     // now set this fields uneditable again ... yeesh.
     for (int i=0; i <filenames.count(); i++) {
-        QTableWidgetItem *t = tableWidget->item(i,1);
+        QTableWidgetItem *t = tableWidget->item(i,WizardTable::DATE_COLUMN);
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        t = tableWidget->item(i,2);
+        t = tableWidget->item(i,WizardTable::TIME_COLUMN);
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
     }
 
@@ -959,9 +966,9 @@ RideImportWizard::abortClicked()
     // Saving now - process the files one-by-one
     for (int i=0; i< filenames.count(); i++) {
 
-        if (tableWidget->item(i,5)->text().startsWith(tr("Error"))) continue; // skip errors
+        if (tableWidget->item(i,WizardTable::STATUS_COLUMN)->text().startsWith(tr("Error"))) continue; // skip errors
 
-        tableWidget->item(i,5)->setText(tr("Saving..."));
+        tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Saving..."));
         tableWidget->setCurrentCell(i,5);
         QApplication::processEvents();
         if (aborted) { done(0); return; }
@@ -970,8 +977,8 @@ RideImportWizard::abortClicked()
 
         // SAVE STEP 3 - prepare the new file names for the next steps - basic name and .JSON in GC format
 
-        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), Qt::ISODate),
-                                           QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
+        QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,WizardTable::DATE_COLUMN)->text(), Qt::ISODate),
+                                           QTime().fromString(tableWidget->item(i,WizardTable::TIME_COLUMN)->text(), "hh:mm:ss"));
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                 .arg ( ridedatetime.date().year(), 4, 10, zero )
                 .arg ( ridedatetime.date().month(), 2, 10, zero )
@@ -986,13 +993,13 @@ RideImportWizard::abortClicked()
         QString finalActivitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
 
         // check if a ride at this point of time already exists in /activities - if yes, skip import
-        if (QFileInfo(finalActivitiesFulltarget).exists()) { tableWidget->item(i,5)->setText(tr("Error - Activity file exists")); continue; }
+        if (QFileInfo(finalActivitiesFulltarget).exists()) { tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - Activity file exists")); continue; }
 
         // in addition, also check the RideCache for a Ride with the same point in Time in UTC, which also indicates
         // that there was already a ride imported - reason is that RideCache start time is in UTC, while the file Name is in "localTime"
         // which causes problems when importing the same file (for files which do not have time/date in the file name),
         // while the computer has been set to a different time zone
-        if (context->athlete->rideCache->getRide(ridedatetime.toUTC())) { tableWidget->item(i,5)->setText(tr("Error - Activity file with same start date/time exists")); continue; };
+        if (context->athlete->rideCache->getRide(ridedatetime.toUTC())) { tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - Activity file with same start date/time exists")); continue; };
 
         // SAVE STEP 4 - copy the source file to "/imports" directory (if it's not taken from there as source)
         // add the date/time of the target to the source file name (for identification)
@@ -1009,7 +1016,7 @@ RideImportWizard::abortClicked()
             // copy the source file to /imports with adjusted name
             QFile source(filenames[i]);
             if (!source.copy(importsFulltarget)) {
-                tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+                tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
             }
         } else {
             // file is re-imported from /imports - keep the name for .JSON Source File Tag
@@ -1023,7 +1030,7 @@ RideImportWizard::abortClicked()
         // -- second  create RideCache() entry
         // -- third   move file from /tmpactivities to /activities
 
-        tableWidget->item(i,5)->setText(tr("Saving file..."));
+        tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Saving file..."));
 
         // serialize the file to .JSON
         QStringList errors;
@@ -1061,18 +1068,18 @@ RideImportWizard::abortClicked()
                                           true, true);                                       // file is available only in /tmpActivities, so use this one please
                 // rideCache is successfully updated, let's move the file to the real /activities
                 if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
-                    tableWidget->item(i,5)->setText(tr("File Saved"));
+                    tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("File Saved"));
                     // and correct the path locally stored in Ride Item
                     context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
                 }  else {
-                    tableWidget->item(i,5)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
+                    tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
                 }
 
             }  else {
-                tableWidget->item(i,5)->setText(tr("Error - .JSON creation failed"));
+                tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - .JSON creation failed"));
             }
         } else {
-            tableWidget->item(i,5)->setText(tr("Error - Import of activitiy file failed"));
+            tableWidget->item(i,WizardTable::STATUS_COLUMN)->setText(tr("Error - Import of activitiy file failed"));
         }
 
         // now metrics have been calculated
@@ -1090,7 +1097,7 @@ RideImportWizard::abortClicked()
     // how did we get on in the end then ...
     int completed = 0;
     for (int i=0; i< filenames.count(); i++)
-        if (!tableWidget->item(i,5)->text().startsWith(tr("Error"))) {
+        if (!tableWidget->item(i,WizardTable::STATUS_COLUMN)->text().startsWith(tr("Error"))) {
             completed++;
         }
 
