@@ -316,9 +316,10 @@ fail:
         R = NULL;
 
         // end embedding
-        QMessageBox warn(QMessageBox::Information, QObject::tr("R version Incompatible"),
-                         dialogtext + QObject::tr("\nR has been disabled in preferences"));
-        warn.exec();
+        // Don't bug the user, most of them don't care
+        //QMessageBox warn(QMessageBox::Information, QObject::tr("R version Incompatible"),
+        //                 dialogtext + QObject::tr("\nR has been disabled in preferences"));
+        //warn.exec();
     }
     starting = false;
 }

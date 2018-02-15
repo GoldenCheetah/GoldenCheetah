@@ -177,12 +177,18 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     // config or environment variable
     QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
     if (PYTHONHOME == "") PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
-    if (PYTHONHOME !="") printd("PYTHONHOME seteting used: %s\n", PYTHONHOME.toStdString().c_str());
+    if (PYTHONHOME !="") printd("PYTHONHOME setting used: %s\n", PYTHONHOME.toStdString().c_str());
 
     // is python3 installed?
     if (pythonInstalled(pybin, pypath, PYTHONHOME)) {
 
         printd("Python is installed: %s\n", pybin.toStdString().c_str());
+
+        // set PYTHONHOME if user specified it
+        if (PYTHONHOME != "") {
+            printd("Py_SetPythonHome: %s\n", pybin.toStdString().c_str());
+            Py_SetPythonHome((wchar_t*) PYTHONHOME.toStdString().c_str());
+        }
 
         // tell python our program name - pretend to be the usual interpreter
         printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str());
@@ -273,11 +279,12 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     // if we get here loading failed
     printd("Embedding failed\n");
-    QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed or in path"),
-        QObject::tr("Python v3.6 or higher is required for Python.\nPython disabled in preferences."));
+    // Don't bug the user -- most of them don't care.
+    //QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed or in path"),
+    //    QObject::tr("Python v3.6 or higher is required for Python.\nPython disabled in preferences."));
+    //msg.exec();
     appsettings->setValue(GC_EMBED_PYTHON, false);
     loaded=false;
-    msg.exec();
     return;
 }
 
