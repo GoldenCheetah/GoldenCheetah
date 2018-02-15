@@ -51,7 +51,11 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     // make sure its underneath the toggle button
     toolButton = new QToolButton(this);
     toolButton->setFixedSize(QSize(16 *dpiXFactor,16 *dpiYFactor));
+#ifdef Q_OS_MAC
+    toolButton->setStyleSheet("QToolButton { background: transparent; }");
+#else
     toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+#endif
     toolButton->setCursor(Qt::ArrowCursor);
     toolButton->setPopupMode(QToolButton::InstantPopup);
 
