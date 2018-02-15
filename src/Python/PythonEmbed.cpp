@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include <stdexcept>
 
+#include <QtGlobal>
 #include <QMessageBox>
 #include <QProcess>
 
@@ -177,18 +178,15 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     // config or environment variable
     QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
     if (PYTHONHOME == "") PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
+    else {
+        qputenv("PYTHONHOME",PYTHONHOME.toUtf8());
+    }
     if (PYTHONHOME !="") printd("PYTHONHOME setting used: %s\n", PYTHONHOME.toStdString().c_str());
 
     // is python3 installed?
     if (pythonInstalled(pybin, pypath, PYTHONHOME)) {
 
         printd("Python is installed: %s\n", pybin.toStdString().c_str());
-
-        // set PYTHONHOME if user specified it
-        if (PYTHONHOME != "") {
-            printd("Py_SetPythonHome: %s\n", pybin.toStdString().c_str());
-            Py_SetPythonHome((wchar_t*) PYTHONHOME.toStdString().c_str());
-        }
 
         // tell python our program name - pretend to be the usual interpreter
         printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str());
