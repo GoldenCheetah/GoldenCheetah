@@ -956,12 +956,12 @@ bool ZipReader::extractAll(const QString &destinationDir) const
 
     foreach (FileInfo fi, allFiles) {
         const QString absPath = destinationDir + QDir::separator() + fi.filePath;
-        if (fi.isFile) {
+        if (!fi.isDir && !fi.isSymLink) { // is file not always set correctly!?
             QFile f(absPath);
             if (!f.open(QIODevice::WriteOnly))
                 return false;
             f.write(fileData(fi.filePath));
-            f.setPermissions(fi.permissions);
+            if (fi.permissions > 0) f.setPermissions(fi.permissions);
             f.close();
         }
     }

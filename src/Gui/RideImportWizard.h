@@ -51,6 +51,9 @@ public:
     void closeEvent(QCloseEvent*);
     void done(int);
 
+    // explicitly only expand archives like .zip or .gz that contain >1 file
+    QList<QString> expandFiles(QList<QString>);
+
     int getNumberOfFiles();  // get the number of files selected for processing
     int process();
     bool importInProcess() { return _importInProcess; }

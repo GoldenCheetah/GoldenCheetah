@@ -20,6 +20,8 @@
 #include "Athlete.h"
 #include "MainWindow.h"
 
+#include "Archive.h"
+
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideImportWizard.h"
@@ -239,8 +241,13 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
 }
 
 void
-RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
+RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
 {
+
+    // expand files if they are archives - this may involve unzipping or extracting
+    //                                     files into a subdirectory, so we also clean-up
+    //                                     before we close.
+    QList<QString> files = expandFiles(original);
 
     // setup Help
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -414,6 +421,35 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 
     // set number of files / so that a caller of the constructor can decide what to do
     numberOfFiles = files.count();
+}
+
+QList<QString>
+RideImportWizard::expandFiles(QList<QString> files)
+{
+    // we keep a list of what we're returning
+    QList<QString> expanded;
+    QRegExp archives("^(zip|gzip)$",  Qt::CaseInsensitive);
+
+    foreach(QString file, files) {
+
+        if (archives.exactMatch(QFileInfo(file).suffix())) {
+            // its an archive so lets check - but only to one depth
+            // archives that contain archives can get in the sea
+            QList<QString> contents = Archive::dir(file);
+            if (contents.count() == 0) expanded << file;
+            else {
+                // we need to extract the contents and return those
+                QStringList ex = Archive::extract(file, contents, const_cast<AthleteDirectoryStructure*>(context->athlete->directoryStructure())->tmpActivities().absolutePath());
+                deleteMe += ex;
+                expanded += ex;
+            }
+
+        } else {
+            expanded << file;
+        }
+    }
+
+    return expanded;
 }
 
 int

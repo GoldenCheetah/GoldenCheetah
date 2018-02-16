@@ -676,7 +676,9 @@ int RideFileFactory::registerReader(const QString &suffix, const QString &descri
 
 QStringList RideFileFactory::suffixes() const
 {
-    return readFuncs_.keys();
+    QStringList returning = readFuncs_.keys();
+    returning += "zip";
+    return returning;
 }
 
 QStringList RideFileFactory::writeSuffixes() const
