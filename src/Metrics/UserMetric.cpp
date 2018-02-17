@@ -307,7 +307,7 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c1.unitsImperial = "";
         c1.conversion = 1;
         c1.conversionSum = 0;
-        c1.program = "{ value { BikeScore; } count { Duration; } }";
+        c1.program = "{ value { BikeStress; } count { Duration; } }";
         c1.precision = 0;
         c1.istime = false;
         c1.aggzero = true;
