@@ -2589,7 +2589,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i) {
         QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol))
+        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
@@ -2786,7 +2786,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i) {
         QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol))
+        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
@@ -2958,6 +2958,8 @@ CustomMetricsPage::refreshTable()
 {
     table->clear();
     foreach(UserMetricSettings m, metrics) {
+
+        if (m.symbol.startsWith("compatibility_")) continue;
 
         QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
         add->setText(0, m.symbol);
@@ -3164,7 +3166,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i) {
         QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol))
+        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
