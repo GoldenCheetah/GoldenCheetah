@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Archive.h"
+#include "ArchiveFile.h"
 #include "../qzip/zipreader.h"
 
 QStringList Archive::extract(QString name, QList<QString> want, QString folder)

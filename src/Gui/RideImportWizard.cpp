@@ -20,7 +20,7 @@
 #include "Athlete.h"
 #include "MainWindow.h"
 
-#include "Archive.h"
+#include "ArchiveFile.h"
 
 #include "RideItem.h"
 #include "RideFile.h"
