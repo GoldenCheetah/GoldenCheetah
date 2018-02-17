@@ -2957,9 +2957,13 @@ void
 CustomMetricsPage::refreshTable()
 {
     table->clear();
+    skipcompat=0;
     foreach(UserMetricSettings m, metrics) {
 
-        if (m.symbol.startsWith("compatibility_")) continue;
+        if (m.symbol.startsWith("compatibility_")) {
+            skipcompat++;
+            continue;
+        }
 
         QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
         add->setText(0, m.symbol);
@@ -3064,13 +3068,13 @@ CustomMetricsPage::doubleClicked(QTreeWidgetItem *item, int)
     int row = table->invisibleRootItem()->indexOfChild(item);
 
     // edit it
-    UserMetricSettings here = metrics[row];
+    UserMetricSettings here = metrics[row+skipcompat];
 
     EditUserMetricDialog editor(this, context, here);
     if (editor.exec() == QDialog::Accepted) {
 
         // add to the list
-        metrics[row] = here;
+        metrics[row+skipcompat] = here;
         refreshTable();
 
     }

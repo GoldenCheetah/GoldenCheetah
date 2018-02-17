@@ -537,6 +537,8 @@ class CustomMetricsPage : public QWidget
         QTreeWidget *table;
         QList<UserMetricSettings> metrics;
 
+        int skipcompat;
+
         struct {
             quint16 crc;
         } b4;
