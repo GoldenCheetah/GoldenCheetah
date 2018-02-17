@@ -1535,8 +1535,8 @@ WorkoutWidget::recompute(bool editing)
         (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) {
 
         // no cp or ftp set
-        parent->TSSlabel->setText("- TSS");
-        parent->IFlabel->setText("- IF");
+        parent->TSSlabel->setText("- Stress");
+        parent->IFlabel->setText("- Intensity");
 
     }
 
@@ -1584,13 +1584,13 @@ WorkoutWidget::recompute(bool editing)
     if (maxy == 0) maxY_ = 400;
 
     //
-    // COMPUTE KEY METRICS TSS/IF
+    // COMPUTE KEY METRICS BikeStress/Intensity
     //
 
-    // The Workout Window has labels for TSS and IF.
-    double NP=0, TSS=0, IF=0;
+    // The Workout Window has labels for BikeStress and IF.
+    double IsoPower=0, BikeStress=0, IF=0;
 
-    // calculating NP
+    // calculating IsoPower
     QVector<int> NProlling(30);
     NProlling.fill(0,30);
     double NPtotal=0;
@@ -1601,7 +1601,7 @@ WorkoutWidget::recompute(bool editing)
     foreach(int watts, wattsArray) {
 
         //
-        // Normalised Power
+        // Iso Power
         //
 
         // sum last 30secs
@@ -1615,7 +1615,7 @@ WorkoutWidget::recompute(bool editing)
 
         // it moves up and down during the ride
         if (NPcount > 30) {
-            NP = pow(double(NPtotal) / double(NPcount), 0.25f);
+            IsoPower = pow(double(NPtotal) / double(NPcount), 0.25f);
         }
 
         // move index on/round
@@ -1623,16 +1623,16 @@ WorkoutWidget::recompute(bool editing)
     }
 
     // IF.....
-    IF = double(NP) / double(FTP);
+    IF = double(IsoPower) / double(FTP);
 
-    // TSS.....
-    double normWork = NP * NPcount;
+    // BikeStress.....
+    double normWork = IsoPower * NPcount;
     double rawTSS = normWork * IF;
     double workInAnHourAtCP = FTP * 3600;
-    TSS = rawTSS / workInAnHourAtCP * 100.0;
+    BikeStress = rawTSS / workInAnHourAtCP * 100.0;
 
-    parent->IFlabel->setText(QString("%1 IF").arg(IF, 0, 'f', 2));
-    parent->TSSlabel->setText(QString("%1 TSS").arg(TSS, 0, 'f', 0));
+    parent->IFlabel->setText(QString("%1 Intensity").arg(IF, 0, 'f', 2));
+    parent->TSSlabel->setText(QString("%1 Stress").arg(BikeStress, 0, 'f', 0));
 
     //
     // COMPUTE W'BAL
@@ -2197,7 +2197,7 @@ WorkoutWidget::configChanged(qint32)
     markerFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
     bigFont = markerFont;
-    bigFont.setPixelSize(pixelSizeForFont(bigFont, 24 * dpiYFactor));
+    bigFont.setPixelSize(pixelSizeForFont(bigFont, 18 * dpiYFactor));
     bigFont.setWeight(QFont::Bold);
 
     repaint();

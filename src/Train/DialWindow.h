@@ -117,7 +117,7 @@ class DialWindow : public GcChartWindow
         bool isNewLap;
 
         // for keeping track of rolling averages (max 30s at 5hz)
-        // used by NP and XPower
+        // used by IsoPower and XPower
         QVector<double> rolling;
         double rollingSum;
         int index; // index into rolling (circular buffer)

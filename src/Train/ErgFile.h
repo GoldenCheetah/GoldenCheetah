@@ -141,12 +141,12 @@ class ErgFile
         QList<ErgFileLap>   Laps;      // interval markers in the file
         QList<ErgFileText>  Texts;     // texts to display
 
-        void calculateMetrics(); // calculate NP value for ErgFile
+        void calculateMetrics(); // calculate IsoPower value for ErgFile
 
         // Metrics for this workout
         double maxY;                // maximum Y value
         double CP;
-        double AP, NP, IF, TSS, VI; // Coggan for erg / mrc
+        double AP, IsoPower, IF, BikeStress, VI; // Coggan for erg / mrc
         double XP, RI, BS, SVI; // Skiba for erg / mrc
         double ELE, ELEDIST, GRADE;    // crs
 

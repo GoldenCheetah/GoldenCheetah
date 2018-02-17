@@ -141,10 +141,10 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "ctl";
     list << "tsb";
     list << "atl";
-    list << "sb(TSS)";
-    list << "lts(TSS)";
-    list << "sts(TSS)";
-    list << "rr(TSS)";
+    list << "sb(BikeStress)";
+    list << "lts(BikeStress)";
+    list << "sts(BikeStress)";
+    list << "rr(BikeStress)";
     list << "tiz(power, 1)";
     list << "tiz(hr, 1)";
     list << "best(power, 3600)";

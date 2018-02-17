@@ -413,7 +413,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showATISS->setCheckState(Qt::Unchecked);
     seriesLeft->addRow(new QLabel(""), showATISS);
 
-    showNP = new QCheckBox(tr("Normalized Power"), this);
+    showNP = new QCheckBox(tr("Iso Power"), this);
     showNP->setCheckState(Qt::Unchecked);
     seriesLeft->addRow(new QLabel(""), showNP);
 
@@ -1430,7 +1430,7 @@ AllPlotWindow::compareChanged()
         if (showAltSlope->currentIndex() > 0) { s.one = RideFile::alt; s.two = RideFile::slope; wanted << s;}; // ALT/SLOPE !
         if (showTemp->isChecked()) { s.one = RideFile::temp; s.two = RideFile::none; wanted << s;};
         if (showWind->isChecked()) { s.one = RideFile::headwind; s.two = RideFile::none; wanted << s;};
-        if (showNP->isChecked()) { s.one = RideFile::NP; s.two = RideFile::none; wanted << s;};
+        if (showNP->isChecked()) { s.one = RideFile::IsoPower; s.two = RideFile::none; wanted << s;};
         if (showRV->isChecked()) { s.one = RideFile::rvert; s.two = RideFile::none; wanted << s;};
         if (showRCad->isChecked()) { s.one = RideFile::rcad; s.two = RideFile::none; wanted << s;};
         if (showRGCT->isChecked()) { s.one = RideFile::rcontact; s.two = RideFile::none; wanted << s;};
@@ -3674,7 +3674,7 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showAltSlope->currentIndex() > 0 && rideItem->ride()->areDataPresent()->alt) { s.one = RideFile::alt; s.two = RideFile::slope; serieslist << s; }
     if (showSlope->isChecked() && rideItem->ride()->areDataPresent()->slope) { s.one = RideFile::slope; s.two = RideFile::none; serieslist << s; }
     if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) { s.one = RideFile::temp; s.two = RideFile::none; serieslist << s; } 
-    if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::NP; s.two = RideFile::none; serieslist << s; }
+    if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::IsoPower; s.two = RideFile::none; serieslist << s; }
     if (showRV->isChecked() && rideItem->ride()->areDataPresent()->rvert) { s.one = RideFile::rvert; s.two = RideFile::none; serieslist << s; }
     if (showRCad->isChecked() && rideItem->ride()->areDataPresent()->rcad) { s.one = RideFile::rcad; s.two = RideFile::none; serieslist << s; }
     if (showRGCT->isChecked() && rideItem->ride()->areDataPresent()->rcontact) { s.one = RideFile::rcontact; s.two = RideFile::none; serieslist << s; }

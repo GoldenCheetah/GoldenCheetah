@@ -54,7 +54,7 @@ class XPower : public RideMetric {
         setType(RideMetric::Average);
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
-        setDescription(tr("xPower is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant, similar to NP."));
+        setDescription(tr("xPower is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant, similar to IsoPower."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -401,7 +401,7 @@ class BikeScore : public RideMetric {
         setName("BikeScore&#8482;");  // Don't translate as many places have special coding for the "TM" sign
         setMetricUnits("");
         setImperialUnits("");
-        setDescription(tr("Skiba's stress score taking into account both the intensity and the duration of the training session, similar to TSS it can be computed as 100 * hours * (Relative Intensity)^2"));
+        setDescription(tr("Skiba's stress score taking into account both the intensity and the duration of the training session, similar to BikeStress it can be computed as 100 * hours * (Relative Intensity)^2"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {

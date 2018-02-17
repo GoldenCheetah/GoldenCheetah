@@ -312,7 +312,7 @@ public:
 // Calculate the session RPE that is the product of RPE * time (minutes) of training/race ride. I
 // We have 3 different "training load" parameters:
 //    - internal load (TRIMPS)
-//    - external load (bikescore/TSS)
+//    - external load (bikescore/BikeStress)
 //    - perceived load (session RPE)
 //
 class SessionRPE : public RideMetric {

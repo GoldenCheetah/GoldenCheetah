@@ -1463,7 +1463,7 @@ CriticalPowerWindow::seriesName(CriticalSeriesType series)
         case watts: return QString(tr("Power"));
         case wattsKg: return QString(tr("Watts per Kilogram"));
         case xPower: return QString(tr("xPower"));
-        case NP: return QString(tr("Normalized Power"));
+        case IsoPower: return QString(tr("Iso Power"));
         case hr: return QString(tr("Heartrate"));
         case kph: return QString(tr("Speed"));
         case kphd: return QString(tr("Acceleration"));
@@ -1490,7 +1490,7 @@ CriticalPowerWindow::getRideSeries(CriticalSeriesType series)
         case watts: return RideFile::watts;
         case wattsKg: return RideFile::wattsKg;
         case xPower: return RideFile::xPower;
-        case NP: return RideFile::NP;
+        case IsoPower: return RideFile::IsoPower;
         case hr: return RideFile::hr;
         case kph: return RideFile::kph;
         case kphd: return RideFile::kphd;
@@ -1520,7 +1520,7 @@ CriticalPowerWindow::addSeries()
     seriesList << watts
                << wattsKg
                << xPower
-               << NP
+               << IsoPower
                << hr
                << kph
                << cad

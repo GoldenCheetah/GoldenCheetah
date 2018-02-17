@@ -252,7 +252,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::aPower: return QString("apower");
         case RideFile::aTISS: return QString("atiss");
         case RideFile::anTISS: return QString("antiss");
-        case RideFile::NP: return QString("NP");
+        case RideFile::IsoPower: return QString("IsoPower");
         case RideFile::alt: return QString("altitude");
         case RideFile::lon: return QString("longitude");
         case RideFile::lat: return QString("latitude");
@@ -309,7 +309,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::aPower: return QString(tr("aPower"));
         case RideFile::aTISS: return QString(tr("aTISS"));
         case RideFile::anTISS: return QString(tr("anTISS"));
-        case RideFile::NP: return QString(tr("Normalized Power"));
+        case RideFile::IsoPower: return QString(tr("Iso Power"));
         case RideFile::alt: return QString(tr("Altitude"));
         case RideFile::lon: return QString(tr("Longitude"));
         case RideFile::lat: return QString(tr("Latitude"));
@@ -369,7 +369,7 @@ RideFile::colorFor(SeriesType series)
     case RideFile::aPower: return GColor(CAPOWER);
     case RideFile::aTISS: return GColor(CNPOWER);
     case RideFile::anTISS: return GColor(CNPOWER);
-    case RideFile::NP: return GColor(CNPOWER);
+    case RideFile::IsoPower: return GColor(CNPOWER);
     case RideFile::alt: return GColor(CALTITUDE);
     case RideFile::headwind: return GColor(CWINDSPEED);
     case RideFile::temp: return GColor(CTEMP);
@@ -432,7 +432,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::aPower: return QString(tr("watts"));
     case RideFile::aTISS: return QString(tr("TISS"));
     case RideFile::anTISS: return QString(tr("TISS"));
-    case RideFile::NP: return QString(tr("watts"));
+    case RideFile::IsoPower: return QString(tr("watts"));
     case RideFile::alt: return QString(useMetricUnits ? tr("metres") : tr("feet"));
     case RideFile::lon: return QString(tr("lon"));
     case RideFile::lat: return QString(tr("lat"));
@@ -1821,7 +1821,7 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::rcontact : return rcontact; break;
         case RideFile::gear : return gear; break;
         case RideFile::interval : return interval; break;
-        case RideFile::NP : return np; break;
+        case RideFile::IsoPower : return np; break;
         case RideFile::xPower : return xp; break;
         case RideFile::aPower : return apower; break;
         case RideFile::aTISS : return atiss; break;
@@ -1880,7 +1880,7 @@ RideFilePoint::setValue(RideFile::SeriesType series, double value)
         case RideFile::rcontact : rcontact = value; break;
         case RideFile::gear : gear = value; break;
         case RideFile::interval : interval = value; break;
-        case RideFile::NP : np = value; break;
+        case RideFile::IsoPower : np = value; break;
         case RideFile::xPower : xp = value; break;
         case RideFile::aPower : apower = value; break;
         case RideFile::aTISS : atiss = value; break;
@@ -1947,7 +1947,7 @@ RideFile::decimalsFor(SeriesType series)
         case aPower : return 0; break;
         case aTISS : return 1; break;
         case anTISS : return 1; break;
-        case NP : return 0; break;
+        case IsoPower : return 0; break;
         case alt : return 3; break;
         case lon : return 8; break;
         case lat : return 8; break;
@@ -2001,7 +2001,7 @@ RideFile::maximumFor(SeriesType series)
         case kph : return 150; break;
         case nm : return 100; break;
         case watts : return 2500; break;
-        case NP : return 2500; break;
+        case IsoPower : return 2500; break;
         case xPower : return 2500; break;
         case aPower : return 2500; break;
         case aTISS : return 1000; break;
@@ -2062,7 +2062,7 @@ RideFile::minimumFor(SeriesType series)
         case aPower : return 0; break;
         case aTISS : return 0; break;
         case anTISS : return 0; break;
-        case NP : return 0; break;
+        case IsoPower : return 0; break;
         case alt : return -413; break; // the Red Sea is lowest land point on earth
         case lon : return -180; break;
         case lat : return -90; break;
@@ -2271,7 +2271,7 @@ RideFile::arePresent()
 //          * Gear ratio
 //          * Hill Slope
 //          * xPower (Skiba)
-//          * Normalized Power (Coggan)
+//          * Iso Power (Coggan)
 //
 
 void
@@ -2283,7 +2283,7 @@ RideFile::recalculateDerivedSeries(bool force)
     if (!force && dstale == false) return; // we're already up to date
 
     //
-    // NP Initialisation -- working variables
+    // IsoPower Initialisation -- working variables
     //
     QVector<double> NProlling;
     int NProllingwindowsize = 30 / (recIntSecs_ ? recIntSecs_ : 1);
@@ -2378,7 +2378,7 @@ RideFile::recalculateDerivedSeries(bool force)
         }
 
         //
-        // NP
+        // IsoPower
         //
         if (dataPresent.watts && NProllingwindowsize > 1) {
 
@@ -2408,7 +2408,7 @@ RideFile::recalculateDerivedSeries(bool force)
             p->np = 0.00f;
         }
 
-        // now the min and max values for NP
+        // now the min and max values for IsoPower
         if (p->np > maxPoint->np) maxPoint->np = p->np;
         if (p->np < minPoint->np) minPoint->np = p->np;
 
@@ -2435,7 +2435,7 @@ RideFile::recalculateDerivedSeries(bool force)
             p->xp = pow(XPtotal / XPcount, 0.25);
         }
 
-        // now the min and max values for NP
+        // now the min and max values for IsoPower
         if (p->xp > maxPoint->xp) maxPoint->xp = p->xp;
         if (p->xp < minPoint->xp) minPoint->xp = p->xp;
 
@@ -2469,7 +2469,7 @@ RideFile::recalculateDerivedSeries(bool force)
             p->apower = p->watts;
         }
 
-        // now the min and max values for NP
+        // now the min and max values for IsoPower
         if (p->apower > maxPoint->apower) maxPoint->apower = p->apower;
         if (p->apower < minPoint->apower) minPoint->apower = p->apower;
 
@@ -3209,7 +3209,7 @@ static struct {
 	{ "ALTITUDE", RideFile::alt },
 	{ "LON", RideFile::lon },
 	{ "LAT", RideFile::lat },
-	{ "NP", RideFile::NP },
+    { "IsoPower", RideFile::IsoPower },
 	{ "HEADWIND", RideFile::headwind },
 	{ "SLOPE", RideFile::slope },
 	{ "TEMPERATURE", RideFile::temp },

@@ -29,25 +29,25 @@
 #include <QApplication>
 
 
-class NP : public RideMetric {
-    Q_DECLARE_TR_FUNCTIONS(NP)
+class IsoPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(IsoPower)
     double np;
     double secs;
 
     public:
 
-    NP() : np(0.0), secs(0.0)
+    IsoPower() : np(0.0), secs(0.0)
     {
         setSymbol("coggan_np");
-        setInternalName("NP");
+        setInternalName("IsoPower");
     }
     void initialize() {
-        setName("NP");
+        setName("IsoPower");
         setType(RideMetric::Average);
         setMetricUnits("watts");
         setImperialUnits("watts");
         setPrecision(0);
-        setDescription(tr("Normalized Power is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant."));
+        setDescription(tr("Iso Power is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -105,7 +105,7 @@ class NP : public RideMetric {
     bool isRelevantForRide(const RideItem*ride) const { return ride->present.contains("P") || (!ride->isRun && !ride->isSwim); }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
-    RideMetric *clone() const { return new NP(*this); }
+    RideMetric *clone() const { return new IsoPower(*this); }
 };
 
 class VI : public RideMetric {
@@ -125,14 +125,14 @@ class VI : public RideMetric {
         setName("VI");
         setType(RideMetric::Average);
         setPrecision(3);
-        setDescription(tr("Variability Index is the ratio between NP and Average Power."));
+        setDescription(tr("Variability Index is the ratio between IsoPower and Average Power."));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
         assert(deps.contains("coggan_np"));
         assert(deps.contains("average_power"));
-        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+        IsoPower *np = dynamic_cast<IsoPower*>(deps.value("coggan_np"));
         assert(np);
         RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
         assert(ap);
@@ -159,14 +159,14 @@ class IntensityFactor : public RideMetric {
     IntensityFactor() : rif(0.0), secs(0.0)
     {
         setSymbol("coggan_if");
-        setInternalName("IF");
+        setInternalName("BikeIntensity");
     }
 
     void initialize() {
-        setName("IF");
+        setName("BikeIntensity");
         setType(RideMetric::Average);
         setPrecision(3);
-        setDescription(tr("Intensity Factor is the ratio between NP and the Functional Threshold Power (FTP) configured in Power Zones."));
+        setDescription(tr("Intensity Factor is the ratio between IsoPower and the Functional Threshold Power (FTP) configured in Power Zones."));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -179,7 +179,7 @@ class IntensityFactor : public RideMetric {
         }
 
         assert(deps.contains("coggan_np"));
-        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+        IsoPower *np = dynamic_cast<IsoPower*>(deps.value("coggan_np"));
         assert(np);
 
         int ftp = item->getText("FTP","0").toInt();
@@ -207,20 +207,20 @@ class IntensityFactor : public RideMetric {
     RideMetric *clone() const { return new IntensityFactor(*this); }
 };
 
-class TSS : public RideMetric {
-    Q_DECLARE_TR_FUNCTIONS(TSS)
+class BikeStress : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(BikeStress)
     double score;
 
     public:
 
-    TSS() : score(0.0)
+    BikeStress() : score(0.0)
     {
         setSymbol("coggan_tss");
-        setInternalName("TSS");
+        setInternalName("BikeStress");
     }
 
     void initialize() {
-        setName("TSS");
+        setName("BikeStress");
         setType(RideMetric::Total);
         setDescription(tr("Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2"));
     }
@@ -237,7 +237,7 @@ class TSS : public RideMetric {
 
         assert(deps.contains("coggan_np"));
         assert(deps.contains("coggan_if"));
-        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+        IsoPower *np = dynamic_cast<IsoPower*>(deps.value("coggan_np"));
         RideMetric *rif = deps.value("coggan_if");
         assert(rif);
         double normWork = np->value(true) * np->count();
@@ -264,7 +264,7 @@ class TSS : public RideMetric {
     bool isRelevantForRide(const RideItem*ride) const { return (!ride->isRun && !ride->isSwim); }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
-    RideMetric *clone() const { return new TSS(*this); }
+    RideMetric *clone() const { return new BikeStress(*this); }
 };
 
 class TSSPerHour : public RideMetric {
@@ -277,11 +277,11 @@ class TSSPerHour : public RideMetric {
     TSSPerHour() : points(0.0), hours(0.0)
     {
         setSymbol("coggan_tssperhour");
-        setInternalName("TSS per hour");
+        setInternalName("BikeStress per hour");
     }
 
     void initialize() {
-        setName(tr("TSS per hour"));
+        setName(tr("BikeStress per hour"));
         setType(RideMetric::Average);
         setPrecision(0);
         setDescription(tr("Training Stress Score divided by Duration in hours"));
@@ -298,7 +298,7 @@ class TSSPerHour : public RideMetric {
 
         // tss
         assert(deps.contains("coggan_tss"));
-        TSS *tss = dynamic_cast<TSS*>(deps.value("coggan_tss"));
+        BikeStress *tss = dynamic_cast<BikeStress*>(deps.value("coggan_tss"));
         assert(tss);
 
         // duration
@@ -340,7 +340,7 @@ class EfficiencyFactor : public RideMetric {
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setPrecision(3);
-        setDescription(tr("The ratio between NP and Average HR for Cycling and xPace (in yd/min) and Average HR for Running"));
+        setDescription(tr("The ratio between IsoPower and Average HR for Cycling and xPace (in yd/min) and Average HR for Running"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -353,7 +353,7 @@ class EfficiencyFactor : public RideMetric {
             assert(xPace);
             ef = xPace->value(true) > 0 ? ((1000.0/METERS_PER_YARD) / xPace->value(true)) : 0.0;
         } else {
-            NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+            IsoPower *np = dynamic_cast<IsoPower*>(deps.value("coggan_np"));
             assert(np);
             ef = np->value(true);
         }
@@ -370,12 +370,12 @@ class EfficiencyFactor : public RideMetric {
 };
 
 static bool addAllCoggan() {
-    RideMetricFactory::instance().addMetric(NP());
+    RideMetricFactory::instance().addMetric(IsoPower());
     QVector<QString> deps;
     deps.append("coggan_np");
     RideMetricFactory::instance().addMetric(IntensityFactor(), &deps);
     deps.append("coggan_if");
-    RideMetricFactory::instance().addMetric(TSS(), &deps);
+    RideMetricFactory::instance().addMetric(BikeStress(), &deps);
     deps.clear();
     deps.append("coggan_np");
     deps.append("average_power");

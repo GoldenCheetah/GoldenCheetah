@@ -57,7 +57,7 @@ static inline double running_power( double weight, double height,
     return (cAero + cKin + cSlope*eff) * speed * weight;
 }
 
-// Lactate Normalized Power, used for GOVSS and xPace calculation
+// Lactate Iso Power, used for GOVSS and xPace calculation
 class LNP : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(LNP)
     double lnp;
@@ -77,7 +77,7 @@ class LNP : public RideMetric {
         setMetricUnits("watts");
         setImperialUnits("watts");
         setPrecision(0);
-        setDescription(tr("Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm"));
+        setDescription(tr("Lactate Iso Power as defined by Dr. Skiba in GOVSS algorithm"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -164,7 +164,7 @@ class LNP : public RideMetric {
     RideMetric *clone() const { return new LNP(*this); }
 };
 
-// xPace: constant Pace which, on flat surface, gives same Lactate Normalized Power
+// xPace: constant Pace which, on flat surface, gives same Lactate Iso Power
 class XPace : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(XPace)
     double xPace;
@@ -202,7 +202,7 @@ class XPace : public RideMetric {
         setImperialUnits(tr("min/mile"));
         setPrecision(1);
         setConversion(KM_PER_MILE);
-        setDescription(tr("Normalized pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP"));
+        setDescription(tr("Iso pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP"));
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
@@ -370,7 +370,7 @@ class GOVSS : public RideMetric {
     void initialize() {
         setName("GOVSS");
         setType(RideMetric::Total);
-        setDescription(tr("Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration"));
+        setDescription(tr("Gravity Ordered Velocity Stress Score, the BikeStress like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration"));
     }
 
 

@@ -798,8 +798,8 @@ GroupByModel::initGroupRanges()
     groupRange::range add;
     groupRange addColumn;
 
-    // TSS
-    addColumn.column = "TSS";
+    // BikeStress
+    addColumn.column = "BikeStress";
     add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
     add = groupRange::range( 0,  150, tr("Low Stress")); addColumn.ranges << add;
     add = groupRange::range( 150,  300, tr("Medium Stress")); addColumn.ranges << add;
@@ -810,7 +810,7 @@ GroupByModel::initGroupRanges()
     addColumn.ranges.clear();
 
     // Intensity Factor
-    addColumn.column = "IF";
+    addColumn.column = "BikeIntensity";
     add = groupRange::range( 0.0,  0.0, tr("Zero or not present")); addColumn.ranges << add;
     add = groupRange::range( 0.0,  0.55, tr("Active Recovery")); addColumn.ranges << add;
     add = groupRange::range( 0.55,  0.75, tr("Endurance")); addColumn.ranges << add;

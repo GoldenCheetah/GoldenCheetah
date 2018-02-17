@@ -45,7 +45,7 @@ class ManualRideDialog : public QDialog
         void okClicked();
         void cancelClicked();
 
-        void estimate();          // estimate TSS et al when method/duration/distance changes
+        void estimate();          // estimate BikeStress et al when method/duration/distance changes
         void deriveFactors();        // calculate factors to use for estimate
 
         void sportChanged(const QString& text); // enable/disable lapsButton
@@ -59,9 +59,9 @@ class ManualRideDialog : public QDialog
         int daysago; // remember last deriveFactors value
 
         // factors for estimator
-        double timeBS, distanceBS,  // Bikescore (use same for TSS)
+        double timeBS, distanceBS,  // Bikescore (use same for BikeStress)
                timeDP, distanceDP,  // Daniel Points
-               timeTSS, distanceTSS,  // Coggan TSS
+               timeTSS, distanceTSS,  // Coggan BikeStress
                timeKJ, distanceKJ;  // Work
 
         LapsEditor *lapsEditor; // Laps Editor Dialog
@@ -88,7 +88,7 @@ class ManualRideDialog : public QDialog
 
         QDoubleSpinBox *BS,       // skiba
                        *DP,       // rhea
-                       *TSS,      // coggan
+                       *BikeStress,      // coggan
                        *KJ;       // work
 
 };

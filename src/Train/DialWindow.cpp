@@ -290,9 +290,9 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     // COGGAN Metrics
-    case RealtimeData::NP:
+    case RealtimeData::IsoPower:
     case RealtimeData::IF:
-    case RealtimeData::TSS:
+    case RealtimeData::BikeStress:
     case RealtimeData::VI:
         {
 
@@ -308,11 +308,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         // move index on/round
         index = (index >= 149) ? 0 : index+1;
 
-        // calculate NP
+        // calculate IsoPower
         double np = pow(rollingSum / (count), 0.25);
 
-        if (series == RealtimeData::NP) {
-            // We only wanted NP so thats it
+        if (series == RealtimeData::IsoPower) {
+            // We only wanted IsoPower so thats it
             valueLabel->setText(QString("%1").arg(round(np)));
 
         } else {
@@ -345,7 +345,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
                 double workInAnHourAtCP = cp * 3600;
                 double tss = rawTSS / workInAnHourAtCP * 100.0;
 
-                if (series == RealtimeData::TSS) {
+                if (series == RealtimeData::BikeStress) {
 
                     valueLabel->setText(QString("%1").arg(tss, 0, 'f', 1));
 
@@ -562,12 +562,12 @@ void DialWindow::seriesChanged()
             foreground = GColor(CBIKESCORE);
             break;
 
-    case RealtimeData::TSS:
+    case RealtimeData::BikeStress:
             foreground = GColor(CTSS);
             break;
 
     case RealtimeData::XPower:
-    case RealtimeData::NP:
+    case RealtimeData::IsoPower:
     case RealtimeData::Joules:
     case RealtimeData::Watts:
     case RealtimeData::AvgWatts:

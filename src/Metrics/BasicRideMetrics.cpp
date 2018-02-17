@@ -1630,7 +1630,7 @@ class HrNp : public RideMetric {
         setMetricUnits("");
         setPrecision(3);
         setType(RideMetric::Average);
-        setDescription(tr("Normalized Power to Average Heart Rate ratio in watts/bpm"));
+        setDescription(tr("Iso Power to Average Heart Rate ratio in watts/bpm"));
     }
 
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {

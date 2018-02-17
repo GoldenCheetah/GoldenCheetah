@@ -131,11 +131,11 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
             // http://localhost:12021/athlete/meanmax/filename
             // optional query parameter:
             //    ?series=watts     (default)
-            //    ?series=<xx>  xx= one of (cad, speed, vam, NP, xPower, nm)
+            //    ?series=<xx>  xx= one of (cad, speed, vam, IsoPower, xPower, nm)
             // http://localhost:12021/athlete/meanmax/bests
             // optional query parameter:
             //    ?series=watts     (default)
-            //    ?series=<xx>  xx=1 of (cad, speed, vam, NP, xPower, nm)
+            //    ?series=<xx>  xx=1 of (cad, speed, vam, IsoPower, xPower, nm)
             paths.removeFirst();
             listMMP(athlete, paths, request, response);
             return;
@@ -431,7 +431,7 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
     else if (seriesp == "speed") series = RideFile::kph;
     else if (seriesp == "watts") series = RideFile::watts;
     else if (seriesp == "vam") series = RideFile::vam;
-    else if (seriesp == "NP") series = RideFile::NP;
+    else if (seriesp == "IsoPower") series = RideFile::IsoPower;
     else if (seriesp == "xPower") series = RideFile::xPower;
     else if (seriesp == "nm") series = RideFile::nm;
     else {

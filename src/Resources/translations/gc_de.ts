@@ -1764,8 +1764,8 @@ Gerät gefunden.
         <location filename="../../Charts/AllPlot.cpp" line="3899"/>
         <location filename="../../Charts/AllPlot.cpp" line="4626"/>
         <location filename="../../Charts/AllPlot.cpp" line="4629"/>
-        <source>NP</source>
-        <translation>NP</translation>
+        <source>IsoPower</source>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3907"/>
@@ -2047,8 +2047,8 @@ Gerät gefunden.
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="303"/>
-        <source>NP</source>
-        <translation>NP</translation>
+        <source>IsoPower</source>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="307"/>
@@ -2581,8 +2581,8 @@ Gerät gefunden.
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="416"/>
-        <source>Normalized Power</source>
-        <translation>Normalisierte Leistung (NP)</translation>
+        <source>Iso Power</source>
+        <translation>Normalisierte Leistung (IsoPower)</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="420"/>
@@ -3013,8 +3013,8 @@ Gerät gefunden.
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="320"/>
-        <source>TSS and IF</source>
-        <translation>TSS und IF</translation>
+        <source>BikeStress and IF</source>
+        <translation>BikeStress und IF</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="321"/>
@@ -4487,7 +4487,7 @@ gespeichert</translation>
     <name>BikeScore</name>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="404"/>
-        <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to TSS it can be computed as 100 * hours * (Relative Intensity)^2</source>
+        <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to BikeStress it can be computed as 100 * hours * (Relative Intensity)^2</source>
         <translation>Skiba&apos;s Belastungskennzahl berücksichtigt sowohl die Intensität als auch die Dauer einer Trainingseinheit</translation>
     </message>
 </context>
@@ -5182,8 +5182,8 @@ Setup durchführen.</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="252"/>
-        <source>Normalised Power</source>
-        <translation>Normalisierte Leistung (NP)</translation>
+        <source>Iso Power</source>
+        <translation>Normalisierte Leistung (IsoPower)</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="257"/>
@@ -7194,8 +7194,8 @@ Wollen Sie die Änderung durchführen und GoldenCheetah neu starten?</translatio
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1466"/>
-        <source>Normalized Power</source>
-        <translation>Normalisierte Leistung (NP)</translation>
+        <source>Iso Power</source>
+        <translation>Normalisierte Leistung (IsoPower)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1467"/>
@@ -8308,12 +8308,12 @@ an den Computer anschließen und
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1807"/>
         <source># type in a formula to use
-# for e.g. TSS / Duration
+# for e.g. BikeStress / Duration
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
         <translation># tippen Sie eine Formel (in Englisch) ein
-# z.b. für TSS / Duration
+# z.b. für BikeStress / Duration
 # während Sie tippen werden die
 # verfügbaren Metriken aus dem
 # getippten zur Vervollständigung
@@ -8767,12 +8767,12 @@ an den Computer anschließen und
     <message>
         <location filename="../../Core/UserData.cpp" line="99"/>
         <source># type in a formula to use
-# for e.g. TSS / Duration
+# for e.g. BikeStress / Duration
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
         <translation># tippen Sie eine Formel (in Englisch) ein
-# z.b. für TSS / Duration
+# z.b. für BikeStress / Duration
 # während Sie tippen werden die
 # verfügbaren Metriken aus dem
 # getippten zur Vervollständigung
@@ -8943,8 +8943,8 @@ an den Computer anschließen und
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="343"/>
-        <source>The ratio between NP and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
-        <translation>Das Verhältnis zwischen NP und ør HF (beim Radfahren) bzw. xPace (in yd/min) und ør HF (beim Laufen)</translation>
+        <source>The ratio between IsoPower and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
+        <translation>Das Verhältnis zwischen IsoPower und ør HF (beim Radfahren) bzw. xPace (in yd/min) und ør HF (beim Laufen)</translation>
     </message>
 </context>
 <context>
@@ -10417,8 +10417,8 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="145"/>
-        <source>Normalised Power</source>
-        <translation>Normalisierte Leistung (NP)</translation>
+        <source>Iso Power</source>
+        <translation>Normalisierte Leistung (IsoPower)</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="146"/>
@@ -10517,8 +10517,8 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="165"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="166"/>
@@ -10828,7 +10828,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <name>GOVSS</name>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="373"/>
-        <source>Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
+        <source>Gravity Ordered Velocity Stress Score, the BikeStress like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
         <translation>GOVSS (Gravity Ordered Velocity Stress Score), ist von Dr. Skiba definierte Laufmetrik, die Dauer, relative Intensität, Steigung und Variation der Geschwindigkeit berücksichtigt</translation>
     </message>
 </context>
@@ -11102,8 +11102,8 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="285"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="411"/>
@@ -13028,7 +13028,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1633"/>
-        <source>Normalized Power to Average Heart Rate ratio in watts/bpm</source>
+        <source>Iso Power to Average Heart Rate ratio in watts/bpm</source>
         <translation>Verhältnis aus normalisierter Leistung zur durchschnittlichen Herzfrequen in Watt:1/min</translation>
     </message>
 </context>
@@ -14711,8 +14711,8 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <name>IntensityFactor</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="169"/>
-        <source>Intensity Factor is the ratio between NP and the Functional Threshold Power (FTP) configured in Power Zones.</source>
-        <translation>Intensivätsfaktor errechnet sich als Verhältnis zwischen NP (Normalized Power) und FTP (Functional Threshold Power) die in den Leistungszonen konfiguriert ist.</translation>
+        <source>Intensity Factor is the ratio between IsoPower and the Functional Threshold Power (FTP) configured in Power Zones.</source>
+        <translation>Intensivätsfaktor errechnet sich als Verhältnis zwischen IsoPower (Iso Power) und FTP (Functional Threshold Power) die in den Leistungszonen konfiguriert ist.</translation>
     </message>
 </context>
 <context>
@@ -15290,7 +15290,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <name>LNP</name>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="80"/>
-        <source>Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm</source>
+        <source>Lactate Iso Power as defined by Dr. Skiba in GOVSS algorithm</source>
         <translation>Laktat normalisierte Leistung (LNP) wie von Dr. Skiba im GOVSS Algorithmus definiert</translation>
     </message>
 </context>
@@ -17815,8 +17815,8 @@ Please check your preference settings.</source>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="259"/>
-        <source>TSS: </source>
-        <translation>TSS: </translation>
+        <source>BikeStress: </source>
+        <translation>BikeStress: </translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="266"/>
@@ -19149,10 +19149,10 @@ Keine Trainingseinheiten zum Importieren gefunden.</translation>
     </message>
 </context>
 <context>
-    <name>NP</name>
+    <name>IsoPower</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
-        <source>Normalized Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
+        <source>Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
         <translation>Normalisierte Leistung ist die geschätzte Leistung, die Sie mit derselben physiologischen &apos;Belastung&apos; geleistet hätten, wenn Ihre Leistung vollkommen gleichmässig gewesen wäre.</translation>
     </message>
 </context>
@@ -22863,8 +22863,8 @@ R has been disabled in preferences</source>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="433"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="439"/>
@@ -22883,7 +22883,7 @@ R has been disabled in preferences</source>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="448"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Normalisierte Leistung</translation>
     </message>
     <message>
@@ -23785,7 +23785,7 @@ Wollen Sie das fortfahren ?</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="312"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Normalisierte Leistung</translation>
     </message>
     <message>
@@ -27912,7 +27912,7 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits existierenden zus
     </message>
 </context>
 <context>
-    <name>TSS</name>
+    <name>BikeStress</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="225"/>
         <source>Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2</source>
@@ -27923,8 +27923,8 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits existierenden zus
     <name>TSSPerHour</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="284"/>
-        <source>TSS per hour</source>
-        <translation>TSS pro Stunde</translation>
+        <source>BikeStress per hour</source>
+        <translation>BikeStress pro Stunde</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="287"/>
@@ -29397,8 +29397,8 @@ F3 drücken, wenn fertig.</translation>
     <name>VI</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="128"/>
-        <source>Variability Index is the ratio between NP and Average Power.</source>
-        <translation>Variablitäts-Index ist das Verhältnis zwischen normalisierter Leistung (NP) und Durchschnittsleistung.</translation>
+        <source>Variability Index is the ratio between IsoPower and Average Power.</source>
+        <translation>Variablitäts-Index ist das Verhältnis zwischen normalisierter Leistung (IsoPower) und Durchschnittsleistung.</translation>
     </message>
 </context>
 <context>
@@ -30491,7 +30491,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     </message>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="205"/>
-        <source>Normalized pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP</source>
+        <source>Iso pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP</source>
         <translation></translation>
     </message>
 </context>
@@ -30514,7 +30514,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="164"/>
-        <source>Normalized Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
+        <source>Iso Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
         <translation></translation>
     </message>
 </context>
@@ -30533,7 +30533,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="57"/>
-        <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to NP.</source>
+        <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to IsoPower.</source>
         <translation></translation>
     </message>
 </context>
@@ -31100,7 +31100,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <name>aBikeScore</name>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="208"/>
-        <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aTSS it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
+        <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aBikeStress it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
         <translation></translation>
     </message>
 </context>
@@ -31113,7 +31113,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="317"/>
-        <source>The ratio between aNP and Average HR</source>
+        <source>The ratio between aIsoPower and Average HR</source>
         <translation></translation>
     </message>
 </context>
@@ -31121,15 +31121,15 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <name>aIntensityFactor</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="169"/>
-        <source>Altitude Adjusted Intensity Factor is the ratio between aNP and the Critical Power (CP) configured in Power Zones.</source>
+        <source>Altitude Adjusted Intensity Factor is the ratio between aIsoPower and the Critical Power (CP) configured in Power Zones.</source>
         <translation></translation>
     </message>
 </context>
 <context>
-    <name>aNP</name>
+    <name>aIsoPower</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="47"/>
-        <source>Altitude Adjusted Normalized Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
+        <source>Altitude Adjusted Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
         <translation></translation>
     </message>
 </context>
@@ -31183,7 +31183,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     </message>
 </context>
 <context>
-    <name>aTSS</name>
+    <name>aBikeStress</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="215"/>
         <source>Altitude Adjusted Training Stress Score takes into account both the intensity and the duration of the training session plus the altitude effect, it can be computed as 100 * hours * aIF^2</source>
@@ -31194,8 +31194,8 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <name>aTSSPerHour</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="264"/>
-        <source>aTSS per hour</source>
-        <translation>aTSS pro Stunde</translation>
+        <source>aBikeStress per hour</source>
+        <translation>aBikeStress pro Stunde</translation>
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="267"/>
@@ -31207,7 +31207,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <name>aVI</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="127"/>
-        <source>Altitude Adjusted Variability Index is the ratio between aNP and Average aPower.</source>
+        <source>Altitude Adjusted Variability Index is the ratio between aIsoPower and Average aPower.</source>
         <translation></translation>
     </message>
 </context>
@@ -31239,7 +31239,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     </message>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="56"/>
-        <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aNP.</source>
+        <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aIsoPower.</source>
         <translation></translation>
     </message>
 </context>

@@ -23,8 +23,8 @@
 		<property name="dataSeries" type="int" value="9" />
 		<property name="style" type="int" value="102812386" />
 	</chart>
-	<chart id="22" name="" title="TSS" >
-		<property name="title" type="QString" value="TSS" />
+	<chart id="22" name="" title="BikeStress" >
+		<property name="title" type="QString" value="BikeStress" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="5.55556" />
 		<property name="heightFactor" type="double" value="7.14286" />

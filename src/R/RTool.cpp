@@ -183,7 +183,7 @@ RTool::RTool()
             { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 2 },
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 3 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 5 },
-            // return a data.frame of pmc series (all=FALSE, metric="TSS")
+            // return a data.frame of pmc series (all=FALSE, metric="BikeStress")
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             // return a data.frame of measure fields (all=FALSE, group="Body")
             { "GC.season.measures", (DL_FUNC) &RTool::measures, 2 },
@@ -270,7 +270,7 @@ RTool::RTool()
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
                                "GC.season.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
                                "GC.season.intervals <- function(type=NULL, compare=FALSE) { .Call(\"GC.season.intervals\", type, compare) }\n"
-                               "GC.season.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
+                               "GC.season.pmc <- function(all=FALSE, metric=\"BikeStress\") { .Call(\"GC.season.pmc\", all, metric) }\n"
                                "GC.season.measures <- function(all=FALSE, group=\"Body\") { .Call(\"GC.season.measures\", all, group) }\n"
                                "GC.season.meanmax <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.meanmax\", all, filter, compare) }\n"
                                // find peaks does a few validation checks on the R side
@@ -282,7 +282,7 @@ RTool::RTool()
                                "}\n"
                                // these 2 added for backward compatibility, may be deprecated
                                "GC.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
-                               "GC.pmc <- function(all=FALSE, metric=\"TSS\") { .Call(\"GC.season.pmc\", all, metric) }\n"
+                               "GC.pmc <- function(all=FALSE, metric=\"BikeStress\") { .Call(\"GC.season.pmc\", all, metric) }\n"
 
                                // version and build
                                "GC.version <- function() { return(\"%1\") }\n"

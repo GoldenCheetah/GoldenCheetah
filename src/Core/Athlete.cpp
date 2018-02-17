@@ -317,7 +317,7 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
 	chartNameMap.insert("Training Mix", tr("Training Mix"));
 	chartNameMap.insert("Time & Distance", tr("Time & Distance"));
 	chartNameMap.insert("BikeScore and Intensity", tr("BikeScore and Intensity"));
-	chartNameMap.insert("TSS and IF", tr("TSS and IF"));
+	chartNameMap.insert("BikeStress and BikeIntensity", tr("BikeStress and BikeIntensity"));
 	chartNameMap.insert("Stress and Distance", tr("Stress and Distance"));
 	chartNameMap.insert("Calories vs Duration", tr("Calories vs Duration"));
     chartNameMap.insert("Stress (TISS)", tr("Stress (TISS)"));

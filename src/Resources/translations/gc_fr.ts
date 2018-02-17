@@ -99,24 +99,24 @@
 <context>
     <name>AboutPage</name>
     <message>
-        <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Application d&apos;analyse de puissance pour le Cyclisme&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU (General Public License)&lt;/a&gt;.&lt;p&gt;Le code source est disponible depuis&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers d&apos;activités et les autres données sont placées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;TSS, NP, IF avec la permission de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec la permission de  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy avec la permission d&apos;&lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
+        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Application d&apos;analyse de puissance pour le Cyclisme&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU (General Public License)&lt;/a&gt;.&lt;p&gt;Le code source est disponible depuis&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers d&apos;activités et les autres données sont placées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;BikeStress, IsoPower, IF avec la permission de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec la permission de  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy avec la permission d&apos;&lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
-        <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Logiciel d&apos;analyse de puissance cycliste&lt;br&gt;pour Linux, Mac, and Windows&lt;p&gt;GoldenCheetah est distribué sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Le code source peut être obtenu sur &lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers de sorties et autres donnéessont stockées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;TSS, NP, IF avec l&apos;aimable autorisation de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec l&apos;aimable autorisation  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;avec l&apos;aimable autorisation de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
+        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Logiciel d&apos;analyse de puissance cycliste&lt;br&gt;pour Linux, Mac, and Windows&lt;p&gt;GoldenCheetah est distribué sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Le code source peut être obtenu sur &lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers de sorties et autres donnéessont stockées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;BikeStress, IsoPower, IF avec l&apos;aimable autorisation de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec l&apos;aimable autorisation  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;avec l&apos;aimable autorisation de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
-        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Logiciel d&apos;analyse de puissance cycliste&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est distribué sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Le code source peut être obtenu sur &lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers des sorties et autres données sont stockées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;TSS, NP, IF avec l&apos;aimable autorisation de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec l&apos;aimable autorisation  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed avec l&apos;aimable autorisation de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Logiciel d&apos;analyse de puissance cycliste&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est distribué sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Le code source peut être obtenu sur &lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers des sorties et autres données sont stockées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;BikeStress, IsoPower, IF avec l&apos;aimable autorisation de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec l&apos;aimable autorisation  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed avec l&apos;aimable autorisation de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
     <message>
-        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Application d&apos;analyse de puissance pour le Cyclisme&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU (General Public License)&lt;/a&gt;.&lt;p&gt;Le code source est disponible depuis&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers d&apos;activités et les autres données sont placées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;TSS, NP, IF avec la permission de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec la permission de  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy avec la permission d&apos;&lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="obsolete">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Application d&apos;analyse de puissance pour le Cyclisme&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU (General Public License)&lt;/a&gt;.&lt;p&gt;Le code source est disponible depuis&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers d&apos;activités et les autres données sont placées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;BikeStress, IsoPower, IF avec la permission de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower avec la permission de  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy avec la permission d&apos;&lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;br&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Application d&apos;analyse de puissance pour le Cyclisme&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU (General Public License)&lt;/a&gt;.&lt;p&gt;Le code source est disponible depuis&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers d&apos;activités et les autres données sont placées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;TSS, NP, IF avec la permission de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore avec la permission de  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy avec la permission d&apos;&lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Le module de température centrale a été développé par &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; et fait l&apos;objet d&apos;un brevet.&lt;br&gt;&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Application d&apos;analyse de puissance pour le Cyclisme&lt;br&gt;pour Linux, Mac, et Windows&lt;p&gt;GoldenCheetah est sous licence&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU (General Public License)&lt;/a&gt;.&lt;p&gt;Le code source est disponible depuis&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Les fichiers d&apos;activités et les autres données sont placées sous &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marques déposées utilisées avec permission&lt;br&gt;BikeStress, IsoPower, IF avec la permission de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore avec la permission de  &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy avec la permission d&apos;&lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Le module de température centrale a été développé par &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; et fait l&apos;objet d&apos;un brevet.&lt;br&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="62"/>
@@ -1866,8 +1866,8 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
         <location filename="../../Charts/AllPlot.cpp" line="3897"/>
         <location filename="../../Charts/AllPlot.cpp" line="4624"/>
         <location filename="../../Charts/AllPlot.cpp" line="4627"/>
-        <source>NP</source>
-        <translation>NP</translation>
+        <source>IsoPower</source>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3905"/>
@@ -2173,8 +2173,8 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="303"/>
-        <source>NP</source>
-        <translation>NP</translation>
+        <source>IsoPower</source>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="307"/>
@@ -2722,7 +2722,7 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="414"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Puissance normalisée</translation>
     </message>
     <message>
@@ -3315,8 +3315,8 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="320"/>
-        <source>TSS and IF</source>
-        <translation>TSS et IF</translation>
+        <source>BikeStress and IF</source>
+        <translation>BikeStress et IF</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="321"/>
@@ -4993,8 +4993,8 @@ Choisir &apos;Suivant&apos; pour continuer</translation>
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="404"/>
-        <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to TSS it can be computed as 100 * hours * (Relative Intensity)^2</source>
-        <translation>Le score de stress de Skiba prend en compte à la fois l&apos;intensité et la durée de la session d&apos;entraînement, semblable au score TSS, il peut être calculé comme 100 * durée en heures * (Intensité Relative)^2</translation>
+        <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to BikeStress it can be computed as 100 * hours * (Relative Intensity)^2</source>
+        <translation>Le score de stress de Skiba prend en compte à la fois l&apos;intensité et la durée de la session d&apos;entraînement, semblable au score BikeStress, il peut être calculé comme 100 * durée en heures * (Intensité Relative)^2</translation>
     </message>
 </context>
 <context>
@@ -5677,7 +5677,7 @@ Commençons par la configuration.</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="245"/>
-        <source>Normalised Power</source>
+        <source>Iso Power</source>
         <translation>Puissance normalisée</translation>
     </message>
     <message>
@@ -5953,7 +5953,7 @@ Commençons par la configuration.</translation>
         <translation type="obsolete">Couple moyen (nm)</translation>
     </message>
     <message>
-        <source>Normalized Power (watts)</source>
+        <source>Iso Power (watts)</source>
         <translation type="obsolete">Puissance normalisée (watts)</translation>
     </message>
     <message>
@@ -7719,7 +7719,7 @@ from %1 to %2?
         <translation type="obsolete">Couple moyen (nm)</translation>
     </message>
     <message>
-        <source>Normalized Power (watts)</source>
+        <source>Iso Power (watts)</source>
         <translation type="obsolete">Puissance normalisée (watts)</translation>
     </message>
     <message>
@@ -8303,7 +8303,7 @@ Ceci peut prendre un certain temps.</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1457"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Puissance normalisée</translation>
     </message>
     <message>
@@ -9690,12 +9690,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1784"/>
         <source># type in a formula to use
-# for e.g. TSS / Duration
+# for e.g. BikeStress / Duration
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
         <translation># entrez un formule a utiliser
-# par ex. TSS / Duration
+# par ex. BikeStress / Duration
 # lors de la saisie 
 # les noms seront proposés
 </translation>
@@ -10137,12 +10137,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../../Core/UserData.cpp" line="99"/>
         <source># type in a formula to use
-# for e.g. TSS / Duration
+# for e.g. BikeStress / Duration
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
         <translation># entrez un formule a utiliser
-# par ex. TSS / Duration
+# par ex. BikeStress / Duration
 # lors de la saisie 
 # les noms seront proposés
 </translation>
@@ -10310,8 +10310,8 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="343"/>
-        <source>The ratio between NP and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
-        <translation>Rapport entre la puissance normalisée NP et moyenne de fréquence cardiaque ou Xpace (en km / min) et moyenne de fréquence cardiaque pour la course à pied sans puissance</translation>
+        <source>The ratio between IsoPower and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
+        <translation>Rapport entre la puissance normalisée IsoPower et moyenne de fréquence cardiaque ou Xpace (en km / min) et moyenne de fréquence cardiaque pour la course à pied sans puissance</translation>
     </message>
 </context>
 <context>
@@ -11926,7 +11926,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="145"/>
-        <source>Normalised Power</source>
+        <source>Iso Power</source>
         <translation>Puissance normalisée</translation>
     </message>
     <message>
@@ -12026,8 +12026,8 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="165"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="166"/>
@@ -12344,8 +12344,8 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <name>GOVSS</name>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="373"/>
-        <source>Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation>GOSS (Gravity Ordered Velocity Stress Score) est un métrique de stress comme TSS défini par le Dr Skiba pour la course à pied, qui prend en comptet les variations de la vitesse, la pente, l&apos;intensité relative et la durée</translation>
+        <source>Gravity Ordered Velocity Stress Score, the BikeStress like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
+        <translation>GOSS (Gravity Ordered Velocity Stress Score) est un métrique de stress comme BikeStress défini par le Dr Skiba pour la course à pied, qui prend en comptet les variations de la vitesse, la pente, l&apos;intensité relative et la durée</translation>
     </message>
 </context>
 <context>
@@ -12720,8 +12720,8 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="285"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="411"/>
@@ -14863,7 +14863,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1575"/>
-        <source>Normalized Power to Average Heart Rate ratio in watts/bpm</source>
+        <source>Iso Power to Average Heart Rate ratio in watts/bpm</source>
         <translation>Ratio entre la puissance normalisée et la fréquence cardiaque moyenne en watt/puls</translation>
     </message>
 </context>
@@ -16180,7 +16180,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <name>IntensityFactor</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="169"/>
-        <source>Intensity Factor is the ratio between NP and the Functional Threshold Power (FTP) configured in Power Zones.</source>
+        <source>Intensity Factor is the ratio between IsoPower and the Functional Threshold Power (FTP) configured in Power Zones.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -16813,7 +16813,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <name>LNP</name>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="80"/>
-        <source>Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm</source>
+        <source>Lactate Iso Power as defined by Dr. Skiba in GOVSS algorithm</source>
         <translation>Puissance normalisée au lactate comme définit par le Dr. Skiba dans l&apos;algorithme de GOVSS</translation>
     </message>
 </context>
@@ -20236,8 +20236,8 @@ CP du cycliste fixée à %3 watts</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="259"/>
-        <source>TSS: </source>
-        <translation>TSS:</translation>
+        <source>BikeStress: </source>
+        <translation>BikeStress:</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="266"/>
@@ -21957,10 +21957,10 @@ No rides found to import.
     </message>
 </context>
 <context>
-    <name>NP</name>
+    <name>IsoPower</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
-        <source>Normalized Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
+        <source>Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
         <translation>Le puissance normalisée peut être une estimation de la puissance qui pourrait être maintenue avec le même &apos;coût&apos; physiologique avec une puissance parfaitement constante.</translation>
     </message>
 </context>
@@ -24513,8 +24513,8 @@ Voulez-vous continuer?</translation>
         <translation type="obsolete">pas de donnée</translation>
     </message>
     <message>
-        <source>Use TSS</source>
-        <translation type="obsolete">TSS</translation>
+        <source>Use BikeStress</source>
+        <translation type="obsolete">BikeStress</translation>
     </message>
     <message>
         <source>Use BikeScore</source>
@@ -25558,8 +25558,8 @@ yyyy</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="433"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <source>BikeScore</source>
@@ -25582,7 +25582,7 @@ yyyy</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="448"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Puissance normalisée</translation>
     </message>
     <message>
@@ -26636,7 +26636,7 @@ Voulez-vous continuer?</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="299"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Puissance normalisée</translation>
     </message>
     <message>
@@ -28117,8 +28117,8 @@ Fichier ignoré...</translation>
         <translation>dd MMM yyyy</translation>
     </message>
     <message>
-        <source>&lt;br&gt;FTP, TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
-        <translation type="vanished">&lt;br&gt;FTP, TSS, NP and IF sont des marques déposées de Peaksware LLC&lt;/center&gt;</translation>
+        <source>&lt;br&gt;FTP, BikeStress, IsoPower and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
+        <translation type="vanished">&lt;br&gt;FTP, BikeStress, IsoPower and IF sont des marques déposées de Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1617"/>
@@ -28365,8 +28365,8 @@ Fichier ignoré...</translation>
         <translation>&lt;h3&gt;Zones de FC&lt;/h3&gt;</translation>
     </message>
     <message>
-        <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
-        <translation type="obsolete">&lt;br&gt;TSS, NP et IF sont des marques déposées par Peaksware LLC&lt;/center&gt;</translation>
+        <source>&lt;br&gt;BikeStress, IsoPower and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
+        <translation type="obsolete">&lt;br&gt;BikeStress, IsoPower et IF sont des marques déposées par Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
         <source>^Average </source>
@@ -31771,7 +31771,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     </message>
 </context>
 <context>
-    <name>TSS</name>
+    <name>BikeStress</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="225"/>
         <source>Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2</source>
@@ -31782,8 +31782,8 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <name>TSSPerHour</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="284"/>
-        <source>TSS per hour</source>
-        <translation>TSS par heure</translation>
+        <source>BikeStress per hour</source>
+        <translation>BikeStress par heure</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="287"/>
@@ -33636,8 +33636,8 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <name>VI</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="128"/>
-        <source>Variability Index is the ratio between NP and Average Power.</source>
-        <translation>Index de variabilité est le ration entre NP la puissance normaliée et AP la puissance moyenne.</translation>
+        <source>Variability Index is the ratio between IsoPower and Average Power.</source>
+        <translation>Index de variabilité est le ration entre IsoPower la puissance normaliée et AP la puissance moyenne.</translation>
     </message>
 </context>
 <context>
@@ -34866,7 +34866,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     </message>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="205"/>
-        <source>Normalized pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP</source>
+        <source>Iso pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP</source>
         <translation>Allure normalisée en min/km ou  min/mile, qui peut correspondre à l&apos;allure constante à plat qui demanderait la même LNP</translation>
     </message>
 </context>
@@ -34889,7 +34889,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="164"/>
-        <source>Normalized Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
+        <source>Iso Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
         <translation>Allure de natation normalisée en min/100m ou  min/100yd, qui peut correspondre à l&apos;allure constante qui demanderait la même xPowerSwim</translation>
     </message>
 </context>
@@ -34908,7 +34908,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="57"/>
-        <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to NP.</source>
+        <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to IsoPower.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -35478,7 +35478,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     <name>aBikeScore</name>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="208"/>
-        <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aTSS it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
+        <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aBikeStress it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -35491,7 +35491,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="317"/>
-        <source>The ratio between aNP and Average HR</source>
+        <source>The ratio between aIsoPower and Average HR</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -35499,15 +35499,15 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     <name>aIntensityFactor</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="169"/>
-        <source>Altitude Adjusted Intensity Factor is the ratio between aNP and the Critical Power (CP) configured in Power Zones.</source>
+        <source>Altitude Adjusted Intensity Factor is the ratio between aIsoPower and the Critical Power (CP) configured in Power Zones.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>aNP</name>
+    <name>aIsoPower</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="47"/>
-        <source>Altitude Adjusted Normalized Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
+        <source>Altitude Adjusted Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -35561,7 +35561,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     </message>
 </context>
 <context>
-    <name>aTSS</name>
+    <name>aBikeStress</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="215"/>
         <source>Altitude Adjusted Training Stress Score takes into account both the intensity and the duration of the training session plus the altitude effect, it can be computed as 100 * hours * aIF^2</source>
@@ -35572,8 +35572,8 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     <name>aTSSPerHour</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="264"/>
-        <source>aTSS per hour</source>
-        <translation>TSS par heure (aPower)</translation>
+        <source>aBikeStress per hour</source>
+        <translation>BikeStress par heure (aPower)</translation>
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="267"/>
@@ -35585,7 +35585,7 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     <name>aVI</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="127"/>
-        <source>Altitude Adjusted Variability Index is the ratio between aNP and Average aPower.</source>
+        <source>Altitude Adjusted Variability Index is the ratio between aIsoPower and Average aPower.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -35617,8 +35617,8 @@ Vous pouvez supprimez ces liens lorsque vous gérez votre bibliothèque par l&ap
     </message>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="56"/>
-        <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aNP.</source>
-        <translation>xPower ajustée à l&apos;altitude est une estimation de la puissance qui aurait pu être maintenue avec le même &apos;coût&apos; physiologique si la puissance avec été constante au niveau de la mer, similaire à aNP.</translation>
+        <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aIsoPower.</source>
+        <translation>xPower ajustée à l&apos;altitude est une estimation de la puissance qui aurait pu être maintenue avec le même &apos;coût&apos; physiologique si la puissance avec été constante au niveau de la mer, similaire à aIsoPower.</translation>
     </message>
 </context>
 <context>

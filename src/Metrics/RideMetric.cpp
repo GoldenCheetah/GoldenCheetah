@@ -84,7 +84,7 @@
 // 74  20  May 2014 Mark Liversedge    Added Athlete Weight
 // 75  25  May 2014 Mark Liversedge    W' work calculation changed to only include energy above CP
 // 76  14  Jun 2014 Mark Liversedge    Add new 'present' field that uses Data tag data
-// 77  18  Jun 2014 Mark Liversedge    Add TSS per hour metric
+// 77  18  Jun 2014 Mark Liversedge    Add BikeStress per hour metric
 // 78  19  Jun 2014 Mark Liversedge    Do not include zeroes in average L/R pedal smoothness/torque effectiveness
 // 79  20  Jun 2014 Mark Liversedge    Change the way average temperature is handled
 // 80  13  Jul 2014 Mark Liversedge    W' work + Below CP work = Work
@@ -108,7 +108,7 @@
 // 98  10  Jan 2015 Ale Martinez       Added Triscore and SwimScore metrics
 // 99  14  Jan 2015 Damien Grauser     Added TotalCalories
 // 100 05  Feb 2015 Ale Martinez       Use duration not time moving when its 0 (rpe metrics)
-// 101 05  Feb 2015 Mark Liversedge    aPower versions of Coggan metrics aNP et al
+// 101 05  Feb 2015 Mark Liversedge    aPower versions of Coggan metrics aIsoPower et al
 // 102 05  Feb 2015 Mark Liversedge    aPower versions of Skiba metrics aBikeScore et al
 // 103 23  Feb 2015 Mark Liversedge    Added total heartbeats
 // 104 24  Apr 2015 Mark Liversedge    Added Workbeat stress (Work * Heartbeats) / 10000
@@ -125,12 +125,12 @@
 // 115 18  Jul 2015 Mark Liversedge    Added Withings Fat, Fat Percent, Lean Body Weight
 // 116 21  Aug 2015 Ale Martinez       TRIMP Zonal Points fallback when Average HR has been entered manually
 // 117 29  Aug 2015 Mark Liversedge    Min non-zero HR
-// 118 16  Sep 2015 Damien Grauser     Use FTP for TSS and IF
+// 118 16  Sep 2015 Damien Grauser     Use FTP for BikeStress and IF
 // 119 20  Oct 2015 Ale Martinez       Added VDOT and TPace for Running
 // 120 3   Nov 2015 Mark Liversedge    Added Above CP time in W'bal zones
 // 121 3   Nov 2015 Mark Liversedge    Added Work in W'bal zones
 // 122 7   Nov 2015 Mark Liversedge    Added HR Zones 9 and 10
-// 123 19  Nov 2015 Mark Liversedge    Force recompute of TSS/IF after logic fix
+// 123 19  Nov 2015 Mark Liversedge    Force recompute of BikeStress/IF after logic fix
 // 124 03  Dec 2015 Mark Liversedge    Min Temp
 // 125 08  Dec 2015 Ale Martinez       Support metrics in Calendar Text
 // 126 08  Mar 2016 Mark Liversedge    Added count of To Exhaustions

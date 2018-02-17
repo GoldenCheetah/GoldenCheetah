@@ -512,7 +512,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList&) const
             rideFile->metricOverrides.insert("total_work", override);
         }
 
-        // TSS
+        // BikeStress
         if (manualTSS) {
             QMap<QString,QString> override;
             override.insert("value", QString("%1").arg(manualTSS));

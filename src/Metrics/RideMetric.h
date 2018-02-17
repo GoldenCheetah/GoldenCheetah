@@ -70,8 +70,8 @@ public:
     //
     // 0 - UNRELIABLE - its known to be problematic (e.g. Estimated Vo2max from 5 min power)
     // 1 - UNKNOWN - we just don't know, there is no data (e.g. TISS)
-    // 2 - UNCLEAR - lack of sufficient evidence or concerns exist (e.g. TSS and BikeScore)
-    // 3 - USEFUL - published and peer reviewed, or results shown independently to be useful (e.g. NP, TRIMP, W'bal)
+    // 2 - UNCLEAR - lack of sufficient evidence or concerns exist (e.g. BikeStress and BikeScore)
+    // 3 - USEFUL - published and peer reviewed, or results shown independently to be useful (e.g. IsoPower, TRIMP, W'bal)
     // 4 - RELIABLE - Adopted and/or verified by the scientific community (e.g. HRV rmSSD)
     // 5 - HIGH - Known to be highly reliable, assuming sufficient device accuracy (e.g. Average HR, Average Power, Work kJ)
     enum metricvalidity { Unreliable, Unknown, Unclear, Useful, Reliable, High };

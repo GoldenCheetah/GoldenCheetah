@@ -37,7 +37,7 @@ public:
     enum dataseries { None=0, Time, LapTime, Distance, Lap,
                       Watts, Speed, Cadence, HeartRate, Load,
                       XPower, BikeScore, RI, Joules, SkibaVI,
-                      NP, TSS, IF, VI, Wbal,
+                      IsoPower, BikeStress, IF, VI, Wbal,
                       SmO2, tHb, HHb, O2Hb,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,

@@ -1032,7 +1032,7 @@ ErgFile::calculateMetrics()
 {
 
     // reset metrics
-    XP = CP = AP = NP = IF = RI = TSS = BS = SVI = VI = 0;
+    XP = CP = AP = IsoPower = IF = RI = BikeStress = BS = SVI = VI = 0;
     ELE = ELEDIST = GRADE = 0;
 
     maxY = 0; // we need to reset it
@@ -1095,7 +1095,7 @@ ErgFile::calculateMetrics()
 
             while (nextSecs < p.x) {
 
-                // CALCULATE NP
+                // CALCULATE IsoPower
                 apsum += last.y;
                 sum +=  last.y;
                 sum -= rolling[index];
@@ -1126,9 +1126,9 @@ ErgFile::calculateMetrics()
             last = p;
         }
 
-        // XP, NP and AP
+        // XP, IsoPower and AP
         XP = pow(sktotal / skcount, 0.25);
-        NP = pow(total / count, 0.25);
+        IsoPower = pow(total / count, 0.25);
         AP = apsum / count;
 
         // CP
@@ -1139,15 +1139,15 @@ ErgFile::calculateMetrics()
 
         // IF
         if (CP) {
-            IF = NP / CP;
+            IF = IsoPower / CP;
             RI = XP / CP;
         }
 
-        // TSS
-        double normWork = NP * (Duration / 1000); // msecs
+        // BikeStress
+        double normWork = IsoPower * (Duration / 1000); // msecs
         double rawTSS = normWork * IF;
         double workInAnHourAtCP = CP * 3600;
-        TSS = rawTSS / workInAnHourAtCP * 100.0;
+        BikeStress = rawTSS / workInAnHourAtCP * 100.0;
 
         // BS
         double xWork = XP * (Duration / 1000); // msecs
@@ -1156,7 +1156,7 @@ ErgFile::calculateMetrics()
 
         // VI and RI
         if (AP) {
-            VI = NP / AP;
+            VI = IsoPower / AP;
             SVI = XP / AP;
         }
     }

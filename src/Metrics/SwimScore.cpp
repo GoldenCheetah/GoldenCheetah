@@ -161,7 +161,7 @@ class XPaceSwim : public RideMetric {
         setImperialUnits(tr("min/100yd"));
         setPrecision(1);
         setConversion(METERS_PER_YARD);
-        setDescription(tr("Normalized Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim"));
+        setDescription(tr("Iso Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim"));
     }
 
 

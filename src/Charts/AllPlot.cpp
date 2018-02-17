@@ -300,7 +300,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot, QList<UserData*> user) : plot(plot)
     atissCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     atissCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
 
-    npCurve = new QwtPlotCurve(tr("NP"));
+    npCurve = new QwtPlotCurve(tr("IsoPower"));
     npCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     npCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
 
@@ -2596,7 +2596,7 @@ AllPlot::refreshCalibrationMarkers()
 
     // only on power based charts
     if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
-        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+        scope != RideFile::IsoPower && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     QColor color = GColor(CPOWER);
     color.setAlpha(15); // almost invisible !
@@ -2632,7 +2632,7 @@ AllPlot::refreshReferenceLines()
 
     // power or hr
     if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::hr &&
-        scope != RideFile::anTISS && scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+        scope != RideFile::anTISS && scope != RideFile::IsoPower && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     foreach(QwtPlotCurve *referenceLine, standard->referenceLines) {
         curveColors->remove(referenceLine);
@@ -2679,7 +2679,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
 
     // power on power plots
     if (referencePoint->watts != 0 && scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && 
-        scope != RideFile::anTISS && scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
+        scope != RideFile::anTISS && scope != RideFile::IsoPower && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
 
     // hr on hr plots
     if (referencePoint->hr !=0 && scope != RideFile::none && scope != RideFile::hr) return NULL;
@@ -3892,11 +3892,11 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         }
         break;
 
-    case RideFile::NP:
+    case RideFile::IsoPower:
         {
         ourCurve = standard->npCurve;
         thereCurve = referencePlot->standard->npCurve;
-        title = tr("NP");
+        title = tr("IsoPower");
         }
         break;
 
@@ -4621,12 +4621,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 }
                 break;
 
-            case RideFile::NP:
+            case RideFile::IsoPower:
                 {
-                ourCurve = new QwtPlotCurve(tr("NP"));
+                ourCurve = new QwtPlotCurve(tr("IsoPower"));
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->npCurve;
-                title = tr("NP");
+                title = tr("IsoPower");
                 }
                 break;
 
@@ -5980,7 +5980,7 @@ AllPlot::setShow(RideFile::SeriesType type, bool state)
     case RideFile::anTISS: 
         setShowANTISS(state);
         break;
-    case RideFile::NP: 
+    case RideFile::IsoPower: 
         setShowNP(state);
         break;
     case RideFile::alt: 
@@ -7207,7 +7207,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
     // REFERENCE LINE FOR POWER
     if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts || scope == RideFile::aTISS || 
-        scope == RideFile::anTISS || scope == RideFile::NP || scope == RideFile::aPower || scope == RideFile::xPower) {
+        scope == RideFile::anTISS || scope == RideFile::IsoPower || scope == RideFile::aPower || scope == RideFile::xPower) {
 
         // which axis ?
         int axis = -1;
@@ -7507,7 +7507,7 @@ AllPlot::plotTmpReference(QwtAxisId axis, int x, int y, RideFile::SeriesType ser
 
     // power on power plots
     if (serie == RideFile::watts && scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && 
-        scope != RideFile::anTISS && scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+        scope != RideFile::anTISS && scope != RideFile::IsoPower && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     // hr on hr plots
     if (serie == RideFile::hr && scope != RideFile::none && scope != RideFile::hr) return;

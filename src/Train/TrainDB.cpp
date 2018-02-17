@@ -393,7 +393,7 @@ bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
 	query.addBindValue(ergFile->Source);
 	query.addBindValue(ergFile->Ftp);
 	query.addBindValue((int)ergFile->Duration);
-	query.addBindValue(ergFile->TSS);
+	query.addBindValue(ergFile->BikeStress);
 	query.addBindValue(ergFile->IF);
 	query.addBindValue(ergFile->ELE);
 	query.addBindValue(ergFile->GRADE);

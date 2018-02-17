@@ -377,9 +377,9 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Load;
         seriesList << BikeScore;
         seriesList << SkibaVI;
-        seriesList << TSS;
+        seriesList << BikeStress;
         seriesList << XPower;
-        seriesList << NP;
+        seriesList << IsoPower;
         seriesList << RI;
         seriesList << IF;
         seriesList << VI;
@@ -430,7 +430,7 @@ QString RealtimeData::seriesName(DataSeries series)
     case LapTimeRemaining: return tr("Lap Time Remaining");
         break;
 
-    case TSS: return tr("TSS");
+    case BikeStress: return tr("BikeStress");
         break;
 
     case BikeScore: return "BikeScore (TM)";
@@ -445,7 +445,7 @@ QString RealtimeData::seriesName(DataSeries series)
     case XPower: return tr("XPower");
         break;
 
-    case NP: return tr("Normalized Power");
+    case IsoPower: return tr("Iso Power");
         break;
 
     case IF: return tr("Intensity Factor");

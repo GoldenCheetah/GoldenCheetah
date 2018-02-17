@@ -248,8 +248,8 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         units = tr("nm");
         break;
 
-    case CriticalPowerWindow::NP:
-        series = tr("Normalised Power");
+    case CriticalPowerWindow::IsoPower:
+        series = tr("Iso Power");
         units = tr("watts");
         break;
 
@@ -1083,7 +1083,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 fill = (GColor(CCP));
                 break;
             case RideFile::wattsd:
-            case RideFile::NP:
+            case RideFile::IsoPower:
             case RideFile::xPower:
                 line.setColor(GColor(CPOWER).darker(200));
                 fill = (GColor(CPOWER));
@@ -2103,7 +2103,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
     if (!rideItem->ride()) return;
 
     // horizontal lines at reference points
-    if (rideSeries == RideFile::aPower || rideSeries == RideFile::xPower || rideSeries == RideFile::NP || rideSeries == RideFile::watts  || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
+    if (rideSeries == RideFile::aPower || rideSeries == RideFile::xPower || rideSeries == RideFile::IsoPower || rideSeries == RideFile::watts  || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
 
         if (rideItem->ride()) {
             foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
@@ -2193,7 +2193,7 @@ CPPlot::plotCentile(RideItem *rideItem)
 
     // loop through the decritized data from top
     // FIRST 6 MINUTES DO BESTS FOR EVERY SECOND
-    // WE DO NOT DO THIS FOR NP or xPower SINCE
+    // WE DO NOT DO THIS FOR IsoPower or xPower SINCE
     // IT IS WELL KNOWN THAT THEY ARE NOT VALID
     // FOR SUCH SHORT DURATIONS AND IT IS VERY
     // CPU INTENSIVE, SO WE DON'T BOTHER

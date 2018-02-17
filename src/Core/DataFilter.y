@@ -94,7 +94,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 /* a one line filter needs to be accounted for as well as a
    complex filter comprised of a block, this is an anomaly
-   caused by using the same code for filtering e.g. TSS > 100
+   caused by using the same code for filtering e.g. BikeStress > 100
    as well as custom metric code involving variables, if and
    while clauses etc
 

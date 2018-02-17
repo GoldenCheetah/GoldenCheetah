@@ -187,10 +187,10 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     ylabel = new QLabel("150w");
     toolbar->addWidget(ylabel);
 
-    IFlabel = new QLabel("0 IF");
+    IFlabel = new QLabel("0 Intensity");
     toolbar->addWidget(IFlabel);
 
-    TSSlabel = new QLabel("0 TSS");
+    TSSlabel = new QLabel("0 Stress");
     toolbar->addWidget(TSSlabel);
 
 #if 0 // not yet!
@@ -253,8 +253,8 @@ WorkoutWindow::configChanged(qint32)
     ylabel->setFont(workout->bigFont);
     IFlabel->setFont(workout->bigFont);
     TSSlabel->setFont(workout->bigFont);
-    IFlabel->setFixedWidth(fm.boundingRect(" 0.85 IF ").width());
-    TSSlabel->setFixedWidth(fm.boundingRect(" 100 TSS ").width());
+    IFlabel->setFixedWidth(fm.boundingRect(" 0.85 Intensity ").width());
+    TSSlabel->setFixedWidth(fm.boundingRect(" 100 Stress ").width());
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
 

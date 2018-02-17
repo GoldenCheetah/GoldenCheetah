@@ -211,7 +211,7 @@ static RideFile::SeriesType nameToSeries(QString name)
     if (!name.compare("hr", Qt::CaseInsensitive)) return RideFile::hr;
     if (!name.compare("speed", Qt::CaseInsensitive)) return RideFile::kph;
     if (!name.compare("torque", Qt::CaseInsensitive)) return RideFile::nm;
-    if (!name.compare("NP", Qt::CaseInsensitive)) return RideFile::NP;
+    if (!name.compare("IsoPower", Qt::CaseInsensitive)) return RideFile::IsoPower;
     if (!name.compare("xPower", Qt::CaseInsensitive)) return RideFile::xPower;
     if (!name.compare("VAM", Qt::CaseInsensitive)) return RideFile::vam;
     if (!name.compare("wpk", Qt::CaseInsensitive)) return RideFile::wattsKg;

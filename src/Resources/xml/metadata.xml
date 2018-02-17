@@ -209,7 +209,7 @@
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"TSS"</fieldname>
+			<fieldname>"BikeStress"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
 			<fielddiary>0</fielddiary>

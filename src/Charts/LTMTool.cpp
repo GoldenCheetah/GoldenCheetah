@@ -1677,7 +1677,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
                << RideFile::wattsKg
                << RideFile::xPower
                << RideFile::aPower
-               << RideFile::NP
+               << RideFile::IsoPower
                << RideFile::hr
                << RideFile::kph
                << RideFile::cad
@@ -1805,7 +1805,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     if (metricDetail->formula == "") {
         // lets put a template in there
         metricDetail->formula = tr("# type in a formula to use\n" 
-                                   "# for e.g. TSS / Duration\n"
+                                   "# for e.g. BikeStress / Duration\n"
                                    "# as you type the available metrics\n"
                                    "# will be offered by autocomplete\n");
     }
@@ -1847,10 +1847,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "ctl";
     list << "tsb";
     list << "atl";
-    list << "sb(TSS)";
-    list << "lts(TSS)";
-    list << "sts(TSS)";
-    list << "rr(TSS)";
+    list << "sb(BikeStress)";
+    list << "lts(BikeStress)";
+    list << "sts(BikeStress)";
+    list << "rr(BikeStress)";
     list << "tiz(power, 1)";
     list << "tiz(hr, 1)";
     list << "best(power, 3600)";

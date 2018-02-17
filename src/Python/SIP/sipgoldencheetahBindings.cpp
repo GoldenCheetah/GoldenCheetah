@@ -619,7 +619,7 @@ static PyObject *meth_Bindings_seasonPmc(PyObject *sipSelf, PyObject *sipArgs, P
 
     {
         bool a0 = 0;
-         ::QString a1def = QString("TSS");
+         ::QString a1def = QString("BikeStress");
          ::QString* a1 = &a1def;
         int a1State = 0;
          ::Bindings *sipCpp;

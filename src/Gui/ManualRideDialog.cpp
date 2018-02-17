@@ -256,12 +256,12 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     DP->setMinimum(0);
     DP->setMaximum(999);
 
-    QLabel *TSSLabel = new QLabel(tr("TSS: "), this);
-    TSS = new QDoubleSpinBox(this);
-    TSS->setSingleStep(1.0);
-    TSS->setDecimals(0);
-    TSS->setMinimum(0);
-    TSS->setMaximum(999);
+    QLabel *TSSLabel = new QLabel(tr("BikeStress: "), this);
+    BikeStress = new QDoubleSpinBox(this);
+    BikeStress->setSingleStep(1.0);
+    BikeStress->setDecimals(0);
+    BikeStress->setMinimum(0);
+    BikeStress->setMaximum(999);
 
     QLabel *KJLabel = new QLabel(tr("Work (KJ):"), this);
     KJ = new QDoubleSpinBox(this);
@@ -337,7 +337,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     metricLayout->addLayout(daysLayout, 1,2,1,-1,Qt::AlignLeft);
 
     metricLayout->addWidget(TSSLabel, 2,2, Qt::AlignLeft);
-    metricLayout->addWidget(TSS, 2,3, Qt::AlignLeft);
+    metricLayout->addWidget(BikeStress, 2,3, Qt::AlignLeft);
     metricLayout->addWidget(KJLabel, 2,4, Qt::AlignLeft);
     metricLayout->addWidget(KJ, 2,5, Qt::AlignLeft);
     metricLayout->addWidget(BSLabel, 3,2, Qt::AlignLeft);
@@ -382,7 +382,7 @@ ManualRideDialog::estimate()
     if (byManual->isChecked()) {
         BS->setEnabled(true);
         DP->setEnabled(true);
-        TSS->setEnabled(true);
+        BikeStress->setEnabled(true);
         KJ->setEnabled(true);
 
         return; // no calculation - manually entered by user
@@ -390,7 +390,7 @@ ManualRideDialog::estimate()
 
         BS->setEnabled(false);
         DP->setEnabled(false);
-        TSS->setEnabled(false);
+        BikeStress->setEnabled(false);
         KJ->setEnabled(false);
     }
 
@@ -403,7 +403,7 @@ ManualRideDialog::estimate()
 
         BS->setValue(hours * timeBS);
         DP->setValue(hours * timeDP);
-        TSS->setValue(hours * timeTSS);
+        BikeStress->setValue(hours * timeTSS);
         KJ->setValue(hours * timeKJ);
 
     } else {
@@ -412,7 +412,7 @@ ManualRideDialog::estimate()
 
         BS->setValue(dist * distanceBS);
         DP->setValue(dist * distanceDP);
-        TSS->setValue(dist * distanceTSS);
+        BikeStress->setValue(dist * distanceTSS);
         KJ->setValue(dist * distanceKJ);
     }
 }
@@ -513,9 +513,9 @@ ManualRideDialog::okClicked()
         override.insert("value", QString("%1").arg(DP->value()));
         rideFile->metricOverrides.insert("daniels_points", override);
     }
-    if (TSS->value()) {
+    if (BikeStress->value()) {
         QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(TSS->value()));
+        override.insert("value", QString("%1").arg(BikeStress->value()));
         rideFile->metricOverrides.insert("coggan_tss", override);
     }
     if (KJ->value()) {

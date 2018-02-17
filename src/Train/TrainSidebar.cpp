@@ -2265,7 +2265,7 @@ void TrainSidebar::setLabels()
 
         } else {
 
-            stress->setText(QString("TSS %1").arg(context->currentErgFile()->TSS, 0, 'f', 0));
+            stress->setText(QString("BikeStress %1").arg(context->currentErgFile()->BikeStress, 0, 'f', 0));
             intensity->setText(QString("IF %1").arg(context->currentErgFile()->IF, 0, 'f', 3));
         }
 

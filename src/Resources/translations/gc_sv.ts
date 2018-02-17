@@ -99,8 +99,8 @@
 <context>
     <name>AboutPage</name>
     <message>
-        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Mjukvara för Effektanalys&lt;br&gt;för Linux, Mac och Windows&lt;p&gt;GoldenCheetah är licensierat under&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Källkoden kan laddas ner från&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Motionspassdata och annan informaiton lagras i&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Använda Varumärken&lt;br&gt;TSS, NP, IF  med tillåtelse av &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore med tillåtelse av &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed med tillåtelse av Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Mjukvarumodulen för kroppstemperaturutvecklades av &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; och är patentsökt&lt;br&gt;&lt;/center&gt;</translation>
+        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
+        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Mjukvara för Effektanalys&lt;br&gt;för Linux, Mac och Windows&lt;p&gt;GoldenCheetah är licensierat under&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Källkoden kan laddas ner från&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Motionspassdata och annan informaiton lagras i&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Använda Varumärken&lt;br&gt;BikeStress, IsoPower, IF  med tillåtelse av &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore med tillåtelse av &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed med tillåtelse av Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Mjukvarumodulen för kroppstemperaturutvecklades av &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; och är patentsökt&lt;br&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="62"/>
@@ -1736,8 +1736,8 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Charts/AllPlot.cpp" line="3897"/>
         <location filename="../../Charts/AllPlot.cpp" line="4624"/>
         <location filename="../../Charts/AllPlot.cpp" line="4627"/>
-        <source>NP</source>
-        <translation>NP</translation>
+        <source>IsoPower</source>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3905"/>
@@ -2015,8 +2015,8 @@ För att gå vidare välj &quot;Fortsätt&quot;
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="303"/>
-        <source>NP</source>
-        <translation>NP</translation>
+        <source>IsoPower</source>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="307"/>
@@ -2544,7 +2544,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="414"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Normaliserad Effekt</translation>
     </message>
     <message>
@@ -2979,8 +2979,8 @@ För att gå vidare välj &quot;Fortsätt&quot;
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="320"/>
-        <source>TSS and IF</source>
-        <translation>TSS och IF</translation>
+        <source>BikeStress and IF</source>
+        <translation>BikeStress och IF</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="321"/>
@@ -4497,8 +4497,8 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <name>BikeScore</name>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="404"/>
-        <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to TSS it can be computed as 100 * hours * (Relative Intensity)^2</source>
-        <translation>Skibas stress score beaktar både intensitet och längd på aktiviteten, liknande TSS kan det beräknas som 100 * tid-i-timmar * (Relativ Intensitet)^2</translation>
+        <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to BikeStress it can be computed as 100 * hours * (Relative Intensity)^2</source>
+        <translation>Skibas stress score beaktar både intensitet och längd på aktiviteten, liknande BikeStress kan det beräknas som 100 * tid-i-timmar * (Relativ Intensitet)^2</translation>
     </message>
 </context>
 <context>
@@ -5142,8 +5142,8 @@ Går till inställningar.</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="245"/>
-        <source>Normalised Power</source>
-        <translation>Normaliserad Effekt (NP)</translation>
+        <source>Iso Power</source>
+        <translation>Normaliserad Effekt (IsoPower)</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="250"/>
@@ -7283,7 +7283,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1457"/>
-        <source>Normalized Power</source>
+        <source>Iso Power</source>
         <translation>Normaliserad Effekt</translation>
     </message>
     <message>
@@ -8379,12 +8379,12 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1784"/>
         <source># type in a formula to use
-# for e.g. TSS / Duration
+# for e.g. BikeStress / Duration
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
         <translation># skriv in en formel (på Engelska)
-# tex för TSS / Tid
+# tex för BikeStress / Tid
 # medans du skriver kommer de
 #tillgängliga storheterna att
 #föreslås automatiskt
@@ -8822,12 +8822,12 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/UserData.cpp" line="99"/>
         <source># type in a formula to use
-# for e.g. TSS / Duration
+# for e.g. BikeStress / Duration
 # as you type the available metrics
 # will be offered by autocomplete
 </source>
         <translation># skriv in en formel (på Engelska)
-# tex för TSS / Tid
+# tex för BikeStress / Tid
 # medans du skriver kommer de
 #tillgängliga storheterna att
 #föreslås automatiskt
@@ -8996,8 +8996,8 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="343"/>
-        <source>The ratio between NP and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
-        <translation>Förhållandet mellan antingen, NP [Cykling] eller xPace (i yd/min) [Löpning] mot den genomsnittliga hjärtfrekvensen</translation>
+        <source>The ratio between IsoPower and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
+        <translation>Förhållandet mellan antingen, IsoPower [Cykling] eller xPace (i yd/min) [Löpning] mot den genomsnittliga hjärtfrekvensen</translation>
     </message>
 </context>
 <context>
@@ -10561,8 +10561,8 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="145"/>
-        <source>Normalised Power</source>
-        <translation>Normaliserad Effekt (NP)</translation>
+        <source>Iso Power</source>
+        <translation>Normaliserad Effekt (IsoPower)</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="146"/>
@@ -10661,8 +10661,8 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="165"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="166"/>
@@ -10972,8 +10972,8 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <name>GOVSS</name>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="373"/>
-        <source>Gravity Ordered Velocity Stress Score, the TSS like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation>Gravity Ordered Velocity Stress Score, TSS liknande storhet definierad av Dr. Skiba för löpning, tar hänsyn till variationer i fart, lutning, relativ intensitet och tidslängd</translation>
+        <source>Gravity Ordered Velocity Stress Score, the BikeStress like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
+        <translation>Gravity Ordered Velocity Stress Score, BikeStress liknande storhet definierad av Dr. Skiba för löpning, tar hänsyn till variationer i fart, lutning, relativ intensitet och tidslängd</translation>
     </message>
 </context>
 <context>
@@ -11253,8 +11253,8 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="285"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="411"/>
@@ -13160,7 +13160,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1575"/>
-        <source>Normalized Power to Average Heart Rate ratio in watts/bpm</source>
+        <source>Iso Power to Average Heart Rate ratio in watts/bpm</source>
         <translation>Förhållandet mellan normalisierad effekt mot medelhjärtfrekvens i Watt:(slag/min)</translation>
     </message>
 </context>
@@ -14541,8 +14541,8 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <name>IntensityFactor</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="169"/>
-        <source>Intensity Factor is the ratio between NP and the Functional Threshold Power (FTP) configured in Power Zones.</source>
-        <translation>&quot;Intensitetsfaktorär förhållandet mellan NP och FTP vilka är konfigurerade i &apos;Verktyg/Inställningar/Effekt Zoner&apos;.</translation>
+        <source>Intensity Factor is the ratio between IsoPower and the Functional Threshold Power (FTP) configured in Power Zones.</source>
+        <translation>&quot;Intensitetsfaktorär förhållandet mellan IsoPower och FTP vilka är konfigurerade i &apos;Verktyg/Inställningar/Effekt Zoner&apos;.</translation>
     </message>
 </context>
 <context>
@@ -15022,7 +15022,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <name>LNP</name>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="80"/>
-        <source>Lactate Normalized Power as defined by Dr. Skiba in GOVSS algorithm</source>
+        <source>Lactate Iso Power as defined by Dr. Skiba in GOVSS algorithm</source>
         <translation>Lactate Normaliserad Power enligt definition i Dr. Skibas GOVSS algorithm</translation>
     </message>
 </context>
@@ -17600,8 +17600,8 @@ Vänligen kontrollera inställningarna.</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="259"/>
-        <source>TSS: </source>
-        <translation>TSS: </translation>
+        <source>BikeStress: </source>
+        <translation>BikeStress: </translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="266"/>
@@ -18986,11 +18986,11 @@ Inga Aktiviteter att importera.
     </message>
 </context>
 <context>
-    <name>NP</name>
+    <name>IsoPower</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
-        <source>Normalized Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
-        <translation>Normaliserad Effekt (NP) är en beräknad konstant effektnivå som idrottaren skulle kunna ha arbetat vid (istället för den faktiska varierande) för att uppnå samma fysiologiska utmattning.</translation>
+        <source>Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
+        <translation>Normaliserad Effekt (IsoPower) är en beräknad konstant effektnivå som idrottaren skulle kunna ha arbetat vid (istället för den faktiska varierande) för att uppnå samma fysiologiska utmattning.</translation>
     </message>
 </context>
 <context>
@@ -22378,8 +22378,8 @@ yyyy</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="433"/>
-        <source>TSS</source>
-        <translation>TSS</translation>
+        <source>BikeStress</source>
+        <translation>BikeStress</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="439"/>
@@ -22398,8 +22398,8 @@ yyyy</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="448"/>
-        <source>Normalized Power</source>
-        <translation>Normalized Power</translation>
+        <source>Iso Power</source>
+        <translation>Iso Power</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="451"/>
@@ -23300,8 +23300,8 @@ Vill du fortsätta?</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="299"/>
-        <source>Normalized Power</source>
-        <translation>Normalized Power</translation>
+        <source>Iso Power</source>
+        <translation>Iso Power</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="300"/>
@@ -24632,8 +24632,8 @@ Skipping file...</source>
         <translation>Maximum</translation>
     </message>
     <message>
-        <source>&lt;br&gt;FTP, TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
-        <translation type="vanished">&lt;br&gt;FTP, TSS, NP och IF är varumärken från Peaksware LLC&lt;/center&gt;</translation>
+        <source>&lt;br&gt;FTP, BikeStress, IsoPower and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
+        <translation type="vanished">&lt;br&gt;FTP, BikeStress, IsoPower och IF är varumärken från Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1663"/>
@@ -27685,7 +27685,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     </message>
 </context>
 <context>
-    <name>TSS</name>
+    <name>BikeStress</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="225"/>
         <source>Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2</source>
@@ -27696,8 +27696,8 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <name>TSSPerHour</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="284"/>
-        <source>TSS per hour</source>
-        <translation>TSS per timma</translation>
+        <source>BikeStress per hour</source>
+        <translation>BikeStress per timma</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="287"/>
@@ -29228,8 +29228,8 @@ Tryck F3 när det är klart.</translation>
     <name>VI</name>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="128"/>
-        <source>Variability Index is the ratio between NP and Average Power.</source>
-        <translation>Variability Index är kvoten mellan NP och Medeleffekt.</translation>
+        <source>Variability Index is the ratio between IsoPower and Average Power.</source>
+        <translation>Variability Index är kvoten mellan IsoPower och Medeleffekt.</translation>
     </message>
 </context>
 <context>
@@ -30344,7 +30344,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     </message>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="205"/>
-        <source>Normalized pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP</source>
+        <source>Iso pace in min/km or min/mile, defined as the constant pace in flat surface which requires the same LNP</source>
         <translatorcomment>english appears wrong</translatorcomment>
         <translation>Det konstanta tempo i min/km eller min/mile på platt mark som ger samma GOVSS värde</translation>
     </message>
@@ -30368,7 +30368,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="164"/>
-        <source>Normalized Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
+        <source>Iso Swim Pace in min/100m or min/100yd, defined as the constant pace which requires the same xPowerSwim</source>
         <translation>Det konstanta simtempo i min/100m eller min/100yard, som skulle gett samma SwimScore</translation>
     </message>
 </context>
@@ -30387,8 +30387,8 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="57"/>
-        <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to NP.</source>
-        <translation>xPower är ett estimat av den konstanta effekt som under samma tidslängd skulle ge upphov till samma fysiologiska kostnad, inte alls olikt NP.</translation>
+        <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to IsoPower.</source>
+        <translation>xPower är ett estimat av den konstanta effekt som under samma tidslängd skulle ge upphov till samma fysiologiska kostnad, inte alls olikt IsoPower.</translation>
     </message>
 </context>
 <context>
@@ -30922,8 +30922,8 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <name>aBikeScore</name>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="208"/>
-        <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aTSS it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
-        <translation>Skibas höjdjusterade cyklings &apos;Stress Score&apos; som tar hänsyn till både intensitet, aktivitetens längd och höjdeffekter. Liknande TSS kan den beräknas som 100 * längd-i-timmar * (aPower * RelativeIntensity)^2</translation>
+        <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aBikeStress it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
+        <translation>Skibas höjdjusterade cyklings &apos;Stress Score&apos; som tar hänsyn till både intensitet, aktivitetens längd och höjdeffekter. Liknande BikeStress kan den beräknas som 100 * längd-i-timmar * (aPower * RelativeIntensity)^2</translation>
     </message>
 </context>
 <context>
@@ -30935,24 +30935,24 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="317"/>
-        <source>The ratio between aNP and Average HR</source>
-        <translation>Kvoten mellan aNP och medelpuls</translation>
+        <source>The ratio between aIsoPower and Average HR</source>
+        <translation>Kvoten mellan aIsoPower och medelpuls</translation>
     </message>
 </context>
 <context>
     <name>aIntensityFactor</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="169"/>
-        <source>Altitude Adjusted Intensity Factor is the ratio between aNP and the Critical Power (CP) configured in Power Zones.</source>
-        <translation>&apos;Altitude Adjusted Intensity Factor&apos; är kvoten mellan aNP och CP (Critical Power sätts i Verktyg/Inställningar.../Idrottare/Effektzoner).</translation>
+        <source>Altitude Adjusted Intensity Factor is the ratio between aIsoPower and the Critical Power (CP) configured in Power Zones.</source>
+        <translation>&apos;Altitude Adjusted Intensity Factor&apos; är kvoten mellan aIsoPower och CP (Critical Power sätts i Verktyg/Inställningar.../Idrottare/Effektzoner).</translation>
     </message>
 </context>
 <context>
-    <name>aNP</name>
+    <name>aIsoPower</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="47"/>
-        <source>Altitude Adjusted Normalized Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
-        <translation>&apos;Altitude Adjusted Normalized Power&apos; är ett estimat av den konstanta effekt som idrottaren skulle kunnat ha upprätthållit för samma fysiologiska kostnad då höjd-över-havet effekters beaktas.</translation>
+        <source>Altitude Adjusted Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
+        <translation>&apos;Altitude Adjusted Iso Power&apos; är ett estimat av den konstanta effekt som idrottaren skulle kunnat ha upprätthållit för samma fysiologiska kostnad då höjd-över-havet effekters beaktas.</translation>
     </message>
 </context>
 <context>
@@ -31005,7 +31005,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     </message>
 </context>
 <context>
-    <name>aTSS</name>
+    <name>aBikeStress</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="215"/>
         <source>Altitude Adjusted Training Stress Score takes into account both the intensity and the duration of the training session plus the altitude effect, it can be computed as 100 * hours * aIF^2</source>
@@ -31016,8 +31016,8 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <name>aTSSPerHour</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="264"/>
-        <source>aTSS per hour</source>
-        <translation>aTSS per timma</translation>
+        <source>aBikeStress per hour</source>
+        <translation>aBikeStress per timma</translation>
     </message>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="267"/>
@@ -31029,8 +31029,8 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <name>aVI</name>
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="127"/>
-        <source>Altitude Adjusted Variability Index is the ratio between aNP and Average aPower.</source>
-        <translation>Altitude Adjusted Variability Index är kvoten mellan aNP och genomsnittet av aPower.</translation>
+        <source>Altitude Adjusted Variability Index is the ratio between aIsoPower and Average aPower.</source>
+        <translation>Altitude Adjusted Variability Index är kvoten mellan aIsoPower och genomsnittet av aPower.</translation>
     </message>
 </context>
 <context>
@@ -31061,9 +31061,9 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     </message>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="56"/>
-        <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aNP.</source>
+        <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aIsoPower.</source>
         <translatorcomment>Which altitude is used for reference???</translatorcomment>
-        <translation>Höjdjusterad xPower är en uppskattning av den konstanta effekt som idrottaren skulle kunna ha arbetat med för samma fysiologiska &apos;konstnad&apos; vid angiven höjd, liknande aNP.</translation>
+        <translation>Höjdjusterad xPower är en uppskattning av den konstanta effekt som idrottaren skulle kunna ha arbetat med för samma fysiologiska &apos;konstnad&apos; vid angiven höjd, liknande aIsoPower.</translation>
     </message>
 </context>
 <context>
