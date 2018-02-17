@@ -22,6 +22,7 @@
 #include "RideMetric.h"
 #include "UserMetricSettings.h"
 #include "UserMetricParser.h"
+#include "DataFilter.h"
 
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
@@ -115,7 +116,9 @@ Context::userMetricsConfigChanged()
         // parse and get return values
         xmlReader.parse(source);
         _userMetrics = handler.getSettings();
+        UserMetric::addCompatibility(_userMetrics);
     }
+
 
     // change the schema version
     quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);

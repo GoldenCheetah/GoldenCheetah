@@ -273,6 +273,7 @@ public:
     bool isClone() const { return clone_; }
 
     void initialize();
+    static void addCompatibility(QList<UserMetricSettings> &metrics);
 
     QString symbol() const;
 

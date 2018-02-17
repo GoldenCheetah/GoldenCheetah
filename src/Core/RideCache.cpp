@@ -75,6 +75,7 @@ RideCache::RideCache(Context *context) : context(context)
             // parse and get return values
             xmlReader.parse(source);
             _userMetrics = handler.getSettings();
+            UserMetric::addCompatibility(_userMetrics);
 
             // reset schema version
             UserMetricSchemaVersion = RideMetric::userMetricFingerprint(_userMetrics);

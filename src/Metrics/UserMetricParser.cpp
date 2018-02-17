@@ -119,6 +119,9 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
     // write out to file
     foreach (UserMetricSettings metric, metrics) {
 
+        // never write them to file, they may be obsoleted by the user.
+        if (metric.symbol.startsWith("compatibility_")) continue;
+
         // symbol
         out <<"\t<usermetric symbol=\"" << Utils::xmlprotect(metric.symbol) <<"\" ";
 

@@ -281,3 +281,77 @@ UserMetric::isTime() const
 {
     return settings.istime;
 }
+
+void
+UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
+{
+
+    // add metrics for backwards compatibility if they are not
+    // already defined by the user
+    bool hasc1=false, hasc2=false, hasc3=false;
+    foreach(UserMetricSettings x, metrics) {
+        if (x.name == "TSS") hasc1=true;
+        if (x.name == "IF") hasc2=true;
+        if (x.name == "NP") hasc3=true;
+    }
+
+    if (!hasc1) {
+        UserMetricSettings c1;
+
+        // add backwards compatibility metrics
+        c1.symbol = "compatibility_1";
+        c1.name = "TSS";
+        c1.description = "BikeStress";
+        c1.type = 0;
+        c1.unitsMetric = "";
+        c1.unitsImperial = "";
+        c1.conversion = 1;
+        c1.conversionSum = 0;
+        c1.program = "{ value { BikeScore; } count { Duration; } }";
+        c1.precision = 0;
+        c1.istime = false;
+        c1.aggzero = true;
+        c1.fingerprint = c1.symbol + DataFilter::fingerprint(c1.program);
+        metrics.insert(0, c1);
+    }
+
+    if (!hasc2) {
+        UserMetricSettings c2;
+
+        // add backwards compatibility metrics
+        c2.symbol = "compatibility_2";
+        c2.name = "IF";
+        c2.type = 1;
+        c2.description = "BikeIntensity";
+        c2.unitsMetric = "";
+        c2.unitsImperial = "";
+        c2.conversion = 1;
+        c2.conversionSum = 0;
+        c2.program = "{ value { BikeIntensity; } count { Duration; } }";
+        c2.precision = 3;
+        c2.istime = false;
+        c2.aggzero = true;
+        c2.fingerprint = c2.symbol + DataFilter::fingerprint(c2.program);
+        metrics.insert(0, c2);
+    }
+
+    if (!hasc3) {
+        UserMetricSettings c3;
+
+        // add backwards compatibility metrics
+        c3.symbol = "compatibility_3";
+        c3.name = "NP";
+        c3.type = 1;
+        c3.description = "IsoPower";
+        c3.unitsMetric = "";
+        c3.unitsImperial = "";
+        c3.conversion = 1;
+        c3.conversionSum = 0;
+        c3.program = "{ value { IsoPower; } count { Duration; } }";
+        c3.precision = 0;
+        c3.istime = false;
+        c3.aggzero = true;
+        c3.fingerprint = c3.symbol + DataFilter::fingerprint(c3.program);
+        metrics.insert(0, c3);
+    }
+}

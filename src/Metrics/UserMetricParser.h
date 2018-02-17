@@ -39,6 +39,7 @@ public:
     bool endElement( const QString&, const QString&, const QString &qName );
     bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
     bool characters( const QString& str );
+    bool parse();
 
 protected:
     QString buffer; // temp store
