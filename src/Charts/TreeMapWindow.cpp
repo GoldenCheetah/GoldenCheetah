@@ -115,6 +115,10 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     QTextEdit title;
     for (int i = 0; i < factory.metricCount(); ++i) {
 
+        // don't let user configure using compatibility metrics - they
+        // are deprecated, but here to support old charts.
+        if (factory.metricName(i).startsWith("compatibility_")) continue;
+
         QTreeWidgetItem *add;
         add = new QTreeWidgetItem(allMetrics, METRIC_TYPE);
 

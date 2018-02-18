@@ -182,6 +182,9 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
             const RideMetric *m = factory.rideMetric(factory.metricName(i));
 
+            // don't offer compatibility metrics- they are for backwards compatibility ONLY
+            if (m->symbol().startsWith("compatibility_")) continue;
+
             QString processed(Utils::unprotect(m->name()));
 
             QTreeWidgetItem *add;

@@ -171,6 +171,10 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i) {
 
+        // don't add compatibility metrics to config tool, we support them
+        // for previously configured charts, but not for creating new ones.
+        if (factory.metricName(i).startsWith("compatibility_")) continue;
+
         // metrics catalogue and settings
         MetricDetail adds;
         QColor cHSV;
