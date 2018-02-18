@@ -40,7 +40,7 @@ class CyclingAnalytics : public CloudService {
         ~CyclingAnalytics();
 
         // upload only and authenticates with OAuth tokens
-        int capabilities() const { return OAuthToken | Upload | Download | Query; }
+        int capabilities() const { return OAuth | Upload | Download | Query; }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
