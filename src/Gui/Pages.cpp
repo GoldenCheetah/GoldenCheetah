@@ -2986,7 +2986,7 @@ CustomMetricsPage::deleteClicked()
     // Are you sure ?
     QMessageBox msgBox;
     msgBox.setText(tr("Are you sure you want to delete this metric?"));
-    msgBox.setInformativeText(metrics[row].name);
+    msgBox.setInformativeText(metrics[row+skipcompat].name);
     QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
     msgBox.setStandardButtons(QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
@@ -2997,7 +2997,7 @@ CustomMetricsPage::deleteClicked()
     if(msgBox.clickedButton() != deleteButton) return;
 
     // wipe it away
-    metrics.removeAt(row);
+    metrics.removeAt(row+skipcompat);
 
     // refresh
     refreshTable();
