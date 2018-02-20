@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QSplitter>
 #include <QFont>
+#include <QFontMetrics>
 #include <QMetaObject>
 #include <QStackedWidget>
 
@@ -167,6 +168,8 @@ public:
     }
 
 protected:
+    double fh() { QFontMetrics fm(baseFont); return fm.height(); }
+    double spacer() { return (2 * dpiYFactor); }
     QSplitterHandle *createHandle() {
         if (this->tabView)
         {
@@ -177,13 +180,13 @@ protected:
         }
         return new GcSplitterHandle(name, orientation, NULL, newclear(), newtoggle(), this);
     }
-    int handleWidth() { return 23 *dpiXFactor; };
+    int handleWidth() { return fh() + (spacer()*4); };
 
     QPushButton *newclear() {
         if (clearbutton) delete clearbutton; // we only need one!
         clearbutton = new QPushButton(tr("Clear"), this);
 //      clearbutton->setFixedWidth(60); // no fixed length to allow translation
-        clearbutton->setFixedHeight(20 *dpiYFactor);
+        clearbutton->setFixedHeight(fh() + (spacer() * 2));
         clearbutton->setFocusPolicy(Qt::NoFocus);
         connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
 
@@ -196,7 +199,7 @@ protected:
         toggle->setCheckable(true);
         toggle->setChecked(false);
 //      toggle->setFixedWidth(40);   // no fixed length to allow translation
-        toggle->setFixedHeight(20 *dpiYFactor);
+        toggle->setFixedHeight(fh() + (spacer()*2));
         toggle->setFocusPolicy(Qt::NoFocus);
         connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
 
