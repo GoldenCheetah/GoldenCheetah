@@ -54,9 +54,12 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     // New API (OAuth)
     QString strToken = "";
     QString strSecret = "";
+    QString strRefreshToken = "";
+
     #ifdef GC_HAVE_KQOAUTH
-    strToken =appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN).toString();
+    strToken = appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN).toString();
     strSecret= appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_SECRET).toString();
+   strRefreshToken = appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_REFRESH_TOKEN).toString();
     #endif
 
     QString strOldKey = appsettings->cvalue(context->athlete->cyclist, GC_WIKEY).toString();
@@ -77,6 +80,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         oautherr.exec();
         return false;
     }
+
 
     if(!strToken.isEmpty() &&! strSecret.isEmpty() &&
             strToken != "" && strToken != "0" &&
@@ -99,29 +103,42 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         params.insert("startdate", QString::number(from.toMSecsSinceEpoch()/1000));
         params.insert("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
 
-        // Hack...
-        // Why should we add params manually (GET) ????
-        QList<QByteArray> requestParameters = oauthRequest->requestParameters();
-
-        for (int i=0; i<requestParameters.count(); i++) {
-            //qDebug() << requestParameters.at(i);
-#if QT_VERSION > 0x050000
-            QUrlQuery _params;
-            _params.setQuery(requestParameters.at(i));
-#else
-            QUrl _params;
-            _params.setEncodedQuery(requestParameters.at(i));
-#endif
-            QString value = _params.queryItems().at(0).second;
-            value = value.replace("\"", "");
-            params.insert(_params.queryItems().at(0).first, value);
-
-        }
-
         oauthRequest->setAdditionalParameters(params);
 
+        // Hack...
+        // Why should we add params manually (GET) ????
+        // We can use KQOAuth because Nokia/Withings expect token in url.
+
+        QList<QByteArray> requestParameters = oauthRequest->requestParameters();
+
+#if QT_VERSION > 0x050000
+        QUrlQuery params2;
+#else
+        QUrl params2;
+#endif
+        for (int i=0; i<requestParameters.count(); i++) {
+            QString _rp = requestParameters.at(i);
+            _rp = _rp;
+
+            QString key = _rp.left(_rp.indexOf("="));
+            QString value = _rp.right(_rp.length()-key.length()-1).replace("\"", "");
+
+            params2.addQueryItem(key, value);
+        }
+        params2.addQueryItem("action", "getmeas");
+        params2.addQueryItem("userid", appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString());
+        params2.addQueryItem("startdate", QString::number(from.toMSecsSinceEpoch()/1000));
+        params2.addQueryItem("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
+
+        QUrl url = QUrl( "https://wbsapi.withings.net/measure?" + params2.toString() );
+        //qDebug() << "URL used: " << url.url();
+
         emit downloadStarted(100);
-        oauthManager->executeRequest(oauthRequest);
+
+        //oauthManager->executeRequest(oauthRequest);
+        QNetworkRequest request(url);
+        nam->get(request);
+
         emit downloadProgress(50);
 
         // blocking request
