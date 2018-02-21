@@ -49,6 +49,11 @@
 #define GC_WITHINGS_CONSUMER_KEY    "292875b6883b87e27cefd2555d1cb872b2282f02fee25b4906871314934" //< consumer key
 #endif
 
+//Nokia
+#ifndef GC_NOKIA_CLIENT_ID
+#define GC_NOKIA_CLIENT_ID    "Not defined"
+#endif
+
 // Dropbox id
 #ifndef GC_DROPBOX_CLIENT_ID
 #define GC_DROPBOX_CLIENT_ID "753fbblhri06ah3"
