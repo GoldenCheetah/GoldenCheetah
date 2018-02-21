@@ -18,7 +18,6 @@ include(gcconfig.pri)
 HEADERS += $${LOCALHEADERS}
 SOURCES += $${LOCALSOURCES}
 
-
 ###=====================
 ### GOLDENCHEETAH TARGET
 ###=====================
@@ -475,8 +474,10 @@ unix:!macx {
     LIBS        += $${LIBUSB_LIBS}
 
     # lots of dependents
-    SOURCES     += Train/LibUsb.cpp Train/EzUsb.c Train/Fortius.cpp Train/FortiusController.cpp
-    HEADERS     += Train/LibUsb.h Train/EzUsb.h Train/Fortius.cpp Train/FortiusController.h
+    SOURCES     += Train/LibUsb.cpp Train/EzUsb.c Train/Fortius.cpp Train/FortiusController.cpp \
+                   Train/Imagic.cpp Train/ImagicController.cpp
+    HEADERS     += Train/LibUsb.h Train/EzUsb.h Train/Fortius.cpp Train/FortiusController.h \
+                   Train/Imagic.h Train/ImagicController.h
 }
 
 

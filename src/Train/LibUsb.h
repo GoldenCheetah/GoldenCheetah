@@ -45,9 +45,11 @@ extern "C" {
 #define FORTIUS_INIT_PID  0xe6be    // uninitialised Fortius PID
 #define FORTIUS_PID       0x1942    // once firmware loaded Fortius PID
 #define FORTIUSVR_PID     0x1932    // Fortius VR doesn't need firmware download ?
+#define IMAGIC_PID        0x1902    // Imagic keeps same PID before and after firmware load
 
 #define TYPE_ANT     0
 #define TYPE_FORTIUS 1
+#define TYPE_IMAGIC  2
 
 class Context;
 
@@ -66,10 +68,14 @@ private:
 
     struct usb_dev_handle* OpenAntStick();
     struct usb_dev_handle* OpenFortius();
+    struct usb_dev_handle* OpenImagic();
     bool findAntStick();
     bool findFortius();
+    bool findImagic();
+
 
     struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
+    struct usb_interface_descriptor* usb_find_imagic_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
     struct usb_interface_descriptor* intf;
 

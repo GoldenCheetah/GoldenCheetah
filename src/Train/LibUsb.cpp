@@ -100,6 +100,9 @@ int LibUsb::open()
 
     case TYPE_FORTIUS: device = OpenFortius();
               break;
+
+    case TYPE_IMAGIC: device = OpenImagic();
+              break;
     }
 
     if (device == NULL) return -1;
@@ -129,6 +132,9 @@ bool LibUsb::find()
               break;
 
     case TYPE_FORTIUS: return findFortius();
+              break;
+
+    case TYPE_IMAGIC: return findImagic();
               break;
     }
 }
@@ -424,6 +430,123 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     return NULL;
 }
 
+bool LibUsb::findImagic()
+{
+#ifdef WIN32
+    if (libNotInstalled) return false;
+#endif
+    struct usb_bus* bus;
+    struct usb_device* dev;
+
+    bool found = false;
+
+    //
+    // Search for an Imagic device
+    //
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == IMAGIC_PID) {
+                found = true;
+            }
+        }
+    }
+    return found;
+}
+
+// Open connection to a Tacx Imagic
+//
+// The Imagic handlebar controller is an EZ-USB device. This is an
+// embedded system using an 8051 microcontroller. Firmware must be
+// downloaded to it once it is connected. This firmware is embedded in
+// the Tacx windows device driver called imagic.sys. This is
+// copyrighted by Tacx and is therefore not distributed with Golden Cheetah.
+// Instead we ask the user to tell us where it can be found when they
+// configure the device. (On Windows platforms the driver is installed
+// by the standard Tacx software as c:\windows\system32\drivers\imagic.sys).
+//
+// So when we open an imagic device we need to search for a
+// handlebar controller 3651:1902 and upload the firmware using the EzUsb
+// functions. Unlike the fortius, there is no change of productid after
+// the firmware load, but we still need to delay a couple of seconds to
+// allow it to "settle".
+//
+// Firmware will need to be reloaded if the device is disconnected or the
+// USB controller is reset after sleep/resume.
+//
+// The same ezusb.c module is used to load the imagic firmware as is used
+// for Fortius (see above comments), although some new procedures have been
+// added specific to imagic
+struct usb_dev_handle* LibUsb::OpenImagic()
+{
+#ifdef WIN32
+#define IMAGIC_SLEEP Sleep(3000)
+    if (libNotInstalled) return NULL;
+#else
+#define IMAGIC_SLEEP sleep(3)
+#endif
+
+    struct usb_bus* bus;
+    struct usb_device* dev;
+    struct usb_dev_handle* udev;
+
+    //
+    // Search for an Imagic device
+    //
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+        for (dev = bus->devices; dev; dev = dev->next) {
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == IMAGIC_PID) {
+
+                if ((udev = usb_open(dev))) {
+
+                    // LOAD THE FIRMWARE
+                    int rc = ezusb_load_ram_imagic(udev, appsettings->value(NULL, IMAGIC_FIRMWARE, "").toString().toLatin1());
+
+                    if (rc < 0) {
+                        qDebug()<<"Unable to load controller RAM - did you specify a valid I-Magic.sys file?";
+                    }
+                    else {
+                        // Now delay for a while to allow the imagic to load its firmware
+                        IMAGIC_SLEEP;
+                        if (dev->descriptor.bNumConfigurations) {
+                            if ((intf = usb_find_imagic_interface(&dev->config[0])) != NULL) {
+
+                                rc = usb_set_configuration(udev, 1);
+                                if (rc < 0) {
+                                        qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
+                                        if (OperatingSystem == LINUX) {
+                                            // looks like the udev rule has not been implemented
+                                            qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
+                                            qDebug()<<"did you remember to setup a udev rule for this device?";
+                                        }
+                                }
+                                else {
+                                        rc = usb_claim_interface(udev, interface);
+                                        if (rc < 0) {
+                                            qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+                                        }
+                                        else {
+                                            if (OperatingSystem != OSX) {
+                                                // fails on Mac OS X, we don't actually need it anyway
+                                                rc = usb_set_altinterface(udev, alternate);
+                                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                                            }
+                                        return udev;
+                                        }
+                                     }
+                            }
+                        }
+                    }
+                    // Close the connection if validation failed after open
+                    usb_close(udev);
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
 bool LibUsb::findAntStick()
 {
 
@@ -566,6 +689,47 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
 
     return intf;
 }
+
+struct usb_interface_descriptor* LibUsb::usb_find_imagic_interface(struct usb_config_descriptor* config_descriptor)
+{
+#ifdef WIN32
+    if (libNotInstalled) return NULL;
+#endif
+
+    struct usb_interface_descriptor* intf;
+
+    readEndpoint = -1;
+    writeEndpoint = -1;
+    interface = -1;
+    alternate = -1;
+
+    if (!config_descriptor) return NULL;
+
+    if (!config_descriptor->bNumInterfaces) return NULL;
+
+    if (!config_descriptor->interface[0].num_altsetting) return NULL;
+
+    intf = &config_descriptor->interface[0].altsetting[1];
+
+    if (intf->bNumEndpoints != 13) return NULL;
+
+    interface = intf->bInterfaceNumber;
+    alternate = intf->bAlternateSetting;
+
+    for (int i = 1 ; i < 3; i++)
+    {
+        if (intf->endpoint[i].bEndpointAddress & USB_ENDPOINT_DIR_MASK)
+            readEndpoint = intf->endpoint[i].bEndpointAddress;
+        else
+            writeEndpoint = intf->endpoint[i].bEndpointAddress;
+    }
+
+    if (readEndpoint < 0 || writeEndpoint < 0)
+        return NULL;
+
+    return intf;
+}
+
 #else
 
 // if we don't have libusb use stubs

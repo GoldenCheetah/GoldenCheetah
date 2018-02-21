@@ -32,6 +32,12 @@
  */
 extern int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage);
 
+/*
+ * This function performs a specialized firmware load for the
+ * earlier 1902 model as used by the Tacx Imagic
+ */
+extern int ezusb_load_ram_imagic (usb_dev_handle *device, const char *path);
+
 
 /*
  * This function stores the firmware from the given file into EEPROM.
