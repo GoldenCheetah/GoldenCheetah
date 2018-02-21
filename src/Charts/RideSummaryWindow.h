@@ -124,6 +124,7 @@ class RideSummaryWindow : public GcChartWindow
 
         QString htmlSummary();        // summary of a ride or a date range
         QString htmlCompareSummary() const; // comparing intervals or seasons
+	static QString addTooltip(QString name, QString tooltip); // adds html tooltip
 
         Context *context;
 #ifdef NOWEBKIT

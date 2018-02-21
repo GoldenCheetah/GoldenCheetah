@@ -437,6 +437,9 @@ GCColor::css(bool ridesummary)
                    "h4 { color: %1; background-color: %2; } "
                    "b { color: %1; background-color: %2; } "
                    "#sharp { color: %1; background-color: darkGray; font-weight: bold; } "
+	           ".tooltip { position: relative; display: inline-block; } "
+		   ".tooltip .tooltiptext { visibility: hidden; background-color: %2; color: %1; text-align: center; padding: %4px 0; border-radius: %5px; position: absolute; z-index: 1; width: %6px; margin-left: -%7px; top: 100%; left: 50%; opacity: 0; transition: opacity 0.3s; } "
+		   ".tooltip:hover .tooltiptext { visibility: visible; opacity: 1; } "
 #ifdef Q_OS_MAC
                    "::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.5);  "
                    "-webkit-box-shadow: inset 0 0 1px rgba(255,255,255,0.6); }"
@@ -450,7 +453,9 @@ GCColor::css(bool ridesummary)
                                .arg(bgColor.name())
                                .arg(fgColor.name())
                                .arg(5 * dpiXFactor)
-                               .arg(6 * dpiXFactor);
+                               .arg(6 * dpiXFactor)
+                               .arg(200 * dpiXFactor)
+                               .arg(100 * dpiXFactor);
 }
 QPalette 
 GCColor::palette()
