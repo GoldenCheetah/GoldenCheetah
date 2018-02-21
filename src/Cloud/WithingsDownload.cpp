@@ -54,13 +54,20 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     // New API (OAuth)
     QString strToken = "";
     QString strSecret = "";
-    QString strRefreshToken = "";
+
+    QString strNokiaToken = "";
+    QString strNokiaRefreshToken = "";
+
+    QString access_token = "";
 
     #ifdef GC_HAVE_KQOAUTH
     strToken = appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN).toString();
     strSecret= appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_SECRET).toString();
-   strRefreshToken = appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_REFRESH_TOKEN).toString();
     #endif
+
+    strNokiaToken = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN).toString();
+    strNokiaRefreshToken = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
+
 
     QString strOldKey = appsettings->cvalue(context->athlete->cyclist, GC_WIKEY).toString();
 
@@ -81,10 +88,81 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         return false;
     }
 
-
     if(!strToken.isEmpty() &&! strSecret.isEmpty() &&
             strToken != "" && strToken != "0" &&
             strSecret != "" && strSecret != "0" ) {
+        qDebug() << "OAuth 2.0 API";
+
+#if QT_VERSION > 0x050000
+        QUrlQuery postData;
+#else
+        QUrl postData;
+#endif
+
+        postData.addQueryItem("grant_type", "refresh_token");
+        postData.addQueryItem("client_id", GC_NOKIA_CLIENT_ID );
+        postData.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET );
+        postData.addQueryItem("refresh_token", appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, QString("%1:%2").arg(strToken).arg(strSecret)).toString() );
+
+        QUrl url = QUrl( "https://account.withings.com/oauth2/token" );
+
+        emit downloadStarted(100);
+
+        //oauthManager->executeRequest(oauthRequest);
+        QNetworkRequest request(url);
+        request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+        nam->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
+
+        // blocking request
+        loop.exec(); // we go on after receiving the data in SLOT(onRequestReady(QByteArray))
+
+        qDebug() << "response" << response;
+
+        if (response.contains("\"access_token\"", Qt::CaseInsensitive))
+        {
+                QJsonParseError parseResult;
+                QJsonDocument migrateJson = QJsonDocument::fromJson(response.toUtf8(), &parseResult);
+
+                access_token = migrateJson.object()["access_token"].toString();
+                QString refresh_token = migrateJson.object()["refresh_token"].toString();
+
+                if (access_token != "") appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_TOKEN, access_token);
+                if (refresh_token != "") appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, refresh_token);
+
+            #if QT_VERSION > 0x050000
+                QUrlQuery params;
+            #else
+                QUrl params;
+            #endif
+
+                emit downloadStarted(100);
+
+                params.addQueryItem("userid", appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString());
+                params.addQueryItem("access_token", access_token);
+
+                QUrl url = QUrl( "https://api.health.nokia.com/measure?" + params.toString() );
+
+                qDebug() << "URL used: " << url.url();
+
+                QNetworkRequest request(url);
+                nam->get(request);
+
+                emit downloadProgress(50);
+
+                // blocking request
+                loop.exec(); // we go on after receiving the data in SLOT(onRequestReady(QByteArray))
+
+                emit downloadEnded(100);
+
+        }
+
+    }
+
+    if(access_token.isEmpty() && !strToken.isEmpty() &&! strSecret.isEmpty() &&
+            strToken != "" && strToken != "0" &&
+            strSecret != "" && strSecret != "0" ) {
+        qDebug() << "OAuth 1.0 API";
+
         #ifdef GC_HAVE_KQOAUTH
         oauthRequest->initRequest(KQOAuthRequest::AuthorizedRequest, QUrl("http://wbsapi.withings.net/measure"));
         oauthRequest->setHttpMethod(KQOAuthRequest::GET);
@@ -172,6 +250,8 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
             return false;
         }
     }
+
+    qDebug() << "response:" << response;
 
     QJsonParseError parseResult;
     if (response.contains("\"status\":0", Qt::CaseInsensitive))

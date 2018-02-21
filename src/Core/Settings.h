@@ -331,8 +331,10 @@
 
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
-#define GC_WITHINGS_REFRESH_TOKEN       "<athlete-private>withings_refresh_token"
 #define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
+//Nokia
+#define GC_NOKIA_TOKEN                  "<athlete-private>nokia_token"
+#define GC_NOKIA_REFRESH_TOKEN          "<athlete-private>nokia_refresh_token"
 //Google Calendar-CALDAV oauthkeys
 #define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
 //Strava
