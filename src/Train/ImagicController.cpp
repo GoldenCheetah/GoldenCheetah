@@ -146,6 +146,48 @@ ImagicController::getRealtimeData(RealtimeData &rtData)
         noPressCount = 0;
     }
 
+    //
+    // Steering left/right to scroll train view up/down
+    //
+    if (steerCalibrate > 50 && steerActive < 75) {
+        // Steering is calibrated and seems to be within bounds
+        if (Steering > (steerStraight+10)) {
+            if (Steering > (steerStraight+20))
+                parent->steerScroll(+2);
+            else
+                parent->steerScroll(+1);
+            ++steerActive;
+        }
+        else if (Steering < (steerStraight-10)) {
+            if (Steering < (steerStraight-20))
+                parent->steerScroll(-2);
+            else
+                parent->steerScroll(-1);
+            ++steerActive;
+        }
+        else {
+            steerActive = 0;
+            // Allow for drift in "Straight ahead" value
+            steerDrift = ((steerDrift * 9.0f) + Steering) / 10.0f;
+            if ((steerDrift - (float)steerStraight) > 1.0f || (steerDrift - (float)steerStraight) < -1.0f)
+                steerStraight = (int)steerDrift;
+        }
+    }
+    // Steering requires calibration
+    else {
+         // If we seem to be steering constantly left or right - recalibrate
+         if (steerActive >= 75) {
+             steerCalibrate = 0;
+             steerActive = 0;
+             steerStraight = 128;
+             parent->steerScroll(0);
+         }
+         // Take average steering value over ~ 10secs and use that as new "straight ahead" value
+         if (Steering > 0) {
+             ++steerCalibrate;
+             steerStraight = steerDrift = (steerStraight*steerCalibrate + Steering) / (steerCalibrate + 1);
+         }
+    }
 
     // Ensure we set the UI load to the actual setpoint from the imagic (as it will clamp)
     rtData.setLoad(myImagic->getLoad());

@@ -1750,6 +1750,15 @@ void TrainSidebar::resetLapTimer()
     lapAudioThisLap = true;
 }
 
+// Can be called from the controller - when user steers to scroll display
+void TrainSidebar::steerScroll(int scrollAmount)
+{
+    if (scrollAmount == 0)
+        emit setNotification(tr("Recalibrating steering.."), 10);
+    else
+        context->notifySteerScroll(scrollAmount);
+}
+
 // can be called from the controller
 void TrainSidebar::nextDisplayMode()
 {

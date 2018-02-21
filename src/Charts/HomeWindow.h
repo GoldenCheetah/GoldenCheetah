@@ -110,6 +110,9 @@ class HomeWindow : public GcWindow
         void drawCursor();
         void rightClick(const QPoint &pos);
 
+        // Realtime steering control of train window scrolling
+        void steerScroll(int scrollAmount);
+
     protected:
         Context *context;
         QString name;

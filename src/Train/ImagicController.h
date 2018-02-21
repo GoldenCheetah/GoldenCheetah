@@ -33,6 +33,10 @@ public:
     ImagicController (TrainSidebar *, DeviceConfiguration *);
 
     Imagic *myImagic;               // the device itself
+    int steerCalibrate = 0;         // Steering detection
+    int steerActive = 0;
+    int steerStraight = 128;
+    float steerDrift = 128;
     int pressCount = 0;
     int noPressCount = 0;
 

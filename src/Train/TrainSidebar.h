@@ -183,6 +183,7 @@ class TrainSidebar : public GcWindow
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!
         void resetLapTimer(); //reset the lap timer
+        void steerScroll(int scrollAmount);   // Scroll the train display
 
         void toggleCalibration();
         void updateCalibration();
