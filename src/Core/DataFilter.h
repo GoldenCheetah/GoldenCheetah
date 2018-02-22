@@ -128,9 +128,6 @@ public:
     // map to adata series
     QStringList dataSeriesSymbols;
 
-    // microcache for oft-repeated vector operations
-    QHash<QString, Result> snips;
-
     // user defined symbols
     QHash<QString, Result> symbols;
 

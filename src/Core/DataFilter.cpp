@@ -1592,7 +1592,6 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
     // remember where we apply
     this->list = list;
     rt.isdynamic=false;
-    rt.snips.clear();
     rt.symbols.clear();
 
     // regardless of fail/pass set the signature
@@ -2923,12 +2922,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
         Specification spec;
 
-        // is this already snipped?
-        Result snipped = df->snips.value(leaf->signature(), Result(0));
-        if (snipped.vector.count() > 0) {
-            return snipped;
-        }
-
         // get date range
         int fromDS = eval(df, leaf->fparms[0], x, m, p, c).number;
         int toDS = eval(df, leaf->fparms[1], x, m, p, c).number;
@@ -2961,10 +2954,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             }
         }
 
-        // vectors of more than 100 items need snipping
-        if (returning.vector.count() > 100)  {
-            df->snips.insert(leaf->signature(), returning);
-        }
         // always return as sum number (for now)
         return returning;
     }
