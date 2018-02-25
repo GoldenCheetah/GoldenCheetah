@@ -283,10 +283,12 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         if (setRestHrv) {
             RideItem *rideItem = ride->context->rideItem();
 
+            double avnn = rideItem->getForSymbol("AVNN");
+
             HrvMeasure hrvMeasure;
             hrvMeasure.when = rideItem->dateTime;
-            hrvMeasure.hr = rideItem->getForSymbol("average_hr");
-            hrvMeasure.avnn = rideItem->getForSymbol("AVNN");
+            hrvMeasure.hr = !qFuzzyIsNull(avnn) ? 60000 / avnn : 0;
+            hrvMeasure.avnn = avnn;
             hrvMeasure.sdnn = rideItem->getForSymbol("SDNN");
             hrvMeasure.rmssd = rideItem->getForSymbol("rMSSD");
             hrvMeasure.pnn50 = rideItem->getForSymbol("pNN50");
