@@ -23,6 +23,8 @@
 #include "HelpWhatsThis.h"
 #include "HrvMeasuresDownload.h"
 #include "HrvMeasures.h"
+#include "Athlete.h"
+#include "RideCache.h"
 
 void FilterHrv(XDataSeries *rr, double rr_min, double rr_max, double filt, int hwin)
 {
@@ -139,6 +141,7 @@ protected:
     QDoubleSpinBox *hrvWindow;
 
     QCheckBox *setRestHrv;
+    QCheckBox *recalcRestHRs;
 
 public:
     FilterHrvOutliersConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -180,6 +183,7 @@ public:
         hrvWindow->setDecimals(0);
 
         setRestHrv = new QCheckBox(tr("Set Rest Hrv"));
+        recalcRestHRs = new QCheckBox(tr("Recalculate past HRs"));
 
         layout->addWidget(hrvMaxLabel);
         layout->addWidget(hrvMax);
@@ -190,6 +194,7 @@ public:
         layout->addWidget(hrvWindowLabel);
         layout->addWidget(hrvWindow);
         layout->addWidget(setRestHrv);
+        layout->addWidget(recalcRestHRs);
 
         layout->addStretch();
     }
@@ -199,6 +204,8 @@ public:
                           "  - \"Filter range\" of the average within a window (flag 0)\n"
                           "  - \"Filter window size\" distance on either side of the current interval\n"
                           "  - \"Set Rest HRV\" if checked the computed HRV metrics are set as Rest HRV Measures\n"
+                          "  - \"Recalculate past HRs\" if checked HRs of all Rest HRV Measures are recalculated\n"
+                          "    based on the respective AVNN (HR = 60000 / AVNN)\n"
                           ""
                           )));
     }
@@ -215,6 +222,9 @@ public:
         hrvFilt->setValue(FiltVal);
         hrvWindow->setValue(Window);
         setRestHrv->setCheckState(SetRestHrv ? Qt::Checked : Qt::Unchecked);
+
+        // no need for persisted setting, because only used once to correct things
+        recalcRestHRs->setCheckState(Qt::Unchecked);
     }
     void saveConfig() {
         appsettings->setValue(GC_RR_MAX, hrvMax->value());
@@ -261,6 +271,7 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         double rrFilt;
         int rrWindow;
         bool setRestHrv;
+        bool recalcRestHRs;
 
         if (config == NULL) { // being called automatically
             rrMax = appsettings->value(NULL, GC_RR_MAX, "2000.0").toDouble();
@@ -268,6 +279,7 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             rrFilt = appsettings->value(NULL, GC_RR_FILT, "0.2").toDouble();
             rrWindow = appsettings->value(NULL, GC_RR_WINDOW, "20").toInt();
             setRestHrv = appsettings->value(NULL, GC_RR_SET_REST_HRV, Qt::Unchecked).toBool();
+            recalcRestHRs = false;
         }
         else { // being called manually
             rrMax = ((FilterHrvOutliersConfig*)(config))->hrvMax->value();
@@ -275,6 +287,7 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             rrFilt = ((FilterHrvOutliersConfig*)(config))->hrvFilt->value();
             rrWindow = (int) ((FilterHrvOutliersConfig*)(config))->hrvWindow->value();
             setRestHrv = (bool) ((FilterHrvOutliersConfig*)(config))->setRestHrv->checkState();
+            recalcRestHRs = (bool) ((FilterHrvOutliersConfig*)(config))->recalcRestHRs->checkState();
         }
         FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
         ride->context->rideItem()->refresh();
@@ -298,6 +311,22 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             hrvMeasures.append(hrvMeasure);
 
             HrvMeasuresDownload::updateMeasures(ride->context, hrvMeasures);
+        }
+
+        if (recalcRestHRs) {
+            Context * ctx = ride->context;
+            HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(ctx->athlete->measures->getGroup(Measures::Hrv));
+            QList<HrvMeasure> measures = pHrvMeasures->hrvMeasures();
+            for (int i = 0; i < measures.count(); i++) {
+                if (!qFuzzyIsNull(measures[i].avnn)) {
+                    measures[i].hr = 60000 / measures[i].avnn;
+                }
+            }
+
+            ctx->athlete->rideCache->cancel();
+            pHrvMeasures->setHrvMeasures(measures);
+            pHrvMeasures->write();
+            ctx->athlete->rideCache->refresh();
         }
 
         return true;
