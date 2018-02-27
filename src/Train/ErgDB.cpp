@@ -18,7 +18,7 @@
 
 #include "ErgDB.h"
 
-static const QString ErgDBUrl = "http://www.73summits.com/ergdb/";
+static const QString ErgDBUrl = "https://www.73summits.com/ergdb/";
 
 ErgDB::ErgDB(QObject *parent) : QObject(parent)
 {
