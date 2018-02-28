@@ -447,6 +447,7 @@ LTMSidebar::resetSeasons()
             Phase phase = season.phases.at(j);
             QTreeWidgetItem *addPhase = new QTreeWidgetItem(addSeason, phase.getType());
             if (phase.id().toString() == id) {
+                addSeason->setExpanded(true);
                 addPhase->setSelected(true);
             }
             addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
