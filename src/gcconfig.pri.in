@@ -46,6 +46,10 @@
 #RCC_DIR = ./.rcc
 #UI_DIR = ./.ui
 
+# Global conf file name: If you'd like to use a different global config file
+# name than the default (e.g. for testing purposes), set it here.
+#DEFINES += GC_SETTINGS_APP=\\\"GoldenCheetahTest\\\"
+
 # If you want a console window to appear on Windows machines
 # then uncomment the following two lines.
 #CONFIG += console
