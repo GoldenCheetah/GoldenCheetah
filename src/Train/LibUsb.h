@@ -118,6 +118,8 @@ private:
     PrototypeInt_Handle_Int usb_set_altinterface;
     PrototypeChar_Void usb_strerror;
 
+    Prototype_EzUsb_control_msg usb_control_msg;
+
 #endif
 };
 #endif

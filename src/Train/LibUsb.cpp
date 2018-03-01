@@ -64,6 +64,8 @@ LibUsb::LibUsb(int type) : type(type)
     usb_set_altinterface = PrototypeInt_Handle_Int(lib.resolve("usb_set_altinterface"));
     usb_strerror = PrototypeChar_Void(lib.resolve("usb_strerror"));
 
+    usb_control_msg = Prototype_EzUsb_control_msg(lib.resolve("usb_control_msg"));
+
 #endif
 
     // Initialize the library.
@@ -322,9 +324,10 @@ bool LibUsb::findFortius()
 //      stage is to control two stage loading, we load in a single stage
 struct usb_dev_handle* LibUsb::OpenFortius()
 {
-
+    Prototype_EzUsb_control_msg usb_control_msg_ptr = 0;
 #ifdef WIN32
     if (libNotInstalled) return NULL;
+    usb_control_msg_ptr = usb_control_msg;
 #endif
     struct usb_bus* bus;
     struct usb_device* dev;
@@ -346,7 +349,7 @@ struct usb_dev_handle* LibUsb::OpenFortius()
                 if ((udev = usb_open(dev))) {
 
                     // LOAD THE FIRMWARE
-                    ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
+                    ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0, usb_control_msg_ptr);
                 }
 
                 // Now close the connection, our work here is done
@@ -480,9 +483,12 @@ bool LibUsb::findImagic()
 // added specific to imagic
 struct usb_dev_handle* LibUsb::OpenImagic()
 {
+    Prototype_EzUsb_control_msg usb_control_msg_ptr = 0;
+
 #ifdef WIN32
 #define IMAGIC_SLEEP Sleep(3000)
     if (libNotInstalled) return NULL;
+    usb_control_msg_ptr = usb_control_msg;
 #else
 #define IMAGIC_SLEEP sleep(3)
 #endif
@@ -501,7 +507,7 @@ struct usb_dev_handle* LibUsb::OpenImagic()
                 if ((udev = usb_open(dev))) {
 
                     // LOAD THE FIRMWARE
-                    int rc = ezusb_load_ram_imagic(udev, appsettings->value(NULL, IMAGIC_FIRMWARE, "").toString().toLatin1());
+                    int rc = ezusb_load_ram_imagic(udev, appsettings->value(NULL, IMAGIC_FIRMWARE, "").toString().toLatin1(), usb_control_msg_ptr);
 
                     if (rc < 0) {
                         qDebug()<<"Unable to load controller RAM - did you specify a valid I-Magic.sys file?";

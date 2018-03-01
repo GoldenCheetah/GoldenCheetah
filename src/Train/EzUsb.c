@@ -51,6 +51,9 @@
 
 int verbose;
 
+// For explicit runtime linking to libusb functions
+Prototype_EzUsb_control_msg ezusb_usb_control_msg = NULL;
+
 /*
  * return true iff [addr,addr+len) includes external RAM
  * for Anchorchips EZ-USB or Cypress EZ-USB FX
@@ -91,7 +94,6 @@ static int fx2_is_external (unsigned short addr, size_t len)
 
 /*****************************************************************************/
 
-
 /*
  * Issue a control request to the specified device.
  * This is O/S specific ...
@@ -105,14 +107,20 @@ static inline int ctrl_msg (
     unsigned char			*data,
     size_t				length
 ) {
-
-/*
- * Don't reference libusb procedures if its not available
- */
-#ifndef GC_HAVE_LIBUSB
-    return -1;
+#ifdef WIN32
+    if (ezusb_usb_control_msg)
+            return ezusb_usb_control_msg(device,
+               (int)requestType,
+               (int)request,
+               (int)value,
+               (int)index,
+               (char*)data,
+               (int)length,
+               10000);
+    else
+        return -1;
 #else
-    return usb_control_msg(device, 
+    return usb_control_msg(device,
 			   (int)requestType,
 			   (int)request,
 			   (int)value,
@@ -577,13 +585,17 @@ static int ram_poke (
  * memory is written, expecting a second stage loader to have already
  * been loaded.  Then file is re-parsed and on-chip memory is written.
  */
-int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage)
+int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage, Prototype_EzUsb_control_msg uptr)
 {
     FILE			*image;
     unsigned short		cpucs_addr;
     int				(*is_external)(unsigned short off, size_t len);
     struct ram_poke_context	ctx;
     int				status;
+
+    //Load the runtime library reference
+    ezusb_usb_control_msg = uptr;
+
 
     image = fopen (path, "r");
     if (image == 0) {
@@ -665,11 +677,14 @@ int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage
  * Unlike some later fortius devices, that imagic has only
  * internal memory
  */
-int ezusb_load_ram_imagic (usb_dev_handle *device, const char *path)
+int ezusb_load_ram_imagic (usb_dev_handle *device, const char *path, Prototype_EzUsb_control_msg uptr)
 {
     FILE			*image;
     struct ram_poke_context	ctx;
     int				status;
+
+    //Load the runtime library reference
+    ezusb_usb_control_msg = uptr;
 
     image = fopen (path, "rb");
     if (image == 0) {
