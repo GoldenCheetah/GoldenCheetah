@@ -99,11 +99,21 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         QUrl postData;
 #endif
 
+        //appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, "");
+        qDebug() << "refresh_token" << appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, QString("%1:%2").arg(strToken).arg(strSecret));
+
+        QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
+        if (refresh_token.isEmpty())
+            refresh_token = QString("%1:%2").arg(strToken).arg(strSecret);
+        qDebug() << "refresh_token" << refresh_token;
+
         postData.addQueryItem("grant_type", "refresh_token");
         postData.addQueryItem("client_id", GC_NOKIA_CLIENT_ID );
         postData.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET );
-        postData.addQueryItem("refresh_token", appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, QString("%1:%2").arg(strToken).arg(strSecret)).toString() );
+        postData.addQueryItem("refresh_token", refresh_token );
 
+
+        qDebug() << appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, QString("%1:%2").arg(strToken).arg(strSecret)).toString();
         QUrl url = QUrl( "https://account.withings.com/oauth2/token" );
 
         emit downloadStarted(100);
