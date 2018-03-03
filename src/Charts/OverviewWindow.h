@@ -86,7 +86,6 @@ class Card : public QGraphicsWidget
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
             setAcceptHoverEvents(true);
 
-            brush = QBrush(GColor(CCARDBACKGROUND));
             setZValue(10);
 
             // a sensible default?
@@ -117,7 +116,6 @@ class Card : public QGraphicsWidget
         void setType(CardType type, RideFile::SeriesType series);   // time in zone, data
         void setType(CardType type, QString symbol);                // metric meta
         void setType(CardType type, QString xsymbol, QString ysymbol, QString zsymbol); // interval
-        void setBrush(QColor x) { brush=QBrush(x); }
 
         // setup data after ride selected
         void setData(RideItem *item);
@@ -181,7 +179,6 @@ class Card : public QGraphicsWidget
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
-        QBrush brush;
         QColor ridecolor;
         bool incorner;
 

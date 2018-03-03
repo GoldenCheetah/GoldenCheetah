@@ -976,15 +976,7 @@ void
 Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
-    else {
-
-        // A brush color of 01010101 means use ride color (same as ride list)
-        // But then a ridecolor of 01010101 means use base colors
-        if (brush.color() == QColor(1,1,1,1)) {
-            if (ridecolor == QColor(1,1,1,1))  painter->setBrush(GColor(CCARDBACKGROUND));
-            else painter->setBrush(QBrush(ridecolor));
-        } else painter->setBrush(brush);
-    }
+    else painter->setBrush(GColor(CCARDBACKGROUND));
 
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);

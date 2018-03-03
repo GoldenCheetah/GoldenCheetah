@@ -2389,10 +2389,20 @@ ColorsPage::applyThemeClicked()
             switch(i) {
 
             case CPLOTBACKGROUND:
+            case CCARDBACKGROUND:
             case CRIDEPLOTBACKGROUND:
             case CTRENDPLOTBACKGROUND:
             case CTRAINPLOTBACKGROUND:
                 color = theme.colors[0]; // background color
+                break;
+
+            case COVERVIEWBACKGROUND:
+                // set back to black for dark themes
+                // and gray for light themes
+                if (GCColor::luminance(theme.colors[0]) < 127) {
+                    if (theme.colors[0] == Qt::black) color = QColor(35,35,35);
+                    else color = Qt::black;
+                } else color = QColor(240,240,240);
                 break;
 
             // fg color theme.colors[1] not used YET XXX
