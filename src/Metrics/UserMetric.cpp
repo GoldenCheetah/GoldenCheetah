@@ -285,6 +285,11 @@ UserMetric::isTime() const
 void
 UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
 {
+    // update the list of compatibility metrics
+    RideMetricFactory &f = RideMetricFactory::instance();
+
+    // reset, get added below ONLY if user didn't define them
+    f.compatibilitymetrics.clear();
 
     // add metrics for backwards compatibility if they are not
     // already defined by the user
@@ -313,6 +318,7 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c1.aggzero = true;
         c1.fingerprint = c1.symbol + DataFilter::fingerprint(c1.program);
         metrics.insert(0, c1);
+        f.compatibilitymetrics << "TSS";
     }
 
     if (!hasc2) {
@@ -333,6 +339,7 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c2.aggzero = true;
         c2.fingerprint = c2.symbol + DataFilter::fingerprint(c2.program);
         metrics.insert(0, c2);
+        f.compatibilitymetrics << "IF";
     }
 
     if (!hasc3) {
@@ -353,5 +360,6 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c3.aggzero = true;
         c3.fingerprint = c3.symbol + DataFilter::fingerprint(c3.program);
         metrics.insert(0, c3);
+        f.compatibilitymetrics << "NP";
     }
 }

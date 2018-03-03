@@ -348,6 +348,10 @@ public:
 
 class RideMetricFactory {
 
+public:
+    static QList<QString> compatibilitymetrics;
+
+private:
     static RideMetricFactory *_instance;
     static QVector<QString> noDeps;
 

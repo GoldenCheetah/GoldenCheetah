@@ -720,7 +720,7 @@ GCColor::applyTheme(int index)
             if (GCColor::luminance(theme.colors[0]) < 127) {
                 if (theme.colors[0] == Qt::black) color = QColor(35,35,35);
                 else color = Qt::black;
-            } else color = QColor(240,240,240);
+            } else color = QColor(243,255,255);
             break;
 
         // fg color theme.colors[1] not used YET XXX

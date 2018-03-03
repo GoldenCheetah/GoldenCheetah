@@ -155,6 +155,7 @@ int DBSchemaVersion = 143;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
+QList<QString> RideMetricFactory::compatibilitymetrics;
 
 // user defined metrics are loaded by the ridecache on startup
 // and then reloaded by ridecache if they change

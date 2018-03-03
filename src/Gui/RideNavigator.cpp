@@ -1309,6 +1309,9 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     QString last;
     foreach (QString column, buttonNames) {
 
+        // hide compatibility metrics
+        if (RideMetricFactory::instance().compatibilitymetrics.contains(column)) continue;
+
         // ignore groupby
         if (column == "*") continue;
 
