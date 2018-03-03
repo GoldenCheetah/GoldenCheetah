@@ -987,7 +987,9 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
-    painter->setPen(QColor(200,200,200));
+    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+    else painter->setPen(QColor(70,70,70));
+
     painter->setFont(parent->titlefont);
     if (type != PMC || drag) painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(parent->titlefont, parent->device()).height()), name);
 
