@@ -25,8 +25,6 @@
 # include  <stdlib.h>
 # include  <string.h>
 
-# include  "usb.h"
-
 # include "EzUsb.h"
 
 
