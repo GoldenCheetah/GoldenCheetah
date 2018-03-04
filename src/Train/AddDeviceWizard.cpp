@@ -28,6 +28,7 @@
 // 10. Select Device Type
 // 20. Scan for Device / select Serial
 // 30. Firmware for Fortius
+// 35. Firmware for Imagic
 // 50. Pair for ANT
 // 55. Pair for BTLE
 // 60. Finalise
@@ -57,6 +58,7 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setPage(10, new AddType(this));   // done
     setPage(20, new AddSearch(this)); // done
     setPage(30, new AddFirmware(this)); // done
+    setPage(35, new AddImagic(this)); // done
     setPage(50, new AddPair(this));     // done
     setPage(55, new AddPairBTLE(this));     // done
     setPage(60, new AddFinal(this));    // todo -- including virtual power
@@ -147,7 +149,8 @@ AddType::clicked(QString p)
         default:
         case DEV_CT : next = 60; break; // confirm and add 
         case DEV_MONARK : next = 60; break; // confirm and add
-        case DEV_FORTIUS : next = 30; break; // confirm and add 
+        case DEV_FORTIUS : next = 30; break; // confirm and add
+        case DEV_IMAGIC : next = 35; break; // confirm and add
         }
     }
     wizard->next();
@@ -204,6 +207,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 #endif
 #ifdef GC_HAVE_LIBUSB
     case DEV_FORTIUS : wizard->controller = new FortiusController(NULL, NULL); break;
+    case DEV_IMAGIC : wizard->controller = new ImagicController(NULL, NULL); break;
 #endif
     case DEV_NULL : wizard->controller = new NullController(NULL, NULL); break;
     case DEV_ANTLOCAL : wizard->controller = new ANTlocalController(NULL, NULL); break;
@@ -451,7 +455,8 @@ AddSearch::nextId() const
         case DEV_MONARK : return 60; break; // confirm and add
         case DEV_KETTLER : return 60; break; // confirm and add
         case DEV_KETTLER_RACER : return 60; break; // confirm and add
-        case DEV_FORTIUS : return 30; break; // confirm and add 
+        case DEV_FORTIUS : return 30; break; // confirm and add
+        case DEV_IMAGIC : return 35; break; // confirm and add
         }
     }
 }
@@ -570,6 +575,94 @@ void
 AddFirmware::browseClicked()
 {
     QString file = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Intel Firmware File (*.hex)"));
+    if (file != "") name->setText(file);
+}
+
+// Imagic Firmware
+AddImagic::AddImagic(AddDeviceWizard *parent) : QWizardPage(parent), parent(parent)
+{
+    setTitle(tr("Select Device driver"));
+    setSubTitle(tr("Select Driver for Tacx Imagic"));
+
+    // create widgets
+    browse = new QPushButton(tr("Browse"), this);
+    copy = new QCheckBox(tr("Copy to Library"));
+    copy->setChecked(true);
+
+    help = new QLabel(this);
+    help->setWordWrap(true);
+
+    help->setText(tr("Tacx Imagic trainers require firmware to be loaded. "
+                  "This firmware is embedded within the device driver I-magic.sys "
+                  "which is provided by Tacx BV."
+                  "This is a copyrighted file and cannot be distributed with "
+                  "GoldenCheetah.\n"
+                  "On windows systems with Tacx Fortius/Imagic installed "
+                  "you will typically find this in C:\\Windows\\system32.\n\n"
+                  "Alternatively, you can extract it from a Tacx software CD\n"
+                  "On older Fortius cds it lives in the directory FortiusInstall\\Support\\driver_imagic.\n"
+                  "On later TTS cds it is in support\\drivers_usb_interface\\32\n\n"
+                  "Place a copy of this file somewhere on this PC and reference it above.\n\n"
+                  "If you choose to copy to library the file will be copied into the "
+                  "GoldenCheetah library, otherwise we will reference it in place. "));
+
+    file = new QLabel(tr("File:"), this);
+
+    name= new QLineEdit(this);
+    name->setEnabled(false);
+
+    QString imagicFirmware = appsettings->value(this, IMAGIC_FIRMWARE, "").toString();
+    name->setText(imagicFirmware);
+
+    // Layout widgets
+    QHBoxLayout *buttons = new QHBoxLayout;
+    QHBoxLayout *filedetails = new QHBoxLayout;
+    filedetails->addWidget(file);
+    filedetails->addWidget(name);
+    filedetails->addWidget(browse);
+    filedetails->addStretch();
+
+    buttons->addWidget(copy);
+    buttons->addStretch();
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(filedetails);
+    mainLayout->addWidget(help);
+    mainLayout->addStretch();
+    mainLayout->addLayout(buttons);
+
+    // connect widgets
+    connect(browse, SIGNAL(clicked()), this, SLOT(browseClicked()));
+}
+
+bool
+AddImagic::validatePage()
+{
+    QString filePath = name->text();
+    if (filePath == "" || !QFile(filePath).exists()) return false;
+
+    // either copy it, or reference it!
+    if (copy->isChecked()) {
+
+        QString fileName = QFileInfo(filePath).fileName();
+        QString targetFilePath = QFileInfo(parent->context->athlete->home->root().canonicalPath() + "/../").canonicalPath() + "/" + fileName;
+
+        // check not the same thing!
+        if(QFileInfo(filePath).canonicalPath() != QFileInfo(targetFilePath).canonicalPath()) {
+            // if the current file exists, wipe it
+            if (QFile(targetFilePath).exists()) QFile(targetFilePath).remove();
+            QFile(filePath).copy(targetFilePath);
+        }
+        name->setText(targetFilePath);
+    }
+    appsettings->setValue(IMAGIC_FIRMWARE, name->text());
+    return true;
+}
+
+void
+AddImagic::browseClicked()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Tacx Device driver (*.sys)"));
     if (file != "") name->setText(file);
 }
 

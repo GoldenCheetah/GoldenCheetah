@@ -29,6 +29,7 @@
 #endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
+#include "ImagicController.h"
 #endif
 #include "ComputrainerController.h"
 #if QT_VERSION >= 0x050000
@@ -147,6 +148,28 @@ class AddFirmware : public QWizardPage
         QLabel *file;
         QLineEdit *name;
         //Context *context;
+        AddDeviceWizard *parent;
+};
+
+class AddImagic : public QWizardPage
+{
+    Q_OBJECT
+
+    public:
+        AddImagic(AddDeviceWizard *);
+        bool validatePage();
+        int nextId() const { return 60; }
+
+    public slots:
+        void browseClicked();
+
+    private:
+        QCheckBox *copy;
+        QPushButton *ok, *cancel;
+        QPushButton *browse;
+        QLabel *help;
+        QLabel *file;
+        QLineEdit *name;
         AddDeviceWizard *parent;
 };
 

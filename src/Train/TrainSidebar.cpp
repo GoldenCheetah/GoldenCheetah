@@ -54,6 +54,7 @@
 #endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
+#include "ImagicController.h"
 #endif
 
 // Media selection helper
@@ -649,6 +650,8 @@ TrainSidebar::configChanged(qint32)
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
             Devices[i].controller = new FortiusController(this, &Devices[i]);
+        } else if (Devices.at(i).type == DEV_IMAGIC) {
+            Devices[i].controller = new ImagicController(this, &Devices[i]);
 #endif
         } else if (Devices.at(i).type == DEV_NULL) {
             Devices[i].controller = new NullController(this, &Devices[i]);
@@ -1537,7 +1540,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     // to within defined limits
                 }
 
-				if (Devices[dev].type == DEV_FORTIUS) {
+                if (Devices[dev].type == DEV_FORTIUS || Devices[dev].type == DEV_IMAGIC) {
 	                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
                     rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
 					// to within defined limits
@@ -1745,6 +1748,15 @@ void TrainSidebar::resetLapTimer()
     lap_time.restart();
     lap_elapsed_msec = 0;
     lapAudioThisLap = true;
+}
+
+// Can be called from the controller - when user steers to scroll display
+void TrainSidebar::steerScroll(int scrollAmount)
+{
+    if (scrollAmount == 0)
+        emit setNotification(tr("Recalibrating steering.."), 10);
+    else
+        context->notifySteerScroll(scrollAmount);
 }
 
 // can be called from the controller

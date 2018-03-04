@@ -66,9 +66,13 @@ DeviceTypes::DeviceTypes()
 #endif
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,
-        tr("Tacx Fortius/iMagic bike trainer with the handlebar controller connected "
+        tr("Tacx Fortius bike trainer with the handlebar controller connected "
         "to a USB port. Please make sure you have device firmware to hand.") ,
         ":images/devices/fortius.png" },
+       { DEV_IMAGIC,  DEV_LIBUSB,  (char *) "Tacx iMagic",          true,    false,
+        tr("Tacx iMagic bike trainer with the handlebar controller connected "
+        "to a USB port.") ,
+        ":images/devices/imagic.png" },
 #endif
 #ifdef GC_WANT_ROBOT
       { DEV_NULL,     DEV_TCP,     (char *) "Robot", false,   false,

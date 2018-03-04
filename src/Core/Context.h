@@ -201,6 +201,8 @@ class Context : public QObject
         void notifyCompareDateRanges(bool state);
         void notifyCompareDateRangesChanged();
 
+        void notifySteerScroll(int scrollAmount) { emit steerScroll(scrollAmount); }
+
     protected:
 
         // we need to act since the user metric config changed
@@ -279,5 +281,8 @@ class Context : public QObject
         void compareIntervalsChanged();
         void compareDateRangesStateChanged(bool);
         void compareDateRangesChanged();
+
+        // Trainer controls
+        void steerScroll(int);
 };
 #endif // _GC_Context_h

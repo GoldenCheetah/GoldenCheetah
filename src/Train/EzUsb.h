@@ -20,6 +20,8 @@
  *    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+// For explicit runtime linking to libusb functions
+typedef int (*Prototype_EzUsb_control_msg)(usb_dev_handle *, int, int, int, int, char *, int, int);
 
 /*
  * This function loads the firmware from the given file into RAM.
@@ -30,7 +32,13 @@
  *
  * The target processor is reset at the end of this download.
  */
-extern int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage);
+extern int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage, Prototype_EzUsb_control_msg uptr);
+
+/*
+ * This function performs a specialized firmware load for the
+ * earlier 1902 model as used by the Tacx Imagic
+ */
+extern int ezusb_load_ram_imagic (usb_dev_handle *device, const char *path, Prototype_EzUsb_control_msg uptr);
 
 
 /*

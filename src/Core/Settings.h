@@ -215,6 +215,7 @@
 #define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
 #define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"

@@ -167,6 +167,9 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     // trends view we should select a library chart when a chart is selected.
     if (name == "home") connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
+    // Allow realtime controllers to scroll train view with steering movements
+    if (name == "train") connect(context, SIGNAL(steerScroll(int)), this, SLOT(steerScroll(int)));
+
     installEventFilter(this);
     qApp->installEventFilter(this);
 }
@@ -1226,6 +1229,43 @@ GcWindowDialog::exec()
         *here = NULL;
     }
     return 0;
+}
+
+/*----------------------------------------------------------------------
+ * Scroll train window                                                 *
+ * Used by Tacx trainers with steering sensors                         *
+ * scrollAmount is:                                                    *
+ * -1 = single step upwards scroll                                     *
+ * -2 = page step upwards scroll                                       *
+ * +1 = single step downwards scroll                                   *
+ * +2 = page step downwards scroll                                     *
+ *--------------------------------------------------------------------*/
+void HomeWindow::steerScroll(int scrollAmount) {
+    QScrollBar *vertScroll;
+    switch (currentStyle) {
+    case 1 : { vertScroll = tileArea->verticalScrollBar(); }
+        break;
+    case 2 : { vertScroll = winArea->verticalScrollBar(); }
+        break;
+    default:
+        return;
+    }
+
+    int scrollPix;
+    switch (scrollAmount) {
+    case 1: { scrollPix = vertScroll->singleStep(); }
+        break;
+    case 2: { scrollPix = vertScroll->pageStep(); }
+        break;
+    case -1: { scrollPix = 0 - vertScroll->singleStep(); }
+        break;
+    case -2: { scrollPix = 0 - vertScroll->pageStep(); }
+        break;
+    default:
+        return;
+    }
+
+    vertScroll->setValue(vertScroll->value() + scrollPix);
 }
 
 /*----------------------------------------------------------------------

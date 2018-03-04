@@ -51,6 +51,9 @@
 
 int verbose;
 
+// For explicit runtime linking to libusb functions
+Prototype_EzUsb_control_msg ezusb_usb_control_msg = NULL;
+
 /*
  * return true iff [addr,addr+len) includes external RAM
  * for Anchorchips EZ-USB or Cypress EZ-USB FX
@@ -91,7 +94,6 @@ static int fx2_is_external (unsigned short addr, size_t len)
 
 /*****************************************************************************/
 
-
 /*
  * Issue a control request to the specified device.
  * This is O/S specific ...
@@ -105,18 +107,20 @@ static inline int ctrl_msg (
     unsigned char			*data,
     size_t				length
 ) {
-
 #ifdef WIN32
-    // the variable "verbose" which triggers the call to 'crtl_msg' is
-    // never set within GoldenCheetah. Since the call to usb_control_msg
-    // is asking the linker to include "libusb0.dll" - which - depending
-    // on the PC may or may not exist (causing GoldenCheetah not to start).
-    // To avoid such problem the use of "libusb0.dll" functions is de-activated
-    // completely for WIN32. Not limiting functionality but the least invasive
-    // way to allow GoldenCheetah to start without "libusb0.dll" existing.
-    return -1;
+    if (ezusb_usb_control_msg)
+            return ezusb_usb_control_msg(device,
+               (int)requestType,
+               (int)request,
+               (int)value,
+               (int)index,
+               (char*)data,
+               (int)length,
+               10000);
+    else
+        return -1;
 #else
-    return usb_control_msg(device, 
+    return usb_control_msg(device,
 			   (int)requestType,
 			   (int)request,
 			   (int)value,
@@ -392,6 +396,104 @@ int parse_ihex (
     return 0;
 }
 
+/*
+ * Scan an Imagic.sys driver file and invoke the poke() function on the
+ * various segments of firmware to be loaded
+ *
+ * image	- the hex image file
+ * context	- for use by poke()
+ * is_external	- always 0 for imagic (internal memory only
+ * poke		- called with each memory segment; errors indicated
+ *	     	  by returning negative values.
+ *
+ */
+int parse_imagic (
+    FILE	*image,
+    void	*context,
+    int 	(*poke) (void *context, unsigned short addr, int external,
+              const unsigned char *data, size_t len),
+    usb_dev_handle *device
+)
+{
+    unsigned short cpucs_addr = 0x7f92;
+    long block1_offset = 0x3bb0;
+    long block2_offset = 0x2420;
+    long expected_filesize = 26356;
+    int	 rc;
+
+    struct imagic_firmware_array_element {
+        unsigned short length;
+        unsigned short load_addr;
+        unsigned char  flag1;
+        unsigned char  data[16];
+        unsigned char  flag2;
+
+    } imagic_firmware_element;
+
+    // First check that the file is the size we expect
+    rc = fseek(image, 0, SEEK_END);
+    if (rc != 0 || ftell(image) != expected_filesize) {
+        printf("Unexpected format for imagic driver file\n");
+        return -2;
+    }
+
+    /* don't let CPU run while we overwrite its code/data */
+    if (!ezusb_cpucs (device, cpucs_addr, 0))
+        return -1;
+
+    // Seek to first firmware block
+    rc = fseek(image, block1_offset, SEEK_SET);
+    if (rc != 0) {
+        printf("Error locating firmware array 1 in imagic driver file\n");
+        return -2;
+    }
+
+    while (1) {
+        rc = fread(&imagic_firmware_element, 1, sizeof(imagic_firmware_element), image);
+        if (rc != sizeof(imagic_firmware_element)) {
+            printf("Error reading imagic driver file\n");
+            return -2;
+        }
+        if (imagic_firmware_element.length <= 0)
+            break;
+
+        rc = poke (context, imagic_firmware_element.load_addr, 0, imagic_firmware_element.data, imagic_firmware_element.length);
+        if (rc < 0)
+            return -1;
+    }
+
+    /* Enable / disable CPU */
+    if (!ezusb_cpucs (device, cpucs_addr, 1))
+        return -1;
+    if (!ezusb_cpucs (device, cpucs_addr, 0))
+        return -1;
+
+    // Seek to second firmware block
+    rc = fseek(image, block2_offset, SEEK_SET);
+    if (rc != 0) {
+        printf("Error locating firmware array 2 in imagic driver file\n");
+        return -2;
+    }
+    while (1) {
+        rc = fread(&imagic_firmware_element, 1, sizeof(imagic_firmware_element), image);
+        if (rc != sizeof(imagic_firmware_element)) {
+            printf("Error reading imagic driver file\n");
+            return -2;
+        }
+        if (imagic_firmware_element.length <= 0)
+            break;
+
+        rc = poke (context, imagic_firmware_element.load_addr, 0, imagic_firmware_element.data, imagic_firmware_element.length);
+        if (rc < 0)
+            return -1;
+    }
+
+    /* Enable  CPU */
+    if (!ezusb_cpucs (device, cpucs_addr, 1))
+        return -1;
+
+    return 0;
+}
 
 /*****************************************************************************/
 
@@ -483,13 +585,17 @@ static int ram_poke (
  * memory is written, expecting a second stage loader to have already
  * been loaded.  Then file is re-parsed and on-chip memory is written.
  */
-int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage)
+int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage, Prototype_EzUsb_control_msg uptr)
 {
     FILE			*image;
     unsigned short		cpucs_addr;
     int				(*is_external)(unsigned short off, size_t len);
     struct ram_poke_context	ctx;
     int				status;
+
+    //Load the runtime library reference
+    ezusb_usb_control_msg = uptr;
+
 
     image = fopen (path, "r");
     if (image == 0) {
@@ -559,6 +665,49 @@ int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage
     /* now reset the CPU so it runs what we just downloaded */
     if (!ezusb_cpucs (device, cpucs_addr, 1))
 	return -1;
+
+    return 0;
+}
+
+/* Write firmware to a Tacx Imagic controller
+ * The fd is the open "usbfs" device, and the path is the name
+ * of the source imagic.sys file. We open the file and try to find
+ * the array within it that contains the firmware.
+ *
+ * Unlike some later fortius devices, that imagic has only
+ * internal memory
+ */
+int ezusb_load_ram_imagic (usb_dev_handle *device, const char *path, Prototype_EzUsb_control_msg uptr)
+{
+    FILE			*image;
+    struct ram_poke_context	ctx;
+    int				status;
+
+    //Load the runtime library reference
+    ezusb_usb_control_msg = uptr;
+
+    image = fopen (path, "rb");
+    if (image == 0) {
+    printf("%s: unable to open for input.\n", path);
+    return -2;
+    } else if (verbose)
+    printf("open Imagic driver file %s\n", path);
+
+    // Always internal memory for imagic
+    ctx.mode = internal_only;
+
+    /* scan the driver for its firmware array */
+    ctx.device = device;
+    ctx.total = ctx.count = 0;
+    status = parse_imagic (image, &ctx, ram_poke, device);
+    if (status < 0) {
+    printf("unable to download %s\n", path);
+    return status;
+    }
+
+    if (verbose)
+    printf("... WROTE: %d bytes, %d segments, avg %d\n",
+        ctx.total, ctx.count, ctx.total / ctx.count);
 
     return 0;
 }
