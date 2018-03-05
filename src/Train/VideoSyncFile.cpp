@@ -72,6 +72,7 @@ void VideoSyncFile::parseRLV()
 
     // running totals
     double rdist = 0; // running total for distance
+    double rend = 0;  // Length of entire course
 
     // open the file for binary reading and open a datastream
     QFile RLVFile(filename);
@@ -228,6 +229,7 @@ void VideoSyncFile::parseRLV()
                             happy = false;
                             break;
                         }
+                        if (courseInfo.end > rend) rend = courseInfo.end;
                     }
                     // FIXME : add those data to training messages
                 }
@@ -242,6 +244,17 @@ void VideoSyncFile::parseRLV()
             block++;
 
         } else happy = false;
+    }
+
+    // Make sure we have a sync point to represent the end of the course
+    // Some earlier rlvs don't supply an end point frame reference,
+    // so we need to assume the speed from the last ref point continues to the end
+    if ((!Points.isEmpty()) && (rend > Points.last().km * 1000) && Points.last().kph > 0) {
+        VideoSyncFilePoint add;
+        add.km = rend / 1000;
+        add.kph = Points.last().kph;
+        add.secs = Points.last().secs + ((add.km - Points.last().km) * 3600) / add.kph;
+        Points.append(add);
     }
 
     // done
