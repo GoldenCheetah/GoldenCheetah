@@ -619,3 +619,24 @@ QColor PMCData::rrColor(double value, QColor defaultColor)
     //if (value < 0) return QColor(Qt::yellow); // risk of losing fitness
     return defaultColor;
 }
+
+// User descriptions for the 4 series
+QString PMCData::ltsDescription()
+{
+    return tr("CTL/LTS : Chronic Training Load/Long Term Stress. The the dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.");
+}
+
+QString PMCData::stsDescription()
+{
+    return tr("ATL/STS : Acute Training Load/Short Term Stress. The dose of training that you accumulated over a short period of time, computed as an exponentially weighted moving average of the selected Training Load metric from 3 to 10 days in general, 7 by default. It is claimed to relate to your fatigue.");
+}
+
+QString PMCData::sbDescription()
+{
+    return tr("TSB/SB : Training Stress Balance/Stress Balance. It’s the result of subtracting yesterday’s Acute Training Load/Shor Term Stress (“fatigue”) from yesterday’s Chronic Training Load/Long Term Stress (“fitness”). In general terms, if it's negative, you're fatigued, and if it's positive you're fresh. It is claimed to relate to your form or freshness.");
+}
+
+QString PMCData::rrDescription()
+{
+    return tr("RR : Ramp Rate. The rate at which CTL/LTS increases over a given time period. Large values up and down indicate a risk of injury and aggressive taper respectively.");
+}

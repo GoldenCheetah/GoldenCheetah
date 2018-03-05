@@ -96,6 +96,12 @@ class PMCData : public QObject {
         static QColor sbColor(double, QColor defaultColor);
         static QColor rrColor(double, QColor defaultColor);
 
+        // user description for the 4 series
+        static QString ltsDescription();
+        static QString stsDescription();
+        static QString sbDescription();
+        static QString rrDescription();
+
     public slots:
 
         // as underlying ride data changes the

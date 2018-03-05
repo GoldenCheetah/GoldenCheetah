@@ -100,6 +100,12 @@ class PDModel : public QObject, public QwtSyntheticPointData
         virtual double FTP()        { return 0; }      // return FTP
         virtual double PMax()       { return 0; }      // return PMax
 
+        // User Descriptions
+        static QString WPrimeDescription() { return tr("W': Formerly known as Anaerobic Work Capacity (AWC). An estimate for the fixed amount of work, expressed in kJ, that you can do above Critical Power."); }
+        static QString CPDescription() { return tr("Critical Power. An estimate of the power that, theoretically, can be maintained for a long time without fatigue."); }
+        static QString FTPDescription() { return tr("Functional Threshold Power. The highest power that a rider can maintain in a quasi-steady state without fatiguing for approximately one hour."); }
+        static QString PMaxDescription() { return tr("P-max: An estimate of the maximal power over one full rotation of the cranks."); }
+
         virtual void saveParameters(QList<double>&here) = 0;
         virtual void loadParameters(QList<double>&here) = 0;
 
