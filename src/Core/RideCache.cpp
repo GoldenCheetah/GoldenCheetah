@@ -85,6 +85,9 @@ RideCache::RideCache(Context *context) : context(context)
                 RideMetricFactory::instance().addMetric(UserMetric(context, m));
             }
         }
+
+        // reset special fields to take into account user metrics
+        context->specialFields = SpecialFields();
     }
 
     // set the list
