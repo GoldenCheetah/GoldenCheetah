@@ -111,7 +111,9 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     QString strToken =appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN, "").toString();
     QString strSecret= appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_SECRET, "").toString();
 
-    if (strToken == "" && strSecret == "") {
+    QString strToken2 =appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString();
+
+    if (strToken2 =="" && strToken == "" && strSecret == "") {
         downloadWithings->setEnabled(false);
     }
 

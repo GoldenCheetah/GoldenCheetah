@@ -85,15 +85,6 @@ private slots:
     void networkRequestFinished(QNetworkReply *reply);
     void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
-#ifdef GC_HAVE_KQOAUTH
-    void onTemporaryTokenReceived(QString, QString);
-    void onAuthorizationReceived(QString, QString);
-    void onAccessTokenReceived(QString token, QString tokenSecret);
-    void onAuthorizedRequestDone();
-    void onRequestReady(QByteArray response);
-    void onAuthorizationPageRequested (QUrl pageUrl);
-#endif
-
 
 private:
     Context *context;

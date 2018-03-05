@@ -24,9 +24,8 @@
 Withings::Withings(Context *context) : CloudService(context), context(context) {
 
     // config
-    settings.insert(OAuthToken, GC_WITHINGS_TOKEN);
-    settings.insert(Local1, GC_WITHINGS_SECRET);
-    settings.insert(Local2, GC_WIUSER);
+    settings.insert(OAuthToken, GC_NOKIA_TOKEN);
+    settings.insert(Local1, GC_NOKIA_REFRESH_TOKEN);
 }
 
 static bool addWithings() {

@@ -180,29 +180,12 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if (site == WITHINGS) {
 
-        // Withings is the only service that uses KQOauth for now.
-
-#ifdef GC_HAVE_KQOAUTH
-        oauthRequest = new KQOAuthRequest;
-        oauthManager = new KQOAuthManager(this);
-
-        connect(oauthManager, SIGNAL(temporaryTokenReceived(QString,QString)), this, SLOT(onTemporaryTokenReceived(QString, QString)));
-        connect(oauthManager, SIGNAL(authorizationReceived(QString,QString)), this, SLOT( onAuthorizationReceived(QString, QString)));
-        connect(oauthManager, SIGNAL(accessTokenReceived(QString,QString)), this, SLOT(onAccessTokenReceived(QString,QString)));
-        connect(oauthManager, SIGNAL(requestReady(QByteArray)), this, SLOT(onRequestReady(QByteArray)));
-        connect(oauthManager, SIGNAL(authorizationPageRequested(QUrl)), this, SLOT(onAuthorizationPageRequested(QUrl)));
-
-        oauthRequest->initRequest(KQOAuthRequest::TemporaryCredentials, QUrl("https://oauth.withings.com/account/request_token"));
-        //oauthRequest->setEnableDebugOutput(true);
-        oauthRequest->setHttpMethod(KQOAuthRequest::GET);
-        oauthRequest->setConsumerKey(GC_WITHINGS_CONSUMER_KEY);
-        oauthRequest->setConsumerSecretKey(GC_WITHINGS_CONSUMER_SECRET);
-        //oauthRequest->setCallbackUrl(QUrl("http://www.goldencheetah.org"));
-        oauthManager->setHandleUserAuthorization(true); // false to use callback
-        oauthManager->setHandleAuthorizationPageOpening(false);
-
-        oauthManager->executeRequest(oauthRequest);
-#endif
+        urlstr = QString("https://account.health.nokia.com/oauth2_user/authorize2?");
+        urlstr.append("redirect_uri=http://www.goldencheetah.org&");
+        urlstr.append("scope=user.info,user.metrics&");
+        urlstr.append("response_type=code&");
+        urlstr.append("state=xyzzy&");
+        urlstr.append("client_id=").append(GC_NOKIA_CLIENT_ID);
 
     } else if (site == XERT) {
         urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
@@ -211,7 +194,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
 
         url = QUrl(urlstr);
         view->setUrl(url);
@@ -230,113 +213,6 @@ OAuthDialog::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 }
 
 
-#ifdef GC_HAVE_KQOAUTH
-
-//
-// KQOauth call backs
-//
-void
-OAuthDialog::onTemporaryTokenReceived(QString, QString)
-{
-    //qDebug() << "onTemporaryTokenReceived";
-    QUrl userAuthURL;
-
-    if (site == WITHINGS) {
-        userAuthURL = "https://oauth.withings.com/account/authorize";
-    }
-
-    if(oauthManager->lastError() == KQOAuthManager::NoError) {
-        oauthManager->getUserAuthorization(userAuthURL);
-    } else
-        qDebug() << "error" << oauthManager->lastError();
-
-}
-
-void
-OAuthDialog::onAuthorizationReceived(QString, QString)
-{
-    //qDebug() << "Authorization token received: " << token << verifier;
-
-    if (site == WITHINGS) {
-        oauthManager->getUserAccessTokens(QUrl("https://oauth.withings.com/account/access_token"));
-    }
-
-    if(oauthManager->lastError() != KQOAuthManager::NoError) {
-        QString error = QString(tr("Error fetching OAuth credentials - Endpoint: /oauth/access_token"));
-        QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
-        oautherr.exec();
-        accept();
-    }
-}
-
-void
-OAuthDialog::onAccessTokenReceived(QString token, QString tokenSecret)
-{
-    //qDebug() << "Access token received: " << token << tokenSecret;
-
-    QString info;
-    if (site == WITHINGS) {
-        service->setSetting(GC_WITHINGS_TOKEN, token);
-        service->setSetting(GC_WITHINGS_SECRET, tokenSecret);
-        appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, "");
-
-        info = QString(tr("Nokia Health (Withings) authorization was successful."));
-    }
-
-
-    QMessageBox information(QMessageBox::Information, tr("Information"), info);
-    information.exec();
-    accept();
-}
-
-
-void
-OAuthDialog::onAuthorizedRequestDone()  {} // request sent - do nothing
-
-void
-OAuthDialog::onRequestReady(QByteArray response)
-{
-    //qDebug() << "Response received: " << response;
-
-    QString r = response;
-    if (r.contains("\"errors\"", Qt::CaseInsensitive)) {
-
-        QMessageBox oautherr(QMessageBox::Critical, tr("Error in authorization"),
-             tr("There was an error during authorization. Please check the error description."));
-             oautherr.setDetailedText(r); // probably blank
-         oautherr.exec();
-
-    } else {
-
-        if (site == WITHINGS) {
-
-            QString userid;
-
-#if QT_VERSION > 0x050000
-            QUrlQuery params;
-            params.setQuery(response);
-#else
-            QUrl params;
-            params.setEncodedQuery(response);
-#endif
-            userid = params.queryItemValue("userid");
-
-            if (userid.isEmpty() == false) {
-                service->setSetting(GC_WIUSER, userid);
-            }
-        }
-    }
-}
-
-
-void OAuthDialog::onAuthorizationPageRequested(QUrl url) {
-    // open Authorization page in view
-    view->setUrl(url);
-
-}
-#endif // KQOAuth callbacks used by Withings only
-
-
 //
 // STEP 2: AUTHORISATION REDIRECT WITH TEMPORARY CODE
 //
@@ -351,7 +227,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == WITHINGS) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -442,6 +318,14 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("grant_type", "password");
 
                 authheader = QString("%1:%1").arg("xert_public");
+            } else if (site == WITHINGS) {
+
+                urlstr = QString("https://account.health.nokia.com/oauth2/token?");
+                params.addQueryItem("client_id", GC_NOKIA_CLIENT_ID);
+                params.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET);
+                params.addQueryItem("redirect_uri","http://www.goldencheetah.org");
+                params.addQueryItem("grant_type", "authorization_code");
+
             }
 
             // all services will need us to send the temporary code received
@@ -712,6 +596,19 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             //information.exec();
 
             service->message = "Xert authorization was successful.";
+
+        } else if (site == WITHINGS) {
+
+            service->setSetting(GC_NOKIA_TOKEN, access_token);
+            service->setSetting(GC_NOKIA_REFRESH_TOKEN, refresh_token);
+
+            // We have to ask for userid ?
+
+
+
+            QString info = QString(tr("Withings/Nokia authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
 
         }
 

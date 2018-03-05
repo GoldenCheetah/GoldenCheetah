@@ -30,6 +30,28 @@
 #include <kqoauthrequest.h>
 #endif
 
+#ifndef WITHINGS_DEBUG
+#define WITHINGS_DEBUG true
+#endif
+#ifdef Q_CC_MSVC
+#define printd(fmt, ...) do {                                                \
+    if (WITHINGS_DEBUG) {                                 \
+        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
+               __FUNCTION__, __VA_ARGS__);                    \
+        fflush(stdout);                                       \
+    }                                                         \
+} while(0)
+#else
+#define printd(fmt, args...)                                            \
+    do {                                                                \
+        if (WITHINGS_DEBUG) {                                       \
+            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
+                   __FUNCTION__, ##args);                               \
+            fflush(stdout);                                             \
+        }                                                               \
+    } while(0)
+#endif
+
 WithingsDownload::WithingsDownload(Context *context) : context(context)
 {
     nam = new QNetworkAccessManager(this);
@@ -75,7 +97,8 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     if((strToken.isEmpty() || strSecret.isEmpty() ||
        strToken == "" || strToken == "0" ||
        strSecret == "" || strSecret == "0" ) &&
-       (strOldKey.isEmpty() || strOldKey == "" || strOldKey == "0" ))
+       (strOldKey.isEmpty() || strOldKey == "" || strOldKey == "0" ) &&
+       (strNokiaRefreshToken.isEmpty() || strNokiaRefreshToken == "" || strNokiaRefreshToken == "0" ))
     {
         #ifdef Q_OS_MACX
         #define GC_PREF tr("Golden Cheetah->Preferences")
@@ -88,10 +111,11 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         return false;
     }
 
-    if(!strToken.isEmpty() &&! strSecret.isEmpty() &&
+    if(!strNokiaRefreshToken.isEmpty() ||
+           (!strToken.isEmpty() &&! strSecret.isEmpty() &&
             strToken != "" && strToken != "0" &&
-            strSecret != "" && strSecret != "0" ) {
-        qDebug() << "OAuth 2.0 API";
+            strSecret != "" && strSecret != "0" )) {
+        printd("OAuth 2.0 API");
 
 #if QT_VERSION > 0x050000
         QUrlQuery postData;
@@ -99,21 +123,15 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         QUrl postData;
 #endif
 
-        //appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, "");
-        qDebug() << "refresh_token" << appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, QString("%1:%2").arg(strToken).arg(strSecret));
-
         QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
         if (refresh_token.isEmpty())
             refresh_token = QString("%1:%2").arg(strToken).arg(strSecret);
-        qDebug() << "refresh_token" << refresh_token;
 
         postData.addQueryItem("grant_type", "refresh_token");
         postData.addQueryItem("client_id", GC_NOKIA_CLIENT_ID );
         postData.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET );
         postData.addQueryItem("refresh_token", refresh_token );
 
-
-        qDebug() << appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, QString("%1:%2").arg(strToken).arg(strSecret)).toString();
         QUrl url = QUrl( "https://account.withings.com/oauth2/token" );
 
         emit downloadStarted(100);
@@ -122,11 +140,13 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         QNetworkRequest request(url);
         request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
         nam->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
+        printd("url %s %s", url.toString().toStdString().c_str(), postData.toString().toStdString().c_str());
 
         // blocking request
         loop.exec(); // we go on after receiving the data in SLOT(onRequestReady(QByteArray))
 
-        qDebug() << "response" << response;
+        printd("response: %s", response.toStdString().c_str());
+
 
         if (response.contains("\"access_token\"", Qt::CaseInsensitive))
         {
@@ -135,9 +155,13 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
                 access_token = migrateJson.object()["access_token"].toString();
                 QString refresh_token = migrateJson.object()["refresh_token"].toString();
+                QString userid = QString("%1").arg(migrateJson.object()["userid"].toInt());
+
 
                 if (access_token != "") appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_TOKEN, access_token);
                 if (refresh_token != "") appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN, refresh_token);
+                if (userid != "") appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, userid);
+
 
             #if QT_VERSION > 0x050000
                 QUrlQuery params;
@@ -147,14 +171,20 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
                 emit downloadStarted(100);
 
-                params.addQueryItem("userid", appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString());
+                params.addQueryItem("action", "getmeas");
+                //params.addQueryItem("userid", userid);
                 params.addQueryItem("access_token", access_token);
+                params.addQueryItem("startdate", QString::number(from.toMSecsSinceEpoch()/1000));
+                params.addQueryItem("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
+
 
                 QUrl url = QUrl( "https://api.health.nokia.com/measure?" + params.toString() );
 
-                qDebug() << "URL used: " << url.url();
+                printd("URL: %s", url.url().toStdString().c_str());
 
                 QNetworkRequest request(url);
+                //request.setRawHeader("Authorization", QString("Bearer %1").arg(access_token).toLatin1());
+
                 nam->get(request);
 
                 emit downloadProgress(50);
@@ -171,7 +201,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     if(access_token.isEmpty() && !strToken.isEmpty() &&! strSecret.isEmpty() &&
             strToken != "" && strToken != "0" &&
             strSecret != "" && strSecret != "0" ) {
-        qDebug() << "OAuth 1.0 API";
+        printd("OAuth 1.0 API");
 
         #ifdef GC_HAVE_KQOAUTH
         oauthRequest->initRequest(KQOAuthRequest::AuthorizedRequest, QUrl("http://wbsapi.withings.net/measure"));
@@ -219,7 +249,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         params2.addQueryItem("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
 
         QUrl url = QUrl( "https://wbsapi.withings.net/measure?" + params2.toString() );
-        //qDebug() << "URL used: " << url.url();
+        printd("URL : ", url.url().toStdString().c_str());
 
         emit downloadStarted(100);
 
@@ -234,7 +264,8 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
         emit downloadEnded(100);
         #endif
-    } else  {
+    } else if (access_token.isEmpty()) {
+        printd("Withings password API");
 
         // account for trailing slash, remove it if it is there (it was the default in preferences)
         QString server = appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString();
@@ -261,7 +292,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
         }
     }
 
-    qDebug() << "response:" << response;
+    printd("response: %s", response.toStdString().c_str());
 
     QJsonParseError parseResult;
     if (response.contains("\"status\":0", Qt::CaseInsensitive))
@@ -384,12 +415,12 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
 #ifdef GC_HAVE_KQOAUTH
 void
 WithingsDownload::onAuthorizedRequestDone() {
-    // qDebug() << "Request sent to Withings!";
+    // printd("Request sent to Withings!");
 }
 
 void
 WithingsDownload::onRequestReady(QByteArray r) {
-    //qDebug() << "Response from the Withings's service: " << response;
+    //printd("Response from the Withings's service: %s", response..toStdString().c_str());
 
     response = r;
     loop.exit(0);
