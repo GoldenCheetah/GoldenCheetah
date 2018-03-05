@@ -633,7 +633,7 @@ QString PMCData::stsDescription()
 
 QString PMCData::sbDescription()
 {
-    return tr("TSB/SB : Training Stress Balance/Stress Balance. It’s the result of subtracting yesterday’s Acute Training Load/Shor Term Stress (“fatigue”) from yesterday’s Chronic Training Load/Long Term Stress (“fitness”). In general terms, if it's negative, you're fatigued, and if it's positive you're fresh. It is claimed to relate to your form or freshness.");
+    return tr("TSB/SB : Training Stress Balance/Stress Balance. It's the result of subtracting yesterday's Acute Training Load/Shor Term Stress (“fatigue”) from yesterday's Chronic Training Load/Long Term Stress (“fitness”). In general terms, if it's negative, you're fatigued, and if it's positive you're fresh. It is claimed to relate to your form or freshness.");
 }
 
 QString PMCData::rrDescription()
