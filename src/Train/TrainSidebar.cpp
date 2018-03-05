@@ -1667,9 +1667,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 displayLapDistance += distanceTick;
                 displayLapDistanceRemaining -= distanceTick;
 
-
-                if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile())) {
-                    displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
+                if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
+                {
+                    displayWorkoutDistance = context->currentVideoSyncFile()->km;
                     // TODO : graphs to be shown at seek position
                 } else {
                     displayWorkoutDistance += distanceTick;
