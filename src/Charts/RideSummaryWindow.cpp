@@ -686,22 +686,26 @@ RideSummaryWindow::htmlSummary()
                                                     GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND));
 
                 // get the Coggan PMC and add values for date of ride
-                summary += QString(tr("<tr><td>CTL:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                summary += QString(tr("<tr><td>%3</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
                                    .arg((int)pmc->lts(rideItem->dateTime.date()))
                                    .arg(PMCData::ltsColor((int)pmc->lts(rideItem->dateTime.date()), defaultColor).name())
-                                    );
-                summary += QString(tr("<tr><td>ATL:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                    )
+                                   .arg(addTooltip("CTL:", PMCData::ltsDescription()));
+                summary += QString(tr("<tr><td>%3</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
                                    .arg((int)pmc->sts(rideItem->dateTime.date()))
                                    .arg(PMCData::stsColor((int)pmc->sts(rideItem->dateTime.date()), defaultColor).name())
-                                    );
-                summary += QString(tr("<tr><td>TSB:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                    )
+                                   .arg(addTooltip("ATL:", PMCData::stsDescription()));
+                summary += QString(tr("<tr><td>%3</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
                                    .arg((int)pmc->sb(rideItem->dateTime.date()))
                                    .arg(PMCData::sbColor((int)pmc->sb(rideItem->dateTime.date()), defaultColor).name())
-                                    );
-                summary += QString(tr("<tr><td>RR:</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
+                                    )
+                                   .arg(addTooltip("TSB:", PMCData::sbDescription()));
+                summary += QString(tr("<tr><td>%3</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
                                    .arg((int)pmc->rr(rideItem->dateTime.date()))
                                    .arg(PMCData::rrColor((int)pmc->rr(rideItem->dateTime.date()), defaultColor).name())
-                                    );
+                                    )
+                                   .arg(addTooltip("RR:", PMCData::rrDescription()));
 
             } else {
 
@@ -761,14 +765,14 @@ RideSummaryWindow::htmlSummary()
                 }
 
                 // show range for date period
-                summary += QString(tr("<tr><td>CTL:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
-                                   .arg((int)lowCTL).arg((int)highCTL).arg((int)avgCTL));
-                summary += QString(tr("<tr><td>ATL:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
-                                   .arg((int)lowATL).arg((int)highATL).arg((int)avgATL));
-                summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
-                                   .arg((int)lowTSB).arg((int)highTSB).arg((int)avgTSB));
-                summary += QString(tr("<tr><td>RR:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
-                                   .arg((int)lowRR).arg((int)highRR).arg((int)avgRR));
+                summary += QString(tr("<tr><td>%4</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
+                                   .arg((int)lowCTL).arg((int)highCTL).arg((int)avgCTL)).arg(addTooltip("CTL:", PMCData::ltsDescription()));
+                summary += QString(tr("<tr><td>%4</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
+                                   .arg((int)lowATL).arg((int)highATL).arg((int)avgATL)).arg(addTooltip("ATL:", PMCData::stsDescription()));
+                summary += QString(tr("<tr><td>%4</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
+                                   .arg((int)lowTSB).arg((int)highTSB).arg((int)avgTSB)).arg(addTooltip("TSB:", PMCData::sbDescription()));
+                summary += QString(tr("<tr><td>%4</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
+                                   .arg((int)lowRR).arg((int)highRR).arg((int)avgRR)).arg(addTooltip("RR:", PMCData::rrDescription()));
             }
             // spacer
             summary += "<tr style=\"height: 3px;\"></tr>";
@@ -792,8 +796,8 @@ RideSummaryWindow::htmlSummary()
              // HTML table row
              QString s("<tr><td>%1%2:</td><td align=\"right\">%3</td></tr>");
  
-             // Maximum Max and Average Average looks nasty, remove from name for display
-             s = s.arg(m->name().replace(QRegExp(tr("^(Average|Max) ")), ""));
+             // Maximum Max and Average Average looks nasty, remove from name for display, and add description tooltip
+             s = s.arg(addTooltip(m->name().replace(QRegExp(tr("^(Average|Max) ")), ""), m->description()));
  
              // Add units (if needed)  and value (with right precision)
              if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
@@ -860,7 +864,7 @@ RideSummaryWindow::htmlSummary()
 
     // W;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 kJ</td></tr>")
-            .arg(tr("W'"))
+            .arg(addTooltip(tr("W'"), PDModel::WPrimeDescription()))
             .arg(WPrimeString);
     summary += QString("<tr><td></td><td align=\"right\">%1 J/kg</td></tr>")
             .arg(WPrimeStringWPK);
@@ -870,7 +874,7 @@ RideSummaryWindow::htmlSummary()
 
     // CP;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 %3</td></tr>")
-            .arg(tr("CP"))
+            .arg(addTooltip(tr("CP"), PDModel::CPDescription()))
             .arg(CPString)
             .arg(tr("watts"));
     summary += QString("<tr><td></td><td align=\"right\">%1 %2</td></tr>")
@@ -883,7 +887,7 @@ RideSummaryWindow::htmlSummary()
 #if 0 // clutters it up and adds almost nothing
     // FTP/MMP60;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg(tr("FTP (watts)"))
+            .arg(addTooltip(tr("FTP (watts)"), PDModel::FTPDescription()))
             .arg(FTPString);
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
             .arg(tr("FTP (w/kg)"))
@@ -892,7 +896,7 @@ RideSummaryWindow::htmlSummary()
 
     // Pmax;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 %3</td></tr>")
-            .arg(tr("P-max"))
+            .arg(addTooltip(tr("P-max"), PDModel::PMaxDescription()))
             .arg(PMaxString)
             .arg(tr("watts"));
     summary += QString("<tr><td></td><td align=\"right\">%1 %2</td></tr>")
@@ -916,7 +920,7 @@ RideSummaryWindow::htmlSummary()
 
             //summary = summary.arg(90 / bestsColumn.count());
             const RideMetric *m = factory.rideMetric(bestsColumn[i]);
-            summary = summary.arg(m->name());
+            summary = summary.arg(addTooltip(m->name(), m->description()));
 
             QList<AthleteBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
 
@@ -1269,13 +1273,13 @@ RideSummaryWindow::htmlSummary()
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
         }
         for (j = 0; j< rideCols; ++j) {
             QString symbol = rideMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
         }
         summary += "</tr>";
 
@@ -1369,13 +1373,13 @@ RideSummaryWindow::htmlSummary()
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
         }
         for (j = 0; j< runCols; ++j) {
             QString symbol = runMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
         }
         summary += "</tr>";
 
@@ -1468,13 +1472,13 @@ RideSummaryWindow::htmlSummary()
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
         }
         for (j = 0; j< swimCols; ++j) {
             QString symbol = swimMetrics[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
         }
         summary += "</tr>";
 
@@ -1830,8 +1834,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 QString name, units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                         units = m->units(context->athlete->useMetricUnits);
-                if (units != "") name = QString("%1 (%2)").arg(m->name()).arg(units);
-                else name = QString("%1").arg(m->name());
+                if (units != "") name = QString("%1 (%2)").arg(addTooltip(m->name(), m->description())).arg(units);
+                else name = QString("%1").arg(addTooltip(m->name(), m->description()));
 
                 name = name.replace(QRegExp(tr("^(Average|Max) ")), ""); // average/max on average/max is dumb
                 summary += "<td align=\"center\" colspan=2><b>" +  name + "</b></td>";
@@ -2197,8 +2201,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 QString name, units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                     units = m->units(context->athlete->useMetricUnits);
-                if (units != "") name = QString("%1 (%2)").arg(m->name()).arg(units);
-                else name = QString("%1").arg(m->name());
+                if (units != "") name = QString("%1 (%2)").arg(addTooltip(m->name(), m->description())).arg(units);
+                else name = QString("%1").arg(addTooltip(m->name(), m->description()));
 
                 name = name.replace(QRegExp(tr("^(Average|Max) ")), ""); // average/max on average/max is dumb
                 summary += "<td align=\"center\" colspan=2><b>" +  name + "</b></td>";
@@ -2629,4 +2633,11 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
     specification.setDateRange(current);
 
     refresh();
+}
+
+QString
+RideSummaryWindow::addTooltip(QString name, QString tooltip)
+{
+    QString s("<div class=\"tooltip\">%1<span class=\"tooltiptext\">%2</span></div>");
+    return s.arg(name).arg(tooltip);
 }
