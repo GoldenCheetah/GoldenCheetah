@@ -132,7 +132,6 @@ class RideMapWindow : public GcChartWindow
         typedef enum {
             OSM,
             GOOGLE,
-            BING,
         } MapType;
 
         RideMapWindow(Context *, int mapType);
@@ -145,7 +144,7 @@ class RideMapWindow : public GcChartWindow
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
-        void setMapType(int x) { mapCombo->setCurrentIndex(x); }
+        void setMapType(int x) { mapCombo->setCurrentIndex(x >= 0 && x < mapCombo->count() ? x : OSM); } // default to OSM for invalid mapType, s.t. deprecated Bing
 
         bool showIntervals() const { return showInt->isChecked(); }
         void setShowIntervals(bool x) { showInt->setChecked(x); }

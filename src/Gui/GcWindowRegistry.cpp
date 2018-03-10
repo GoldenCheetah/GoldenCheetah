@@ -235,9 +235,9 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #endif
     // old maps (GoogleMap and BingMap) replaced by RideMapWindow
     case GcWindowTypes::GoogleMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::GOOGLE); break; // new GoogleMapControl(context);
-    case GcWindowTypes::BingMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::BING); break; //returning = new BingMap(context);
+    case GcWindowTypes::BingMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::OSM); break; //returning = new BingMap(context);
 
-    case GcWindowTypes::RideMapWindow: returning = new RideMapWindow(context, RideMapWindow::BING); break;
+    case GcWindowTypes::RideMapWindow: returning = new RideMapWindow(context, RideMapWindow::OSM); break; // Deprecated Bing, default to OSM
 
     case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
