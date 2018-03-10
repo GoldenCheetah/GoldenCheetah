@@ -200,7 +200,7 @@
 #define GC_MOXY_FIX_SMO2                "<global-general>dataprocess/fixmoxydata/fix_smo2"
 #define GC_MOXY_FIX_THB                 "<global-general>dataprocess/fixmoxydata/fix_thb"
 #define GC_MOXY_FIX_THB_MAX             "<global-general>dataprocess/fixmoxydata/fix_thb_max"
-
+#define GC_DPGPS_SPEED                  "<global-general>dataprocess/fixgps/set_speed"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
