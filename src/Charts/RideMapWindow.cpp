@@ -94,6 +94,10 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     osmTSUrl = new QLineEdit("");
     osmTSUrl->setFixedWidth(250);
 
+    // set default Tile Server and URL
+    tileCombo->setCurrentIndex(0);
+    setTileServerUrlForTileType(0);
+
     commonLayout->addRow(osmTSTitle);
     commonLayout->addRow(osmTSLabel, tileCombo);
     commonLayout->addRow(osmTSUrlLabel, osmTSUrl);
@@ -261,7 +265,7 @@ RideMapWindow::osmCustomTSURLEditingFinished()
 {
 
     // just store the text - even if not changed
-    switch (tileCombo->currentData().toInt())
+    switch (osmTS())
     {
     case 0:
         appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, osmTSUrl->text());
