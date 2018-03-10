@@ -65,9 +65,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     mapCombo= new QComboBox(this);
     mapCombo->addItem(tr("OpenStreetMap"));
     mapCombo->addItem(tr("Google"));
-    mapCombo->addItem(tr("Bing"));
 
-    mapCombo->setCurrentIndex(mapType);
+    setMapType(mapType); // validate mapType and set current index in mapCombo
 
     showMarkersCk = new QCheckBox();
     showFullPlotCk = new QCheckBox();
@@ -92,9 +91,12 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     tileCombo->addItem(tr("Custom Tile Server B"), QVariant(20));
     tileCombo->addItem(tr("Custom Tile Server C"), QVariant(30));
 
-
     osmTSUrl = new QLineEdit("");
     osmTSUrl->setFixedWidth(250);
+
+    // set default Tile Server and URL
+    tileCombo->setCurrentIndex(0);
+    setTileServerUrlForTileType(0);
 
     commonLayout->addRow(osmTSTitle);
     commonLayout->addRow(osmTSLabel, tileCombo);
@@ -263,7 +265,7 @@ RideMapWindow::osmCustomTSURLEditingFinished()
 {
 
     // just store the text - even if not changed
-    switch (tileCombo->currentData().toInt())
+    switch (osmTS())
     {
     case 0:
         appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, osmTSUrl->text());
@@ -406,9 +408,6 @@ void RideMapWindow::createHtml()
     if (mapCombo->currentIndex() == GOOGLE || mapCombo->currentIndex() == OSM) {
         // Load Google Map v3 API
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM\"></script> \n");
-    } else if (mapCombo->currentIndex() == BING) {
-        // Load BING Rest API Services
-        currentPage += QString("<script type=\"text/javascript\" src=\"http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0\"></script>\n");
     }
 
 #ifdef NOWEBKIT
@@ -492,30 +491,6 @@ void RideMapWindow::createHtml()
 
             "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
                   .arg(styleoptions == "" ? 0.4f : 1.0f);
-    }
-    else if (mapCombo->currentIndex() == BING) {
-        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
-              // route will be drawn with these options
-              "    var routeOptionsYellow = {\n"
-              "        strokeColor: new Microsoft.Maps.Color(100, 255, 255, 0),\n"
-              "        strokeThickness: 7,\n"
-              "        strokeDashArray: '5 0',\n"
-              "        zIndex: -2\n"
-              "    };\n"
-
-              // create the route path
-              "    var route = new Array();\n"
-              "    var j=0;\n"
-              "    while (j < latlons.length) { \n"
-              "        route.push(new Microsoft.Maps.Location(latlons[j],latlons[j+1]));\n"
-              "        j += 2;\n"
-              "    }\n"
-
-              // create the route Polyline
-              "    var routeYellow = new Microsoft.Maps.Polyline(route, routeOptionsYellow);\n"
-              "    map.entities.push(routeYellow);\n"
-
-              "}\n");
     }
 
     currentPage += QString("function drawIntervals() { \n"
@@ -700,76 +675,6 @@ void RideMapWindow::createHtml()
         "<div id=\"map-canvas\"></div>\n"
         "</body>\n"
         "</html>\n");
-    } else if (mapCombo->currentIndex() == BING) {
-        currentPage += QString("function drawInterval(latlons) { \n"
-            // intervals will be drawn with these options
-            "    var polyOptions = {\n"
-            "        strokeColor: new Microsoft.Maps.Color(100, 0, 0, 255),\n"
-            "        strokeThickness: 5,\n"
-            "        strokeDashArray: '5 0',\n"
-            "        zIndex: -1\n"
-            "    };\n"
-
-            // create the route path
-            "   var route = new Array();\n"
-            "   var j=0;\n"
-            "   while (j < latlons.length) { \n"
-            "        route.push(new Microsoft.Maps.Location(latlons[j],latlons[j+1]));\n"
-            "        j += 2;\n"
-            "    }\n"
-
-            // create the route Polyline
-            "    var intervalHighlighter = new Microsoft.Maps.Polyline(route, polyOptions);\n"
-            "    map.entities.push(intervalHighlighter);\n"
-            "    intervalList.push(intervalHighlighter);\n"
-            "}\n"
-
-            // initialise function called when map loaded
-            "function initialize() {\n"
-
-            // define initial map boundary
-            "    var initialViewBounds = Microsoft.Maps.LocationRect.fromCorners("
-                                       "new Microsoft.Maps.Location(%1,%2), "
-                                       "new Microsoft.Maps.Location(%3,%4));\n"
-
-            // map options - we like AUTO change as you zoom in
-            "    var options = {\n"
-            "        credentials:\"AtgAt5wRsWGlmft5J_qUbo4rTJg_qZvepiwN_8FQMQwryIlMMCSpwCbvYiIZO5Zr\",\n" // API key, registered to GoldenCheetah
-            "        bounds: initialViewBounds,\n"
-            "        mapTypeId: Microsoft.Maps.MapTypeId.auto,\n"
-            "        animate: true\n"
-            "    };\n"
-
-            // setup the map, and fit to contain the limits of the route
-            "    map = new Microsoft.Maps.Map(document.getElementById(\"map_canvas\"),options);\n"
-
-            // initialise local variables
-            "    markerList = new Array();\n"
-            "    intervalList = new Array();\n"
-            "    polyList = new Array();\n"
-
-            // draw the main route data, getting the geo
-            // data from the webbridge - reduces data sent/received
-            // to the map server and makes the UI pretty snappy
-            "    drawRoute();\n"
-
-            "    drawIntervals();\n"
-
-            // catch signals to redraw intervals
-            "    webBridge.drawIntervals.connect(drawIntervals);\n"
-
-            // we're done now let the C++ side draw its overlays
-            "    webBridge.drawOverlays();\n"
-
-            "}\n"
-            "</script>\n").arg(minLat,0,'g',GPS_COORD_TO_STRING).arg(minLon,0,'g',GPS_COORD_TO_STRING).arg(maxLat,0,'g',GPS_COORD_TO_STRING).arg(maxLon,0,'g',GPS_COORD_TO_STRING);
-
-        // the main page is rather trivial
-        currentPage += QString("</head>\n"
-        "<body\">\n"
-        "<div id=\"map_canvas\"></div>\n"
-        "</body>\n"
-        "</html>\n");
     }
 }
 
@@ -807,13 +712,6 @@ RideMapWindow::drawShadedRoute()
                 if (rfp->lat || rfp->lon)
                     code += QString("path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
             }
-        } else if (mapCombo->currentIndex() == BING) {
-            if (count == 0) {
-                code = QString("{\nvar route = new Array();\n");
-            } else {
-                if (rfp->lat || rfp->lon)
-                    code += QString("route.push(new Microsoft.Maps.Location(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-            }
         }
 
         // running total of time
@@ -843,20 +741,6 @@ RideMapWindow::drawShadedRoute()
                                 "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
                                       .arg(styleoptions == "" ? 0.5f : 1.0f);
 
-            } else if (mapCombo->currentIndex() == BING) {
-                // color the polyline
-                code += QString("    var polyOptions = {\n"
-                                "        strokeColor: new Microsoft.Maps.Color(200, %1, %2, %3),\n"
-                                "        strokeThickness: 3,\n"
-                                "        strokeDashArray: '5 0',\n"
-                                "        zIndex: 1\n"
-                                "    };\n"
-                                "    var polyline = new Microsoft.Maps.Polyline(route, polyOptions);\n"
-                                "    polyline.setOptions(polyOptions);\n"
-                                "    map.entities.push(polyline);\n"
-                                "}\n").arg(color.red())
-                                      .arg(color.green())
-                                      .arg(color.blue());
             }
 
         #ifdef NOWEBKIT
@@ -974,12 +858,6 @@ RideMapWindow::createMarkers()
                        "var image = new google.maps.MarkerImage('qrc:images/maps/loop.png');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
-        } else if (mapCombo->currentIndex() == BING) {
-            code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2); "
-                       "var pushpinOptions = { icon: 'qrc:images/maps/loop.png', height: 37, width: 32 };"
-                       "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
-                       "map.entities.push(pushpin); }"
-                       ).arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         }
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
@@ -993,12 +871,6 @@ RideMapWindow::createMarkers()
                        "var image = new google.maps.MarkerImage('qrc:images/maps/cycling.png');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
-        } else if (mapCombo->currentIndex() == BING) {
-            code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2); "
-                       "var pushpinOptions = { icon: 'qrc:images/maps/cycling.png', height: 37, width: 32 };"
-                       "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
-                       "map.entities.push(pushpin); }"
-                       ).arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         }
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
@@ -1011,12 +883,6 @@ RideMapWindow::createMarkers()
                        "var image = new google.maps.MarkerImage('qrc:images/maps/finish.png');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
-        } else if (mapCombo->currentIndex() == BING) {
-            code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2); "
-                       "var pushpinOptions = { icon: 'qrc:images/maps/finish.png', height: 37, width: 32 };"
-                       "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
-                       "map.entities.push(pushpin); }"
-                       ).arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         }
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
@@ -1070,12 +936,6 @@ RideMapWindow::createMarkers()
                         "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                         "marker.setMap(map);"
                     "}").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-                } else if (mapCombo->currentIndex() == BING) {
-                    code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2); "
-                       "var pushpinOptions = { icon: 'qrc:images/maps/cycling_feed.png', height: 37, width: 32 };"
-                       "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
-                       "map.entities.push(pushpin); }"
-                        ).arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
                 }
 
             #ifdef NOWEBKIT
@@ -1115,19 +975,6 @@ RideMapWindow::createMarkers()
                                         .arg(x->name)
                                         .arg(interval)
                                         ;
-        } else if (mapCombo->currentIndex() == BING) {
-            code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2);\n"
-                       "var pushpinOptions = { };\n"
-                       "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);\n"
-                       "map.entities.push(pushpin);\n"
-                       "if (pushpin.cm1001_er_etr) pushpin.cm1001_er_etr.dom.setAttribute('title', '%3');\n"
-                       "if (pushpin.cm1002_er_etr) pushpin.cm1002_er_etr.dom.setAttribute('title', '%3');\n"
-                       "pushpinClick= Microsoft.Maps.Events.addHandler(pushpin, 'click', function(event) { webBridge.toggleInterval(%4); });\n"
-                       " }")
-                       .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
-                       .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
-                       .arg(x->name)
-                       .arg(interval);
         }
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
@@ -1179,16 +1026,6 @@ void RideMapWindow::zoomInterval(IntervalItem *which)
                                "var northeast = new google.maps.LatLng(%3, %4);\n"
                                "var bounds = new google.maps.LatLngBounds(southwest, northeast);\n"
                                "map.fitBounds(bounds);\n }")
-                        .arg(minLat,0,'g',GPS_COORD_TO_STRING)
-                        .arg(minLon,0,'g',GPS_COORD_TO_STRING)
-                        .arg(maxLat,0,'g',GPS_COORD_TO_STRING)
-                        .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
-    } else if (mapCombo->currentIndex() == BING) {
-        code = QString("{\n"
-                               "    var viewBounds = Microsoft.Maps.LocationRect.fromCorners("
-                               "                                  new Microsoft.Maps.Location(%1,%2), "
-                               "                                  new Microsoft.Maps.Location(%3,%4));\n"
-                               "   map.setView( { bounds: viewBounds });\n }")
                         .arg(minLat,0,'g',GPS_COORD_TO_STRING)
                         .arg(minLon,0,'g',GPS_COORD_TO_STRING)
                         .arg(maxLat,0,'g',GPS_COORD_TO_STRING)
