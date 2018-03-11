@@ -430,12 +430,13 @@ static bool did_mmp_durations = setup_mmp_durations();
 // the filename may be supplied if exporting for other purposes, if empty then save
 // to ~athlete/cache/rideDB.json
 //
-// we also re-use this to write the ride summary we send to the opendata project
-// this doesn't (and must not) contain PII or metadata, but does include some
-// distributions for Heartrate, Power, Cadence and Speed along with MMP data
+// When writing for opendata the file this doesn't (and must not) contain PII or
+// metadata, but does include some distributions for Heartrate, Power, Cadence
+// and Speed along with MMP data. We need to consider what athlete info to add
+// possibly only gender and year of birth.
 //
 // it must be valid json and can be parse with python using
-//      import python
+//      import json
 //      with open('rideDB.json') as json_data:
 //          d = json.load(json_data)
 //      print(len(d["RIDES"])
