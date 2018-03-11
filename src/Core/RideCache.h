@@ -104,7 +104,7 @@ class RideCache : public QObject
 
         // restore / dump cache to disk (json)
         void load();
-        void save();
+        void save(bool opendata=false, QString filename="");
 
         // user updated options/preferences
         void configChanged(qint32);

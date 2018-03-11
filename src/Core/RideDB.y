@@ -18,6 +18,7 @@
  */
 
 #include "RideDB.h"
+#include "RideFileCache.h"
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
 #endif
@@ -401,12 +402,49 @@ static QString protect(const QString string)
     return s;
 }
 
-// save cache to disk, "cache/rideDB.json"
-void RideCache::save()
+static QVector<int> mmp_durations;
+static bool setup_mmp_durations()
+{
+    // 1s - 3mins every second
+    for(int i=1; i<=180; i++) mmp_durations << i;
+
+    // 3mins to 10mins every 5 seconds
+    for(int i=185; i<=600; i+=5) mmp_durations << i;
+
+    // 10mins to 30 mins every 30 seconds
+    for(int i=630; i<=1800; i+=30) mmp_durations << i;
+
+    // 30mins to 2hrs every minute
+    for(int i=1860; i<=(120*60); i += 60) mmp_durations << i;
+
+    // 2hrs+ every 30 mins
+    for(int i=(120*60)+1800; i <= (10 * 60 * 60); i+=1800) mmp_durations << i;
+}
+static bool did_mmp_durations = setup_mmp_durations();
+
+// save cache to disk
+//
+// if opendata is true then save in format for sending to the GC OpenData project
+// the filename may be supplied if exporting for other purposes, if empty then save
+// to ~athlete/cache/rideDB.json
+//
+// we also re-use this to write the ride summary we send to the opendata project
+// this doesn't (and must not) contain PII or metadata, but does include some
+// distributions for Heartrate, Power, Cadence and Speed along with MMP data
+//
+// it must be valid json and can be parse with python using
+//      import python
+//      with open('rideDB.json') as json_data:
+//          d = json.load(json_data)
+//      print(len(d["RIDES"])
+//
+void RideCache::save(bool opendata, QString filename)
 {
 
-    // now save data away
+    // now save data away - use passed filename if set
     QFile rideDB(QString("%1/%2").arg(context->athlete->home->cache().canonicalPath()).arg("rideDB.json"));
+    if (filename != "") rideDB.setFileName(filename);
+
     if (rideDB.open(QFile::WriteOnly)) {
 
         const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -414,7 +452,9 @@ void RideCache::save()
         // ok, lets write out the cache
         QTextStream stream(&rideDB);
         stream.setCodec("UTF-8");
-        stream.setGenerateByteOrderMark(true);
+
+        // no BOM needed for opendata as it doesn't contain textual data
+        if (!opendata) stream.setGenerateByteOrderMark(true);
 
         stream << "{" ;
         stream << QString("\n  \"VERSION\":\"%1\",").arg(RIDEDB_VERSION);
@@ -436,28 +476,37 @@ void RideCache::save()
 
             // basic ride information
             stream << "\t{\n";
-            stream << "\t\t\"filename\":\"" <<item->fileName <<"\",\n";
             stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
-            stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
-            stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
-            stream << "\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
-            stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
-            stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
-            stream << "\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
-            stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
-            stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
-            stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
-            stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
-            stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
-            if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
-            if (item->hrZoneRange >= 0) stream << "\t\t\"hrzonerange\":\"" <<item->hrZoneRange <<"\",\n";
-            if (item->paceZoneRange >= 0) stream << "\t\t\"pacezonerange\":\"" <<item->paceZoneRange <<"\",\n";
+            if (!opendata) {
+                // we don't send this info when sharing as opendata
+                stream << "\t\t\"filename\":\"" <<item->fileName <<"\",\n";
+                stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
+                stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
+                stream << "\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
+                stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
+                stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+                stream << "\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
+                stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
+                stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
+                stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
+                stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
+                stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
-            // if there are overrides, do share them
-            if (item->overrides_.count()) stream << "\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";
+                if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
+                if (item->hrZoneRange >= 0) stream << "\t\t\"hrzonerange\":\"" <<item->hrZoneRange <<"\",\n";
+                if (item->paceZoneRange >= 0) stream << "\t\t\"pacezonerange\":\"" <<item->paceZoneRange <<"\",\n";
 
-            stream << "\t\t\"samples\":\"" <<(item->samples ? "1" : "0") <<"\",\n";
+                // if there are overrides, do share them
+                if (item->overrides_.count()) stream << "\t\t\"overrides\":\"" <<item->overrides_.join(",") <<"\",\n";
+
+                stream << "\t\t\"samples\":\"" <<(item->samples ? "1" : "0") <<"\",\n";
+            } else {
+
+                // need to know what data was collected
+                stream << "\t\t\"data\":\"" <<item->getText("Data","") <<"\",\n";
+                stream << "\t\t\"sport\":\"" <<item->getText("Sport","") <<"\",\n";
+            }
 
             // pre-computed metrics
             stream << "\n\t\t\"METRICS\":{\n";
@@ -467,8 +516,9 @@ void RideCache::save()
                 QString name = factory.metricName(i);
                 int index = factory.rideMetric(name)->index();
 
-                // don't output 0 values, they're set to 0 by default
-                if (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f) {
+                // don't output 0, nan or inf values, they're set to 0 by default
+                if (!std::isinf(item->metrics()[index]) && !std::isnan(item->metrics()[index]) &&
+                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f) && !name.startsWith("compatibility_")) {
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
 
@@ -490,10 +540,126 @@ void RideCache::save()
                     }
                 }
             }
+
+            // if opendata lets put in the distributions for power, hr, cadence and speed
+            if (opendata) {
+
+                QString data = item->getText("Data","");
+
+                if (data.contains("P") || data.contains("H") || data.contains("S") || data.contains("C")) {
+
+                    // get the cache -- may refresh if its out of data, so this might take a while ....
+                    RideFileCache *cache =  new RideFileCache(context, item->fileName, item->weight, NULL, false, true);
+
+                    QList<RideFile::SeriesType> list;
+                    if (data.contains("P")) list <<RideFile::watts;
+                    if (data.contains("H")) list <<RideFile::hr;
+                    if (data.contains("S")) list <<RideFile::kph;
+                    if (data.contains("C")) list <<RideFile::cad;
+
+                    // output distribution for each series
+                    foreach(RideFile::SeriesType x, list) {
+
+                        QVector<double> &array = cache->distributionArray(x);
+                        int split= x==RideFile::cad ? 5 : 10; // set bin size to use
+                        int div=   x==RideFile::kph ? 10 : 1; // speed needs to be divided by 10 to get kph
+
+                        // distribution arrays:
+                        // power_dist_bins:[ n1, n2, n3 ... ],
+                        // power_dist:[ p1, p2, p3 ... ]
+                        //
+                        // the bins are always 10w wide, so we aggregate the data from
+                        // the ridefilecache before outputting the bin starts and values
+                        QVector<int> bins, totals;
+
+                        // lets aggregates
+                        int count=0;
+                        double total=0;
+                        for(int i=0; i< array.count(); i++) {
+
+                            // save value away
+                            if (count==split) {
+                                if (total > 0) { // need a value !
+                                    bins << i-split;
+                                    totals << total;
+                                }
+                                count=0;
+                                total=0;
+                            }
+
+                            total += array[i];
+                            count++;
+                        }
+
+                        // add last partial bin
+                        if (total > 0 && count > 0) {
+                            bins << array.count()-count;
+                            totals << total;
+                        }
+
+                        // series name
+                        QString type=RideFile::seriesName(x, true).toLower();
+
+                        // now write the distribution and the bins
+                        if (bins.count()) {
+
+                            // totals
+                            stream << ",\n\t\t\t\""<<type<<"_dist\":[" ;
+                            for(int i=0; i < totals.count(); i++) {
+                                stream<< QString("%1").arg(totals[i]);
+                                if (i+1 != bins.count()) stream<<", ";
+                            }
+                            stream << " ]";
+
+                            // bins
+                            stream << ",\n\t\t\t\""<<type<<"_dist_bins\":[" ;
+                            for(int i=0; i < bins.count(); i++) {
+                                stream<< QString("%1").arg(bins[i] > 0 ? bins[i] / div : 0);
+                                if (i+1 != bins.count()) stream<<", ";
+                            }
+                            stream << " ]";
+
+                        }
+                    }
+
+                    // MMP - We want to try and keep some of the resolution as this is likely to be filtered
+                    //       and/or aggregated in some fashion by the user. So we choose to keep resolution
+                    //       high at short durations and low at long durations with the points at which the
+                    //       resolution degrades at some point after a physiological boundary.
+                    //
+                    // power_mmp - the mean max values
+                    // power_mmp_secs - the mean max durations
+                    if (data.contains("P")) {
+
+                        QVector<double> &array = cache->meanMaxArray(RideFile::watts);
+
+                        if (array.count() > 0) {
+
+                            // power_mmp
+                            stream << ",\n\t\t\t\"power_mmp\":[" ;
+                            for (int i=0; i<mmp_durations.count() && mmp_durations[i] < array.count(); i++) {
+                                if (i>0) stream << ", "; // for all but first value add comma
+                                stream<< QString("%1").arg(array[mmp_durations[i]], 0, 'f', 0);
+                            }
+                            stream << " ]";
+
+                            // power_mmp_secs
+                            stream << ",\n\t\t\t\"power_mmp_secs\":[" ;
+                            for (int i=0; i<mmp_durations.count() && mmp_durations[i] < array.count(); i++) {
+                                if (i>0) stream << ", "; // for all but first value add comma
+                                stream<< QString("%1").arg(mmp_durations[i]);
+                            }
+                            stream << " ]";
+                        }
+                    }
+                    delete cache;
+                }
+
+            }
             stream << "\n\t\t}";
 
-            // pre-loaded metadata
-            if (item->metadata().count()) {
+            // pre-loaded metadata - don't send to OpenData
+            if (!opendata && item->metadata().count()) {
 
                 stream << ",\n\t\t\"TAGS\":{\n";
 
@@ -535,8 +701,8 @@ void RideCache::save()
                 stream << "\n\t\t}";
             }
 
-            // intervals
-            if (item->intervals().count()) {
+            // intervals - but not for opendata
+            if (!opendata && item->intervals().count()) {
 
                 stream << ",\n\t\t\"INTERVALS\":[\n";
                 bool firstInterval = true;
