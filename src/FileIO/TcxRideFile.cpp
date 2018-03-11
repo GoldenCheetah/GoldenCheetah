@@ -96,15 +96,46 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         activity.appendChild(notes);
     }
 
-    // device type if present
-    if (ride->deviceType() != "") {
-        QDomElement creator = doc.createElement("Creator");
-        QDomElement creatorName = doc.createElement("Name");
-        text = doc.createTextNode(ride->deviceType());
-        creatorName.appendChild(text);
-        creator.appendChild(creatorName);
-        activity.appendChild(creator);
+    // always create as Garmin TCX (to allow import into other programs)
+    // exception is "Zwift" - since some programs (e.g. Strava) interpret that as "virtual ride"
+    // so let them still have the chance to identify a ride coming from Zwift
+    QDomElement creator = doc.createElement("Creator");
+    creator.setAttribute("xsi:type", "Device_t");
+    QDomElement creatorName = doc.createElement("Name");
+    if (ride->deviceType().toLower().contains("zwift") ) {
+        text = doc.createTextNode("Zwift");
+    } else {
+        text = doc.createTextNode("Garmin TCX");
     }
+    creatorName.appendChild(text);
+    creator.appendChild(creatorName);
+    QDomElement unitid = doc.createElement("UnitId");
+    text = doc.createTextNode ("0");
+    unitid.appendChild(text);
+    creator.appendChild(unitid);
+    QDomElement productid = doc.createElement("ProductId");
+    text = doc.createTextNode ("20119");
+    productid.appendChild(text);
+    creator.appendChild(productid);
+    QDomElement version = doc.createElement("Version");
+    QDomElement versionMajor = doc.createElement("VersionMajor");
+    text = doc.createTextNode ("0");
+    versionMajor.appendChild(text);
+    version.appendChild(versionMajor);
+    QDomElement versionMinor = doc.createElement("VersionMinor");
+    text = doc.createTextNode ("0");
+    versionMinor.appendChild(text);
+    version.appendChild(versionMinor);
+    QDomElement buildMajor = doc.createElement("BuildMajor");
+    text = doc.createTextNode ("0");
+    buildMajor.appendChild(text);
+    version.appendChild(buildMajor);
+    QDomElement buildMinor = doc.createElement("BuildMinor");
+    text = doc.createTextNode ("0");
+    buildMinor.appendChild(text);
+    version.appendChild(buildMinor);
+    creator.appendChild(version);
+    activity.appendChild(creator);
 
     QDomElement lap = doc.createElement("Lap");
     lap.setAttribute("StartTime", ride->startTime().toUTC().toString(Qt::ISODate));
