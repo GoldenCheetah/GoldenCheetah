@@ -419,6 +419,8 @@ static bool setup_mmp_durations()
 
     // 2hrs+ every 30 mins
     for(int i=(120*60)+1800; i <= (10 * 60 * 60); i+=1800) mmp_durations << i;
+
+    return true;
 }
 static bool did_mmp_durations = setup_mmp_durations();
 
