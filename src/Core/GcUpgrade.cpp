@@ -250,7 +250,7 @@ GcUpgrade::upgrade(const QDir &home)
                 FieldDefinition f = fieldDefinitions[i];
 
                 if (f.tab == tr("Metric") && pos < 0) pos = i;
-                if (f.name == "BikeStress") indexTSS=i;
+                if (f.name == "TSS") indexTSS=i;
                 if (f.name == tr("Aerobic TISS")) indexAeTISS=i;
                 if (f.name == tr("Anaerobic TISS")) indexAnTISS=i;
             }
@@ -282,7 +282,7 @@ GcUpgrade::upgrade(const QDir &home)
                     fieldDefinitions.insert(pos, add);
                 }
                 if (indexTSS < 0) {
-                    add.name = tr("BikeStress");
+                    add.name = tr("TSS");
                     fieldDefinitions.insert(pos, add);
                 }
                 updated = true;
