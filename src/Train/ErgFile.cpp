@@ -401,6 +401,13 @@ void ErgFile::parseTacx()
     // if we got here and are still happy then it
     // must have been a valid file.
     if (happy) {
+        // Set the end point for the workout
+        ErgFilePoint end;
+        end.x = rdist;
+        end.y = Points.last().y;
+        end.val = Points.last().val;
+        Points.append(end);
+
         valid = true;
 
         // set ErgFile duration
