@@ -195,6 +195,13 @@ HrvMeasuresDownload::download() {
 
        updateMeasures(context, hrvMeasures, discardExistingMeasures->isChecked());
 
+#ifdef Q_MAC_OS
+       // since progressBar on MacOS does not show the % values
+       QMessageBox msgBox;
+       msgBox.setText(tr("Download completed."));
+       msgBox.exec();
+#endif
+
    } else {
        // handle error document in err String
        QMessageBox::warning(this, tr("HRV Measurements"), tr("Downloading of HRV measurements failed with error: %1").arg(err));

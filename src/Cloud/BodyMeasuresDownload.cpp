@@ -304,6 +304,13 @@ BodyMeasuresDownload::download() {
        // do a refresh, it will check if needed
        context->athlete->rideCache->refresh();
 
+#ifdef Q_MAC_OS
+       // since progressBar on MacOS does not show the % values
+       QMessageBox msgBox;
+       msgBox.setText(tr("Download completed."));
+       msgBox.exec();
+#endif
+
    } else {
        // handle error document in err String
        QMessageBox::warning(this, tr("Body Measurements"), tr("Downloading of body measurements failed with error: %1").arg(err));
