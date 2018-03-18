@@ -187,7 +187,7 @@ class CloudService : public QObject {
         QString activeSettingName() const { return QString("%1/%2/active").arg(GC_QSETTINGS_ATHLETE_PRIVATE).arg(id()); }
 
         // PUBLIC INTERFACES. DO NOT REIMPLEMENT
-        static bool upload(QWidget *parent, CloudService *store, RideItem*);
+        static bool upload(QWidget *parent, Context *context, CloudService *store, RideItem*);
 
         enum compression { none, zip, gzip };
         typedef enum compression CompressionType;
@@ -228,7 +228,7 @@ class CloudServiceUploadDialog : public QDialog
     Q_OBJECT
 
     public:
-        CloudServiceUploadDialog(QWidget *parent, CloudService *store, RideItem *item);
+        CloudServiceUploadDialog(QWidget *parent, Context *context, CloudService *store, RideItem *item);
 
         QLabel *info;               // how much being uploaded / status
         QProgressBar *progress;     // whilst we wait
@@ -239,6 +239,7 @@ class CloudServiceUploadDialog : public QDialog
         void completed(QString name, QString message);
 
     private:
+        Context *context;
         CloudService *store;
         RideItem *item;
         QByteArray data;            // compressed data to upload
