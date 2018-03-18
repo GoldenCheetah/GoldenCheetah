@@ -400,7 +400,9 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 
         // make sure they fit
         eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
-        appsettings->setCValue(context->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, dateRange->id().toString());
+
+        QString lastDateSel = phase ? phase->id().toString() : dateRange->id().toString();
+        appsettings->setCValue(context->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, lastDateSel);
 
     }
 
@@ -445,6 +447,7 @@ LTMSidebar::resetSeasons()
             Phase phase = season.phases.at(j);
             QTreeWidgetItem *addPhase = new QTreeWidgetItem(addSeason, phase.getType());
             if (phase.id().toString() == id) {
+                addSeason->setExpanded(true);
                 addPhase->setSelected(true);
             }
             addPhase->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
