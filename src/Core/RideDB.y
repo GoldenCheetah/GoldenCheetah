@@ -461,6 +461,16 @@ void RideCache::save(bool opendata, QString filename)
 
         stream << "{" ;
         stream << QString("\n  \"VERSION\":\"%1\",").arg(RIDEDB_VERSION);
+
+        // send very basic athlete info with no PII
+        // year of birth, gender, uuid
+        if (opendata) {
+            stream << QString("\n  \"ATHLETE\":{ \"gender\":\"%1\", \"yob\":\"%2\", \"id\":\"%3\" },")
+                        .arg(appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt() == 0 ? "M" : "F")
+                        .arg(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate().year())
+                        .arg(context->athlete->id.toString());
+        }
+
         stream << "\n  \"RIDES\":[\n";
 
         bool firstRide = true;
