@@ -239,6 +239,13 @@
 #define GC_UPGRADE_FOLDER_SUCCESS       "<athlete-general>upgradesuccess/folder"     // success tracking of folder upgrade stored on athlete level
 #define GC_ATHLETE_SNIPPETID            "<athlete-general>snippetid"
 
+#define GC_OPENDATA_GRANTED             "<athlete-general>opendata/allowed"         // did the user grant permission? (Y, N, X)
+                                                                                    // X means we haven't asked yet (default)
+#define GC_OPENDATA_RUNCOUNT            "<athlete-general>opendata/runcount"        // times launched, so ask after a while and
+                                                                                    // make sure they're a regular user
+#define GC_OPENDATA_LASTPOSTED          "<athlete-general>opendata/postingdate"     // when did we last send data?
+#define GC_OPENDATA_LASTPOSTCOUNT       "<athlete-general>opendata/postingdate"     // when we last posted how many workouts?
+
 #define GC_LTM_LAST_DATE_RANGE          "<athlete-layout>ltmwindow/lastDateRange"
 #define GC_LTM_AUTOFILTERS              "<athlete-layout>ltmwindow/autofilters"
 #define GC_BLANK_ANALYSIS               "<athlete-layout>blank/analysis"

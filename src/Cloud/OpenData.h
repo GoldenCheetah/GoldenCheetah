@@ -39,9 +39,11 @@ class OpenData : public QThread {
         OpenData(Context *context);
         virtual ~OpenData();
 
-        void postData() { start(); }
+        // check if time to ask or send data
+        static void check(Context *);
 
-        // run in a thread
+        // posting - done via a thread
+        void postData() { start(); }
         void run();
 
     signals:
@@ -58,6 +60,27 @@ class OpenData : public QThread {
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
+};
+
+class OpenDataDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    OpenDataDialog(Context *);
+
+private slots:
+    void acceptConditions();
+    void rejectConditions();
+
+private:
+
+    Context *context;
+
+    QScrollArea *scrollText;
+    QPushButton *proceedButton;
+    QPushButton *abortButton;
+
 };
 
 #endif

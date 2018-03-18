@@ -76,6 +76,7 @@
 #include "GoogleDrive.h"
 #include "KentUniversity.h"
 #include "SixCycle.h"
+#include "OpenData.h"
 #endif
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
@@ -610,6 +611,9 @@ MainWindow::MainWindow(const QDir &home)
      * Lets ask for telemetry and check for updates
      *--------------------------------------------------------------------*/
 
+#if QT_VERSION > 0x050000
+    OpenData::check(currentTab->context);
+#endif
 #ifdef GC_HAS_CLOUD_DB
 
     telemetryClient = new CloudDBTelemetryClient();
