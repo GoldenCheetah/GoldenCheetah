@@ -19,6 +19,7 @@
 
 #include "RideDB.h"
 #include "RideFileCache.h"
+#include "Settings.h"
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
 #endif
