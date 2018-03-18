@@ -1300,10 +1300,15 @@ LTMSidebar::addEvent()
         return; // must be a user season
     }
 
-    SeasonEvent myevent("", QDate());
+    SeasonEvent myevent("", seasons->seasons[seasonindex].getEnd());
     EditSeasonEventDialog dialog(context, &myevent);
 
     if (dialog.exec()) {
+
+        if (myevent.date < seasons->seasons[seasonindex].getStart() || myevent.date > seasons->seasons[seasonindex].getEnd()) {
+            QMessageBox::warning(this, tr("Add Event"), tr("You can only add events within season date range. Please enter a valid date for the selected season when adding an event."));
+            return; // must be within the season date range
+        }
 
         active = true;
         seasons->seasons[seasonindex].events.append(myevent);
