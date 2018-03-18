@@ -1111,6 +1111,17 @@ CloudServiceSyncDialog::refreshClicked()
         add->setText(7, "");
     }
 
+    // adjust column widths to content text length
+    for (int j=0; j<rideListUp->columnCount(); j++) {
+        rideListUp->resizeColumnToContents(j);
+    }
+    for (int j=0; j<rideListSync->columnCount(); j++) {
+        rideListSync->resizeColumnToContents(j);
+    }
+    for (int j=0; j<rideListDown->columnCount(); j++) {
+        rideListDown->resizeColumnToContents(j);
+    }
+
     // refresh the progress label
     tabChanged(tabs->currentIndex());
 }
