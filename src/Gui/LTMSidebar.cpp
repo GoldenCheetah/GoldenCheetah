@@ -684,8 +684,14 @@ LTMSidebar::eventPopup()
     // events are against a selected season
     if (dateRangeTree->selectedItems().count() == 0) return; // need a season selected!
 
+    // if a phase is selected (rather than a season), get the season this phase belongs to
+    QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+    if (selectedDateRange->parent() != NULL) {
+        selectedDateRange = selectedDateRange->parent();
+    }
+
     // and the season must be user defined not temporary
-    int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+    int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
     if (seasons->seasons[seasonindex].getType() == Season::temporary) return;
 
     // have we selected an event?
@@ -1322,7 +1328,13 @@ LTMSidebar::deleteEvent()
 
     if (dateRangeTree->selectedItems().count()) {
 
-        int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+        // if a phase is selected (rather than a season), get the season this phase belongs to
+        QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+        if (selectedDateRange->parent() != NULL) {
+            selectedDateRange = selectedDateRange->parent();
+        }
+
+        int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
 
         // only delete those that are selected
         if (eventTree->selectedItems().count() > 0) {
@@ -1350,7 +1362,13 @@ LTMSidebar::editEvent()
 
     if (dateRangeTree->selectedItems().count()) {
 
-        int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+        // if a phase is selected (rather than a season), get the season this phase belongs to
+        QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+        if (selectedDateRange->parent() != NULL) {
+            selectedDateRange = selectedDateRange->parent();
+        }
+
+        int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
 
         // only delete those that are selected
         if (eventTree->selectedItems().count() == 1) {
