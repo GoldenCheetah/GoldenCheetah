@@ -4028,10 +4028,9 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
 
         foreach (Season s, tmpSeasons) {
             /* if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) { */
-            if (s.getStart() >= from && s.getStart() < to) {
+            if ((s.getStart() >= from && s.getStart() <= to) || (s.getEnd() >= from && s.getEnd() <= to)) {
             foreach (SeasonEvent event, s.events) {
-
-                if (event.date > from && event.date < to) {
+                if (event.date >= from && event.date <= to) {
 
                     // and the events...
                     QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
