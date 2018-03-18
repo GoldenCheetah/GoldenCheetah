@@ -26,6 +26,8 @@
 #include <QThread>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QScrollArea>
+#include <QPushButton>
 
 // we maintain a list of receiving servers here:
 #define OPENDATA_SERVERSURL "http://www.goldencheetah.org/opendata.json"
