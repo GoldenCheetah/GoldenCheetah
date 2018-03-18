@@ -639,6 +639,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Cloud/Dropbox.h
     SOURCES += Cloud/GoogleDrive.cpp Cloud/KentUniversity.cpp
     HEADERS += Cloud/GoogleDrive.h Cloud/KentUniversity.h
+    SOURCES += Cloud/OpenData.cpp
+    HEADERS += Cloud/OpenData.h
 
     greaterThan(QT_MINOR_VERSION, 3) {
         SOURCES += Cloud/SixCycle.cpp

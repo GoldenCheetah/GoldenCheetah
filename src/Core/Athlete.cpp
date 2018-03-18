@@ -48,6 +48,7 @@
 #include "RideAutoImportConfig.h"
 #include "AthleteBackup.h"
 #include "CloudService.h"
+#include "OpenData.h"
 
 #include "Route.h"
 
