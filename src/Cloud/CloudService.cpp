@@ -73,11 +73,11 @@ CloudService::newCloudServiceEntry()
 }
 
 bool
-CloudService::upload(QWidget *parent, CloudService *store, RideItem *item)
+CloudService::upload(QWidget *parent, Context *context, CloudService *store, RideItem *item)
 {
 
     // open a dialog to do it
-    CloudServiceUploadDialog uploader(parent, store, item);
+    CloudServiceUploadDialog uploader(parent, context, store, item);
     int ret = uploader.exec();
 
     // was it successfull ?
@@ -311,7 +311,7 @@ CloudService::uploadExtension() {
     return spec;
 }
 
-CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService *store, RideItem *item) : QDialog(parent), store(store), item(item)
+CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, Context *context, CloudService *store, RideItem *item) : QDialog(parent), context(context), store(store), item(item)
 {
     // setup the gui!
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -335,6 +335,40 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, CloudService
 
     // compress and upload if opened successfully.
     if (status == true) {
+
+        // check for unsaved changes
+        if (item->isDirty()) {
+
+               QMessageBox msgBox;
+                msgBox.setWindowTitle(tr("Upload to ") + store->uiName());
+                msgBox.setText(tr("The activity you want to upload has unsaved changes."));
+                msgBox.setDetailedText(tr("Unsaved changes in activities will be uploaded as well. \n\n"
+                                          "This may lead to inconsistencies between your local activities "
+                                          "and the uploaded activities if you do not save the activity in GoldenCheetah. "
+                                          "We recommend to save the changed activity before proceeding."));
+                msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Ignore | QMessageBox::Cancel);
+                msgBox.setIcon(QMessageBox::Question);
+                int ret = msgBox.exec();
+                switch (ret) {
+                case QMessageBox::Save:
+                    // save
+                    context->notifyMetadataFlush();
+                    context->ride->notifyRideMetadataChanged();
+                    context->mainWindow->saveSilent(context, item);
+                    break;
+                case QMessageBox::Ignore:
+                    // just proceed
+                    break;
+                case QMessageBox::Cancel:
+                    QApplication::processEvents();
+                    QMetaObject::invokeMethod(this, "close", Qt::QueuedConnection);
+                    return;
+                default:
+                    // should never be reached
+                    break;
+                }
+
+        }
 
         // get a compressed version
         store->compressRide(item->ride(), data, QFileInfo(item->fileName).baseName() + ".json");
@@ -862,8 +896,56 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
     connect (tabs, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     QWidget::show();
 
+    // check for any unsaved rides - since synchronize takes data from the stored files,
+    // any unstored changes would not be uploaded
+    QList<RideItem*> dirtyList;
+    foreach (RideItem *rideItem, context->athlete->rideCache->rides())
+        if (rideItem->isDirty() == true)
+            dirtyList.append(rideItem);
+
+    if (dirtyList.count() > 0 ) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Sync with ") + store->uiName());
+        if (dirtyList.count() == 1) {
+            msgBox.setText(tr("One of your activities has unsaved changes."));
+        } else {
+            msgBox.setText(tr("%1 of your activities have unsaved changes.").arg(dirtyList.count()));
+        }
+        msgBox.setDetailedText(tr("Changes in activities which are not saved, will not be synchronized. \n\n"
+                                  "This may lead to inconsistencies between your local GoldenCheetah activities "
+                                  "and the uploaded activities. We recommend to save the changed activities "
+                                  "before proceeding."));
+        msgBox.setStandardButtons(QMessageBox::SaveAll | QMessageBox::Ignore | QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Question);
+        int ret = msgBox.exec();
+        switch (ret) {
+        case QMessageBox::SaveAll:
+            context->notifyMetadataFlush();
+            context->ride->notifyRideMetadataChanged();
+            // save
+            if (dirtyList.count() > 0) {
+                for (int i=0; i<dirtyList.count(); i++) {
+                    context->mainWindow->saveSilent(context, dirtyList.at(i));
+                }
+            }
+            break;
+        case QMessageBox::Ignore:
+            // just proceed
+            break;
+        case QMessageBox::Cancel:
+            QApplication::processEvents();
+            QMetaObject::invokeMethod(this, "close", Qt::QueuedConnection);
+            return;
+        default:
+            // should never be reached
+            break;
+        }
+
+    }
+
     // refresh anyway
     refreshClicked();
+
 }
 
 void

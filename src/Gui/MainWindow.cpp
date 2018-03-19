@@ -2062,7 +2062,7 @@ MainWindow::uploadCloud(QAction *action)
  #endif
         } else {
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
-            CloudService::upload(this, db, currentTab->context->ride);
+            CloudService::upload(this, currentTab->context, db, currentTab->context->ride);
         }
     }
 }
