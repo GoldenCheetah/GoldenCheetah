@@ -1300,7 +1300,7 @@ LTMSidebar::addEvent()
         return; // must be a user season
     }
 
-    SeasonEvent myevent("", QDate());
+    SeasonEvent myevent("", seasons->seasons[seasonindex].getEnd());
     EditSeasonEventDialog dialog(context, &myevent);
 
     if (dialog.exec()) {
