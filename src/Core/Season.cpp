@@ -170,6 +170,10 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+
+    // initialize button state
+    nameChanged();
 }
 
 void
@@ -190,10 +194,15 @@ EditSeasonDialog::cancelClicked()
     reject();
 }
 
+void EditSeasonDialog::nameChanged()
+{
+    applyButton->setEnabled(!nameEdit->text().isEmpty());
+}
+
 /*----------------------------------------------------------------------
  * EDIT SEASONEVENT DIALOG
  *--------------------------------------------------------------------*/
-EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *event) :
+EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *event, Season &season) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), event(event)
 {
     setWindowTitle(tr("Edit Event"));
@@ -208,6 +217,7 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     nameEdit->setText(event->name);
 
     dateEdit = new QDateEdit(this);
+    dateEdit->setDateRange(season.getStart(), season.getEnd());
     dateEdit->setDate(event->date);
     dateEdit->setCalendarPopup(true);
 
@@ -230,6 +240,10 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+
+    // initialize button state
+    nameChanged();
 }
 
 void
@@ -245,6 +259,11 @@ void
 EditSeasonEventDialog::cancelClicked()
 {
     reject();
+}
+
+void EditSeasonEventDialog::nameChanged()
+{
+    applyButton->setEnabled(!nameEdit->text().isEmpty());
 }
 
 //
@@ -566,7 +585,7 @@ Phase::Phase(QString _name, QDate _start, QDate _end) : Season()
 /*----------------------------------------------------------------------
  * EDIT PHASE DIALOG
  *--------------------------------------------------------------------*/
-EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
+EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), phase(phase)
 {
     setWindowTitle(tr("Edit Date Range"));
@@ -593,10 +612,12 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
     typeEdit->setCurrentIndex(typeEdit->findData(phase->getType()));
 
     fromEdit = new QDateEdit(this);
+    fromEdit->setDateRange(season.getStart(), season.getEnd());
     fromEdit->setDate(phase->getStart());
     fromEdit->setCalendarPopup(true);
 
     toEdit = new QDateEdit(this);
+    toEdit->setDateRange(season.getStart(), season.getEnd());
     toEdit->setDate(phase->getEnd());
     toEdit->setCalendarPopup(true);
 
@@ -644,6 +665,10 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+
+    // initialize button state
+    nameChanged();
 }
 
 void
@@ -662,4 +687,9 @@ void
 EditPhaseDialog::cancelClicked()
 {
     reject();
+}
+
+void EditPhaseDialog::nameChanged()
+{
+    applyButton->setEnabled(!nameEdit->text().isEmpty());
 }

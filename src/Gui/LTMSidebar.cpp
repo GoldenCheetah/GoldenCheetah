@@ -1164,7 +1164,7 @@ LTMSidebar::editRange()
 
     QDialog* dialog;
     if (phaseIdx> -1) {
-        dialog = new EditPhaseDialog(context, &seasons->seasons[seasonIdx].phases[phaseIdx]);
+        dialog = new EditPhaseDialog(context, &seasons->seasons[seasonIdx].phases[phaseIdx], seasons->seasons[seasonIdx]);
     } else {
         dialog = new EditSeasonDialog(context, &seasons->seasons[seasonIdx]);
     }
@@ -1267,7 +1267,7 @@ LTMSidebar::addEvent()
     }
 
     SeasonEvent myevent("", seasons->seasons[seasonindex].getEnd());
-    EditSeasonEventDialog dialog(context, &myevent);
+    EditSeasonEventDialog dialog(context, &myevent, seasons->seasons[seasonindex]);
 
     if (dialog.exec()) {
 
@@ -1342,7 +1342,7 @@ LTMSidebar::editEvent()
             QTreeWidgetItem *ours = eventTree->selectedItems().first();
             int index = allEvents->indexOfChild(ours);
 
-            EditSeasonEventDialog dialog(context, &seasons->seasons[seasonindex].events[index]);
+            EditSeasonEventDialog dialog(context, &seasons->seasons[seasonindex].events[index], seasons->seasons[seasonindex]);
 
             if (dialog.exec()) {
 
@@ -1380,7 +1380,7 @@ LTMSidebar::addPhase()
     }
 
     Phase myphase("", seasons->seasons[seasonindex].getStart(), seasons->seasons[seasonindex].getEnd());
-    EditPhaseDialog dialog(context, &myphase);
+    EditPhaseDialog dialog(context, &myphase, seasons->seasons[seasonindex]);
 
     if (dialog.exec()) {
 
