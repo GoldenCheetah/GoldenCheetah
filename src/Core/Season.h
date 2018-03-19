@@ -107,6 +107,7 @@ class EditSeasonDialog : public QDialog
     public slots:
         void applyClicked();
         void cancelClicked();
+        void nameChanged();
 
     private:
         Context *context;
@@ -127,11 +128,12 @@ class EditSeasonEventDialog : public QDialog
 
 
     public:
-        EditSeasonEventDialog(Context *, SeasonEvent *);
+        EditSeasonEventDialog(Context *, SeasonEvent *, Season &);
 
     public slots:
         void applyClicked();
         void cancelClicked();
+        void nameChanged();
 
     private:
         Context *context;
@@ -207,11 +209,12 @@ class EditPhaseDialog : public QDialog
 
 
     public:
-        EditPhaseDialog(Context *, Phase *);
+        EditPhaseDialog(Context *, Phase *, Season &);
 
     public slots:
         void applyClicked();
         void cancelClicked();
+        void nameChanged();
 
     private:
         Context *context;
