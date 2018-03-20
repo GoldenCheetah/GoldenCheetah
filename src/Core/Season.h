@@ -228,4 +228,17 @@ class EditPhaseDialog : public QDialog
         QDoubleSpinBox *lowEdit;
 };
 
+class SeasonEventTreeView : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        SeasonEventTreeView();
+
+    signals:
+        void itemMoved(QTreeWidgetItem* item, int previous, int actual);
+
+    protected:
+        void dropEvent(QDropEvent* event);
+};
 #endif /* SEASON_H_ */
