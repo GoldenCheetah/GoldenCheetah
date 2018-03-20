@@ -693,3 +693,28 @@ void EditPhaseDialog::nameChanged()
 {
     applyButton->setEnabled(!nameEdit->text().isEmpty());
 }
+
+SeasonEventTreeView::SeasonEventTreeView()
+{
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropOverwriteMode(true);
+}
+
+void
+SeasonEventTreeView::dropEvent(QDropEvent* event)
+{
+    // get the list of the items that are about to be dropped
+    QTreeWidgetItem* item = selectedItems()[0];
+
+    // row we started on
+    int idx1 = indexFromItem(item).row();
+
+    // the default implementation takes care of the actual move inside the tree
+    QTreeWidget::dropEvent(event);
+
+    // moved to !
+    int idx2 = indexFromItem(item).row();
+
+    // notify subscribers in some useful way
+    Q_EMIT itemMoved(item, idx1, idx2);
+}

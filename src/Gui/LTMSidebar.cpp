@@ -103,9 +103,11 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
 
-    eventTree = new QTreeWidget;
+    eventTree = new SeasonEventTreeView;
     eventTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     allEvents = eventTree->invisibleRootItem();
+    // Drop for Events
+    allEvents->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allEvents->setText(0, tr("Events"));
     eventTree->setFrameStyle(QFrame::NoFrame);
     eventTree->setColumnCount(2);
@@ -263,6 +265,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     // events
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
+    connect(eventTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(eventMoved(QTreeWidgetItem*, int, int)));
 
     // presets
     connect(chartTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(presetPopup(const QPoint &)));
@@ -394,6 +397,7 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
         for (i=0; i <dateRange->events.count(); i++) {
             SeasonEvent event = dateRange->events.at(i);
             QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+            add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             add->setText(0, event.name);
             add->setText(1, event.date.toString("MMM d, yyyy"));
         }
@@ -1309,6 +1313,7 @@ LTMSidebar::addEvent()
         seasons->seasons[seasonindex].events.append(myevent);
 
         QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+        add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         add->setText(0, myevent.name);
         add->setText(1, myevent.date.toString("MMM d, yyyy"));
 
@@ -1389,6 +1394,36 @@ LTMSidebar::editEvent()
             }
         }
     }
+    active = false;
+}
+
+void
+LTMSidebar::eventMoved(QTreeWidgetItem*item, int oldposition, int newposition)
+{
+    active = true;
+
+    if (dateRangeTree->selectedItems().count()) {
+
+        // if a phase is selected (rather than a season), get the season this phase belongs to
+        QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+        if (selectedDateRange->parent() != NULL) {
+            selectedDateRange = selectedDateRange->parent();
+        }
+
+        int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
+
+        // report the move in the seasons
+        seasons->seasons[seasonindex].events.move(oldposition, newposition);
+
+        // save changes away
+        seasons->writeSeasons();
+
+        // deselect actual selection
+        eventTree->selectedItems().first()->setSelected(false);
+        // select the move/drop item
+        item->setSelected(true);
+    }
+
     active = false;
 }
 
