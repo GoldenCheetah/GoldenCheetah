@@ -164,6 +164,8 @@ void VideoSyncFile::parseRLV()
                 {
                     // read in the mapping records
                     uint32_t PreviousFrameNbr=0;
+                    double PreviousDistance=0;
+
                     for (unsigned int record=0; record < info.records; record++) {
                         // get the next record
                         if (sizeof(framemapping) != input.readRawData((char*)&framemapping, sizeof(framemapping))) {
@@ -171,11 +173,16 @@ void VideoSyncFile::parseRLV()
                             break;
                         }
 
+                        if (record == 0) PreviousDistance = framemapping.distance;
                         VideoSyncFilePoint add;
 
                         if (format == RLV) {
-                            double distance = framemapping.distance; // in meters per frame
-                            rdist += distance * (double) (framemapping.frameNbr - PreviousFrameNbr);
+                            // Calculate average distance per video frame between this sync point and the last
+                            // using the formula (2a+b)/3 where a is the point of lower speed and b is the higher.
+                            double distance = framemapping.distance;
+                            double avgDistance = (qMin(distance, PreviousDistance)*2 + qMax(distance, PreviousDistance)) / 3;
+
+                            rdist += avgDistance * (double) (framemapping.frameNbr - PreviousFrameNbr);
                             add.km = rdist / 1000.0;
 
                             // time
@@ -186,6 +193,7 @@ void VideoSyncFile::parseRLV()
 
                             // FIXME : do we have to consider video offset and weight ?
                             PreviousFrameNbr = framemapping.frameNbr;
+                            PreviousDistance = distance;
                         }
 
                         Points.append(add);

@@ -1670,6 +1670,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
                 {
                     displayWorkoutDistance = context->currentVideoSyncFile()->km;
+                    // If we reached the end of the RLV then stop
+                    if (displayWorkoutDistance >= context->currentVideoSyncFile()->Distance) {
+                        Stop(DEVICE_OK);
+                        return;
+                    }
                     // TODO : graphs to be shown at seek position
                 } else {
                     displayWorkoutDistance += distanceTick;
