@@ -219,6 +219,7 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     QLabel *name = new QLabel(tr("Name"));
     QLabel *date = new QLabel(tr("Date"));
     QLabel *priority = new QLabel(tr("Priority"));
+    QLabel *description = new QLabel(tr("Description"));
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(event->name);
@@ -228,9 +229,12 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     dateEdit->setDate(event->date);
     dateEdit->setCalendarPopup(true);
 
-    priorityEdit = new QComboBox;
+    priorityEdit = new QComboBox(this);
     foreach(QString priority, SeasonEvent::priorityList()) priorityEdit->addItem(priority);
     priorityEdit->setCurrentIndex(event->priority);
+
+    descriptionEdit = new QTextEdit(this);
+    descriptionEdit->setText(event->description);
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
@@ -238,6 +242,8 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     grid->addWidget(dateEdit, 1,1);
     grid->addWidget(priority, 2,0);
     grid->addWidget(priorityEdit, 2,1);
+    grid->addWidget(description, 3, 0);
+    grid->addWidget(descriptionEdit, 4,0,4,2);
 
     mainLayout->addLayout(grid);
 
@@ -266,6 +272,7 @@ EditSeasonEventDialog::applyClicked()
     event->name = nameEdit->text();
     event->date = dateEdit->date();
     event->priority = priorityEdit->currentIndex();
+    event->description = descriptionEdit->toPlainText();
     accept();
 }
 
