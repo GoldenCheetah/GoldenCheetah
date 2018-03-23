@@ -35,11 +35,16 @@ class Phase;
 
 class SeasonEvent
 {
+    Q_DECLARE_TR_FUNCTIONS(Season)
+
     public:
-        SeasonEvent(QString name, QDate date) : name(name), date(date) {}
+        static QStringList priorityList();
+
+        SeasonEvent(QString name, QDate date, int priority=0) : name(name), date(date), priority(priority) {}
 
         QString name;
         QDate date;
+        int priority;
 };
 
 class Season
@@ -142,6 +147,7 @@ class EditSeasonEventDialog : public QDialog
         QPushButton *applyButton, *cancelButton;
         QLineEdit *nameEdit;
         QDateEdit *dateEdit;
+        QComboBox *priorityEdit;
 };
 
 class Seasons : public QObject {

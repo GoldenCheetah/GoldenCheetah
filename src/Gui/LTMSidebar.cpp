@@ -110,7 +110,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     allEvents->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allEvents->setText(0, tr("Events"));
     eventTree->setFrameStyle(QFrame::NoFrame);
-    eventTree->setColumnCount(2);
+    eventTree->setColumnCount(3);
     eventTree->setSelectionMode(QAbstractItemView::SingleSelection);
     eventTree->header()->hide();
     eventTree->setIndentation(5);
@@ -400,6 +400,7 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
             add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             add->setText(0, event.name);
             add->setText(1, event.date.toString("MMM d, yyyy"));
+            add->setText(2, SeasonEvent::priorityList().at(event.priority));
         }
 
         // make sure they fit
@@ -1316,6 +1317,7 @@ LTMSidebar::addEvent()
         add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         add->setText(0, myevent.name);
         add->setText(1, myevent.date.toString("MMM d, yyyy"));
+        add->setText(2, SeasonEvent::priorityList().at(myevent.priority));
 
         // make sure they fit
         eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
@@ -1385,9 +1387,13 @@ LTMSidebar::editEvent()
 
             if (dialog.exec()) {
 
-                // update name
+                // update event data
                 ours->setText(0, seasons->seasons[seasonindex].events[index].name);
                 ours->setText(1, seasons->seasons[seasonindex].events[index].date.toString("MMM d, yyyy"));
+                ours->setText(2, SeasonEvent::priorityList().at(seasons->seasons[seasonindex].events[index].priority));
+
+                // make sure they fit
+                eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
 
                 // save changes away
                 seasons->writeSeasons();

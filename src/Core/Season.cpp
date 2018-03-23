@@ -26,6 +26,12 @@
 #include "SeasonParser.h"
 #include <QXmlSimpleReader>
 
+QStringList
+SeasonEvent::priorityList()
+{
+    return QStringList()<<" "<<tr("A")<<tr("B")<<tr("C")<<tr("D")<<tr("E");
+}
+
 static QList<QString> _setSeasonTypes()
 {
     QList<QString> returning;
@@ -212,6 +218,7 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     QGridLayout *grid = new QGridLayout;
     QLabel *name = new QLabel(tr("Name"));
     QLabel *date = new QLabel(tr("Date"));
+    QLabel *priority = new QLabel(tr("Priority"));
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(event->name);
@@ -221,10 +228,16 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     dateEdit->setDate(event->date);
     dateEdit->setCalendarPopup(true);
 
+    priorityEdit = new QComboBox;
+    foreach(QString priority, SeasonEvent::priorityList()) priorityEdit->addItem(priority);
+    priorityEdit->setCurrentIndex(event->priority);
+
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
     grid->addWidget(date, 1,0);
     grid->addWidget(dateEdit, 1,1);
+    grid->addWidget(priority, 2,0);
+    grid->addWidget(priorityEdit, 2,1);
 
     mainLayout->addLayout(grid);
 
@@ -252,6 +265,7 @@ EditSeasonEventDialog::applyClicked()
     // get the values back
     event->name = nameEdit->text();
     event->date = dateEdit->date();
+    event->priority = priorityEdit->currentIndex();
     accept();
 }
 
