@@ -71,7 +71,7 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
             season.setSeed(buffer.trimmed().toInt());
     } else if (qName == "event") {
 
-        season.events.append(SeasonEvent(Utils::unprotect(buffer), seasonDateToDate(dateString)));
+        season.events.append(SeasonEvent(Utils::unprotect(buffer), seasonDateToDate(dateString), priorityString.toInt()));
 
     } else if(qName == "season") {
 
@@ -118,6 +118,7 @@ bool SeasonParser::startElement( const QString&, const QString&, const QString &
 
         for(int i=0; i<attrs.count(); i++) {
             if (attrs.qName(i) == "date") dateString=attrs.value(i);
+            else if (attrs.qName(i) == "priority") priorityString=attrs.value(i);
         }
     }
 
@@ -234,9 +235,10 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
 
             foreach(SeasonEvent x, season.events) {
 
-                out<<QString("\t\t<event date=\"%1\">\"%2\"</event>")
+                out<<QString("\t\t<event date=\"%1\" priority=\"%3\">\"%2\"</event>")
                             .arg(x.date.toString("yyyy-MM-dd"))
-                            .arg(Utils::xmlprotect(x.name));
+                            .arg(Utils::xmlprotect(x.name))
+                            .arg(x.priority);
             
             }
             out <<QString("\t</season>\n");
