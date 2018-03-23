@@ -28,6 +28,7 @@
 #include <QTreeWidget>
 #include <QLabel>
 #include <QLineEdit>
+#include <QTextEdit>
 
 #include "Context.h"
 
@@ -40,11 +41,12 @@ class SeasonEvent
     public:
         static QStringList priorityList();
 
-        SeasonEvent(QString name, QDate date, int priority=0) : name(name), date(date), priority(priority) {}
+        SeasonEvent(QString name, QDate date, int priority=0, QString description="") : name(name), date(date), priority(priority), description(description) {}
 
         QString name;
         QDate date;
         int priority;
+        QString description;
 };
 
 class Season
@@ -148,6 +150,7 @@ class EditSeasonEventDialog : public QDialog
         QLineEdit *nameEdit;
         QDateEdit *dateEdit;
         QComboBox *priorityEdit;
+        QTextEdit *descriptionEdit;
 };
 
 class Seasons : public QObject {

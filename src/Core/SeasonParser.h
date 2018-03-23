@@ -49,6 +49,6 @@ protected:
     int loadcount;
     QString dateString;
     QString priorityString;
-
+    QString eventDescription;
 };
 #endif //SeasonParser
