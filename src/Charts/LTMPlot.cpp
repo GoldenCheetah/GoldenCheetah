@@ -55,8 +55,8 @@
 
 //#include <QDebug>
 
-LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) : 
-    bg(NULL), parent(parent), context(context), highlighter(NULL), first(first), isolation(false)
+LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
+    bg(NULL), parent(parent), context(context), highlighter(NULL), isolation(false), position(position)
 {
     // don't do this ..
     setAutoReplot(false);
@@ -4001,6 +4001,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
     void
 LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby, QColor color)
 {
+    const int viewDepth = 4; //show markers only for the 1st of each 4 charts
     double baseday = groupForDate(from, groupby);
     QwtIndPlotMarker::resetDrawnLabels();
     // seasons and season events
@@ -4017,7 +4018,8 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                 mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
                 mrk->setLinePen(QPen(color, 0, Qt::DashLine));
                 mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
-                if (first) {
+
+                if (position % viewDepth == 0) {
                     QwtText text(s.getName());
                     text.setFont(QFont("Helvetica", 10, QFont::Bold));
                     text.setColor(color);
@@ -4041,7 +4043,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                     mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
                     mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
 
-                    if (first) {
+                    if (position % viewDepth == 0) {
                         QwtText text(event.name);
                         text.setFont(QFont("Helvetica", 10, QFont::Bold));
                         text.setColor(Qt::red);
@@ -4063,7 +4065,8 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
         mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
         mrk->setLinePen(QPen(color, 0, Qt::DotLine));
         mrk->setValue(double(groupForDate(today, groupby)) - baseday,0);
-        if (first) {
+
+        if (position % viewDepth == 0) {
             QwtText text(tr("Today"));
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(Qt::red);
