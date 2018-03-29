@@ -44,6 +44,7 @@
 #include "SeasonParser.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#include "CalDAV.h" // upload Events to remote calendar
 
 // named searchs
 #include "FreeSearch.h"
@@ -1277,6 +1278,12 @@ LTMSidebar::addEvent()
     if (dialog.exec()) {
 
         active = true;
+
+        // upload to remote calendar if configured
+        if (context->athlete->davCalendar->getConfig())
+            if (!context->athlete->davCalendar->upload(&myevent))
+                QMessageBox::warning(this, tr("Add Event"), tr("The new event could not be uploaded to your remote calendar."));
+
         seasons->seasons[seasonindex].events.append(myevent);
 
         QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);

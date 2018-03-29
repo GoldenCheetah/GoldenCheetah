@@ -50,6 +50,9 @@
 #include "RideFile.h"
 #include "JsonRideFile.h"
 
+// SeasonEvent
+#include "Season.h"
+
 // create a UUID
 #include <QUuid>
 
@@ -84,6 +87,10 @@ public slots:
 
     // Upload ride as a VEVENT
     bool upload(RideItem *rideItem);
+    // Upload SeasonEvent as a VEVENT
+    bool upload(SeasonEvent *seasonEvent);
+    // Upload a VEVENT
+    bool upload(QByteArray vcardtext);
 
     // Catch NAM signals ...
     void requestReply(QNetworkReply *reply);
@@ -96,16 +103,16 @@ public slots:
     // enable aynchronous up/download for Google
     // since access token is temporarily valid only, it needs refresh before access to Google CALDAV
     bool doDownload();
-    bool doUpload(RideItem *rideItem);
+    bool doUpload();
 
-    void getConfig();
+    bool getConfig();
 
 private:
 
     Context *context;
     QNetworkAccessManager *nam;
-    ActionType mode;
     CalDAVType calDavType;
+    QString url; QString calID;
     QString googleCalDAVurl;
     bool ignoreDownloadErrors;
 
@@ -113,7 +120,9 @@ private:
     QNetworkAccessManager *googleNetworkAccessManager;
     void requestGoogleAccessTokenToExecute();
     QByteArray googleCalendarAccessToken;
-    RideItem *itemForUpload;
+    ActionType mode;
+    QString fileName;
+    QByteArray vcardtext;
 
 };
 #endif
