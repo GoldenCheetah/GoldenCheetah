@@ -38,7 +38,8 @@ CalDAV::CalDAV(Context *context) : context(context), mode(None)
 }
 
 
-void CalDAV::getConfig() {
+bool
+CalDAV::getConfig() {
 
     int t = appsettings->cvalue(context->athlete->cyclist, GC_DVCALDAVTYPE, "0").toInt();
     if (t == 0) {
@@ -46,6 +47,20 @@ void CalDAV::getConfig() {
     } else {
         calDavType = Google;
     };
+
+    if (calDavType == Standard) {
+        url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+    } else { // calDavType = GOOGLE
+        calID = appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString();
+        url =  googleCalDAVurl.arg(calID);
+    }
+
+    // check if we have an useful URL (not space and not the Google Default without CalID
+    if ((url == "" && calDavType == Standard) || (calID == "" && calDavType == Google)) {
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -56,9 +71,16 @@ void CalDAV::getConfig() {
 bool
 CalDAV::download(bool ignoreErrors)
 {
-    getConfig();
     ignoreDownloadErrors = ignoreErrors;
     mode = Events;
+
+    if (!getConfig()) {
+        if (!ignoreDownloadErrors) {
+             QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
+        }
+        mode = None;
+        return false;
+    }
 
     if (calDavType == Standard) {
         return doDownload();
@@ -72,23 +94,6 @@ CalDAV::download(bool ignoreErrors)
 bool
 CalDAV::doDownload()
 {
-
-    QString url; QString calID;
-    if (calDavType == Standard) {
-        url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    } else { // calDavType = GOOGLE
-        calID = appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString();
-        url =  googleCalDAVurl.arg(calID);
-    }
-
-    // check if we have an useful URL (not space and not the Google Default without CalID
-    if ((url == "" && calDavType == Standard) || (calID == "" && calDavType == Google)) {
-        if (!ignoreDownloadErrors) {
-             QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
-        }
-        mode = None;
-        return false;
-    }
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
 
@@ -323,6 +328,66 @@ icalcomponent *createEvent(RideItem *rideItem)
     return root;
 }
 
+// utility function to create a VCALENDAR from a single SeasonEvent
+static
+icalcomponent *createEvent(SeasonEvent *seasonEvent)
+{
+    // calendar
+    icalcomponent *root = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
+
+    // calendar version
+    icalproperty *version = icalproperty_new_version("2.0");
+    icalcomponent_add_property(root, version);
+
+
+    icalcomponent *event = icalcomponent_new(ICAL_VEVENT_COMPONENT);
+
+    //
+    // Unique ID
+    //
+    QString id = seasonEvent->id;
+    if (id == "") {
+        id = QUuid::createUuid().toString() + "@" + "goldencheetah.org";
+        seasonEvent->id = id;
+    }
+    icalproperty *uid = icalproperty_new_uid(id.toLatin1());
+    icalcomponent_add_property(event, uid);
+
+    //
+    // START DATE
+    //
+    struct icaltimetype atime;
+    atime.year = seasonEvent->date.year();
+    atime.month = seasonEvent->date.month();
+    atime.day = seasonEvent->date.day();
+    atime.hour = 0;
+    atime.minute = 0;
+    atime.second = 0;
+    //atime.is_utc = 1; // this is UTC is_utc is redundant but kept for completeness
+    atime.is_date = 1; // this is a date
+    atime.is_daylight = 0; // no daylight savings - its UTC
+    atime.zone = icaltimezone_get_utc_timezone(); // set UTC timezone
+    icalproperty *dtstart = icalproperty_new_dtstart(atime);
+    icalcomponent_add_property(event, dtstart);
+
+    //
+    // PRIORITY
+    //
+    if (seasonEvent->priority > 0) {
+        icalproperty* priority = icalproperty_new_priority(seasonEvent->priority);
+        icalcomponent_add_property(event, priority);
+    }
+
+
+    // set title & description
+    icalcomponent_set_summary(event, seasonEvent->name.toLatin1());
+    icalcomponent_set_description(event, seasonEvent->description.toLatin1());
+
+    // put the event into root
+    icalcomponent_add_component(root, event);
+    return root;
+}
+
 // extract <calendar-data> entries and concatenate
 // into a single string. This is from a query response
 // where the VEVENTS are embedded within an XML document
@@ -382,13 +447,47 @@ static QString extractComponents(QString document)
 bool
 CalDAV::upload(RideItem *rideItem)
 {
-    getConfig();
+    // is this a valid ride?
+    if (!rideItem || !rideItem->ride()) return false;
+
+    fileName = rideItem->fileName;
+    // create the ICal event
+    icalcomponent *vcard = createEvent(rideItem);
+    QByteArray vcardtext(icalcomponent_as_ical_string(vcard));
+    icalcomponent_free(vcard);
+
+    return upload(vcardtext);
+}
+
+//
+// PUT a SeasonEvent
+//
+
+bool
+CalDAV::upload(SeasonEvent *seasonEvent)
+{
+    fileName = seasonEvent->id;
+    // create the ICal event
+    icalcomponent *vcard = createEvent(seasonEvent);
+    QByteArray vcardtxt(icalcomponent_as_ical_string(vcard));
+    icalcomponent_free(vcard);
+
+    return upload(vcardtxt);
+}
+
+bool
+CalDAV::upload(QByteArray vcardtxt)
+{
+    if (!getConfig()) {
+        QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
+        return false;
+    }
     mode = Put;
+    vcardtext = vcardtxt;
     if (calDavType == Standard) {
-        return doUpload(rideItem);
+        return doUpload();
     } else { // calDavType = GOOGLE
         // after having the token the function defined in "mode" will be executed
-        itemForUpload = rideItem;
         requestGoogleAccessTokenToExecute();
     }
     return true;
@@ -396,32 +495,14 @@ CalDAV::upload(RideItem *rideItem)
 
 
 bool
-CalDAV::doUpload(RideItem *rideItem)
+CalDAV::doUpload()
 {
-    // is this a valid ride?
-    if (!rideItem || !rideItem->ride()) return false;
-
-    QString url; QString calID;
-    if (calDavType == Standard) {
-        url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    } else { // calDavType = GOOGLE
-        calID = appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString();
-        url =  googleCalDAVurl.arg(calID);
-    }
-
-    // check if we have an useful URL (not space and not the Google Default without CalID
-    if ((url == "" && calDavType == Standard) || (calID == "" && calDavType == Google)) {
-        QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("CalID or CalDAV Url is missing in preferences"));
-        mode = None;
-        return false;
-    }
-
     // if URL does not end with "/" - just  add it (for convenience)
     if (!url.endsWith("/")) {
         url += "/";
     }
     // lets upload to calendar
-    url += rideItem->fileName;
+    url += fileName;
     url += ".ics";
 
     // form the request
@@ -431,11 +512,6 @@ CalDAV::doUpload(RideItem *rideItem)
     if (calDavType == Google && googleCalendarAccessToken != "") {
         request.setRawHeader("Authorization", "Bearer "+googleCalendarAccessToken );
     }
-
-    // create the ICal event
-    icalcomponent *vcard = createEvent(rideItem);
-    QByteArray vcardtext(icalcomponent_as_ical_string(vcard));
-    icalcomponent_free(vcard);
 
     mode = Put;
     QNetworkReply *reply = nam->put(request, vcardtext);
@@ -467,15 +543,20 @@ CalDAV::requestReply(QNetworkReply *reply)
     case Report:
     case Events:
         context->athlete->rideCalendar->refreshRemote(extractComponents(response));
+        mode = None;
         break;
     default:
     case Options:
     case PropFind:
-    case Put:
         //nothing at the moment
+        mode = None;
+        break;
+    case Put:
+        //refresh local calendar
+        mode = None;
+        download(false);
         break;
     }
-    mode = None;
 }
 
 //
@@ -591,7 +672,7 @@ CalDAV::googleNetworkRequestFinished(QNetworkReply* reply)   {
     }
 
     // now we have a token and can do the requested jobs
-    if (mode == Put) doUpload(itemForUpload);
+    if (mode == Put) doUpload();
     if (mode == Events) doDownload();
 }
 
