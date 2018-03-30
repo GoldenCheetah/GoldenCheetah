@@ -175,7 +175,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="
                          && last->lat == point->lat && last->lon == point->lon;
 
             // moved for less than stop seconds ... interpolate
-            if (!stationary && gap > tolerance && gap < stop) {
+            if (!stationary && gap >= tolerance && gap <= stop) {
 
                 // what's needed?
                 dropouts++;

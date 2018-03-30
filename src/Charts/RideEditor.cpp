@@ -533,7 +533,7 @@ AnomalyDialog::check()
             // anything bigger than a second is of a material concern
             // and we assume time always flows forward ;-)
             double diff = secs[count] - (secs[count-1] + rideEditor->ride->ride()->recIntSecs());
-            if (diff > (double)1.0 || diff < (double)-1.0 || secs[count] < secs[count-1]) {
+            if (diff > (double)0.0 || diff < (double)0.0 || secs[count] < secs[count-1]) {
                 rideEditor->data->anomalies.insert(xsstring(count, RideFile::secs),
                                        tr("Invalid recording gap"));
             }
