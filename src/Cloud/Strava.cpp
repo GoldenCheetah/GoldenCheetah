@@ -681,7 +681,7 @@ Strava:: fixSmartRecording(RideFile* ret)
                          && last->lat == point->lat && last->lon == point->lon;
 
             // moved for less than GarminHWM seconds ... interpolate
-            if (!stationary && gap > 1 && gap < GarminHWM.toInt()) {
+            if (!stationary && gap >= 1 && gap <= GarminHWM.toInt()) {
 
                 // what's needed?
                 dropouts++;
