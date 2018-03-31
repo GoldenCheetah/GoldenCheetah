@@ -131,7 +131,8 @@ OpenData::run()
     if (reply->error() != QNetworkReply::NoError) {
         // how did it go?
         emit progress(step, 0, tr("Network Problem reading server list"));
-        delete nam; quit();
+        delete nam;
+        return;
     }
 
     // did we get a good response ?
@@ -147,7 +148,8 @@ OpenData::run()
     if (parseError.error != QJsonParseError::NoError) {
         emit progress(step, 0, tr("Invalid server list, please try again later"));
         printd("invalid server list!");
-        delete nam; quit();
+        delete nam;
+        return;
     }
 
     // ----------------------------------------------------------------
@@ -198,7 +200,8 @@ OpenData::run()
     if (server == "") {
         printd("Failed to find an available server\n");
         emit progress(step, 0, tr("No servers available, please try later."));
-        delete nam; quit();
+        delete nam;
+        return;
     }
     printd("found a server to post to: %s\n", server.toStdString().c_str());
 
@@ -324,7 +327,8 @@ OpenData::run()
         QByteArray r = reply->readAll();
         printd("post failed %s\n", r.data());
         emit progress(step, 0, QString("%s: %s").arg(tr("Server replied:")).arg(r.data()));
-        delete nam; quit();
+        delete nam;
+        return;
     }
 
     // ----------------------------------------------------------------
@@ -344,7 +348,6 @@ OpenData::run()
 
     printd("terminate thread\n");
     delete nam;
-    quit();
 }
 
 OpenDataDialog::OpenDataDialog(Context *context) : context(context)
