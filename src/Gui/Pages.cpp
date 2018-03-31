@@ -196,6 +196,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     offset += 1;
 #endif
 
+#if QT_VERSION >= 0x050000
+    opendata = new QCheckBox(tr("Share to the OpenData project"), this);
+    QString grant = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_GRANTED, "X").toString();
+    opendata->setChecked(grant == "Y");
+    configLayout->addWidget(opendata, 7+offset,1, Qt::AlignLeft);
+    if (grant == "X") opendata->hide();
+    offset += 1;
+#endif
+
     //
     // Athlete directory (home of athletes)
     //
@@ -324,6 +333,12 @@ GeneralPage::saveClicked()
 #endif
 #ifdef GC_WANT_PYTHON
     appsettings->setValue(GC_PYTHON_HOME, pythonDirectory->text());
+#endif
+
+#if QT_VERSION >= 0x050000
+    // update to reflect the state - if hidden user hasn't been asked yet to
+    // its neither set or unset !
+    if (!opendata->isHidden()) appsettings->setCValue(context->athlete->cyclist, GC_OPENDATA_GRANTED, opendata->isChecked() ? "Y" : "N");
 #endif
 
     // Elevation

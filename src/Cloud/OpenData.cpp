@@ -53,6 +53,11 @@
     } while(0)
 #endif
 
+// Version    Date              Change
+// 1          31 Mar 2018       Full OpenData Format with json summary and csv sample data
+
+static int OpenDataVersion = 1;
+
 OpenData::OpenData(Context *context) : context(context) {}
 OpenData::~OpenData() {}
 void OpenData::onSslErrors(QNetworkReply *reply, const QList<QSslError>&) { reply->ignoreSslErrors(); }
@@ -78,14 +83,17 @@ OpenData::check(Context *context)
 
     // may have changed !
     granted = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_GRANTED, "X").toString();
+    int version = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTVERSION, 0).toInt();
+
     QDate lastpost = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTED, QDate(1970,01,01)).toDate();
-    if (granted == "Y" && lastpost.daysTo(QDate::currentDate()) > 365) {
+    if (granted == "Y" && (version < OpenDataVersion || lastpost.daysTo(QDate::currentDate()) > 365)) {
         // might be time, but lets just check we have new workouts
         int newworkouts = context->athlete->rideCache->count() -
                           appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTCOUNT, 0).toInt();
 
         // we need AT LEAST 100 new workouts to make this worthwhile
-        if (newworkouts > 100) {
+        // or the version has changed and we need to send a different format
+        if (version < OpenDataVersion || newworkouts > 100) {
             OpenData *od = new OpenData(context); // no mem leak as a QThread that terminates itself
             od->postData();
             printd("sending new workouts\n");
@@ -221,6 +229,44 @@ OpenData::run()
     QString zipname = context->athlete->id.toString() + ".json";
     writer.addFile(zipname, jsonFile.readAll());
     jsonFile.close();
+
+    // now add every activity as a CSV file
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+        // we open directly, in another thread so no conflicts with main threads
+        QFile file(item->path + "/" + item->fileName);
+        QStringList errors;
+        RideFile *f = RideFileFactory::instance().openRideFile(context, file, errors);
+
+        // write to zip if we have something useful
+        if (f != NULL && f->dataPoints().count() > 0) {
+
+            // will either be a gc or json file
+            QString csvname = item->fileName;
+            csvname.replace("json", "csv");
+            csvname.replace("gc", "csv");
+
+            printd("Adding %s\n", csvname.toStdString().c_str());
+
+            // write as CSV to string
+            QString CSV = QString("secs,km,power,hr,cad,alt\n");
+            foreach(RideFilePoint *p, f->dataPoints()) {
+                CSV += QString("%1,%2,%3,%4,%5,%6\n")
+                       .arg(p->secs)
+                       .arg(p->km)
+                       .arg(f->areDataPresent()->watts ? QString("%1").arg(p->watts) : "")
+                       .arg(f->areDataPresent()->hr ? QString("%1").arg(p->hr) : "")
+                       .arg(f->areDataPresent()->cad ? QString("%1").arg(p->cad) : "")
+                       .arg(f->areDataPresent()->alt ? QString("%1").arg(p->alt) : "");
+            }
+
+            // write data to zipfile
+            writer.addFile(csvname, CSV.toLatin1());
+        }
+
+        if (f) delete(f);
+    }
+
     writer.close();
 
     // read the ZIP into MEMORY
@@ -290,7 +336,8 @@ OpenData::run()
 
     // record the fact we sent some stuff
     appsettings->setCValue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTED, QDate::currentDate());
-    appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTCOUNT,  context->athlete->rideCache->count());
+    appsettings->setCValue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTCOUNT,  context->athlete->rideCache->count());
+    appsettings->setCValue(context->athlete->cyclist, GC_OPENDATA_LASTPOSTVERSION,  OpenDataVersion);
 
     // and terminate
     emit progress(0, last, tr("Done"));
@@ -304,7 +351,8 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
 {
 
     setWindowTitle(QString(tr("OpenData")));
-    setMinimumWidth(550);
+    setMinimumWidth(700*dpiXFactor);
+    setMinimumHeight(730*dpiYFactor);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -318,7 +366,7 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
     QLabel *header = new QLabel(this);
     header->setWordWrap(true);
     header->setTextFormat(Qt::RichText);
-    header->setText(QString(tr("<b><big>Share aggregated data</big></b>")));
+    header->setText(QString(tr("<b><big>OpenData Project</big></b>")));
 
     QHBoxLayout *toprow = new QHBoxLayout;
     toprow->addWidget(important);
@@ -328,24 +376,30 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
     QLabel *text = new QLabel(this);
     text->setWordWrap(true);
     text->setTextFormat(Qt::RichText);
-    text->setText(tr("<center><b>Your chance to give back</b><br><p></center>"
-                     "We have started a new project to collect user workout data, in aggregate format, to enable "
-                     "researchers, coaches and others to develop new models and solutions.<p>"
-                     "All data shared is anonymous and cannot be traced back to the original user, no personal data is "
-                     "shared and the workout data is limited to metrics and distributions. No sample by sample data is being "
-                     "collected at all.<p>"
-                     "The data will be published to the general public via github every quarter, in exactly the same format "
-                     "you have provided it in.<p>"
+    text->setText(tr("We have started a new project to collect user activity data to enable "
+                     "researchers, coaches and others to develop new models and solutions using real world data.<p>"
+                     "All data that is shared is <b>anonymous</b> and cannot be traced back to the original user, no personal data is "
+                     "shared and the workout data is limited to Power, Heartrate, Altitude, Cadence and Distance data along with metrics and distributions. "
+                     "No personally identifiable information is collected at all.<p>"
+                     "The data will be published to the general public in exactly the same format you have provided it in. And you can choose to "
+                     "remove your data at any time. You can also choose to opt out again in athlete preferences.<p>"
+                     "<center>Your data will only be sent once every year or so.</center>"
+                     "<br>"
                      "<b>WE WILL NOT</b>:<p>"
                      "- Collect personal information <p>"
                      "- Collect GPS information <p>"
                      "- Collect notes or other metadata  <p>"
-                     "- Collect sample data <p>"
                      "<p>"
+                     "<br>"
                      "<b>WE WILL</b>:<p>"
                      "- Collect basic athlete info: Gender, Year of Birth and UUID<p>"
+                     "- Collect basic activity samples for HR, Cadence, Power, Distance, Altitude<p>"
                      "- Collect metrics for every activity stored for this athlete<p>"
                      "- Collect distribution and mean-max aggregates of activity data<p>"
+                     "<p>"
+                     "<br>"
+                     "The public repository is held in an <a href=\"http://goldencheetah.s3.eu-west-2.amazonaws.com/\">Amazon S3 bucket</a> with read-only access granted to everyone.<p>"
+                     "We have also setup an <a href=\"https://github.com/GoldenCheetah/OpenData\">OpenData github project</a> to publish tools for working with the dataset.<p>"
                      ));
 
     scrollText = new QScrollArea();
@@ -366,6 +420,11 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
     lastRow->addStretch();
     lastRow->addWidget(proceedButton);
     layout->addLayout(lastRow);
+
+    // make YES the default if they hit return (it will be highlighted this way on screen too)
+    proceedButton->setDefault(true);
+    proceedButton->setAutoDefault(true);
+    proceedButton->setFocus();
 
 }
 
