@@ -322,6 +322,7 @@ OpenData::run()
 
     // success?
     if (reply->error() == QNetworkReply::NoError) {
+        QByteArray r = reply->readAll();
         printd("post success %s\n", r.toStdString().c_str());
     } else {
         QByteArray r = reply->readAll();
