@@ -470,6 +470,114 @@ CredentialsPage::CredentialsPage(Context *context) : context(context)
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+
+    //////////////////////////////////////////////////
+    // Remote Calendar Configuration
+    QFrame *line;
+    line = new QFrame;
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(line, 2,0);
+
+    QGridLayout *grid = new QGridLayout;
+    unsigned int row = 0;
+
+    QFont current;
+    current.setWeight(QFont::Black);
+
+    QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
+
+    // Web Calendar
+    QLabel *webcal = new QLabel(tr("Web Calendar"));
+    webcal->setFont(current);
+    QLabel *wcurlLabel = new QLabel(tr("Webcal URL"));
+
+    webcalURL = new QLineEdit(this);
+    webcalURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_WEBCAL_URL, "").toString());
+
+    grid->addWidget(webcal, ++row, 0);
+
+    grid->addWidget(wcurlLabel, ++row, 0);
+    grid->addWidget(webcalURL, row, 1, 0);
+
+    // CalDAV Calendar
+    QLabel *dv = new QLabel(tr("CalDAV Calendar"));
+    dvCALDAVType = new QComboBox(this);
+    dvCALDAVType->addItem(tr("Generic CalDAV"));
+    dvCALDAVType->addItem(tr("Google Calendar"));
+
+    dvCALDAVType->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_DVCALDAVTYPE, "0").toInt());
+
+    // setup and fill all fields
+    dv->setFont(current);
+    QLabel *dvurlLabel = new QLabel(tr("CalDAV URL"));
+    QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
+    QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
+    QLabel *dvTypeLabel = new QLabel(tr("Calendar Type"));
+    QLabel *dvGoogleCalendarLabel = new QLabel(tr("Google CalID"));
+
+    dvURL = new QLineEdit(this);
+    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
+    url.replace("%40", "@"); // remove escape of @ character
+    dvURL->setText(url);
+
+    dvUser = new QLineEdit(this);
+    dvUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVUSER, "").toString());
+
+    dvPass = new QLineEdit(this);
+    dvPass->setEchoMode(QLineEdit::Password);
+    dvPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVPASS, "").toString());
+
+    dvGoogleCalid = new QLineEdit(this);
+    dvGoogleCalid->setText(
+        appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "")
+        .toString());
+
+    QLabel *googleCalendarAuthLabel = new QLabel(tr("Google Calendar"));
+
+    googleCalendarAuthorise = new QPushButton(tr("Authorise"), this);
+    googleCalendarAuthorised = new QPushButton(this);
+    googleCalendarAuthorised->setContentsMargins(0,0,0,0);
+    googleCalendarAuthorised->setIcon(passwords.scaled(16,16));
+    googleCalendarAuthorised->setIconSize(QSize(16,16));
+    googleCalendarAuthorised->setFixedHeight(16);
+    googleCalendarAuthorised->setFixedWidth(16);
+
+    grid->addWidget(dv, ++row, 0);
+
+    grid->addWidget(dvTypeLabel, ++row, 0);
+    grid->addWidget(dvCALDAVType, row, 1, 0);
+
+    grid->addWidget(dvurlLabel, ++row, 0);
+    grid->addWidget(dvURL, row, 1, 0);
+
+    grid->addWidget(dvuserLabel, ++row, 0);
+    grid->addWidget(dvUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(dvpassLabel, ++row, 0);
+    grid->addWidget(dvPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(dvGoogleCalendarLabel, ++row, 0);
+    grid->addWidget(dvGoogleCalid, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(googleCalendarAuthLabel, ++row, 0);
+    grid->addWidget(googleCalendarAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist,
+                            GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "") != "") {
+        grid->addWidget(googleCalendarAuthorised, row, 1,
+                        Qt::AlignLeft | Qt::AlignVCenter);
+    } else {
+        googleCalendarAuthorised->hide(); // if no token no show
+    }
+    connect(googleCalendarAuthorise, SIGNAL(clicked()), this,
+                SLOT(authoriseGoogleCalendar()));
+
+    connect (dvCALDAVType, SIGNAL(currentIndexChanged(int)), this, SLOT(dvCALDAVTypeChanged(int)));
+
+    // activate/deactivate the input fields according to the type selected
+    dvCALDAVTypeChanged(dvCALDAVType->currentIndex());
+
+    mainLayout->addLayout(grid, 3,0);
 }
 
 void
@@ -505,6 +613,16 @@ CredentialsPage::resetList()
 qint32
 CredentialsPage::saveClicked()
 {
+    appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
+    // escape the at character
+    QString url = dvURL->text();
+    url.replace("@", "%40");
+    appsettings->setCValue(context->athlete->cyclist, GC_DVURL, url);
+    appsettings->setCValue(context->athlete->cyclist, GC_DVUSER, dvUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_DVPASS, dvPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_DVGOOGLE_CALID, dvGoogleCalid->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_DVCALDAVTYPE, dvCALDAVType->currentIndex());
 
     return 0;
 }
@@ -553,6 +671,43 @@ CredentialsPage::editClicked()
     // when the wizard closes we need to raise back - or else we get hidden
     connect(edit, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
     edit->exec();
+
+}
+
+void CredentialsPage::authoriseGoogleCalendar() {
+    OAuthDialog *oauthDialog;
+
+    oauthDialog = new OAuthDialog(context, OAuthDialog::GOOGLE_CALENDAR, NULL);
+
+    if (oauthDialog->sslLibMissing()) {
+        delete oauthDialog;
+    } else {
+        oauthDialog->setWindowModality(Qt::ApplicationModal);
+        oauthDialog->exec();
+    }
+}
+
+void CredentialsPage::dvCALDAVTypeChanged(int type)
+{
+    if (type == 0) {
+        // normal CALDAV selected
+        googleCalendarAuthorise->setEnabled(false);
+        dvGoogleCalid->setEnabled(false);
+        dvURL->setEnabled(true);
+        dvUser->setEnabled(true);
+        dvPass->setEnabled(true);
+    } else {
+        // Google Selected
+        googleCalendarAuthorise->setEnabled(true);
+        dvGoogleCalid->setEnabled(true);
+        dvURL->setEnabled(false);
+        dvUser->setEnabled(false);
+        dvPass->setEnabled(false);
+    }
+    // set always inactive if authorization process not feasible
+#ifndef GC_GOOGLE_CALENDAR_CLIENT_SECRET
+        googleCalendarAuthorise->setEnabled(false);
+#endif
 
 }
 
