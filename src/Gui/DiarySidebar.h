@@ -22,13 +22,6 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
-#ifdef NOWEBKIT
-#include <QWebEngineView>
-#include <QWebEngineSettings>
-#else
-#include <QWebView>
-#include <QWebFrame>
-#endif
 
 #include "Context.h"
 #include "Athlete.h"
@@ -176,7 +169,6 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
 
         void setRide(RideItem *ride);
         void refresh(); 
-        void setSummary(); // set the summary at the bottom
 
         void configChanged(qint32);
         void filterChanged() { multiCalendar->filterChanged(); }
@@ -197,16 +189,8 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
 
         //QPalette black, grey, white;
         GcSplitter *splitter; // calendar vs summary
-        GcSplitterItem *calendarItem,
-                       *summaryItem;
+        GcSplitterItem *calendarItem;
 
-        QComboBox *summarySelect;
-#ifdef NOWEBKIT
-        QWebEngineView *summary;
-#else
-        QWebView *summary;
-#endif
-        QWidget *summaryWidget;
         QDate from, to;
 };
 #endif // _GC_DiarySidebar_h

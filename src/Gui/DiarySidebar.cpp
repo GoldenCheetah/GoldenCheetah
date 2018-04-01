@@ -51,7 +51,6 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 
     // calendar
     calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
-    summaryItem = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
     // cal widget
     calWidget = new QWidget(this);
@@ -66,69 +65,11 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     HelpWhatsThis *helpCalendarItem = new HelpWhatsThis(calendarItem);
     calendarItem->setWhatsThis(helpCalendarItem->getWhatsThisText(HelpWhatsThis::SideBarDiaryView_Calendar));
 
-    // summary widget
-    summaryWidget = new QWidget(this);
-    summaryWidget->setContentsMargins(0,0,0,0);
-    summaryWidget->setObjectName("summaryWidget");
-    summaryWidget->setAutoFillBackground(true);
-    QVBoxLayout *slayout = new QVBoxLayout(summaryWidget);
-    slayout->setSpacing(0);
-    slayout->setContentsMargins(0,0,0,0);
-    summaryItem->addWidget(summaryWidget);
-
-    HelpWhatsThis *helpSummaryItem = new HelpWhatsThis(summaryItem);
-    summaryItem->setWhatsThis(helpSummaryItem->getWhatsThisText(HelpWhatsThis::SideBarDiaryView_Summary));
-
     splitter->addWidget(calendarItem);
-    splitter->addWidget(summaryItem);
     splitter->prepare(context->athlete->cyclist, "diary");
 
     multiCalendar = new GcMultiCalendar(context);
     layout->addWidget(multiCalendar);
-
-    // Summary level selector
-    QHBoxLayout *h = new QHBoxLayout();
-    h->setSpacing(5 *dpiXFactor);
-    summarySelect = new QComboBox(this);
-    summarySelect->setFixedWidth(150); // is it impossible to size constrain qcombos?
-    summarySelect->addItem(tr("Day Summary"));
-    summarySelect->addItem(tr("Weekly Summary"));
-    summarySelect->addItem(tr("Monthly Summary"));
-    summarySelect->setCurrentIndex(2); // default to monthly
-    h->addStretch();
-    h->addWidget(summarySelect, Qt::AlignCenter);
-    h->addStretch();
-    slayout->addLayout(h);
-
-    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-
-#ifdef NOWEBKIT
-    // WebEngine
-    summary = new QWebEngineView(this);
-    summary->setEnabled(false);
-    summary->setContentsMargins(0,0,0,0);
-    summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    summary->setAcceptDrops(false);
-    summary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize());
-    summary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-    summary->page()->view()->setContentsMargins(0,0,0,0);
-    //XXX WEBENGINE XXX summary->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
-#else
-    summary = new QWebView(this);
-    summary->setContentsMargins(0,0,0,0);
-    summary->page()->view()->setContentsMargins(0,0,0,0);
-    summary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
-    summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    summary->setAcceptDrops(false);
-    summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
-    summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
-
-    slayout->addWidget(summary);
-    slayout->addStretch();
-
-    // summary mode changed
-    connect(summarySelect, SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
 
     // refresh on these events...
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
@@ -148,15 +89,12 @@ DiarySidebar::configChanged(qint32)
     // and NOT its children. This is why stylesheets on widgets is a stoopid idea
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
-    summaryWidget->setStyleSheet(QString("QWidget#summaryWidget { color: %1; background: %2; }")
-                                .arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
 
     // now apply
     multiCalendar->refresh();
 
     // and summary .. forgetting what we already prepared
     from = to = QDate();
-    setSummary();
 }
 
 void
@@ -164,7 +102,6 @@ DiarySidebar::refresh()
 {
     if (!isHidden()) {
         multiCalendar->refresh();
-        setSummary();
     }
     repaint();
 }
@@ -175,7 +112,6 @@ DiarySidebar::setRide(RideItem *ride)
     _ride = ride;
 
     multiCalendar->setRide(ride);
-    setSummary();
 }
 
 bool
@@ -269,182 +205,6 @@ GcLabel::paintEvent(QPaintEvent *)
         painter.drawRect(QRect(0,0,width(),height()));
     }
     painter.restore();
-}
-
-void
-DiarySidebar::setSummary()
-{
-    // are we metric?
-    bool useMetricUnits = context->athlete->useMetricUnits;
-
-    // where we construct the text
-    QString summaryText("");
-
-    QDate when;
-    if (_ride && _ride->ride()) when = _ride->dateTime.date();
-    else when = QDate::currentDate();
-
-    // main totals
-    static const QStringList totalColumn = QStringList()
-        << "workout_time"
-        << "time_riding"
-        << "total_distance"
-        << "total_work"
-        << "elevation_gain";
-
-    static const QStringList averageColumn = QStringList()
-        << "average_speed"
-        << "average_power"
-        << "average_hr"
-        << "average_cad";
-
-    static const QStringList maximumColumn = QStringList()
-        << "max_speed"
-        << "max_power"
-        << "max_heartrate"
-        << "max_cadence";
-
-    // user defined
-    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-
-    // in case they were set tand then unset
-    if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
-    QStringList metricColumn = s.split(",");
-
-    // what date range should we use?
-    QDate newFrom, newTo;
-
-    switch(summarySelect->currentIndex()) {
-
-        case 0 :
-            // DAILY - just the date of the ride
-            newFrom = newTo = when;
-            break;
-        case 1 :
-            // WEEKLY - from Mon to Sun
-            newFrom = when.addDays((when.dayOfWeek()-1)*-1);
-            newTo = newFrom.addDays(6);
-            break;
-
-        default:
-        case 2 : 
-            // MONTHLY - all days in month
-            newFrom = QDate(when.year(), when.month(), 1);
-            newTo = newFrom.addMonths(1).addDays(-1);
-            break;
-    }
-
-    if (newFrom != from || newTo != to) {
-
-        // date range changed lets refresh
-        from = newFrom;
-        to = newTo;
-
-        Specification spec;
-        spec.setDateRange(DateRange(from, to));
-
-        // foreach of the metrics get an aggregated value
-        // header of summary
-        summaryText = QString("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2//EN\">"
-                              "<html>"
-                              "<head>"
-                              "<title></title>"
-                              "</head>"
-                              "%1"
-                              "<body>"
-                              "<center>").arg(GCColor::css());
-
-        for (int i=0; i<4; i++) { //taken out maximums -- too much info -- looks ugly
-
-            QString aggname;
-            QStringList list;
-
-            switch(i) {
-                case 0 : // Totals
-                    aggname = tr("Totals");
-                    list = totalColumn;
-                    break;
-
-                case 1 :  // Averages
-                    aggname = tr("Averages");
-                    list = averageColumn;
-                    break;
-
-                case 3 :  // Maximums
-                    aggname = tr("Maximums");
-                    list = maximumColumn;
-                    break;
-
-                case 2 :  // User defined.. 
-                    aggname = tr("Metrics");
-                    list = metricColumn;
-                    break;
-
-            }
-
-            summaryText += QString("<p><table width=\"85%\">"
-                                   "<tr>"
-                                   "<td align=\"center\" colspan=\"2\">"
-                                   "<b>%1</b>"
-                                   "</td>"
-                                   "</tr>").arg(aggname);
-
-            foreach(QString metricname, list) {
-
-                const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
-
-                QStringList empty; // usually for filters, but we don't do that
-                QString value = context->athlete->rideCache->getAggregate(metricname, spec, useMetricUnits);
-
-
-                // Maximum Max and Average Average looks nasty, remove from name for display
-                QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
-
-                // don't show units for time values
-                if (metric && (metric->units(useMetricUnits) == "seconds" ||
-                               metric->units(useMetricUnits) == tr("seconds") ||
-                               metric->units(useMetricUnits) == "")) {
-
-                    summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")
-                                            .arg(s)
-                                            .arg(value);
-
-                } else {
-                    summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td>")
-                                            .arg(s)
-                                            .arg(metric ? metric->units(useMetricUnits) : "unknown")
-                                            .arg(value);
-                }
-
-            }
-            summaryText += QString("</tr>" "</table>");
-
-        }
-
-        // finish off the html document
-        summaryText += QString("</center>"
-                               "</body>"
-                               "</html>");
-
-        // set webview contents
-#ifdef NOWEBKIT
-        summary->page()->setHtml(summaryText);
-#else
-        summary->page()->mainFrame()->setHtml(summaryText);
-#endif
-    }
-
-    // we always tell everyone the date range changed
-    QString name;
-
-    if (summarySelect->currentIndex() == 0)
-        name = tr("Day of ") + from.toString(tr("dddd MMMM d"));
-    else if (summarySelect->currentIndex() == 1)
-        name = QString(tr("Week Commencing %1")).arg(from.toString(tr("dddd MMMM d")));
-    else if (summarySelect->currentIndex() == 2)
-        name = from.toString(tr("MMMM yyyy"));
-
-    emit dateRangeChanged(DateRange(from, to, name));
 }
 
 //********************************************************************************
