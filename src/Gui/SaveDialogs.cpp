@@ -19,6 +19,7 @@
 #include "Tab.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "Estimator.h"
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
 #include "RideItem.h"
@@ -197,6 +198,9 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
 
     // mark clean as we have now saved the data
     rideItem->ride()->emitSaved();
+
+    // model estimates (lazy refresh)
+    context->athlete->rideCache->estimator->refresh();
 }
 
 

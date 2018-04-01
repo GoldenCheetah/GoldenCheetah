@@ -99,8 +99,49 @@ class RollingBests {
 
 Estimator::Estimator(Context *context) : context(context)
 {
+    // used to flag when we need to stop
+    abort = false;
+
+    // lazy start signal
+    connect(&singleshot, SIGNAL(timeout()), this, SLOT(calculate()));
+
     // when thread finishes we can let everyone know estimates are updated
     connect(this, SIGNAL(finished()), context, SLOT(notifyEstimatesRefreshed()));
+}
+
+void
+Estimator::stop()
+{
+    if (isRunning()) {
+
+        // we could use requestInterruption but would mean we need QT > 5.2
+        // and there isn't much value in that.
+        abort = true;
+
+        // now wait for the thread to stop
+        while(isRunning() && abort == true)  msleep(50);
+    }
+}
+
+// terminate thread before closing
+Estimator::~Estimator()
+{
+    stop();
+}
+
+// refresh
+void
+Estimator::refresh()
+{
+    printd("Lazy start triggered.\n");
+
+    stop(); // stop any running threads
+    singleshot.stop(); // stop any pending threads
+
+    // 15 secs delay before calculate() is triggered
+    singleshot.setSingleShot(true);
+    singleshot.setInterval(15000);
+    singleshot.start();
 }
 
 // setup and run, if not already running
@@ -183,6 +224,13 @@ Estimator::run()
     // calculate Estimates for all data per week including the week of the last Power recording
     QDate date = from;
     while (date < to) {
+
+        // check if we've been asked to stop
+        if (abort == true) {
+            printd("Model estimator aborted.\n");
+            abort = false;
+            return;
+        }
 
         QDate begin = date;
         QDate end = date.addDays(6);

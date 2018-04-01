@@ -132,6 +132,7 @@ class RideCache : public QObject
     protected:
 
         friend class ::Athlete;
+        friend class ::MainWindow; // save dialog
         friend class ::RideCacheBackgroundRefresh;
 
         Context *context;

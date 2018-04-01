@@ -287,6 +287,9 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
         // notify everyone to select the one we were already on
         context->notifyRideSelected(prior);
     }
+
+    // model estimates (lazy refresh)
+    estimator->refresh();
 }
 
 void
@@ -376,6 +379,9 @@ RideCache::removeCurrentRide()
 
     // now select another ride
     context->notifyRideSelected(select);
+
+    // model estimates (lazy refresh)
+    estimator->refresh();
 }
 
 // NOTE:

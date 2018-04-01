@@ -38,12 +38,21 @@ class Estimator : public QThread {
     public:
 
         Estimator(Context *);
-
-        // sets up and kicks off thread
-        void calculate();
+        ~Estimator();
 
         // perform calculation in thread
         void run();
+
+        // halt the thread
+        void stop();
+
+        // cancel any pending/running and kick off with 15 sec delay
+        void refresh();
+
+    public slots:
+
+        // setup and run estimators
+        void calculate();
 
     protected:
 
@@ -53,7 +62,9 @@ class Estimator : public QThread {
         QMutex lock;
         QList<PDEstimate> estimates;
         QVector<RideItem*> rides; // worklist
+        QTimer singleshot;
 
+        bool abort;
 };
 
 #endif
