@@ -951,7 +951,7 @@ void
 RideNavigator::setRide(RideItem*rideItem)
 {
     // if we have a selection and its this one just ignore.
-    if (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0) return;
+    if (rideItem == NULL || (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0)) return;
 
     for (int i=0; i<tableView->model()->rowCount(); i++) {
 
