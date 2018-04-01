@@ -287,6 +287,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
+    connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(refresh()));
 
     // comparing things
     connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));

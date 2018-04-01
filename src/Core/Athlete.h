@@ -93,9 +93,7 @@ class Athlete : public QObject
         void setCriticalPower(int cp);
 
         // Data
-        QMutex lock;
         Seasons *seasons;
-        QList<PDEstimate> PDEstimates_;
         Routes *routes;
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;

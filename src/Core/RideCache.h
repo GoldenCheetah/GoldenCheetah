@@ -41,6 +41,7 @@ class RideCacheBackgroundRefresh;
 class Specification;
 class AthleteBest;
 class RideCacheModel;
+class Estimator;
 
 class RideCache : public QObject
 {
@@ -97,9 +98,6 @@ class RideCache : public QObject
         void refresh();
         double progress() { return progress_; }
 
-        // PD Model refreshing (temporary move)
-        void refreshCPModelMetrics();
-
     public slots:
 
         // restore / dump cache to disk (json)
@@ -121,6 +119,9 @@ class RideCache : public QObject
         // clear deleted objects
         void garbageCollect();
 
+        // first run to initialise estimates
+        void initEstimates();
+
     signals:
 
         void modelProgress(int, int); // let others know when we're refreshing the model estimates
@@ -130,6 +131,7 @@ class RideCache : public QObject
 
     protected:
 
+        friend class ::Athlete;
         friend class ::RideCacheBackgroundRefresh;
 
         Context *context;
@@ -138,12 +140,13 @@ class RideCache : public QObject
         QVector<RideItem*> rides_, reverse_, delete_;
         RideCacheModel *model_;
         bool exiting;
-        bool refreshingEstimates;
 	    double progress_; // percent
 
         QFuture<void> future;
         QFutureWatcher<void> watcher;
 
+        Estimator *estimator;
+        bool first; // updated when estimates are marked stale
 };
 
 class AthleteBest

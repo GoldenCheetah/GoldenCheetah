@@ -202,6 +202,7 @@ class Context : public QObject
         void notifyCompareDateRangesChanged();
 
         void notifySteerScroll(int scrollAmount) { emit steerScroll(scrollAmount); }
+        void notifyEstimatesRefreshed() { emit estimatesRefreshed(); }
 
     protected:
 
@@ -232,6 +233,7 @@ class Context : public QObject
         void refreshStart();
         void refreshEnd();
         void refreshUpdate(QDate);
+        void estimatesRefreshed();
 
         // cloud download
         void autoDownloadStart();

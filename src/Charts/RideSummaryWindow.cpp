@@ -141,7 +141,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     }
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
-    connect(context->athlete->rideCache, SIGNAL(modelProgress(int,int)), this, SLOT(modelProgress(int,int)));
+    connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(refresh()));
 
     setChartLayout(vlayout);
     configChanged(CONFIG_APPEARANCE | CONFIG_METRICS); // set colors
@@ -208,37 +208,6 @@ RideSummaryWindow::setFilter(QStringList list)
     filters = list;
     filtered = true;
     refresh();
-}
-
-void 
-RideSummaryWindow::modelProgress(int year, int month)
-{
-    // ignore if not visible!
-    if (firstload || !amVisible()) return;
-
-    QString string;
-
-    if (!year && !month) {
-        string = tr("<h3>Model</h3>");
-    } else {
-
-#if 0 // too much info, just do years ...
-        QString dotstring;
-        if (month < 5) dotstring = ".  ";
-        else if (month < 9) dotstring = ".. ";
-        else dotstring = "...";
-#endif
-
-        string = QString(tr("<h3>Modeling<br>%1</h3>")).arg(year);
-    }
-
-#ifdef NOWEBKIT
-    rideSummary->page()->runJavaScript(
-        QString("var div = document.getElementById(\"modhead\"); if (div != null) div.innerHTML = '%1'; ").arg(string));;
-#else
-    rideSummary->page()->mainFrame()->evaluateJavaScript(
-        QString("var div = document.getElementById(\"modhead\"); if (div != null) div.innerHTML = '%1'; ").arg(string));;
-#endif
 }
 
 void
@@ -840,19 +809,8 @@ RideSummaryWindow::htmlSummary()
         summary += "</table></td>";
     }
 
-    // get the PDEStimates for this athlete
-    if (context->athlete->getPDEstimates().count() == 0) {
-
-        // ugh .. refresh in background
-        WPrimeStringWPK = CPStringWPK = FTPStringWPK = PMaxStringWPK = 
-        WPrimeString = CPString = FTPString = PMaxString = "-";
-        future = QtConcurrent::run(this, &RideSummaryWindow::getPDEstimates);
-
-    } else {
-
-        // set from cached values
-        getPDEstimates();
-    }
+    // get the PDEStimates for this athlete - may be empty
+    getPDEstimates();
 
     // MODEL 
     // lets get a table going
@@ -1564,12 +1522,8 @@ RideSummaryWindow::htmlSummary()
 void
 RideSummaryWindow::getPDEstimates()
 {
-    bool ping = false;
-    // refresh if needed
-    if (context->athlete->getPDEstimates().count() == 0) {
-        ping = true;
-        context->athlete->rideCache->refreshCPModelMetrics(); //true = bg ...
-    }
+    // none available yet?
+    if (context->athlete->getPDEstimates().count() == 0)  return;
 
     for (int i=0; i<2; i++) {
 
@@ -1648,9 +1602,6 @@ RideSummaryWindow::getPDEstimates()
             PMaxStringWPK = PMaxString;
         }
     }
-
-    // now refresh !
-    if (ping) emit doRefresh();
 }
 
 QString

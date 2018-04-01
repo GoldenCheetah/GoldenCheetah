@@ -24,6 +24,7 @@
 #include "RideCacheModel.h"
 #include "Specification.h"
 #include "DataProcessor.h"
+#include "Estimator.h"
 
 #include "Route.h"
 
@@ -54,8 +55,8 @@ RideCache::RideCache(Context *context) : context(context)
     plannedDirectory = context->athlete->home->planned();
 
     progress_ = 100;
-    refreshingEstimates = false;
     exiting = false;
+    estimator = new Estimator(context);
 
     // initial load of user defined metrics - do once we have an initial context
     // but before we refresh or check metrics for the first time
@@ -132,11 +133,16 @@ RideCache::RideCache(Context *context) : context(context)
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
+    // after the first ridecache refresh we set initial pd estimates
+    first= true;
+    connect(context, SIGNAL(refreshEnd()), this, SLOT(initEstimates()));
+
     // now refresh just in case.
     refresh();
 
     // do we have any stale items ?
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
 
     // future watching
     connect(&watcher, SIGNAL(finished()), this, SLOT(garbageCollect()));
@@ -164,6 +170,16 @@ RideCache::garbageCollect()
         if (item) item->deleteLater();
     }
     delete_.clear();
+}
+
+void
+RideCache::initEstimates()
+{
+    // kickoff first calculation
+    if (first) {
+        first = false;
+        estimator->calculate();
+    }
 }
 
 void
@@ -484,6 +500,7 @@ RideCache::refresh()
         qSort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
         future = QtConcurrent::map(reverse_, itemRefresh);
         watcher.setFuture(future);
+
     } else {
 
         // nothing to do, notify its started and done immediately
@@ -633,208 +650,6 @@ RideCache::getBests(QString symbol, int n, Specification specification, bool use
 
     // return the array with the right number of entries in #1 - n order
     return results;
-}
-
-class RollingBests {
-    private:
-
-        // buffer of best values; Watts or Watts/KG
-        // is a double to handle both use cases
-        QVector<QVector<float> > buffer;
-
-        // current location in circular buffer
-        int index;
-
-    public:
-
-        // iniitalise with circular buffer size
-        RollingBests(int size) {
-            index=1;
-            buffer.resize(size);
-        }
-
-        // add a new weeks worth of data, losing
-        // whatever is at the back of the buffer
-        void addBests(QVector<float> array) {
-            buffer[index++] = array;
-            if (index >= buffer.count()) index=0;
-        }
-
-        // get an aggregate of all the bests
-        // currently in the circular buffer
-        QVector<float> aggregate() {
-
-            QVector<float> returning;
-
-            // set return buffer size
-            int size=0;
-            for(int i=0; i<buffer.count(); i++)
-                if (buffer[i].size() > size)
-                    size = buffer[i].size();
-
-            // initialise return values
-            returning.fill(0.0f, size);
-
-            // get largest values
-            for(int i=0; i<buffer.count(); i++)
-                for (int j=0; j<buffer[i].count(); j++)
-                    if(buffer[i].at(j) > returning[j])
-                        returning[j] = buffer[i].at(j);
-
-            // return the aggregate
-            return returning;
-        }
-};
-
-void
-RideCache::refreshCPModelMetrics()
-{
-    // we're refreshing, so away
-    if (refreshingEstimates == true) return;
-
-    // need to lock
-    refreshingEstimates = true;
-    context->athlete->lock.lock();
-
-    // this needs to be done once all the other metrics
-    // Calculate a *monthly* estimate of CP, W' etc using
-    // bests data from the previous 12 weeks
-    RollingBests bests(12);
-    RollingBests bestsWPK(12);
-
-    // clear any previous calculations
-    context->athlete->PDEstimates_.clear();
-
-    // we do this by aggregating power data into bests
-    // for each month, and having a rolling set of 3 aggregates
-    // then aggregating those up into a rolling 3 month 'bests'
-    // which we feed to the models to get the estimates for that
-    // point in time based upon the available data
-    QDate from, to;
-
-    // what dates have any power data ?
-    foreach(RideItem *item, rides()) {
-
-        // has power, but not running
-        if (item->present.contains("P") && !item->isRun) {
-
-            // no date set
-            if (from == QDate()) from = item->dateTime.date();
-            if (to == QDate()) to = item->dateTime.date();
-
-            // later...
-            if (item->dateTime.date() < from) from = item->dateTime.date();
-
-            // earlier...
-            if (item->dateTime.date() > to) to = item->dateTime.date();
-        }
-    }
-
-    // if we don't have 2 rides or more then skip this but add a blank estimate
-    if (from == to || to == QDate()) {
-        context->athlete->PDEstimates_ << PDEstimate();
-        context->athlete->lock.unlock();
-        refreshingEstimates = false;
-        return;
-    }
-
-    // set up the models we support
-    CP2Model p2model(context);
-    CP3Model p3model(context);
-    WSModel wsmodel(context);
-    MultiModel multimodel(context);
-    ExtendedModel extmodel(context);
-
-    QList <PDModel *> models;
-    models << &p2model;
-    models << &p3model;
-    models << &multimodel;
-    models << &extmodel;
-    models << &wsmodel;
-
-
-    // from has first ride with Power data / looking at the next 7 days of data with Power
-    // calculate Estimates for all data per week including the week of the last Power recording
-    QDate date = from;
-    while (date < to) {
-
-        QDate begin = date;
-        QDate end = date.addDays(6);
-
-        // let others know where we got to...
-        emit modelProgress(date.year(), date.month());
-
-        // months is a rolling 3 months sets of bests
-        QVector<float> wpk; // for getting the wpk values
-
-        // don't include RUNS ..................................................vvvvv
-        bests.addBests(RideFileCache::meanMaxPowerFor(context, wpk, begin, end, false));
-        bestsWPK.addBests(wpk);
-
-        // we now have the data
-        foreach(PDModel *model, models) {
-
-            PDEstimate add;
-
-            // set the data
-            model->setData(bests.aggregate());
-            model->saveParameters(add.parameters); // save the computed parms
-
-            add.wpk = false;
-            add.from = begin;
-            add.to = end;
-            add.model = model->code();
-            add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
-            add.CP = model->hasCP() ? model->CP() : 0;
-            add.PMax = model->hasPMax() ? model->PMax() : 0;
-            add.FTP = model->hasFTP() ? model->FTP() : 0;
-
-            if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
-
-            // so long as the important model derived values are sensible ...
-            if (add.WPrime > 1000 && add.CP > 100)
-                context->athlete->PDEstimates_ << add;
-
-            //qDebug()<<add.to<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
-
-            // set the wpk data
-            model->setData(bestsWPK.aggregate());
-            model->saveParameters(add.parameters); // save the computed parms
-
-            add.wpk = true;
-            add.from = begin;
-            add.to = end;
-            add.model = model->code();
-            add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
-            add.CP = model->hasCP() ? model->CP() : 0;
-            add.PMax = model->hasPMax() ? model->PMax() : 0;
-            add.FTP = model->hasFTP() ? model->FTP() : 0;
-            if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
-
-            // so long as the model derived values are sensible ...
-            if ((!model->hasWPrime() || add.WPrime > 10.0f) &&
-                (!model->hasCP() || add.CP > 1.0f) &&
-                (!model->hasPMax() || add.PMax > 1.0f) &&
-                (!model->hasFTP() || add.FTP > 1.0f))
-                context->athlete->PDEstimates_ << add;
-
-            //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
-        }
-
-        // go forward a week
-        date = date.addDays(7);
-    }
-
-    // add a dummy entry if we have no estimates to stop constantly trying to refresh
-    if (context->athlete->PDEstimates_.count() == 0) {
-        context->athlete->PDEstimates_ << PDEstimate();
-    }
-
-    // unlock
-    context->athlete->lock.unlock();
-    refreshingEstimates = false;
-
-    emit modelProgress(0, 0); // all done
 }
 
 QList<QDateTime>

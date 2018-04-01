@@ -24,6 +24,7 @@
 #include "Colors.h"
 #include "RideMetadata.h"
 #include "RideCache.h"
+#include "Estimator.h"
 #include "RideFileCache.h"
 #include "RideMetric.h"
 #include "Settings.h"
@@ -463,13 +464,14 @@ AthleteDirectoryStructure::upgradedDirectoriesHaveData() {
 QList<PDEstimate>
 Athlete::getPDEstimates()
 {
+    // returns whatever estimator has, if not running
     QList<PDEstimate> returning;
 
-    // access is via mutex because its updated in another thread
-    if (lock.tryLock(100)) {
-        returning = PDEstimates_;
-        lock.unlock();
-    }
+    // get estimates
+    rideCache->estimator->lock.lock();
+    returning = rideCache->estimator->estimates;
+    rideCache->estimator->lock.unlock();
+
     return returning;
 }
 
@@ -560,7 +562,7 @@ PDEstimate
 Athlete::getPDEstimateFor(QDate date, QString model, bool wpk)
 {
     // whats the estimate for this date
-    foreach(PDEstimate est, PDEstimates_) {
+    foreach(PDEstimate est, getPDEstimates()) {
         if (est.model == model && est.wpk == wpk && est.from <= date && est.to >= date)
             return est;
     }
