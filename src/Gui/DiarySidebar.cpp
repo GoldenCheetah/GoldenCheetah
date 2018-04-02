@@ -95,6 +95,9 @@ DiarySidebar::configChanged(qint32)
 
     // and summary .. forgetting what we already prepared
     from = to = QDate();
+
+    // set the charts range
+    setDateRange();
 }
 
 void
@@ -102,6 +105,7 @@ DiarySidebar::refresh()
 {
     if (!isHidden()) {
         multiCalendar->refresh();
+        setDateRange();
     }
     repaint();
 }
@@ -112,6 +116,7 @@ DiarySidebar::setRide(RideItem *ride)
     _ride = ride;
 
     multiCalendar->setRide(ride);
+    setDateRange();
 }
 
 bool
@@ -643,6 +648,29 @@ GcMiniCalendar::setDate(int _month, int _year)
                 } else d->setSelected(false);
             }
         }
+    }
+}
+
+void
+DiarySidebar::setDateRange()
+{
+    QDate when;
+    if (_ride && _ride->ride()) when = _ride->dateTime.date();
+    else when = QDate::currentDate();
+
+    // what date range should we use?
+    QDate newFrom = when.addDays((when.dayOfWeek()-1)*-1);
+    QDate newTo = newFrom.addDays(6);
+
+    // if changed lets tell everyone
+    if (newFrom != from || newTo != to) {
+
+        // date range changed lets refresh
+        from = newFrom;
+        to = newTo;
+        QString name = QString(tr("Week Commencing %1")).arg(from.toString(tr("dddd MMMM d")));
+
+        emit dateRangeChanged(DateRange(from, to, name));
     }
 }
 

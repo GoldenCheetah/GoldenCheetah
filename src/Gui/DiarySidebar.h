@@ -173,6 +173,8 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
         void configChanged(qint32);
         void filterChanged() { multiCalendar->filterChanged(); }
 
+        void setDateRange();
+
     signals:
         void dateRangeChanged(DateRange);
 
