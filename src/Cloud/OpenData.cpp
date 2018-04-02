@@ -402,7 +402,7 @@ OpenDataDialog::OpenDataDialog(Context *context) : context(context)
                      "- Collect distribution and mean-max aggregates of activity data<p>"
                      "<p>"
                      "<br>"
-                     "The public repository is held in an <a href=\"http://goldencheetah.s3.eu-west-2.amazonaws.com/\">Amazon S3 bucket</a> with read-only access granted to everyone.<p>"
+                     "We publish the data at the <a href=\"https://cos.io/\">Center for Open Science</a> as an <a href=\"https://osf.io/6hfpz/\">OpenData project</a> open to everyone. <p>"
                      "We have also setup an <a href=\"https://github.com/GoldenCheetah/OpenData\">OpenData github project</a> to publish tools for working with the dataset.<p>"
                      ));
 

@@ -39,7 +39,7 @@ class OpenData : public QThread {
     public:
 
         OpenData(Context *context);
-        virtual ~OpenData();
+        ~OpenData();
 
         // check if time to ask or send data
         static void check(Context *);
