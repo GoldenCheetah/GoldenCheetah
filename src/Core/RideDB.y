@@ -532,7 +532,7 @@ void RideCache::save(bool opendata, QString filename)
 
                 // don't output 0, nan or inf values, they're set to 0 by default
                 if (!std::isinf(item->metrics()[index]) && !std::isnan(item->metrics()[index]) &&
-                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f) && !name.startsWith("compatibility_")) {
+                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f)) {
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
 
