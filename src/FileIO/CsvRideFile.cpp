@@ -191,6 +191,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     double precSecs=0.0;
     double maxWatts=0.0;
     double lastsecs=0.0;
+    double lastkm=0.0;
 
     // RP3 accrual
     int lastinterval=0;
@@ -388,6 +389,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                     rideFile->addXData("ROW", rowSeries);
 
+
+               } else if (line == "secs,km,power,hr,cad,alt") {
+                    // OpenData CSV
+                    csvType = opendata;
+                    rideFile->setDeviceType("Unknown");
+                    rideFile->setFileFormat("OpenData CSV (csv)");
 
                } else {  // default
                     csvType = generic;
@@ -1028,6 +1035,27 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                         rowSeries->datapoints.append(p);
                     }
+
+               } else if (csvType == opendata) {
+
+                    // secs,km,power,hr,cad,alt
+                    double secs = line.section(',', 0, 0).toDouble();
+                    km = line.section(',', 1, 1).toDouble();
+                    watts = line.section(',', 2, 2).toDouble();
+                    hr = line.section(',', 3, 3).toDouble();
+                    cad = line.section(',', 4, 4).toDouble();
+                    alt = line.section(',', 5, 5).toDouble();
+                    kph = (km - lastkm) / (secs-lastsecs) * 3600;
+
+                    // for next time
+                    lastsecs = secs;
+                    lastkm = km;
+
+                    rideFile->appendPoint(secs, cad, hr, km, kph, 0.0, watts, alt,
+                                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0);
 
                } else {
                     if (vo>0 || gct>0) {
