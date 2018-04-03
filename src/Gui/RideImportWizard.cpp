@@ -491,6 +491,7 @@ RideImportWizard::process()
         if (!thisfile.exists())  tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - File does not exist."));
         else if (!thisfile.isFile())  tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Not a file."));
         else if (!thisfile.isReadable())  tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - File is not readable."));
+        else if (thisfile.fileName().endsWith("json") && thisfile.fileName().startsWith("{"))  tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Opendata summary."));
         else {
 
             // is it one we understand ?
