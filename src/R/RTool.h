@@ -18,6 +18,7 @@
 
 #include "RChart.h"
 #include "Context.h"
+#include "DataFilter.h"
 
 #ifndef _GC_RTool_h
 
@@ -40,7 +41,7 @@ class RTool {
         RCanvas *canvas;
         RChart *chart;
 
-        Context *context;
+        ScriptContext scriptContext;
         QString version;
 
         // layout and page size

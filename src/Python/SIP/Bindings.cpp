@@ -65,7 +65,7 @@ Bindings::result(double value)
 // get athlete data
 PyObject* Bindings::athlete() const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     PyObject* dict = PyDict_New();
@@ -111,7 +111,7 @@ class gcZoneConfig {
 PyObject*
 Bindings::athleteZones(PyObject* date, QString sport) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // import datetime if necessary
@@ -466,7 +466,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
 PyObject*
 Bindings::activities(QString filter) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
 
     if (context && context->athlete && context->athlete->rideCache) {
 
@@ -524,7 +524,7 @@ Bindings::activities(QString filter) const
 RideItem*
 Bindings::fromDateTime(PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
 
     // import datetime if necessary
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;
@@ -548,16 +548,27 @@ Bindings::fromDateTime(PyObject* activity) const
 PythonDataSeries*
 Bindings::series(int type, PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
     if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
     if (item == NULL) return NULL;
 
     RideFile* f = item->ride();
-    PythonDataSeries* ds = new PythonDataSeries(seriesName(type), f->dataPoints().count());
-    for(int i=0; i<ds->count; i++) ds->data[i] = f->dataPoints()[i]->value(static_cast<RideFile::SeriesType>(type));
+    if (f == NULL) return NULL;
+
+    // count the included points, create data series output and copy data
+    int pCount = 0;
+    RideFileIterator it(f, python->contexts.value(threadid()).spec);
+    while (it.hasNext()) { it.next(); pCount++; }
+    PythonDataSeries* ds = new PythonDataSeries(seriesName(type), pCount);
+    it.toFront();
+    for(int i=0; i<pCount && it.hasNext(); i++) {
+        struct RideFilePoint *point = it.next();
+        ds->data[i] = point->value(static_cast<RideFile::SeriesType>(type));
+    }
 
     return ds;
 }
@@ -566,10 +577,11 @@ Bindings::series(int type, PyObject* activity) const
 PythonDataSeries*
 Bindings::activityWbal(PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
     if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
     if (item == NULL) return NULL;
 
@@ -580,8 +592,19 @@ Bindings::activityWbal(PyObject* activity) const
     WPrime *w = f->wprimeData();
     if (w == NULL) return NULL;
 
-    PythonDataSeries* ds = new PythonDataSeries("WBal", w->ydata().count());
-    for(int i=0; i<ds->count; i++) ds->data[i] = w->ydata()[i];
+    // count the included points, create data series output and copy data
+    int pCount = 0;
+    int idxStart = 0;
+    int secsStart = python->contexts.value(threadid()).spec.secsStart();
+    int secsEnd = python->contexts.value(threadid()).spec.secsEnd();
+    for(int i=0; i<w->xdata(false).count(); i++) {
+        if (w->xdata(false)[i] < secsStart) continue;
+        if (secsEnd >= 0 && w->xdata(false)[i] > secsEnd) break;
+        if (pCount == 0) idxStart = i;
+        pCount++;
+    }
+    PythonDataSeries* ds = new PythonDataSeries("WBal", pCount);
+    for(int i=0; i<pCount; i++) ds->data[i] = w->ydata()[i+idxStart];
 
     return ds;
 }
@@ -603,10 +626,11 @@ Bindings::activityXdata(QString name, QString series, QString join, PyObject* ac
         case 3: xjoin = RideFile::RESAMPLE; break;
     }
 
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
     if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
     if (item == NULL) return NULL;
 
@@ -618,11 +642,16 @@ Bindings::activityXdata(QString name, QString series, QString join, PyObject* ac
 
     if (!xds->valuename.contains(series)) return NULL; // No shuch XData name
 
-    PythonDataSeries* ds = new PythonDataSeries(name, f->dataPoints().count());
+    // count the included points, create data series output and copy data
+    int pCount = 0;
+    RideFileIterator it(f, python->contexts.value(threadid()).spec);
+    while (it.hasNext()) { it.next(); pCount++; }
+    PythonDataSeries* ds = new PythonDataSeries(name, pCount);
+    it.toFront();
     int idx = 0;
-    for(int i=0; i<ds->count; i++) {
-        RideFilePoint *p = f->dataPoints()[i];
-        double val = f->xdataValue(p, idx, name, series, xjoin);
+    for(int i=0; i<pCount && it.hasNext(); i++) {
+        struct RideFilePoint *point = it.next();
+        double val = f->xdataValue(point, idx, name, series, xjoin);
         ds->data[i] = (val == RideFile::NA) ? sqrt(-1) : val; // NA => NaN
     }
 
@@ -645,10 +674,11 @@ bool
 Bindings::seriesPresent(int type, PyObject* activity) const
 {
 
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return false;
 
     RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
     if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
     if (item == NULL) return NULL;
 
@@ -676,7 +706,7 @@ PythonDataSeries::~PythonDataSeries()
 PyObject*
 Bindings::activityMetrics(bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // want a list of compares
@@ -726,7 +756,7 @@ Bindings::activityMetrics(bool compare) const
 PyObject*
 Bindings::activityMetrics(RideItem* item) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     PyObject* dict = PyDict_New();
@@ -801,7 +831,7 @@ Bindings::activityMetrics(RideItem* item) const
 PyObject*
 Bindings::seasonMetrics(bool all, QString filter, bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // want a list of compares
@@ -856,7 +886,7 @@ Bindings::seasonMetrics(bool all, QString filter, bool compare) const
 PyObject*
 Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
 
     // how many rides to return if we're limiting to the
@@ -992,7 +1022,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
 PyObject*
 Bindings::seasonIntervals(QString type, bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // want a list of compares
@@ -1047,7 +1077,7 @@ Bindings::seasonIntervals(QString type, bool compare) const
 PyObject*
 Bindings::seasonIntervals(DateRange range, QString type) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -1172,7 +1202,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
 PythonDataSeries*
 Bindings::metrics(QString metric, bool all, QString filter) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL || context->athlete == NULL || context->athlete->rideCache == NULL) return NULL;
 
     // how many rides to return if we're limiting to the
@@ -1238,7 +1268,7 @@ Bindings::metrics(QString metric, bool all, QString filter) const
 PyObject*
 Bindings::activityMeanmax(bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // want a list of compares
@@ -1285,7 +1315,7 @@ Bindings::activityMeanmax(bool compare) const
 PyObject*
 Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // want a list of compares
@@ -1341,7 +1371,7 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
 PyObject*
 Bindings::seasonMeanmax(bool all, DateRange range, QString filter) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // construct the date range and then get a ridefilecache
@@ -1431,7 +1461,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
 PyObject*
 Bindings::seasonPmc(bool all, QString metric) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
 
     // return a dict with PMC data for all or the current season
     // XXX uses the default half-life
@@ -1532,7 +1562,7 @@ Bindings::seasonPmc(bool all, QString metric) const
 PyObject*
 Bindings::seasonMeasures(bool all, QString group) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
 
     // return a dict with Measures data for all or the current season
     if (context && context->athlete && context->athlete->measures) {
@@ -1605,7 +1635,7 @@ Bindings::seasonMeasures(bool all, QString group) const
 PyObject*
 Bindings::season(bool all, bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // import datetime if necessary
@@ -1672,7 +1702,7 @@ Bindings::season(bool all, bool compare) const
 PyObject*
 Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bool compare) const
 {
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // lets get a Map of names to series
@@ -1755,7 +1785,7 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
 {
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
 
-    Context *context = python->contexts.value(threadid());
+    Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
 
     // we return a dict

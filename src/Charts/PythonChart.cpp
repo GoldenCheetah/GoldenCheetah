@@ -197,7 +197,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 line = line.replace("$$", chartid);
 
                 python->cancelled = false;
-                python->runline(context, line);
+                python->runline(ScriptContext(context), line);
 
                 // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));
@@ -471,7 +471,7 @@ PythonChart::setState(QString)
 void
 PythonChart::execScript(PythonChart *chart)
 {
-    python->runline(chart->context, chart->script->toPlainText());
+    python->runline(ScriptContext(chart->context), chart->script->toPlainText());
 }
 
 void

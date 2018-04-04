@@ -68,7 +68,7 @@ RTool::RTool()
     starting = true;
     canvas = NULL;
     chart = NULL;
-    context = NULL;
+    scriptContext.context = NULL;
 
     // if we bail we need to explain why, its in here
     QString dialogtext;
@@ -370,7 +370,7 @@ RTool::configChanged()
 SEXP
 RTool::athlete()
 {
-    if (rtool == NULL || rtool->context == NULL)   return Rf_allocVector(INTSXP, 0);
+    if (rtool == NULL || rtool->scriptContext.context == NULL)   return Rf_allocVector(INTSXP, 0);
 
     // name, home, dob, height, weight, gender
     SEXP ans, names;
@@ -383,14 +383,14 @@ RTool::athlete()
 
     // NAME
     PROTECT(item=Rf_allocVector(STRSXP, 1));
-    SET_STRING_ELT(item, 0, Rf_mkChar(rtool->context->athlete->cyclist.toLatin1().constData()));
+    SET_STRING_ELT(item, 0, Rf_mkChar(rtool->scriptContext.context->athlete->cyclist.toLatin1().constData()));
     SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("name"));
     UNPROTECT(1);
 
     // HOME
     PROTECT(item=Rf_allocVector(STRSXP, 1));
-    SET_STRING_ELT(item, 0, Rf_mkChar(rtool->context->athlete->home->root().absolutePath().toLatin1().constData()));
+    SET_STRING_ELT(item, 0, Rf_mkChar(rtool->scriptContext.context->athlete->home->root().absolutePath().toLatin1().constData()));
     SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("home"));
     UNPROTECT(1);
@@ -398,7 +398,7 @@ RTool::athlete()
     // DOB
     PROTECT(item=Rf_allocVector(INTSXP, 1));
     QDate d1970(1970,01,01);
-    INTEGER(item)[0] = d1970.daysTo(appsettings->cvalue(rtool->context->athlete->cyclist, GC_DOB).toDate());
+    INTEGER(item)[0] = d1970.daysTo(appsettings->cvalue(rtool->scriptContext.context->athlete->cyclist, GC_DOB).toDate());
     SEXP dclas;
     PROTECT(dclas=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(dclas, 0, Rf_mkChar("Date"));
@@ -409,20 +409,20 @@ RTool::athlete()
 
     // WEIGHT
     PROTECT(item=Rf_allocVector(REALSXP, 1));
-    REAL(item)[0] = appsettings->cvalue(rtool->context->athlete->cyclist, GC_WEIGHT).toDouble();
+    REAL(item)[0] = appsettings->cvalue(rtool->scriptContext.context->athlete->cyclist, GC_WEIGHT).toDouble();
     SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("weight"));
     UNPROTECT(1);
 
     // HEIGHT
     PROTECT(item=Rf_allocVector(REALSXP, 1));
-    REAL(item)[0] = appsettings->cvalue(rtool->context->athlete->cyclist, GC_HEIGHT).toDouble();
+    REAL(item)[0] = appsettings->cvalue(rtool->scriptContext.context->athlete->cyclist, GC_HEIGHT).toDouble();
     SET_VECTOR_ELT(ans, next, item);
     SET_STRING_ELT(names, next++, Rf_mkChar("height"));
     UNPROTECT(1);
 
     // GENDER
-    int isfemale = appsettings->cvalue(rtool->context->athlete->cyclist, GC_SEX).toInt();
+    int isfemale = appsettings->cvalue(rtool->scriptContext.context->athlete->cyclist, GC_SEX).toInt();
     PROTECT(item=Rf_allocVector(STRSXP, 1));
     SET_STRING_ELT(item, 0, isfemale ? Rf_mkChar("female") : Rf_mkChar("male"));
     SET_VECTOR_ELT(ans, next, item);
@@ -454,8 +454,8 @@ RTool::zones(SEXP pDate, SEXP pSport)
     // return a dataframe with
     // date, sport, cp, w', pmax, ftp, lthr, rhr, hrmax, cv, zoneslow, zonescolor
 
-    // need non-null context
-    if (!rtool || !rtool->context)  return Rf_allocVector(INTSXP, 0);
+    // need non-null scriptContext.context
+    if (!rtool || !rtool->scriptContext.context)  return Rf_allocVector(INTSXP, 0);
 
     // COLLECT ALL THE CONFIG TOGETHER
     QList<gcZoneConfig> config;
@@ -473,81 +473,81 @@ RTool::zones(SEXP pDate, SEXP pSport)
         gcZoneConfig swim("bike");
 
         // BIKE POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->scriptContext.context->athlete->zones(false)) {
 
             // run through the bike zones
-            int range=rtool->context->athlete->zones(false)->whichRange(forDate);
+            int range=rtool->scriptContext.context->athlete->zones(false)->whichRange(forDate);
             if (range >= 0) {
                 bike.date =  forDate;
-                bike.cp = rtool->context->athlete->zones(false)->getCP(range);
-                bike.wprime = rtool->context->athlete->zones(false)->getWprime(range);
-                bike.pmax = rtool->context->athlete->zones(false)->getPmax(range);
-                bike.ftp = rtool->context->athlete->zones(false)->getFTP(range);
-                bike.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                bike.cp = rtool->scriptContext.context->athlete->zones(false)->getCP(range);
+                bike.wprime = rtool->scriptContext.context->athlete->zones(false)->getWprime(range);
+                bike.pmax = rtool->scriptContext.context->athlete->zones(false)->getPmax(range);
+                bike.ftp = rtool->scriptContext.context->athlete->zones(false)->getFTP(range);
+                bike.zoneslow = rtool->scriptContext.context->athlete->zones(false)->getZoneLows(range);
             }
         }
 
         // RUN POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->scriptContext.context->athlete->zones(false)) {
 
             // run through the bike zones
-            int range=rtool->context->athlete->zones(true)->whichRange(forDate);
+            int range=rtool->scriptContext.context->athlete->zones(true)->whichRange(forDate);
             if (range >= 0) {
 
                 run.date = forDate;
-                run.cp = rtool->context->athlete->zones(true)->getCP(range);
-                run.wprime = rtool->context->athlete->zones(true)->getWprime(range);
-                run.pmax = rtool->context->athlete->zones(true)->getPmax(range);
-                run.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                run.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
+                run.cp = rtool->scriptContext.context->athlete->zones(true)->getCP(range);
+                run.wprime = rtool->scriptContext.context->athlete->zones(true)->getWprime(range);
+                run.pmax = rtool->scriptContext.context->athlete->zones(true)->getPmax(range);
+                run.ftp = rtool->scriptContext.context->athlete->zones(true)->getFTP(range);
+                run.zoneslow = rtool->scriptContext.context->athlete->zones(true)->getZoneLows(range);
             }
         }
 
         // BIKE HR
-        if (rtool->context->athlete->hrZones(false)) {
+        if (rtool->scriptContext.context->athlete->hrZones(false)) {
 
-            int range=rtool->context->athlete->hrZones(false)->whichRange(forDate);
+            int range=rtool->scriptContext.context->athlete->hrZones(false)->whichRange(forDate);
             if (range >= 0) {
 
                 bike.date =  forDate;
-                bike.lthr =  rtool->context->athlete->hrZones(false)->getLT(range);
-                bike.rhr =  rtool->context->athlete->hrZones(false)->getRestHr(range);
-                bike.hrmax =  rtool->context->athlete->hrZones(false)->getMaxHr(range);
+                bike.lthr =  rtool->scriptContext.context->athlete->hrZones(false)->getLT(range);
+                bike.rhr =  rtool->scriptContext.context->athlete->hrZones(false)->getRestHr(range);
+                bike.hrmax =  rtool->scriptContext.context->athlete->hrZones(false)->getMaxHr(range);
             }
         }
 
         // RUN HR
-        if (rtool->context->athlete->hrZones(true)) {
+        if (rtool->scriptContext.context->athlete->hrZones(true)) {
 
-            int range=rtool->context->athlete->hrZones(true)->whichRange(forDate);
+            int range=rtool->scriptContext.context->athlete->hrZones(true)->whichRange(forDate);
             if (range >= 0) {
 
                 run.date =  forDate;
-                run.lthr =  rtool->context->athlete->hrZones(true)->getLT(range);
-                run.rhr =  rtool->context->athlete->hrZones(true)->getRestHr(range);
-                run.hrmax =  rtool->context->athlete->hrZones(true)->getMaxHr(range);
+                run.lthr =  rtool->scriptContext.context->athlete->hrZones(true)->getLT(range);
+                run.rhr =  rtool->scriptContext.context->athlete->hrZones(true)->getRestHr(range);
+                run.hrmax =  rtool->scriptContext.context->athlete->hrZones(true)->getMaxHr(range);
             }
         }
 
         // RUN PACE
-        if (rtool->context->athlete->paceZones(false)) {
+        if (rtool->scriptContext.context->athlete->paceZones(false)) {
 
-            int range=rtool->context->athlete->paceZones(false)->whichRange(forDate);
+            int range=rtool->scriptContext.context->athlete->paceZones(false)->whichRange(forDate);
             if (range >= 0) {
 
                 run.date =  forDate;
-                run.cv =  rtool->context->athlete->paceZones(false)->getCV(range);
+                run.cv =  rtool->scriptContext.context->athlete->paceZones(false)->getCV(range);
             }
         }
 
         // SWIM PACE
-        if (rtool->context->athlete->paceZones(true)) {
+        if (rtool->scriptContext.context->athlete->paceZones(true)) {
 
-            int range=rtool->context->athlete->paceZones(true)->whichRange(forDate);
+            int range=rtool->scriptContext.context->athlete->paceZones(true)->whichRange(forDate);
             if (range >= 0) {
 
                 swim.date =  forDate;
-                swim.cv =  rtool->context->athlete->paceZones(true)->getCV(range);
+                swim.cv =  rtool->scriptContext.context->athlete->paceZones(true)->getCV(range);
             }
         }
 
@@ -558,95 +558,95 @@ RTool::zones(SEXP pDate, SEXP pSport)
     } else {
 
         // BIKE POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->scriptContext.context->athlete->zones(false)) {
 
-            for (int range=0; range < rtool->context->athlete->zones(false)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->scriptContext.context->athlete->zones(false)->getRangeSize(); range++) {
 
                 // run through the bike zones
                 gcZoneConfig c("bike");
 
-                c.date =  rtool->context->athlete->zones(false)->getStartDate(range);
-                c.cp = rtool->context->athlete->zones(false)->getCP(range);
-                c.wprime = rtool->context->athlete->zones(false)->getWprime(range);
-                c.pmax = rtool->context->athlete->zones(false)->getPmax(range);
-                c.ftp = rtool->context->athlete->zones(false)->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                c.date =  rtool->scriptContext.context->athlete->zones(false)->getStartDate(range);
+                c.cp = rtool->scriptContext.context->athlete->zones(false)->getCP(range);
+                c.wprime = rtool->scriptContext.context->athlete->zones(false)->getWprime(range);
+                c.pmax = rtool->scriptContext.context->athlete->zones(false)->getPmax(range);
+                c.ftp = rtool->scriptContext.context->athlete->zones(false)->getFTP(range);
+                c.zoneslow = rtool->scriptContext.context->athlete->zones(false)->getZoneLows(range);
 
                 config << c;
             }
         }
 
         // RUN POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->scriptContext.context->athlete->zones(false)) {
 
             // run through the bike zones
-            for (int range=0; range < rtool->context->athlete->zones(true)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->scriptContext.context->athlete->zones(true)->getRangeSize(); range++) {
 
                 // run through the bike zones
                 gcZoneConfig c("run");
 
-                c.date =  rtool->context->athlete->zones(true)->getStartDate(range);
-                c.cp = rtool->context->athlete->zones(true)->getCP(range);
-                c.wprime = rtool->context->athlete->zones(true)->getWprime(range);
-                c.pmax = rtool->context->athlete->zones(true)->getPmax(range);
-                c.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
+                c.date =  rtool->scriptContext.context->athlete->zones(true)->getStartDate(range);
+                c.cp = rtool->scriptContext.context->athlete->zones(true)->getCP(range);
+                c.wprime = rtool->scriptContext.context->athlete->zones(true)->getWprime(range);
+                c.pmax = rtool->scriptContext.context->athlete->zones(true)->getPmax(range);
+                c.ftp = rtool->scriptContext.context->athlete->zones(true)->getFTP(range);
+                c.zoneslow = rtool->scriptContext.context->athlete->zones(true)->getZoneLows(range);
 
                 config << c;
             }
         }
 
         // BIKE HR
-        if (rtool->context->athlete->hrZones(false)) {
+        if (rtool->scriptContext.context->athlete->hrZones(false)) {
 
-            for (int range=0; range < rtool->context->athlete->hrZones(false)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->scriptContext.context->athlete->hrZones(false)->getRangeSize(); range++) {
 
                 gcZoneConfig c("bike");
-                c.date =  rtool->context->athlete->hrZones(false)->getStartDate(range);
-                c.lthr =  rtool->context->athlete->hrZones(false)->getLT(range);
-                c.rhr =  rtool->context->athlete->hrZones(false)->getRestHr(range);
-                c.hrmax =  rtool->context->athlete->hrZones(false)->getMaxHr(range);
+                c.date =  rtool->scriptContext.context->athlete->hrZones(false)->getStartDate(range);
+                c.lthr =  rtool->scriptContext.context->athlete->hrZones(false)->getLT(range);
+                c.rhr =  rtool->scriptContext.context->athlete->hrZones(false)->getRestHr(range);
+                c.hrmax =  rtool->scriptContext.context->athlete->hrZones(false)->getMaxHr(range);
 
                 config << c;
             }
         }
 
         // RUN HR
-        if (rtool->context->athlete->hrZones(true)) {
+        if (rtool->scriptContext.context->athlete->hrZones(true)) {
 
-            for (int range=0; range < rtool->context->athlete->hrZones(true)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->scriptContext.context->athlete->hrZones(true)->getRangeSize(); range++) {
 
                 gcZoneConfig c("run");
-                c.date =  rtool->context->athlete->hrZones(true)->getStartDate(range);
-                c.lthr =  rtool->context->athlete->hrZones(true)->getLT(range);
-                c.rhr =  rtool->context->athlete->hrZones(true)->getRestHr(range);
-                c.hrmax =  rtool->context->athlete->hrZones(true)->getMaxHr(range);
+                c.date =  rtool->scriptContext.context->athlete->hrZones(true)->getStartDate(range);
+                c.lthr =  rtool->scriptContext.context->athlete->hrZones(true)->getLT(range);
+                c.rhr =  rtool->scriptContext.context->athlete->hrZones(true)->getRestHr(range);
+                c.hrmax =  rtool->scriptContext.context->athlete->hrZones(true)->getMaxHr(range);
 
                 config << c;
             }
         }
 
         // RUN PACE
-        if (rtool->context->athlete->paceZones(false)) {
+        if (rtool->scriptContext.context->athlete->paceZones(false)) {
 
-            for (int range=0; range < rtool->context->athlete->paceZones(false)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->scriptContext.context->athlete->paceZones(false)->getRangeSize(); range++) {
 
                 gcZoneConfig c("run");
-                c.date =  rtool->context->athlete->paceZones(false)->getStartDate(range);
-                c.cv =  rtool->context->athlete->paceZones(false)->getCV(range);
+                c.date =  rtool->scriptContext.context->athlete->paceZones(false)->getStartDate(range);
+                c.cv =  rtool->scriptContext.context->athlete->paceZones(false)->getCV(range);
 
                 config << c;
             }
         }
 
         // SWIM PACE
-        if (rtool->context->athlete->paceZones(true)) {
+        if (rtool->scriptContext.context->athlete->paceZones(true)) {
 
-            for (int range=0; range < rtool->context->athlete->paceZones(true)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->scriptContext.context->athlete->paceZones(true)->getRangeSize(); range++) {
 
                 gcZoneConfig c("swim");
-                c.date =  rtool->context->athlete->paceZones(true)->getStartDate(range);
-                c.cv =  rtool->context->athlete->paceZones(true)->getCV(range);
+                c.date =  rtool->scriptContext.context->athlete->paceZones(true)->getStartDate(range);
+                c.cv =  rtool->scriptContext.context->athlete->paceZones(true)->getCV(range);
 
                 config << c;
             }
@@ -894,14 +894,14 @@ RTool::activities(SEXP filter)
     SEXP clas;
 
 
-    if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+    if (rtool->scriptContext.context && rtool->scriptContext.context->athlete && rtool->scriptContext.context->athlete->rideCache) {
 
         // filters
         // apply any global filters
         Specification specification;
         FilterSet fs;
-        fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
-        fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+        fs.addFilter(rtool->scriptContext.context->isfiltered, rtool->scriptContext.context->filters);
+        fs.addFilter(rtool->scriptContext.context->ishomefiltered, rtool->scriptContext.context->homeFilters);
 
         // did call contain any filters?
         PROTECT(filter=Rf_coerceVector(filter, STRSXP));
@@ -911,9 +911,9 @@ RTool::activities(SEXP filter)
             QString f(CHAR(STRING_ELT(filter,i)));
             if (f != "") {
 
-                DataFilter dataFilter(rtool->canvas, rtool->context);
+                DataFilter dataFilter(rtool->canvas, rtool->scriptContext.context);
                 QStringList files;
-                dataFilter.parseFilter(rtool->context, f, &files);
+                dataFilter.parseFilter(rtool->scriptContext.context, f, &files);
                 fs.addFilter(true, files);
             }
         }
@@ -922,7 +922,7 @@ RTool::activities(SEXP filter)
 
         // how many pass?
         int count=0;
-        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
 
             // apply filters
             if (!specification.pass(item)) continue;
@@ -934,7 +934,7 @@ RTool::activities(SEXP filter)
 
         // fill with values for date and class
         int i=0;
-        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
 
             // apply filters
             if (!specification.pass(item)) continue;
@@ -965,17 +965,17 @@ RTool::dfForRideItem(const RideItem *ri)
     RideItem *item = const_cast<RideItem*>(ri);
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    int rides = rtool->context->athlete->rideCache->count();
+    int rides = rtool->scriptContext.context->athlete->rideCache->count();
     int metrics = factory.metricCount();
 
     // count the number of meta fields to add
     int meta = 0;
-    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+    if (rtool->scriptContext.context && rtool->scriptContext.context->athlete->rideMetadata()) {
 
         // count active fields
-        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition def, rtool->scriptContext.context->athlete->rideMetadata()->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !rtool->context->specialFields.isMetric(def.name))
+                !rtool->scriptContext.context->specialFields.isMetric(def.name))
                 meta++;
         }
     }
@@ -1050,11 +1050,11 @@ RTool::dfForRideItem(const RideItem *ri)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = rtool->scriptContext.context->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = rtool->scriptContext.context->athlete->useMetricUnits;
         REAL(m)[0] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
 
         // add to the list
@@ -1072,11 +1072,11 @@ RTool::dfForRideItem(const RideItem *ri)
     //
     // META
     //
-    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, rtool->scriptContext.context->athlete->rideMetadata()->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            rtool->context->specialFields.isMetric(field.name)) continue;
+            rtool->scriptContext.context->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1135,17 +1135,17 @@ SEXP
 RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 {
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    int rides = rtool->context->athlete->rideCache->count();
+    int rides = rtool->scriptContext.context->athlete->rideCache->count();
     int metrics = factory.metricCount();
 
     // count the number of meta fields to add
     int meta = 0;
-    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+    if (rtool->scriptContext.context && rtool->scriptContext.context->athlete->rideMetadata()) {
 
         // count active fields
-        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition def, rtool->scriptContext.context->athlete->rideMetadata()->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !rtool->context->specialFields.isMetric(def.name))
+                !rtool->scriptContext.context->specialFields.isMetric(def.name))
                 meta++;
         }
     }
@@ -1156,8 +1156,8 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     // apply any global filters
     Specification specification;
     FilterSet fs;
-    fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
-    fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    fs.addFilter(rtool->scriptContext.context->isfiltered, rtool->scriptContext.context->filters);
+    fs.addFilter(rtool->scriptContext.context->ishomefiltered, rtool->scriptContext.context->homeFilters);
     specification.setFilterSet(fs);
 
     // did call contain any filters?
@@ -1168,9 +1168,9 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
         QString f(CHAR(STRING_ELT(filter,i)));
         if (f != "") {
 
-            DataFilter dataFilter(rtool->canvas, rtool->context);
+            DataFilter dataFilter(rtool->canvas, rtool->scriptContext.context);
             QStringList files;
-            dataFilter.parseFilter(rtool->context, f, &files);
+            dataFilter.parseFilter(rtool->scriptContext.context, f, &files);
             fs.addFilter(true, files);
         }
     }
@@ -1179,7 +1179,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
     // we need to count rides that are in range...
     rides = 0;
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date())) rides++;
     }
@@ -1209,7 +1209,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
     int k=0;
     QDate d1970(1970,01,01);
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date()))
             INTEGER(date)[k++] = d1970.daysTo(ride->dateTime.date());
@@ -1230,7 +1230,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
     // fill with values for date and class if its one we need to return
     k=0;
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date()))
             REAL(time)[k++] = ride->dateTime.toUTC().toTime_t();
@@ -1264,14 +1264,14 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = rtool->scriptContext.context->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = rtool->scriptContext.context->athlete->useMetricUnits;
 
         int index=0;
-        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
             if (!specification.pass(item)) continue;
             if (all || range.pass(item->dateTime.date())) {
                 REAL(m)[index++] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
@@ -1294,18 +1294,18 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     //
     // META
     //
-    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, rtool->scriptContext.context->athlete->rideMetadata()->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            rtool->context->specialFields.isMetric(field.name)) continue;
+            rtool->scriptContext.context->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
         PROTECT(m=Rf_allocVector(STRSXP, rides));
 
         int index=0;
-        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
             if (!specification.pass(item)) continue;
             if (all || range.pass(item->dateTime.date())) {
                 SET_STRING_ELT(m, index++, Rf_mkChar(item->getText(field.name, "").toLatin1().constData()));
@@ -1329,7 +1329,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     PROTECT(color=Rf_allocVector(STRSXP, rides));
 
     int index=0;
-    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(item)) continue;
         if (all || range.pass(item->dateTime.date())) {
 
@@ -1380,13 +1380,13 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
     // apply any global filters
     Specification specification;
     FilterSet fs;
-    fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
-    fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    fs.addFilter(rtool->scriptContext.context->isfiltered, rtool->scriptContext.context->filters);
+    fs.addFilter(rtool->scriptContext.context->ishomefiltered, rtool->scriptContext.context->homeFilters);
     specification.setFilterSet(fs);
 
     // we need to count intervals that are in range...
     intervals = 0;
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (!range.pass(ride->dateTime.date())) continue;
 
@@ -1423,7 +1423,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
     int k=0;
     QDate d1970(1970,01,01);
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
             foreach(IntervalItem *item, ride->intervals())
@@ -1447,7 +1447,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
     // fill with values for date and class if its one we need to return
     k=0;
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
             foreach(IntervalItem *item, ride->intervals())
@@ -1475,7 +1475,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
     SEXP intervalnames;
     PROTECT(intervalnames = Rf_allocVector(STRSXP, intervals));
     k=0;
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
             foreach(IntervalItem *item, ride->intervals())
@@ -1493,7 +1493,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
     SEXP intervaltypes;
     PROTECT(intervaltypes = Rf_allocVector(STRSXP, intervals));
     k=0;
-    foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *ride, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (range.pass(ride->dateTime.date())) {
             foreach(IntervalItem *item, ride->intervals())
@@ -1519,14 +1519,14 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = rtool->scriptContext.context->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = rtool->scriptContext.context->athlete->useMetricUnits;
 
         int index=0;
-        foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+        foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
             if (!specification.pass(item)) continue;
             if (range.pass(item->dateTime.date())) {
 
@@ -1555,7 +1555,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
     PROTECT(color=Rf_allocVector(STRSXP, intervals));
 
     int index=0;
-    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
         if (!specification.pass(item)) continue;
         if (!range.pass(item->dateTime.date())) continue;
 
@@ -1631,24 +1631,24 @@ RTool::season(SEXP pAll, SEXP pCompare)
 
     if (compare) {
         // return a list, even if just one
-        if (rtool->context->isCompareDateRanges) {
-            foreach(CompareDateRange p, rtool->context->compareDateRanges)
+        if (rtool->scriptContext.context->isCompareDateRanges) {
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges)
                 worklist << DateRange(p.start, p.end, p.name, p.color);
         } else {
             // if compare not active just return current selection
-            worklist << rtool->context->currentDateRange();
+            worklist << rtool->scriptContext.context->currentDateRange();
         }
 
     } else if (all) {
         // list all seasons
-        foreach(Season season, rtool->context->athlete->seasons->seasons) {
+        foreach(Season season, rtool->scriptContext.context->athlete->seasons->seasons) {
             worklist << DateRange(season.start, season.end, season.name, QColor(127,127,127));
         }
 
     } else {
 
         // just the currently selected season please
-        worklist << rtool->context->currentDateRange();
+        worklist << rtool->scriptContext.context->currentDateRange();
     }
 
     SEXP rownames, start, end, name, color;
@@ -1713,14 +1713,14 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
     bool compare = LOGICAL(pCompare)[0];
 
     // want a list of compares not a dataframe
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
         // only return compares if its actually active
-        if (rtool->context->isCompareDateRanges) {
+        if (rtool->scriptContext.context->isCompareDateRanges) {
 
             // how many to return?
             int count=0;
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             SEXP list;
@@ -1737,7 +1737,7 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -1783,7 +1783,7 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the metrics
-            DateRange range = rtool->context->currentDateRange();
+            DateRange range = rtool->scriptContext.context->currentDateRange();
             SEXP df = rtool->dfForDateRangeIntervals(range, types);
             SET_VECTOR_ELT(namedlist, 0, df);
 
@@ -1803,10 +1803,10 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
             return list;
         }
 
-    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+    } else if (rtool->scriptContext.context && rtool->scriptContext.context->athlete && rtool->scriptContext.context->athlete->rideCache) {
 
         // just a datafram of metrics
-        DateRange range = rtool->context->currentDateRange();
+        DateRange range = rtool->scriptContext.context->currentDateRange();
         return rtool->dfForDateRangeIntervals(range, types);
 
     }
@@ -1828,14 +1828,14 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
     bool compare = LOGICAL(pCompare)[0];
 
     // want a list of compares not a dataframe
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
         // only return compares if its actually active
-        if (rtool->context->isCompareDateRanges) {
+        if (rtool->scriptContext.context->isCompareDateRanges) {
 
             // how many to return?
             int count=0;
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             SEXP list;
@@ -1852,7 +1852,7 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -1898,7 +1898,7 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the metrics
-            DateRange range = rtool->context->currentDateRange();
+            DateRange range = rtool->scriptContext.context->currentDateRange();
             SEXP df = rtool->dfForDateRange(all, range, pFilter);
             SET_VECTOR_ELT(namedlist, 0, df);
 
@@ -1918,10 +1918,10 @@ RTool::metrics(SEXP pAll, SEXP pFilter, SEXP pCompare)
             return list;
         }
 
-    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+    } else if (rtool->scriptContext.context && rtool->scriptContext.context->athlete && rtool->scriptContext.context->athlete->rideCache) {
 
         // just a datafram of metrics
-        DateRange range = rtool->context->currentDateRange();
+        DateRange range = rtool->scriptContext.context->currentDateRange();
         return rtool->dfForDateRange(all, range, pFilter);
 
     }
@@ -2129,7 +2129,7 @@ RTool::activitiesFor(SEXP datetime)
         // we need to find this one !
         QDateTime asdt = QDateTime::fromTime_t(dt);
 
-        foreach(RideItem*item, rtool->context->athlete->rideCache->rides()) {
+        foreach(RideItem*item, rtool->scriptContext.context->athlete->rideCache->rides()) {
             if (item->dateTime.toUTC() == asdt.toUTC()) {
                 returning << const_cast<RideItem*>(item);
                 break;
@@ -2218,13 +2218,13 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
 
             return list;
 
-    } else if ((split || compare) && rtool->context) { // split or compare will generate a list
+    } else if ((split || compare) && rtool->scriptContext.context) { // split or compare will generate a list
 
-        if (compare && rtool->context->isCompareIntervals) {
+        if (compare && rtool->scriptContext.context->isCompareIntervals) {
 
             // how many to return?
             int count=0;
-            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             QList<SEXP> f;
@@ -2239,7 +2239,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareInterval p, rtool->context->compareIntervals) {
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) {
                 if (p.isChecked()) {
 
                     foreach(SEXP df,  rtool->dfForActivity(p.rideItem->ride(), split, join)) {
@@ -2275,7 +2275,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
 
             return list;
 
-        } else if (rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        } else if (rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // just return a list of one ride
             // cool we can return a list of intervals to compare
@@ -2288,7 +2288,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // add the ride
-            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            RideFile *f = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
             foreach(SEXP df, rtool->dfForActivity(f, split, join)) {
 
@@ -2325,10 +2325,10 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
     } else if (!split && !compare) { // not compare, so just return a dataframe
 
         // access via global as this is a static function
-        if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        if(rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // get the ride
-            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            RideFile *f = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
 
             // get as a data frame
@@ -2364,9 +2364,9 @@ RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
         QString f(CHAR(STRING_ELT(filter,i)));
         if (f != "") {
 
-            DataFilter dataFilter(rtool->canvas, rtool->context);
+            DataFilter dataFilter(rtool->canvas, rtool->scriptContext.context);
             QStringList files;
-            dataFilter.parseFilter(rtool->context, f, &files);
+            dataFilter.parseFilter(rtool->scriptContext.context, f, &files);
             filelist << files;
             filt=true;
         }
@@ -2374,7 +2374,7 @@ RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
     UNPROTECT(1);
 
     // RideFileCache for a date range with our filters (if any)
-    RideFileCache cache(rtool->context, range.from, range.to, filt, filelist, false, NULL);
+    RideFileCache cache(rtool->scriptContext.context, range.from, range.to, filt, filelist, false, NULL);
 
     return dfForRideFileCache(&cache);
 
@@ -2543,14 +2543,14 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
     }
 
     // want a list of compares not a dataframe
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
         // only return compares if its actually active
-        if (rtool->context->isCompareDateRanges) {
+        if (rtool->scriptContext.context->isCompareDateRanges) {
 
             // how many to return?
             int count=0;
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             SEXP list;
@@ -2567,7 +2567,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -2613,7 +2613,7 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the metrics
-            DateRange range = rtool->context->currentDateRange();
+            DateRange range = rtool->scriptContext.context->currentDateRange();
             SEXP df = rtool->dfForDateRangePeaks(all, range, pFilter, series, durations);
             SET_VECTOR_ELT(namedlist, 0, df);
 
@@ -2633,10 +2633,10 @@ RTool::seasonPeaks(SEXP pAll, SEXP pFilter, SEXP pCompare, SEXP pSeries, SEXP pD
             return list;
         }
 
-    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+    } else if (rtool->scriptContext.context && rtool->scriptContext.context->athlete && rtool->scriptContext.context->athlete->rideCache) {
 
         // just a datafram of metrics
-        DateRange range = rtool->context->currentDateRange();
+        DateRange range = rtool->scriptContext.context->currentDateRange();
         return rtool->dfForDateRangePeaks(all, range, pFilter, series, durations);
 
     }
@@ -2663,8 +2663,8 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
     // how many rides ?
     Specification specification;
     FilterSet fs;
-    fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
-    fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    fs.addFilter(rtool->scriptContext.context->isfiltered, rtool->scriptContext.context->filters);
+    fs.addFilter(rtool->scriptContext.context->ishomefiltered, rtool->scriptContext.context->homeFilters);
     specification.setFilterSet(fs);
 
     // did call contain any filters?
@@ -2675,9 +2675,9 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
         QString f(CHAR(STRING_ELT(filter,i)));
         if (f != "") {
 
-            DataFilter dataFilter(rtool->canvas, rtool->context);
+            DataFilter dataFilter(rtool->canvas, rtool->scriptContext.context);
             QStringList files;
-            dataFilter.parseFilter(rtool->context, f, &files);
+            dataFilter.parseFilter(rtool->scriptContext.context, f, &files);
             fs.addFilter(true, files);
         }
     }
@@ -2686,7 +2686,7 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
 
     // how many pass?
     int size=0;
-    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
 
         // apply filters
         if (!specification.pass(item)) continue;
@@ -2702,7 +2702,7 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
 
     // fill with values for date and class
     int i=0;
-    foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+    foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
         // apply filters
         if (!specification.pass(item)) continue;
 
@@ -2736,7 +2736,7 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
             // fill with values
             // get the value for the series and duration requested, although this is called
             int index=0;
-            foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
+            foreach(RideItem *item, rtool->scriptContext.context->athlete->rideCache->rides()) {
 
                 // apply filters
                 if (!specification.pass(item)) continue;
@@ -2790,14 +2790,14 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
     bool compare = LOGICAL(pCompare)[0];
 
     // want a list of compares not a dataframe
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
         // only return compares if its actually active
-        if (rtool->context->isCompareDateRanges) {
+        if (rtool->scriptContext.context->isCompareDateRanges) {
 
             // how many to return?
             int count=0;
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) if (p.isChecked()) count++;
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) if (p.isChecked()) count++;
 
             // cool we can return a list of meanaxes to compare
             SEXP list;
@@ -2814,7 +2814,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareDateRange p, rtool->context->compareDateRanges) {
+            foreach(CompareDateRange p, rtool->scriptContext.context->compareDateRanges) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -2860,7 +2860,7 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the meanmaxes
-            DateRange range = rtool->context->currentDateRange();
+            DateRange range = rtool->scriptContext.context->currentDateRange();
             SEXP df = rtool->dfForDateRangeMeanmax(all, range, pFilter);
             SET_VECTOR_ELT(namedlist, 0, df);
 
@@ -2880,10 +2880,10 @@ RTool::seasonMeanmax(SEXP pAll, SEXP pFilter, SEXP pCompare)
             return list;
         }
 
-    } else if (rtool->context && rtool->context->athlete && rtool->context->athlete->rideCache) {
+    } else if (rtool->scriptContext.context && rtool->scriptContext.context->athlete && rtool->scriptContext.context->athlete->rideCache) {
 
         // just a datafram of meanmax
-        DateRange range = rtool->context->currentDateRange();
+        DateRange range = rtool->scriptContext.context->currentDateRange();
         return rtool->dfForDateRangeMeanmax(all, range, pFilter);
 
     }
@@ -2904,14 +2904,14 @@ RTool::activityMeanmax(SEXP pCompare)
     bool compare = LOGICAL(pCompare)[0];
 
     // return a list
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
 
-        if (rtool->context->isCompareIntervals) {
+        if (rtool->scriptContext.context->isCompareIntervals) {
 
             // how many to return?
             int count=0;
-            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             SEXP list;
@@ -2928,7 +2928,7 @@ RTool::activityMeanmax(SEXP pCompare)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareInterval p, rtool->context->compareIntervals) {
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -2957,7 +2957,7 @@ RTool::activityMeanmax(SEXP pCompare)
 
             return list;
 
-        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        } else if(rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // just return a list of one ride
             // cool we can return a list of intervals to compare
@@ -2975,7 +2975,7 @@ RTool::activityMeanmax(SEXP pCompare)
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the ride
-            SEXP df = rtool->dfForActivityMeanmax(rtool->context->currentRideItem());
+            SEXP df = rtool->dfForActivityMeanmax(rtool->scriptContext.context->currentRideItem());
             SET_VECTOR_ELT(namedlist, 0, df);
 
             // add the color
@@ -2997,10 +2997,10 @@ RTool::activityMeanmax(SEXP pCompare)
     } else if (!compare) { // not compare, so just return a dataframe
 
         // access via global as this is a static function
-        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        if(rtool->scriptContext.context && rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // get as a data frame
-            ans = rtool->dfForActivityMeanmax(rtool->context->currentRideItem());
+            ans = rtool->dfForActivityMeanmax(rtool->scriptContext.context->currentRideItem());
             return ans;
         }
     }
@@ -3020,14 +3020,14 @@ RTool::activityMetrics(SEXP pCompare)
     bool compare = LOGICAL(pCompare)[0];
 
     // return a list
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
 
-        if (rtool->context->isCompareIntervals) {
+        if (rtool->scriptContext.context->isCompareIntervals) {
 
             // how many to return?
             int count=0;
-            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             SEXP list;
@@ -3044,7 +3044,7 @@ RTool::activityMetrics(SEXP pCompare)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareInterval p, rtool->context->compareIntervals) {
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -3073,7 +3073,7 @@ RTool::activityMetrics(SEXP pCompare)
 
             return list;
 
-        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        } else if(rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // just return a list of one ride
             // cool we can return a list of intervals to compare
@@ -3091,7 +3091,7 @@ RTool::activityMetrics(SEXP pCompare)
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the ride
-            SEXP df = rtool->dfForRideItem(rtool->context->currentRideItem());
+            SEXP df = rtool->dfForRideItem(rtool->scriptContext.context->currentRideItem());
             SET_VECTOR_ELT(namedlist, 0, df);
 
             // add the color
@@ -3113,10 +3113,10 @@ RTool::activityMetrics(SEXP pCompare)
     } else if (!compare) { // not compare, so just return a dataframe
 
         // access via global as this is a static function
-        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        if(rtool->scriptContext.context && rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // get as a data frame
-            ans = rtool->dfForRideItem(rtool->context->currentRideItem());
+            ans = rtool->dfForRideItem(rtool->scriptContext.context->currentRideItem());
             return ans;
         }
     }
@@ -3140,16 +3140,16 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
 
     // return a dataframe with PMC data for all or the current season
     // XXX uses the default half-life
-    if (rtool->context) {
+    if (rtool->scriptContext.context) {
 
         // get the currently selected date range
-        DateRange range(rtool->context->currentDateRange());
+        DateRange range(rtool->scriptContext.context->currentDateRange());
 
         // convert the name to a symbol, if not found just leave as it is
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++) {
             QString symbol = factory.metricName(i);
-            QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            QString name = rtool->scriptContext.context->specialFields.internalName(factory.rideMetric(symbol)->name());
             name.replace(" ","_");
 
             if (name == metric) {
@@ -3159,7 +3159,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
         }
 
         // create the data
-        PMCData pmcData(rtool->context, Specification(), metric);
+        PMCData pmcData(rtool->scriptContext.context, Specification(), metric);
 
         // how many entries ?
         QDate d1970(1970,01,01);
@@ -3280,19 +3280,19 @@ RTool::measures(SEXP pAll, SEXP pGroup)
     QString groupSymbol (CHAR(STRING_ELT(pGroup,0)));
 
     // return a dataframe with Measures data for all or the current season
-    if (rtool->context) {
+    if (rtool->scriptContext.context) {
 
         // get the currently selected date range
-        DateRange range(rtool->context->currentDateRange());
+        DateRange range(rtool->scriptContext.context->currentDateRange());
 
         // convert the group symbol to an index, default to Body=0
-        int groupIdx = rtool->context->athlete->measures->getGroupSymbols().indexOf(groupSymbol);
+        int groupIdx = rtool->scriptContext.context->athlete->measures->getGroupSymbols().indexOf(groupSymbol);
         if (groupIdx < 0) groupIdx = 0;
 
         // Update range for all
         if (all) {
-            range.from = rtool->context->athlete->measures->getStartDate(groupIdx);
-            range.to = rtool->context->athlete->measures->getEndDate(groupIdx);
+            range.from = rtool->scriptContext.context->athlete->measures->getStartDate(groupIdx);
+            range.to = rtool->scriptContext.context->athlete->measures->getEndDate(groupIdx);
         }
 
         // how many entries ?
@@ -3306,7 +3306,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
         // returning a dataframe with
         // date, field1, field2, ...
         SEXP ans, names;
-        QStringList fieldSymbols = rtool->context->athlete->measures->getFieldSymbols(groupIdx);
+        QStringList fieldSymbols = rtool->scriptContext.context->athlete->measures->getFieldSymbols(groupIdx);
 
         // date, field1, field2, ...
         PROTECT(ans=Rf_allocVector(VECSXP, fieldSymbols.count() + 1));
@@ -3345,7 +3345,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
             if (day >= from && day <= to) {
 
                 for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
-                    REAL(fields[fieldIdx])[index] = rtool->context->athlete->measures->getFieldValue(groupIdx, d1970.addDays(day), fieldIdx);
+                    REAL(fields[fieldIdx])[index] = rtool->scriptContext.context->athlete->measures->getFieldValue(groupIdx, d1970.addDays(day), fieldIdx);
                 index++;
             }
             day++;
@@ -3387,14 +3387,14 @@ RTool::activityWBal(SEXP pCompare)
     bool compare = LOGICAL(pCompare)[0];
 
     // return a list
-    if (compare && rtool->context) {
+    if (compare && rtool->scriptContext.context) {
 
 
-        if (rtool->context->isCompareIntervals) {
+        if (rtool->scriptContext.context->isCompareIntervals) {
 
             // how many to return?
             int count=0;
-            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) if (p.isChecked()) count++;
 
             // cool we can return a list of intervals to compare
             SEXP list;
@@ -3411,7 +3411,7 @@ RTool::activityWBal(SEXP pCompare)
             SET_STRING_ELT(names, 1, Rf_mkChar("color"));
 
             // create a data.frame for each and add to list
-            foreach(CompareInterval p, rtool->context->compareIntervals) {
+            foreach(CompareInterval p, rtool->scriptContext.context->compareIntervals) {
                 if (p.isChecked()) {
 
                     // create a named list
@@ -3440,7 +3440,7 @@ RTool::activityWBal(SEXP pCompare)
 
             return list;
 
-        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        } else if(rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // just return a list of one ride
             // cool we can return a list of intervals to compare
@@ -3458,7 +3458,7 @@ RTool::activityWBal(SEXP pCompare)
             PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
 
             // add the ride
-            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            RideFile *f = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
             SEXP df = rtool->dfForActivityWBal(f);
             SET_VECTOR_ELT(namedlist, 0, df);
@@ -3482,10 +3482,10 @@ RTool::activityWBal(SEXP pCompare)
     } else if (!compare) { // not compare, so just return a dataframe
 
         // access via global as this is a static function
-        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+        if(rtool->scriptContext.context && rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
 
             // get the ride
-            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            RideFile *f = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride();
             f->recalculateDerivedSeries();
 
             // get as a data frame

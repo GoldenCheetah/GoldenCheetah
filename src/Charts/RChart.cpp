@@ -179,7 +179,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
 
             // set the context for the call - used by all the
             // R functions to access the athlete data/model etc
-            rtool->context = context;
+            rtool->scriptContext.context = context;
             rtool->canvas = parent->canvas;
             rtool->chart = parent;
 
@@ -218,7 +218,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
             }
 
             // clear context
-            rtool->context = NULL;
+            rtool->scriptContext.context = NULL;
             rtool->canvas = NULL;
             rtool->chart = NULL;
         }
@@ -485,7 +485,7 @@ RChart::runScript()
         setUpdatesEnabled(false);
 
         // run it !!
-        rtool->context = context;
+        rtool->scriptContext.context = context;
         rtool->canvas = canvas;
         rtool->chart = this;
 
@@ -546,7 +546,7 @@ RChart::runScript()
         canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
 
         // clear context
-        rtool->context = NULL;
+        rtool->scriptContext.context = NULL;
         rtool->canvas = NULL;
         rtool->chart = NULL;
     }
