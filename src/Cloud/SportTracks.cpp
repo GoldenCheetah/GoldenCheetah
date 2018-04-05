@@ -433,6 +433,17 @@ SportTracks::readFileCompleted()
         // we now work through the tracks combining them into samples
         // with a common offset (ie, by row, not column).
         int index=0;
+
+        // for estimated speed
+        int rollingwindowsize = 3;
+
+        QVector<double> rolling(rollingwindowsize);
+
+        int rolling_index = 0;
+        double rolling_sum = 0;
+        double rolling_secs = 0.0;
+        double rolling_km = 0.0;
+
         do {
 
             // We stop when all tracks have been accomodated
@@ -484,6 +495,25 @@ SportTracks::readFileCompleted()
                     }
                 }
             }
+
+            // Estimate Speed from travelled distance
+            double kph = 0.0;
+            if (add.secs - rolling_secs > 0) kph = 3600 * (add.km - rolling_km) / (add.secs - rolling_secs);
+            //if (kph>100)
+            //    kph = 100;
+
+            // compute rolling average for rollingwindowsize seconds
+            rolling_sum += kph;
+            rolling_sum -= rolling[rolling_index];
+            rolling[rolling_index] = kph;
+            kph = rolling_sum/std::min(index+1, rollingwindowsize);
+            // move index on/round
+            rolling_index = (rolling_index >= rollingwindowsize-1) ? 0 : rolling_index+1;
+            add.kph = kph;
+            // update accumulated time and distance
+            rolling_secs = add.secs;
+            rolling_km = add.km;
+
 
             // don't add blanks
             if (updated) ret->appendPoint(add);
