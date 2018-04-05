@@ -454,7 +454,11 @@ SportTracks::readFileCompleted()
                     // get the offset for the current sample in the current track
                     int ct = data[t].samples.at(data[t].index).toInt();
 
-                    if (ct == index) {
+                    // if data missing we have to repeat last sample
+                    if (ct > index) {
+                        data[t].index = data[t].index - 2;
+                    }
+                    if (ct >= index) {
 
                         if (data[t].type == RideFile::lat) {
 
