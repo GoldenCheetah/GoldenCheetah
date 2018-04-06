@@ -1057,6 +1057,12 @@ RTool::dfForRideItem(const RideItem *ri)
         bool useMetricUnits = rtool->scriptContext.context->athlete->useMetricUnits;
         REAL(m)[0] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
 
+        // Override if we have precomputed values in ScriptContext (UserMetric)
+        if (rtool->scriptContext.metrics && rtool->scriptContext.metrics->contains(symbol)) {
+            const RideMetric *metric = rtool->scriptContext.metrics->value(symbol);
+            REAL(m)[0] = metric->value(useMetricUnits);
+        }
+
         // add to the list
         SET_VECTOR_ELT(ans, next, m);
 
@@ -1958,6 +1964,10 @@ RTool::dfForActivity(RideFile *f, int split, QString join)
 
     // start at first sample in ride
     int index=0;
+    // unless an interval is set in ScriptContext and split is not required
+    if (!split && rtool->scriptContext.spec.secsStart() >= 0)
+        index = f->timeIndex(rtool->scriptContext.spec.secsStart());
+
     int pcount=0;
 
     while(index < f->dataPoints().count()) {
@@ -1977,6 +1987,11 @@ RTool::dfForActivity(RideFile *f, int split, QString join)
 
         // do we stop at the end, or mid-ride ?
         int stop = f->dataPoints().count();
+
+        // honor interval if set in ScriptContext
+        if (rtool->scriptContext.spec.secsEnd() >= 0)
+            stop = f->timeIndex(rtool->scriptContext.spec.secsEnd());
+
         if (split) {
             for(int i=index+1; i<f->dataPoints().count(); i++) {
                 if (i && (f->dataPoints()[i]->secs - f->dataPoints()[i-1]->secs) > double(split)) {
@@ -2324,11 +2339,14 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
 
     } else if (!split && !compare) { // not compare, so just return a dataframe
 
+        RideItem *item = rtool->scriptContext.item;
+        if (item == NULL) item = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem());
+
         // access via global as this is a static function
-        if(rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
+        if(item && item->ride()) {
 
             // get the ride
-            RideFile *f = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride();
+            RideFile *f = item->ride();
             f->recalculateDerivedSeries();
 
             // get as a data frame
@@ -2996,11 +3014,14 @@ RTool::activityMeanmax(SEXP pCompare)
 
     } else if (!compare) { // not compare, so just return a dataframe
 
+        RideItem *item = rtool->scriptContext.item;
+        if (item == NULL) item = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem());
+
         // access via global as this is a static function
-        if(rtool->scriptContext.context && rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
+        if(item && item->ride()) {
 
             // get as a data frame
-            ans = rtool->dfForActivityMeanmax(rtool->scriptContext.context->currentRideItem());
+            ans = rtool->dfForActivityMeanmax(item);
             return ans;
         }
     }
@@ -3112,11 +3133,14 @@ RTool::activityMetrics(SEXP pCompare)
 
     } else if (!compare) { // not compare, so just return a dataframe
 
+        RideItem *item = rtool->scriptContext.item;
+        if (item == NULL) item = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem());
+
         // access via global as this is a static function
-        if(rtool->scriptContext.context && rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
+        if(item && item->ride()) {
 
             // get as a data frame
-            ans = rtool->dfForRideItem(rtool->scriptContext.context->currentRideItem());
+            ans = rtool->dfForRideItem(item);
             return ans;
         }
     }
@@ -3481,11 +3505,14 @@ RTool::activityWBal(SEXP pCompare)
 
     } else if (!compare) { // not compare, so just return a dataframe
 
+        RideItem *item = rtool->scriptContext.item;
+        if (item == NULL) item = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem());
+
         // access via global as this is a static function
-        if(rtool->scriptContext.context && rtool->scriptContext.context->currentRideItem() && const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride()) {
+        if(item && item->ride()) {
 
             // get the ride
-            RideFile *f = const_cast<RideItem*>(rtool->scriptContext.context->currentRideItem())->ride();
+            RideFile *f = item->ride();
             f->recalculateDerivedSeries();
 
             // get as a data frame
@@ -3507,15 +3534,26 @@ RTool::dfForActivityWBal(RideFile*f)
         // get as a data frame
         WPrime *w = f->wprimeData();
 
-        if (w && w->ydata().count() >0) {
+        // count the included points, create data series output and copy data
+        int pCount = 0;
+        int idxStart = 0;
+        int secsStart = rtool->scriptContext.spec.secsStart();
+        int secsEnd = rtool->scriptContext.spec.secsEnd();
+        for(int i=0; i<w->xdata(false).count(); i++) {
+            if (w->xdata(false)[i] < secsStart) continue;
+            if (secsEnd >= 0 && w->xdata(false)[i] > secsEnd) break;
+            if (pCount == 0) idxStart = i;
+            pCount++;
+        }
+
+        if (pCount > 0) {
 
                 // construct a vector
                 SEXP ans;
-                PROTECT(ans=Rf_allocVector(REALSXP, w->ydata().count()));
+                PROTECT(ans=Rf_allocVector(REALSXP, pCount));
 
                 // add values
-                for(int i=0; i<w->ydata().count(); i++) REAL(ans)[i] = w->ydata()[i];
-
+                for(int i=0; i<pCount; i++) REAL(ans)[i] = w->ydata()[i+idxStart];
                 UNPROTECT(1);
 
                 return ans;
