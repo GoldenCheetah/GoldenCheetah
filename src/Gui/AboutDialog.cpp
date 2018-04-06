@@ -27,17 +27,11 @@ AboutDialog::AboutDialog(Context *context) : context(context)
     aboutPage = new AboutPage(context);
     versionPage = new VersionPage(context);
     contributorsPage = new ContributorsPage(context);
-#ifndef GC_VERSION
-    configPage = new ConfigPage(context);
-#endif
 
     tabWidget = new QTabWidget;
     tabWidget->setContentsMargins(0,0,0,0);
     tabWidget->addTab(aboutPage, tr("About"));
     tabWidget->addTab(versionPage, tr("Version"));
-#ifndef GC_VERSION
-    tabWidget->addTab(configPage, tr("Config"));
-#endif
     tabWidget->addTab(contributorsPage, tr("Contributors"));
 
     mainLayout = new QVBoxLayout;
@@ -224,29 +218,3 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
 
     setLayout(mainLayout);
 }
-
-ConfigPage::ConfigPage(Context *context) : context(context)
-{
-    QTextEdit *text = new QTextEdit(this);
-    text->setAutoFillBackground(false);
-#ifdef Q_OS_MAC
-    text->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#endif
-    text->setFrameStyle(QFrame::NoFrame);
-    text->setContentsMargins(0,0,0,0);
-
-    QFile file(":gcconfig.pri");
-    file.open(QFile::ReadOnly);
-    QTextStream stream(&file);
-    QString contents = stream.readAll();
-    file.close();
-    text->setText(contents);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->addWidget(text);
-
-    setLayout(mainLayout);
-}
-

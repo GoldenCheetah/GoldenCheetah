@@ -24,7 +24,6 @@ class AboutDialog: public QDialog
 
         AboutPage *aboutPage;
         VersionPage *versionPage;
-        ConfigPage *configPage;
         ContributorsPage *contributorsPage;
 
         QTabWidget *tabWidget;
@@ -53,17 +52,6 @@ class VersionPage : public QWidget
 
     public:
         VersionPage(Context *context);
-
-    private:
-        Context *context;
-};
-
-class ConfigPage : public QWidget
-{
-    Q_OBJECT
-
-    public:
-        ConfigPage(Context *context);
 
     private:
         Context *context;
