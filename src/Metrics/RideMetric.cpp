@@ -152,7 +152,8 @@
 // 142 25  Jul 2017 Ale Martinez       Added HRV metrics at rest (Measures)
 // 143 07  Feb 2018 Walter Buerki      Daniels Points using GAP when no power
 // 144 02  Apr 2018 Mark Liversedge    Force refresh for compatibility metrics
-int DBSchemaVersion = 144;
+// 145 06  Apr 2018 Ale Martinez       Python Scripts in UserMetric honor RideItem and Specification
+int DBSchemaVersion = 145;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

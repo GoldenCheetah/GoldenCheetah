@@ -747,7 +747,8 @@ Bindings::activityMetrics(bool compare) const
     } else {
 
         // not compare, so just return a dict
-        RideItem *item = const_cast<RideItem*>(context->currentRideItem());
+        RideItem *item = python->contexts.value(threadid()).item;
+        if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
 
         return activityMetrics(item);
     }
@@ -786,6 +787,12 @@ Bindings::activityMetrics(RideItem* item) const
 
         bool useMetricUnits = context->athlete->useMetricUnits;
         double value = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
+
+        // Override if we have precomputed values in ScriptContext (UserMetric)
+        if (python->contexts.value(threadid()).metrics && python->contexts.value(threadid()).metrics->contains(symbol)) {
+            const RideMetric *metric = python->contexts.value(threadid()).metrics->value(symbol);
+            value = metric->value(useMetricUnits);
+        }
 
         // add to the dict
         PyDict_SetItemString(dict, name.toUtf8().constData(), PyFloat_FromDouble(value));
@@ -1308,7 +1315,9 @@ Bindings::activityMeanmax(bool compare) const
     } else {
 
         // not compare, so just return a dict
-        return activityMeanmax(context->currentRideItem());
+        RideItem *item = python->contexts.value(threadid()).item;
+        if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+        return activityMeanmax(item);
     }
 }
 
