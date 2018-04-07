@@ -110,6 +110,7 @@
 #include "CloudDBVersion.h"
 #include "GcUpgrade.h"
 #endif
+#include "Secrets.h"
 
 #if defined(_MSC_VER) && defined(_WIN64)
 #include "WindowsCrashHandler.cpp"
@@ -611,11 +612,13 @@ MainWindow::MainWindow(const QDir &home)
      * Lets ask for telemetry and check for updates
      *--------------------------------------------------------------------*/
 
-#if QT_VERSION > 0x050000
+#if QT_VERSION > 0x050000 && !defined(OPENDATA_DISABLE)
     OpenData::check(currentTab->context);
+#else
+    fprintf(stderr, "OpenData disabled, secret not defined.\n"); fflush(stderr);
 #endif
-#ifdef GC_HAS_CLOUD_DB
 
+#ifdef GC_HAS_CLOUD_DB
     telemetryClient = new CloudDBTelemetryClient();
     if (appsettings->value(NULL, GC_ALLOW_TELEMETRY, "undefined").toString() == "undefined" ) {
         // ask user if storing is allowed
