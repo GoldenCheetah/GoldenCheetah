@@ -23,6 +23,7 @@
 #include <QString>
 #include <QMap>
 #include <QStringList>
+#include "DataFilter.h"
 
 class Context;
 class PythonChart;
@@ -54,13 +55,13 @@ class PythonEmbed {
     void *clear;
 
     // run a single line from console
-    void runline(Context *, QString);
+    void runline(ScriptContext, QString);
 
     // stop current execution
     void cancel();
 
     // context for caller - can be called in a thread
-    QMap<long,Context *> contexts;
+    QMap<long, ScriptContext> contexts;
     PythonChart *chart;
     QWidget *canvas;
 

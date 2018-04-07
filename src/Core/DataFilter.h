@@ -37,6 +37,18 @@ class FieldDefinition;
 class DataFilter;
 class DataFilterRuntime;
 
+// Context for R/Python Scripts
+class ScriptContext {
+    public:
+
+        ScriptContext(Context *context=NULL, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification()) : context(context), item(item), metrics(metrics), spec(spec) {}
+
+        Context *context;
+        RideItem *item;
+        const QHash<QString,RideMetric*> *metrics;
+        Specification spec;
+};
+
 class Result {
     public:
 
@@ -67,9 +79,10 @@ class Leaf {
         // LTM chart - using symbols from RideItem *m
         // Ride Plot - using symbols from RideItem *m
         // Search/Filter - using symbols from RideItem *m
-        // User Metric - using symbols from QHash<..> (RideItem + Interval)
+        // User Metric - using symbols from QHash<..> (RideItem + Interval) and
+        // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL);
+        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification());
 
         // tree traversal etc
         void print(Leaf *, int level, DataFilterRuntime*);  // print leaf and all children
@@ -141,12 +154,12 @@ public:
 
 #ifdef GC_WANT_PYTHON
     // embedded python runtime
-    double runPythonScript(Context *context, QString script);
+    double runPythonScript(Context *context, QString script, RideItem *m, const QHash<QString,RideMetric*> *metrics, Specification spec);
 #endif
 
 #ifdef GC_WANT_R
     // embedded R runtime
-    double runRScript(Context *context, QString script);
+    double runRScript(Context *context, QString script, RideItem *m, const QHash<QString,RideMetric*> *metrics, Specification spec);
 #endif
 };
 
