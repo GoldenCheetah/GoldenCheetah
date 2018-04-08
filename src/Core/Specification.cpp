@@ -67,14 +67,14 @@ Specification::setIntervalItem(IntervalItem *it, double recintsecs)
 }
 
 double 
-Specification::secsStart()
+Specification::secsStart() const
 {
     if (it) return it->start;
     else return -1;
 }
 
 double 
-Specification::secsEnd()
+Specification::secsEnd() const
 {
     if (it) return it->stop;
     else return -1;

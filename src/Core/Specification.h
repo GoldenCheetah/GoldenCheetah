@@ -113,8 +113,8 @@ class Specification
         // when working with intervals secs start and end
         // if no interval is set then they return -1 to indicate
         // that the entire ride is in scope
-        double secsStart();
-        double secsEnd();
+        double secsStart() const;
+        double secsEnd() const;
 
     private:
         DateRange dr;
