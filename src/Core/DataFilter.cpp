@@ -33,11 +33,6 @@
 QMutex pythonMutex;
 #endif
 
-#ifdef GC_WANT_R
-#include "RTool.h"
-QMutex RMutex;
-#endif
-
 #include "Zones.h"
 #include "PaceZones.h"
 #include "HrZones.h"
@@ -2537,9 +2532,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
  #ifdef GC_WANT_PYTHON
         if (leaf->function == "python")  return Result(df->runPythonScript(m->context, *leaf->lvalue.s, m, c, s));
  #endif
- #ifdef GC_WANT_R
-        if (leaf->function == "R")  return Result(df->runRScript(m->context, *leaf->lvalue.s));
- #endif
         return Result(0);
     }
     break;
@@ -3051,55 +3043,6 @@ DataFilterRuntime::runPythonScript(Context *context, QString script, RideItem *m
 
     // free up the interpreter
     pythonMutex.unlock();
-
-    return result;
-}
-#endif
-
-#ifdef GC_WANT_R
-double
-DataFilterRuntime::runRScript(Context *context, QString script)
-{
-
-    if (rtool == NULL) return(0);
-
-    // get the lock
-    RMutex.lock();
-
-    double result=0;
-
-    // run it !!
-    rtool->context = context;
-    rtool->canvas = NULL;
-    rtool->chart = NULL;
-
-    try {
-
-        // run it
-        rtool->R->parseEval(script);
-
-        // ignore errors
-        rtool->messages.clear();
-
-    } catch(std::exception& ex) {
-
-        rtool->messages.clear();
-
-    } catch(...) {
-
-        rtool->messages.clear();
-    }
-
-    // if the program expects more we clear it, otherwise
-    // weird things can happen!
-    rtool->R->program.clear();
-
-    // clear context
-    rtool->context = NULL;
-
-    result = rtool->R->result;
-
-    RMutex.unlock();
 
     return result;
 }

@@ -50,7 +50,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %}
 
 // Symbol can be meta or metric name
-%token <leaf> SYMBOL RSCRIPT PYTHON
+%token <leaf> SYMBOL PYTHON
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
@@ -77,7 +77,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
 %type <leaf> simple_statement if_clause while_clause function_def;
-%type <leaf> r_script python_script;
+%type <leaf> python_script;
 %type <comp> statements
 
 %right '?' ':'
@@ -184,16 +184,6 @@ python_script:
                                                   $$->function = "python";
                                                   QString full(DataFiltertext);
                                                   $$->lvalue.s = new QString(full.mid(8,full.length()-10));
-                                                }
-        ;
-
-r_script:
-
-        RSCRIPT                                 { $$ = new Leaf(@1.first_column, @1.last_column);
-                                                  $$->type = Leaf::Script;
-                                                  $$->function = "R";
-                                                  QString full(DataFiltertext);
-                                                  $$->lvalue.s = new QString(full.mid(3,full.length()-5));
                                                 }
         ;
 
@@ -477,7 +467,6 @@ expr:
         | array                                 { $$ = $1; }
         | literal                               { $$ = $1; }
         | symbol                                { $$ = $1; }
-        | r_script                              { $$ = $1; }
         | python_script                         { $$ = $1; }
         ;
 

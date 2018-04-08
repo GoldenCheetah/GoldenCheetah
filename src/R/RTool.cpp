@@ -114,7 +114,6 @@ RTool::RTool()
         // setup when embedding v3.4 or higher
         R_CMethodDef34 cMethods34[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0,0 },
-            { "GC.result", (DL_FUNC) &RTool::result, 0,0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 0,0  },
             { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0 },
@@ -137,7 +136,6 @@ RTool::RTool()
         // setup when embedding prior to 3.4
         R_CMethodDef33 cMethods33[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0,0,0 },
-            { "GC.result", (DL_FUNC) &RTool::result, 0,0,0 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 0,0,0  },
             { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0,0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0,0 },
@@ -159,7 +157,6 @@ RTool::RTool()
 
         R_CallMethodDef callMethods[] = {
             { "GC.display", (DL_FUNC) &RGraphicsDevice::GCdisplay, 0 },
-            { "GC.result", (DL_FUNC) &RTool::result, 1 },
             { "GC.page", (DL_FUNC) &RTool::pageSize, 2 },
             { "GC.size", (DL_FUNC) &RTool::windowSize, 0 },
 
@@ -251,7 +248,6 @@ RTool::RTool()
 
                                 // graphics device
                                "GC.display <- function() { .Call(\"GC.display\") }\n"
-                               "GC.result <- function(result=0) { .Call(\"GC.result\", result) }\n"
                                "GC.page <- function(width=0, height=0) { .Call(\"GC.page\", width, height) }\n"
                                "GC.size <- function() { .Call(\"GC.size\") }\n"
 
@@ -850,15 +846,6 @@ RTool::zones(SEXP pDate, SEXP pSport)
     // fail
     return ans;
 
-}
-
-SEXP
-RTool::result(SEXP value)
-{
-    value = Rf_coerceVector(value, REALSXP);
-    rtool->R->result = REAL(value)[0];
-
-    return Rf_allocVector(INTSXP, 0);
 }
 
 SEXP

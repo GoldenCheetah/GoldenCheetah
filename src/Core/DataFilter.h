@@ -145,10 +145,6 @@ public:
     double runPythonScript(Context *context, QString script, RideItem *m, const QHash<QString,RideMetric*> *metrics, Specification spec);
 #endif
 
-#ifdef GC_WANT_R
-    // embedded R runtime
-    double runRScript(Context *context, QString script);
-#endif
 };
 
 class DataFilter : public QObject
