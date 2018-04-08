@@ -24,11 +24,25 @@
 #include <QMap>
 #include <QStringList>
 
+#include "RideItem.h"
+
 class Context;
 class PythonChart;
 
 class PythonEmbed;
 extern PythonEmbed *python;
+
+// Context for Python Scripts
+class ScriptContext {
+    public:
+
+        ScriptContext(Context *context=NULL, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification()) : context(context), item(item), metrics(metrics), spec(spec) {}
+
+        Context *context;
+        RideItem *item;
+        const QHash<QString,RideMetric*> *metrics;
+        Specification spec;
+};
 
 // a plain C++ class, no QObject stuff
 class PythonEmbed {
@@ -54,13 +68,13 @@ class PythonEmbed {
     void *clear;
 
     // run a single line from console
-    void runline(Context *, QString);
+    void runline(ScriptContext, QString);
 
     // stop current execution
     void cancel();
 
     // context for caller - can be called in a thread
-    QMap<long,Context *> contexts;
+    QMap<long, ScriptContext> contexts;
     PythonChart *chart;
     QWidget *canvas;
 

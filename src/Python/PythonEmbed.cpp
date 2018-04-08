@@ -287,7 +287,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 }
 
 // run on called thread
-void PythonEmbed::runline(Context *context, QString line)
+void PythonEmbed::runline(ScriptContext scriptContext, QString line)
 {
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
@@ -301,7 +301,7 @@ void PythonEmbed::runline(Context *context, QString line)
     Py_DECREF(ident);
 
     // add to the thread/context map
-    contexts.insert(threadid, context);
+    contexts.insert(threadid, scriptContext);
 
     // run and generate errors etc
     messages.clear();
