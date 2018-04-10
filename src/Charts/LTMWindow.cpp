@@ -76,7 +76,7 @@ LTMWindow::LTMWindow(Context *context) :
     plotLayout->setSpacing(0);
     plotLayout->setContentsMargins(0,0,0,0);
     
-    ltmPlot = new LTMPlot(this, context, true);
+    ltmPlot = new LTMPlot(this, context, 0);
     spanSlider = new QxtSpanSlider(Qt::Horizontal, this);
     spanSlider->setFocusPolicy(Qt::NoFocus);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
@@ -298,6 +298,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(context, SIGNAL(rideSaved(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
+    connect(context->athlete->seasons, SIGNAL(seasonsChanged()), this, SLOT(refreshPlot()));
 
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
@@ -552,7 +553,7 @@ LTMWindow::refreshCompare()
         if (m.stack) plotSetting.metrics << m;
     }
 
-    bool first = true;
+    int position = 0;
 
     // create ltmPlot with this
     if (plotSetting.metrics.count()) {
@@ -560,12 +561,9 @@ LTMWindow::refreshCompare()
         compareplotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *stacked = new LTMPlot(this, context, first);
+        LTMPlot *stacked = new LTMPlot(this, context, position++);
         stacked->setCompareData(&compareplotSettings.last()); // setData using the compare data
         stacked->setFixedHeight(200); // maybe make this adjustable later
-
-        // no longer first
-        first = false;
 
         // now add
         compareplotsLayout->addWidget(stacked);
@@ -585,11 +583,8 @@ LTMWindow::refreshCompare()
         compareplotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *plot = new LTMPlot(this, context, first);
+        LTMPlot *plot = new LTMPlot(this, context, position++);
         plot->setCompareData(&compareplotSettings.last()); // setData using the compare data
-
-        // no longer first
-        first = false;
 
         // now add
         compareplotsLayout->addWidget(plot);
@@ -661,7 +656,7 @@ LTMWindow::refreshStackPlots()
         if (m.stack) plotSetting.metrics << m;
     }
 
-    bool first = true;
+    int position = 0;
 
     // create ltmPlot with this
     if (plotSetting.metrics.count()) {
@@ -669,12 +664,9 @@ LTMWindow::refreshStackPlots()
         plotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *stacked = new LTMPlot(this, context, first);
+        LTMPlot *stacked = new LTMPlot(this, context, position++);
         stacked->setData(&plotSettings.last());
         stacked->setFixedHeight(200); // maybe make this adjustable later
-
-        // no longer first
-        first = false;
 
         // now add
         plotsLayout->addWidget(stacked);
@@ -694,11 +686,8 @@ LTMWindow::refreshStackPlots()
         plotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *plot = new LTMPlot(this, context, first);
+        LTMPlot *plot = new LTMPlot(this, context, position++);
         plot->setData(&plotSettings.last());
-
-        // no longer first
-        first = false;
 
         // now add
         plotsLayout->addWidget(plot);

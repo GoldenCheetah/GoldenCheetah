@@ -51,7 +51,7 @@ class LTMPlot : public QwtPlot
 
 
     public:
-        LTMPlot(LTMWindow *, Context *context, bool first=true); // first if in a stack
+        LTMPlot(LTMWindow *, Context *context, int postition=0); // position in a stack
         ~LTMPlot();
         void setData(LTMSettings *);
         void setCompareData(LTMSettings *);
@@ -145,8 +145,8 @@ class LTMPlot : public QwtPlot
         void refreshMarkers(LTMSettings *, QDate from, QDate to, int groupby, QColor color);
 
         QList<QwtAxisId> supportedAxes;
-        bool first, isolation;
-        int MAXX;
+        bool isolation;
+        int position, MAXX;
 };
 
 class CompareScaleDraw: public QwtScaleDraw

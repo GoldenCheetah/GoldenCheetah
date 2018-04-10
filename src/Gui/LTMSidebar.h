@@ -69,6 +69,7 @@ class LTMSidebar : public QWidget
         void editEvent();
         void deleteEvent();
         void addEvent();
+        void eventMoved(QTreeWidgetItem *, int, int);
 
         void addPhase();
 
@@ -118,7 +119,7 @@ class LTMSidebar : public QWidget
         QTreeWidgetItem *allCharts;
 
         GcSplitterItem *eventsWidget;
-        QTreeWidget *eventTree;
+        SeasonEventTreeView *eventTree;
         QTreeWidgetItem *allEvents;
 
         GcSplitterItem *filtersWidget;

@@ -44,6 +44,7 @@
 #include "SeasonParser.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#include "CalDAV.h" // upload Events to remote calendar
 
 // named searchs
 #include "FreeSearch.h"
@@ -103,12 +104,14 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
 
-    eventTree = new QTreeWidget;
+    eventTree = new SeasonEventTreeView;
     eventTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     allEvents = eventTree->invisibleRootItem();
+    // Drop for Events
+    allEvents->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allEvents->setText(0, tr("Events"));
     eventTree->setFrameStyle(QFrame::NoFrame);
-    eventTree->setColumnCount(2);
+    eventTree->setColumnCount(3);
     eventTree->setSelectionMode(QAbstractItemView::SingleSelection);
     eventTree->header()->hide();
     eventTree->setIndentation(5);
@@ -229,6 +232,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     // events
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
+    connect(eventTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(eventMoved(QTreeWidgetItem*, int, int)));
 
     // presets
     connect(chartTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(presetPopup(const QPoint &)));
@@ -360,8 +364,10 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
         for (i=0; i <dateRange->events.count(); i++) {
             SeasonEvent event = dateRange->events.at(i);
             QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+            add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             add->setText(0, event.name);
             add->setText(1, event.date.toString("MMM d, yyyy"));
+            add->setText(2, SeasonEvent::priorityList().at(event.priority));
         }
 
         // make sure they fit
@@ -1164,7 +1170,7 @@ LTMSidebar::editRange()
 
     QDialog* dialog;
     if (phaseIdx> -1) {
-        dialog = new EditPhaseDialog(context, &seasons->seasons[seasonIdx].phases[phaseIdx]);
+        dialog = new EditPhaseDialog(context, &seasons->seasons[seasonIdx].phases[phaseIdx], seasons->seasons[seasonIdx]);
     } else {
         dialog = new EditSeasonDialog(context, &seasons->seasons[seasonIdx]);
     }
@@ -1267,16 +1273,24 @@ LTMSidebar::addEvent()
     }
 
     SeasonEvent myevent("", seasons->seasons[seasonindex].getEnd());
-    EditSeasonEventDialog dialog(context, &myevent);
+    EditSeasonEventDialog dialog(context, &myevent, seasons->seasons[seasonindex]);
 
     if (dialog.exec()) {
 
         active = true;
+
+        // upload to remote calendar if configured
+        if (context->athlete->davCalendar->getConfig())
+            if (!context->athlete->davCalendar->upload(&myevent))
+                QMessageBox::warning(this, tr("Add Event"), tr("The new event could not be uploaded to your remote calendar."));
+
         seasons->seasons[seasonindex].events.append(myevent);
 
         QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+        add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         add->setText(0, myevent.name);
         add->setText(1, myevent.date.toString("MMM d, yyyy"));
+        add->setText(2, SeasonEvent::priorityList().at(myevent.priority));
 
         // make sure they fit
         eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
@@ -1342,19 +1356,53 @@ LTMSidebar::editEvent()
             QTreeWidgetItem *ours = eventTree->selectedItems().first();
             int index = allEvents->indexOfChild(ours);
 
-            EditSeasonEventDialog dialog(context, &seasons->seasons[seasonindex].events[index]);
+            EditSeasonEventDialog dialog(context, &seasons->seasons[seasonindex].events[index], seasons->seasons[seasonindex]);
 
             if (dialog.exec()) {
 
-                // update name
+                // update event data
                 ours->setText(0, seasons->seasons[seasonindex].events[index].name);
                 ours->setText(1, seasons->seasons[seasonindex].events[index].date.toString("MMM d, yyyy"));
+                ours->setText(2, SeasonEvent::priorityList().at(seasons->seasons[seasonindex].events[index].priority));
+
+                // make sure they fit
+                eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
 
                 // save changes away
                 seasons->writeSeasons();
             }
         }
     }
+    active = false;
+}
+
+void
+LTMSidebar::eventMoved(QTreeWidgetItem*item, int oldposition, int newposition)
+{
+    active = true;
+
+    if (dateRangeTree->selectedItems().count()) {
+
+        // if a phase is selected (rather than a season), get the season this phase belongs to
+        QTreeWidgetItem *selectedDateRange = dateRangeTree->selectedItems().first();
+        if (selectedDateRange->parent() != NULL) {
+            selectedDateRange = selectedDateRange->parent();
+        }
+
+        int seasonindex = allDateRanges->indexOfChild(selectedDateRange);
+
+        // report the move in the seasons
+        seasons->seasons[seasonindex].events.move(oldposition, newposition);
+
+        // save changes away
+        seasons->writeSeasons();
+
+        // deselect actual selection
+        eventTree->selectedItems().first()->setSelected(false);
+        // select the move/drop item
+        item->setSelected(true);
+    }
+
     active = false;
 }
 
@@ -1380,7 +1428,7 @@ LTMSidebar::addPhase()
     }
 
     Phase myphase("", seasons->seasons[seasonindex].getStart(), seasons->seasons[seasonindex].getEnd());
-    EditPhaseDialog dialog(context, &myphase);
+    EditPhaseDialog dialog(context, &myphase, seasons->seasons[seasonindex]);
 
     if (dialog.exec()) {
 
