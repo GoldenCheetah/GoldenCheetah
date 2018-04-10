@@ -366,6 +366,9 @@ class CredentialsPage : public QScrollArea
         void deleteClicked();
         void editClicked();
 
+        void authoriseGoogleCalendar();
+        void dvCALDAVTypeChanged(int);
+
 
     private:
 
@@ -373,6 +376,14 @@ class CredentialsPage : public QScrollArea
         QTreeWidget *accounts;
         QPushButton *addButton, *editButton, *deleteButton;
 
+        QComboBox *dvCALDAVType;
+        QPushButton *googleCalendarAuthorise, *googleCalendarAuthorised;
+        QLineEdit *webcalURL; // url for webcal calendar (read only, TP.com, Google Calendar)
+
+        QLineEdit *dvURL; // url for calDAV calendar (read/write, e.g. Hotmail)
+        QLineEdit *dvUser;
+        QLineEdit *dvPass;
+        QLineEdit *dvGoogleCalid;
 };
 
 class deviceModel : public QAbstractTableModel

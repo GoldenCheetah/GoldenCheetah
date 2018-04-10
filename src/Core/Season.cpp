@@ -26,6 +26,12 @@
 #include "SeasonParser.h"
 #include <QXmlSimpleReader>
 
+QStringList
+SeasonEvent::priorityList()
+{
+    return QStringList()<<" "<<tr("A")<<tr("B")<<tr("C")<<tr("D")<<tr("E");
+}
+
 static QList<QString> _setSeasonTypes()
 {
     QList<QString> returning;
@@ -170,6 +176,10 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+
+    // initialize button state
+    nameChanged();
 }
 
 void
@@ -190,10 +200,15 @@ EditSeasonDialog::cancelClicked()
     reject();
 }
 
+void EditSeasonDialog::nameChanged()
+{
+    applyButton->setEnabled(!nameEdit->text().isEmpty());
+}
+
 /*----------------------------------------------------------------------
  * EDIT SEASONEVENT DIALOG
  *--------------------------------------------------------------------*/
-EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *event) :
+EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *event, Season &season) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), event(event)
 {
     setWindowTitle(tr("Edit Event"));
@@ -203,18 +218,32 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     QGridLayout *grid = new QGridLayout;
     QLabel *name = new QLabel(tr("Name"));
     QLabel *date = new QLabel(tr("Date"));
+    QLabel *priority = new QLabel(tr("Priority"));
+    QLabel *description = new QLabel(tr("Description"));
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(event->name);
 
     dateEdit = new QDateEdit(this);
+    dateEdit->setDateRange(season.getStart(), season.getEnd());
     dateEdit->setDate(event->date);
     dateEdit->setCalendarPopup(true);
+
+    priorityEdit = new QComboBox(this);
+    foreach(QString priority, SeasonEvent::priorityList()) priorityEdit->addItem(priority);
+    priorityEdit->setCurrentIndex(event->priority);
+
+    descriptionEdit = new QTextEdit(this);
+    descriptionEdit->setText(event->description);
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
     grid->addWidget(date, 1,0);
     grid->addWidget(dateEdit, 1,1);
+    grid->addWidget(priority, 2,0);
+    grid->addWidget(priorityEdit, 2,1);
+    grid->addWidget(description, 3, 0);
+    grid->addWidget(descriptionEdit, 4,0,4,2);
 
     mainLayout->addLayout(grid);
 
@@ -230,6 +259,10 @@ EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *even
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+
+    // initialize button state
+    nameChanged();
 }
 
 void
@@ -238,6 +271,8 @@ EditSeasonEventDialog::applyClicked()
     // get the values back
     event->name = nameEdit->text();
     event->date = dateEdit->date();
+    event->priority = priorityEdit->currentIndex();
+    event->description = descriptionEdit->toPlainText();
     accept();
 }
 
@@ -245,6 +280,11 @@ void
 EditSeasonEventDialog::cancelClicked()
 {
     reject();
+}
+
+void EditSeasonEventDialog::nameChanged()
+{
+    applyButton->setEnabled(!nameEdit->text().isEmpty());
 }
 
 //
@@ -566,7 +606,7 @@ Phase::Phase(QString _name, QDate _start, QDate _end) : Season()
 /*----------------------------------------------------------------------
  * EDIT PHASE DIALOG
  *--------------------------------------------------------------------*/
-EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
+EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase, Season &season) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), phase(phase)
 {
     setWindowTitle(tr("Edit Date Range"));
@@ -593,10 +633,12 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
     typeEdit->setCurrentIndex(typeEdit->findData(phase->getType()));
 
     fromEdit = new QDateEdit(this);
+    fromEdit->setDateRange(season.getStart(), season.getEnd());
     fromEdit->setDate(phase->getStart());
     fromEdit->setCalendarPopup(true);
 
     toEdit = new QDateEdit(this);
+    toEdit->setDateRange(season.getStart(), season.getEnd());
     toEdit->setDate(phase->getEnd());
     toEdit->setCalendarPopup(true);
 
@@ -644,6 +686,10 @@ EditPhaseDialog::EditPhaseDialog(Context *context, Phase *phase) :
     // connect up slots
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(nameChanged()));
+
+    // initialize button state
+    nameChanged();
 }
 
 void
@@ -662,4 +708,34 @@ void
 EditPhaseDialog::cancelClicked()
 {
     reject();
+}
+
+void EditPhaseDialog::nameChanged()
+{
+    applyButton->setEnabled(!nameEdit->text().isEmpty());
+}
+
+SeasonEventTreeView::SeasonEventTreeView()
+{
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropOverwriteMode(true);
+}
+
+void
+SeasonEventTreeView::dropEvent(QDropEvent* event)
+{
+    // get the list of the items that are about to be dropped
+    QTreeWidgetItem* item = selectedItems()[0];
+
+    // row we started on
+    int idx1 = indexFromItem(item).row();
+
+    // the default implementation takes care of the actual move inside the tree
+    QTreeWidget::dropEvent(event);
+
+    // moved to !
+    int idx2 = indexFromItem(item).row();
+
+    // notify subscribers in some useful way
+    Q_EMIT itemMoved(item, idx1, idx2);
 }

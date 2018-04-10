@@ -28,6 +28,7 @@
 #include <QTreeWidget>
 #include <QLabel>
 #include <QLineEdit>
+#include <QTextEdit>
 
 #include "Context.h"
 
@@ -35,11 +36,18 @@ class Phase;
 
 class SeasonEvent
 {
+    Q_DECLARE_TR_FUNCTIONS(Season)
+
     public:
-        SeasonEvent(QString name, QDate date) : name(name), date(date) {}
+        static QStringList priorityList();
+
+        SeasonEvent(QString name, QDate date, int priority=0, QString description="", QString id="") : name(name), date(date), priority(priority), description(description), id(id) {}
 
         QString name;
         QDate date;
+        int priority;
+        QString description;
+        QString id; // unique id
 };
 
 class Season
@@ -107,6 +115,7 @@ class EditSeasonDialog : public QDialog
     public slots:
         void applyClicked();
         void cancelClicked();
+        void nameChanged();
 
     private:
         Context *context;
@@ -127,11 +136,12 @@ class EditSeasonEventDialog : public QDialog
 
 
     public:
-        EditSeasonEventDialog(Context *, SeasonEvent *);
+        EditSeasonEventDialog(Context *, SeasonEvent *, Season &);
 
     public slots:
         void applyClicked();
         void cancelClicked();
+        void nameChanged();
 
     private:
         Context *context;
@@ -140,6 +150,8 @@ class EditSeasonEventDialog : public QDialog
         QPushButton *applyButton, *cancelButton;
         QLineEdit *nameEdit;
         QDateEdit *dateEdit;
+        QComboBox *priorityEdit;
+        QTextEdit *descriptionEdit;
 };
 
 class Seasons : public QObject {
@@ -207,11 +219,12 @@ class EditPhaseDialog : public QDialog
 
 
     public:
-        EditPhaseDialog(Context *, Phase *);
+        EditPhaseDialog(Context *, Phase *, Season &);
 
     public slots:
         void applyClicked();
         void cancelClicked();
+        void nameChanged();
 
     private:
         Context *context;
@@ -225,4 +238,17 @@ class EditPhaseDialog : public QDialog
         QDoubleSpinBox *lowEdit;
 };
 
+class SeasonEventTreeView : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        SeasonEventTreeView();
+
+    signals:
+        void itemMoved(QTreeWidgetItem* item, int previous, int actual);
+
+    protected:
+        void dropEvent(QDropEvent* event);
+};
 #endif /* SEASON_H_ */

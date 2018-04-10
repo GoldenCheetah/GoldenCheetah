@@ -48,6 +48,8 @@ protected:
     Phase phase;
     int loadcount;
     QString dateString;
-
+    QString priorityString;
+    QString eventDescription;
+    QString eventId;
 };
 #endif //SeasonParser
