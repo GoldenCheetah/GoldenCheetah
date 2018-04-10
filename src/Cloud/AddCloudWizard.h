@@ -137,7 +137,7 @@ class AddAuth : public QWizardPage
     public slots:
         void initializePage();
         bool validatePage();
-        int nextId() const { return wizard->cloudService->type() & CloudService::Measures ? 90 : (hasAthlete ? 25 : 30); }
+        int nextId() const { return wizard->cloudService->type() & (CloudService::Measures|CloudService::Calendar) ? 90 : (hasAthlete ? 25 : 30); }
         void updateServiceSettings();
         void doAuth();
 

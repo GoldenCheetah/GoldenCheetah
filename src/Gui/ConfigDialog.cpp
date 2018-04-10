@@ -49,7 +49,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
 
-    setMinimumSize(700 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
+    setMinimumSize(800 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
     // center

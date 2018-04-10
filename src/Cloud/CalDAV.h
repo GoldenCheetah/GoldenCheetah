@@ -58,13 +58,13 @@ class CalDAV : public QObject
     Q_OBJECT
     G_OBJECT
 
+public:
     enum action { Options, PropFind, Put, Get, Events, Report, None };
     typedef enum action ActionType;
 
-    enum type { Standard, Google };
+    enum type { Standard, Google, Webcal };
     typedef enum type CalDAVType;
 
-public:
     CalDAV(Context *context);
 
 public slots:

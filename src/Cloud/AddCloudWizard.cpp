@@ -110,14 +110,12 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     mapper->setMapping(p, CloudService::Measures);
     layout->addWidget(p);
 
-#if 0 // DEPRECATING (?)
-    // Activities
-    p = new QCommandLinkButton(tr("Calendar"), tr("Sync planned workouts to WebDAV and CalDAV calendars."));
+    // Calendar
+    p = new QCommandLinkButton(tr("Calendar"), tr("Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar."));
     p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Calendar);
     layout->addWidget(p);
-#endif
 
     setFinalPage(false);
 }

@@ -46,6 +46,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Strava") site = this->site = STRAVA;
         if (service->id() == "Dropbox") site = this->site = DROPBOX;
         if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
+        if (service->id() == "Google Calendar") site = this->site = GOOGLE_CALENDAR;
         if (service->id() == "Google Drive") site = this->site = GOOGLE_DRIVE;
         if (service->id() == "University of Kent") site = this->site = KENTUNI;
         if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
@@ -129,6 +130,14 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
 #if QT_VERSION >= 0x050000
 
+    } else if (site == GOOGLE_CALENDAR) {
+        // OAUTH 2.0 - Google flow for installed applications
+        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
+        urlstr.append("scope=https://www.googleapis.com/auth/calendar&");
+        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
+
     } else if (site == GOOGLE_DRIVE) {
 
         const QString scope =  service->getSetting(GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
@@ -194,7 +203,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
 
         url = QUrl(urlstr);
         view->setUrl(url);
@@ -363,7 +372,7 @@ void
 OAuthDialog::loadFinished(bool ok)
 {
 
-    if (site == GOOGLE_DRIVE || site == KENTUNI) {
+    if (site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) {
 
         if (ok && url.toString().startsWith("https://accounts.google.com/o/oauth2/auth")) {
 
@@ -380,9 +389,15 @@ OAuthDialog::loadFinished(bool ok)
                 QUrl params;
 #endif
                 QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
-                params.addQueryItem("client_id", GC_GOOGLE_DRIVE_CLIENT_ID);
+                if (site == GOOGLE_CALENDAR) {
+                    params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
+                } else if (site == GOOGLE_DRIVE || site == KENTUNI) {
+                    params.addQueryItem("client_id", GC_GOOGLE_DRIVE_CLIENT_ID);
+                }
 
-                if (site == GOOGLE_DRIVE || site == KENTUNI) {
+                if (site == GOOGLE_CALENDAR) {
+                    params.addQueryItem("client_secret", GC_GOOGLE_CALENDAR_CLIENT_SECRET);
+                } else if (site == GOOGLE_DRIVE || site == KENTUNI) {
                     params.addQueryItem("client_secret", GC_GOOGLE_DRIVE_CLIENT_SECRET);
                 }
 
@@ -481,7 +496,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
         // if we failed to extract then we have a big problem
         // google uses a refresh token so trap for them only
-        if (((site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") || access_token == "") {
+        if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") || access_token == "") {
 
             // Something failed.
             // Only Google uses both refresh and access tokens.
@@ -559,6 +574,16 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             service->setSetting(GC_CYCLINGANALYTICS_TOKEN, access_token);
             QString info = QString(tr("Cycling Analytics authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+
+        } else if (site == GOOGLE_CALENDAR) {
+            // remove the Google Page first
+            url = QUrl("http://www.goldencheetah.org");
+            view->setUrl(url);
+            appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, refresh_token);
+            QString info = QString(tr("Google Calendar authorization was successful."));
+            QMessageBox information(QMessageBox::Information,
+                                    tr("Information"), info);
             information.exec();
 
         } else if (site == KENTUNI) {
