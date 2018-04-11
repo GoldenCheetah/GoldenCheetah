@@ -158,6 +158,10 @@ QDateTime convertToLocalTime(QString timestamp)
 
         // ISO format without timezone offset
         return QDateTime::fromString(timestamp, Qt::ISODate);
+    } else if (timestamp.size() == 23 && timestamp[10].toLower() == 't') {
+
+        // ISO extended format without timezone offset but with milliseconds
+        return QDateTime::fromString(timestamp, Qt::ISODateWithMs);
     }
 
     // if not sure, just fallback to basic method
