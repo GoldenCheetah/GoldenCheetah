@@ -13,6 +13,7 @@ Makefile
 *.prl
 *.swp
 *.user
+*.AppImage
 
 # osx noise
 .DS_Store
