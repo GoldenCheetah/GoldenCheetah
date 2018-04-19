@@ -28,8 +28,10 @@
 #include <QMessageBox>
 #include <QProcess>
 
-// Python header - using a C preprocessor hack
-// GC_PYTHON_INCDIR is from gcconfig.pri, typically python3.6
+#if PYTHON3_VERSION < 5
+#error "PYTHON3_VERSION must specify the python version for this build eg 6"
+#endif
+
 #ifdef slots // clashes with python headers
 #undef slots
 #endif
@@ -50,7 +52,7 @@ PythonEmbed::~PythonEmbed()
 
 bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME)
 {
-    QStringList names; names<<"python3"<< "bin/python3" << "python" << "bin/python";
+    QStringList names; names << QString("python3.%1").arg(PYTHON3_VERSION) << QString("bin/python3.%1").arg(PYTHON3_VERSION) << "python3" << "bin/python3" << "python" << "bin/python";
     QString pythonbinary;
 
     if (PYTHONHOME=="") {
@@ -111,6 +113,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
     args << "-c";
     args << QString("import sys\n"
                     "print('ZZ',sys.version_info.major,'ZZ')\n"
+                    "print('ZZ',sys.version_info.minor,'ZZ')\n"
                     "print('ZZ', '%1'.join(sys.path), 'ZZ')\n"
                     "quit()\n").arg(PATHSEP);
     py.setArguments(args);
@@ -140,14 +143,15 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
     }
 
     // scan output
-    QRegExp contents("^ZZ(.*)ZZ.*ZZ(.*)ZZ.*$");
+    QRegExp contents("^ZZ(.*)ZZ.*ZZ(.*)ZZ.*ZZ(.*)ZZ.*$");
     if (contents.exactMatch(output)) {
         QString vmajor=contents.cap(1);
-        QString path=contents.cap(2);
+        QString vminor=contents.cap(2);
+        QString path=contents.cap(3);
 
-        // check its version 3
-        if (vmajor.toInt() != 3) {
-            printd( "%s is not version 3, it's version %d\n", pythonbinary.toStdString().c_str(), vmajor.toInt());
+        // check its Python 3 matching the version used for build
+        if (vmajor.toInt() != 3 || vminor.toInt() != PYTHON3_VERSION) {
+            printd( "%s is not version 3.%d, it's version %d.%d\n", pythonbinary.toStdString().c_str(), PYTHON3_VERSION, vmajor.toInt(), vminor.toInt());
             return false;
         }
 
@@ -277,10 +281,11 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     // if we get here loading failed
     printd("Embedding failed\n");
-    // Don't bug the user -- most of them don't care.
-    //QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed or in path"),
-    //    QObject::tr("Python v3.6 or higher is required for Python.\nPython disabled in preferences."));
-    //msg.exec();
+    // Only inform the user if Python embedding is enabled
+    if (appsettings->value(NULL, GC_EMBED_PYTHON, false).toBool()) {
+        QMessageBox msg(QMessageBox::Information, QObject::tr("Python not installed or in path"), QObject::tr("Python v3.%1 is required for Python embedding.\nPython disabled in preferences.").arg(PYTHON3_VERSION));
+        msg.exec();
+    }
     appsettings->setValue(GC_EMBED_PYTHON, false);
     loaded=false;
     return;
