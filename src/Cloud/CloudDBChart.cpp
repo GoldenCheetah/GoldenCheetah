@@ -840,8 +840,9 @@ CloudDBChartListDialog::addAndCloseClicked() {
         for (int i = 0; i< selected.count(); i++) {
             QTableWidgetItem* s = selected.at(i);
             if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
-#ifdef GC_WANT_R
+#if defined(GC_WANT_R) || defined (GC_WANT_PYTHON)
                 int chartType = g_currentPresets->at(s->row()).gchartType.toInt();
+#ifdef GC_WANT_R
                 if (chartType == GcWindowTypes::RConsole ||
                     chartType == GcWindowTypes::RConsoleSeason ) {
                     if (rtool == NULL) {
@@ -851,6 +852,18 @@ CloudDBChartListDialog::addAndCloseClicked() {
                                                                               is installed and activated to be able to use this chart."));
                     }
                 }
+#endif
+#ifdef GC_WANT_PYTHON
+                if (chartType == GcWindowTypes::Python ||
+                    chartType == GcWindowTypes::PythonSeason ) {
+                    if (rtool == NULL) {
+                        QMessageBox::information(0, tr("Chart requires 'Python'"), tr("The chart your are downloading requires 'Python' to be installed \
+                                                                              and activated for GoldenCheetah to show any graphics. Either 'Python' is not activated \
+                                                                              in the preferences, or not even installed.<br><br> Please ensure 'Python' \
+                                                                              is installed and activated to be able to use this chart."));
+                    }
+                }
+#endif
 #endif
                 g_selected << g_currentPresets->at(s->row()).gchartDef;
 
