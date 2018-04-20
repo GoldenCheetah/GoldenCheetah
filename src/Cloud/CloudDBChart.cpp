@@ -28,6 +28,10 @@
 #include <RTool.h>
 #endif
 
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
+#endif
+
 #include <QtGlobal>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -856,7 +860,7 @@ CloudDBChartListDialog::addAndCloseClicked() {
 #ifdef GC_WANT_PYTHON
                 if (chartType == GcWindowTypes::Python ||
                     chartType == GcWindowTypes::PythonSeason ) {
-                    if (rtool == NULL) {
+                    if (python == NULL) {
                         QMessageBox::information(0, tr("Chart requires 'Python'"), tr("The chart your are downloading requires 'Python' to be installed \
                                                                               and activated for GoldenCheetah to show any graphics. Either 'Python' is not activated \
                                                                               in the preferences, or not even installed.<br><br> Please ensure 'Python' \
