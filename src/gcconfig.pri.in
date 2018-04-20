@@ -24,15 +24,15 @@
 # python3.6-config --libs
 #
 # below 3 lines work well on Linux style OS
-#DEFINES += GC_WANT_PYTHON PYTHON3_VERSION=6
+#DEFINES += GC_WANT_PYTHON
 #PYTHONINCLUDES = -I/usr/include/python3.6
 #PYTHONLIBS = -L/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu -lpython3.6m
 # below 3 lines work well on Windows
-#DEFINES += GC_WANT_PYTHON PYTHON3_VERSION=6
+#DEFINES += GC_WANT_PYTHON
 #PYTHONINCLUDES = -I\"C:\Program Files\Python36\include\"
 #PYTHONLIBS = -L\"C:\Program Files\Python36\libs\" -lpython36
 #Below work ok on MacOS High Sierra
-#DEFINES += GC_WANT_PYTHON PYTHON3_VERSION=6
+#DEFINES += GC_WANT_PYTHON
 #PYTHONINCLUDES = -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m
 #PYTHONLIBS = -L/Library/Frameworks/Python.framework/Versions/3.6/lib -lpython3.6m
 
