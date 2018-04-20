@@ -28,14 +28,15 @@
 #include <QMessageBox>
 #include <QProcess>
 
-#if PYTHON3_VERSION < 5
-#error "PYTHON3_VERSION must specify the python version for this build eg 6"
-#endif
-
 #ifdef slots // clashes with python headers
 #undef slots
 #endif
 #include <Python.h>
+
+// we only really support Python 3, so lets only work on that basis
+#if PY_MAJOR_VERSION >= 3
+#define PYTHON3_VERSION PY_MINOR_VERSION
+#endif
 
 // global instance of embedded python
 PythonEmbed *python;
