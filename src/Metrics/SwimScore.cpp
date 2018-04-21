@@ -387,7 +387,7 @@ class TriScore : public RideMetric {
     void initialize() {
         setName("TriScore");
         setType(RideMetric::Total);
-        setDescription(tr("TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming"));
+        setDescription(tr("TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming. On zero fallback to TRIMP Zonal Points for HR based score."));
     }
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
@@ -402,6 +402,12 @@ class TriScore : public RideMetric {
             score = deps.value("skiba_bike_score")->value(true);
         }
 
+        // On zero fallback to TRIMP Zonal Points for HR based score
+        if (score == 0.0) {
+            assert(deps.contains("trimp_zonal_points"));
+            score = deps.value("trimp_zonal_points")->value(true);
+        }
+
         setValue(score);
     }
     MetricClass classification() const { return Undefined; }
@@ -414,6 +420,7 @@ static bool addTriScore() {
     deps.append("swimscore");
     deps.append("govss");
     deps.append("skiba_bike_score");
+    deps.append("trimp_zonal_points");
     RideMetricFactory::instance().addMetric(TriScore(), &deps);
     return true;
 }
