@@ -1346,7 +1346,7 @@ struct FitFileReaderState
             // s.t. Garmin 910xt
             double secs = time - start_time;
             if ((total_distance == 0.0) && (secs > last_time + 1) &&
-                (isGarminSmartRecording.toInt() != 0) &&
+                //(isGarminSmartRecording.toInt() != 0) && // always do this for swim laps
                 (secs - last_time < 100*GarminHWM.toInt())) {
                 double deltaSecs = secs - last_time;
                 for (int i = 1; i <= deltaSecs; i++) {
@@ -2154,7 +2154,7 @@ struct FitFileReaderState
             if (secs>0) {
                 int idx = rideFile->timeIndex(round(secs));
 
-                if (rideFile->dataPoints().at(idx)->secs==secs)
+                if (idx < 0 || rideFile->dataPoints().at(idx)->secs==secs)
                     rideFile->appendOrUpdatePoint(
                             secs, 0.0, hr.at(i),
                             0.0,
