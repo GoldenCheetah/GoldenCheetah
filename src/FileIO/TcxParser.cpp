@@ -363,8 +363,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             swimXdata->datapoints.append(p);
             lastLength = secs + round(lapSecs);
         }
-        // expand only if Smart Recording is enabled
-        if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
+        // expand even if Smart Recording is not enabled
+        if (swim == Swim && distance == 0) {
             // fill in the pause, partially if too long
             for(int i = 1; i <= round(lapSecs) && i <= 300*GarminHWM.toInt(); i++)
                 rideFile->appendPoint(secs + i,

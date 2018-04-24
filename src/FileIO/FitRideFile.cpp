@@ -1343,10 +1343,9 @@ struct FitFileReaderState
         }
         if (isLapSwim) {
             // Fill empty laps due to false starts or pauses in some devices
-            // s.t. Garmin 910xt
+            // s.t. Garmin 910xt - cap to avoid crashes on bad data
             double secs = time - start_time;
             if ((total_distance == 0.0) && (secs > last_time + 1) &&
-                //(isGarminSmartRecording.toInt() != 0) && // always do this for swim laps
                 (secs - last_time < 100*GarminHWM.toInt())) {
                 double deltaSecs = secs - last_time;
                 for (int i = 1; i <= deltaSecs; i++) {
@@ -1994,7 +1993,7 @@ struct FitFileReaderState
         // only fill 100x the maximal smart recording gap defined
         // in preferences - we don't want to crash / stall on bad
         // or corrupt files
-        if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
+        if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
             double deltaSecs = length_duration;
             double deltaDist = km - last_distance;
             kph = 3600.0 * deltaDist / deltaSecs;
