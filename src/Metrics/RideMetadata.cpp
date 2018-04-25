@@ -731,7 +731,13 @@ FormField::metadataFlush()
             // update metric override QMap!
             QMap<QString,QString> override;
             override.insert("value", text);
-            ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+
+            // check for compatability metrics
+            QString symbol = meta->sp.metricSymbol(definition.name);
+            if (definition.name == "TSS") symbol = "coggan_tss";
+            if (definition.name == "NP") symbol = "coggan_np";
+            if (definition.name == "IF") symbol = "coggan_if";
+            ourRideItem->ride()->metricOverrides.insert(symbol, override);
 
         } else {
 
@@ -980,9 +986,14 @@ FormField::stateChanged(int state)
     // remove from overrides if neccessary
     if (ourRideItem && ourRideItem->ride()) {
 
+        QString symbol = meta->sp.metricSymbol(definition.name);
+        if (definition.name == "TSS") symbol = "coggan_tss";
+        if (definition.name == "NP") symbol = "coggan_np";
+        if (definition.name == "IF") symbol = "coggan_if";
+
         if (state) {
             // setup initial override value
-            QMap<QString,QString> override = ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name));
+            QMap<QString,QString> override = ourRideItem->ride()->metricOverrides.value(symbol);
 
             // clear and reset override value for this metric
             override.insert("value", QString("%1").arg(0.0)); // add metric value
@@ -990,11 +1001,11 @@ FormField::stateChanged(int state)
             if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0));
             else ((QDoubleSpinBox *)widget)->setValue(0.0);
             // update overrides for this metric in the main QMap
-            ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+            ourRideItem->ride()->metricOverrides.insert(symbol, override);
 
-        } else if (ourRideItem->ride()->metricOverrides.contains(meta->sp.metricSymbol(definition.name))) {
+        } else if (ourRideItem->ride()->metricOverrides.contains(symbol)) {
             // remove existing override for this metric
-            ourRideItem->ride()->metricOverrides.remove(meta->sp.metricSymbol(definition.name));
+            ourRideItem->ride()->metricOverrides.remove(symbol);
         }
 
         // rideFile is now dirty!
@@ -1024,9 +1035,15 @@ FormField::metadataChanged()
         else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
             if (meta->sp.isMetric(definition.name)) {
+
+                QString symbol = meta->sp.metricSymbol(definition.name);
+                if (definition.name == "TSS") symbol = "coggan_tss";
+                if (definition.name == "NP") symbol = "coggan_np";
+                if (definition.name == "IF") symbol = "coggan_if";
+
                 //  get from metric overrides
                 const QMap<QString,QString> override =
-                      ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name));
+                      ourRideItem->ride()->metricOverrides.value(symbol);
                 if (override.contains("value")) {
                     enabled->setChecked(true);
                     //widget->setEnabled(true);
