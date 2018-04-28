@@ -1157,7 +1157,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
                         if (col==QColor(Qt::white)) col=QColor(127,127,127);
                         color = col.name();
                     } else
-                        color = ride->color.name();
+                        color = item->color.name();
                     PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
 
                     idx++;
@@ -1197,6 +1197,112 @@ Bindings::seasonIntervals(DateRange range, QString type) const
                         PyList_SET_ITEM(metriclist, index++, PyFloat_FromDouble(interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
                 }
             }
+        }
+
+        // add to the dict
+        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+    }
+
+    return dict;
+}
+
+PyObject*
+Bindings::activityIntervals(QString type, PyObject* activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == NULL) return NULL;
+
+    RideItem* ride = fromDateTime(activity);
+    if (ride == NULL) ride = python->contexts.value(threadid()).item;
+    if (ride == NULL) ride = const_cast<RideItem*>(context->currentRideItem());
+    if (ride == NULL) return NULL;
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    int intervals = 0;
+
+    // how many interval to return in the currently selected RideItem ?
+
+    // we need to count intervals that are of requested type
+    intervals = 0;
+    if (type.isEmpty()) intervals = ride->intervals().count();
+    else foreach(IntervalItem *item, ride->intervals()) if (type == RideFileInterval::typeDescription(item->type)) intervals++;
+
+    PyObject* dict = PyDict_New();
+    if (dict == NULL) return dict;
+
+    //
+    // Start, Stop, Name Type and Color
+    //
+    if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
+
+    PyObject* startlist = PyList_New(intervals);
+    PyObject* stoplist = PyList_New(intervals);
+    PyObject* namelist = PyList_New(intervals);
+    PyObject* typelist = PyList_New(intervals);
+    PyObject* colorlist = PyList_New(intervals);
+    PyObject* selectedlist = PyList_New(intervals);
+
+    int idx=0;
+    foreach(IntervalItem *item, ride->intervals())
+        if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type)) {
+
+            // START
+            PyList_SET_ITEM(startlist, idx, PyLong_FromLong(item->start));
+
+            // STOP
+            PyList_SET_ITEM(stoplist, idx, PyLong_FromLong(item->stop));
+
+            // NAME
+            PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
+
+            // TYPE
+            PyList_SET_ITEM(typelist, idx, PyUnicode_FromString(RideFileInterval::typeDescription(item->type).toUtf8().constData()));
+
+            // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+            QString color;
+            if (item->color == QColor(1,1,1,1)) {
+                // use the inverted color, not plot marker as that hideous
+                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                // white is jarring on a dark background!
+                if (col==QColor(Qt::white)) col=QColor(127,127,127);
+                color = col.name();
+            } else
+                color = item->color.name();
+            PyList_SET_ITEM(colorlist, idx, PyUnicode_FromString(color.toUtf8().constData()));
+
+            // SELECTED
+            PyList_SET_ITEM(selectedlist, idx, PyBool_FromLong(item->selected));
+
+            idx++;
+        }
+
+    PyDict_SetItemString(dict, "start", startlist);
+    PyDict_SetItemString(dict, "stop", stoplist);
+    PyDict_SetItemString(dict, "name", namelist);
+    PyDict_SetItemString(dict, "type", typelist);
+    PyDict_SetItemString(dict, "color", colorlist);
+    PyDict_SetItemString(dict, "selected", selectedlist);
+
+    //
+    // METRICS
+    //
+    for(int i=0; i<factory.metricCount();i++) {
+
+        // set a list of metric values
+        PyObject* metriclist = PyList_New(intervals);
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        bool useMetricUnits = context->athlete->useMetricUnits;
+
+        int index=0;
+        foreach(IntervalItem *item, ride->intervals()) {
+            if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type))
+                PyList_SET_ITEM(metriclist, index++, PyFloat_FromDouble(item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum())));
         }
 
         // add to the dict

@@ -142,7 +142,6 @@ public:
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;
     PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
-    PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
     PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) /TransferBack/;
     PyObject* seasonPmc(bool all=false, QString metric=QString("BikeStress")) /TransferBack/;
     PyObject* seasonMeasures(bool all=false, QString group=QString("Body")) /TransferBack/;
@@ -151,5 +150,9 @@ public:
     PyObject* activityMeanmax(bool compare=false) /TransferBack/;
     PyObject* seasonMeanmax(bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
     PyObject* seasonPeaks(QString series, int duration, bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
+
+    // working with intervals
+    PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
+    PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) /TransferBAck/;
 };
 

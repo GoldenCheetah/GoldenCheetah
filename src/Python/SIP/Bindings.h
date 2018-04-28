@@ -51,7 +51,6 @@ class Bindings {
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
         PyObject* seasonMetrics(bool all=false, QString filter=QString(), bool compare=false) const;
-        PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
         PythonDataSeries *metrics(QString metric, bool all=false, QString filter=QString()) const;
         PyObject* seasonPmc(bool all=false, QString metric=QString("TSS")) const;
         PyObject* seasonMeasures(bool all=false, QString group=QString("Body")) const;
@@ -61,6 +60,10 @@ class Bindings {
         PyObject* seasonMeanmax(bool all=false, QString filter=QString(), bool compare=false) const;
         PyObject* seasonPeaks(QString series, int duration, bool all=false, QString filter=QString(), bool compare=false) const;
 
+        // working with intervals
+        PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
+        PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) const;
+
     private:
         // find a RideItem by DateTime
         RideItem* fromDateTime(PyObject* activity=NULL) const;
@@ -69,6 +72,7 @@ class Bindings {
         PyObject* activityMetrics(RideItem* item) const;
         PyObject* seasonMetrics(bool all, DateRange range, QString filter) const;
         PyObject* seasonIntervals(DateRange range, QString type) const;
+
         // get a dict populated with meanmax data
         PyObject* activityMeanmax(const RideItem* item) const;
         PyObject* seasonMeanmax(bool all, DateRange range, QString filter) const;
