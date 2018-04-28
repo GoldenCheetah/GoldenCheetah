@@ -837,7 +837,7 @@ Leaf::toString()
                         .arg(fparms[0]->toString())
                         .arg(fparms[1]->toString());
 
-    case Leaf::Conditional : qDebug()<<"cond:"<<op;
+    case Leaf::Conditional : //qDebug()<<"cond:"<<op;
         {
                     if (rvalue.l) {
                         return QString("%1?%2:%3")
