@@ -106,6 +106,16 @@ void RealtimeData::setDistance(double x)
     this->distance = x;
 }
 
+void RealtimeData::setLapDistance(double x)
+{
+    this->lapDistance = x;
+}
+
+void RealtimeData::setLapDistanceRemaining(double x)
+{
+    this->lapDistanceRemaining = x;
+}
+
 void RealtimeData::setLRBalance(double x)
 {
     this->lrbalance = x;
@@ -193,6 +203,14 @@ long RealtimeData::getLapMsecs() const
 double RealtimeData::getDistance() const
 {
     return distance;
+}
+double RealtimeData::getLapDistance() const
+{
+    return lapDistance;
+}
+double RealtimeData::getLapDistanceRemaining() const
+{
+    return lapDistanceRemaining;
 }
 double RealtimeData::getLRBalance() const
 {
@@ -296,6 +314,12 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case Distance: return distance;
+        break;
+
+    case LapDistance: return lapDistance;
+        break;
+
+    case LapDistanceRemaining: return lapDistanceRemaining;
         break;
 
     case AltWatts: return altWatts;
@@ -406,6 +430,8 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << LeftPedalSmoothness;
         seriesList << RightPedalSmoothness;
         seriesList << Slope;
+        seriesList << LapDistance;
+        seriesList << LapDistanceRemaining;
     }
     return seriesList;
 }
@@ -536,6 +562,12 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Slope: return tr("Slope");
+        break;
+
+    case LapDistance: return tr("Lap Distance");
+        break;
+
+    case LapDistanceRemaining: return tr("Lap Distance Remaining");
         break;
     }
 }

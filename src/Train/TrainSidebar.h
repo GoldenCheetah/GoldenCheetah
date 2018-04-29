@@ -247,12 +247,16 @@ class TrainSidebar : public GcWindow
         double displayLRBalance, displayLTE, displayRTE, displayLPS, displayRPS;
         double displaySMO2, displayTHB, displayO2HB, displayHHB;
         double displayDistance, displayWorkoutDistance;
+        double displayLapDistance, displayLapDistanceRemaining;
         long load;
         double slope;
         int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
         bool lapAudioEnabled;
         bool lapAudioThisLap;
+
+        void updateMetricLapDistance();
+        void updateMetricLapDistanceRemaining();
 
         // for non-zero average calcs
         int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc

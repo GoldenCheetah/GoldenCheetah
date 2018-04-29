@@ -43,7 +43,8 @@ public:
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
                       LeftTorqueEffectiveness, RightTorqueEffectiveness,
-                      LeftPedalSmoothness, RightPedalSmoothness, Slope};
+                      LeftPedalSmoothness, RightPedalSmoothness, Slope, 
+                      LapDistance, LapDistanceRemaining };
 
     typedef enum dataseries DataSeries;
 
@@ -75,6 +76,8 @@ public:
     void setJoules(long);
     void setXPower(long);
     void setLap(long);
+    void setLapDistance(double distance);
+    void setLapDistanceRemaining(double distance);
     void setLRBalance(double);
     void setLTE(double);
     void setRTE(double);
@@ -107,6 +110,8 @@ public:
     long getLapMsecs() const;
     double getDistance() const;
     long getLap() const;
+    double getLapDistance() const;
+    double getLapDistanceRemaining() const;
     double getLRBalance() const;
     double getLTE() const;
     double getRTE() const;
@@ -141,6 +146,8 @@ private:
 
     // derived data
     double distance;
+    double lapDistance;
+    double lapDistanceRemaining;
     double virtualSpeed;
     double wbal;
     double hhb, o2hb;
