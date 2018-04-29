@@ -2,7 +2,7 @@
 
 #### **Do you have questions about how to use GoldenCheetah?**
 
-* Ask any question about how to use GoldenCheetah on [golden-cheetah-users mailing list](https://github.com/GoldenCheetah/GoldenCheetah/wiki), ideally after watching the corresponding [tutorials](http://www.goldencheetah.org/#section-tutorials) and/or reading the relevant parts of the [documentation](https://github.com/GoldenCheetah/GoldenCheetah/wiki).
+* Ask any question about how to use GoldenCheetah on [golden-cheetah-users mailing list](https://groups.google.com/forum/#!forum/golden-cheetah-users), ideally after watching the corresponding [tutorials](https://www.goldencheetah.org/#section-tutorials) and/or reading the relevant parts of the [documentation](https://github.com/GoldenCheetah/GoldenCheetah/wiki).
 
 #### **Do you have questions about the source code?**
 
