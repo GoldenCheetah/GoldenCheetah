@@ -553,14 +553,23 @@ void ErgFile::parseComputrainer(QString p)
     if (section == END && Points.count() > 0) {
         valid = true;
 
-        // add the last point for a crs file
         if (mode == CRS) {
+            // Add the last point for a crs file
             ErgFilePoint add;
             add.x = rdist;
             add.val = 0.0;
             add.y = ralt;
             Points.append(add);
             if (add.y > MaxWatts) MaxWatts=add.y;
+
+            // Add a final meta-lap at the end - causes the system to correctly mark off laps.
+            // An improvement would be to check for a lap marker at end, and only add this if required.
+            ErgFileLap lap;
+            lap.x = rdist;
+            lap.LapNum = ++lapcounter;
+            lap.selected = false;
+            lap.name = lapmarker.cap(2).simplified();
+            Laps.append(lap);
         }
 
         // add a start point if it doesn't exist
@@ -1014,17 +1023,36 @@ ErgFile::gradientAt(long x, int &lapnum)
     return Points.at(leftPoint).val;
 }
 
+// Retrieve the offset for the start of next lap.
+// Params: x - current workout distance (m) / time (ms)
+// Returns: distance (m) / time (ms) offset for next lap.
 int ErgFile::nextLap(long x)
 {
     if (!isValid()) return -1; // not a valid ergfile
 
     // do we need to return the Lap marker?
     if (Laps.count() > 0) {
+        // If the current position is before the start the lap, then the lap is next
         for (int i=0; i<Laps.count(); i++) {
             if (x<Laps.at(i).x) return Laps.at(i).x;
         }
     }
     return -1; // nope, no marker ahead of there
+}
+
+// Retrieve the offset for the start of current lap.
+// Params: x - current workout distance (m) / time (ms)
+// Returns: distance (m) / time (ms) offset for start of current lap.
+int
+ErgFile::currentLap(long x)
+{
+    if (!isValid()) return -1; // not a valid ergfile
+
+    // If the current position is before the start of the next lap, return this lap
+    for (int i=0; i<Laps.count() - 1; i++) {
+        if (x<Laps.at(i+1).x) return Laps.at(i).x;
+    }
+    return -1; // No matching lap
 }
 
 void

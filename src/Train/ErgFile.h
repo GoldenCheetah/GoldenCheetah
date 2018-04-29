@@ -112,7 +112,9 @@ class ErgFile
         int format;             // ERG, CRS or MRC currently supported
         int wattsAt(long, int&);      // return the watts value for the passed msec
         double gradientAt(long, int&);      // return the gradient value for the passed meter
-        int nextLap(long);      // return the msecs value for the next Lap marker
+
+        int nextLap(long);      // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
+        int currentLap(long);   // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
 
         // turn the ergfile into a series of sections rather
         // than a list of points

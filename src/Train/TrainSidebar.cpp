@@ -812,9 +812,65 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
     }
 
+    updateMetricLapDistanceRemaining();
+
     // clean last
     if (prior) delete prior;
 
+}
+
+/*
+ * Calculates the current lap distance
+ *
+ * Needs to be called as the lapping occurs, otherwise you get
+ * skew due to inaccuracies in lap calculations.
+ */
+void
+TrainSidebar::updateMetricLapDistance()
+{
+    // lapDistance is only relevant for SLOPE ERG files
+    if (!ergFile || !(status&RT_MODE_SLOPE)) {
+        displayLapDistance = 0;
+        return;
+    }
+
+    // XXX This might have sub-optimal display in the final lap of a file.
+    double currentposition = displayWorkoutDistance*1000;
+    double lapmarker = ergFile->currentLap(currentposition);
+    if (lapmarker == -1) {
+        displayLapDistance = 0;
+        return;
+    } 
+
+    displayLapDistance = (currentposition - lapmarker) / (double) 1000;
+}
+
+/*
+ * Calculates the lap distance remaining in the current lap.
+ *
+ * Can be called at any time, but better to just decrement the displayLapDistanceRemaining
+ * variable as the workout progresses.
+ */
+void
+TrainSidebar::updateMetricLapDistanceRemaining()
+{
+    // lapDistanceRemaining is only relevant for SLOPE ERG files
+    if (!ergFile || !(status&RT_MODE_SLOPE)) {
+        displayLapDistanceRemaining = -1;
+        return;
+    }
+
+    // Review what happens when we are at the end of the course and there are no more lap markers.
+    // perhaps we should look at course length.
+    double currentposition = displayWorkoutDistance*1000;
+    double lapmarker = ergFile->nextLap(currentposition);
+    if (lapmarker == -1) {
+        // In this case, there are either no lap markers, or we are in last lap (and so no next lap)
+        displayLapDistanceRemaining = -1;
+        return;
+    } 
+
+    displayLapDistanceRemaining = (lapmarker - currentposition) / (double) 1000;
 }
 
 QStringList
@@ -1352,6 +1408,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     lap_elapsed_msec = 0;
     lap_time.restart();
     displayWorkoutDistance = displayDistance = 0;
+    displayLapDistance = 0;
+    displayLapDistanceRemaining = -1;
     guiUpdate();
 
     emit setNotification(tr("Stopped.."), 2);
@@ -1556,6 +1614,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (dev == kphTelemetry) {
                     rtData.setSpeed(local.getSpeed());
                     rtData.setDistance(local.getDistance());
+                    rtData.setLapDistance(local.getLapDistance());
+                    rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
                 }
                 if (dev == wattsTelemetry) {
                     rtData.setWatts(local.getWatts());
@@ -1580,16 +1640,29 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             // only update time & distance if actively running (not just connected, and not running but paused)
             if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
                 // Distance assumes current speed for the last second. from km/h to km/sec
-                displayDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+                double distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+                displayDistance += distanceTick;
+                displayLapDistance += distanceTick;
+                displayLapDistanceRemaining -= distanceTick;
 
-                if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
-                {
+
+                if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile())) {
                     displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
                     // TODO : graphs to be shown at seek position
+                } else {
+                    displayWorkoutDistance += distanceTick;
                 }
-                else
-                    displayWorkoutDistance += displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+
+                // If we just tripped over the end of the lap, we need to look at base data
+                // to find distance to next lap. This is primarily due to lap display updates
+                // -0.999 is chosen as a number that is less than 0, but greater than -1
+                if (displayLapDistanceRemaining < 0 && displayLapDistanceRemaining > -0.999) {
+                    updateMetricLapDistanceRemaining();
+                }
+
                 rtData.setDistance(displayDistance);
+                rtData.setLapDistance(displayLapDistance);
+                rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
@@ -1632,6 +1705,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapMsecsRemaining(lapTimeRemaining);
             } else {
                 rtData.setDistance(displayDistance);
+                rtData.setLapDistance(displayLapDistance);
+                rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
                 rtData.setMsecs(session_elapsed_msec);
                 rtData.setLapMsecs(lap_elapsed_msec);
             }
@@ -1737,6 +1812,10 @@ void TrainSidebar::newLap()
         hrcount   = 0;
         spdcount  = 0;
 
+        // This forces a hard reset of the lap marker.
+        displayLapDistance = 0;
+        updateMetricLapDistanceRemaining();
+
         context->notifyNewLap();
 
         emit setNotification(tr("New lap.."), 2);
@@ -1748,6 +1827,8 @@ void TrainSidebar::resetLapTimer()
     lap_time.restart();
     lap_elapsed_msec = 0;
     lapAudioThisLap = true;
+    displayLapDistance = 0;
+    this->updateMetricLapDistanceRemaining();
 }
 
 // Can be called from the controller - when user steers to scroll display
@@ -1836,6 +1917,8 @@ void TrainSidebar::loadUpdate()
         if(displayWorkoutLap != curLap)
         {
             context->notifyNewLap();
+            updateMetricLapDistance();
+            updateMetricLapDistanceRemaining();
         }
         displayWorkoutLap = curLap;
 
@@ -1852,6 +1935,8 @@ void TrainSidebar::loadUpdate()
         if(displayWorkoutLap != curLap)
         {
             context->notifyNewLap();
+            updateMetricLapDistance();
+            updateMetricLapDistanceRemaining();
         }
         displayWorkoutLap = curLap;
 

@@ -241,7 +241,16 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
+    // If the distance remaining is negative, it is either irrelevant, or we've passed the last lap marker
+    case RealtimeData::LapDistanceRemaining:
+        if (value < 0) {
+            valueLabel->setText("N/A");
+            break;
+        }
+        // intentional fall-through to standard distance rendering
+
     case RealtimeData::Distance:
+    case RealtimeData::LapDistance:
         if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
@@ -543,6 +552,8 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTime:
     case RealtimeData::LapTimeRemaining:
     case RealtimeData::Distance:
+    case RealtimeData::LapDistance:
+    case RealtimeData::LapDistanceRemaining:
     case RealtimeData::LRBalance:
     case RealtimeData::Lap:
     case RealtimeData::RI:
