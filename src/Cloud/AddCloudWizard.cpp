@@ -351,6 +351,10 @@ AddAuth::doAuth()
                     message->show();
                     wizard->cloudService->message = "";
                 }
+
+                // Due to the OAuth dialog being modal, the order of the background windows can get out of order
+                // This ensures the wizard is back on top
+                wizard->raise();
             }
         }
     }
