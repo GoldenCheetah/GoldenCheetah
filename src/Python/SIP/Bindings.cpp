@@ -1138,8 +1138,8 @@ Bindings::seasonIntervals(DateRange range, QString type) const
                     QDate d = ride->dateTime.date();
                     PyList_SET_ITEM(datelist, idx, PyDate_FromDate(d.year(), d.month(), d.day()));
 
-                    // TIME
-                    QTime t = ride->dateTime.time();
+                    // TIME - time offsets by time of interval
+                    QTime t = ride->dateTime.time().addSecs(item->start);
                     PyList_SET_ITEM(timelist, idx, PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
                     // NAME
