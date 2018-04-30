@@ -1247,10 +1247,10 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
         if (type.isEmpty() || type == RideFileInterval::typeDescription(item->type)) {
 
             // START
-            PyList_SET_ITEM(startlist, idx, PyLong_FromLong(item->start));
+            PyList_SET_ITEM(startlist, idx, PyFloat_FromDouble(item->start));
 
             // STOP
-            PyList_SET_ITEM(stoplist, idx, PyLong_FromLong(item->stop));
+            PyList_SET_ITEM(stoplist, idx, PyFloat_FromDouble(item->stop));
 
             // NAME
             PyList_SET_ITEM(namelist, idx, PyUnicode_FromString(item->name.toUtf8().constData()));
