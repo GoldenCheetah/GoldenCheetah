@@ -123,6 +123,7 @@ RTool::RTool()
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0 },
+            { "GC.activity.intervals", (DL_FUNC) &RTool::activityIntervals, 0,0 },
             { "GC.season", (DL_FUNC) &RTool::season, 0,0 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0 },
             { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0,0 },
@@ -145,6 +146,7 @@ RTool::RTool()
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0,0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0,0 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0,0 },
+            { "GC.activity.intervals", (DL_FUNC) &RTool::activityIntervals, 0,0,0 },
             { "GC.season", (DL_FUNC) &RTool::season, 0,0,0 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0,0 },
             { "GC.season.intervals", (DL_FUNC) &RTool::seasonIntervals, 0,0,0 },
@@ -172,6 +174,8 @@ RTool::RTool()
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
+            // type=any, datetime=0
+            { "GC.activity.intervals", (DL_FUNC) &RTool::activityIntervals, 2 },
 
             // all=FALSE, compare=FALSE
             { "GC.season", (DL_FUNC) &RTool::season, 2 },
@@ -261,6 +265,7 @@ RTool::RTool()
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
+                               "GC.activity.intervals <- function(type=NULL, activity=0) { .Call(\"GC.activity.intervals\", type, activity) }\n"
 
                                // season
                                "GC.season <- function(all=FALSE, compare=FALSE) { .Call(\"GC.season\", all, compare) }\n"
@@ -1561,7 +1566,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
                 SET_STRING_ELT(color, index++, Rf_mkChar(col.name().toLatin1().constData()));
             } else
-                SET_STRING_ELT(color, index++, Rf_mkChar(item->color.name().toLatin1().constData()));
+                SET_STRING_ELT(color, index++, Rf_mkChar(interval->color.name().toLatin1().constData()));
         }
     }
 
@@ -1800,6 +1805,200 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
 
     // fail
     return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::activityIntervals(SEXP pTypes, SEXP datetime)
+{
+    // p1 - type of intervals to get (vector of strings)
+    // p2 - activity (datetime)
+    pTypes = Rf_coerceVector(pTypes, STRSXP);
+    QStringList types;
+    for(int i=0; i<Rf_length(pTypes); i++)
+        types << QString(CHAR(STRING_ELT(pTypes,i)));
+
+    // get an activity to process
+    RideItem* ride;
+    QList<RideItem*>activities = rtool->activitiesFor(datetime);
+    if (activities.count()) ride = activities[0];
+    else ride = const_cast<RideItem*>(rtool->context->currentRideItem());
+
+    // if no current ride or more than one activity requested, nothing to return
+    if (ride == NULL || activities.count() > 1) return Rf_allocVector(INTSXP, 0);
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    int intervals = 0;
+    int metrics = factory.metricCount();
+
+    // we need to count intervals that are in range...
+    if (types.isEmpty()) intervals = ride->intervals().count();
+    else {
+        foreach(IntervalItem *item, ride->intervals())
+            if (types.contains(RideFileInterval::typeDescription(item->type)))
+                intervals++;
+    }
+
+    // get a listAllocated
+    SEXP ans;
+    SEXP names; // column names
+    SEXP rownames; // row names (numeric)
+
+    // +6 is for start and stop, name, type, color and selected
+    PROTECT(ans=Rf_allocVector(VECSXP, metrics+6));
+    PROTECT(names = Rf_allocVector(STRSXP, metrics+6));
+
+    // we have to give a name to each row
+    PROTECT(rownames = Rf_allocVector(STRSXP, intervals));
+    for(int i=0; i<intervals; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
+    // next name
+    int next=0;
+
+    // START
+    SEXP start;
+    PROTECT(start=Rf_allocVector(REALSXP, intervals));
+
+    int k=0;
+    foreach(IntervalItem *item, ride->intervals())
+        if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+            REAL(start)[k++] = item->start;
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, start);
+    SET_STRING_ELT(names, next++, Rf_mkChar("start"));
+
+    // STOP
+    SEXP stop;
+    PROTECT(stop=Rf_allocVector(REALSXP, intervals));
+
+    k=0;
+    foreach(IntervalItem *item, ride->intervals())
+        if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+            REAL(stop)[k++] = item->stop;
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, stop);
+    SET_STRING_ELT(names, next++, Rf_mkChar("stop"));
+
+    // NAME
+    SEXP intervalnames;
+    PROTECT(intervalnames = Rf_allocVector(STRSXP, intervals));
+    k=0;
+    foreach(IntervalItem *item, ride->intervals())
+        if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+            SET_STRING_ELT(intervalnames, k++, Rf_mkChar(item->name.toLatin1().constData()));
+
+    // add to the list and give a columnname
+    SET_VECTOR_ELT(ans, next, intervalnames);
+    SET_STRING_ELT(names, next, Rf_mkChar("name"));
+    next++;
+
+    // TYPE
+    SEXP intervaltypes;
+    PROTECT(intervaltypes = Rf_allocVector(STRSXP, intervals));
+    k=0;
+    foreach(IntervalItem *item, ride->intervals())
+        if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+            SET_STRING_ELT(intervaltypes, k++, Rf_mkChar(RideFileInterval::typeDescription(item->type).toLatin1().constData()));
+    SET_VECTOR_ELT(ans, next, intervaltypes);
+    SET_STRING_ELT(names, next, Rf_mkChar("type"));
+    next++;
+
+    // SELECTED
+    SEXP selected;
+    PROTECT(selected=Rf_allocVector(LGLSXP, intervals));
+
+    k=0;
+    foreach(IntervalItem *item, ride->intervals())
+        if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
+            LOGICAL(selected)[k++] = item->selected;
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, selected);
+    SET_STRING_ELT(names, next++, Rf_mkChar("selected"));
+
+    // start + stop + name + type + selected, but not ans!
+    UNPROTECT(5);
+
+    //
+    // METRICS
+    //
+    for(int i=0; i<factory.metricCount();i++) {
+
+        // set a vector
+        SEXP m;
+        PROTECT(m=Rf_allocVector(REALSXP, intervals));
+
+        QString symbol = factory.metricName(i);
+        const RideMetric *metric = factory.rideMetric(symbol);
+        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        name = name.replace(" ","_");
+        name = name.replace("'","_");
+
+        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+
+        int index=0;
+        foreach(IntervalItem *interval, ride->intervals()) {
+            if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(interval->type)))
+                REAL(m)[index++] = interval->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion())
+                                                  + (useMetricUnits ? 0.0f : metric->conversionSum());
+        }
+
+        // add to the list
+        SET_VECTOR_ELT(ans, next, m);
+
+        // give it a name
+        SET_STRING_ELT(names, next, Rf_mkChar(name.toLatin1().constData()));
+
+        next++;
+
+        // vector
+        UNPROTECT(1);
+    }
+
+    // add Color
+    SEXP color;
+    PROTECT(color=Rf_allocVector(STRSXP, intervals));
+
+    int index=0;
+    foreach(IntervalItem *interval, ride->intervals()) {
+
+        if (!types.isEmpty() && !types.contains(RideFileInterval::typeDescription(interval->type))) continue;
+
+        // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+        if (interval->color == QColor(1,1,1,1)) {
+
+            // use the inverted color, not plot marker as that hideous
+            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+
+            // white is jarring on a dark background!
+            if (col==QColor(Qt::white)) col=QColor(127,127,127);
+
+            SET_STRING_ELT(color, index++, Rf_mkChar(col.name().toLatin1().constData()));
+        } else
+            SET_STRING_ELT(color, index++, Rf_mkChar(interval->color.name().toLatin1().constData()));
+    }
+
+    // add to the list and name it
+    SET_VECTOR_ELT(ans, next, color);
+    SET_STRING_ELT(names, next, Rf_mkChar("color"));
+    next++;
+
+    UNPROTECT(1);
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+    Rf_namesgets(ans, names);
+
+    // ans + names
+    UNPROTECT(3);
+
+    // return it
+    return ans;
 }
 
 SEXP

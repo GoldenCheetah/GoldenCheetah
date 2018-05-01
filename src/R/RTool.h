@@ -57,6 +57,7 @@ class RTool {
         static SEXP activityMeanmax(SEXP compare);
         static SEXP activityWBal(SEXP compare);
         static SEXP activityMetrics(SEXP compare);
+        static SEXP activityIntervals(SEXP type, SEXP datetime);
 
         // seasons
         static SEXP season(SEXP all, SEXP compare);
