@@ -352,6 +352,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(runScript()));
 
+            // refresh when intervals changed / selected
+            connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
+            connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
+
         } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
 
