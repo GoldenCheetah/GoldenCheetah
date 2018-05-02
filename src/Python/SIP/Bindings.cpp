@@ -640,7 +640,7 @@ Bindings::activityXdata(QString name, QString series, QString join, PyObject* ac
     if (!f->xdata().contains(name)) return NULL; // No such XData series
     XDataSeries *xds = f->xdata()[name];
 
-    if (!xds->valuename.contains(series)) return NULL; // No shuch XData name
+    if (!xds->valuename.contains(series)) return NULL; // No such XData name
 
     // count the included points, create data series output and copy data
     int pCount = 0;
@@ -653,6 +653,56 @@ Bindings::activityXdata(QString name, QString series, QString join, PyObject* ac
         struct RideFilePoint *point = it.next();
         double val = f->xdataValue(point, idx, name, series, xjoin);
         ds->data[i] = (val == RideFile::NA) ? sqrt(-1) : val; // NA => NaN
+    }
+
+    return ds;
+}
+
+// get the xdata series for the currently selected ride, without interpolation
+PythonDataSeries*
+Bindings::activityXdataSeries(QString name, QString series, PyObject* activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == NULL) return NULL;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return NULL;
+
+    RideFile* f = item->ride();
+    if (f == NULL) return NULL;
+
+    if (!f->xdata().contains(name)) return NULL; // No such XData series
+    XDataSeries *xds = f->xdata()[name];
+
+    int valueIdx = -1;
+    if (xds->valuename.contains(series))
+        valueIdx = xds->valuename.indexOf(series);
+    else if (series != "secs" && series != "km")
+        return NULL; // No such XData name
+
+    // count the included points, create data series output and copy data
+    Specification spec(python->contexts.value(threadid()).spec);
+    IntervalItem* it = spec.interval();
+    int pCount = 0;
+    foreach(XDataPoint* p, xds->datapoints) {
+        if (it && p->secs < it->start) continue;
+        if (it && p->secs > it->stop) break;
+        pCount++;
+    }
+
+    PythonDataSeries* ds = new PythonDataSeries(name, pCount);
+
+    int idx = 0;
+    foreach(XDataPoint* p, xds->datapoints) {
+        if (it && p->secs < it->start) continue;
+        if (it && p->secs > it->stop) break;
+        double val = sqrt(-1); // NA => NaN
+        if (valueIdx >= 0) val = p->number[valueIdx];
+        else if (series == "secs") val = p->secs;
+        else if (series == "km") val = p->km;
+        ds->data[idx++] = val;
     }
 
     return ds;
