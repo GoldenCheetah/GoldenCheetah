@@ -708,6 +708,35 @@ Bindings::activityXdataSeries(QString name, QString series, PyObject* activity) 
     return ds;
 }
 
+PyObject*
+Bindings::activityXdataNames(QString name, PyObject* activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == NULL) return NULL;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return NULL;
+
+    RideFile* f = item->ride();
+    if (f == NULL) return NULL;
+
+    QStringList namelist;
+    if (name.isEmpty())
+        namelist = f->xdata().keys();
+    else if (f->xdata().contains(name))
+        namelist = f->xdata()[name]->valuename;
+    else
+        return NULL; // No such XData series
+
+    PyObject* list = PyList_New(namelist.size());
+    for (int i = 0; i < namelist.size(); i++)
+        PyList_SET_ITEM(list, i, PyUnicode_FromString(namelist.at(i).toUtf8().constData()));
+
+    return list;
+}
+
 int
 Bindings::seriesLast() const
 {

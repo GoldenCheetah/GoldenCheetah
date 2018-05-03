@@ -16,6 +16,7 @@
 /* Define the strings used by this module. */
 const char sipStrings_goldencheetah[] = {
     'a', 'c', 't', 'i', 'v', 'i', 't', 'y', 'X', 'd', 'a', 't', 'a', 'S', 'e', 'r', 'i', 'e', 's', 0,
+    'a', 'c', 't', 'i', 'v', 'i', 't', 'y', 'X', 'd', 'a', 't', 'a', 'N', 'a', 'm', 'e', 's', 0,
     'a', 'c', 't', 'i', 'v', 'i', 't', 'y', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 's', 0,
     'P', 'y', 't', 'h', 'o', 'n', 'D', 'a', 't', 'a', 'S', 'e', 'r', 'i', 'e', 's', 0,
     's', 'e', 'a', 's', 'o', 'n', 'I', 'n', 't', 'e', 'r', 'v', 'a', 'l', 's', 0,

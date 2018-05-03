@@ -509,6 +509,41 @@ static PyObject *meth_Bindings_activityXdataSeries(PyObject *sipSelf, PyObject *
 }
 
 
+extern "C" {static PyObject *meth_Bindings_activityXdataNames(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_activityXdataNames(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString a0def = QString();
+         ::QString* a0 = &a0def;
+        int a0State = 0;
+        PyObject * a1 = 0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_name,
+            sipName_activity,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|J1P0", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1))
+        {
+            PyObject * sipRes;
+
+            sipRes = sipCpp->activityXdataNames(*a0,a1);
+            sipReleaseType(a0,sipType_QString,a0State);
+
+            return sipRes;
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_activityXdataNames, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_activityMetrics(PyObject *, PyObject *, PyObject *);}
 static PyObject *meth_Bindings_activityMetrics(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
@@ -940,6 +975,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_activityMetrics), (PyCFunction)meth_Bindings_activityMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityWbal), (PyCFunction)meth_Bindings_activityWbal, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityXdata), (PyCFunction)meth_Bindings_activityXdata, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_activityXdataNames), (PyCFunction)meth_Bindings_activityXdataNames, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityXdataSeries), (PyCFunction)meth_Bindings_activityXdataSeries, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athleteZones), (PyCFunction)meth_Bindings_athleteZones, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -976,7 +1012,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        26, methods_Bindings,
+        27, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
