@@ -123,6 +123,7 @@ RTool::RTool()
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0 },
+            { "GC.activity.xdata", (DL_FUNC) &RTool::activityXData, 0,0 },
             { "GC.activity.intervals", (DL_FUNC) &RTool::activityIntervals, 0,0 },
             { "GC.season", (DL_FUNC) &RTool::season, 0,0 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0 },
@@ -146,6 +147,7 @@ RTool::RTool()
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0,0 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 0,0,0 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 0,0,0 },
+            { "GC.activity.xdata", (DL_FUNC) &RTool::activityXData, 0,0,0 },
             { "GC.activity.intervals", (DL_FUNC) &RTool::activityIntervals, 0,0,0 },
             { "GC.season", (DL_FUNC) &RTool::season, 0,0,0 },
             { "GC.season.metrics", (DL_FUNC) &RTool::metrics, 0,0,0 },
@@ -174,6 +176,8 @@ RTool::RTool()
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 1 },
             { "GC.activity.meanmax", (DL_FUNC) &RTool::activityMeanmax, 1 },
             { "GC.activity.wbal", (DL_FUNC) &RTool::activityWBal, 1 },
+            // name="", compare=FALSE
+            { "GC.activity.xdata", (DL_FUNC) &RTool::activityXData, 2 },
             // type=any, datetime=0
             { "GC.activity.intervals", (DL_FUNC) &RTool::activityIntervals, 2 },
 
@@ -265,6 +269,7 @@ RTool::RTool()
                                "GC.activity.metrics <- function(compare=FALSE) { .Call(\"GC.activity.metrics\", compare) }\n"
                                "GC.activity.meanmax <- function(compare=FALSE) { .Call(\"GC.activity.meanmax\", compare) }\n"
                                "GC.activity.wbal <- function(compare=FALSE) { .Call(\"GC.activity.wbal\", compare) }\n"
+                               "GC.activity.xdata <- function(name=\"\", compare=FALSE) { .Call(\"GC.activity.xdata\", name, compare) }\n"
                                "GC.activity.intervals <- function(type=NULL, activity=0) { .Call(\"GC.activity.intervals\", type, activity) }\n"
 
                                // season
@@ -3320,7 +3325,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
     pAll = Rf_coerceVector(pAll, LGLSXP);
     bool all = LOGICAL(pAll)[0];
 
-    // p2 - all=TRUE|FALSE - return list of compares (or current if not active)
+    // p2 - metric="BikeStress" - base stress metric
     pMetric = Rf_coerceVector(pMetric, STRSXP);
     QString metric (CHAR(STRING_ELT(pMetric,0)));
 
@@ -3710,4 +3715,247 @@ RTool::dfForActivityWBal(RideFile*f)
 
     // nothing to return
     return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::activityXData(SEXP pName, SEXP pCompare)
+{
+    SEXP ans=NULL;
+
+    // p1 - compare=TRUE|FALSE - return list of compare rides if active, or just current
+    pCompare = Rf_coerceVector(pCompare, LGLSXP);
+    bool compare = LOGICAL(pCompare)[0];
+
+    // p2 - name="" - XData series name
+    pName = Rf_coerceVector(pName, STRSXP);
+    QString name (CHAR(STRING_ELT(pName,0)));
+
+    // return a list
+    if (compare && rtool->context) {
+
+
+        if (rtool->context->isCompareIntervals) {
+
+            // how many to return?
+            int count=0;
+            foreach(CompareInterval p, rtool->context->compareIntervals) if (p.isChecked()) count++;
+
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, count));
+            int lindex=0;
+
+            // a named list with data.frame 'activity' and color 'color'
+            SEXP namedlist;
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("activity"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // create a data.frame for each and add to list
+            foreach(CompareInterval p, rtool->context->compareIntervals) {
+                if (p.isChecked()) {
+
+                    // create a named list
+                    PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
+
+                    // add the ride
+                    SEXP df = rtool->dfForActivityXData(p.rideItem->ride(), name);
+                    SET_VECTOR_ELT(namedlist, 0, df);
+
+                    // add the color
+                    SEXP color;
+                    PROTECT(color=Rf_allocVector(STRSXP, 1));
+                    SET_STRING_ELT(color, 0, Rf_mkChar(p.color.name().toLatin1().constData()));
+                    SET_VECTOR_ELT(namedlist, 1, color);
+
+                    // name them
+                    Rf_namesgets(namedlist, names);
+
+                    // add to back and move on
+                    SET_VECTOR_ELT(list, lindex++, namedlist);
+
+                    UNPROTECT(2);
+                }
+            }
+            UNPROTECT(2); // list and names
+
+            return list;
+
+        } else if(rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // just return a list of one ride
+            // cool we can return a list of intervals to compare
+            SEXP list;
+            PROTECT(list=Rf_allocVector(VECSXP, 1));
+
+            // names
+            SEXP names;
+            PROTECT(names=Rf_allocVector(STRSXP, 2));
+            SET_STRING_ELT(names, 0, Rf_mkChar("activity"));
+            SET_STRING_ELT(names, 1, Rf_mkChar("color"));
+
+            // named list of activity and color
+            SEXP namedlist;
+            PROTECT(namedlist=Rf_allocVector(VECSXP, 2));
+
+            // add the ride
+            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            f->recalculateDerivedSeries();
+            SEXP df = rtool->dfForActivityXData(f, name);
+            SET_VECTOR_ELT(namedlist, 0, df);
+
+            // add the color
+            SEXP color;
+            PROTECT(color=Rf_allocVector(STRSXP, 1));
+            SET_STRING_ELT(color, 0, Rf_mkChar("#FF00FF"));
+            SET_VECTOR_ELT(namedlist, 1, color);
+
+            // name them
+            Rf_namesgets(namedlist, names);
+
+            // add to back and move on
+            SET_VECTOR_ELT(list, 0, namedlist);
+            UNPROTECT(4);
+
+            return list;
+        }
+
+    } else if (!compare) { // not compare, so just return a dataframe
+
+        // access via global as this is a static function
+        if(rtool->context && rtool->context->currentRideItem() && const_cast<RideItem*>(rtool->context->currentRideItem())->ride()) {
+
+            // get the ride
+            RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
+            f->recalculateDerivedSeries();
+
+            // get as a data frame
+            ans = rtool->dfForActivityXData(f, name);
+            return ans;
+        }
+    }
+
+    // nothing to return
+    return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::dfForActivityXData(RideFile*f, QString name)
+{
+    // When no name is given, return names present as a list
+    if (name.isEmpty()) {
+        SEXP names;
+        PROTECT(names = Rf_allocVector(STRSXP, f->xdata().count()));
+        int k = 0;
+        foreach(name, f->xdata().keys()) SET_STRING_ELT(names, k++, Rf_mkChar(name.toLatin1().constData()));
+        UNPROTECT(1);
+        return names;
+    }
+
+    // nothing to return if XData series is not present
+    if (!f->xdata().contains(name)) return Rf_allocVector(INTSXP, 0);
+    XDataSeries* xds = f->xdata()[name];
+
+    // PROTECT count
+    int pcount = 0;
+
+    // how many series?
+    int seriescount = xds->valuename.count();
+
+    // how many data points?
+    int points = xds->datapoints.count();
+
+    // if we have any series we will continue and add 'time' and 'distance' series
+    if (seriescount) seriescount += 2;
+    else return Rf_allocVector(INTSXP, 0);
+
+    // we return a list of series vectors
+    SEXP ans = PROTECT(Rf_allocVector(VECSXP, seriescount));
+    pcount++;
+
+    // we collect the names as we go
+    SEXP names = PROTECT(Rf_allocVector(STRSXP, seriescount)); // names attribute (column names)
+    pcount++;
+
+    int next = 0;
+
+    // TIME
+
+    // add in actual time in POSIXct format
+    SEXP time = PROTECT(Rf_allocVector(REALSXP, points));
+    pcount++;
+
+    // fill with values for date and class
+    for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(xds->datapoints[k]->secs).toUTC().toTime_t();
+
+    // POSIXct class
+    SEXP clas = PROTECT(Rf_allocVector(STRSXP, 2));
+    pcount++;
+    SET_STRING_ELT(clas, 0, Rf_mkChar("POSIXct"));
+    SET_STRING_ELT(clas, 1, Rf_mkChar("POSIXt"));
+    Rf_classgets(time,clas);
+
+    // we use "UTC" for all timezone
+    Rf_setAttrib(time, Rf_install("tzone"), Rf_mkString("UTC"));
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, time);
+    SET_STRING_ELT(names, next++, Rf_mkChar("time"));
+
+    // DISTANCE
+
+    // set a vector
+    SEXP distance = PROTECT(Rf_allocVector(REALSXP, points));
+    pcount++;
+
+    // fill with values
+    for(int k=0; k<points; k++) REAL(distance)[k] = xds->datapoints[k]->km;
+
+    // add to the data.frame and give it a name
+    SET_VECTOR_ELT(ans, next, distance);
+    SET_STRING_ELT(names, next++, Rf_mkChar("distance"));
+
+    // add a series for every one
+    int valueIdx = 0;
+    foreach(QString series, xds->valuename) {
+
+        // set a vector
+        SEXP vector = PROTECT(Rf_allocVector(REALSXP, points));
+        pcount++;
+
+        int idx = 0;
+        foreach(XDataPoint* p, xds->datapoints) {
+            double val = p->number[valueIdx];
+            REAL(vector)[idx++] = (val == RideFile::NA) ? NA_REAL : val;
+        }
+
+        // add to the list
+        SET_VECTOR_ELT(ans, next, vector);
+
+        // give it a name
+        SET_STRING_ELT(names, next++, Rf_mkChar(QString("%1_%2").arg(xds->name).arg(series.replace(" ","_")).toLatin1().constData()));
+
+        valueIdx++;
+    }
+
+    // add rownames
+    SEXP rownames = PROTECT(Rf_allocVector(STRSXP, points));
+    pcount++;
+    for(int i=0; i<points; i++) {
+        QString rownumber=QString("%1").arg(i+1);
+        SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
+    }
+
+    // turn the list into a data frame + set column names
+    Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
+    Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
+    Rf_namesgets(ans, names);
+
+    UNPROTECT(pcount);
+
+    // return a valid result
+    return ans;
 }
