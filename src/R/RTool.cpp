@@ -3803,7 +3803,6 @@ RTool::activityXData(SEXP pName, SEXP pCompare)
 
             // add the ride
             RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
-            f->recalculateDerivedSeries();
             SEXP df = rtool->dfForActivityXData(f, name);
             SET_VECTOR_ELT(namedlist, 0, df);
 
@@ -3830,7 +3829,6 @@ RTool::activityXData(SEXP pName, SEXP pCompare)
 
             // get the ride
             RideFile *f = const_cast<RideItem*>(rtool->context->currentRideItem())->ride();
-            f->recalculateDerivedSeries();
 
             // get as a data frame
             ans = rtool->dfForActivityXData(f, name);
