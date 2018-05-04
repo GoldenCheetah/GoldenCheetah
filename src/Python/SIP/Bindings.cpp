@@ -692,7 +692,7 @@ Bindings::activityXdataSeries(QString name, QString series, PyObject* activity) 
         pCount++;
     }
 
-    PythonDataSeries* ds = new PythonDataSeries(name, pCount);
+    PythonDataSeries* ds = new PythonDataSeries(QString("%1_%2").arg(name).arg(series), pCount);
 
     int idx = 0;
     foreach(XDataPoint* p, xds->datapoints) {
