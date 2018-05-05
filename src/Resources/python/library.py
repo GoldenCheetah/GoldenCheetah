@@ -7,19 +7,30 @@
 #--------------------------------------------------
 
 # basic activity data
-def __GCactivity(activity=None, join="repeat"):
+def __GCactivity(join="repeat", activity=None):
    rd={}
    for x in range(0,GC.seriesLast()):
       if (GC.seriesPresent(x, activity)):
          rd[GC.seriesName(x)] = GC.series(x, activity)
-   for name in GC.activityXdataNames("", activity):
-      for serie in GC.activityXdataNames(name, activity):
-         xd = GC.activityXdata(name, serie, join, activity)
+   for name in GC.xdataNames("", activity):
+      for serie in GC.xdataNames(name, activity):
+         xd = GC.xdata(name, serie, join, activity)
          rd[str(xd)] = xd
+   return rd
+
+# xdata
+def __GCactivityXdata(name="", activity=None):
+   if not name:
+      return GC.xdataNames("")
+   rd={}
+   for serie in GC.xdataNames(name, activity):
+      xd = GC.xdataSeries(name, serie, activity)
+      rd[str(xd)] = xd
    return rd
 
 # add to main GC entrypoint
 GC.activity=__GCactivity
+GC.activityXdata=__GCactivityXdata
 
 # constants
 GC.SERIES_SECS = 0

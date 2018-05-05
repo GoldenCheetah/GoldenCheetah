@@ -137,9 +137,9 @@ public:
     int seriesLast() const;
     PythonDataSeries series(int type=10, PyObject* activity=NULL) /TransferBack/;
     PythonDataSeries activityWbal(PyObject* activity=NULL) /TransferBack/;
-    PythonDataSeries activityXdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) /TransferBack/;
-    PythonDataSeries activityXdataSeries(QString name, QString series, PyObject* activity=NULL) /TransferBack/;
-    PyObject* activityXdataNames(QString name=QString(), PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries xdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries xdataSeries(QString name, QString series, PyObject* activity=NULL) /TransferBack/;
+    PyObject* xdataNames(QString name=QString(), PyObject* activity=NULL) /TransferBack/;
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;

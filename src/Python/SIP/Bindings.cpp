@@ -611,7 +611,7 @@ Bindings::activityWbal(PyObject* activity) const
 
 // get the xdata series for the currently selected ride
 PythonDataSeries*
-Bindings::activityXdata(QString name, QString series, QString join, PyObject* activity) const
+Bindings::xdata(QString name, QString series, QString join, PyObject* activity) const
 {
     // XDATA join method
     RideFile::XDataJoin xjoin;
@@ -660,7 +660,7 @@ Bindings::activityXdata(QString name, QString series, QString join, PyObject* ac
 
 // get the xdata series for the currently selected ride, without interpolation
 PythonDataSeries*
-Bindings::activityXdataSeries(QString name, QString series, PyObject* activity) const
+Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
 {
     Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
@@ -709,7 +709,7 @@ Bindings::activityXdataSeries(QString name, QString series, PyObject* activity) 
 }
 
 PyObject*
-Bindings::activityXdataNames(QString name, PyObject* activity) const
+Bindings::xdataNames(QString name, PyObject* activity) const
 {
     Context *context = python->contexts.value(threadid()).context;
     if (context == NULL) return NULL;
