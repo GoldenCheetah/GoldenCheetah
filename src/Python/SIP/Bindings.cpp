@@ -646,7 +646,7 @@ Bindings::activityXdata(QString name, QString series, QString join, PyObject* ac
     int pCount = 0;
     RideFileIterator it(f, python->contexts.value(threadid()).spec);
     while (it.hasNext()) { it.next(); pCount++; }
-    PythonDataSeries* ds = new PythonDataSeries(name, pCount);
+    PythonDataSeries* ds = new PythonDataSeries(QString("%1_%2").arg(name).arg(series), pCount);
     it.toFront();
     int idx = 0;
     for(int i=0; i<pCount && it.hasNext(); i++) {
