@@ -154,7 +154,8 @@
 // 144 02  Apr 2018 Mark Liversedge    Force refresh for compatibility metrics
 // 145 06  Apr 2018 Ale Martinez       Python Scripts in UserMetric honor RideItem and Specification
 // 146 21  Apr 2018 Ale Martinez       TriScore Fallback to TRIMP Zonal Points
-int DBSchemaVersion = 146;
+// 147 06  May 2018 Ale Martinez       Added PeakHr metrics and HrZone
+int DBSchemaVersion = 147;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

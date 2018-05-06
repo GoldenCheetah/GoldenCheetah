@@ -858,7 +858,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/BasicRideMetrics.cpp Metrics/BikeScore.cpp \
            Metrics/Coggan.cpp Metrics/CPSolver.cpp Metrics/DanielsPoints.cpp Metrics/Estimator.cpp Metrics/ExtendedCriticalPower.cpp \
            Metrics/GOVSS.cpp Metrics/HrTimeInZone.cpp Metrics/HrZones.cpp Metrics/LeftRightBalance.cpp Metrics/PaceTimeInZone.cpp \
-           Metrics/PaceZones.cpp Metrics/PDModel.cpp Metrics/PeakPace.cpp Metrics/PeakPower.cpp Metrics/PMCData.cpp Metrics/RideMetadata.cpp \
+           Metrics/PaceZones.cpp Metrics/PDModel.cpp Metrics/PeakPace.cpp Metrics/PeakPower.cpp Metrics/PeakHr.cpp Metrics/PMCData.cpp Metrics/RideMetadata.cpp \
            Metrics/RideMetric.cpp Metrics/RunMetrics.cpp Metrics/SwimMetrics.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
            Metrics/TimeInZone.cpp Metrics/TRIMPPoints.cpp Metrics/UserMetric.cpp Metrics/UserMetricParser.cpp Metrics/VDOTCalculator.cpp \
            Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp
