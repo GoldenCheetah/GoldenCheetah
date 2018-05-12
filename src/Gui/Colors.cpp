@@ -430,7 +430,7 @@ GCColor::css(bool ridesummary)
                    "body { position: absolute; "
                    "       top: %4px; left: %4px; bottom: %4px; right: %4px; padding: 0px; "
                    "       overflow-y: hidden; overflow-x: hidden; color: %3; background-color: %2; }"
-                   "body:hover { overflow-y: scroll; }"
+                   "body:hover { overflow-y: scroll;  overflow-x: scroll; }"
                    "h1 { color: %1; background-color: %2; } "
                    "h2 { color: %1; background-color: %2; } "
                    "h3 { color: %1; background-color: %2; } "
@@ -443,11 +443,11 @@ GCColor::css(bool ridesummary)
 #ifdef Q_OS_MAC
                    "::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.5);  "
                    "-webkit-box-shadow: inset 0 0 1px rgba(255,255,255,0.6); }"
-                   "::-webkit-scrollbar { width: 9; background: %2; } "
+                   "::-webkit-scrollbar { width: 9; height: 9; background: %2; } "
 #else
                    "::-webkit-scrollbar-thumb { background: darkGray; } "
                    "::-webkit-scrollbar-thumb:hover { background: lightGray; } "
-                   "::-webkit-scrollbar { width: %5px; background: %2; } "
+                   "::-webkit-scrollbar { width: %5px; height: %5px; background: %2; } "
 #endif
                    "</style> ").arg(GColor(CPLOTMARKER).name())
                                .arg(bgColor.name())
