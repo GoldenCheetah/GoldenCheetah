@@ -115,6 +115,7 @@ class ErgFile
 
         int nextLap(long);      // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         int currentLap(long);   // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+        int nextPoint(long);    // return the start value (erg - time(ms) or slope - distance(m)) for the next point
 
         // turn the ergfile into a series of sections rather
         // than a list of points

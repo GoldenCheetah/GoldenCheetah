@@ -44,7 +44,7 @@ public:
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
                       LeftTorqueEffectiveness, RightTorqueEffectiveness,
                       LeftPedalSmoothness, RightPedalSmoothness, Slope, 
-                      LapDistance, LapDistanceRemaining };
+                      LapDistance, LapDistanceRemaining, ErgTimeRemaining };
 
     typedef enum dataseries DataSeries;
 
@@ -71,6 +71,7 @@ public:
     void setMsecs(long);
     void setLapMsecs(long);
     void setLapMsecsRemaining(long);
+    void setErgMsecsRemaining(long);
     void setDistance(double);
     void setBikeScore(long);
     void setJoules(long);
@@ -155,6 +156,7 @@ private:
     long msecs;
     long lapMsecs;
     long lapMsecsRemaining;
+    long ergMsecsRemaining;
 
     bool trainerStatusAvailable;
     bool trainerReady;
