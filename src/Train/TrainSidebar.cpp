@@ -1676,7 +1676,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 else lapTimeRemaining = 0;
 
                 long ergTimeRemaining;
-                if (ergFile) ergTimeRemaining = ergFile->nextPoint(load_msecs) - load_msecs;
+                if (ergFile) ergTimeRemaining = ergFile->Points.at(ergFile->rightPoint).x - load_msecs;
                 else ergTimeRemaining = 0;
 
 #if defined Q_OS_LINUX && QT_VERSION < 0x050600

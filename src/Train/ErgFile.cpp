@@ -1055,22 +1055,6 @@ ErgFile::currentLap(long x)
     return -1; // No matching lap
 }
 
-// Retrieve the offset for the start of next point.
-// Params: x - current workout distance (m) / time (ms)
-// Returns: distance (m) / time (ms) offset for next point.
-int
-ErgFile::nextPoint(long x)
-{
-    if (!isValid()) return -1; // not a valid ergfile
-
-    // find next point
-    for (int i=0; i<Points.count(); i++) {
-        int nextPoint = Points.at(i).x;
-        if (x < nextPoint) return nextPoint;
-    }
-    return -1; // No next point
-}
-
 void
 ErgFile::calculateMetrics()
 {
