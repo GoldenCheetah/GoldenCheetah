@@ -48,6 +48,9 @@ void RealtimeData::setAltWatts(double watts)
 }
 void RealtimeData::setWatts(double watts)
 {
+    // negs not allowed (usually from virtual power)
+    if (watts < 0) watts = 0;
+
     this->watts = (int)watts;
 }
 
