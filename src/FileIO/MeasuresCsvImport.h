@@ -1,5 +1,6 @@
 /*
- *  * Copyright (c) 2017 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2017 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2017 Ale Martinez (amtriathlon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,25 +17,25 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GC_BodyMeasuresCsvImport_h
-#define GC_BodyMeasuresCsvImport_h
+#ifndef GC_MeasuresCsvImport_h
+#define GC_MeasuresCsvImport_h
 
 #include "Context.h"
-#include "BodyMeasures.h"
+#include "Measures.h"
 
 #include <QFileDialog>
 
-class BodyMeasuresCsvImport : public QObject {
+class MeasuresCsvImport : public QObject {
 
     Q_OBJECT
 
     public:
 
-        BodyMeasuresCsvImport(Context *context);
-        ~BodyMeasuresCsvImport();
+        MeasuresCsvImport(Context *context);
+        ~MeasuresCsvImport();
 
         // get the data
-        bool getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data);
+        bool getMeasures(MeasuresGroup *measuresGroup, QString &error, QDateTime from, QDateTime to, QList<Measure> &data);
 
     signals:
         void downloadStarted(int);
@@ -43,7 +44,6 @@ class BodyMeasuresCsvImport : public QObject {
 
     private:
         Context *context;
-        QStringList allowedHeaders;
 
 };
 

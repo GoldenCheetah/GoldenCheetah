@@ -128,7 +128,8 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     // units change on general affects units used on entry in athlete pages
     connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePage, SLOT(unitChanged(int)));
-    connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePhysPage, SLOT(unitChanged(int)));
+    for (int i = 0; i < athlete->measuresPages.count(); i++)
+        connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->measuresPages[i], SLOT(unitChanged(int)));
 
     appearance = new AppearanceConfig(_home, context);
     HelpWhatsThis *appearanceHelp = new HelpWhatsThis(appearance);
@@ -307,13 +308,13 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     HelpWhatsThis *athleteModelHelp = new HelpWhatsThis(modelPage);
     modelPage->setWhatsThis(athleteModelHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Model));
 
-    athletePhysPage = new RiderPhysPage(this, context);
-    HelpWhatsThis *athletePhysHelp = new HelpWhatsThis(athletePhysPage);
-    athletePhysPage->setWhatsThis(athletePhysHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Phys));
-
-    hrvPage = new HrvPage(this, context);
-    HelpWhatsThis *hrvHelp = new HelpWhatsThis(hrvPage);
-    hrvPage->setWhatsThis(hrvHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Hrv));
+    // one for each Measures Group
+    measuresPages = QVector<MeasuresPage*>(context->athlete->measures->getGroupNames().count());
+    for (int i = 0; i < measuresPages.count(); i++) {
+        measuresPages[i] = new MeasuresPage(this, context, context->athlete->measures->getGroup(i));
+        HelpWhatsThis *measuresHelp = new HelpWhatsThis(measuresPages[i]);
+        measuresPages[i]->setWhatsThis(measuresHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Measures));
+    }
 
     zonePage = new ZonePage(context);
     HelpWhatsThis *zoneHelp = new HelpWhatsThis(zonePage);
@@ -344,6 +345,10 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
+    QTabWidget *measuresTab = new QTabWidget(this);
+    for (int i=0; i<context->athlete->measures->getGroupNames().count(); i++)
+        measuresTab->addTab(measuresPages[i], context->athlete->measures->getGroupNames()[i]);
+
     QTabWidget *zonesTab = new QTabWidget(this);
     zonesTab->addTab(zonePage, tr("Power Zones"));
     zonesTab->addTab(hrZonePage, tr("Heartrate Zones"));
@@ -352,8 +357,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));
     tabs->addTab(modelPage, tr("Model"));
-    tabs->addTab(athletePhysPage, tr("Measurements"));
-    tabs->addTab(hrvPage, tr("HRV"));
+    tabs->addTab(measuresTab, tr("Measures"));
     tabs->addTab(zonesTab, tr("Zones"));
     tabs->addTab(credentialsPage, tr("Accounts"));
     tabs->addTab(autoImportPage, tr("Auto Import"));
@@ -368,8 +372,8 @@ qint32 AthleteConfig::saveClicked()
 
     state |= athletePage->saveClicked();
     state |= modelPage->saveClicked();
-    state |= athletePhysPage->saveClicked();
-    state |= hrvPage->saveClicked();
+    foreach (MeasuresPage *measuresPage, measuresPages)
+        state |= measuresPage->saveClicked();
     state |= zonePage->saveClicked();
     state |= hrZonePage->saveClicked();
     state |= paceZonePage->saveClicked();

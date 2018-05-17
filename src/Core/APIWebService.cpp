@@ -630,19 +630,21 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
 void
 APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
 {
+    QDir configDir(home.absolutePath() + "/" + athlete + "/config");
+
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
 
     if (paths.isEmpty()) {
 
-        foreach (QString group, Measures().getGroupSymbols()) {
+        foreach (QString group, Measures(configDir).getGroupSymbols()) {
             response.write(group.toLocal8Bit());
             response.write("\n");
         }
         return;
     }
 
-    Measures measures = Measures(QDir(home.absolutePath() + "/" + athlete + "/config"), true);
+    Measures measures = Measures(configDir, true);
     int group_index = measures.getGroupSymbols().indexOf(paths[0]);
     MeasuresGroup* measuresGroup = measures.getGroup(group_index);
     if (group_index < 0 || measuresGroup == NULL) {

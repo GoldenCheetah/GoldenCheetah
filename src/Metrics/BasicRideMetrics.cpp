@@ -659,7 +659,7 @@ class AthleteFat : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        setValue(item->getWeight(BodyMeasure::FatKg));
+        setValue(item->getWeight(Measure::FatKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -695,7 +695,7 @@ class AthleteBones : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::BonesKg));
+        setValue(item->getWeight(Measure::BonesKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -731,7 +731,7 @@ class AthleteMuscles : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::MuscleKg));
+        setValue(item->getWeight(Measure::MuscleKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -767,7 +767,7 @@ class AthleteLean : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::LeanKg));
+        setValue(item->getWeight(Measure::LeanKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -802,7 +802,7 @@ class AthleteFatP : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::FatPercent));
+        setValue(item->getWeight(Measure::FatPercent));
     }
 
     MetricClass classification() const { return Undefined; }
