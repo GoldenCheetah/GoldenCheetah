@@ -25,6 +25,7 @@
 #include <QStringList>
 
 #include "RideItem.h"
+#include "Specification.h"
 
 class Context;
 class PythonChart;

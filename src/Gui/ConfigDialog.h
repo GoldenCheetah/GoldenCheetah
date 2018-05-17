@@ -63,8 +63,7 @@ class AthleteConfig : public QWidget
         AboutRiderPage *athletePage;
         AboutModelPage *modelPage;
         CredentialsPage *credentialsPage;
-        RiderPhysPage *athletePhysPage;
-        HrvPage *hrvPage;
+        QVector<MeasuresPage*> measuresPages;
 
     public slots:
         qint32 saveClicked();

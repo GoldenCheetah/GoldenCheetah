@@ -679,17 +679,13 @@ double
 RideItem::getWeight(int type)
 {
     // get any body measurements first
-    BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
-    pBodyMeasures->getBodyMeasure(dateTime.date(), weightData);
+    MeasuresGroup* pBodyMeasures = context->athlete->measures->getGroup(Measures::Body);
+    double m = pBodyMeasures->getFieldValue(dateTime.date(), type);
 
     // return what was asked for!
-    switch(type) {
-
-    default: // just get weight in kilos
-    case BodyMeasure::WeightKg:
-    {
+    if (type == Measure::WeightKg) {
         // get weight from whatever we got
-        weight = weightData.weightkg;
+        weight = m;
 
         // from metadata
         if (weight <= 0.00) weight = metadata_.value("Weight", "0.0").toDouble();
@@ -701,34 +697,36 @@ RideItem::getWeight(int type)
         if (weight <= 0.00) weight = 80.00;
 
         return weight;
+    } else {
+        // all the other weight measures supported by BodyMetrics
+        return m;
     }
-
-    // all the other weight measures supported by BodyMetrics
-    case BodyMeasure::FatKg : return weightData.fatkg;
-    case BodyMeasure::MuscleKg : return weightData.musclekg;
-    case BodyMeasure::BonesKg : return weightData.boneskg;
-    case BodyMeasure::LeanKg : return weightData.leankg;
-    case BodyMeasure::FatPercent : return weightData.fatpercent;
-
-    }
-    return weight;
 }
 
 double
-RideItem::getHrvMeasure(int type)
+RideItem::getHrvMeasure(QString fieldSymbol)
 {
     // get HRV measure for the date of the ride
-    return context->athlete->measures->getFieldValue(Measures::Hrv, dateTime.date(), type);
+    MeasuresGroup *pHrvMeasures = context->athlete->measures->getGroup(Measures::Hrv);
+    if (pHrvMeasures) {
+        return pHrvMeasures->getFieldValue(dateTime.date(), pHrvMeasures->getFieldSymbols().indexOf(fieldSymbol));
+    } else {
+        return 0.0;
+    }
 }
 
 unsigned short
 RideItem::getHrvFingerprint()
 {
     // get HRV measure for the date of the ride
-    HrvMeasure hrvMeasure;
-    HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
-    pHrvMeasures->getHrvMeasure(dateTime.date(), hrvMeasure);
-    return hrvMeasure.getFingerprint();
+    MeasuresGroup* pHrvMeasures = context->athlete->measures->getGroup(Measures::Hrv);
+    if (pHrvMeasures) {
+        Measure hrvMeasure;
+        pHrvMeasures->getMeasure(dateTime.date(), hrvMeasure);
+        return hrvMeasure.getFingerprint();
+    } else {
+        return 0;
+    }
 }
 
 double

@@ -22,7 +22,7 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Secrets.h"
-#include "BodyMeasures.h"
+#include "Measures.h"
 #include <QMessageBox>
 
 #ifndef WITHINGS_DEBUG
@@ -55,7 +55,7 @@ WithingsDownload::WithingsDownload(Context *context) : context(context)
 }
 
 bool
-WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data)
+WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<Measure> &data)
 {
     response = "";
 
@@ -186,7 +186,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
 
 QJsonParseError
-WithingsDownload::parse(QString text, QList<BodyMeasure> &bodyMeasures)
+WithingsDownload::parse(QString text, QList<Measure> &bodyMeasures)
 {
 
     QJsonParseError parseResult;
@@ -199,16 +199,16 @@ WithingsDownload::parse(QString text, QList<BodyMeasure> &bodyMeasures)
 
     // convert from Withings to general format
     foreach(WithingsReading r, readings) {
-        BodyMeasure w;
+        Measure w;
         // we just take
         if (r.weightkg > 0 && r.when.isValid()) {
             w.when =  r.when;
             w.comment = r.comment;
-            w.weightkg = r.weightkg;
-            w.fatkg = r.fatkg;
-            w.leankg = r.leankg;
-            w.fatpercent = r.fatpercent;
-            w.source = BodyMeasure::Withings;
+            w.values[Measure::WeightKg] = r.weightkg;
+            w.values[Measure::FatKg] = r.fatkg;
+            w.values[Measure::LeanKg] = r.leankg;
+            w.values[Measure::FatPercent] = r.fatpercent;
+            w.source = Measure::Withings;
             bodyMeasures.append(w);
         }
     }

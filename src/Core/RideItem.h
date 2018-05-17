@@ -22,8 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideMetric.h"
-#include "BodyMeasures.h"
-#include "HrvMeasures.h"
+#include "Measures.h"
 
 #include <QString>
 #include <QMap>
@@ -155,7 +154,6 @@ class RideItem : public QObject
         double weight; // what weight was used ?
 
         // access to the cached data !
-        BodyMeasure weightData;
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
@@ -164,7 +162,7 @@ class RideItem : public QObject
         QMap <int, double>&stdvariances() { return stdvariance_; }
         const QStringList errors() { return errors_; }
         double getWeight(int type=0);
-        double getHrvMeasure(int type=HrvMeasure::RMSSD);
+        double getHrvMeasure(QString fieldSymbol);
         unsigned short getHrvFingerprint();
 
         // when retrieving interval lists we can provide criteria too

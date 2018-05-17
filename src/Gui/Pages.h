@@ -51,8 +51,7 @@
 #include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
-#include "BodyMeasures.h"
-#include "HrvMeasures.h"
+#include "Measures.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -152,14 +151,14 @@ class GeneralPage : public QWidget
 
 };
 
-class RiderPhysPage : public QWidget
+class MeasuresPage : public QWidget
 {
     Q_OBJECT
     G_OBJECT
 
 
     public:
-        RiderPhysPage(QWidget *parent, Context *context);
+        MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *measuresGroup);
         qint32 saveClicked();
 
     public slots:
@@ -171,82 +170,20 @@ class RiderPhysPage : public QWidget
 
     private:
         Context *context;
+        MeasuresGroup *measuresGroup;
         bool metricUnits;
-        QList<BodyMeasure> bodyMeasures;
-
-        QLabel *defaultWeightlabel;
-        QDoubleSpinBox *defaultWeight;
+        QList<Measure> measures;
 
         QLabel *dateLabel;
         QDateTimeEdit *dateTimeEdit;
-        QLabel *weightlabel;
-        QDoubleSpinBox *weight;
-        QLabel *fatkglabel;
-        QDoubleSpinBox *fatkg;
-        QLabel *musclekglabel;
-        QDoubleSpinBox *musclekg;
-        QLabel *boneskglabel;
-        QDoubleSpinBox *boneskg;
-        QLabel *leankglabel;
-        QDoubleSpinBox *leankg;
-        QLabel *fatpercentlabel;
-        QDoubleSpinBox *fatpercent;
+
+        QVector<QLabel*> valuesLabel;
+        QVector<QDoubleSpinBox*> valuesEdit;
+
         QLabel *commentlabel;
         QLineEdit *comment;
 
-        QTreeWidget *bmTree;
-        QPushButton *addButton, *updateButton, *deleteButton;
-
-    struct {
-        double defaultWeight;
-        unsigned long fingerprint;
-    } b4;
-
-    private slots:
-};
-
-class HrvPage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        HrvPage(QWidget *parent, Context *context);
-        qint32 saveClicked();
-
-    public slots:
-        void addOReditClicked();
-        void deleteClicked();
-        void rangeEdited();
-        void rangeSelectionChanged();
-
-    private:
-        Context *context;
-        QList<HrvMeasure> hrvMeasures;
-
-        QLabel *dateLabel;
-        QDateTimeEdit *dateTimeEdit;
-        QLabel *rmssdlabel;
-        QDoubleSpinBox *rmssd;
-        QLabel *hrlabel;
-        QDoubleSpinBox *hr;
-        QLabel *avnnlabel;
-        QDoubleSpinBox *avnn;
-        QLabel *sdnnlabel;
-        QDoubleSpinBox *sdnn;
-        QLabel *pnn50label;
-        QDoubleSpinBox *pnn50;
-        QLabel *lflabel;
-        QDoubleSpinBox *lf;
-        QLabel *hflabel;
-        QDoubleSpinBox *hf;
-        QLabel *recovery_pointslabel;
-        QDoubleSpinBox *recovery_points;
-        QLabel *commentlabel;
-        QLineEdit *comment;
-
-        QTreeWidget *hrvTree;
+        QTreeWidget *measuresTree;
         QPushButton *addButton, *updateButton, *deleteButton;
 
     struct {
@@ -277,6 +214,8 @@ class AboutRiderPage : public QWidget
         QLineEdit *nickname;
         QDateEdit *dob;
         QComboBox *sex;
+        QLabel *weightlabel;
+        QDoubleSpinBox *weight;
         QLabel *heightlabel;
         QDoubleSpinBox *height;
         QPushButton *avatarButton;
@@ -288,6 +227,7 @@ class AboutRiderPage : public QWidget
 
 
     struct {
+        double weight;
         double height;
         int wheel;
         int crank;

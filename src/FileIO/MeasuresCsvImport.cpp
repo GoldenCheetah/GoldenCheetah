@@ -17,33 +17,33 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "HrvMeasuresCsvImport.h"
+#include "MeasuresCsvImport.h"
 #include "Settings.h"
 #include "Athlete.h"
 
 #include <QRegExp>
+#include <algorithm>
 
 
 
 
-HrvMeasuresCsvImport::HrvMeasuresCsvImport(Context *context) : context(context) {
+MeasuresCsvImport::MeasuresCsvImport(Context *context) : context(context) {
 }
 
-HrvMeasuresCsvImport::~HrvMeasuresCsvImport()
+MeasuresCsvImport::~MeasuresCsvImport()
 {
 }
 
-
 bool
-HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime to, QList<HrvMeasure> &data)
+MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDateTime from, QDateTime to, QList<Measure> &data)
 {
 
   // all variables to be defined here (to allow :goto - for simplified error handling/less redundant code)
   bool tsExists = false;
   bool dateExists = false;
-  bool rmssdExists = false;
+  bool reqFieldExists = false; // the first field is required
 
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select HRV measurements file to import"), "", tr("CSV Files (*.csv)"));
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select %1 measurements file to import").arg(measuresGroup->getName()), "", tr("CSV Files (*.csv)"));
   if (fileName.isEmpty()) {
       error = tr("No file selected.");
       return false;
@@ -57,10 +57,12 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
 
   emit downloadStarted(100);
 
+  int fieldCount = std::min(measuresGroup->getFieldSymbols().count(), MAX_MEASURES);
+
   // get all lines considering both LF and CR endings
   QStringList lines = QString(file.readAll()).split(QRegExp("[\n\r]"));
 
-  // get headers first / and check if this is a HRV measures file
+  // get headers first / and check if this is a valid measures file
   CsvString headerLine = lines[0];
   QStringList headers = headerLine.split();
   // remove whitespaces from strings
@@ -77,20 +79,20 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
   }
 
   foreach(QString h, headers) {
-      if (h == "timestamp_measurement" || h == "Datetime") tsExists = true;
+      if (h == "ts" || h == "timestamp_measurement" || h == "Datetime") tsExists = true;
       if (h == "date") dateExists = true;
-      if (h == "rMSSD" || h == "rMSSD_lying" || h == "Rmssd") rmssdExists = true;
+      if (measuresGroup->getFieldHeaders(0).contains(h)) reqFieldExists = true;
   }
   if (!tsExists && !dateExists) {
       error = tr("Column 'timestamp_measurement'/'Datetime'/'date' is missing.");
       goto error;
   }
-  if (!rmssdExists) {
-      error = tr("Column 'rMSSD'/'rMSSD_lying'/'Rmssd' is missing.");
+  if (!reqFieldExists) {
+      error = tr("Column '%1' is missing.").arg(measuresGroup->getFieldHeaders(0).join("/"));
       goto error;
   }
 
-  // No duplicates and minimal "timestamp"/"date" and "rmssd" exist
+  // No duplicates and minimal "timestamp"/"date" and required field exist
   emit downloadProgress(50);
   for (int lineNo = 1; lineNo<lines.count(); lineNo++) {
       CsvString itemLine = lines[lineNo];
@@ -103,7 +105,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           goto error;
       }
       // extract the values
-      HrvMeasure m;
+      Measure m;
       for (int j = 0; j< headers.count(); j++) {
           QString h = headers.at(j);
           QString i = items.at(j);
@@ -111,8 +113,25 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           if (i.isEmpty() || i == "-") {
               continue; // skip empty values
           }
-          if (h == "timestamp_measurement" || h == "Datetime") {
+          if (h == "ts") {
+             qint64 ts = i.toLongLong(&ok);
+             if (ok) {
+                // is is a valid timestamp (in Secs / not MSecs)
+                m.when = QDateTime::fromMSecsSinceEpoch(ts*1000);
+                // skip line if not in date range
+                if (m.when < from || m.when > to) {
+                    m.when = QDateTime::fromMSecsSinceEpoch(0);
+                    break; // stop analysing the data items of the line
+                }
+             }
+             if (!ok || !m.when.isValid()) {
+                 error = tr("Invalid 'ts' - Timestamp - in line %1").arg(lineNo);
+                 goto error;
+             }
+          } else if (h == "timestamp_measurement" || h == "Datetime" ||
+                     (h == "date" && i.length() > 18)) { // Body measures date
               // parse date/time ISO 8601 (HRV4Training for iPhone or EliteHRV)
+              tsExists = true;
               m.when = QDateTime::fromString(i, Qt::ISODate);
               if (!m.when.isValid()) {
                   // try 12hr format (HRV4Training for iPhone variant...)
@@ -145,61 +164,25 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           } else if (!tsExists && h == "time") {
               // parse time (HRV4Training for Android)
               m.when.setTime(QTime::fromString(i, "hh:mm"));
-          } else if (h == "rMSSD" || h == "rMSSD_lying" || h == "Rmssd") {
-              m.rmssd = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'rMSSD' - in line %1").arg(lineNo);
-                  goto error;
-              }
-          } else if (h == "HR" || h == "HR_lying") {
-              m.hr = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'HR' - in line %1").arg(lineNo);
-                  goto error;
-              }
-          } else if (h == "AVNN" || h == "AVNN_lying") {
-              m.avnn = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'AVNN' - in line %1").arg(lineNo);
-                  goto error;
-              }
-          } else if (h == "SDNN" || h == "SDNN_lying" || h == "Sdnn") {
-              m.sdnn = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'SDNN' - in line %1").arg(j);
-                  goto error;
-              }
-          } else if (h == "pNN50" || h == "pNN50_lying" || h == "Pnn50") {
-              m.pnn50 = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'pNN50' - in line %1").arg(lineNo);
-                  goto error;
-              }
-          } else if (h == "LF" || h == "LF_lying") {
-              m.lf = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'LF' - in line %1").arg(lineNo);
-                  goto error;
-              }
-          } else if (h == "HF" || h == "HF_lying") {
-              m.hf = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'HF' - in line %1").arg(lineNo);
-                  goto error;
-              }
-          } else if (h == "HRV4T_Recovery_Points" || h == "lnRmssd") {
-              m.recovery_points = i.toDouble(&ok);
-              if (!ok) {
-                  error = tr("Invalid 'HRV4T_Recovery_Points' - in line %1").arg(lineNo);
-                  goto error;
-              }
           } else if (h == "note") {
               m.comment = i.trimmed();
+          } else {
+              for (int k=0; k<fieldCount; k++)
+                  if (measuresGroup->getFieldHeaders(k).contains(h)) {
+                      m.values[k] = i.toDouble(&ok);
+                      if (!ok) {
+                          error = tr("Invalid '%1' - in line %2")
+                              .arg(measuresGroup->getFieldHeaders(k).join("/"))
+                              .arg(lineNo);
+                          goto error;
+                      }
+                      break;
+                  }
           }
       }
-      // only append if we have a good date & rMSSD
-      if (m.when > QDateTime::fromMSecsSinceEpoch(0) && m.rmssd > 0.0) {
-          m.source = HrvMeasure::CSV;
+      // only append if we have a good date & required field non zero
+      if (m.when > QDateTime::fromMSecsSinceEpoch(0) && m.values[0] > 0.0) {
+          m.source = Measure::CSV;
           data.append(m);
       }
   }
