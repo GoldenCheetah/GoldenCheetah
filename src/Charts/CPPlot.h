@@ -82,7 +82,7 @@ class CPPlot : public QwtPlot
         void setPlotType(int index);
         void showXAxisLinear(bool x);
         void setModel(int sanI1, int sanI2, int anI1, int anI2,
-                      int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant);
+                      int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant, int fit);
 
         // getters
         QVector<double> getBests();
@@ -145,6 +145,7 @@ class CPPlot : public QwtPlot
 
         // Models and Extended Models
         int model, modelVariant;
+        int fit;
         double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
 
         // Data and State
@@ -206,5 +207,8 @@ class CPPlot : public QwtPlot
 
         // the model
         PDModel *pdModel;
+
+        // filtered data
+        QVector<double> filtertime, filterpower;
 };
 #endif // _GC_CPPlot_h

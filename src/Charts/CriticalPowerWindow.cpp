@@ -270,6 +270,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     mcl->addRow(new QLabel(tr("Model")), modelCombo);
 
+    fitCombo= new QComboBox(this);
+    fitCombo->addItem(tr("Envelope"));
+    fitCombo->addItem(tr("Least Squares (LMA)"));
+    fitCombo->setCurrentIndex(0); // default to envelope, backwards compatibility
+    mcl->addRow(new QLabel(tr("Curve Fit")), fitCombo);
+
     mcl->addRow(new QLabel(tr(" ")));
     intervalLabel = new QLabel(tr("Search Interval"));
     secondsLabel = new QLabel(tr("(seconds)"));
@@ -500,6 +506,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     // model updated?
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
+    connect(fitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fitChanged()));
     connect(anI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(anI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(aeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
@@ -681,6 +688,12 @@ CriticalPowerWindow::configChanged(qint32)
 }
 
 void
+CriticalPowerWindow::fitChanged()
+{
+    // gets a replot
+    modelParametersChanged();
+}
+void
 CriticalPowerWindow::modelChanged()
 {
     // we changed from/to a 2 or 3 parameter model
@@ -857,7 +870,8 @@ CriticalPowerWindow::modelParametersChanged()
                         laeI1SpinBox->value(),
                         laeI2SpinBox->value(),
                         modelCombo->currentIndex(),
-                        variant());
+                        variant(),
+                        fitCombo->currentIndex());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {

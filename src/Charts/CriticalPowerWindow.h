@@ -58,6 +58,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(QString season READ season WRITE setSeason USER true)
 
     Q_PROPERTY(int cpmodel READ cpModel WRITE setCPModel USER true)
+    Q_PROPERTY(int fit READ fit WRITE setFit USER true)
     Q_PROPERTY(int variant READ variant WRITE setVariant USER true)
     Q_PROPERTY(int ani1 READ anI1 WRITE setAnI1 USER true)
     Q_PROPERTY(int ani2 READ anI2 WRITE setAnI2 USER true)
@@ -103,6 +104,9 @@ class CriticalPowerWindow : public GcChartWindow
 
         int cpModel() const { return modelCombo->currentIndex(); }
         void setCPModel(int x) { modelCombo->setCurrentIndex(x); }
+
+        int fit() const { return fitCombo->currentIndex(); }
+        void setFit(int x) { fitCombo->setCurrentIndex(x); }
 
         int variant() const;
         void setVariant(int x);
@@ -241,7 +245,8 @@ class CriticalPowerWindow : public GcChartWindow
 
         void refreshRideSaved(RideItem*);
         void modelParametersChanged(); // we changed the intervals
-        void modelChanged(); // we changed the model type 
+        void modelChanged(); // we changed the model type
+        void fitChanged();
 
         // reveal controls changed
         void rPercentChanged(int check);
@@ -279,6 +284,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpintCPValue;
         QComboBox *seriesCombo;
         QComboBox *modelCombo;
+        QComboBox *fitCombo;
         QLabel *vlabel;
         QRadioButton *velo1, *velo2, *velo3; // for selecting veloclinic formulation
         QComboBox *cComboSeason;

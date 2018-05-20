@@ -55,7 +55,7 @@
 CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
     // model
-    model(0), modelVariant(0),
+    model(0), modelVariant(0), fit(0),
 
     // state
     context(context), bestsCache(NULL), dateCV(0.0), isRun(false), isSwim(false),
@@ -354,10 +354,22 @@ CPPlot::initModel()
 
     if (pdModel) {
 
-        // set the model and load data
-        pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-        pdModel->setMinutes(true); // we're minutes here ...
-        pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+        if (fit == 0 || model == 3) { //!!! always envelope fit the ecp model
+
+            // envelope fit always uses all data
+            pdModel->setFit(PDModel::Envelope);
+            pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+            pdModel->setMinutes(true); // we're minutes here ...
+            pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+
+        } else {
+            // LM fit will use filtered data or all data
+            pdModel->setFit(PDModel::LeastSquares);
+            pdModel->setMinutes(true); // ignored by lmfit methods
+            //fprintf(stderr, "best filtered to %d points\n", filtertime.count()); fflush(stderr);
+            if (filterBest) pdModel->setPtData(filterpower, filtertime);
+            else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+        }
    }
 
     #if GC_HAVE_MODEL_LABS
@@ -847,7 +859,10 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
     if (pdmodel) {
         pdmodel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
         pdmodel->setMinutes(true); // we're minutes here ...
-        pdmodel->setData(vector);
+
+        if (filterBest) {
+
+        } else pdmodel->setData(vector);
     }
 
     // create curve
@@ -1175,8 +1190,10 @@ CPPlot::plotBests(RideItem *rideItem)
                             keep.t=t[i];
 
                             // but clear since we iterate beyond
-                            p[i]=0;
-                            t[i]=0;
+                            if (i>0) { // always keep pmax point
+                                p[i]=0;
+                                t[i]=0;
+                            }
 
                             // from here to the end of all the points, lets see if there is one further away?
                             for(int x=i+1; x<t.count(); x++) {
@@ -1193,9 +1210,11 @@ CPPlot::plotBests(RideItem *rideItem)
                                         keep.t = t[x];
                                     }
 
-                                    w[x] = QDate();
-                                    p[x] = 0;
-                                    t[x] = 0;
+                                    if (x>0) { // always keep pmax point
+                                        w[x] = QDate();
+                                        p[x] = 0;
+                                        t[x] = 0;
+                                    }
                                 }
                             }
 
@@ -1205,17 +1224,19 @@ CPPlot::plotBests(RideItem *rideItem)
                         }
                     }
                     // set a series where t > 1
-                    QVector<double> tp;
-                    QVector<double> pp;
+                    filtertime.clear();
+                    filtertime.resize(0);
+                    filterpower.clear();
+                    filterpower.resize(0);
                     for(int i=0; i<t.count(); i++) {
                         if (t[i] >0) {
-                            tp << t[i];
-                            pp << p[i];
+                            filtertime << t[i];
+                            filterpower << p[i];
                         }
                     }
 
                     // only show filtered data
-                    curve->setSamples(tp.data(), pp.data(), pp.count());
+                    curve->setSamples(filtertime.data(), filterpower.data(), filterpower.count());
 
                 } else {
 
@@ -1794,6 +1815,12 @@ CPPlot::setRide(RideItem *rideItem)
     // NOW PLOT THE MODEL CURVE
     // it will need to decide if it is relevant etc
     // but we need to make sure we have it
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // IT MUST ALWAYS BE LAST IN THIS METHOD
+    // TO ENSURE MEANMAX AND/ OR FILTERED DATA
+    // HAVE BEEN REFRESHED ABOVE
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     plotModel();
 
     // now replot please
@@ -2068,7 +2095,7 @@ CPPlot::showXAxisLinear(bool x)
 
 // model parameters!
 void
-CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant)
+CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant, int fit)
 {
     this->anI1 = double(anI1);
     this->anI2 = double(anI2);
@@ -2082,6 +2109,7 @@ CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, i
 
     this->model = model;
     this->modelVariant = variant;
+    this->fit = fit;
 
     clearCurves();
 }

@@ -17,9 +17,11 @@
  */
 
 #include "PDModel.h"
+#include "lmcurve.h"
 
 // base class for all models
 PDModel::PDModel(Context *context) :
+    fit(Envelope),
     QwtSyntheticPointData(PDMODEL_MAXT),
     inverseTime(false),
     context(context),
@@ -35,11 +37,25 @@ void
 PDModel::setData(QVector<double> meanMaxPower)
 {
     cp = tau = t0 = 0; // reset on new data
-    data.resize(meanMaxPower.size());
     data = meanMaxPower;
+
+    // generate t data, in seconds
+    tdata.resize(meanMaxPower.size());
+    for(int i=0; i<meanMaxPower.size(); i++) tdata[i] = i+1;
     emit dataChanged();
 }
 
+void
+PDModel::setPtData(QVector<double>p, QVector<double>t)
+{
+    cp = tau = t0 = 0;
+    data = p;
+    tdata = t;
+    for(int i=0; i<t.count(); i++) {
+        tdata[i] = tdata[i] * 60;
+    }
+    emit dataChanged();
+}
 void
 PDModel::setMinutes(bool x)
 {
@@ -72,7 +88,11 @@ PDModel::setData(QVector<float> meanMaxPower)
 {
     cp = tau = t0 = 0; // reset on new data
     data.resize(meanMaxPower.size());
-    for (int i=0; i< data.size(); i++) data[i] = meanMaxPower[i];
+    tdata.resize(meanMaxPower.size());
+    for (int i=0; i< data.size(); i++) {
+        data[i] = meanMaxPower[i];
+        tdata[i] = i+1;
+    }
     emit dataChanged();
 }
 
@@ -93,6 +113,13 @@ PDModel::setIntervals(double sanI1, double sanI2, double anI1, double anI2,
     emit intervalsChanged();
 }
 
+// used to wrap a function call when deriving parameters
+QMutex calllmfit;
+static PDModel *calllmfitmodel = NULL;
+static double calllmfitf(double t, const double *p) {
+    return static_cast<PDModel*>(calllmfitmodel)->f(t, p);
+}
+
 // using the data and intervals from above, derive the
 // cp, tau and t0 values needed for the model
 // this is the function originally found in CPPlot
@@ -101,7 +128,7 @@ PDModel::deriveCPParameters(int model)
 {
     // bit of a hack, but the model deriving code is shared
     // basically because it does pretty much the same thing
-    // for all the models and I didn't want to abstract it 
+    // for all the models and I didn't want to abstract it
     // any further, so we pass the subclass as a model number
     // to control which intervals and formula to use
     // where model is
@@ -111,113 +138,195 @@ PDModel::deriveCPParameters(int model)
     // 3 = Veloclinic (Mike P)
     // 4 = Ward Smith
 
-    // bounds on anaerobic interval in minutes
-    const double t1 = anI1;
-    const double t2 = anI2;
+    // only try lmfit if the model supports that
+    if (fit == LeastSquares && this->nparms() > 0) {
 
-    // bounds on aerobic interval in minutes
-    const double t3 = aeI1;
-    const double t4 = aeI2;
+        // used for fit
+        QVector<double> p, t;
 
-    // bounds of these time values in the data
-    int i1, i2, i3, i4;
+        // starting values for parameters
+        double par[3];
 
-    // find the indexes associated with the bounds
-    // the first point must be at least the minimum for the anaerobic interval, or quit
-    for (i1 = 0; i1 < t1; i1++)
-        if (i1 + 1 > data.size())
-            return;
-    // the second point is the maximum point suitable for anaerobicly dominated efforts.
-    for (i2 = i1; i2 + 1 <= t2; i2++)
-        if (i2 + 1 > data.size())
-            return;
-    // the third point is the beginning of the minimum duration for aerobic efforts
-    for (i3 = i2; i3 < t3; i3++)
-        if (i3 + 1 > data.size())
-            return;
-    for (i4 = i3; i4 + 1 <= t4; i4++)
-        if (i4 + 1 > data.size())
-            break;
+        if (model == 0) {
 
-    // initial estimate of tau
-    if (tau == 0) tau = 1;
-
-    // initial estimate of cp (if not already available)
-    if (cp == 0) cp = 300;
-
-    // initial estimate of t0: start small to maximize sensitivity to data
-    t0 = 0;
-
-    // lower bound on tau
-    const double tau_min = 0.5;
-
-    // convergence delta for tau
-    const double tau_delta_max = 1e-4;
-    const double t0_delta_max  = 1e-4;
-
-    // previous loop value of tau and t0
-    double tau_prev;
-    double t0_prev;
-
-    // maximum number of loops
-    const int max_loops = 100;
-
-    // loop to convergence
-    int iteration = 0;
-    do {
-
-        // clear cherries
-        map.clear();
-
-        // bounds check, don't go on for ever
-        if (iteration++ > max_loops) break;
-
-        // record the previous version of tau, for convergence
-        tau_prev = tau;
-        t0_prev  = t0;
-
-        // estimate cp, given tau
-        int i;
-        cp = 0;
-        bool changed=false;
-        int index=0;
-        double value=0;
-        for (i = i3; i < i4; i++) {
-            double cpn = data[i] / (1 + tau / (t0 + i / 60.0));
-            if (cp < cpn) {
-                cp = cpn;
-                index=i; value=data[i];
-                changed=true;
+            // CLASSIC CP
+            // we need to prepare the data for the fit
+            // mostly this means classic CP only fits to
+            // points between 2mins and 20mins to avoid
+            // data that is short and rate limited or long
+            // and likely submaximal or fatigued (or both!)
+            //fprintf(stderr, "points=%d\n", data.count()); fflush(stderr);
+            for(int i=0; i<data.count(); i++) {
+                if (tdata[i] >= 120 && tdata[i] <= 1200) {
+                    p << data[i];
+                    t << tdata[i];
+                }
             }
-        }
-        if(changed) map.insert(index,value);
+            //fprintf(stderr, " used points=%d\n", p.count()); fflush(stderr);
 
+            // set starting values cp and w'
+            par[0] = 200;
+            par[1] = 15000;
 
-        // if cp = 0; no valid data; give up
-        if (cp == 0.0)
-            return;
+        } else if (model==1) {
 
-        // estimate tau, given cp
-        tau = tau_min;
-        changed=false;
-        for (i = i1; i <= i2; i++) {
-            double taun = (data[i] / cp - 1) * (i / 60.0 + t0) - t0;
-            if (tau < taun) {
-                changed=true;
-                index=i;
-                value=data[i];
-                tau = taun;
+            // MORTON 3 PARAMETER
+            // Just skip post 20 mins to avoid data that
+            // is most likely submaximal or fatigued
+            for(int i=0; i<data.count(); i++) {
+                if (tdata[i] <= 1200) {
+                    p << data[i];
+                    t << tdata[i];
+                }
             }
+
+            // set starting values cp, w' and k
+            par[0] = 250;
+            par[1] = 18000;
+            par[2] = 32;
+
+
+        } else {
+            p = data;
+            t = tdata;
         }
-        if (changed) map.insert(index,value);
 
-        // estimate t0 - but only for veloclinic/3parm cp
-        // where model is non-zero (CP2 is nonzero)
-        if (model) t0 = tau / (data[1] / cp - 1) - 1 / 60.0;
+        lm_control_struct control = lm_control_double;
+        lm_status_struct status;
 
-        //qDebug()<<"CONVERGING:"<<iteration<<"t0="<<t0<<"tau="<<tau<<"cp="<<cp;
+        // use forwarder via global variable, so mutex around this !
+        calllmfit.lock();
+        calllmfitmodel = this;
 
-    } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
+        //fprintf(stderr, "Fitting ...\n" ); fflush(stderr);
+        lmcurve(this->nparms(), par, p.count(), t.constData(), p.constData(), calllmfitf, &control, &status);
+
+        // release for others
+        calllmfit.unlock();
+
+        //fprintf(stderr, "Results:\n" );
+        //fprintf(stderr, "status after %d function evaluations:\n  %s\n",
+        //        status.nfev, lm_infmsg[status.outcome] ); fflush(stderr);
+        //fprintf(stderr,"obtained parameters:\n"); fflush(stderr);
+        //for (int i = 0; i < this->nparms(); ++i)
+        //    fprintf(stderr,"  par[%i] = %12g\n", i, par[i]);
+        //fprintf(stderr,"obtained norm:\n  %12g\n", status.fnorm ); fflush(stderr);
+
+        // save away the values we fit to.
+        this->setParms(par);
+
+    } else {
+
+        // bounds on anaerobic interval in minutes
+        const double t1 = anI1;
+        const double t2 = anI2;
+
+        // bounds on aerobic interval in minutes
+        const double t3 = aeI1;
+        const double t4 = aeI2;
+
+        // bounds of these time values in the data
+        int i1, i2, i3, i4;
+
+        // find the indexes associated with the bounds
+        // the first point must be at least the minimum for the anaerobic interval, or quit
+        for (i1 = 0; i1 < t1; i1++)
+            if (i1 + 1 > data.size())
+                return;
+        // the second point is the maximum point suitable for anaerobicly dominated efforts.
+        for (i2 = i1; i2 + 1 <= t2; i2++)
+            if (i2 + 1 > data.size())
+                return;
+        // the third point is the beginning of the minimum duration for aerobic efforts
+        for (i3 = i2; i3 < t3; i3++)
+            if (i3 + 1 > data.size())
+                return;
+        for (i4 = i3; i4 + 1 <= t4; i4++)
+            if (i4 + 1 > data.size())
+                break;
+
+        // initial estimate of tau
+        if (tau == 0) tau = 1;
+
+        // initial estimate of cp (if not already available)
+        if (cp == 0) cp = 300;
+
+        // initial estimate of t0: start small to maximize sensitivity to data
+        t0 = 0;
+
+        // lower bound on tau
+        const double tau_min = 0.5;
+
+        // convergence delta for tau
+        const double tau_delta_max = 1e-4;
+        const double t0_delta_max  = 1e-4;
+
+        // previous loop value of tau and t0
+        double tau_prev;
+        double t0_prev;
+
+        // maximum number of loops
+        const int max_loops = 100;
+
+        // loop to convergence
+        int iteration = 0;
+        do {
+
+            // clear cherries
+            map.clear();
+
+            // bounds check, don't go on for ever
+            if (iteration++ > max_loops) break;
+
+            // record the previous version of tau, for convergence
+            tau_prev = tau;
+            t0_prev  = t0;
+
+            // estimate cp, given tau
+            int i;
+            cp = 0;
+            bool changed=false;
+            int index=0;
+            double value=0;
+            for (i = i3; i < i4; i++) {
+                double cpn = data[i] / (1 + tau / (t0 + i / 60.0));
+                if (cp < cpn) {
+                    cp = cpn;
+                    index=i; value=data[i];
+                    changed=true;
+                }
+            }
+            if(changed) map.insert(index,value);
+
+
+            // if cp = 0; no valid data; give up
+            if (cp == 0.0)
+                return;
+
+            // estimate tau, given cp
+            tau = tau_min;
+            changed=false;
+            for (i = i1; i <= i2; i++) {
+                double taun = (data[i] / cp - 1) * (i / 60.0 + t0) - t0;
+                if (tau < taun) {
+                    changed=true;
+                    index=i;
+                    value=data[i];
+                    tau = taun;
+                }
+            }
+            if (changed) map.insert(index,value);
+
+            // estimate t0 - but only for veloclinic/3parm cp
+            // where model is non-zero (CP2 is nonzero)
+            if (model) t0 = tau / (data[1] / cp - 1) - 1 / 60.0;
+
+            //qDebug()<<"CONVERGING:"<<iteration<<"t0="<<t0<<"tau="<<tau<<"cp="<<cp;
+
+        } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
+
+        fprintf(stderr, "tau=%f, t0= %f\n", tau, t0); fflush(stderr);
+    }
 }
 
 //
@@ -709,265 +818,313 @@ ExtendedModel::onIntervalsChanged()
 void
 ExtendedModel::deriveExtCPParameters()
 {
-    // bounds on anaerobic interval in minutes
-    const double t1 = sanI1;
-    const double t2 = sanI2;
-
-    // bounds on anaerobic interval in minutes
-    const double t3 = anI1;
-    const double t4 = anI2;
-
-    // bounds on aerobic interval in minutes
-    const double t5 = aeI1;
-    const double t6 = aeI2;
-
-    // bounds on long aerobic interval in minutes
-    const double t7 = laeI1;
-    const double t8 = laeI2;
-
-    // bounds of these time values in the data
-    int i1, i2, i3, i4, i5, i6, i7, i8;
-
-    // find the indexes associated with the bounds
-    // the first point must be at least the minimum for the anaerobic interval, or quit
-    for (i1 = 0; i1 < t1; i1++)
-        if (i1 + 1 > data.size())
-            return;
-    // the second point is the maximum point suitable for anaerobicly dominated efforts.
-    for (i2 = i1; i2 + 1 <= t2; i2++)
-        if (i2 + 1 >= data.size())
-            return;
-
-    // the third point is the beginning of the minimum duration for aerobic efforts
-    for (i3 = i2; i3 < t3; i3++)
-        if (i3 + 1 >= data.size())
-            return;
-    for (i4 = i3; i4 + 1 <= t4; i4++)
-        if (i4 + 1 >= data.size())
-            break;
-
-    // the fifth point is the beginning of the minimum duration for aerobic efforts
-    for (i5 = i4; i5 < t5; i5++)
-        if (i5 + 1 >= data.size())
-            return;
-    for (i6 = i5; i6 + 1 <= t6; i6++)
-        if (i6 + 1 >= data.size())
-            break;
-
-    // the first point must be at least the minimum for the anaerobic interval, or quit
-    for (i7 = i6; i7 < t7; i7++)
-        if (i7 + 1 >= data.size())
-            return;
-    // the second point is the maximum point suitable for anaerobicly dominated efforts.
-    for (i8 = i7; i8 + 1 <= t8; i8++)
-        if (i8 + 1 >= data.size())
-            break;
-
-
-
-    // initial estimate
-    paa = 300;
-    etau = 1;
+    // initial estimates
+    paa = 1000;
+    etau = 1.2;
     ecp = 300;
     paa_dec = -2;
     ecp_del = -0.9;
     tau_del = -4.8;
-    ecp_dec = -1;
+    ecp_dec = -0.6;
     ecp_dec_del = -180;
 
-    // lower bound
-    const double paa_min = 100;
-    const double etau_min = 0.5;
-    const double paa_dec_max = -0.25;
-    const double paa_dec_min = -3;
-    const double ecp_dec_min = -5;
+#if 0
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // LEAST SQUARES FIT WITH ECP MODEL REQUIRES
+    // CONSTRAINTS TO BE VALIDATED AND REFINED
+    // THE MODEL IS GROSSLY OVERFITTING WITHOUT
+    // PLAUSIBLE CONSTRAINTS FOR DECAY/DELAY
+    // PARAMETERS
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    // convergence delta
-    const double etau_delta_max = 1e-4;
-    const double paa_delta_max = 1e-2;
-    const double paa_dec_delta_max = 1e-4;
-    const double ecp_del_delta_max = 1e-4;
-    const double ecp_dec_delta_max  = 1e-8;
+    // now, if we have a ls fit, at least we have some
+    // half decent starting parameters to work from
+    if (fit == LeastSquares) {
 
-    // previous loop values
-    double etau_prev;
-    double paa_prev;
-    double paa_dec_prev;
-    double ecp_del_prev;
-    double ecp_dec_prev;
+        // used for fit
+        QVector<double> p, t;
 
-    // maximum number of loops
-    const int max_loops = 100;
+        p = data;
+        t = tdata;
 
-    // loop to convergence
-    int iteration = 0;
-    do {
+        fprintf(stderr, "derive %d params using lmfit!\n", this->nparms()); fflush(stderr);
 
-        // bounds check, don't go on for ever
-        if (iteration++ > max_loops) break;
+        // set starting values
+        double par[8];
+        par[0]= paa;
+        par[1]= paa_dec;
+        par[2]= ecp;
+        par[3]= etau;
+        par[4]= tau_del;
+        par[5]= ecp_del;
+        par[6]= ecp_dec;
+        par[7]= ecp_dec_del;
 
-        // clear last point used
-        map.clear();
+        lm_control_struct control = lm_control_double;
+        lm_status_struct status;
 
-        // record the previous version of tau, for convergence
-        etau_prev = etau;
-        paa_prev = paa;
-        paa_dec_prev = paa_dec;
-        ecp_del_prev = ecp_del;
-        ecp_dec_prev = ecp_dec;
+        // use forwarder via global variable, so mutex around this !
+        calllmfit.lock();
+        calllmfitmodel = this;
 
-        // 
-        // Solve for CP [asymptote]
-        //
-        int i;
-        ecp = 0;
-        bool changed=false;
-        double val = 0;
-        int index=0;
-        for (i = i5; i <= i6; i++) {
-            double ecpn = (data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) / ( 1 + etau/(i/60.0));
+        fprintf(stderr, "Fitting ...\n" ); fflush(stderr);
+        lmcurve(this->nparms(), par, p.count(), t.constData(), p.constData(), calllmfitf, &control, &status);
 
-            if (ecp < ecpn) {
-                ecp = ecpn;
-                val = data[i];
-                index=i;
-                changed=true;
+        // release for others
+        calllmfit.unlock();
+
+        fprintf(stderr, "Results:\n" );
+        fprintf(stderr, "status after %d function evaluations:\n  %s\n",
+                status.nfev, lm_infmsg[status.outcome] ); fflush(stderr);
+
+        fprintf(stderr,"obtained parameters:\n"); fflush(stderr);
+        for (int i = 0; i < this->nparms(); ++i)
+            fprintf(stderr,"  par[%i] = %12g\n", i, par[i]);
+        fprintf(stderr,"obtained norm:\n  %12g\n", status.fnorm ); fflush(stderr);
+
+        // save away the values we fit to.
+        this->setParms(par);
+
+    } else {
+ #endif
+
+        // bounds on anaerobic interval in minutes
+        const double t1 = sanI1;
+        const double t2 = sanI2;
+
+        // bounds on anaerobic interval in minutes
+        const double t3 = anI1;
+        const double t4 = anI2;
+
+        // bounds on aerobic interval in minutes
+        const double t5 = aeI1;
+        const double t6 = aeI2;
+
+        // bounds on long aerobic interval in minutes
+        const double t7 = laeI1;
+        const double t8 = laeI2;
+
+        // bounds of these time values in the data
+        int i1, i2, i3, i4, i5, i6, i7, i8;
+
+        // find the indexes associated with the bounds
+        // the first point must be at least the minimum for the anaerobic interval, or quit
+        for (i1 = 0; i1 < t1; i1++)
+            if (i1 + 1 > data.size())
+                return;
+        // the second point is the maximum point suitable for anaerobicly dominated efforts.
+        for (i2 = i1; i2 + 1 <= t2; i2++)
+            if (i2 + 1 >= data.size())
+                return;
+
+        // the third point is the beginning of the minimum duration for aerobic efforts
+        for (i3 = i2; i3 < t3; i3++)
+            if (i3 + 1 >= data.size())
+                return;
+        for (i4 = i3; i4 + 1 <= t4; i4++)
+            if (i4 + 1 >= data.size())
+                break;
+
+        // the fifth point is the beginning of the minimum duration for aerobic efforts
+        for (i5 = i4; i5 < t5; i5++)
+            if (i5 + 1 >= data.size())
+                return;
+        for (i6 = i5; i6 + 1 <= t6; i6++)
+            if (i6 + 1 >= data.size())
+                break;
+
+        // the first point must be at least the minimum for the anaerobic interval, or quit
+        for (i7 = i6; i7 < t7; i7++)
+            if (i7 + 1 >= data.size())
+                return;
+        // the second point is the maximum point suitable for anaerobicly dominated efforts.
+        for (i8 = i7; i8 + 1 <= t8; i8++)
+            if (i8 + 1 >= data.size())
+                break;
+
+
+
+        // previous loop values
+        double etau_prev;
+        double paa_prev;
+        double paa_dec_prev;
+        double ecp_del_prev;
+        double ecp_dec_prev;
+
+        // maximum number of loops
+        const int max_loops = 100;
+
+        // loop to convergence
+        int iteration = 0;
+        do {
+
+            // bounds check, don't go on for ever
+            if (iteration++ > max_loops) break;
+
+            // clear last point used
+            map.clear();
+
+            // record the previous version of tau, for convergence
+            etau_prev = etau;
+            paa_prev = paa;
+            paa_dec_prev = paa_dec;
+            ecp_del_prev = ecp_del;
+            ecp_dec_prev = ecp_dec;
+
+            //
+            // Solve for CP [asymptote]
+            //
+            int i;
+            ecp = 0;
+            bool changed=false;
+            double val = 0;
+            int index=0;
+            for (i = i5; i <= i6; i++) {
+                double ecpn = (data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) / ( 1 + etau/(i/60.0));
+
+                if (ecp < ecpn) {
+                    ecp = ecpn;
+                    val = data[i];
+                    index=i;
+                    changed=true;
+                }
             }
-        }
-        if (changed) {
-            map.insert(index,val);
-            //qDebug()<<iteration<<"eCP Resolving: cp="<<ecp<<"tau="<<etau<<"p[i]"<<val;
-        }
-
-
-        // if cp = 0; no valid data; give up
-        if (ecp == 0.0)
-            return;
-
-        //
-        // SOLVE FOR TAU [curvature constant]
-        //
-        etau = etau_min;
-        changed=false;
-        val = 0;
-        for (i = i3; i <= i4; i++) {
-            double etaun = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) - 1) * (i/60.0);
-
-            if (etau < etaun) {
-                etau = etaun;
-                val=data[i];
-                index=i;
-                changed=true;
+            if (changed) {
+                map.insert(index,val);
+                //qDebug()<<iteration<<"eCP Resolving: cp="<<ecp<<"tau="<<etau<<"p[i]"<<val;
             }
-        }
-        if (changed) {
-            map.insert(index,val);
-            //qDebug()<<iteration<<"eCP Resolving: tau="<<etau<<"CP="<<ecp<<"p[i]"<<val;
-        }
 
 
-        //
-        // SOLVE FOR PAA_DEC [decay rate for ATP-PCr energy system]
-        //
-        paa_dec = paa_dec_min;
-        changed=false;
-        val=0;
-        for (i = i1; i <= i2; i++) {
-            double paa_decn = log((data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0)) ) / paa / (1.20-0.20*exp(-1*(i/60.0))) ) / (i/60.0);
-
-            if (paa_dec < paa_decn && paa_decn < paa_dec_max) {
-                paa_dec = paa_decn;
-                changed=true;
-                val=data[i];
-                index=i;
+            // if cp = 0; no valid data; give up
+            if (ecp == 0.0) {
+                return;
             }
-        }
-        if(changed) {
-            //qDebug()<<iteration<<"eCP Resolving: paa_dec="<<paa_dec<<"CP="<<ecp<<"p[i]"<<val;
-            map.insert(index,val);
-        }
 
-        //
-        // SOLVE FOR PAA [max power]
-        //
-        paa = paa_min;
-        double _avg_paa = 0.0;
-        int count=1;
-        changed=false;
-        val=0;
-        for (i = 1; i <= 8; i++) {
-            double paan = (data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0))) / exp(paa_dec*(i/60.0)) / (1.20-0.20*exp(-1*(i/60.0)));
-            _avg_paa = (double)((count-1)*_avg_paa+paan)/count;
+            //
+            // SOLVE FOR TAU [curvature constant]
+            //
+            etau = etau_min;
+            changed=false;
+            val = 0;
+            for (i = i3; i <= i4; i++) {
+                double etaun = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) - 1) * (i/60.0);
 
-            if (paa < paan) {
-                paa = paan;
-                changed=true;
-                val=data[i];
-                index=i;
+                if (etau < etaun) {
+                    etau = etaun;
+                    val=data[i];
+                    index=i;
+                    changed=true;
+                }
             }
-            count++;
-        }
-        if (changed) {
-            map.insert(index,val);
-            //qDebug()<<iteration<<"eCP Resolving: paa="<<paa<<"CP="<<ecp<<"p[i]"<<val;
-        }
-
-        if (_avg_paa<0.95*paa) {
-            paa = _avg_paa;
-        }
-
-
-        //
-        // SOLVE FOR ECP_DEC [Fatigue rate; CHO, Motivation, Hydration etc]
-        //
-        ecp_dec = ecp_dec_min;
-        changed=false;
-        val=0;
-        for (i = i7; i <= i8; i=i+120) {
-            double ecp_decn = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / ( 1 + etau/(i/60.0)) -1 ) / exp(ecp_dec_del/(i / 60.0));
-
-            if (ecp_decn > 0) ecp_decn = 0;
-
-            if (ecp_dec < ecp_decn) {
-                ecp_dec = ecp_decn;
-                changed=true;
-                val=data[i];
-                index=i;
+            if (changed) {
+                map.insert(index,val);
+                //qDebug()<<iteration<<"eCP Resolving: tau="<<etau<<"CP="<<ecp<<"p[i]"<<val;
             }
-        }
-        if (changed) {
-            //qDebug()<<iteration<<"eCP Resolving: ecp_dec="<<ecp_dec<<"CP="<<ecp<<"p[i]"<<val;
-            map.insert(index,val);
-        }
 
 
-    } while ((fabs(etau - etau_prev) > etau_delta_max) ||
-             (fabs(paa - paa_prev) > paa_delta_max)  ||
-             (fabs(paa_dec - paa_dec_prev) > paa_dec_delta_max)  ||
-             (fabs(ecp_del - ecp_del_prev) > ecp_del_delta_max)  ||
-             (fabs(ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
-            );
+            //
+            // SOLVE FOR PAA_DEC [decay rate for ATP-PCr energy system]
+            //
+            paa_dec = paa_dec_min;
+            changed=false;
+            val=0;
+            for (i = i1; i <= i2; i++) {
+                double paa_decn = log((data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0)) ) / paa / (1.20-0.20*exp(-1*(i/60.0))) ) / (i/60.0);
 
-    // What did we get ...
-    // To help debug this below we output the derived values
-    // commented out for release, its quite a mouthful !
+                if (paa_dec < paa_decn && paa_decn < paa_dec_max) {
+                    paa_dec = paa_decn;
+                    changed=true;
+                    val=data[i];
+                    index=i;
+                }
+            }
+            if(changed) {
+                //qDebug()<<iteration<<"eCP Resolving: paa_dec="<<paa_dec<<"CP="<<ecp<<"p[i]"<<val;
+                map.insert(index,val);
+            }
+
+            //
+            // SOLVE FOR PAA [max power]
+            //
+            paa = paa_min;
+            double _avg_paa = 0.0;
+            int count=1;
+            changed=false;
+            val=0;
+            for (i = 1; i <= 8; i++) {
+                double paan = (data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0))) / exp(paa_dec*(i/60.0)) / (1.20-0.20*exp(-1*(i/60.0)));
+                _avg_paa = (double)((count-1)*_avg_paa+paan)/count;
+
+                if (paa < paan) {
+                    paa = paan;
+                    changed=true;
+                    val=data[i];
+                    index=i;
+                }
+                count++;
+            }
+            if (changed) {
+                map.insert(index,val);
+                //qDebug()<<iteration<<"eCP Resolving: paa="<<paa<<"CP="<<ecp<<"p[i]"<<val;
+            }
+
+            if (_avg_paa<0.95*paa) {
+                paa = _avg_paa;
+            }
+
+
+            //
+            // SOLVE FOR ECP_DEC [Fatigue rate; CHO, Motivation, Hydration etc]
+            //
+            ecp_dec = ecp_dec_min;
+            changed=false;
+            val=0;
+            for (i = i7; i <= i8; i=i+120) {
+                double ecp_decn = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / ( 1 + etau/(i/60.0)) -1 ) / exp(ecp_dec_del/(i / 60.0));
+
+                if (ecp_decn > 0) ecp_decn = 0;
+
+                if (ecp_dec < ecp_decn) {
+                    ecp_dec = ecp_decn;
+                    changed=true;
+                    val=data[i];
+                    index=i;
+                }
+            }
+            if (changed) {
+                //qDebug()<<iteration<<"eCP Resolving: ecp_dec="<<ecp_dec<<"CP="<<ecp<<"p[i]"<<val;
+                map.insert(index,val);
+            }
+
+
+        } while ((fabs(etau - etau_prev) > etau_delta_max) ||
+                 (fabs(paa - paa_prev) > paa_delta_max)  ||
+                 (fabs(paa_dec - paa_dec_prev) > paa_dec_delta_max)  ||
+                 (fabs(ecp_del - ecp_del_prev) > ecp_del_delta_max)  ||
+                 (fabs(ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
+                );
+
+        // What did we get ...
+        // To help debug this below we output the derived values
+        // commented out for release, its quite a mouthful !
+
+        int pMax = paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp *
+                   (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) *
+                   (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) *
+                   (1+etau/(1/60.0));
+
+        int mmp60 = paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp *
+                   (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) *
+                   (1+ecp_dec*exp(ecp_dec_del/60.0)) *
+                   (1+etau/(60.0));
 
 #if 0
-    int pMax = paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * 
-               (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * 
-               (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * 
-               (1+etau/(1/60.0));
+        qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau
+                 << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec"
+                 << ecp_dec << "ecp_dec_del" << ecp_dec_del;
 
-    int mmp60 = paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp * 
-               (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) * 
-               (1+ecp_dec*exp(ecp_dec_del/60.0)) * 
-               (1+etau/(60.0));
-
-    qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau 
-             << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec" 
-             << ecp_dec << "ecp_dec_del" << ecp_dec_del;
-
-    qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
+        qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
+    }
 #endif
 }
 
