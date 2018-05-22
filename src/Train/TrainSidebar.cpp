@@ -1675,6 +1675,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
                 else lapTimeRemaining = 0;
 
+                long ergTimeRemaining;
+                if (ergFile) ergTimeRemaining = ergFile->Points.at(ergFile->rightPoint).x - load_msecs;
+                else ergTimeRemaining = 0;
+
 #if defined Q_OS_LINUX && QT_VERSION < 0x050600
                 // Sorry, lap alerts are only enabled for for Qt version 5.6 onwards on Linux
                 // see https://bugreports.qt.io/browse/QTBUG-40823
@@ -1699,10 +1703,17 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 if(lapTimeRemaining < 0) {
                         if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
-                        if(lapTimeRemaining < 0)
+                        if (lapTimeRemaining < 0)
                             lapTimeRemaining = 0;
                 }
                 rtData.setLapMsecsRemaining(lapTimeRemaining);
+
+                if (ergTimeRemaining < 0) {
+                        if (ergFile) ergTimeRemaining =  ergFile->Duration - load_msecs;
+                        if (ergTimeRemaining < 0)
+                            ergTimeRemaining = 0;
+                }
+                rtData.setErgMsecsRemaining(ergTimeRemaining);
             } else {
                 rtData.setDistance(displayDistance);
                 rtData.setLapDistance(displayLapDistance);

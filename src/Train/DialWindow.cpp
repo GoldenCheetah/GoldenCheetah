@@ -211,6 +211,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::LapTimeRemaining:
+    case RealtimeData::ErgTimeRemaining:
         {
         long msecs = value;
         valueLabel->setText(QString("%1:%2:%3").arg(msecs/MS_IN_ONE_HOUR)
@@ -551,6 +552,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::Time:
     case RealtimeData::LapTime:
     case RealtimeData::LapTimeRemaining:
+    case RealtimeData::ErgTimeRemaining:
     case RealtimeData::Distance:
     case RealtimeData::LapDistance:
     case RealtimeData::LapDistanceRemaining:

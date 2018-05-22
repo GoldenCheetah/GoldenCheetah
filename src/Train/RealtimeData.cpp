@@ -25,8 +25,8 @@ RealtimeData::RealtimeData()
 {
     name[0] = '\0';
     hr= watts= altWatts= speed= wheelRpm= load= slope= torque= 0.0;
-	cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
-	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
+    cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
+    lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
     lrbalance = rte = lte = lps = rps = 0.0;
     trainerStatusAvailable = false;
@@ -102,6 +102,11 @@ void RealtimeData::setLapMsecs(long x)
 void RealtimeData::setLapMsecsRemaining(long x)
 {
     this->lapMsecsRemaining = x;
+}
+
+void RealtimeData::setErgMsecsRemaining(long x)
+{
+    this->ergMsecsRemaining = x;
 }
 
 void RealtimeData::setDistance(double x)
@@ -316,6 +321,9 @@ double RealtimeData::value(DataSeries series) const
     case LapTimeRemaining: return lapMsecsRemaining;
         break;
 
+    case ErgTimeRemaining: return ergMsecsRemaining;
+        break;
+
     case Distance: return distance;
         break;
 
@@ -435,6 +443,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Slope;
         seriesList << LapDistance;
         seriesList << LapDistanceRemaining;
+        seriesList << ErgTimeRemaining;
     }
     return seriesList;
 }
@@ -457,6 +466,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case LapTimeRemaining: return tr("Lap Time Remaining");
+        break;
+
+    case ErgTimeRemaining: return tr("Section Time Remaining");
         break;
 
     case BikeStress: return tr("BikeStress");
