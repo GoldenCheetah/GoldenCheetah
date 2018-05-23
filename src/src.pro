@@ -89,8 +89,8 @@ QMAKE_CFLAGS_ISYSTEM =
 ### DISTRIBUTED SOURCE [Snaffled in sources to avoid further dependencies]
 ###=======================================================================
 
-# qwt, qxt, libz, json and qwtcurve
-INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve
+# qwt, qxt, libz, json, lmfit and qwtcurve
+INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve ../lmfit
 DEFINES += QXT_STATIC
 
 # to make sure we are toolchain neutral we NEVER refer to a lib
@@ -250,20 +250,6 @@ RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
 #                                                                             #
 #                                                                             #
 ###############################################################################
-
-###========================================
-### OPTIONAL => LMFIT Model fitting library
-###========================================
-!isEmpty(LMFIT_INSTALL) {
-
-    # we will work out the rest if you tell us where it is installed
-    isEmpty(LMFIT_INCLUDE) { LMFIT_INCLUDE = $${LMFIT_INSTALL}/src }
-    isEmpty(LMFIT_LIBS)    { LMFIT_LIBS    = -L$${LMFIT_INSTALL}/lib -llmfit }
-
-    INCLUDEPATH += $${LMFIT_INCLUDE}
-    LIBS        += $${LMFIT_LIBS}
-    DEFINES     += GC_HAVE_LMFIT
-}
 
 ###=========================
 ### OPTIONAL => Embed Python
@@ -769,7 +755,7 @@ HEADERS += Planning/PlanningWindow.h
 # contrib
 HEADERS += ../qtsolutions/codeeditor/codeeditor.h ../qtsolutions/json/mvjson.h ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
            ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h ../qxt/src/qxtstringspinbox.h ../qzip/zipreader.h \
-           ../qzip/zipwriter.h
+           ../qzip/zipwriter.h ../lmfit/lmcurve.h  ../lmfit/lmcurve_tyd.h  ../lmfit/lmmin.h  ../lmfit/lmstruct.h
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
@@ -868,7 +854,8 @@ SOURCES += Planning/PlanningWindow.cpp
 
 ## Contributed solutions
 SOURCES += ../qtsolutions/codeeditor/codeeditor.cpp ../qtsolutions/json/mvjson.cpp ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
-           ../qxt/src/qxtspanslider.cpp ../qxt/src/qxtstringspinbox.cpp ../qzip/zip.cpp
+           ../qxt/src/qxtspanslider.cpp ../qxt/src/qxtstringspinbox.cpp ../qzip/zip.cpp \
+           ../lmfit/lmcurve.c ../lmfit/lmmin.c
 
 ## Train View Components
 SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \

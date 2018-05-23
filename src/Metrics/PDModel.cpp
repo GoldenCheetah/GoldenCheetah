@@ -325,7 +325,7 @@ PDModel::deriveCPParameters(int model)
 
         } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 
-        fprintf(stderr, "tau=%f, t0= %f\n", tau, t0); fflush(stderr);
+        //fprintf(stderr, "tau=%f, t0= %f\n", tau, t0); fflush(stderr);
     }
 }
 
