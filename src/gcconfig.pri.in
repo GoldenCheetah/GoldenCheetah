@@ -235,10 +235,6 @@
 #CONFIG   += link_pkgconfig
 #PKGCONFIG = 
 
-# We use LMFit for model fitting Banister models
-# download from http://apps.jcns.fz-juelich.de/src/lmfit/
-#LMFIT_INSTALL = /usr/local
-
 # If your QT build includes its own local compress libs
 # then you should comment the line below, otherwise you
 # will need to have the compress libraries installed
