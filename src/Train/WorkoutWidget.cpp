@@ -1547,10 +1547,13 @@ WorkoutWidget::recompute(bool editing)
     // get CP/FTP to use in calculation
     int WPRIME = context->athlete->zones(false)->getWprime(rnum);
     int CP = context->athlete->zones(false)->getCP(rnum);
+    int PMAX = context->athlete->zones(false)->getPmax(rnum);
     int FTP = context->athlete->zones(false)->getFTP(rnum);
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
                         context->athlete->zones(false)->useCPforFTPSetting(), 0).toInt() == 0);
     if (useCPForFTP) FTP=CP;
+    if (PMAX<=0) PMAX=1000;
+    int K=WPRIME/(PMAX-CP);
 
     // truncate
     wattsArray.resize(0);
@@ -1671,16 +1674,28 @@ WorkoutWidget::recompute(bool editing)
             // 2 minutes, anything shorter and we are done
             int t = (secs-i-1) > 3600 ? 3600 : secs-i-1;
 
-            while (t > 120) {
+            while (t > 1) {
 
                 // calculate the TTE for the joules in the interval
                 // starting at i seconds with duration t
-                // This takes the monod equation p(t) = W'/t + CP and
-                // solves for t, but the added complication of also
-                // accounting for the fact it is expressed in joules
-                // So take Joules = (W'/t + CP) * t and solving that
-                // for t gives t = (Joules - W') / CP
-                double tc = ((integrated[i+t]-integrated[i]) - WPRIME) / CP;
+                //
+                // This uses a reformulation of the Morton 3 parameter
+                // model, which calculates TTE for a given work
+                // the exact formulation was taken from the article*:
+                //
+                //     Jones et al, Critical Power: Implications for Determination
+                //     of VO2max and Exercise Tolerance.  2010 ACMS.
+                //     DOI: 10.1249/MSS.0b013e3181d9cf7f
+                //
+                // * formula [16] and corrected a small typo
+                //
+                int W = integrated[i+t]-integrated[i];
+                double tc = (((W + (CP*K)) - WPRIME) +
+                            std::sqrt((std::pow(W + (CP*K) - WPRIME, 2) - (4*CP*K*W)))) / (2*CP);
+
+                // TTE goes negative !
+                if (tc < 0) tc=1;
+
                 // NOTE FOR ABOVE: it is looking at accumulation AFTER this point
                 //                 not FROM this point, so we are looking 1s ahead of i
                 //                 which is why the interval is registered as starting
@@ -1708,8 +1723,7 @@ WorkoutWidget::recompute(bool editing)
                 } else {
 
                     t = tc;
-                    if (t<120)
-                        t=120;
+                    if (t<1) t=1;
                 }
             }
         }
