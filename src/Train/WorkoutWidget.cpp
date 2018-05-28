@@ -1717,8 +1717,9 @@ WorkoutWidget::recompute(bool editing)
                     }
 
 
-                    // move on shorter/harder are just as bad
-                    t=0;
+                    // keep searching if on second pass
+                    if (j) t--;
+                    else t=0;
 
                 } else {
 
