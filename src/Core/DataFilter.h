@@ -73,7 +73,7 @@ class Leaf {
         Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification());
 
         // tree traversal etc
-        void print(Leaf *, int level, DataFilterRuntime*);  // print leaf and all children
+        void print(int level, DataFilterRuntime*);  // print leaf and all children
         void color(Leaf *, QTextDocument *);  // update the document to match
         bool isDynamic(Leaf *);
         void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate

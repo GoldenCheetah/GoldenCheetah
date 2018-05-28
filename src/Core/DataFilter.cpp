@@ -853,66 +853,78 @@ Leaf::toString()
     return "";
 }
 
-void Leaf::print(Leaf *leaf, int level, DataFilterRuntime *df)
+void Leaf::print(int level, DataFilterRuntime *df)
 {
     qDebug()<<"LEVEL"<<level;
-    if (leaf == NULL) {
-        qDebug()<<"NULL";
-        return;
-    }
-    switch(leaf->type) {
-    case Leaf::Script: qDebug()<<leaf->lvalue.s; break;
-    case Leaf::Compound: 
-                        qDebug()<<"{";
-                        foreach(Leaf *p, *(leaf->lvalue.b)) print(p, level+1, df);
-                        qDebug()<<"}";
-                        break;
+    switch(type) {
+    case Leaf::Script :
+        qDebug()<<lvalue.s;
+        break;
+    case Leaf::Compound :
+        qDebug()<<"{";
+        foreach(Leaf *p, *(lvalue.b))
+            p->print(level+1, df);
+        qDebug()<<"}";
+        break;
 
-    case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f<<leaf->dynamic; break;
-    case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i<<leaf->dynamic; break;
-    case Leaf::String : qDebug()<<"string"<<*leaf->lvalue.s<<leaf->dynamic; break;
-    case Leaf::Symbol : {
-                            double value=0;
-                            if (df) value=df->symbols.value(*leaf->lvalue.n).number;
-                            qDebug()<<"symbol"<<*leaf->lvalue.n<<leaf->dynamic<<value;
-                        }
-                        break;
-    case Leaf::Logical  : qDebug()<<"lop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1, df);
-                    if (leaf->op) // nonzero ?
-                    leaf->print(leaf->rvalue.l, level+1, df);
-                    break;
-    case Leaf::Operation : qDebug()<<"cop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1, df);
-                    leaf->print(leaf->rvalue.l, level+1, df);
-                    break;
-    case Leaf::UnaryOperation : qDebug()<<"uop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1, df);
-                    break;
-    case Leaf::BinaryOperation : qDebug()<<"bop"<<leaf->op;
-                    leaf->print(leaf->lvalue.l, level+1, df);
-                    leaf->print(leaf->rvalue.l, level+1, df);
-                    break;
-    case Leaf::Function :
-                    if (leaf->series) {
-                        qDebug()<<"function"<<leaf->function<<"parm="<<*(leaf->series->lvalue.n);
-                        if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1, df);
-                    } else {
-                        qDebug()<<"function"<<leaf->function<<"parms:"<<leaf->fparms.count();
-                        foreach(Leaf*l, leaf->fparms) leaf->print(l, level+1, df);
-                    }
-                    break;
-    case Leaf::Vector : qDebug()<<"vector";
-                    leaf->print(leaf->lvalue.l, level+1, df);
-                    leaf->print(leaf->fparms[0], level+1, df);
-                    leaf->print(leaf->fparms[1], level+1, df);
-                    break;
-    case Leaf::Conditional : qDebug()<<"cond"<<op;
+    case Leaf::Float :
+        qDebug()<<"float"<<lvalue.f<<dynamic;
+        break;
+    case Leaf::Integer :
+        qDebug()<<"integer"<<lvalue.i<<dynamic;
+        break;
+    case Leaf::String :
+        qDebug()<<"string"<<*lvalue.s<<dynamic;
+        break;
+    case Leaf::Symbol :
         {
-                    leaf->print(leaf->cond.l, level+1, df);
-                    leaf->print(leaf->lvalue.l, level+1, df);
-                    if (leaf->rvalue.l) leaf->print(leaf->rvalue.l, level+1, df);
+            double value = (df ? df->symbols.value(*lvalue.n).number : 0);
+            qDebug()<<"symbol"<<*lvalue.n<<dynamic<<value;
         }
+        break;
+    case Leaf::Logical :
+        qDebug()<<"lop"<<op;
+        lvalue.l->print(level+1, df);
+        if (op) // nonzero ?
+            rvalue.l->print(level+1, df);
+        break;
+    case Leaf::Operation:
+        qDebug()<<"cop"<<op;
+        lvalue.l->print(level+1, df);
+        rvalue.l->print(level+1, df);
+        break;
+    case Leaf::UnaryOperation:
+        qDebug()<<"uop"<<op;
+        lvalue.l->print(level+1, df);
+        break;
+    case Leaf::BinaryOperation:
+        qDebug()<<"bop"<<op;
+        lvalue.l->print(level+1, df);
+        rvalue.l->print(level+1, df);
+        break;
+    case Leaf::Function:
+        if (series) {
+            qDebug()<<"function"<<function<<"parm="<<*(series->lvalue.n);
+            if (lvalue.l)
+                lvalue.l->print(level+1, df);
+        } else {
+            qDebug()<<"function"<<function<<"parms:"<<fparms.count();
+            foreach(Leaf* l, fparms)
+                l->print(level+1, df);
+        }
+        break;
+    case Leaf::Vector:
+        qDebug()<<"vector";
+        lvalue.l->print(level+1, df);
+        fparms[0]->print(level+1, df);
+        fparms[1]->print(level+1, df);
+        break;
+    case Leaf::Conditional:
+        qDebug()<<"cond"<<op;
+        cond.l->print(level+1, df);
+        lvalue.l->print(level+1, df);
+        if (rvalue.l)
+            rvalue.l->print(level+1, df);
         break;
 
     default:
@@ -1260,8 +1272,8 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         (leaf->function == "unset" && leaf->fparms.count() != 2)) {
 
                         leaf->inerror = true;
-                        DataFiltererrors << (leaf->function == "set" ? 
-                            QString(tr("set function needs 3 paramaters; symbol, value and expression.")) : 
+                        DataFiltererrors << (leaf->function == "set" ?
+                            QString(tr("set function needs 3 paramaters; symbol, value and expression.")) :
                             QString(tr("unset function needs 2 paramaters; symbol and expression.")));
 
                     } else {
@@ -1441,7 +1453,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             }
 
             // a list of statements, the last of which is what we
-            // evaluate to for the purposes of filtering etc 
+            // evaluate to for the purposes of filtering etc
             foreach(Leaf *p, *(leaf->lvalue.b)) validateFilter(context, df, p);
         }
         break;
@@ -1602,7 +1614,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
         rt.isdynamic = treeRoot->isDynamic(treeRoot);
 
         // successfully parsed, lets check semantics
-        //treeRoot->print(treeRoot);
+        //treeRoot->print(0,NULL);
         emit parseGood();
 
         // clear current filter list
@@ -1777,7 +1789,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 PMAX = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getPmax(zoneRange) : 0;
 
                 // use CP for FTP, or is it configured separately
-                bool useCPForFTP = (appsettings->cvalue(m->context->athlete->cyclist, 
+                bool useCPForFTP = (appsettings->cvalue(m->context->athlete->cyclist,
                                     m->context->athlete->zones(m->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
                 if (zoneRange >= 0 && !useCPForFTP) {
                     FTP = m->context->athlete->zones(m->isRun)->getFTP(zoneRange);
@@ -2380,7 +2392,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     if (leaf->fparms.count() != 1) qDebug()<<"bad print.";
 
                     // symbol we are setting
-                    leaf->print(leaf->fparms[0], 0, df);
+                    leaf->fparms[0]->print(0, df);
                 }
                 break;
 
