@@ -243,10 +243,12 @@ function_def:
 parms: 
 
         lexpr                                   { $$ = new Leaf(@1.first_column, @1.last_column);
-                                                  $$->type = Leaf::Parameters;
+                                                  $$->type = Leaf::Function;
+                                                  $$->series = NULL; // not tiz/best
                                                   $$->fparms << $1;
                                                 }
-        | parms ',' lexpr                       { $1->fparms << $3; }
+        | parms ',' lexpr                       { $1->fparms << $3;
+                                                  $1->leng = @3.last_column; }
         ;
 
 /*
@@ -446,12 +448,11 @@ expr:
                                                   $$->lvalue.l = NULL;
                                                 }
                                                   /* functions all have zero or more parameters */
-        | symbol '(' parms ')'                  { /* need to convert symbol to a function */
-                                                  $1->leng = @4.last_column;
-                                                  $1->type = Leaf::Function;
-                                                  $1->series = NULL; // not tiz/best
-                                                  $1->function = *($1->lvalue.n);
-                                                  $1->fparms = $3->fparms;
+        | symbol '(' parms ')'                  { /* need to convert params to a function */
+                                                  $3->loc = @1.first_column;
+                                                  $3->leng = @4.last_column;
+                                                  $3->function = *($1->lvalue.n);
+                                                  $$ = $3;
                                                 }
         | symbol '(' ')'                        { /* need to convert symbol to function */
                                                   $1->type = Leaf::Function;

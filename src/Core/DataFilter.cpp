@@ -845,8 +845,6 @@ Leaf::toString()
                     }
         }
         break;
-    case Leaf::Parameters :
-        break;
 
     default:
         break;
@@ -916,12 +914,6 @@ void Leaf::print(Leaf *leaf, int level, DataFilterRuntime *df)
                     if (leaf->rvalue.l) leaf->print(leaf->rvalue.l, level+1, df);
         }
         break;
-    case Leaf::Parameters :
-        {
-        qDebug()<<"parameters"<<leaf->fparms.count();
-        foreach(Leaf*l, fparms) leaf->print(l, level+1, df);
-        }
-        break;
 
     default:
         break;
@@ -985,7 +977,6 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
             return true;
         }
         break;
-    case Leaf::Parameters : return false; break;
 
     default:
         return false;
@@ -1437,14 +1428,6 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             validateFilter(context, df, leaf->cond.l);
             validateFilter(context, df, leaf->lvalue.l);
             if (leaf->rvalue.l) validateFilter(context, df, leaf->rvalue.l);
-        }
-        break;
-
-    case Leaf::Parameters :
-        {
-            // should never get here !
-            DataFiltererrors << tr("internal parser error: parms");
-            leaf->inerror = true;
         }
         break;
 

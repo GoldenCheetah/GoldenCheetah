@@ -85,7 +85,7 @@ class Leaf {
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
                Function, Conditional, Vector, Index,
-               Parameters, Compound, Script } type;
+               Compound, Script } type;
 
         union value {
             float f;
