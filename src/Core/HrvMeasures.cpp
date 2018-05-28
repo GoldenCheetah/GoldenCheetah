@@ -148,6 +148,7 @@ HrvMeasureParser::unserialize(QFile &file, QList<HrvMeasure> &data) {
         data.append(m);
     }
 
+    file.close();
     return true;
 }
 

@@ -216,5 +216,6 @@ void CpuStat::lookUp( double values[NValues] ) const
             }
         }
         while( !textStream.atEnd() );
+        file.close();
     }
 }

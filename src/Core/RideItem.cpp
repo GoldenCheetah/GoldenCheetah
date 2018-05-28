@@ -1433,6 +1433,7 @@ RideItem::updateIntervals()
             }
         }
         out << "STOP" << QDateTime::currentDateTime().toString() + "\r\n";
+        log.close();
     }
 
 
