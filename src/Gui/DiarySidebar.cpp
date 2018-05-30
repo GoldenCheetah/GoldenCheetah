@@ -85,12 +85,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 void
 DiarySidebar::configChanged(qint32)
 {
-    // GCColor stylesheet is too generic, we ONLY want to style the container
-    // and NOT its children. This is why stylesheets on widgets is a stoopid idea
-    QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
-
-    // now apply
+    // apply
     multiCalendar->refresh();
 
     // and summary .. forgetting what we already prepared

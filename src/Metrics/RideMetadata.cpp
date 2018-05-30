@@ -608,10 +608,12 @@ FormField::~FormField()
 
     switch (definition.type) {
         case FIELD_TEXT:
-        case FIELD_SHORTTEXT: if (definition.name == "Keywords")
+        case FIELD_SHORTTEXT:
+            if (definition.name == "Keywords")
                 delete (QLineEdit*)widget;
-                if (completer) delete completer;
-                break;
+            if (completer)
+                delete completer;
+            break;
         case FIELD_TEXTBOX : if (definition.name == "Summary")
                                  delete ((RideSummaryWindow *)widget);
                              else

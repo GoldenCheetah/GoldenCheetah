@@ -1507,7 +1507,7 @@ CPPlot::plotEfforts()
 
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
-    sym->setSize((dpiXFactor * rangemode) ? 4 : 6);
+    sym->setSize(dpiXFactor * (rangemode ? 4 : 6));
     QColor col= GColor(CPOWER);
     col.setAlpha(128);
     sym->setBrush(col);

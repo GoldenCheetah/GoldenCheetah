@@ -235,7 +235,7 @@ void lmmin(
     if( C->verbosity&2 )
         lm_print_pars(nout, x, msgfile);
     (*evaluate)(x, m, data, fvec, &(S->userbreak));
-    if( C->verbosity&8 )
+    if( C->verbosity&8 ){
         if (y)
             for( i=0; i<m; ++i )
                 fprintf(msgfile, "    i, f, y-f: %4i %18.8g %18.8g\n",
@@ -243,6 +243,7 @@ void lmmin(
         else
             for( i=0; i<m; ++i )
                 fprintf(msgfile, "    i, f: %4i %18.8g\n", i, fvec[i]);
+    }
     S->nfev = 1;
     if ( S->userbreak )
         goto terminate;
@@ -461,7 +462,7 @@ void lmmin(
             /* ratio of actual to predicted reduction */
             ratio = prered ? actred/prered : 0;
 
-            if( C->verbosity&32 )
+            if( C->verbosity&32 ){
                 if (y)
                     for( i=0; i<m; ++i )
                         fprintf(msgfile, "    i, f, y-f: %4i %18.8g %18.8g\n",
@@ -470,6 +471,7 @@ void lmmin(
                     for( i=0; i<m; ++i )
                         fprintf(msgfile, "    i, f, y-f: %4i %18.8g\n",
                                 i, fvec[i]);
+            }
             if( C->verbosity&2 ) {
                 printf("%3i %2i %9.2g %9.2g %9.2g %14.6g"
                        " %9.2g %10.3e %10.3e %21.15e",
@@ -570,7 +572,7 @@ terminate:
         fprintf(msgfile, "lmmin terminates with outcome %i\n", S->outcome);
     if( C->verbosity&2 )
         lm_print_pars(nout, x, msgfile);
-    if( C->verbosity&8 )
+    if( C->verbosity&8 ){
         if (y)
             for( i=0; i<m; ++i )
                 fprintf(msgfile, "    i, f, y-f: %4i %18.8g %18.8g\n",
@@ -578,6 +580,7 @@ terminate:
         else
             for( i=0; i<m; ++i )
                 fprintf(msgfile, "    i, f, y-f: %4i %18.8g\n", i, fvec[i]);
+    }
     if( C->verbosity&2 )
         fprintf(msgfile, "  fnorm=%24.16g xnorm=%24.16g\n", S->fnorm, xnorm);
     if ( S->userbreak ) /* user-requested break */
@@ -1192,12 +1195,12 @@ double lm_enorm(const int n, const double *const x)
 
     if (s1 != 0)
         return x1max * sqrt(s1 + (s2 / x1max) / x1max);
-    else if (s2 != 0)
+    else if (s2 != 0) {
         if (s2 >= x3max)
             return sqrt(s2 * (1 + (x3max / s2) * (x3max * s3)));
         else
             return sqrt(x3max * ((s2 / x3max) + (x3max * s3)));
-    else
+    } else
         return x3max * sqrt(s3);
 
 } /*** lm_enorm. ***/
@@ -1269,12 +1272,12 @@ double lm_fnorm(const int n, const double *const x, const double *const y)
 
     if (s1 != 0)
         return x1max * sqrt(s1 + (s2 / x1max) / x1max);
-    else if (s2 != 0)
+    else if (s2 != 0) {
         if (s2 >= x3max)
             return sqrt(s2 * (1 + (x3max / s2) * (x3max * s3)));
         else
             return sqrt(x3max * ((s2 / x3max) + (x3max * s3)));
-    else
+    } else
         return x3max * sqrt(s3);
 
 } /*** lm_fnorm. ***/

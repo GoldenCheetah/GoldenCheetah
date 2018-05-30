@@ -681,7 +681,7 @@ struct BinFileReaderState
                         default:
                             for (int i = 0; i < field.size; ++i)
                                 read_byte(&bytes_read,&sum);
-                                errors << QString("unsupported field size %1").arg(field.size);
+                            errors << QString("unsupported field size %1").arg(field.size);
                      }
                      values.push_back(v);
                      //printf("- %d : %d\n", field.id, v);

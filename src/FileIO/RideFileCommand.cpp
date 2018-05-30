@@ -638,11 +638,13 @@ SetXDataPointValueCommand::doCommand()
     if (series && !doubles_equal(oldvalue, newvalue)) {
         switch(col){
         case 0:
-        series->datapoints[row]->secs = newvalue;
+            series->datapoints[row]->secs = newvalue;
+            break;
         case 1:
-        series->datapoints[row]->km = newvalue;
+            series->datapoints[row]->km = newvalue;
+            break;
         default:
-        series->datapoints[row]->number[col-2] = newvalue;
+            series->datapoints[row]->number[col-2] = newvalue;
         }
     }
     return true;
@@ -654,11 +656,13 @@ SetXDataPointValueCommand::undoCommand()
     if (series && !doubles_equal(oldvalue, newvalue)) {
         switch(col){
         case 0:
-        series->datapoints[row]->secs = oldvalue;
+            series->datapoints[row]->secs = oldvalue;
+            break;
         case 1:
-        series->datapoints[row]->km = oldvalue;
+            series->datapoints[row]->km = oldvalue;
+            break;
         default:
-        series->datapoints[row]->number[col-2] = oldvalue;
+            series->datapoints[row]->number[col-2] = oldvalue;
         }
     }
     return true;

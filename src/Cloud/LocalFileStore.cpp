@@ -144,7 +144,6 @@ LocalFileStore::readFile(QByteArray *data, QString remotename, QString)
         *data = file.readAll();
         file.close();
     } else {
-        file.close();
         return false;
     };
 
@@ -177,7 +176,6 @@ LocalFileStore::writeFile(QByteArray &data, QString remotename, RideFile *ride)
         file.write(data);
         file.close();
     } else {
-        file.close();
         emit writeComplete("", tr("Write to folder %1 failed").arg(path));  // required for single upload to get to an end
         return false;
     };

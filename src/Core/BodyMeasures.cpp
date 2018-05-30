@@ -142,6 +142,7 @@ BodyMeasureParser::unserialize(QFile &file, QList<BodyMeasure> &data) {
         data.append(m);
     }
 
+    file.close();
     return true;
 }
 

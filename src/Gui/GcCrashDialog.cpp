@@ -540,6 +540,6 @@ GcCrashDialog::saveAs()
         out << report->page()->mainFrame()->toPlainText();
 #endif
 
+        file.close();
     }
-    file.close();
 }

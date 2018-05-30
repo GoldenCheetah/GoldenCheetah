@@ -739,6 +739,7 @@ CriticalPowerWindow::modelChanged()
             velo2->show();
             velo3->show();
 
+            // intentional fallthrough
             // and drop through into case 1 below ...
 
     case 1 : // Classic 2 param model 2-20 default (per literature)

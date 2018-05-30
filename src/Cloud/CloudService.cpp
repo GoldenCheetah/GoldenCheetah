@@ -200,6 +200,10 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
     }
 
     if (result == true) {
+        // read the ride file
+        jsonFile.open(QFile::ReadOnly);
+        data = jsonFile.readAll();
+        jsonFile.close();
 
         if (uploadCompression == zip) {
             // create a temp zip file
@@ -211,10 +215,8 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
             QString zipname = zipFile.fileName();
             ZipWriter writer(zipname);
 
-            // read the ride file back and add to zip file
-            jsonFile.open(QFile::ReadOnly);
-            writer.addFile(name, jsonFile.readAll());
-            jsonFile.close();
+            // add the ride file to the zip file
+            writer.addFile(name, data);
             writer.close();
 
             // now read in the zipfile
@@ -223,12 +225,7 @@ CloudService::compressRide(RideFile*ride, QByteArray &data, QString name)
             data = zip.readAll();
             zip.close();
         } else if (uploadCompression == gzip) {
-            // read the ride file
-            jsonFile.open(QFile::ReadOnly);
-            data = gCompress(jsonFile.readAll());
-        } else {
-            jsonFile.open(QFile::ReadOnly);
-            data = jsonFile.readAll();
+            data = gCompress(data);
         }
     }
 }

@@ -264,6 +264,7 @@ MUPlot::setModel(int model)
             fastHandle->attach(this);
 
         }
+        // intentional fallthrough
 
     case 1 : // Normal distribution
         {

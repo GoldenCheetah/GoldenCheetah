@@ -210,7 +210,6 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
         // get the data
         QByteArray r = reply->readAll();
 
-        int received = 0;
         printd("page : %s\n", r.toStdString().c_str());
 
         // parse JSON payload
@@ -221,7 +220,6 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
         if (parseError.error == QJsonParseError::NoError) {
 
             QJsonArray activities = document.object()["activities"].toArray();
-            received = activities.count();
             for(int i=0; i<activities.count(); i++) {
 
                 QJsonObject activity = activities.at(i).toObject();
@@ -334,6 +332,8 @@ Xert::readActivityDetail(QString path, bool withSessionData)
 
         }
     }
+
+    return QJsonObject();
 }
 
 // read a file at location (relative to home) into passed array

@@ -1259,6 +1259,7 @@ void ANTChannel::attemptTransition(int message_id)
         // unassign regardless of status
         parent->sendMessage(ANTMessage::unassignChannel(number)); // unassign whatever we had before
 
+        // intentional fallthrough
         // drops through into assign channel because if the channel currently has no
         // assignment the unassign channel message will generate an error response not
         // an unassign channel response. But we don't really know what state the device

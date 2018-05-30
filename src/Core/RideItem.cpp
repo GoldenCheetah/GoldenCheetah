@@ -97,32 +97,34 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
 
     // don't update the interval pointers if this is a 
     // temporary "fake" rideitem.
-    if (!temp) foreach(IntervalItem *p, intervals_) p->rideItem_ = this;
+    if (!temp)
+        foreach(IntervalItem *p, intervals_)
+            p->rideItem_ = this;
 
-	context = here.context;
-	isdirty = here.isdirty;
+    context = here.context;
+    isdirty = here.isdirty;
     isstale = here.isstale;
-	isedit = here.isedit;
-	skipsave = here.skipsave;
+    isedit = here.isedit;
+    skipsave = here.skipsave;
     if (planned == false)
         path = here.path;
-	fileName = here.fileName;
-	dateTime = here.dateTime;
+    fileName = here.fileName;
+    dateTime = here.dateTime;
     zoneRange = here.zoneRange;
     hrZoneRange = here.hrZoneRange;
     paceZoneRange = here.paceZoneRange;
-	fingerprint = here.fingerprint;
-	metacrc = here.metacrc;
+    fingerprint = here.fingerprint;
+    metacrc = here.metacrc;
     crc = here.crc;
-	timestamp = here.timestamp;
-	dbversion = here.dbversion;
-	udbversion = here.udbversion;
-	color = here.color;
-	present = here.present;
+    timestamp = here.timestamp;
+    dbversion = here.dbversion;
+    udbversion = here.udbversion;
+    color = here.color;
+    present = here.present;
     isRun = here.isRun;
     isSwim = here.isSwim;
-	weight = here.weight;
-	overrides_ = here.overrides_;
+    weight = here.weight;
+    overrides_ = here.overrides_;
     samples = here.samples;
 }
 
@@ -1433,6 +1435,7 @@ RideItem::updateIntervals()
             }
         }
         out << "STOP" << QDateTime::currentDateTime().toString() + "\r\n";
+        log.close();
     }
 
 
