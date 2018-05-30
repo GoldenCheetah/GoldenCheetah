@@ -20900,7 +20900,7 @@ No rides found to import.
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
-        <source>PolarFlow authorization was successful.</source>
+        <source>Polar Flow authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -23433,17 +23433,17 @@ Chcete pokračovat?</translation>
     <name>PolarFlow</name>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
-        <source>Network Problem reading PolarFlow data</source>
+        <source>Network Problem reading Polar Flow data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
-        <source>problem parsing PolarFlow data</source>
+        <source>problem parsing Polar Flow data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
-        <source>You must authorise with Today&apos;s Plan first</source>
+        <source>You must authorise with Polar Flow first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

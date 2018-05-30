@@ -23775,8 +23775,8 @@ Pas d&apos;activité trouvée à importer.
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
-        <source>PolarFlow authorization was successful.</source>
-        <translation>L&apos;autorisation pour PolarFlow a réussie.</translation>
+        <source>Polar Flow authorization was successful.</source>
+        <translation>L&apos;autorisation pour Polar Flow a réussie.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
@@ -26341,18 +26341,18 @@ Voulez-vous continuer?</translation>
     <name>PolarFlow</name>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
-        <source>Network Problem reading PolarFlow data</source>
-        <translation>Problème de réseau lors de la lecture des données PolarFlow</translation>
+        <source>Network Problem reading Polar Flow data</source>
+        <translation>Problème de réseau lors de la lecture des données Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
-        <source>problem parsing PolarFlow data</source>
-        <translation>Problème d&apos;analyse des données PolarFlow</translation>
+        <source>problem parsing Polar Flow data</source>
+        <translation>Problème d&apos;analyse des données Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
-        <source>You must authorise with Today&apos;s Plan first</source>
-        <translation>Vous devez d&apos;abord autoriser avec Today&apos;s Plan</translation>
+        <source>You must authorise with Polar Flow first</source>
+        <translation>Vous devez d&apos;abord autoriser avec Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>

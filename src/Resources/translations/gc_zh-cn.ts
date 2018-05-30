@@ -20908,8 +20908,8 @@ No rides found to import.
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
-        <source>PolarFlow authorization was successful.</source>
-        <translation>PolarFlow授权成功.</translation>
+        <source>Polar Flow authorization was successful.</source>
+        <translation>Polar Flow授权成功.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
@@ -23384,18 +23384,18 @@ Do you want to continue?</source>
     <name>PolarFlow</name>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
-        <source>Network Problem reading PolarFlow data</source>
-        <translation>读取PolarFlow数据网络错误</translation>
+        <source>Network Problem reading Polar Flow data</source>
+        <translation>读取Polar Flow数据网络错误</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
-        <source>problem parsing PolarFlow data</source>
-        <translation>解析PolarFlow数据错误</translation>
+        <source>problem parsing Polar Flow data</source>
+        <translation>解析Polar Flow数据错误</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
-        <source>You must authorise with Today&apos;s Plan first</source>
-        <translation>必须首先通过Today&apos;s Plan授权</translation>
+        <source>You must authorise with Polar Flow first</source>
+        <translation>必须首先通过Polar Flow授权</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>

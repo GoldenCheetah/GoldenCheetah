@@ -556,7 +556,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QByteArray r = bind->readAll();
             //qDebug()<<bind->errorString()<< "bind response="<<r;
 
-            QString info = QString(tr("PolarFlow authorization was successful."));
+            QString info = QString(tr("Polar Flow authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 
