@@ -9112,7 +9112,7 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="538"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="34"/>
@@ -10104,7 +10104,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="130"/>
         <source>You must authorise with Dropbox first</source>
-        <translation>Vous devez d&apos;abord autoriser avec Dropbox</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à Dropbox</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="199"/>
@@ -10115,12 +10115,12 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
         <location filename="../../Cloud/Dropbox.cpp" line="287"/>
         <location filename="../../Cloud/Dropbox.cpp" line="306"/>
         <source>Completed.</source>
-        <translation>Accompli.</translation>
+        <translation>Terminé.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="291"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <source>Dropbox Cloud Storage</source>
@@ -11839,7 +11839,7 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     </message>
     <message>
         <source>Completed.</source>
-        <translation type="vanished">Accompli.</translation>
+        <translation>Terminé.</translation>
     </message>
 </context>
 <context>
@@ -12151,7 +12151,7 @@ Note: if the ride file already contain wind data
     </message>
     <message>
         <source>, direction</source>
-        <translation type="vanished">, de face</translation>
+        <translation>, direction</translation>
     </message>
     <message>
         <source>Derive estimated power data based on speed/elevation/weight etc
@@ -14512,7 +14512,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Cloud/GoogleDrive.cpp" line="284"/>
         <source>You must authorise with GoogleDrive first</source>
-        <translation>Vous devez d&apos;abord autoriser avec GoogleDrive</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à GoogleDrive</translation>
     </message>
     <message>
         <location filename="../../Cloud/GoogleDrive.cpp" line="301"/>
@@ -14523,7 +14523,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../../Cloud/GoogleDrive.cpp" line="621"/>
         <location filename="../../Cloud/GoogleDrive.cpp" line="637"/>
         <source>Completed.</source>
-        <translation>Accompli.</translation>
+        <translation>Terminé.</translation>
     </message>
     <message>
         <location filename="../../Cloud/GoogleDrive.cpp" line="625"/>
@@ -20248,7 +20248,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../../Cloud/LocalFileStore.cpp" line="150"/>
         <location filename="../../Cloud/LocalFileStore.cpp" line="183"/>
         <source>Completed.</source>
-        <translation>Accompli.</translation>
+        <translation>Terminé.</translation>
     </message>
     <message>
         <location filename="../../Cloud/LocalFileStore.cpp" line="170"/>
@@ -26352,7 +26352,7 @@ Voulez-vous continuer?</translation>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
         <source>You must authorise with Polar Flow first</source>
-        <translation>Vous devez d&apos;abord autoriser avec Polar Flow</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>
@@ -29703,7 +29703,7 @@ Fichier ignoré...</translation>
     </message>
     <message>
         <source>Completed.</source>
-        <translation type="obsolete">Accompli.</translation>
+        <translation>Terminé.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1143"/>
@@ -30436,7 +30436,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="221"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec de l&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/RideWithGPS.h" line="34"/>
@@ -31887,7 +31887,7 @@ Devons-nous le faire?
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="193"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.h" line="34"/>
@@ -32092,7 +32092,7 @@ Devons-nous le faire?
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="456"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.h" line="38"/>
@@ -32830,12 +32830,12 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="137"/>
         <source>JSON parser error</source>
-        <translation>Erreur d&apos;analyse JSON</translation>
+        <translation>Données JSON malformées</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="172"/>
         <source>You must authorise with SportTracks first</source>
-        <translation>Vous devez d&apos;abord autoriser avec SportTracks</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à SportTracks</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="552"/>
@@ -32846,7 +32846,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="611"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.h" line="38"/>
@@ -33065,7 +33065,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../../Cloud/Strava.cpp" line="116"/>
         <source>You must authorise with Strava first</source>
-        <translation>Vous devez d&apos;abord autoriser avec Strava</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à Strava</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="156"/>
@@ -34014,7 +34014,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="199"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation>Vous devez d&apos;abord autoriser avec Today&apos;s Plan</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="471"/>
@@ -34025,7 +34025,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="475"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.h" line="38"/>
@@ -34241,7 +34241,7 @@ Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="334"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation>Vous devez d&apos;abord autoriser avec Today&apos;s Plan</translation>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à Today&apos;s Plan</translation>
     </message>
 </context>
 <context>
@@ -35059,7 +35059,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     </message>
     <message>
         <source>Completed.</source>
-        <translation type="vanished">Terminé.</translation>
+        <translation>Terminé.</translation>
     </message>
     <message>
         <source>Error - Upload failed.</source>
@@ -35817,7 +35817,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="238"/>
         <source>Network Error - Upload failed.</source>
-        <translation>Erreur réseau - Échec d&apos;envoi.</translation>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.h" line="39"/>
@@ -37023,6 +37023,40 @@ Vous pouvez supprimer des références lors de la gestion de la bibliothèque vi
         <location filename="../../Cloud/Xert.h" line="38"/>
         <source>Xert</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Xert.h" line="39"/>
+        <source>Sync with the innovative site for fitness monitoring, tracking, and planning.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Xert</name>
+    <message>
+        <location filename="../../Cloud/Xert.cpp" line="139"/>
+        <source>JSON parser error</source>
+        <translation>Données JSON malformées</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Xert.cpp" line="174"/>
+        <source>You must authorise with Xert first</source>
+        <translation>Vous devez d&apos;abord autoriser GC à accéder à Xert</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Xert.cpp" line="478"/>
+        <location filename="../../Cloud/Xert.cpp" line="569"/>
+        <source>Completed.</source>
+        <translation>Terminé.</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Xert.cpp" line="571"/>
+        <source>Network Error - Upload failed.</source>
+        <translation>Problème de connexion - échec de l'envoi.</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Xert.h" line="38"/>
+        <source>Xert</source>
+        <translation>Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="39"/>
