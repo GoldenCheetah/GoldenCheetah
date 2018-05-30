@@ -2,9 +2,9 @@ version: ci.{build}
 image: Visual Studio 2015
 clone_depth: 1
 init:
-# Setup QT 5.9.4 - 64Bit
+# Setup QT 5.9 - 64Bit
 
-- set QTDIR=C:\Qt\5.9.4\msvc2015_64
+- set QTDIR=C:\Qt\5.9\msvc2015_64
 - set PATH=%QTDIR%\bin;%PATH%
 
 # Setup MSVC - VS 2015
