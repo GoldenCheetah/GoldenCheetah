@@ -242,10 +242,8 @@ OAuthDialog::urlChanged(const QUrl &url)
                 url.toString().contains("blank.html?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
 
-            QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
-
-            // sporttracks insists on passing state
-            if (code.endsWith("&state=xyzzy")) code = code.mid(0,code.length()-12);
+            QUrlQuery parse(url);
+            QString code=parse.queryItemValue("code");
 
             QByteArray data;
 #if QT_VERSION > 0x050000
