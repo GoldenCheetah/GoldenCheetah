@@ -21,9 +21,6 @@
 #include "GoldenCheetah.h"
 #include "Pages.h"
 #include "CloudService.h"
-#ifdef GC_HAVE_KQOAUTH
-#include <kqoauthmanager.h>
-#endif
 #include <QObject>
 #include <QtGui>
 #include <QWidget>
@@ -108,11 +105,6 @@ private:
     QNetworkAccessManager* manager;
 
     QUrl url;
-
-#ifdef GC_HAVE_KQOAUTH
-    KQOAuthManager *oauthManager;
-    KQOAuthRequest *oauthRequest;
-#endif
 };
 
 #endif // OAUTHDIALOG_H

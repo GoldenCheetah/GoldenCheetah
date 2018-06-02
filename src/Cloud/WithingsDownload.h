@@ -29,10 +29,6 @@
 #include "BodyMeasures.h"
 #include "WithingsReading.h"
 
-#ifdef GC_HAVE_KQOAUTH
-#include <kqoauthmanager.h>
-#endif
-
 class WithingsDownload : public QObject
 {
     Q_OBJECT
@@ -53,10 +49,6 @@ private:
     QNetworkAccessManager *nam;
     QString response;
 
-    #ifdef GC_HAVE_KQOAUTH
-    KQOAuthManager *oauthManager;
-    KQOAuthRequest *oauthRequest;
-    #endif
     QEventLoop loop;
 
     QJsonParseError parse(QString text, QList<BodyMeasure> &bodyMeasures);
@@ -65,9 +57,5 @@ private:
 private slots:
 
     void downloadFinished(QNetworkReply *reply);
-    #ifdef GC_HAVE_KQOAUTH
-    void onRequestReady(QByteArray);
-    void onAuthorizedRequestDone();
-    #endif
 };
 #endif

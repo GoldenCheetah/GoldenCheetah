@@ -59,10 +59,6 @@
 #include "srmio.h"
 #endif
 
-#ifdef GC_HAVE_KQOAUTH
-#include "kqoauthmanager.h"
-#endif
-
 #ifdef GC_HAVE_SAMPLERATE
 #include <samplerate.h>
 #endif

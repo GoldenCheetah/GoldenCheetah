@@ -331,33 +331,6 @@ contains(DEFINES, "GC_WANT_R") {
     QT += opengl
 }
 
-###====================
-### OPTIONAL => KQOAUTH
-###====================
-
-unix:!macx {
-
-    # build from version in repo for Linux builds since
-    # kqoauth is not packaged for the Debian and this makes
-    # life much easier for the package maintainer
-    INCLUDEPATH += $${PWD}/../kqoauth
-    LIBS        += $${PWD}/../kqoauth/libkqoauth.a
-    DEFINES     += GC_HAVE_KQOAUTH
-
-} else {
-
-    !isEmpty(KQOAUTH_INSTALL) {
-
-        # we will work out the rest if you tell us where it is installed
-        isEmpty(KQOAUTH_INCLUDE) { KQOAUTH_INCLUDE = $${KQOAUTH_INSTALL}/src }
-        isEmpty(KQOAUTH_LIBS)    { KQOAUTH_LIBS    = -L$${KQOAUTH_INSTALL}/lib -lkqoauth }
-
-        INCLUDEPATH += $${KQOAUTH_INCLUDE}
-        LIBS        += $${KQOAUTH_LIBS}
-        DEFINES     += GC_HAVE_KQOAUTH
-    }
-}
-
 ###=======================================================
 ### OPTIONAL => D2XX FOR FTDI DRIVERS ON WINDOWS PLATFORMS
 ###=======================================================
@@ -707,7 +680,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalDAVCloud.h Cloud/CalendarDownload.h Cloud/CloudService.h \
-           Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/OAuthManager.h Cloud/TodaysPlanBodyMeasures.h \
+           Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/HrvMeasuresDownload.h Cloud/Xert.h
@@ -800,7 +773,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/BodyMeasuresDownload.cpp Cloud/CalDAVCloud.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
-           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/OAuthManager.cpp Cloud/TodaysPlanBodyMeasures.cpp \
+           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/HrvMeasuresDownload.cpp Cloud/Xert.cpp

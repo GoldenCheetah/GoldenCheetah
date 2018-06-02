@@ -25,7 +25,6 @@
 #include "Colors.h"
 #include "CloudService.h"
 #include "OAuthDialog.h"
-#include "OAuthManager.h"
 
 #include <QMessageBox>
 #include <QRegExp>
@@ -317,48 +316,27 @@ AddAuth::doAuth()
     updateServiceSettings();
 
     if (wizard->cloudService->capabilities() & CloudService::OAuth) {
-        if (wizard->cloudService->capabilities() & CloudService::UserPass) {
-            OAuthManager *oauthManager = new OAuthManager(wizard->context, OAuthManager::NONE, wizard->cloudService);
-            if (oauthManager->sslLibMissing()) {
-                delete oauthManager;
-            } else {
+        OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
+        if (oauthDialog->sslLibMissing()) {
+            delete oauthDialog;
+        } else {
+            oauthDialog->setWindowModality(Qt::ApplicationModal);
+            oauthDialog->exec();
+            token->setText(wizard->cloudService->getSetting(cname, "").toString());
+
+            QString msg = wizard->cloudService->message;
+            if (msg != "") {
+                message->setText(msg);
                 messageLabel->show();
                 message->show();
-                message->setText(QString("Connecting with %1...").arg(wizard->cloudService->id()));
-                oauthManager->authorize();
-                token->setText(wizard->cloudService->getSetting(cname, "").toString());
-
-                QString msg = wizard->cloudService->message;
-                if (msg != "") {
-                    message->setText(msg);
-
-                    wizard->cloudService->message = "";
-                }
+                wizard->cloudService->message = "";
             }
-        } else {
-            OAuthDialog *oauthDialog = new OAuthDialog(wizard->context, OAuthDialog::NONE, wizard->cloudService);
-            if (oauthDialog->sslLibMissing()) {
-                delete oauthDialog;
-            } else {
-                oauthDialog->setWindowModality(Qt::ApplicationModal);
-                oauthDialog->exec();
-                token->setText(wizard->cloudService->getSetting(cname, "").toString());
 
-                QString msg = wizard->cloudService->message;
-                if (msg != "") {
-                    message->setText(msg);
-                    messageLabel->show();
-                    message->show();
-                    wizard->cloudService->message = "";
-                }
-
-                // Due to the OAuth dialog being modal, the order of the background windows can get out of order
-                // This ensures the wizard is back on top
-                wizard->raise();
-            }
+            // Due to the OAuth dialog being modal, the order of the background windows can get out of order
+            // This ensures the wizard is back on top
+            wizard->raise();
         }
     }
-
 }
 
 void
