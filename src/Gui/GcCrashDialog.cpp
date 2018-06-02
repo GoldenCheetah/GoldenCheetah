@@ -211,17 +211,6 @@ QString GcCrashDialog::versionHTML()
     d2xx = "yes";
     #endif
 
-    // -- LIBOAUTH ----
-    QString oauth = "none";
-
-    #ifdef GC_HAVE_KQOAUTH
-    #ifdef KQOAUTH_VERSION
-    oauth = KQOAUTH_VERSION;
-    #else
-    oauth = "yes";
-    #endif
-    #endif
-
     // -- QWTPLOT3D ----
     QString qwtplot3d = "none";
 
@@ -301,21 +290,20 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">QWT</td><td>%2</td></tr>"
             "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
-            "<tr><td colspan=\"2\">OAUTH</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">D2XX</td><td>%7</td></tr>"
-            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%8</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%9</td></tr>"
-            "<tr><td colspan=\"2\">ICAL</td><td>%10</td></tr>"
-            "<tr><td colspan=\"2\">USBXPRESS</td><td>%11</td></tr>"
-            "<tr><td colspan=\"2\">LIBUSB</td><td>%12</td></tr>"
-            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
-            "<tr><td colspan=\"2\">VIDEO</td><td>%14</td></tr>"
-            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%15</td></tr>"
-            "<tr><td colspan=\"2\">SSL</td><td>%16</td></tr>"
-            "<tr><td colspan=\"2\">R</td><td>%17</td></tr>"
-            "<tr><td colspan=\"2\">Python</td><td>%20</td></tr>"
-            "<tr><td colspan=\"2\">WEBKIT</td><td>%18</td></tr>"
-            "<tr><td colspan=\"2\">LMFIT</td><td>%19</td></tr>"
+            "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
+            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
+            "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
+            "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
+            "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">VIDEO</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">SAMPLERATE</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">SSL</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
+            "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
+            "<tr><td colspan=\"2\">WEBKIT</td><td>%17</td></tr>"
+            "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -323,7 +311,6 @@ QString GcCrashDialog::versionHTML()
             .arg(COMPILER)
             .arg(COMPILER_VERSION)
             .arg(srmio)
-            .arg(oauth)
             .arg(d2xx)
             .arg(qwtplot3d)
             .arg(kml)
@@ -352,11 +339,6 @@ QString GcCrashDialog::versionHTML()
 #endif
 #endif
             .arg(webkit)
-#ifdef GC_HAVE_LMFIT
-            .arg("yes")
-#else
-            .arg("none")
-#endif
 #ifdef GC_HAVE_PYTHON
             .arg(python ? python->version.split(" ").at(0) : QString("disabled"));
 #else
