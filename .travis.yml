@@ -1,43 +1,24 @@
-
+language: c++
+env:
+  global:
+    - QT=qt5
+    - QT_PATH=qt5
+    - WEBKIT=0
 matrix:
   include:
-    - env: GOLDENCHEETAH_PLATFORM='linux'
-      os: linux
+    - os: linux
       dist: trusty
       sudo: required
-      language: c++
-    - env: GOLDENCHEETAH_PLATFORM='osx'
-      os: osx
-      language: objective-c
-      secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
-      secure: C6f58PXwvvHeVOjCLbyDRjgyF0tk+bXjCNUDur8VJLhJEGNdnrt+rH+d3azYaX0n348ZnQZ14as4M4rHjN1A/3DRbdUdOS7PQZrkj/n363ck1tvYOG/tzYqkEcVoQyjIJ7ZoTuBXDQry/VJmLxQjM0glTa2upNFHMOMwqZNkF+I=
-      secure: mgf181ok4rJTHxAdSaeIb/OzUx7PQc6UjJYfhJQcZDjN1Nou+Um6OHpnooMHeEq0CdGuLSiv2xVmuQnRjI5MfG5re/a3l39hSzi9tPLWi1y7uOLCtQFooJw3H+LhiKZcgAtEnkTmEhUCEu5uZ7cp4lWhrQZWCR5mCDNtJrGHjiw=
-      secure: UkW6SpgeACb6enGZADTAtPPRe23Tffne/SRQoBsZ3kGbKzgv8kTCLY0G5N71B1xEGdLB/36piOa0yji2SMW1jbflxR7tdOsiNpfd9R5qYqWVZRulY0qite8ZCwU5dqgy87pp4ECC1hNSOTq17aa4Sc4G4egg9AOy8cntLBTtxJA=
-      secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
-      secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
-      secure: K9+6ufffQ2a6dCTwVSI5ZtrGE+JSsj2ZeQwJ8Xk/y1yhSlbnW6Uptfs5oZ4XJ/BAQbuKbctnczP/jwDtGBG/Y0WOxn8m1DYBrkeLeToc0JZ8dn2lF6H6BEcB3VI3iPUtxAXWHNeSCk2qaC83z80Ydjc5GCxoAOwlw5/BEsRYI/s=
-      secure: n6khzr3bPnvh2lTE1NmcaPWRWkqLBUcXZL20EO0Q0HyhH2O22fwsKfnODCDtP1UEQxW+E0G3DkedSz/RmpMWbv1KpWKNNKl74wIdUE53nRIBLTULRoypCq1tDZzQqkoogbXu3pWrb23YoUuM2p5zxM9l3TiNbcrdZeQ+PInVL6o=
-      secure: mJEJUwt1jhx5qx5h5C8gnYJyaUb5fItSJGU/Tgp0IMCPCUSXtjHf9QTKITAKvg/hY8zggSwo+Vg2VzdMypdxDKqAeH/xAjq/o1+4linWphSjWpUGTqF/B8sR37WtduXtetamX+ctsbG4I77Xw+7y8OPPoCPxDct9hWxfCw6eBrI=
-      secure: BX7lVlMs6c6qOCMc7Eu0s3G7/es+3h/EGElS/4wjw4/nxp91bd0RbkOmGmgEKOFw5XRFl8gV0kEzmFhrJTdGfTnWHmdsGjSo2VzwePgW/PbDdQrTVD2rYBmmPoeTXf3S3v0P7d3pBrpuxAqkmj7bFkpnvviCN9erC4bUhSg6jEI=
-      secure: AC6pelym0R1Pq6GgcAy7E/BmlNWrni+41P8V8PMtjBKEtiyJ3tQa+KCn5g0UfGzktRHk+0l+szz3Wdy+bzl+ifiJVhXXs95B9F9El03p33UQLFPi+wFlivddP5DLc+4vIsDUiaNX97p89vo1/R96OLjpF1mUzfOMKYmAiMGP/Co=
-      secure: QXyyyutxesRVae/WFi75dxlNw2qTyWc6WQ3vmRER9BFhlrNtt8lmE+M6ghMDOhxigzSXWxHcG9r66BLOw4DML7AXg4f3NIAIYuYQrpfsWQ1TKGC/vVvIPDlNBKL62zSOoNowjup1HfZpB575wl4JkmHjoMPDfQ4yM/JVR+MKmIM=
-      secure: lefpL3SB8yN0Vn1R2e0hAFpJgFnu4rJ/vn7DucSKQvJ61K7t3LrUHFXElDQGFZMbytx4OJDeYsJtrccrIHjcsSAEIyW8TTcwn5/JopnyeQ3ukV5AYpEoQusym09XKru9E7awqvnZrXz6mdoIum5JP7+H116mPN4vsvz5nkNWxeg=
-      secure: RAGPq/thN9x6STNueDbeJWGUN75OLNcUVUkLHI/eZwPrkMaiQPfxIaJ+8eO2PszDcBojw3eYVhzbRvLnLiXmHL3buwD6oXMTyYnxGzCZ61DeDQ2cQa8ynKmRim5JL3viKMqtdyasXVoGf/u0GqMsgaLcqN6e/vXuXMGu6kkUPEQ=
+      compiler:
+        - gcc
+    - os: osx
+      compiler:
+        - clang
 before_install:
-    - source ${TRAVIS_BUILD_DIR}/travis/${GOLDENCHEETAH_PLATFORM}/before_install_QT5.sh
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/before_install_QT5.sh
 before_script:
-    - source ${TRAVIS_BUILD_DIR}/travis/${GOLDENCHEETAH_PLATFORM}/before_script_QT5.sh
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/before_script_QT5.sh
 script:
-    - source ${TRAVIS_BUILD_DIR}/travis/${GOLDENCHEETAH_PLATFORM}/script_QT5.sh
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/script_QT5.sh
 after_success:
-    - source ${TRAVIS_BUILD_DIR}/travis/${GOLDENCHEETAH_PLATFORM}/after_success_QT5.sh
-deploy:
-  provider: releases
-  api_key:
-    secure: KlfkRM8oGP02y5LhbdxetnhqUG3YzVylvyhT8BTYjdoJtkJr7YXYpdhj9byZ9aiy1gSWI/g7A1X6/P8/McqRtgt4dEYr4Zg8QO7Y7QdTpgNQEwu8ZrkyyG/7b/rSkfFHDjrOAHslLVXuBNwWgi8YW1aTn0rY2AqDbOri7u6tt9Q=
-  file: src/$FINAL_NAME
-  skip_cleanup: true
-  on:
-    tags: true
-    repo: GoldenCheetah/GoldenCheetah
-
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/after_success_QT5.sh
