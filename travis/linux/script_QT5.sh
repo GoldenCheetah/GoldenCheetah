@@ -1,7 +1,5 @@
 #!/bin/sh
 
-source /opt/qt59/bin/qt59-env.sh
-
 ### This script should be run from GoldenCheetah root directory after build
 if [ ! -x src/GoldenCheetah ]
 then echo "Build GoldenCheetah and execute from distribution root"; exit 1
