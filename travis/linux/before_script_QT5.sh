@@ -1,3 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-# exmpty file.
+set -x
+set -e
+
+# Set integrations.

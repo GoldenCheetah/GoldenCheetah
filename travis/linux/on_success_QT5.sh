@@ -1,6 +1,0 @@
-#!/bin/bash
-
-set -x
-set -e
-
-curl --upload-file "${TRAVIS_BUILD_DIR}/GoldenCheetah-x86_64.AppImage" https://transfer.sh/GoldenCheetah-x86_64.AppImage; 

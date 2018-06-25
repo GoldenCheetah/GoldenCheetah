@@ -137,6 +137,9 @@ win32-msvc* {
 
         # Linux Flex compiler grumbles about unsigned comparisons
         QMAKE_CXXFLAGS += -Wno-sign-compare
+
+        # Linux needs C99 mode to enable some for loops
+        QMAKE_CFLAGS += -std=gnu99
     }
 }
 
@@ -219,9 +222,6 @@ TRANSLATIONS = Resources/translations/gc_fr.ts \
                Resources/translations/gc_zh-tw.ts \
                Resources/translations/gc_nl.ts \
                Resources/translations/gc_sv.ts
-
-# linux qt5 lrelease
-
 
 # need lrelease to generate qm files
 isEmpty(QMAKE_LRELEASE) {
