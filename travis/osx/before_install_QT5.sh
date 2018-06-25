@@ -3,6 +3,10 @@
 set -x
 set -e
 
+export QT=qt5
+export QT_PATH=qt5
+export WEBKIT=0
+
 ## try early just to check, can delete later
 date
 brew update
