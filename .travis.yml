@@ -1,141 +1,36 @@
-branches:
-- master
-language:
-- objective-c
-compiler:
-- clang
-- gcc
+language: c++
 env:
-  matrix:
-  - BRANCH=master QT=qt5 QT_PATH=qt5 WEBKIT=0
   global:
-  - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
-  - secure: C6f58PXwvvHeVOjCLbyDRjgyF0tk+bXjCNUDur8VJLhJEGNdnrt+rH+d3azYaX0n348ZnQZ14as4M4rHjN1A/3DRbdUdOS7PQZrkj/n363ck1tvYOG/tzYqkEcVoQyjIJ7ZoTuBXDQry/VJmLxQjM0glTa2upNFHMOMwqZNkF+I=
-  - secure: mgf181ok4rJTHxAdSaeIb/OzUx7PQc6UjJYfhJQcZDjN1Nou+Um6OHpnooMHeEq0CdGuLSiv2xVmuQnRjI5MfG5re/a3l39hSzi9tPLWi1y7uOLCtQFooJw3H+LhiKZcgAtEnkTmEhUCEu5uZ7cp4lWhrQZWCR5mCDNtJrGHjiw=
-  - secure: UkW6SpgeACb6enGZADTAtPPRe23Tffne/SRQoBsZ3kGbKzgv8kTCLY0G5N71B1xEGdLB/36piOa0yji2SMW1jbflxR7tdOsiNpfd9R5qYqWVZRulY0qite8ZCwU5dqgy87pp4ECC1hNSOTq17aa4Sc4G4egg9AOy8cntLBTtxJA=
-  - secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
-  - secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
-  - secure: K9+6ufffQ2a6dCTwVSI5ZtrGE+JSsj2ZeQwJ8Xk/y1yhSlbnW6Uptfs5oZ4XJ/BAQbuKbctnczP/jwDtGBG/Y0WOxn8m1DYBrkeLeToc0JZ8dn2lF6H6BEcB3VI3iPUtxAXWHNeSCk2qaC83z80Ydjc5GCxoAOwlw5/BEsRYI/s=
-  - secure: n6khzr3bPnvh2lTE1NmcaPWRWkqLBUcXZL20EO0Q0HyhH2O22fwsKfnODCDtP1UEQxW+E0G3DkedSz/RmpMWbv1KpWKNNKl74wIdUE53nRIBLTULRoypCq1tDZzQqkoogbXu3pWrb23YoUuM2p5zxM9l3TiNbcrdZeQ+PInVL6o=
-  - secure: mJEJUwt1jhx5qx5h5C8gnYJyaUb5fItSJGU/Tgp0IMCPCUSXtjHf9QTKITAKvg/hY8zggSwo+Vg2VzdMypdxDKqAeH/xAjq/o1+4linWphSjWpUGTqF/B8sR37WtduXtetamX+ctsbG4I77Xw+7y8OPPoCPxDct9hWxfCw6eBrI=
-  - secure: BX7lVlMs6c6qOCMc7Eu0s3G7/es+3h/EGElS/4wjw4/nxp91bd0RbkOmGmgEKOFw5XRFl8gV0kEzmFhrJTdGfTnWHmdsGjSo2VzwePgW/PbDdQrTVD2rYBmmPoeTXf3S3v0P7d3pBrpuxAqkmj7bFkpnvviCN9erC4bUhSg6jEI=
-  - secure: AC6pelym0R1Pq6GgcAy7E/BmlNWrni+41P8V8PMtjBKEtiyJ3tQa+KCn5g0UfGzktRHk+0l+szz3Wdy+bzl+ifiJVhXXs95B9F9El03p33UQLFPi+wFlivddP5DLc+4vIsDUiaNX97p89vo1/R96OLjpF1mUzfOMKYmAiMGP/Co=
-  - secure: QXyyyutxesRVae/WFi75dxlNw2qTyWc6WQ3vmRER9BFhlrNtt8lmE+M6ghMDOhxigzSXWxHcG9r66BLOw4DML7AXg4f3NIAIYuYQrpfsWQ1TKGC/vVvIPDlNBKL62zSOoNowjup1HfZpB575wl4JkmHjoMPDfQ4yM/JVR+MKmIM=
-  - secure: lefpL3SB8yN0Vn1R2e0hAFpJgFnu4rJ/vn7DucSKQvJ61K7t3LrUHFXElDQGFZMbytx4OJDeYsJtrccrIHjcsSAEIyW8TTcwn5/JopnyeQ3ukV5AYpEoQusym09XKru9E7awqvnZrXz6mdoIum5JP7+H116mPN4vsvz5nkNWxeg=
-  - secure: RAGPq/thN9x6STNueDbeJWGUN75OLNcUVUkLHI/eZwPrkMaiQPfxIaJ+8eO2PszDcBojw3eYVhzbRvLnLiXmHL3buwD6oXMTyYnxGzCZ61DeDQ2cQa8ynKmRim5JL3viKMqtdyasXVoGf/u0GqMsgaLcqN6e/vXuXMGu6kkUPEQ=
+    - QT=qt5
+    - QT_PATH=qt5
+    - WEBKIT=0
+    #- secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
+    #- secure: C6f58PXwvvHeVOjCLbyDRjgyF0tk+bXjCNUDur8VJLhJEGNdnrt+rH+d3azYaX0n348ZnQZ14as4M4rHjN1A/3DRbdUdOS7PQZrkj/n363ck1tvYOG/tzYqkEcVoQyjIJ7ZoTuBXDQry/VJmLxQjM0glTa2upNFHMOMwqZNkF+I=
+    #- secure: mgf181ok4rJTHxAdSaeIb/OzUx7PQc6UjJYfhJQcZDjN1Nou+Um6OHpnooMHeEq0CdGuLSiv2xVmuQnRjI5MfG5re/a3l39hSzi9tPLWi1y7uOLCtQFooJw3H+LhiKZcgAtEnkTmEhUCEu5uZ7cp4lWhrQZWCR5mCDNtJrGHjiw=
+    #- secure: UkW6SpgeACb6enGZADTAtPPRe23Tffne/SRQoBsZ3kGbKzgv8kTCLY0G5N71B1xEGdLB/36piOa0yji2SMW1jbflxR7tdOsiNpfd9R5qYqWVZRulY0qite8ZCwU5dqgy87pp4ECC1hNSOTq17aa4Sc4G4egg9AOy8cntLBTtxJA=
+    #- secure: rb/MKPHEK8yOK5uYpXq2o+MQ7h65ft+c/xE9XmLFk1jLnK0oxe6+KeoSFlQ0n5UwLSsHrytMXVaUHex6EEt0TheXFlohi7BcNFWRWXr+wLucuaPjMnU49VErrSigjJ5VW/rcR7fORmnDwn5y06r3Rer9SC1hImCxf/pqF8hFZps=
+    #- secure: FXJzm98lwbc1R2eh9/CvVReVRHEPLDm+sCRjiV9HJgeCveIUauLasp9Skamz0c6OKLmkjLY8JERPT491ZgCG8YcQ9x1bM8HGbmRqnn9xSUxINIRzVmyTiLMBoT/ibHHeFjFpyiGfukOAkHwMNNsrSrbaekhiJuekaXo7iTwYQB0=
+    #- secure: K9+6ufffQ2a6dCTwVSI5ZtrGE+JSsj2ZeQwJ8Xk/y1yhSlbnW6Uptfs5oZ4XJ/BAQbuKbctnczP/jwDtGBG/Y0WOxn8m1DYBrkeLeToc0JZ8dn2lF6H6BEcB3VI3iPUtxAXWHNeSCk2qaC83z80Ydjc5GCxoAOwlw5/BEsRYI/s=
+    #- secure: n6khzr3bPnvh2lTE1NmcaPWRWkqLBUcXZL20EO0Q0HyhH2O22fwsKfnODCDtP1UEQxW+E0G3DkedSz/RmpMWbv1KpWKNNKl74wIdUE53nRIBLTULRoypCq1tDZzQqkoogbXu3pWrb23YoUuM2p5zxM9l3TiNbcrdZeQ+PInVL6o=
+    #- secure: mJEJUwt1jhx5qx5h5C8gnYJyaUb5fItSJGU/Tgp0IMCPCUSXtjHf9QTKITAKvg/hY8zggSwo+Vg2VzdMypdxDKqAeH/xAjq/o1+4linWphSjWpUGTqF/B8sR37WtduXtetamX+ctsbG4I77Xw+7y8OPPoCPxDct9hWxfCw6eBrI=
+    #- secure: BX7lVlMs6c6qOCMc7Eu0s3G7/es+3h/EGElS/4wjw4/nxp91bd0RbkOmGmgEKOFw5XRFl8gV0kEzmFhrJTdGfTnWHmdsGjSo2VzwePgW/PbDdQrTVD2rYBmmPoeTXf3S3v0P7d3pBrpuxAqkmj7bFkpnvviCN9erC4bUhSg6jEI=
+    #- secure: AC6pelym0R1Pq6GgcAy7E/BmlNWrni+41P8V8PMtjBKEtiyJ3tQa+KCn5g0UfGzktRHk+0l+szz3Wdy+bzl+ifiJVhXXs95B9F9El03p33UQLFPi+wFlivddP5DLc+4vIsDUiaNX97p89vo1/R96OLjpF1mUzfOMKYmAiMGP/Co=
+    #- secure: QXyyyutxesRVae/WFi75dxlNw2qTyWc6WQ3vmRER9BFhlrNtt8lmE+M6ghMDOhxigzSXWxHcG9r66BLOw4DML7AXg4f3NIAIYuYQrpfsWQ1TKGC/vVvIPDlNBKL62zSOoNowjup1HfZpB575wl4JkmHjoMPDfQ4yM/JVR+MKmIM=
+    #- secure: lefpL3SB8yN0Vn1R2e0hAFpJgFnu4rJ/vn7DucSKQvJ61K7t3LrUHFXElDQGFZMbytx4OJDeYsJtrccrIHjcsSAEIyW8TTcwn5/JopnyeQ3ukV5AYpEoQusym09XKru9E7awqvnZrXz6mdoIum5JP7+H116mPN4vsvz5nkNWxeg=
+    #- secure: RAGPq/thN9x6STNueDbeJWGUN75OLNcUVUkLHI/eZwPrkMaiQPfxIaJ+8eO2PszDcBojw3eYVhzbRvLnLiXmHL3buwD6oXMTyYnxGzCZ61DeDQ2cQa8ynKmRim5JL3viKMqtdyasXVoGf/u0GqMsgaLcqN6e/vXuXMGu6kkUPEQ=
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+    #- os: osx
+    #  compiler: clang
 before_install:
-## try early just to check, can delete later
-- date
-- brew update
-- sh travis/install-qt.sh
-##- brew install $QT
-- brew install libical
-##- brew install libusb libusb-compat # no longer needed?
-- brew install srmio
-- brew install libsamplerate
-- rm -rf '/usr/local/include/c++'
-- brew install r
-- brew install brewsci/science/lmfit
-## Disable KML for now
-##- brew install --HEAD travis/libkml.rb
-- sudo chmod -R +w /usr/local
-- curl -O http://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
-- git clone --branch 0.98 https://github.com/kypeli/kQOAuth.git kQOAuth-0.98
-- cd kQOAuth-0.98
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
-- CC=clang CXX=clang++ make -j2 qmake_all
-- CC=clang CXX=clang++ sudo make install
-- cd ..
-- hdiutil mount D2XX1.2.2.dmg
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/before_install_QT5.sh
 before_script:
-- mkdir D2XX
-- cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
-- sudo cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib /usr/local/lib
-- cp /Volumes/release/D2XX/bin/*.h D2XX
-- sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|"
-  src/FileIO/D2XX.cpp
-- cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
-- cp src/gcconfig.pri.in src/gcconfig.pri
-- /usr/local/opt/$QT_PATH/bin/lupdate src/src.pro
-- if [[ "$WEBKIT" == "0" ]]; then echo DEFINES += NOWEBKIT >> src/gcconfig.pri; fi
-- sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
-- sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/$QT_PATH/bin/lrelease|"
-  src/gcconfig.pri
-- sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch
-  x86_64|" src/gcconfig.pri
-- sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
-- sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
-- sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
-- sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx.1.2.2|" src/gcconfig.pri
-- sed -i "" "s|#\(KQOAUTH_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(KQOAUTH_INCLUDE =.*\)|\1 \$\$[QT_INSTALL_LIBS]/kqoauth.framework/Headers|"
-  src/gcconfig.pri
-- sed -i "" "s|#\(KQOAUTH_LIBS =.*\)|\1 -F\$\$[QT_INSTALL_LIBS] -framework kqoauth|"
-  src/gcconfig.pri
-## Disable KML for now
-#- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-#- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom -lkmlconvenience -lkmlengine -lkmlbase -lexpect|" src/gcconfig.pri
-- sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
-- sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/usr/local/lib -lusb -lusb-1.0|" src/gcconfig.pri
-- sed -i "" "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/usr/local/lib -lsamplerate|" src/gcconfig.pri
-- sed -i "" "s|#\(LMFIT_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
-- sed -i "" "s|#\(HTPATH = ../httpserver.*\)|\1 |" src/gcconfig.pri
-- sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
-##- sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri ## we want this for now XXX till AVKit fixup
-##- sed -i "" "s|#\(DEFINES += GC_VIDEO_QUICKTIME.*\)|\1 |" src/gcconfig.pri ## QT is deprecated, don't build with it.
-##Issues with c++11 and stdlib on travis and dependencies
-- sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
-- echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
-- sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_STRAVA_CLIENT_SECRET__/"$GC_STRAVA_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_DROPBOX_CLIENT_SECRET__/"$GC_DROPBOX_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_CYCLINGANALYTICS_CLIENT_SECRET__/"$GC_CYCLINGANALYTICS_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_TWITTER_CONSUMER_SECRET__/"$GC_TWITTER_CONSUMER_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_DROPBOX_CLIENT_ID__/"$GC_DROPBOX_CLIENT_ID"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_MAPQUESTAPI_KEY__/"$GC_MAPQUESTAPI_KEY"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_CLOUD_DB_BASIC_AUTH__/"$GC_CLOUD_DB_BASIC_AUTH"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_CLOUD_DB_APP_NAME__/"$GC_CLOUD_DB_APP_NAME"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_GOOGLE_DRIVE_CLIENT_ID__/"$GC_GOOGLE_DRIVE_CLIENT_ID"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_GOOGLE_DRIVE_CLIENT_SECRET__/"$GC_GOOGLE_DRIVE_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_GOOGLE_DRIVE_API_KEY__/"$GC_GOOGLE_DRIVE_API_KEY"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_TODAYSPLAN_CLIENT_SECRET__/"$GC_TODAYSPLAN_CLIENT_SECRET"/" src/Core/Secrets.h
-- cat src/gcconfig.pri
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/before_script_QT5.sh
 script:
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
-- CC=clang CXX=clang++ make qmake_all
-- CC=clang CXX=clang++ make -j4 sub-qwt --silent
-- CC=clang CXX=clang++ make -j4 sub-src
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/script_QT5.sh
 after_success:
-- cd src
-- echo "Checking GoldenCheetah.app can execute"
-- GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
-- echo "About to create dmg file and fix up"
-- /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
-- python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/$QT_PATH
-- echo "Cleaning up installed QT libraries from $QT"
-- brew remove $QT
-- echo "Renaming dmg file to branch and build number ready for deploy"
-- export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.dmg
-- mv GoldenCheetah.dmg $FINAL_NAME
-- ls -l $FINAL_NAME
-- echo "Mounting dmg file and testing it can execute"
-- hdiutil mount $FINAL_NAME
-- cd /Volumes/GoldenCheetah
-- GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
-- echo "Make sure we are back in the Travis build directory"
-- cd $TRAVIS_BUILD_DIR
-deploy:
-  provider: releases
-  api_key:
-    secure: KlfkRM8oGP02y5LhbdxetnhqUG3YzVylvyhT8BTYjdoJtkJr7YXYpdhj9byZ9aiy1gSWI/g7A1X6/P8/McqRtgt4dEYr4Zg8QO7Y7QdTpgNQEwu8ZrkyyG/7b/rSkfFHDjrOAHslLVXuBNwWgi8YW1aTn0rY2AqDbOri7u6tt9Q=
-  file: src/$FINAL_NAME
-  skip_cleanup: true
-  on:
-    tags: true
-    repo: GoldenCheetah/GoldenCheetah
-
+    - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/after_success_QT5.sh

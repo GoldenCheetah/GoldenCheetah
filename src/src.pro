@@ -137,6 +137,9 @@ win32-msvc* {
 
         # Linux Flex compiler grumbles about unsigned comparisons
         QMAKE_CXXFLAGS += -Wno-sign-compare
+
+        # Linux needs C99 mode to enable some for loops
+        QMAKE_CFLAGS += -std=gnu99
     }
 }
 
@@ -223,7 +226,8 @@ TRANSLATIONS = Resources/translations/gc_fr.ts \
 # need lrelease to generate qm files
 isEmpty(QMAKE_LRELEASE) {
     win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
-    unix:!macx {QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease-qt4 }
+    macx:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+    unix:lessThan(QT_MAJOR_VERSION, 5):QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease-qt4
     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 
@@ -685,7 +689,7 @@ HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalDAVCloud.h Cloud/CalendarDownlo
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/HrvMeasuresDownload.h Cloud/Xert.h
 
-# core data 
+# core data
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
@@ -750,7 +754,7 @@ HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
 ### SOURCE FILES
 ###=============
 
-## ANT+ 
+## ANT+
 SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogger.cpp ANT/ANTMessage.cpp
 
 ## Charts and related
@@ -863,4 +867,3 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 OTHER_FILES += Resources/web/Rider.js Resources/web/ride.js Resources/web/jquery-1.6.4.min.js \
                Resources/web/MapWindow.html Resources/web/StreetViewWindow.html Resources/web/Window.css \
                Resources/python/library.py Python/SIP/goldencheetah.sip
-
