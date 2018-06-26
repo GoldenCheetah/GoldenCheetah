@@ -3,7 +3,6 @@
 set -x
 set -e
 
-
 # Add recent Qt dependency ppa
 # Update this file on a newer qt version.
 sudo add-apt-repository ppa:beineri/opt-qt595-trusty -y
@@ -14,14 +13,12 @@ sudo apt install -y qt5-default qt59base qt59tools qt59serialport qt59svg\
  libexpat1-dev libkml-dev libical-dev libusb-dev libvlc-dev libvlccore-dev\
  libssl-dev libpulse-dev zlib1g
 
-#source /opt/qt*/bin/qt*-env.sh
-export QTDIR=/opt/qt59
-export PATH=/opt/qt59/bin:$PATH
-export LD_LIBRARY_PATH=/opt/qt59/lib/x86_64-linux-gnu:/opt/qt59/lib:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=/opt/qt59/lib/pkgconfig:$PKG_CONFIG_PATH
-
-# Temporarily alias ldrelease
-# sudo ln -s $QTDIR/bin/lrelease $QTDIR/bin/lrelease-qt4
+cat /opt/qt*/bin/qt*-env.sh
+source /opt/qt*/bin/qt*-env.sh
+#export QTDIR=/opt/qt59
+#export PATH=/opt/qt59/bin:$PATH
+#export LD_LIBRARY_PATH=/opt/qt59/lib/x86_64-linux-gnu:/opt/qt59/lib:$LD_LIBRARY_PATH
+#export PKG_CONFIG_PATH=/opt/qt59/lib/pkgconfig:$PKG_CONFIG_PATH
 
 cd qwt
 cp qwtconfig.pri.in qwtconfig.pri
@@ -45,7 +42,3 @@ cd ..
 
 # Disable webkit, and enable webengine?
 if [[ "$WEBKIT" == "0" ]]; then echo DEFINES += NOWEBKIT >> src/gcconfig.pri; fi
-
-qmake -recursive CONFIG+=release PREFIX=/usr
-make -j$(nproc)
-#make INSTALL_ROOT=appdir -j$(nproc) install

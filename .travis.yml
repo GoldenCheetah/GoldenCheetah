@@ -24,8 +24,8 @@ matrix:
       dist: trusty
       sudo: required
       compiler: gcc
-    - os: osx
-      compiler: clang
+    #- os: osx
+    #  compiler: clang
 before_install:
     - source ${TRAVIS_BUILD_DIR}/travis/${TRAVIS_OS_NAME}/before_install_QT5.sh
 before_script:

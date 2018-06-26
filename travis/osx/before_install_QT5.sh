@@ -1,7 +1,15 @@
 #!/bin/bash
 
 set -x
-set -e
+# Do not exit. rvm overrides cd and returns !=0
+# set -e
+
+# try to get rid of the rvm debug logs
+unalias -a
+unset -f rvm_debug
+unset -f cd
+unset -f pushd
+unset -f popd
 
 export QT=qt5
 export QT_PATH=qt5

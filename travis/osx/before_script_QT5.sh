@@ -1,8 +1,7 @@
 #!/bin/bash
 
 set -x
-# Do not exit. rvm overrides cd and returns !=0
-# set -e
+set -e
 
 mkdir D2XX
 cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
