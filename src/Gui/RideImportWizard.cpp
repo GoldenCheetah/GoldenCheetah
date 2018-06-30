@@ -1067,8 +1067,6 @@ RideImportWizard::abortClicked()
         // -- second  create RideCache() entry
         // -- third   move file from /tmpactivities to /activities
 
-        tableWidget->item(i,STATUS_COLUMN)->setText(tr("Saving file..."));
-
         // serialize the file to .JSON
         QStringList errors;
         QFile thisfile(filenames[i]);
@@ -1088,8 +1086,11 @@ RideImportWizard::abortClicked()
             context->athlete->rideMetadata()->setLinkedDefaults(ride);
 
             // run the processor first... import
+            tableWidget->item(i,STATUS_COLUMN)->setText(tr("Processing..."));
             DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
             ride->recalculateDerivedSeries();
+
+            tableWidget->item(i,STATUS_COLUMN)->setText(tr("Saving file..."));
 
             // serialize
             JsonFileReader reader;
