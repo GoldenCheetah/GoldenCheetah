@@ -1559,7 +1559,7 @@ CriticalPowerWindow::addSeries()
 void
 CriticalPowerWindow::updateOptions(CriticalSeriesType series)
 {
-    if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) {
+    if ((series == watts || series == wattsKg || series == kph || series == aPower || series == aPowerKg) && modelCombo->currentIndex() >= 1) {
         helperWidget()->show();
     } else {
         helperWidget()->hide();

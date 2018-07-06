@@ -563,7 +563,7 @@ CPPlot::plotModel()
 
             // update the helper widget -- either as watts, w/kg or kph
 
-            if (rideSeries == RideFile::watts) {
+            if (rideSeries == RideFile::watts || rideSeries == RideFile::aPower) {
 
                 // Reset Rank
                 cpw->titleRank->setText(tr("Rank"));
@@ -619,7 +619,7 @@ CPPlot::plotModel()
                     cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
                 }
 
-            } else if (rideSeries == RideFile::wattsKg) {
+            } else if (rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
 
                 // Reset Rank
                 cpw->titleRank->setText(tr("Rank"));
