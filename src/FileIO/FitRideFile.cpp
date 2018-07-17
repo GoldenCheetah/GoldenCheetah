@@ -114,6 +114,7 @@ struct FitFileReaderState
     RideFile *rideFile;
     time_t start_time;
     time_t last_time;
+    time_t last_reference_time;
     quint32 last_event_timestamp;
     double start_timestamp;
     double last_distance;
@@ -489,7 +490,7 @@ struct FitFileReaderState
             // Bryton
             return "Bryton";
         } else if (manu == 282) {
-            // Bryton
+            // Sufferfest
             return "The Sufferfest";
         } else if (manu == 284) {
             // Rouvy
@@ -553,6 +554,9 @@ struct FitFileReaderState
                     return RideFile::thb;
             case 57: // SMO2
                     return RideFile::smo2;
+
+            case 253: // SECS
+                return RideFile::secs;
             default:
                     return RideFile::none;
         }
@@ -1381,9 +1385,13 @@ struct FitFileReaderState
     void decodeRecord(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
         if (isLapSwim) return; // We use the length message for Lap Swimming
+
         time_t time = 0;
-        if (time_offset > 0)
-            time = last_time + time_offset;
+        if (time_offset == 0) // Damien : I have to confirm this...
+            last_reference_time = last_time;
+        if (time_offset > -1)
+            time = last_reference_time + time_offset; // was last_time + time_offset
+
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = RideFile::NA;
         double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0, headwind = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
@@ -1711,8 +1719,8 @@ struct FitFileReaderState
             }
         }
 
-        if (time == last_time)
-            return; // Not true for Bryton
+        //if (time == last_time)
+        //    return; // Not true for Bryton
 
         if (stopped) {
             // As it turns out, this happens all the time in some FIT files.
@@ -1736,6 +1744,7 @@ struct FitFileReaderState
         }
         if (start_time == 0) {
             start_time = time - 1; // recording interval?
+            last_reference_time = start_time;
             QDateTime t;
             t.setTime_t(start_time);
             rideFile->setStartTime(t);
@@ -1850,6 +1859,7 @@ struct FitFileReaderState
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
                      smO2, tHb, rvert, rcad, rcontact, 0.0, interval, false);
+
         last_time = time;
         last_distance = km;
 
@@ -1965,6 +1975,7 @@ struct FitFileReaderState
             return; // Sketchy, but some FIT files do this.
         if (start_time == 0) {
             start_time = time - 1; // recording interval?
+            last_reference_time = start_time;
             QDateTime t;
             t.setTime_t(start_time);
             rideFile->setStartTime(t);
@@ -2543,7 +2554,7 @@ struct FitFileReaderState
         else {
             // Data record
             int local_msg_type = 0;
-            int time_offset = 0;
+            int time_offset = -1;
             if (header_byte & 0x80) {
                 // compressed time record
                 local_msg_type = (header_byte >> 5) & 0x3;
@@ -2562,8 +2573,8 @@ struct FitFileReaderState
             const FitDefinition &def = local_msg_types[local_msg_type];
 
             if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)  {
-                printf( "read_record message local=%d global=%d\n", local_msg_type,
-                    def.global_msg_num );
+                printf( "read_record message local=%d global=%d offset=%d\n", local_msg_type,
+                    def.global_msg_num, time_offset );
             }
 
             std::vector<FitValue> values;
@@ -2689,8 +2700,13 @@ struct FitFileReaderState
                 values.push_back(value);
 
                 if (FIT_DEBUG && ((FIT_DEBUG_LEVEL>2 && def.global_msg_num!=RECORD_MSG_NUM) || FIT_DEBUG_LEVEL>3 )) {
-                    printf( " field: type=%d num=%d size=%d(%d) ",
-                        field.type, field.num, field.size, size);
+                    QString nativeName = "";
+                    if (def.global_msg_num == RECORD_MSG_NUM) {
+                        RideFile::SeriesType series = getSeriesForNative(field.num);
+                        nativeName = rideFile->symbolForSeries(series);
+                    }
+                    printf( " field: type=%d num=%d %s size=%d(%d) ",
+                        field.type, field.num, nativeName.toStdString().c_str(), field.size, size);
                     if (value.type == SingleValue) {
                         if (value.v == NA_VALUE)
                             printf( "value=NA\n");
