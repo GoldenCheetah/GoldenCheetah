@@ -4128,7 +4128,7 @@ ZonePage::ZonePage(Context *context) : context(context)
 
         // no power model estimates for runners
         QList<PDEstimate> estimates = isRun ? QList<PDEstimate>() : context->athlete->getPDEstimates();
-        cpEstimatesPage[i] = new CPEstiamtesPage(context, estimates);
+        cpEstimatesPage[i] = new CPEstiamtesPage(context, estimates, zones[i]);
     }
 
     // finish setup for the default sport
@@ -4489,6 +4489,10 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+
+    // zones_ connect
+    connect(zones_, SIGNAL(zoneRangeAdded(int, ZoneRange)), this, SLOT(rangeAdded(int, ZoneRange)));
+    connect(zones_, SIGNAL(zoneRangeDeleted(int, ZoneRange)), this, SLOT(rangeDeleted(int, ZoneRange)));
 }
 
 qint32
@@ -4569,12 +4573,43 @@ CPPage::initializeRanges() {
 
 }
 
+void
+CPPage::rangeAdded(int index, ZoneRange range)
+{
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+    ranges->invisibleRootItem()->insertChild(index, add);
 
+    int column = 0;
+
+    // date
+    add->setText(column++, range.begin.toString(tr("MMM d, yyyy")));
+
+    // CP
+    add->setText(column++, QString("%1").arg(range.cp));
+
+    // FTP
+    if (useCPForFTPCombo->currentIndex() == 1) {
+        add->setText(column++, QString("%1").arg(range.ftp));
+    }
+
+    // W'
+    add->setText(column++, QString("%1").arg(range.wprime));
+
+    // Pmax
+    add->setText(column++, QString("%1").arg(range.pmax));
+}
+
+void
+CPPage::rangeDeleted(int index, ZoneRange)
+{
+    delete ranges->invisibleRootItem()->takeChild(index);
+}
 
 void
 CPPage::addClicked()
 {
-
     // get current scheme
     zones_->setScheme(schemePage->getScheme());
 
@@ -4593,32 +4628,7 @@ CPPage::addClicked()
 
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
-    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax, QString());
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
-
-    int column = 0;
-
-    // date
-    add->setText(column++, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CP
-    add->setText(column++, QString("%1").arg(cpEdit->value()));
-
-    // FTP
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        add->setText(column++, QString("%1").arg(ftpEdit->value()));
-    }
-
-    // W'
-    add->setText(column++, QString("%1").arg(wp));
-
-    // Pmax
-    add->setText(column++, QString("%1").arg(pmax));
-
+    zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax, QString());
 }
 
 void
@@ -4673,6 +4683,9 @@ CPPage::editClicked()
     zoneRange.pmax = pmax;
     edit->setText(columns++, QString("%1").arg(pmax));
 
+    // Origin: If a range is updated, it looses its origin setting
+    zoneRange.origin = QString();
+
     zones_->setZoneRange(index, zoneRange);
 }
 
@@ -4681,7 +4694,6 @@ CPPage::deleteClicked()
 {
     if (ranges->currentItem()) {
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        delete ranges->invisibleRootItem()->takeChild(index);
         zones_->deleteRange(index);
     }
 }
@@ -4719,6 +4731,14 @@ CPPage::rangeEdited()
 {
     if (ranges->currentItem()) {
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        if (index >= zones_->getRangeSize()) {
+            index = zones_->getRangeSize() - 1;
+        }
+
+        if (index < 0) {
+            updateButton->hide();
+            return;
+        }
 
         QDate date = dateEdit->date();
         QDate odate = zones_->getStartDate(index);
@@ -4758,6 +4778,15 @@ CPPage::rangeSelectionChanged()
 
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        if (index >= zones_->getRangeSize()) {
+            index = zones_->getRangeSize() - 1;
+        }
+
+        if (index < 0) {
+            active = false;
+            return;
+        }
+
         ZoneRange current = zones_->getZoneRange(index);
 
         dateEdit->setDate(zones_->getStartDate(index));
@@ -4924,8 +4953,8 @@ CPPage::zonesChanged()
     }
 }
 
-CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates)
-    : context(context), estimates(estimates)
+CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, Zones *zones)
+    : context(context), estimates(estimates), zones(zones)
 {
     QVBoxLayout *outerLayout = new QVBoxLayout(this);
 
@@ -4950,6 +4979,7 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates)
     headLayout->addWidget(modelCombo);
 
     ranges = new QTreeWidget;
+    ranges->headerItem()->setText(RangeColumns::IncludedInSettings, "");
     ranges->headerItem()->setText(RangeColumns::DateFrom, tr("From Date"));
     ranges->headerItem()->setText(RangeColumns::CP, tr("Critical Power"));
     ranges->headerItem()->setText(RangeColumns::FTP, tr("FTP"));
@@ -4971,6 +5001,10 @@ CPEstiamtesPage::CPEstiamtesPage(Context *context, QList<PDEstimate> estimates)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(refreshStart()), ranges, SLOT(clear()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(initializeRanges()));
+    connect(zones, SIGNAL(zoneRangesRefreshed()), this, SLOT(initializeRanges()));
+    connect(zones, SIGNAL(zoneRangeDeleted(int, ZoneRange)), this, SLOT(zoneRangeDeleted(int, ZoneRange)));
+    connect(zones, SIGNAL(zoneRangeUpdated(int, ZoneRange, ZoneRange)), this, SLOT(zoneRangeDeleted(int, ZoneRange)));
+    connect(ranges, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(rangesItemChanged(QTreeWidgetItem *, int)));
 }
 
 void
@@ -5004,8 +5038,8 @@ CPEstiamtesPage::initializeRanges()
     for (int i = 0; i < estimates.length(); i++) {
         const PDEstimate &est = estimates.at(i);
 
-        // check whether this estimate belongs to the selected model and it's not wpk
-        if (est.model != curModel->code || est.wpk) {
+        // check whether this estimate belongs to the selected model, it's not wpk and model supports CP
+        if (est.model != curModel->code || est.wpk || !curModel->hasCP) {
             continue;
         }
 
@@ -5020,12 +5054,43 @@ CPEstiamtesPage::initializeRanges()
         }
 
         // add the entry
-        QTreeWidgetItem *newEntry = new QTreeWidgetItem(ranges->invisibleRootItem());
+        QTreeWidgetItem *newEntry = new QTreeWidgetItem();
         newEntry->setFlags(newEntry->flags() & ~Qt::ItemIsEditable);
 
+        // inclusion in CP range settings
+        // check whether this estimate is included
+        Qt::CheckState isIncluded = Qt::CheckState::Unchecked;
+        for (int j = 0; j < zones->getRangeSize(); j++) {
+            ZoneRange range = zones->getZoneRange(j);
+            QString rangeModelCode;
+            QDate rangeBeginDate;
+            if (!TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate) ||
+                rangeModelCode != curModelCode || rangeBeginDate != est.to) {
+                continue;
+            }
+
+            // we have a match
+            isIncluded = Qt::CheckState::Checked;
+        }
+
+        // a checkbox to include/exclude the entry in/from the CP range settings
+        newEntry->setCheckState(RangeColumns::IncludedInSettings, isIncluded);
+        newEntry->setToolTip(RangeColumns::IncludedInSettings,
+                             tr("Include/exclude this estimate in your CP range settings"));
+
         // date: the end date of the estimate (est.to) is the start date of the new range (DateFrom)
-        // also: correct the any date that might be in the future
         QDate dateFrom = est.to;
+
+        // before the date correction below: save the original value for est identification purposes
+        newEntry->setData(RangeColumns::DateFrom, Qt::UserRole, dateFrom);
+
+        // save raw values for other parameters too
+        newEntry->setData(RangeColumns::CP, Qt::UserRole, est.CP);
+        newEntry->setData(RangeColumns::FTP, Qt::UserRole, est.FTP);
+        newEntry->setData(RangeColumns::WPrime, Qt::UserRole, est.WPrime);
+        newEntry->setData(RangeColumns::PMax, Qt::UserRole, est.PMax);
+
+        // correct any date that might be in the future
         if (dateFrom > QDate::currentDate()) {
             dateFrom = QDate::currentDate();
         }
@@ -5042,6 +5107,8 @@ CPEstiamtesPage::initializeRanges()
         newEntry->setTextAlignment(RangeColumns::WPrime, Qt::AlignmentFlag::AlignRight);
         newEntry->setTextAlignment(RangeColumns::PMax, Qt::AlignmentFlag::AlignRight);
 
+        ranges->invisibleRootItem()->addChild(newEntry);
+
         // update ptr to prev entry
         prevEst = &est;
     }
@@ -5049,6 +5116,107 @@ CPEstiamtesPage::initializeRanges()
     for (int i = 0; i < ranges->columnCount(); i++) {
         ranges->resizeColumnToContents(i);
     }
+}
+
+void
+CPEstiamtesPage::zoneRangeDeleted(int, ZoneRange range)
+{
+    QString rangeModelCode;
+    QDate rangeBeginDate;
+    if (!TryParseZoneRangeOrigin(range.origin, rangeModelCode, rangeBeginDate)) {
+        return;
+    }
+
+    // ignore ranges of other models
+    QString curModelCode = modelCombo->currentData().toString();
+    if (rangeModelCode != curModelCode) {
+        return;
+    }
+
+    // find out, which estimate it is and unset the inclusion flag
+    for (int i = 0; i < ranges->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *item = ranges->invisibleRootItem()->child(i);
+        QDate dateFrom = item->data(RangeColumns::DateFrom, Qt::UserRole).toDate();
+        if (dateFrom == rangeBeginDate) {
+            Qt::CheckState checkState = item->checkState(RangeColumns::IncludedInSettings);
+            if (checkState != Qt::CheckState::Unchecked) {
+                item->setCheckState(RangeColumns::IncludedInSettings, Qt::CheckState::Unchecked);
+            }
+
+            break;
+        }
+    }
+}
+
+void CPEstiamtesPage::rangesItemChanged(QTreeWidgetItem *item, int column)
+{
+    if (column == RangeColumns::IncludedInSettings) {
+
+        // create 'origin' string (for zone range identification)
+        QString curModelCode = modelCombo->currentData().toString();
+        QDate dateFrom = item->data(RangeColumns::DateFrom, Qt::UserRole).toDate();
+        QString origin = ToZoneRangeOrigin(curModelCode, dateFrom);
+
+        Qt::CheckState checkState = item->checkState(RangeColumns::IncludedInSettings);
+        if (checkState == Qt::CheckState::Checked) {
+
+            // get current model
+            PDModelRegistry &modelReg = PDModelRegistry::instance();
+            const PDModelDescriptor *curModel = modelReg.getDescriptorByCode(curModelCode);
+
+            // correct any date that might be in the future
+            if (dateFrom > QDate::currentDate()) {
+                dateFrom = QDate::currentDate();
+            }
+
+            // get CP - all models have at least CP
+            double cp = item->data(RangeColumns::CP, Qt::UserRole).toDouble();
+
+            // default values for models lacking some values
+            double defaultFtp = cp;
+            int defaultWPrime = 20000; // default to 20kJ
+            int defaultPMax = 1000;
+
+            // get all other values
+            double ftp = curModel->hasFTP ? item->data(RangeColumns::FTP, Qt::UserRole).toDouble() : defaultFtp;
+            double wPrime = curModel->hasWPrime
+                    ? item->data(RangeColumns::WPrime, Qt::UserRole).toDouble()
+                    : defaultWPrime;
+            double pMax = curModel->hasPMax ? item->data(RangeColumns::PMax, Qt::UserRole).toDouble() : defaultPMax;
+
+            // add it
+            zones->addZoneRange(dateFrom, qRound(cp), qRound(ftp), qRound(wPrime), qRound(pMax), origin);
+
+        } else if (checkState == Qt::CheckState::Unchecked) {
+            for (int i = 0; i < zones->getRangeSize(); i++) {
+                ZoneRange range = zones->getZoneRange(i);
+                if (range.origin == origin) {
+                    zones->deleteRange(i);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+QString
+CPEstiamtesPage::ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate)
+{
+    QString estimateEndDateString = estimateEndDate.toString(Qt::ISODate);
+    return QString("%1|%2").arg(modelCode).arg(estimateEndDateString);
+}
+
+bool
+CPEstiamtesPage::TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate)
+{
+    QStringList originTokens = origin.split('|');
+    if (originTokens.count() < 2) {
+        return false;
+    }
+
+    modelCode = originTokens[0];
+    zoneRangeBeginDate = QDate::fromString(originTokens[1], Qt::ISODate);
+    return zoneRangeBeginDate.isValid();
 }
 
 //

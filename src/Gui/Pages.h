@@ -884,6 +884,8 @@ class CPPage : public QWidget
         void deleteZoneClicked();
         void zonesChanged();
         void initializeRanges();
+        void rangeAdded(int index, ZoneRange range);
+        void rangeDeleted(int index, ZoneRange);
 
     private:
         bool active;
@@ -909,6 +911,7 @@ class CPEstiamtesPage : public QWidget
     G_OBJECT
     
     enum RangeColumns {
+        IncludedInSettings,
         DateFrom,
         CP,
         FTP,
@@ -919,18 +922,24 @@ class CPEstiamtesPage : public QWidget
     };
     
     public:
-        CPEstiamtesPage(Context *context, QList<PDEstimate> estimates);
+        CPEstiamtesPage(Context *context, QList<PDEstimate> estimates, Zones *zones);
     
     private slots:
         void configChanged(qint32 config);
         void initializeRanges();
+        void zoneRangeDeleted(int, ZoneRange range);
+        void rangesItemChanged(QTreeWidgetItem *item, int column);
 
     private:
         Context *context;
         QList<PDEstimate> estimates;
+        Zones *zones;
 
         QComboBox *modelCombo;
         QTreeWidget *ranges;
+
+        QString ToZoneRangeOrigin(QString modelCode, QDate estimateEndDate);
+        bool TryParseZoneRangeOrigin(QString origin, QString &modelCode, QDate &zoneRangeBeginDate);
 };
 
 class ZonePage : public QWidget
