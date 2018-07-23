@@ -63,6 +63,7 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(invalidate()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(invalidate()));
     connect(context->athlete->rideCache, SIGNAL(itemChanged(RideItem*)), this, SLOT(invalidate()));
+    connect(context->athlete->seasons, SIGNAL(seasonsChanged()), this, SLOT(invalidate()));
 }
 
 PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilterRuntime *df, int stsDays, int ltsDays) 
