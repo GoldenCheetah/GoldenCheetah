@@ -155,7 +155,8 @@
 // 145 06  Apr 2018 Ale Martinez       Python Scripts in UserMetric honor RideItem and Specification
 // 146 21  Apr 2018 Ale Martinez       TriScore Fallback to TRIMP Zonal Points
 // 147 06  May 2018 Ale Martinez       Added PeakHr metrics and HrZone
-int DBSchemaVersion = 147;
+// 148 27  Jul 2018 Ale Martinez       Changed Hrv Measures to retrun 0 when no record for the date
+int DBSchemaVersion = 148;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
