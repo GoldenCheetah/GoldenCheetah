@@ -114,6 +114,10 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
           if (h == "timestamp_measurement" || h == "Datetime") {
               // parse date/time ISO 8601 (HRV4Training for iPhone or EliteHRV)
               m.when = QDateTime::fromString(i, Qt::ISODate);
+              if (!m.when.isValid()) {
+                  // try 12hr format (HRV4Training for iPhone variant...)
+                  m.when = QDateTime::fromString(i.left(19).trimmed(), "yyyy-MM-dd h:mm:ss");
+              }
               if (m.when.isValid()) {
                   // skip line if not in date range
                   if (m.when < from || m.when > to) {
