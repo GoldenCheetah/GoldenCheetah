@@ -117,6 +117,7 @@ HrvMeasuresCsvImport::getHrvMeasures(QString &error, QDateTime from, QDateTime t
               if (!m.when.isValid()) {
                   // try 12hr format (HRV4Training for iPhone variant...)
                   m.when = QDateTime::fromString(i.left(19).trimmed(), "yyyy-MM-dd h:mm:ss");
+                  if (i.contains("p", Qt::CaseInsensitive)) m.when.addSecs(12*3600);
               }
               if (m.when.isValid()) {
                   // skip line if not in date range
