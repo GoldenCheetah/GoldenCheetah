@@ -170,7 +170,6 @@ class RideMetadata : public QWidget
         QVector<FormField*> getFormFields();
 
         bool singlecolumn;
-        SpecialFields sp;
 
         Context *context;
         SpecialTabs specialTabs;

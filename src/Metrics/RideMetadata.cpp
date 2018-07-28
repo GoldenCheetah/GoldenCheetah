@@ -328,8 +328,8 @@ RideMetadata::calendarText(RideItem *rideItem)
         QString fieldName = (field.name == "Weight") ? "Athlete Weight" :
                                                        field.name;
         QString value;
-        if (sp.isMetric(fieldName)) {
-            value = rideItem->getStringForSymbol(sp.rideMetric(fieldName)->symbol(), context->athlete->useMetricUnits);
+        if (context->specialFields.isMetric(fieldName)) {
+            value = rideItem->getStringForSymbol(context->specialFields.rideMetric(fieldName)->symbol(), context->athlete->useMetricUnits);
         } else {
             value = rideItem->getText(fieldName, "");
         }
@@ -452,7 +452,7 @@ Form::arrange()
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
-        if (meta->sp.isMetric(fields[i]->definition.name)) {
+        if (meta->context->specialFields.isMetric(fields[i]->definition.name)) {
             QHBoxLayout *override = new QHBoxLayout;
             overrides.append(override);
 
@@ -480,9 +480,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     enabled = NULL;
     isTime = false;
 
-    if (meta->sp.isMetric(field.name)) {
+    if (meta->context->specialFields.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
-        units = meta->sp.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
+        units = meta->context->specialFields.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
         // remove "seconds", since the field will be a QTimeEdit field
         if (units == "seconds" || units == tr("seconds")) units = "";
         // layout units name for screen
@@ -494,7 +494,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         units = meta->context->athlete->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
-    label = new QLabel(QString("%1%2").arg(meta->sp.displayName(field.name)).arg(units), this);
+    label = new QLabel(QString("%1%2").arg(meta->context->specialFields.displayName(field.name)).arg(units), this);
     label->setPalette(meta->palette);
     //label->setFont(font);
     //label->setFixedHeight(18);
@@ -548,11 +548,11 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
         ((QDoubleSpinBox*)widget)->setMinimum(-999999.99);
         ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
-        if (meta->sp.isMetric(field.name)) {
+        if (meta->context->specialFields.isMetric(field.name)) {
 
             enabled = new QCheckBox(this);
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
-            units = meta->sp.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
+            units = meta->context->specialFields.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
 
             if (units == "seconds" || units == tr("seconds")) {
                 // we need to use a TimeEdit instead
@@ -721,12 +721,12 @@ FormField::metadataFlush()
         ourRideItem->setStartTime(update);
 
     } else if (definition.name != "Summary") {
-        if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
+        if (meta->context->specialFields.isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
             if (!meta->context->athlete->useMetricUnits) {
-                double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
-                value -= meta->sp.rideMetric(definition.name)->conversionSum();
+                double value = text.toDouble() * (1/ meta->context->specialFields.rideMetric(definition.name)->conversion());
+                value -= meta->context->specialFields.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
@@ -735,7 +735,7 @@ FormField::metadataFlush()
             override.insert("value", text);
 
             // check for compatability metrics
-            QString symbol = meta->sp.metricSymbol(definition.name);
+            QString symbol = meta->context->specialFields.metricSymbol(definition.name);
             if (definition.name == "TSS") symbol = "coggan_tss";
             if (definition.name == "NP") symbol = "coggan_np";
             if (definition.name == "IF") symbol = "coggan_if";
@@ -876,17 +876,17 @@ FormField::editFinished()
         }
 
     } else if (definition.name != "Summary") {
-        if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
+        if (meta->context->specialFields.isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
             if (!meta->context->athlete->useMetricUnits) {
-                double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
-                value -= meta->sp.rideMetric(definition.name)->conversionSum();
+                double value = text.toDouble() * (1/ meta->context->specialFields.rideMetric(definition.name)->conversion());
+                value -= meta->context->specialFields.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
             QMap<QString, QString> empty;
-            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name), empty);
+            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(meta->context->specialFields.metricSymbol(definition.name), empty);
             QString currentvalue = current.value("value", "");
 
             if (currentvalue != text) {
@@ -894,7 +894,7 @@ FormField::editFinished()
                 changed = true;
                 QMap<QString,QString> override;
                 override.insert("value", text);
-                ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
+                ourRideItem->ride()->metricOverrides.insert(meta->context->specialFields.metricSymbol(definition.name), override);
             }
 
         } else {
@@ -988,7 +988,7 @@ FormField::stateChanged(int state)
     // remove from overrides if neccessary
     if (ourRideItem && ourRideItem->ride()) {
 
-        QString symbol = meta->sp.metricSymbol(definition.name);
+        QString symbol = meta->context->specialFields.metricSymbol(definition.name);
         if (definition.name == "TSS") symbol = "coggan_tss";
         if (definition.name == "NP") symbol = "coggan_np";
         if (definition.name == "IF") symbol = "coggan_if";
@@ -1036,9 +1036,9 @@ FormField::metadataChanged()
         else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
         else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
-            if (meta->sp.isMetric(definition.name)) {
+            if (meta->context->specialFields.isMetric(definition.name)) {
 
-                QString symbol = meta->sp.metricSymbol(definition.name);
+                QString symbol = meta->context->specialFields.metricSymbol(definition.name);
                 if (definition.name == "TSS") symbol = "coggan_tss";
                 if (definition.name == "NP") symbol = "coggan_np";
                 if (definition.name == "IF") symbol = "coggan_if";
@@ -1053,11 +1053,11 @@ FormField::metadataChanged()
                     value = override.value("value");
 
                     // does it need conversion from metric?
-                    if (meta->sp.rideMetric(definition.name)->conversion() != 1.0) {
+                    if (meta->context->specialFields.rideMetric(definition.name)->conversion() != 1.0) {
                         // do we want imperial?
                         if (!meta->context->athlete->useMetricUnits) {
-                            double newvalue = value.toDouble() * meta->sp.rideMetric(definition.name)->conversion();
-                            newvalue -= meta->sp.rideMetric(definition.name)->conversionSum();
+                            double newvalue = value.toDouble() * meta->context->specialFields.rideMetric(definition.name)->conversion();
+                            newvalue -= meta->context->specialFields.rideMetric(definition.name)->conversionSum();
                             value = QString("%1").arg(newvalue);
                         }
                     }
