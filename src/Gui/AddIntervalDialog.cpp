@@ -993,7 +993,7 @@ AddIntervalDialog::addClicked()
             rideItem->newInterval(name, start, stop,
                                  ride->timeToDistance(start),
                                  ride->timeToDistance(stop),
-                                 false);
+                                 Qt::black, false);
         }
     }
 

@@ -547,7 +547,7 @@ struct BinFileReaderState
             }
         }
         if (interval>1) {
-            rideFile->addInterval(RideFileInterval::DEVICE, last_interval_secs, secs, QString("%1").arg(interval-1));
+            rideFile->addInterval(RideFileInterval::DEVICE, last_interval_secs, secs, QString("%1").arg(interval-1), Qt::black);
         }
         last_interval_secs = secs;
 

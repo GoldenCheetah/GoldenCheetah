@@ -63,12 +63,12 @@ IntervalItem::setFrom(IntervalItem &other)
 void
 IntervalItem::setValues(QString name, double duration1, double duration2, 
                                       double distance1, double distance2,
-                                      bool test)
+                                      QColor color, bool test)
 {
     // apply the update
     this->name = name;
     this->test = test;
-    this->color = color; // !!!!! this is never kept !!!!! XXXFIXME
+    this->color = color;
     start = duration1;
     stop = duration2;
     startKM = distance1;
@@ -80,6 +80,7 @@ IntervalItem::setValues(QString name, double duration1, double duration2,
         // update us and our ridefileinterval
         rideInterval->start = start = duration1;
         rideInterval->stop = stop = duration2;
+        rideInterval->color = color;
         startKM = distance1;
         stopKM = distance2;
 
@@ -255,10 +256,10 @@ EditIntervalDialog::applyClicked()
             istartKM = interval.rideItem_->ride()->timeToDistance(istart);
             istopKM = interval.rideItem_->ride()->timeToDistance(istop);
         }
-        QColor icolor = colorEdit->getColor(); // XXX FIXME XXX Never used and lost
+        QColor icolor = colorEdit->getColor();
         bool itest = istest->isChecked();
 
-        interval.setValues(iname, istart, istop, istartKM, istopKM, itest);
+        interval.setValues(iname, istart, istop, istartKM, istopKM, icolor, itest);
     }
     accept();
 }

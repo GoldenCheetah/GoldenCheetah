@@ -46,7 +46,7 @@ class IntervalItem
         // change basic values, will also apply to ridefile
         void setValues(QString name, double duration1, double duration2, 
                                      double distance1, double distance2,
-                                     bool test);
+                                     QColor color, bool test);
 
         // is this interval currently selected ?
         bool selected;

@@ -120,8 +120,10 @@ class RideFileInterval
         double start, stop;
         QString name;
         bool test;
-        RideFileInterval() : type(USER), start(0.0), stop(0.0), test(false) {}
-        RideFileInterval(IntervalType type, double start, double stop, QString name, bool test=false) : type(type), start(start), stop(stop), name(name), test(test) {}
+        QColor color;
+        RideFileInterval() : type(USER), start(0.0), stop(0.0), test(false), color(Qt::black) {}
+        RideFileInterval(IntervalType type, double start, double stop, QString name, QColor color, bool test=false) :
+        type(type), start(start), stop(stop), name(name), test(test), color(color) {}
 
 
         // order bu start time (and stop+name for QMap)
@@ -310,8 +312,8 @@ class RideFile : public QObject // QObject to emit signals
         void setId(const QString &value) { id_ = value; }
 
         // Working with INTERVALS
-        void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name, bool test=false) {
-            intervals_.append(new RideFileInterval(type, start, stop, name, test));
+        void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name, QColor color=Qt::black, bool test=false) {
+            intervals_.append(new RideFileInterval(type, start, stop, name, color, test));
         }
         int intervalBegin(const RideFileInterval &interval) const;
         int intervalBeginSecs(const double secs) const;

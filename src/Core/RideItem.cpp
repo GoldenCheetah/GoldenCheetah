@@ -318,12 +318,12 @@ RideItem::addInterval(IntervalItem item)
 }
 
 IntervalItem *
-RideItem::newInterval(QString name, double start, double stop, double startKM, double stopKM, bool test)
+RideItem::newInterval(QString name, double start, double stop, double startKM, double stopKM, QColor color, bool test)
 {
     // add a new interval to the end of the list
     IntervalItem *add = new IntervalItem(this, name, start, stop, startKM, stopKM, 1, 
-                                         standardColor(intervals(RideFileInterval::USER).count()), test,
-                                         RideFileInterval::USER);
+                                         color == Qt::black ? standardColor(intervals(RideFileInterval::USER).count()) : color,
+                                         test, RideFileInterval::USER);
     // add to RideFile
     add->rideInterval = ride()->newInterval(name, start, stop, test);
 
@@ -929,13 +929,15 @@ RideItem::updateIntervals()
                                                       f->timeToDistance(interval->start),
                                                       f->timeToDistance(interval->stop),
                                                       seq,
-                                                      standardColor(count++),
+                                                      (interval->color == Qt::black) ? standardColor(count) : interval->color,
                                                       interval->test,
                                                       RideFileInterval::USER);
+
         intervalItem->rideInterval = interval;
         intervalItem->refresh();        // XXX will get called in constructor when refactor
         intervals_ << intervalItem;
 
+        count++;
         //qDebug()<<"interval:"<<interval.name<<interval.start<<interval.stop<<"f:"<<begin->secs<<end->secs;
     }
 

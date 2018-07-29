@@ -1222,7 +1222,7 @@ MapWebBridge::clickPath(double lat, double lng)
 
         point = list.at(0);
 
-        IntervalItem *add = rideItem->newInterval(name, point->secs, point->secs, 0, 0, false);
+        IntervalItem *add = rideItem->newInterval(name, point->secs, point->secs, 0, 0, Qt::black, false);
         add->selected = true;
 
         // rebuild list in sidebar

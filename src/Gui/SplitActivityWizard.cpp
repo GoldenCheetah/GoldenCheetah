@@ -159,7 +159,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
                     // we have a candidate
                     segments.append(new RideFileInterval(RideFileInterval::USER, segmentStart, segmentEnd,
-                                    QString(tr("Activity Segment #%1")).arg(++counter)));
+                                    QString(tr("Activity Segment #%1")).arg(++counter), Qt::black, false));
 
                 }
                 segmentEnd = segmentStart = p->secs;
@@ -178,7 +178,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
         // we have a candidate
         segments.append(new RideFileInterval(RideFileInterval::USER, segmentStart, segmentEnd,
-                                             QString(tr("Activity Segment #%1")).arg(++counter)));
+                                             QString(tr("Activity Segment #%1")).arg(++counter), Qt::black, false));
 
     }
 
@@ -200,7 +200,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
             RideFileInterval *gap = new RideFileInterval(RideFileInterval::USER,
                                                          lastsecs,
                                                          ride->start,
-                                                         QString(tr("Gap in recording #%1")).arg(gapnum));
+                                                         QString(tr("Gap in recording #%1")).arg(gapnum), Qt::black, false);
             gaps.append(gap);
 
             // add to interval list
@@ -216,7 +216,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
         RideFileInterval *gap = new RideFileInterval(RideFileInterval::USER,
                                                      lastsecs,
                                                      rideItem->ride()->dataPoints().last()->secs,
-                                                     QString(tr("Gap in recording #%1")).arg(gapnum));
+                                                     QString(tr("Gap in recording #%1")).arg(gapnum), Qt::black, false);
         gaps.append(gap);
 
         // add to interval list
@@ -227,7 +227,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
     // so we can mark the start and stop for splitting
     segments.insert(0, new RideFileInterval(RideFileInterval::USER, rideItem->ride()->dataPoints().first()->secs,
                                      rideItem->ride()->dataPoints().last()->secs,
-                                     tr("Entire Activity")));
+                                     tr("Entire Activity"), Qt::black, false));
 
     // now fold in the ride intervals
     segments.append(rideItem->ride()->intervals());

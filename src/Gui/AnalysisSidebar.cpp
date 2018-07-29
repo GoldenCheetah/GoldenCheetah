@@ -881,7 +881,7 @@ AnalysisSidebar::editInterval()
             activeInterval->rideInterval->start = activeInterval->start;
             activeInterval->rideInterval->stop = activeInterval->stop;
             activeInterval->rideInterval->test = activeInterval->test;
-            //activeInterval->rideInterval->color = activeInterval->color; //XXX FIXME
+            activeInterval->rideInterval->color = activeInterval->color;
             activeInterval->rideItem()->setDirty(true);
 
             // refresh metrics!
