@@ -992,7 +992,8 @@ AddIntervalDialog::addClicked()
             // add new one to the ride
             rideItem->newInterval(name, start, stop,
                                  ride->timeToDistance(start),
-                                 ride->timeToDistance(stop));
+                                 ride->timeToDistance(stop),
+                                 false);
         }
     }
 

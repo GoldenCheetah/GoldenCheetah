@@ -119,8 +119,9 @@ class RideFileInterval
         IntervalType type;
         double start, stop;
         QString name;
-        RideFileInterval() : start(0.0), stop(0.0) {}
-        RideFileInterval(IntervalType type, double start, double stop, QString name) : type(type), start(start), stop(stop), name(name) {}
+        bool test;
+        RideFileInterval() : type(USER), start(0.0), stop(0.0), test(false) {}
+        RideFileInterval(IntervalType type, double start, double stop, QString name, bool test=false) : type(type), start(start), stop(stop), name(name), test(test) {}
 
 
         // order bu start time (and stop+name for QMap)
@@ -134,6 +135,7 @@ class RideFileInterval
         bool isMatch() const;
         bool isClimb() const;
         bool isBest() const;
+        bool isTest() const;
 };
 
 struct RideFileCalibration
@@ -308,15 +310,15 @@ class RideFile : public QObject // QObject to emit signals
         void setId(const QString &value) { id_ = value; }
 
         // Working with INTERVALS
-        void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name) {
-            intervals_.append(new RideFileInterval(type, start, stop, name));
+        void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name, bool test=false) {
+            intervals_.append(new RideFileInterval(type, start, stop, name, test));
         }
         int intervalBegin(const RideFileInterval &interval) const;
         int intervalBeginSecs(const double secs) const;
         bool removeInterval(RideFileInterval*);
         void moveInterval(int from, int to);
-        RideFileInterval *newInterval(QString name, double start, double stop) {
-            RideFileInterval *add = new RideFileInterval(RideFileInterval::USER, start, stop, name);
+        RideFileInterval *newInterval(QString name, double start, double stop, bool test) {
+            RideFileInterval *add = new RideFileInterval(RideFileInterval::USER, start, stop, name, test);
             intervals_ << add;
             return add;
         }

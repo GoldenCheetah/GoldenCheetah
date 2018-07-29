@@ -259,6 +259,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                                                           ride->timeToDistance(stop),
                                                           ++found,
                                                           QColor(255,127,80),
+                                                          false,
                                                           RideFileInterval::ROUTE);
             intervalItem->route = id();
             here << intervalItem;

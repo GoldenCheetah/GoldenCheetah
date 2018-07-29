@@ -861,13 +861,7 @@ AnalysisSidebar::editIntervalSelected()
 void
 AnalysisSidebar::editInterval()
 {
-    IntervalItem temp;
-    temp.name = activeInterval->name;
-    temp.start = activeInterval->start;
-    temp.stop = activeInterval->stop;
-    temp.color = activeInterval->color;
-    temp.rideInterval = activeInterval->rideInterval;
- 
+    IntervalItem temp(*activeInterval);
     EditIntervalDialog dialog(this, temp); // pass by reference
 
     if (dialog.exec()) {
@@ -877,6 +871,7 @@ AnalysisSidebar::editInterval()
         activeInterval->color = temp.color;
         activeInterval->start = temp.start;
         activeInterval->stop = temp.stop;
+        activeInterval->test = temp.test;
         activeInterval->startKM = activeInterval->rideItem()->ride()->timeToDistance(temp.start);
         activeInterval->stopKM = activeInterval->rideItem()->ride()->timeToDistance(temp.stop);
 
@@ -885,6 +880,8 @@ AnalysisSidebar::editInterval()
             activeInterval->rideInterval->name = activeInterval->name;
             activeInterval->rideInterval->start = activeInterval->start;
             activeInterval->rideInterval->stop = activeInterval->stop;
+            activeInterval->rideInterval->test = activeInterval->test;
+            //activeInterval->rideInterval->color = activeInterval->color; //XXX FIXME
             activeInterval->rideItem()->setDirty(true);
 
             // refresh metrics!

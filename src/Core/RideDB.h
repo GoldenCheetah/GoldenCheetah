@@ -41,8 +41,9 @@
 // 1.6      16 Jul 16  Mark Liversedge         xdata added
 // 1.7      20 Feb 17  Mark Liversedge         Metric count (if nonzero) added
 // 1.8      22 Feb 17  Mark Liversedge         Metric stdmean() stdvariance() added
+// 1.9      29 Jul 18  Mark Liversedge         Mark intervals as performance tests
 
-#define RIDEDB_VERSION "1.8"
+#define RIDEDB_VERSION "1.9"
 
 class APIWebService;
 class HttpResponse;

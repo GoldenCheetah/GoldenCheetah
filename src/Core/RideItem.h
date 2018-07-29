@@ -117,7 +117,7 @@ class RideItem : public QObject
         void clearIntervals() { intervals_.clear(); } // does NOT delete them
 
         // new Interval created and needs to be reflected in ridefile
-        IntervalItem * newInterval(QString name, double start, double stop, double startKM, double stopKM);
+        IntervalItem * newInterval(QString name, double start, double stop, double startKM, double stopKM, bool test);
 
         // access the metric value
         double getForSymbol(QString name, bool useMetricUnits=true);

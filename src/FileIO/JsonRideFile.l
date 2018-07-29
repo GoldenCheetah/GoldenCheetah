@@ -115,6 +115,7 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"NAME\"            return NAME;
 \"START\"           return START;
 \"STOP\"            return STOP;
+\"PTEST\"           return TEST; /* bool is a performance test */
 \"CALIBRATIONS\"    return CALIBRATIONS;
 \"VALUE\"           return VALUE;
 \"VALUES\"          return VALUES;

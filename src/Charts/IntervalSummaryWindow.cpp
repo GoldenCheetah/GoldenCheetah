@@ -237,7 +237,7 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
     QHash<QString,RideMetricPtr> notmetrics = RideMetric::computeMetrics(notfake, Specification(), intervalMetrics);
 
     // create temp interval item to use by interval summary
-    IntervalItem temp;
+    IntervalItem temp(NULL, "", 0, 0, 0, 0, 0, Qt::black, false, RideFileInterval::USER);
 
     // pack the metrics away and clean up if needed
     temp.metrics().fill(0, factory.metricCount());

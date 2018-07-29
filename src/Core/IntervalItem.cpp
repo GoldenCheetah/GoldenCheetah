@@ -25,7 +25,7 @@
 #include "ColorButton.h"
 
 IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, double stop, 
-                           double startKM, double stopKM, int displaySequence, QColor color,
+                           double startKM, double stopKM, int displaySequence, QColor color, bool test,
                            RideFileInterval::IntervalType type)
 {
     this->name = name;
@@ -37,14 +37,15 @@ IntervalItem::IntervalItem(const RideItem *ride, QString name, double start, dou
     this->type = type;
     this->color = color;
     this->selected = false;
+    this->test = test;
     this->rideInterval = NULL;
     this->rideItem_ = const_cast<RideItem*>(ride);
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     count_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
-IntervalItem::IntervalItem() : rideItem_(NULL), name(""), type(RideFileInterval::USER), start(0), stop(0),
-                               startKM(0), stopKM(0), displaySequence(0), color(Qt::black), rideInterval(NULL)
+IntervalItem::IntervalItem() : rideItem_(NULL), selected(false), name(""), type(RideFileInterval::USER), start(0), stop(0),
+                               startKM(0), stopKM(0), displaySequence(0), color(Qt::black), test(false), rideInterval(NULL)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     count_.fill(0, RideMetricFactory::instance().metricCount());
@@ -54,23 +55,27 @@ void
 IntervalItem::setFrom(IntervalItem &other)
 {
     *this = other;
+    rideItem_ = other.rideItem_;
     rideInterval = NULL;
     selected = false;
 }
 
 void
 IntervalItem::setValues(QString name, double duration1, double duration2, 
-                                      double distance1, double distance2)
+                                      double distance1, double distance2,
+                                      bool test)
 {
     // apply the update
     this->name = name;
+    this->test = test;
+    this->color = color; // !!!!! this is never kept !!!!! XXXFIXME
     start = duration1;
     stop = duration2;
     startKM = distance1;
     stopKM = distance2;
 
     // only accept changes if we can send on
-    if (type == RideFileInterval::USER && rideInterval) {
+    if (type == RideFileInterval::USER && rideInterval && rideItem_) {
 
         // update us and our ridefileinterval
         rideInterval->start = start = duration1;
@@ -80,10 +85,11 @@ IntervalItem::setValues(QString name, double duration1, double duration2,
 
         // update ridefile
         rideItem_->setDirty(true);
+
+        // update metrics
+        refresh();
     }
 
-    // update metrics
-    refresh();
 }
 
 void
@@ -196,6 +202,9 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
 
         colorEdit = new ColorButton(this, interval.name, interval.color);
         colorEdit->setAutoDefault(false);
+
+        istest = new QCheckBox(tr("Performance Test"), this);
+        istest->setChecked(interval.istest());
     }
 
 
@@ -209,6 +218,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
         grid->addWidget(toEdit, 2,1);
         grid->addWidget(new QLabel("Color"), 3,0);
         grid->addWidget(colorEdit, 3,1);
+        grid->addWidget(istest, 4,0);
     }
 
     mainLayout->addLayout(grid);
@@ -230,15 +240,29 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
 void
 EditIntervalDialog::applyClicked()
 {
-    // get the values back
-    interval.name = nameEdit->text();
+    // set the values to the interval but need to recalc the KM
+    // and use the rideItem functions to do this to ensure they
+    // get applied to the ridefile interval too (so it gets saved)
     if (interval.rideInterval != NULL) {
-        interval.start = QTime(0,0,0).secsTo(fromEdit->time());
-        interval.stop = QTime(0,0,0).secsTo(toEdit->time());
-        interval.color = colorEdit->getColor();
+
+        QString iname = nameEdit->text();
+        double istart = QTime(0,0,0).secsTo(fromEdit->time());
+        double istop = QTime(0,0,0).secsTo(toEdit->time());
+        double istartKM = 0;
+        double istopKM = 0;
+
+        if (interval.rideItem_ && interval.rideItem_->ride()) {
+            istartKM = interval.rideItem_->ride()->timeToDistance(istart);
+            istopKM = interval.rideItem_->ride()->timeToDistance(istop);
+        }
+        QColor icolor = colorEdit->getColor(); // XXX FIXME XXX Never used and lost
+        bool itest = istest->isChecked();
+
+        interval.setValues(iname, istart, istop, istartKM, istopKM, itest);
     }
     accept();
 }
+
 void
 EditIntervalDialog::cancelClicked()
 {

@@ -197,7 +197,7 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
 
                 // create an interval item for each interval
                 IntervalItem interval(&rideItem, ri->name, ri->start, ri->stop, 0, 0, 1,
-                                             QColor(Qt::black), RideFileInterval::USER);
+                                             QColor(Qt::black), ri->test, RideFileInterval::USER);
                 // refresh metrics
                 interval.refresh();
 

@@ -250,6 +250,7 @@ interval_tuple: string ':' string                               {
                                                                      else if ($1 == "color") jc->interval.color = QColor($3);
                                                                      else if ($1 == "seq") jc->interval.displaySequence = $3.toInt();
                                                                      else if ($1 == "route") jc->interval.route = QUuid($3);
+                                                                     else if ($1 == "test") jc->interval.test = $3 == "true" ? true : false;
                                                                 }
 
 interval_metrics: METRICS ':' '{' interval_metrics_list '}'                       ;
@@ -735,6 +736,7 @@ void RideCache::save(bool opendata, QString filename)
                     stream << "\t\t\t\"startKM\":\"" << interval->startKM <<"\",\n";
                     stream << "\t\t\t\"stopKM\":\"" << interval->stopKM <<"\",\n";
                     stream << "\t\t\t\"type\":\"" << static_cast<int>(interval->type) <<"\",\n";
+                    stream << "\t\t\t\"test\":\"" << (interval->test ? "true" : "false") <<"\",\n";
                     stream << "\t\t\t\"color\":\"" << interval->color.name() <<"\",\n";
 
                     // routes have a segment identifier
