@@ -66,6 +66,7 @@ class CPPlot : public QwtPlot
         void setRide(RideItem *rideItem);
         void setDateRange(const QDate &start, const QDate &end);
         void setShowPercent(bool x);
+        void setShowTest(bool x);
         void setShowBest(bool x);
         void setFilterBest(bool x);
         void setShowHeat(bool x);
@@ -127,6 +128,7 @@ class CPPlot : public QwtPlot
         // plotters
         void plotRide(RideItem *);
         void plotBests(RideItem *);
+        void plotTests(RideItem *);
         void plotEfforts();
         void plotModel();
         void plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline); // for compare date range models
@@ -165,6 +167,7 @@ class CPPlot : public QwtPlot
         int shadeMode;
         bool shadeIntervals;
         bool rangemode;
+        bool showTest;
         bool showBest;
         bool filterBest;
         bool showPercent;
@@ -193,10 +196,13 @@ class CPPlot : public QwtPlot
         QwtPlotCurve *heatCurve;
         CpPlotCurve *heatAgeCurve;
 
+        QwtPlotCurve *testCurve;
+
         // other plot objects
         QList<QwtPlotMarker*> referenceLines;
         QList<QwtPlotMarker*> allZoneLabels;
         QList<QwtPlotMarker*> cherries;
+        QList<QwtPlotMarker*> performanceTests;
 
         LogTimeScaleDraw *ltsd;
         QwtScaleDraw *sd;

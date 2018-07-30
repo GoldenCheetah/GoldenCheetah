@@ -209,6 +209,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QLabel *gridify = new QLabel(tr("Show grid"));
     cl->addRow(gridify, showGridCheck);
 
+    showTestCheck = new QCheckBox(this);
+    showTestCheck->setChecked(true); // default on
+    QLabel *testify = new QLabel(tr("Show Performance Tests"));
+    cl->addRow(testify, showTestCheck);
+
     showBestCheck = new QCheckBox(this);
     showBestCheck->setChecked(true); // default on
     QLabel *bestify = new QLabel(tr("Show Bests"));
@@ -537,6 +542,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showTestCheck, SIGNAL(stateChanged(int)), this, SLOT(showTestChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
     connect(filterBestCheck, SIGNAL(stateChanged(int)), this, SLOT(filterBestChanged(int)));
     connect(showGridCheck, SIGNAL(stateChanged(int)), this, SLOT(showGridChanged(int)));
@@ -1746,6 +1752,16 @@ CriticalPowerWindow::filterBestChanged(int state)
     if (rangemode) dateRangeChanged(DateRange());
     else cpPlot->setRide(currentRide);
 }
+void
+CriticalPowerWindow::showTestChanged(int state)
+{
+    cpPlot->setShowTest(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
+}
+
 void
 CriticalPowerWindow::showBestChanged(int state)
 {

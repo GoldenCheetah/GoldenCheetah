@@ -62,7 +62,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showBest(true), filterBest(false), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showTest(true), showBest(true), filterBest(false), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
     xAxisLinearOnSpeed(true),
 
@@ -958,6 +958,10 @@ CPPlot::clearCurves()
         modelCPCurves.clear();
     }
 
+    // performance test markers
+    foreach(QwtPlotMarker *p, performanceTests) delete p;
+    performanceTests.clear();
+
 }
 
 // get bests or an empty set if it is null
@@ -974,6 +978,62 @@ CPPlot::getBestDates()
 {
     if (bestsCache) return bestsCache->meanMaxDates(rideSeries);
     else return QVector<QDate>();
+}
+
+// plot tests if needed
+void
+CPPlot::plotTests(RideItem *rideitem)
+{
+    if (showTest) {
+
+        // just plot tests as power duration for now, will reiterate to add others later.
+        if (rideSeries == RideFile::SeriesType::watts) {
+
+            // rides to search, this one only -or- all in the date range selected?
+            QList<RideItem*> rides;
+            if (rideitem) rides << rideitem;
+            else {
+
+                // honoring chart settings and filters, lets set the list of
+                // rides we will search for performance tests...
+                FilterSet fs;
+                fs.addFilter(context->isfiltered, context->filters);
+                fs.addFilter(context->ishomefiltered, context->homeFilters);
+                Specification spec;
+                spec.setFilterSet(fs);
+                spec.setDateRange(DateRange(startDate, endDate));
+
+                foreach(RideItem *r, context->athlete->rideCache->rides()) {
+                    // does it match ?
+                    if (spec.pass(r)) rides << r;
+                }
+            }
+
+            foreach (RideItem *item, rides) {
+                foreach (IntervalItem *interval, item->intervals()) {
+                    if (interval->istest()) {
+
+                        double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
+                        double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
+
+                        QwtSymbol *sym = new QwtSymbol;
+                        sym->setBrush(QBrush(Qt::red));
+                        sym->setPen(QPen(Qt::red));
+                        sym->setStyle(QwtSymbol::Triangle);
+                        sym->setSize(18*dpiXFactor);
+
+                        QwtPlotMarker *test = new QwtPlotMarker();
+                        test->setSymbol(sym);
+                        test->setValue(duration/60.00f, watts);
+
+                        // and attach
+                        test->attach(this);
+                        performanceTests << test;
+                    }
+                }
+            }
+        }
+    }
 }
 
 // plot the bests curve and refresh the data if needed too
@@ -1771,6 +1831,9 @@ CPPlot::setRide(RideItem *rideItem)
         plotBests(NULL);
     }
 
+    // plot tests (in ride, or across date range)
+    plotTests(rangemode ? NULL : rideItem);
+
     // Plot Sustained Efforts
     plotEfforts();
 
@@ -2032,6 +2095,14 @@ CPPlot::setFilterBest(bool x)
 {
     filterBest = x;
     clearCurves();
+}
+
+void
+CPPlot::setShowTest(bool x)
+{
+    showTest = x;
+    clearCurves();
+    fprintf(stderr, "Toggle show test to %s\n", x ? "on" : "off"); fflush(stderr);
 }
 
 void
