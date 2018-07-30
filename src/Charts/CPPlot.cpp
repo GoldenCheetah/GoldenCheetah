@@ -1003,7 +1003,7 @@ CPPlot::plotTests(RideItem *rideitem)
     QVector<QPointF> points;
 
     // just plot tests as power duration for now, will reiterate to add others later.
-    if (rideSeries == RideFile::SeriesType::watts) {
+    if (rideSeries == RideFile::watts) {
 
         // rides to search, this one only -or- all in the date range selected?
         QList<RideItem*> rides;
