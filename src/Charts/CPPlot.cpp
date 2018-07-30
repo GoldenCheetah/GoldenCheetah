@@ -55,7 +55,7 @@
 CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
     // model
-    model(0), modelVariant(0), fit(0),
+    model(0), modelVariant(0), fit(0), fitdata(0),
 
     // state
     context(context), bestsCache(NULL), dateCV(0.0), isRun(false), isSwim(false),
@@ -367,8 +367,11 @@ CPPlot::initModel()
             pdModel->setFit(PDModel::LeastSquares);
             pdModel->setMinutes(true); // ignored by lmfit methods
             //fprintf(stderr, "best filtered to %d points\n", filtertime.count()); fflush(stderr);
-            if (filterBest) pdModel->setPtData(filterpower, filtertime);
-            else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+            if (fitdata && testpower.count() >= 3) pdModel->setPtData(testpower, testtime);
+            else {
+                if (filterBest) pdModel->setPtData(filterpower, filtertime);
+                else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+            }
         }
    }
 
@@ -980,42 +983,59 @@ CPPlot::getBestDates()
     else return QVector<QDate>();
 }
 
+// for sorting points on x axis
+static bool qpointflessthan(const QPointF &s1, const QPointF &s2)
+{
+            return s1.x() < s2.x();
+}
+
 // plot tests if needed
 void
 CPPlot::plotTests(RideItem *rideitem)
 {
-    if (showTest) {
+    // clear out test data
+    testtime.clear();
+    testtime.resize(0);
+    testpower.clear();
+    testpower.resize(0);
 
-        // just plot tests as power duration for now, will reiterate to add others later.
-        if (rideSeries == RideFile::SeriesType::watts) {
+    // used to sort
+    QVector<QPointF> points;
 
-            // rides to search, this one only -or- all in the date range selected?
-            QList<RideItem*> rides;
-            if (rideitem) rides << rideitem;
-            else {
+    // just plot tests as power duration for now, will reiterate to add others later.
+    if (rideSeries == RideFile::SeriesType::watts) {
 
-                // honoring chart settings and filters, lets set the list of
-                // rides we will search for performance tests...
-                FilterSet fs;
-                fs.addFilter(context->isfiltered, context->filters);
-                fs.addFilter(context->ishomefiltered, context->homeFilters);
-                Specification spec;
-                spec.setFilterSet(fs);
-                spec.setDateRange(DateRange(startDate, endDate));
+        // rides to search, this one only -or- all in the date range selected?
+        QList<RideItem*> rides;
+        if (rideitem) rides << rideitem;
+        else {
 
-                foreach(RideItem *r, context->athlete->rideCache->rides()) {
-                    // does it match ?
-                    if (spec.pass(r)) rides << r;
-                }
+            // honoring chart settings and filters, lets set the list of
+            // rides we will search for performance tests...
+            FilterSet fs;
+            fs.addFilter(context->isfiltered, context->filters);
+            fs.addFilter(context->ishomefiltered, context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+            spec.setDateRange(DateRange(startDate, endDate));
+
+            foreach(RideItem *r, context->athlete->rideCache->rides()) {
+                // does it match ?
+                if (spec.pass(r)) rides << r;
             }
+        }
 
-            foreach (RideItem *item, rides) {
-                foreach (IntervalItem *interval, item->intervals()) {
-                    if (interval->istest()) {
+        foreach (RideItem *item, rides) {
+            foreach (IntervalItem *interval, item->intervals()) {
+                if (interval->istest()) {
 
-                        double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
-                        double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
+                    double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
+                    double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
 
+                    // x and y, we need to sort on x before done
+                    points << QPointF(duration, watts);
+
+                    if (showTest) {
                         QwtSymbol *sym = new QwtSymbol;
                         sym->setBrush(QBrush(Qt::red));
                         sym->setPen(QPen(Qt::red));
@@ -1032,6 +1052,13 @@ CPPlot::plotTests(RideItem *rideitem)
                     }
                 }
             }
+        }
+
+        // now sort the points on x so we can feed to model fit
+        qSort(points.begin(), points.end(), qpointflessthan);
+        foreach(QPointF point, points) {
+            testtime << point.x() / 60.0f;
+            testpower << point.y();
         }
     }
 }
@@ -2102,7 +2129,6 @@ CPPlot::setShowTest(bool x)
 {
     showTest = x;
     clearCurves();
-    fprintf(stderr, "Toggle show test to %s\n", x ? "on" : "off"); fflush(stderr);
 }
 
 void
@@ -2166,7 +2192,7 @@ CPPlot::showXAxisLinear(bool x)
 
 // model parameters!
 void
-CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant, int fit)
+CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant, int fit, int fitdata)
 {
     this->anI1 = double(anI1);
     this->anI2 = double(anI2);
@@ -2181,6 +2207,7 @@ CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, i
     this->model = model;
     this->modelVariant = variant;
     this->fit = fit;
+    this->fitdata = fitdata;
 
     clearCurves();
 }

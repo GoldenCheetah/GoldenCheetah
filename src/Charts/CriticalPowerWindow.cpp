@@ -281,6 +281,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     fitCombo->setCurrentIndex(0); // default to envelope, backwards compatibility
     mcl->addRow(new QLabel(tr("Curve Fit")), fitCombo);
 
+    fitdataCombo= new QComboBox(this);
+    fitdataCombo->addItem(tr("MMP bests"));
+    fitdataCombo->addItem(tr("Performance tests"));
+    fitdataCombo->setCurrentIndex(0); // default to MMP, backwards compatibility
+    mcl->addRow(new QLabel(tr("Data to fit")), fitdataCombo);
+
     mcl->addRow(new QLabel(tr(" ")));
     intervalLabel = new QLabel(tr("Search Interval"));
     secondsLabel = new QLabel(tr("(seconds)"));
@@ -512,6 +518,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     // model updated?
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(fitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fitChanged()));
+    connect(fitdataCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fitChanged()));
     connect(anI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(anI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(aeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
@@ -699,6 +706,7 @@ CriticalPowerWindow::fitChanged()
     // gets a replot
     modelParametersChanged();
 }
+
 void
 CriticalPowerWindow::modelChanged()
 {
@@ -878,7 +886,8 @@ CriticalPowerWindow::modelParametersChanged()
                         laeI2SpinBox->value(),
                         modelCombo->currentIndex(),
                         variant(),
-                        fitCombo->currentIndex());
+                        fitCombo->currentIndex(),
+                        fitdataCombo->currentIndex());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {
