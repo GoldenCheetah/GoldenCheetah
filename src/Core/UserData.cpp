@@ -150,7 +150,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "best(cadence, 3600)";
     list << "best(speed, 3600)";
     list << "best(torque, 3600)";
-    list << "best(np, 3600)";
+    list << "best(isopower, 3600)";
     list << "best(xpower, 3600)";
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
