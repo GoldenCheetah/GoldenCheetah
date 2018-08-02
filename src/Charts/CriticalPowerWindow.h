@@ -266,6 +266,9 @@ class CriticalPowerWindow : public GcChartWindow
         void setSliderFromEdit();
         void setEditFromSlider();
 
+        // get fit summary
+        void setSummary(QString x) { summary->setText(x); }
+
         // menu option
         void exportData();
 
@@ -328,6 +331,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *ftpTitle, *ftpValue, *ftpRank;
         QLabel *pmaxTitle, *pmaxValue, *pmaxRank;
         QLabel *eiTitle, *eiValue;
+        QLabel *summary;
 
         void addSeries();
         void updateOptions(CriticalSeriesType series);

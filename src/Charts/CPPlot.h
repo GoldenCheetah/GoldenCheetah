@@ -60,7 +60,7 @@ class CPPlot : public QwtPlot
 
     public:
 
-        CPPlot(QWidget *parent, Context *, bool rangemode);
+        CPPlot(CriticalPowerWindow *parent, Context *, bool rangemode);
 
         // setters
         void setRide(RideItem *rideItem);
@@ -119,7 +119,7 @@ class CPPlot : public QwtPlot
 
     private:
 
-        QWidget *parent;
+        CriticalPowerWindow *parent;
 
         // calculate / data setting
         void calculateForDateRanges(QList<CompareDateRange> compareDateRanges);

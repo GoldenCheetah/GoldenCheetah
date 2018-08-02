@@ -139,6 +139,8 @@ class PDModel : public QObject, public QwtSyntheticPointData
         // available with the extended CP model
         QList<QPointF> cherries();
 
+        QString fitsummary;
+
     protected:
 
     signals:

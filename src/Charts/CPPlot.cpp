@@ -52,7 +52,7 @@
 #include "LTMTrend.h"
 
 
-CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
+CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
 
     // model
     model(0), modelVariant(0), fit(0), fitdata(0),
@@ -373,6 +373,7 @@ CPPlot::initModel()
                 else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
             }
         }
+        parent->setSummary(pdModel->fitsummary);
    }
 
     #if GC_HAVE_MODEL_LABS

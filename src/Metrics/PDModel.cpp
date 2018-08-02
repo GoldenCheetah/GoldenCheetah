@@ -21,8 +21,8 @@
 
 // base class for all models
 PDModel::PDModel(Context *context) :
-    fit(Envelope),
     QwtSyntheticPointData(PDMODEL_MAXT),
+    fit(Envelope),
     inverseTime(false),
     context(context),
     sanI1(0), sanI2(0), anI1(0), anI2(0), aeI1(0), aeI2(0), laeI1(0), laeI2(0),
@@ -137,6 +137,7 @@ PDModel::deriveCPParameters(int model)
     // 2 = Extended Model  (Damien)
     // 3 = Veloclinic (Mike P)
     // 4 = Ward Smith
+    fitsummary="";
 
     // only try lmfit if the model supports that
     if (fit == LeastSquares && this->nparms() > 0) {
@@ -214,6 +215,27 @@ PDModel::deriveCPParameters(int model)
 
         // save away the values we fit to.
         this->setParms(par);
+
+        // calculate RMSE
+
+        // get vector of residuals
+        QVector<double> residuals(p.size());
+        double errtot=0;
+        for(int i=0; i<p.size(); i++){
+            double err = p[i] - y(t[i]/60.0f);
+            errtot += err; // for mean
+            residuals[i]=err;
+        }
+        double mean = errtot/double(p.size());
+        errtot = 0;
+
+        // mean of residuals^2
+        for(int i=0; i<p.size(); i++) errtot += pow(residuals[i]-mean, 2);
+        mean = errtot / double(p.size());
+
+        // RMSE
+        double RMSE=sqrt(mean);
+        fitsummary = QString("RMSE %1 watts [LM] %2 points").arg(RMSE, 0, 'g', 2).arg(p.size());
 
     } else {
 
@@ -326,6 +348,26 @@ PDModel::deriveCPParameters(int model)
         } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 
         //fprintf(stderr, "tau=%f, t0= %f\n", tau, t0); fflush(stderr);
+
+        // get vector of residuals
+        QVector<double> residuals(data.size());
+        double errtot=0;
+        for(int i=0; i<data.size(); i++){
+            double err = data[i] - y((i+1)/60.0f);
+            errtot += err; // for mean
+            residuals[i]=err;
+        }
+        double mean = errtot/double(data.size());
+        errtot = 0;
+
+        // mean of residuals^2
+        for(int i=0; i<data.size(); i++) errtot += pow(residuals[i]-mean, 2);
+        mean = errtot / double(data.size());
+
+        // RMSE
+        double RMSE=sqrt(mean);
+        fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'g', 2).arg(data.size());
+
     }
 }
 

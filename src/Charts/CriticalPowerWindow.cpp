@@ -428,6 +428,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     ftpRank = new QLabel(tr("n/a"), this);
     eiTitle = new QLabel(tr("Endurance Index"), this);
     eiValue = new QLabel(tr("n/a"), this);
+    summary = new QLabel(tr(""), this);
 
     // autofill
     titleBlank->setAutoFillBackground(true);
@@ -447,6 +448,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     ftpRank->setAutoFillBackground(true);
     eiTitle->setAutoFillBackground(true);
     eiValue->setAutoFillBackground(true);
+    summary->setAutoFillBackground(true);
 
     // align all centered
     titleBlank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -485,6 +487,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     gridLayout->addWidget(ftpRank, 4, 2);
     gridLayout->addWidget(eiTitle, 5, 0);
     gridLayout->addWidget(eiValue, 5, 1);
+    gridLayout->addWidget(summary, 6, 0, 1, 3);
 
 #ifdef GC_HAVE_MUMODEL
     addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
@@ -658,6 +661,7 @@ CriticalPowerWindow::configChanged(qint32)
     ftpRank->setFont(font);
     eiTitle->setFont(font);
     eiValue->setFont(font);
+    summary->setFont(font);
 
     helper->setPalette(palette);
     titleBlank->setPalette(palette);
@@ -677,10 +681,11 @@ CriticalPowerWindow::configChanged(qint32)
     ftpRank->setPalette(whitepalette);
     eiTitle->setPalette(palette);
     eiValue->setPalette(whitepalette);
-
+    summary->setPalette(whitepalette);
     CPEdit->setPalette(whitepalette);
     CPLabel->setPalette(whitepalette);
     CPSlider->setPalette(whitepalette);
+
 
 #ifndef Q_OS_MAC
     QString style = QString("QSpinBox { background: %1; }").arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name());
@@ -691,7 +696,11 @@ CriticalPowerWindow::configChanged(qint32)
         helper->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
                                                                       .arg(GColor(CPLOTMARKER).name()));
     }
+
+    // do after cascade above
+    summary->setStyleSheet(QString("background-color: '%1'; color '%2';").arg(GColor(CPLOTBACKGROUND).name()).arg(QColor(Qt::gray).name()));
 #endif
+
 
     QPen gridPen(GColor(CPLOTGRID));
     grid->setPen(gridPen);
