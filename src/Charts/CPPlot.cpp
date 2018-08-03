@@ -361,16 +361,20 @@ CPPlot::initModel()
             pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
             pdModel->setMinutes(true); // we're minutes here ...
             pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+            pdModel->fitsummary += " [MMP]";
 
         } else {
             // LM fit will use filtered data or all data
             pdModel->setFit(PDModel::LeastSquares);
             pdModel->setMinutes(true); // ignored by lmfit methods
             //fprintf(stderr, "best filtered to %d points\n", filtertime.count()); fflush(stderr);
-            if (fitdata && testpower.count() >= 3) pdModel->setPtData(testpower, testtime);
-            else {
+            if (fitdata && testpower.count() >= 3) {
+                pdModel->setPtData(testpower, testtime);
+                pdModel->fitsummary += " [Perf]";
+            } else {
                 if (filterBest) pdModel->setPtData(filterpower, filtertime);
                 else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+                pdModel->fitsummary += " [MMP]";
             }
         }
         parent->setSummary(pdModel->fitsummary);

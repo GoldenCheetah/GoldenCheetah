@@ -1168,6 +1168,24 @@ ExtendedModel::deriveExtCPParameters()
         qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
     }
 #endif
+        // get vector of residuals
+        QVector<double> residuals(data.size());
+        double errtot=0;
+        for(int i=0; i<data.size(); i++){
+            double err = data[i] - y((i+1)/60.0f);
+            errtot += err; // for mean
+            residuals[i]=err;
+        }
+        double mean = errtot/double(data.size());
+        errtot = 0;
+
+        // mean of residuals^2
+        for(int i=0; i<data.size(); i++) errtot += pow(residuals[i]-mean, 2);
+        mean = errtot / double(data.size());
+
+        // RMSE
+        double RMSE=sqrt(mean);
+        fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'g', 2).arg(data.size());
 }
 
 QList<QPointF> 

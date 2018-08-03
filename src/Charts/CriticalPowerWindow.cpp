@@ -698,7 +698,7 @@ CriticalPowerWindow::configChanged(qint32)
     }
 
     // do after cascade above
-    summary->setStyleSheet(QString("background-color: '%1'; color '%2';").arg(GColor(CPLOTBACKGROUND).name()).arg(QColor(Qt::gray).name()));
+    summary->setStyleSheet(QString("background-color: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name()).arg(QColor(Qt::gray).name()));
 #endif
 
 
