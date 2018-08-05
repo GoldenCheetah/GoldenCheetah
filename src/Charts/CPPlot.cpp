@@ -1044,6 +1044,9 @@ CPPlot::plotTests(RideItem *rideitem)
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
                     double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
 
+                    // ignore where no power present
+                    if (watts <= 0) continue;
+
                     // wpk need weight?
                     if (rideSeries == RideFile::wattsKg) watts /= item->weight;
 
@@ -1052,10 +1055,14 @@ CPPlot::plotTests(RideItem *rideitem)
 
                     if (showTest) {
                         QwtSymbol *sym = new QwtSymbol;
-                        sym->setBrush(QBrush(Qt::red));
-                        sym->setPen(QPen(Qt::red));
-                        sym->setStyle(QwtSymbol::Triangle);
-                        sym->setSize(18*dpiXFactor);
+
+                        // use interval color user selected
+                        sym->setBrush(QBrush(interval->color));
+                        sym->setPen(QPen(Qt::NoPen));
+                        sym->setStyle(QwtSymbol::Diamond);
+
+                        // make it a really big symbol if from todays ride
+                        sym->setSize((12 + (rideitem == item ? 6 : 0))*dpiXFactor);
 
                         QwtPlotMarker *test = new QwtPlotMarker();
                         test->setSymbol(sym);
