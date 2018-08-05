@@ -259,7 +259,8 @@ AnalysisSidebar::setRide(RideItem*ride)
             add->setText(0, interval->name);
             add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
             add->setData(0, Qt::UserRole+1, QVariant(interval->color));
-            add->setFlags(Qt::ItemIsEnabled 
+            add->setData(0, Qt::UserRole+2, QVariant(interval->test));
+            add->setFlags(Qt::ItemIsEnabled
 #if QT_VERSION >= 0x50101
                           | Qt::ItemNeverHasChildren
 #endif
@@ -907,6 +908,7 @@ AnalysisSidebar::editIntervalSelected()
                 // update tree to reflect changes!
                 userIntervals->child(j)->setText(0, activeInterval->name);
                 userIntervals->child(j)->setData(0, Qt::UserRole+1, activeInterval->color);
+                userIntervals->child(j)->setData(0, Qt::UserRole+2, activeInterval->test ? 255 : 0);
 
                 // tell the charts !
                 context->notifyIntervalsChanged();

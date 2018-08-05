@@ -150,7 +150,7 @@ void
 IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const 
 {
-    QStyledItemDelegate::paint(painter, option, index);
+    //QStyledItemDelegate::paint(painter, option, index);
 
     painter->save();
 
@@ -176,6 +176,11 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             painter->fillRect(high, color);
 
         }
+
+        // is it a performance test ?
+        QVariant t = item->data(0, Qt::UserRole+2);
+        const_cast<QStyleOptionViewItem&>(option).font.setBold(t.toInt() ? true : false);
     }
+    QStyledItemDelegate::paint(painter, option, index);
     painter->restore();
 }
