@@ -68,6 +68,7 @@ class Season
         int getMaxRamp() { return _ramp; }
         QString getName();
         int days() { return _days; } // how many days in the season, -1 if never ending
+        int prior(); // if a relative season, how many days prior does it cover e.g. Last 21 days returns 21. 0 if not relative
         int getType();
         static bool LessThanForStarts(const Season &a, const Season &b);
 

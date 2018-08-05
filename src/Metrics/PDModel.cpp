@@ -165,6 +165,16 @@ PDModel::deriveCPParameters(int model)
             }
             //fprintf(stderr, " used points=%d\n", p.count()); fflush(stderr);
 
+            // if not enough data use everything in desperation...
+            if (p.count() < 3) {
+                p.resize(0);
+                t.resize(0);
+                for(int i=0; i<data.count(); i++) {
+                    p << data[i];
+                    t << tdata[i];
+                }
+            }
+
             // set starting values cp and w'
             par[0] = 200;
             par[1] = 15000;
@@ -176,6 +186,16 @@ PDModel::deriveCPParameters(int model)
             // is most likely submaximal or fatigued
             for(int i=0; i<data.count(); i++) {
                 if (tdata[i] <= 1200) {
+                    p << data[i];
+                    t << tdata[i];
+                }
+            }
+
+            // if not enough data use everything in desperation...
+            if (p.count() < 3) {
+                p.resize(0);
+                t.resize(0);
+                for(int i=0; i<data.count(); i++) {
                     p << data[i];
                     t << tdata[i];
                 }

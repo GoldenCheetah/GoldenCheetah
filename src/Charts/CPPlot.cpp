@@ -151,12 +151,21 @@ CPPlot::setAxisTitle(int axis, QString label)
 void
 CPPlot::setDateRange(const QDate &start, const QDate &end)
 {
-    // wipe out current - calculate will reinstate
-    startDate = (start == QDate()) ? QDate(1900, 1, 1) : start;
-    endDate = (end == QDate()) ? QDate(3000, 12, 31) : end;
 
-    // we need to replot the bests and model curves
-    clearCurves(); // clears all bar the ride curve
+    // wipe out current - calculate will reinstate
+    QDate istart = (start == QDate()) ? QDate(1900, 1, 1) : start;
+    QDate iend = (end == QDate()) ? QDate(3000, 12, 31) : end;
+
+    // check they actually changed, to avoid ridefilecache aggregation
+    // which is an expensive function
+    if (startDate != istart || endDate != iend) {
+
+        startDate = istart;
+        endDate = iend;
+
+        // we need to replot the bests and model curves
+        clearCurves(); // clears all bar the ride curve
+    }
 }
 
 // what series are we plotting ?
@@ -372,7 +381,8 @@ CPPlot::initModel()
                 pdModel->setPtData(testpower, testtime);
                 pdModel->fitsummary += " [Perf]";
             } else {
-                if (filterBest) pdModel->setPtData(filterpower, filtertime);
+                // must have at least 3 points, otherwise drop back to full MMP
+                if (filterBest && filtertime.count() >= 3) pdModel->setPtData(filterpower, filtertime);
                 else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
                 pdModel->fitsummary += " [MMP]";
             }
@@ -1012,22 +1022,19 @@ CPPlot::plotTests(RideItem *rideitem)
 
         // rides to search, this one only -or- all in the date range selected?
         QList<RideItem*> rides;
-        if (rideitem) rides << rideitem;
-        else {
 
-            // honoring chart settings and filters, lets set the list of
-            // rides we will search for performance tests...
-            FilterSet fs;
-            fs.addFilter(context->isfiltered, context->filters);
-            fs.addFilter(context->ishomefiltered, context->homeFilters);
-            Specification spec;
-            spec.setFilterSet(fs);
-            spec.setDateRange(DateRange(startDate, endDate));
+        // honoring chart settings and filters, lets set the list of
+        // rides we will search for performance tests...
+        FilterSet fs;
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        Specification spec;
+        spec.setFilterSet(fs);
+        spec.setDateRange(DateRange(startDate, endDate));
 
-            foreach(RideItem *r, context->athlete->rideCache->rides()) {
-                // does it match ?
-                if (spec.pass(r)) rides << r;
-            }
+        foreach(RideItem *r, context->athlete->rideCache->rides()) {
+            // does it match ?
+            if (spec.pass(r)) rides << r;
         }
 
         foreach (RideItem *item, rides) {

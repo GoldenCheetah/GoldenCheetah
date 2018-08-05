@@ -960,10 +960,6 @@ CriticalPowerWindow::forceReplot()
         dateRangeChanged(myDateRange); 
 
     } else {
-        Season season = seasons->seasons.at(cComboSeason->currentIndex());
-
-        // Refresh aggregated curve (ride added/filter changed)
-        cpPlot->setDateRange(season.getStart(), season.getEnd());
 
         // if visible make the changes visible
         // rideSelected is easiest way
@@ -1247,6 +1243,19 @@ CriticalPowerWindow::rideSelected()
             delete hoverCurve;
             hoverCurve = NULL;
         }
+
+        // when plotting a single ride, the date range is either as selected
+        // for a fixed period (e.g. 2018) or it is for a fixed period
+        // prior to the ride (e.g. Last 28 days), we look at the
+        // date range id to map to known first, then just use the season
+        // range, that way as you look at older rides the dates being
+        // used change to reflect capability at that time, whilst in
+        // range mode (trends) its just the season selected.
+        Season season = seasons->seasons.at(cComboSeason->currentIndex());
+
+        // Refresh aggregated curve (ride added/filter changed)
+        if (season.prior() == 0) cpPlot->setDateRange(season.getStart(), season.getEnd()); // fixed
+        else cpPlot->setDateRange(myRideItem->dateTime.date().addDays(season.prior()), myRideItem->dateTime.date());
     }
 
     if (!amVisible()) return;
@@ -1619,7 +1628,10 @@ CriticalPowerWindow::resetSeasons()
     // insert seasons
     for (int i=0; i <seasons->seasons.count(); i++) {
         Season season = seasons->seasons.at(i);
-        cComboSeason->addItem(season.getName());
+        // we add the id as user data since there are some 'fixed' ids
+        // that represent last 28 days etc that we can then use to offset
+        // from the date of the ride
+        cComboSeason->addItem(season.getName(), QVariant(season.id()));
     }
     // restore previous selection
     int index = cComboSeason->findText(prev);

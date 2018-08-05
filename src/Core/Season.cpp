@@ -72,6 +72,23 @@ int Season::getType()
     return type;
 }
 
+// how many days prior does this season represent
+// if value is 0 then its not a Last x days kind of season
+int Season::prior()
+{
+    //  Last x days, Last x months turn into number of days prior
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000005}")) return -7;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000006}")) return -14;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000011}")) return -21;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000007}")) return -28;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000008}")) return -60;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000012}")) return -90;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000009}")) return -180;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000010}")) return -365;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000015}")) return -42;
+    return 0;
+}
+
 void Season::setEnd(QDate _end)
 {
     end = _end;
@@ -380,6 +397,13 @@ Seasons::readSeasons()
     season.setStart(today.addDays(-27));
     season.setEnd(today);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000007}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 6 weeks"));
+    season.setType(Season::temporary);
+    season.setEnd(today);
+    season.setStart(today.addDays(-42));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000015}"));
     seasons.append(season);
 
     season.setName(tr("Last 2 months"));
