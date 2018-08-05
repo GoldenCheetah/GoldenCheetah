@@ -57,7 +57,7 @@ IntervalItem::setFrom(IntervalItem &other)
     *this = other;
     rideItem_ = other.rideItem_;
     rideInterval = NULL;
-    selected = false;
+    selected = other.selected;
 }
 
 void

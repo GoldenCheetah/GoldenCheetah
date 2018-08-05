@@ -319,8 +319,8 @@ class RideFile : public QObject // QObject to emit signals
         int intervalBeginSecs(const double secs) const;
         bool removeInterval(RideFileInterval*);
         void moveInterval(int from, int to);
-        RideFileInterval *newInterval(QString name, double start, double stop, bool test) {
-            RideFileInterval *add = new RideFileInterval(RideFileInterval::USER, start, stop, name, test);
+        RideFileInterval *newInterval(QString name, double start, double stop, QColor color, bool test) {
+            RideFileInterval *add = new RideFileInterval(RideFileInterval::USER, start, stop, name, color, test);
             intervals_ << add;
             return add;
         }

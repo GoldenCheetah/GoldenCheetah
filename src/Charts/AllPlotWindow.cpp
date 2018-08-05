@@ -2411,12 +2411,14 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
                 // update interval - could do via a IntervalItem::setXX() function
                 IntervalItem *interval = users.last();
                 interval->setValues(interval->name, duration1, duration2, distance1, distance2, interval->color, false);
+                interval->selected = true;
 
             } else {
 
                 //create a new one
                 IntervalItem *interval = ride->newInterval(name, duration1, duration2, distance1, distance2, Qt::black, false);
                 interval->selected = true;
+                ride->
 
                 // rebuild list
                 context->notifyIntervalsUpdate(ride);

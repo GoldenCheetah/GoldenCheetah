@@ -86,6 +86,8 @@ class AnalysisSidebar : public QWidget
         void createRouteIntervalSelected(void); // from menu popup
         void frontInterval();
         void backInterval();
+        void perfTestIntervalSelected();
+        void createPerfTestIntervalSelected();
 
     private:
 
