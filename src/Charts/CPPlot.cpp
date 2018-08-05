@@ -1018,7 +1018,7 @@ CPPlot::plotTests(RideItem *rideitem)
     QVector<QPointF> points;
 
     // just plot tests as power duration for now, will reiterate to add others later.
-    if (rideSeries == RideFile::watts) {
+    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg) {
 
         // rides to search, this one only -or- all in the date range selected?
         QList<RideItem*> rides;
@@ -1043,6 +1043,9 @@ CPPlot::plotTests(RideItem *rideitem)
 
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
                     double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
+
+                    // wpk need weight?
+                    if (rideSeries == RideFile::wattsKg) watts /= item->weight;
 
                     // x and y, we need to sort on x before done
                     points << QPointF(duration, watts);
