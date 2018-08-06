@@ -1068,6 +1068,19 @@ CPPlot::plotTests(RideItem *rideitem)
                         test->setSymbol(sym);
                         test->setValue(duration/60.00f, watts);
 
+                        QString desc = QString("%3\n%1%4\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
+                                                             .arg(interval_to_str(duration))
+                                                             .arg(interval->name)
+                                                             .arg(RideFile::unitName(rideSeries, context));
+                        QwtText text(desc);
+                        QFont font; // default
+                        font.setPointSize(8);
+                        text.setFont(font);
+                        text.setRenderFlags((text.renderFlags()&~Qt::AlignCenter)|Qt::AlignLeft);
+                        text.setColor(interval->color);
+                        test->setLabel(text);
+                        test->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
+
                         // and attach
                         test->attach(this);
                         performanceTests << test;
