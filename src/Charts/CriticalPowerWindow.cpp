@@ -810,10 +810,10 @@ CriticalPowerWindow::modelChanged()
             laeI2SpinBox->hide();
 
             // Default values
-            anI1SpinBox->setValue(1800);
-            anI2SpinBox->setValue(2400);
-            aeI1SpinBox->setValue(2400);
-            aeI2SpinBox->setValue(3600);
+            anI1SpinBox->setValue(180);
+            anI2SpinBox->setValue(240);
+            aeI1SpinBox->setValue(600);
+            aeI2SpinBox->setValue(1200);
 
             break;
 
