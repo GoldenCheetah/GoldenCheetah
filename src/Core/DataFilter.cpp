@@ -20,6 +20,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideNavigator.h"
 #include "RideFileCache.h"
 #include "PMCData.h"
@@ -125,6 +126,8 @@ static struct {
     // Daily Measures Access by date
     { "measure", 3 },   // measure(DATE, "Hrv", "RMSSD")
 
+    // how many performance tests in the ride?
+    { "tests", 0 },
     // add new ones above this line
     { "", -1 }
 };
@@ -2504,6 +2507,18 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     // retrieve measure value
                     double value = m->context->athlete->measures->getFieldValue(group, date, field);
                     return Result(value);
+                }
+                break;
+
+        case 43 :
+                {   // TESTS() for now just return a count of performance test intervals in the rideitem
+                    if (m == NULL) return 0;
+                    else {
+                        int count=0;
+                        foreach(IntervalItem *i, m->intervals())
+                            if (i->istest()) count++;
+                        return Result(count);
+                    }
                 }
                 break;
         default:
