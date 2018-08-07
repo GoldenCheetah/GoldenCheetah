@@ -91,7 +91,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         // provide data to a QwtPlotCurve
         double x(unsigned int index) const; 
-        virtual double y(double /* t */) const { return 0; }
+        virtual double y(double /* t */) const = 0;
 
         // return an estimate of vo2max using the predicted 5m power
         // if using a model using w/kg then it will return ml/min/kg
@@ -138,6 +138,9 @@ class PDModel : public QObject, public QwtSyntheticPointData
         // lets make these available, currently only
         // available with the extended CP model
         QList<QPointF> cherries();
+
+        // calculate the fit summary
+        void calcSummary();
 
         QString fitsummary;
 
@@ -203,7 +206,7 @@ class CP2Model : public PDModel
         CP2Model(Context *context);
 
         // synthetic data for a curve
-        double y(double t) const;
+        virtual double y(double t) const;
 
         // when using lest squares fitting
         int nparms() { return 2; } // CP + W'
@@ -248,7 +251,7 @@ class CP3Model : public PDModel
         CP3Model(Context *context);
 
         // synthetic data for a curve
-        double y(double t) const;
+        virtual double y(double t) const;
 
         // working with least squares
         int nparms() { return 3; }
@@ -297,7 +300,7 @@ class WSModel : public PDModel // ward-smith
         WSModel(Context *context);
 
         // synthetic data for a curve
-        double y(double t) const;
+        virtual double y(double t) const;
 
         bool hasWPrime() { return true; }  // can estimate W'
         bool hasCP()     { return true; }  // can CP
@@ -332,7 +335,7 @@ class MultiModel : public PDModel
         void setVariant(int); // which variant to use
 
         // synthetic data for a curve
-        double y(double t) const;
+        virtual double y(double t) const;
 
         bool hasWPrime() { return true; }  // can estimate W'
         bool hasCP()     { return true; }  // can CP
@@ -371,7 +374,7 @@ class ExtendedModel : public PDModel
         ExtendedModel(Context *context);
 
         // synthetic data for a curve
-        double y(double t) const;
+        virtual double y(double t) const;
 
         int nparms() { return 8; }
         double f(double x, const double *parms) {

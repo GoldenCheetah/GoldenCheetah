@@ -269,8 +269,10 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     modelCombo->addItem(tr("2 parameter"));
     modelCombo->addItem(tr("3 parameter"));
     modelCombo->addItem(tr("Extended CP"));
+#if 0 // disable until model fitting errors are fixed (!!!)
     modelCombo->addItem(tr("Multicomponent"));
     modelCombo->addItem(tr("Ward-Smith"));
+#endif
     modelCombo->setCurrentIndex(1);
 
     mcl->addRow(new QLabel(tr("Model")), modelCombo);

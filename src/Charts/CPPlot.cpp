@@ -363,7 +363,7 @@ CPPlot::initModel()
 
     if (pdModel) {
 
-        if (fit == 0 || model == 3) { //!!! always envelope fit the ecp model
+        if (fit == 0 || model >= 3) { //!!! always envelope fit the ecp, ward-smith and velo model
 
             // envelope fit always uses all data
             pdModel->setFit(PDModel::Envelope);
