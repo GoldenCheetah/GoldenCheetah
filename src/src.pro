@@ -90,7 +90,7 @@ QMAKE_CFLAGS_ISYSTEM =
 ###=======================================================================
 
 # qwt, qxt, libz, json, lmfit and qwtcurve
-INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve ../lmfit
+INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve ../lmfit ../levmar
 DEFINES += QXT_STATIC
 
 # to make sure we are toolchain neutral we NEVER refer to a lib
@@ -728,7 +728,8 @@ HEADERS += Planning/PlanningWindow.h
 # contrib
 HEADERS += ../qtsolutions/codeeditor/codeeditor.h ../qtsolutions/json/mvjson.h ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
            ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h ../qxt/src/qxtstringspinbox.h ../qzip/zipreader.h \
-           ../qzip/zipwriter.h ../lmfit/lmcurve.h  ../lmfit/lmcurve_tyd.h  ../lmfit/lmmin.h  ../lmfit/lmstruct.h
+           ../qzip/zipwriter.h ../lmfit/lmcurve.h  ../lmfit/lmcurve_tyd.h  ../lmfit/lmmin.h  ../lmfit/lmstruct.h \
+           ../levmar/compiler.h  ../levmar/levmar.h  ../levmar/lm.h  ../levmar/misc.h
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
@@ -828,7 +829,11 @@ SOURCES += Planning/PlanningWindow.cpp
 ## Contributed solutions
 SOURCES += ../qtsolutions/codeeditor/codeeditor.cpp ../qtsolutions/json/mvjson.cpp ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
            ../qxt/src/qxtspanslider.cpp ../qxt/src/qxtstringspinbox.cpp ../qzip/zip.cpp \
-           ../lmfit/lmcurve.c ../lmfit/lmmin.c
+           ../lmfit/lmcurve.c ../lmfit/lmmin.c \
+           ../levmar/Axb.c ../levmar/lm_core.c ../levmar/lmbc_core.c \
+           ../levmar/lmblec_core.c ../levmar/lmbleic_core.c ../levmar/lmlec.c ../levmar/misc.c \
+           ../levmar/Axb_core.c ../levmar/lm.c ../levmar/lmbc.c ../levmar/lmblec.c ../levmar/lmbleic.c \
+           ../levmar/lmlec_core.c ../levmar/misc_core.c
 
 ## Train View Components
 SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \
