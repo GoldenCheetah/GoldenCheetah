@@ -72,6 +72,8 @@
 #include "PythonEmbed.h"
 #endif
 
+#include "levmar.h"
+
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
@@ -304,6 +306,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
             "<tr><td colspan=\"2\">WEBKIT</td><td>%17</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
+            "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -340,10 +343,11 @@ QString GcCrashDialog::versionHTML()
 #endif
             .arg(webkit)
 #ifdef GC_HAVE_PYTHON
-            .arg(python ? python->version.split(" ").at(0) : QString("disabled"));
+            .arg(python ? python->version.split(" ").at(0) : QString("disabled"))
 #else
             .arg("none")
 #endif
+            .arg(LM_VERSION)
             ;
 
     QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");
