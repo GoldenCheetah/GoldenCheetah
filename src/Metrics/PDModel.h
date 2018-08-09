@@ -157,6 +157,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
     protected:
 
         Context *context;
+        int model;
 
         // intervals to search for best points
         double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;

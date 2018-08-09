@@ -37,11 +37,17 @@ void
 PDModel::setData(QVector<double> meanMaxPower)
 {
     cp = tau = t0 = 0; // reset on new data
+    int size = meanMaxPower.size();
+
+    // truncate the data for 2p and 3p models
+    if (model < 3)  size = size < 1200 ? size : 1200;
+
     data = meanMaxPower;
+    data.resize(size);
 
     // generate t data, in seconds
-    tdata.resize(meanMaxPower.size());
-    for(int i=0; i<meanMaxPower.size(); i++) tdata[i] = i+1;
+    tdata.resize(size);
+    for(int i=0; i<size; i++) tdata[i] = i+1;
     emit dataChanged();
 }
 
@@ -87,9 +93,14 @@ void
 PDModel::setData(QVector<float> meanMaxPower)
 {
     cp = tau = t0 = 0; // reset on new data
-    data.resize(meanMaxPower.size());
-    tdata.resize(meanMaxPower.size());
-    for (int i=0; i< data.size(); i++) {
+    int size = meanMaxPower.size();
+
+    // truncate the data for 2p and 3p models
+    if (model < 3)  size = size < 1200 ? size : 1200;
+
+    data.resize(size);
+    tdata.resize(size);
+    for (int i=0; i< size; i++) {
         data[i] = meanMaxPower[i];
         tdata[i] = i+1;
     }
@@ -405,11 +416,12 @@ PDModel::calcSummary()
 CP2Model::CP2Model(Context *context) :
     PDModel(context)
 {
-    // set default intervals to search CP 2-3 mins and 7-20 mins
+    // set default intervals to search CP 2-3 mins and 10-20 mins
     anI1=120;
     anI2=200;
-    aeI1=420;
+    aeI1=720;
     aeI2=1200;
+    model = 0;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
     connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
@@ -466,11 +478,13 @@ void CP2Model::onIntervalsChanged()
 CP3Model::CP3Model(Context *context) :
     PDModel(context)
 {
-    // set default intervals to search CP 30-60
-    anI1=1800;
-    anI2=2400;
-    aeI1=2400;
-    aeI2=3600;
+    // set default intervals to search CP 2-3 mins and 12-20mins
+    anI1=120;
+    anI2=200;
+    aeI1=720;
+    aeI2=1200;
+
+    model = 1;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
     connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
@@ -541,6 +555,8 @@ WSModel::WSModel(Context *context) : PDModel(context)
     anI2=2400;
     aeI1=2400;
     aeI2=3600;
+
+    model = 3;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
     connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
@@ -658,6 +674,7 @@ MultiModel::MultiModel(Context *context) :
     aeI1=2400;
     aeI2=3600;
 
+    model = 4;
     variant = 0; // use exp top/bottom by default.
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
@@ -805,6 +822,8 @@ ExtendedModel::ExtendedModel(Context *context) :
     aeI2=3000;
     laeI1=3600;
     laeI2=30000;
+
+    model = 3;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
     connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
