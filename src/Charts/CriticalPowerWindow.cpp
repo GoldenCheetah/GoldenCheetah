@@ -1220,7 +1220,7 @@ CriticalPowerWindow::intervalsChanged()
     if (!amVisible()) return;
 
     // replot if needed
-    intervalSelected(); // will refresh
+    forceReplot();
 }
 
 void
