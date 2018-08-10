@@ -169,8 +169,8 @@ IntervalColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         if (!selected && !hover) {
 
             // 7 pix wide mark on rhs
-            QRect high(option.rect.x()+option.rect.width() - 7, 
-                       option.rect.y(), 7, tree->rowHeightPublic(index));
+            QRect high(option.rect.x()+option.rect.width() - (7*dpiXFactor),
+                       option.rect.y(), (7*dpiXFactor), tree->rowHeightPublic(index));
 
             // use the interval colour
             painter->fillRect(high, color);
