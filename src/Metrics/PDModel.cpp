@@ -818,8 +818,8 @@ ExtendedModel::ExtendedModel(Context *context) :
     sanI2=90;
     anI1=120;
     anI2=300;
-    aeI1=600;
-    aeI2=3000;
+    aeI1=420;
+    aeI2=1800;
     laeI1=3600;
     laeI2=30000;
 

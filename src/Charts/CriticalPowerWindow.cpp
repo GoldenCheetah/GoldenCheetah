@@ -325,7 +325,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     aeI1SpinBox->setMaximum(3600);
     aeI1SpinBox->setSingleStep(1.0);
     aeI1SpinBox->setAlignment(Qt::AlignRight);
-    aeI1SpinBox->setValue(1200); // 30 minutes
+    aeI1SpinBox->setValue(420); // 7 minutes
 
     aeI2SpinBox = new QDoubleSpinBox(this);
     aeI2SpinBox->setDecimals(0);
@@ -333,7 +333,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     aeI2SpinBox->setMaximum(3600);
     aeI2SpinBox->setSingleStep(1.0);
     aeI2SpinBox->setAlignment(Qt::AlignRight);
-    aeI2SpinBox->setValue(1800); // 60 minutes
+    aeI2SpinBox->setValue(1800); // 30 minutes
 
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
@@ -857,8 +857,8 @@ CriticalPowerWindow::modelChanged()
             sanI2SpinBox->setValue(90);
             anI1SpinBox->setValue(120);
             anI2SpinBox->setValue(300);
-            aeI1SpinBox->setValue(600);
-            aeI2SpinBox->setValue(3000);
+            aeI1SpinBox->setValue(420);
+            aeI2SpinBox->setValue(1800);
             laeI1SpinBox->setValue(4000);
             laeI2SpinBox->setValue(30000);
 
