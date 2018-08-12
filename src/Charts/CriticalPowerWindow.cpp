@@ -714,6 +714,8 @@ CriticalPowerWindow::configChanged(qint32)
 void
 CriticalPowerWindow::fitChanged()
 {
+    if (active == true) return;
+
     // gets a replot
     modelParametersChanged();
 }
@@ -734,6 +736,20 @@ CriticalPowerWindow::modelChanged()
     velo1->hide();
     velo2->hide();
     velo3->hide();
+
+    // multimodels use envelope, always
+    // others should use LM, but user can choose
+    if (modelCombo->currentIndex() > 2) {
+        fitCombo->setCurrentIndex(0);
+        fitdataCombo->setCurrentIndex(0);
+        fitCombo->setEnabled(false);
+        fitdataCombo->setEnabled(false);
+    } else {
+        fitCombo->setCurrentIndex(1);
+        fitdataCombo->setCurrentIndex(1);
+        fitCombo->setEnabled(true);
+        fitdataCombo->setEnabled(true);
+    }
 
     switch (modelCombo->currentIndex()) {
 
