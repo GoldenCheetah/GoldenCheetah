@@ -425,9 +425,6 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     pmaxTitle = new QLabel(tr("Pmax"), this);
     pmaxValue = new QLabel(tr("0 w"), this);
     pmaxRank = new QLabel(tr("n/a"), this);
-    ftpTitle = new QLabel(tr("FTP"), this);
-    ftpValue = new QLabel(tr("0 w"), this);
-    ftpRank = new QLabel(tr("n/a"), this);
     eiTitle = new QLabel(tr("Endurance Index"), this);
     eiValue = new QLabel(tr("n/a"), this);
     summary = new QLabel(tr(""), this);
@@ -445,9 +442,6 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     pmaxTitle->setAutoFillBackground(true);
     pmaxValue->setAutoFillBackground(true);
     pmaxRank->setAutoFillBackground(true);
-    ftpTitle->setAutoFillBackground(true);
-    ftpValue->setAutoFillBackground(true);
-    ftpRank->setAutoFillBackground(true);
     eiTitle->setAutoFillBackground(true);
     eiValue->setAutoFillBackground(true);
     summary->setAutoFillBackground(true);
@@ -465,9 +459,6 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     pmaxTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     pmaxValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     pmaxRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    ftpTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    ftpValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    ftpRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     eiTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     eiValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
@@ -475,21 +466,18 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     gridLayout->addWidget(titleBlank, 0, 0);
     gridLayout->addWidget(titleValue, 0, 1);
     gridLayout->addWidget(titleRank, 0, 2);
-    gridLayout->addWidget(wprimeTitle, 1, 0);
-    gridLayout->addWidget(wprimeValue, 1, 1);
-    gridLayout->addWidget(wprimeRank, 1, 2);
-    gridLayout->addWidget(cpTitle, 2, 0);
-    gridLayout->addWidget(cpValue, 2, 1);
-    gridLayout->addWidget(cpRank, 2, 2);
+    gridLayout->addWidget(cpTitle, 1, 0);
+    gridLayout->addWidget(cpValue, 1, 1);
+    gridLayout->addWidget(cpRank, 1, 2);
+    gridLayout->addWidget(wprimeTitle, 2, 0);
+    gridLayout->addWidget(wprimeValue, 2, 1);
+    gridLayout->addWidget(wprimeRank, 2, 2);
     gridLayout->addWidget(pmaxTitle, 3, 0);
     gridLayout->addWidget(pmaxValue, 3, 1);
     gridLayout->addWidget(pmaxRank, 3, 2);
-    gridLayout->addWidget(ftpTitle, 4, 0);
-    gridLayout->addWidget(ftpValue, 4, 1);
-    gridLayout->addWidget(ftpRank, 4, 2);
-    gridLayout->addWidget(eiTitle, 5, 0);
-    gridLayout->addWidget(eiValue, 5, 1);
-    gridLayout->addWidget(summary, 6, 0, 1, 3);
+    gridLayout->addWidget(eiTitle, 4, 0);
+    gridLayout->addWidget(eiValue, 4, 1);
+    gridLayout->addWidget(summary, 5, 0, 1, 3);
 
 #ifdef GC_HAVE_MUMODEL
     addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
@@ -658,9 +646,6 @@ CriticalPowerWindow::configChanged(qint32)
     pmaxTitle->setFont(font);
     pmaxValue->setFont(font);
     pmaxRank->setFont(font);
-    ftpTitle->setFont(font);
-    ftpValue->setFont(font);
-    ftpRank->setFont(font);
     eiTitle->setFont(font);
     eiValue->setFont(font);
     summary->setFont(font);
@@ -678,9 +663,6 @@ CriticalPowerWindow::configChanged(qint32)
     pmaxTitle->setPalette(palette);
     pmaxValue->setPalette(whitepalette);
     pmaxRank->setPalette(whitepalette);
-    ftpTitle->setPalette(palette);
-    ftpValue->setPalette(whitepalette);
-    ftpRank->setPalette(whitepalette);
     eiTitle->setPalette(palette);
     eiValue->setPalette(whitepalette);
     summary->setPalette(whitepalette);

@@ -328,7 +328,6 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *titleBlank, *titleValue, *titleRank;
         QLabel *wprimeTitle, *wprimeValue, *wprimeRank;
         QLabel *cpTitle, *cpValue, *cpRank;
-        QLabel *ftpTitle, *ftpValue, *ftpRank;
         QLabel *pmaxTitle, *pmaxValue, *pmaxRank;
         QLabel *eiTitle, *eiValue;
         QLabel *summary;
