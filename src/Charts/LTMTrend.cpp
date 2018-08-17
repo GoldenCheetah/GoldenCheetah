@@ -22,7 +22,7 @@
 
 #include <QDebug>
 
-LTMTrend::LTMTrend(double *xdata, double *ydata, int count) :
+LTMTrend::LTMTrend(const double *xdata, const double *ydata, int count) :
           minX(0.0), maxX(0.0), minY(0.0), maxY(0.0),
           points(0.0), sumX(0.0), sumY(0.0), sumXsquared(0.0),
           sumYsquared(0.0), sumXY(0.0), a(0.0), b(0.0)

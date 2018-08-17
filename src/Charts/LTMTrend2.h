@@ -26,7 +26,7 @@ class LTMTrend2
         double minx, miny, maxx, maxy;
 
         // constructor just initialises variables
-        LTMTrend2(double *xdata, double *ydata, int count) 
+        LTMTrend2(const double *xdata, const double *ydata, int count)
                 : minx(10000), miny(10000), maxx(-10000), maxy(-10000), count(count),
                   sx4(0), sx3(0), sx2(0), sx(0), sx2y(0), sxy(0), sy(0)
         {

@@ -17,6 +17,7 @@
  */
 
 #include "PDModel.h"
+#include "LTMTrend.h"
 #include "lmcurve.h"
 
 // base class for all models
@@ -150,8 +151,49 @@ PDModel::deriveCPParameters(int model)
     // 4 = Ward Smith
     fitsummary="";
 
+    if (fit == LinearRegression) {
+
+        // first lets just do a linear regression on the data as supplied
+        QVector<double> joules;
+        QVector<double> t;
+        QVector<double> p;
+        for(int i=0; i<data.count(); i++) {
+            if (tdata[i] > 120 && tdata[i] <= 1200) {
+                joules << (data[i]*tdata[i]);
+                t << tdata[i];
+                p << data[i];
+            }
+        }
+        LTMTrend lr(t.constData(),joules.constData(), t.count());
+        //fprintf(stderr, "Linear regression: CP=%f, W'=%f\n", lr.slope(), lr.intercept()); fflush(stderr);
+
+        double par[3];
+        par[0]=lr.slope();
+        par[1]=lr.intercept();
+        par[2]=0;
+        setParms(par);
+
+        // get vector of residuals
+        QVector<double> residuals(t.size());
+        double errtot=0;
+        for(int i=0; i<t.size(); i++){
+            double err = p[i] - y(t[i]/60.0f);
+            errtot += err; // for mean
+            residuals[i]=err;
+        }
+        double mean = errtot/double(t.size());
+        errtot = 0;
+
+        // mean of residuals^2
+        for(int i=0; i<t.size(); i++) errtot += pow(residuals[i]-mean, 2);
+        mean = errtot / double(t.size());
+
+        // RMSE
+        double RMSE=sqrt(mean);
+        fitsummary = QString("RMSE %1 watts [LR] %2 points").arg(RMSE, 0, 'f', 2).arg(t.size());
+
+    } else if (fit == LeastSquares && this->nparms() > 0) {
     // only try lmfit if the model supports that
-    if (fit == LeastSquares && this->nparms() > 0) {
 
         // used for fit
         QVector<double> p, t;
@@ -266,7 +308,7 @@ PDModel::deriveCPParameters(int model)
 
         // RMSE
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts [LM] %2 points").arg(RMSE, 0, 'g', 2).arg(p.size());
+        fitsummary = QString("RMSE %1 watts [LM] %2 points").arg(RMSE, 0, 'f', 2).arg(p.size());
 
     } else {
 
@@ -384,6 +426,7 @@ PDModel::deriveCPParameters(int model)
         calcSummary();
 
     }
+
 }
 
 void
@@ -406,7 +449,7 @@ PDModel::calcSummary()
 
     // RMSE
     double RMSE=sqrt(mean);
-    fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'g', 2).arg(data.size());
+    fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'f', 2).arg(data.size());
 }
 
 //
@@ -1231,7 +1274,7 @@ ExtendedModel::deriveExtCPParameters()
 
         // RMSE
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'g', 2).arg(data.size());
+        fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'f', 2).arg(data.size());
 }
 
 QList<QPointF> 

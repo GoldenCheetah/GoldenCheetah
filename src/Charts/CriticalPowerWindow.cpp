@@ -280,6 +280,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     fitCombo= new QComboBox(this);
     fitCombo->addItem(tr("Envelope"));
     fitCombo->addItem(tr("Least Squares (LMA)"));
+    fitCombo->addItem(tr("Linear Regression (Work)"));
     fitCombo->setCurrentIndex(0); // default to envelope, backwards compatibility
     mcl->addRow(new QLabel(tr("Curve Fit")), fitCombo);
 
@@ -732,6 +733,11 @@ CriticalPowerWindow::modelChanged()
         fitCombo->setEnabled(true);
         fitdataCombo->setEnabled(true);
     }
+
+    // disable linear regression fit for all models
+    // except CP2, this is a bit of a hack, but works
+    QStandardItem *item=qobject_cast<QStandardItemModel*>(fitCombo->model())->item(2);
+    item->setFlags(modelCombo->currentIndex() != 1 ? item->flags() & ~Qt::ItemIsEnabled: item->flags() | Qt::ItemIsEnabled);
 
     switch (modelCombo->currentIndex()) {
 

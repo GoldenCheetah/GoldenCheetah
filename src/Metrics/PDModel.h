@@ -65,8 +65,9 @@ class PDModel : public QObject, public QwtSyntheticPointData
     public:
 
 
-        enum fittype { Envelope,                 // envelope fit
-                       LeastSquares,             // uses Levenberg-Marquardt Damped Least Squares
+        enum fittype { Envelope=0,                 // envelope fit
+                       LeastSquares=1,             // uses Levenberg-Marquardt Damped Least Squares
+                       LinearRegression=2         // using slope and intercept of linear regression
                      } fit;
 
         PDModel(Context *context);

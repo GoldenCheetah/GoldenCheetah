@@ -374,7 +374,7 @@ CPPlot::initModel()
 
         } else {
             // LM fit will use filtered data or all data
-            pdModel->setFit(PDModel::LeastSquares);
+            pdModel->setFit(fit == 1 ? PDModel::LeastSquares : PDModel::LinearRegression);
             pdModel->setMinutes(true); // ignored by lmfit methods
             //fprintf(stderr, "best filtered to %d points\n", filtertime.count()); fflush(stderr);
             if (fitdata && testpower.count() >= 3) {
