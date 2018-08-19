@@ -789,10 +789,10 @@ CriticalPowerWindow::modelChanged()
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
 
-            // Default values: class 2-3mins 7-20 model
+            // Default values: class 2-3mins 10-20 model
             anI1SpinBox->setValue(120);
             anI2SpinBox->setValue(200);
-            aeI1SpinBox->setValue(420);
+            aeI1SpinBox->setValue(720);
             aeI2SpinBox->setValue(1200);
 
             break;
