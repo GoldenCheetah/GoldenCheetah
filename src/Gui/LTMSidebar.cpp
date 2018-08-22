@@ -1279,10 +1279,12 @@ LTMSidebar::addEvent()
 
         active = true;
 
+#ifdef GC_HAVE_ICAL
         // upload to remote calendar if configured
         if (context->athlete->davCalendar->getConfig())
             if (!context->athlete->davCalendar->upload(&myevent))
                 QMessageBox::warning(this, tr("Add Event"), tr("The new event could not be uploaded to your remote calendar."));
+#endif
 
         seasons->seasons[seasonindex].events.append(myevent);
 
