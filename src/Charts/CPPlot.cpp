@@ -67,7 +67,7 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     xAxisLinearOnSpeed(true),
 
     // curves and plot objects
-    rideCurve(NULL), modelCurve(NULL), effortCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), pdModel(NULL)
+    rideCurve(NULL), modelCurve(NULL), effortCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), workModelCurve(NULL), pdModel(NULL)
 
 {
     setAutoFillBackground(true);
@@ -337,6 +337,12 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 void
 CPPlot::initModel()
 {
+
+    //if (pdModel) {
+        //delete pdModel; // fix mem leak
+        //pdModel=NULL;
+    //}
+
     switch (model) {
 
     case 0 : // no model - do nothing
@@ -369,7 +375,7 @@ CPPlot::initModel()
             pdModel->setFit(PDModel::Envelope);
             pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
             pdModel->setMinutes(true); // we're minutes here ...
-            pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+            pdModel->setData(bestsCache->meanMaxArray(criticalSeries == CriticalPowerWindow::work ? RideFile::watts : rideSeries));
             pdModel->fitsummary += " [MMP]";
 
         } else {
@@ -382,11 +388,16 @@ CPPlot::initModel()
                 pdModel->fitsummary += " [Perf]";
             } else {
                 // must have at least 3 points, otherwise drop back to full MMP
-                if (filterBest && filtertime.count() >= 3) pdModel->setPtData(filterpower, filtertime);
-                else pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+                if (filterBest && filtertime.count() >= 3) {
+                    pdModel->setPtData(filterpower, filtertime);
+                } else {
+                    pdModel->setData(bestsCache->meanMaxArray(criticalSeries == CriticalPowerWindow::work ? RideFile::watts : rideSeries));
+                }
                 pdModel->fitsummary += " [MMP]";
             }
         }
+
+        updateModelHelper();
         parent->setSummary(pdModel->fitsummary);
    }
 
@@ -479,6 +490,42 @@ CPPlot::initModel()
         //modelCurves.append(curve);
     }
     #endif
+
+}
+
+void
+CPPlot::plotLinearWorkModel()
+{
+    // need to get rid of old one and also be plotting work....
+    if (workModelCurve || criticalSeries != CriticalPowerWindow::work) return;
+
+    // normal model estimation, using current settings
+    initModel();
+
+    // if we want a model (!)
+    if (pdModel) {
+
+        workModelCurve = new QwtPlotCurve("Model");
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
+            workModelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+        // prepare two points at 1s and 3600s
+        QVector<double> x, work;
+
+        x << 1/60.00f; work << ((pdModel->CP() + pdModel->WPrime())/1000.00f);
+        x << 60.00f; work << (((pdModel->CP() * 3600.00) + pdModel->WPrime())/1000.00f);
+        workModelCurve->setSamples(x.constData(), work.constData(), 2);
+
+        // curve cosmetics
+        QPen pen(GColor(CCP));
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+        pen.setWidth(width);
+        if (showBest) pen.setStyle(Qt::DashLine);
+        workModelCurve->setPen(pen);
+        workModelCurve->attach(this);
+    }
+
+    return;
 
 }
 
@@ -575,127 +622,6 @@ CPPlot::plotModel()
             if (showBest) pen.setStyle(Qt::DashLine);
             modelCurve->setPen(pen);
             modelCurve->attach(this);
-
-            // update the model parameters display
-            CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
-
-            // update the helper widget -- either as watts, w/kg or kph
-
-            if (rideSeries == RideFile::watts || rideSeries == RideFile::aPower) {
-
-                // Reset Rank
-                cpw->titleRank->setText(tr("Rank"));
-
-                //WPrime
-                cpw->wprimeTitle->setText(tr("W'"));
-                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
-                else cpw->wprimeValue->setText(tr("n/a"));
-
-                //CP
-                cpw->cpTitle->setText(tr("CP"));
-                cpw->cpValue->setText(QString(tr("%1 w")).arg(pdModel->CP(), 0, 'f', 0));
-                cpw->cpRank->setText(tr("n/a"));
-
-                // P-MAX and P-MAX ranking
-                cpw->pmaxTitle->setText(tr("Pmax"));
-                if (pdModel->hasPMax()) {
-                    cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
-
-                    // Reference 22.5W/kg -> untrained 8W/kg
-                    int _pMaxLevel = 15 * (pdModel->PMax() / context->athlete->getWeight(QDate::currentDate()) - 8) / (23-8) ;
-                    if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
-                        cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
-                    else
-                        cpw->pmaxRank->setText(tr("n/a"));
-
-                } else  {
-                    cpw->pmaxValue->setText(tr("n/a"));
-                    cpw->pmaxRank->setText(tr("n/a"));
-                }
-
-                // Endurance Index
-                if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
-                    cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
-                }
-
-            } else if (rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
-
-                // Reset Rank
-                cpw->titleRank->setText(tr("Rank"));
-
-                //WPrime
-                cpw->wprimeTitle->setText(tr("W'"));
-                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 J/kg")).arg(pdModel->WPrime(), 0, 'f', 0));
-                else cpw->wprimeValue->setText(tr("n/a"));
-
-                //CP
-                cpw->cpTitle->setText(tr("CP"));
-                cpw->cpValue->setText(QString(tr("%1 w/kg")).arg(pdModel->CP(), 0, 'f', 2));
-                cpw->cpRank->setText(tr("n/a"));
-
-                // P-MAX and P-MAX ranking
-                cpw->pmaxTitle->setText(tr("Pmax"));
-                if (pdModel->hasPMax()) {
-                    cpw->pmaxValue->setText(QString(tr("%1 w/kg")).arg(pdModel->PMax(), 0, 'f', 2));
-
-                    // Reference 22.5W/kg -> untrained 8W/kg
-                    int _pMaxLevel = 15 * (pdModel->PMax() - 8) / (23-8) ;
-                    if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
-                        cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
-                    else
-                        cpw->pmaxRank->setText(tr("n/a"));
-                } else  {
-                    cpw->pmaxValue->setText(tr("n/a"));
-                    cpw->pmaxRank->setText(tr("n/a"));
-                }
-
-                // Endurance Index
-                if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
-                    cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
-                }
-
-            } else if (rideSeries == RideFile::kph) {
-
-                const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
-                // Rank field is reused for pace according to sport
-                bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
-                cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
-
-                //DPrime
-                cpw->wprimeTitle->setText(tr("D'"));
-                if (pdModel->hasWPrime()) {
-                    cpw->wprimeValue->setText(kmToString(pdModel->WPrime()/1000.0));
-                    cpw->wprimeRank->setText(QString(tr("%1 %2"))
-                                    .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
-                                    .arg(metricPace ? tr("m") : tr("yd")));
-                } else {
-                    cpw->wprimeValue->setText(tr("n/a"));
-                    cpw->wprimeRank->setText(tr("n/a"));
-                }
-
-                //CV
-                cpw->cpTitle->setText(tr("CV"));
-                // TODO: Should metric instead depend on the swim/run/default unit settings?
-                cpw->cpValue->setText(kphToString(pdModel->CP()));
-                cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
-
-                // V-MAX
-                cpw->pmaxTitle->setText(tr("Vmax"));
-                if (pdModel->hasPMax()) {
-                    cpw->pmaxValue->setText(kphToString(pdModel->PMax()));
-                    cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
-
-                } else  {
-                    cpw->pmaxValue->setText(tr("n/a"));
-                    cpw->pmaxRank->setText(tr("n/a"));
-                }
-
-                // Endurance Index
-                if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
-                    cpw->eiValue->setText(QString("%1").arg(3.6 * pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
-                }
-
-            }
         }
     }
 
@@ -769,6 +695,130 @@ CPPlot::plotModel()
 
     }
     zoomer->setZoomBase(false);
+}
+
+void
+CPPlot::updateModelHelper()
+{
+    CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
+
+    // update the helper widget -- either as watts, w/kg or kph
+
+    if (criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::watts || rideSeries == RideFile::aPower) {
+
+        // Reset Rank
+        cpw->titleRank->setText(tr("Rank"));
+
+        //WPrime
+        cpw->wprimeTitle->setText(tr("W'"));
+        if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
+        else cpw->wprimeValue->setText(tr("n/a"));
+
+        //CP
+        cpw->cpTitle->setText(tr("CP"));
+        cpw->cpValue->setText(QString(tr("%1 w")).arg(pdModel->CP(), 0, 'f', 0));
+        cpw->cpRank->setText(tr("n/a"));
+
+        // P-MAX and P-MAX ranking
+        cpw->pmaxTitle->setText(tr("Pmax"));
+        if (pdModel->hasPMax()) {
+            cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
+
+            // Reference 22.5W/kg -> untrained 8W/kg
+            int _pMaxLevel = 15 * (pdModel->PMax() / context->athlete->getWeight(QDate::currentDate()) - 8) / (23-8) ;
+            if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
+                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+            else
+                cpw->pmaxRank->setText(tr("n/a"));
+
+        } else  {
+            cpw->pmaxValue->setText(tr("n/a"));
+            cpw->pmaxRank->setText(tr("n/a"));
+        }
+
+        // Endurance Index
+        if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
+            cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+        }
+
+    } else if (rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPowerKg) {
+
+        // Reset Rank
+        cpw->titleRank->setText(tr("Rank"));
+
+        //WPrime
+        cpw->wprimeTitle->setText(tr("W'"));
+        if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 J/kg")).arg(pdModel->WPrime(), 0, 'f', 0));
+        else cpw->wprimeValue->setText(tr("n/a"));
+
+        //CP
+        cpw->cpTitle->setText(tr("CP"));
+        cpw->cpValue->setText(QString(tr("%1 w/kg")).arg(pdModel->CP(), 0, 'f', 2));
+        cpw->cpRank->setText(tr("n/a"));
+
+        // P-MAX and P-MAX ranking
+        cpw->pmaxTitle->setText(tr("Pmax"));
+        if (pdModel->hasPMax()) {
+            cpw->pmaxValue->setText(QString(tr("%1 w/kg")).arg(pdModel->PMax(), 0, 'f', 2));
+
+            // Reference 22.5W/kg -> untrained 8W/kg
+            int _pMaxLevel = 15 * (pdModel->PMax() - 8) / (23-8) ;
+            if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
+                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+            else
+                cpw->pmaxRank->setText(tr("n/a"));
+        } else  {
+            cpw->pmaxValue->setText(tr("n/a"));
+            cpw->pmaxRank->setText(tr("n/a"));
+        }
+
+        // Endurance Index
+        if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
+            cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+        }
+
+    } else if (rideSeries == RideFile::kph) {
+
+        const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
+        // Rank field is reused for pace according to sport
+        bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
+        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
+
+        //DPrime
+        cpw->wprimeTitle->setText(tr("D'"));
+        if (pdModel->hasWPrime()) {
+            cpw->wprimeValue->setText(kmToString(pdModel->WPrime()/1000.0));
+            cpw->wprimeRank->setText(QString(tr("%1 %2"))
+                            .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
+                            .arg(metricPace ? tr("m") : tr("yd")));
+        } else {
+            cpw->wprimeValue->setText(tr("n/a"));
+            cpw->wprimeRank->setText(tr("n/a"));
+        }
+
+        //CV
+        cpw->cpTitle->setText(tr("CV"));
+        // TODO: Should metric instead depend on the swim/run/default unit settings?
+        cpw->cpValue->setText(kphToString(pdModel->CP()));
+        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
+
+        // V-MAX
+        cpw->pmaxTitle->setText(tr("Vmax"));
+        if (pdModel->hasPMax()) {
+            cpw->pmaxValue->setText(kphToString(pdModel->PMax()));
+            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
+
+        } else  {
+            cpw->pmaxValue->setText(tr("n/a"));
+            cpw->pmaxRank->setText(tr("n/a"));
+        }
+
+        // Endurance Index
+        if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
+            cpw->eiValue->setText(QString("%1").arg(3.6 * pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+        }
+
+    }
 }
 
 // our model for combining a model for delta mode
@@ -928,6 +978,11 @@ CPPlot::clearCurves()
         modelCPCurves.clear();
     }
 
+    if (workModelCurve) {
+        delete workModelCurve;
+        workModelCurve = NULL;
+    }
+
     // performance test markers
     foreach(QwtPlotMarker *p, performanceTests) delete p;
     performanceTests.clear();
@@ -970,7 +1025,7 @@ CPPlot::plotTests(RideItem *rideitem)
     QVector<QPointF> points;
 
     // just plot tests as power duration for now, will reiterate to add others later.
-    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg) {
+    if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || criticalSeries == CriticalPowerWindow::work) {
 
         // rides to search, this one only -or- all in the date range selected?
         QList<RideItem*> rides;
@@ -996,6 +1051,7 @@ CPPlot::plotTests(RideItem *rideitem)
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
                     double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
 
+
                     // ignore where no power present
                     if (watts <= 0) continue;
 
@@ -1015,6 +1071,9 @@ CPPlot::plotTests(RideItem *rideitem)
 
                         // make it a really big symbol if from todays ride
                         sym->setSize((12 + (rideitem == item ? 6 : 0))*dpiXFactor);
+
+                        // plotting work, lets convert watts to joules
+                        if (criticalSeries == CriticalPowerWindow::work) watts *= duration / 1000.00f;
 
                         QwtPlotMarker *test = new QwtPlotMarker();
                         test->setSymbol(sym);
@@ -1181,11 +1240,14 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // when plotting power bests AND a model we draw bests as dots
             // but only if in 'plain' mode .. not doing a rainbow curve.
-            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower || rideSeries == RideFile::kph) && model) {
+            if ((criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::aPower || rideSeries == RideFile::kph) && model) {
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize((filterBest ? 8 : 4) *dpiXFactor);
+                if (criticalSeries == CriticalPowerWindow::work)
+                    sym->setSize(2*dpiXFactor);
+                else
+                    sym->setSize((filterBest ? 8 : 4) *dpiXFactor);
                 sym->setBrush(QBrush(fill));
                 sym->setPen(QPen(fill));
                 curve->setSymbol(sym);
@@ -1196,7 +1258,7 @@ CPPlot::plotBests(RideItem *rideItem)
             line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
 
             curve->setPen(line);
-            if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)
+            if (criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::aPower || rideSeries == RideFile::aPowerKg || rideSeries == RideFile::kph)
                 curve->setBrush(Qt::NoBrush);
             else
                 curve->setBrush(QBrush(fill));
@@ -1504,7 +1566,7 @@ CPPlot::plotBests(RideItem *rideItem)
     double xmax = time[maxNonZero - 1];
 
     // truncate at an hour for energy mode
-    if (criticalSeries == CriticalPowerWindow::work) xmax = 60.0;
+    if (criticalSeries == CriticalPowerWindow::work) xmax = 30.0;
 
     // not interested in short durations for vam
     if (criticalSeries == CriticalPowerWindow::vam) xmin = 4.993;
@@ -1537,8 +1599,9 @@ CPPlot::plotBests(RideItem *rideItem)
 
     double ymax;
     if (criticalSeries == CriticalPowerWindow::work) {
-        int i = std::lower_bound(time.begin(), time.end(), 60.0) - time.begin();
-        ymax = 10 * ceil(work[i] / 10);
+        if (maxNonZero > 1800) ymax = 10 * ceil(work[1799] / 10);
+        else ymax = 10 * ceil(work[maxNonZero-1] / 10);
+
     } else if (criticalSeries == CriticalPowerWindow::vam) {
         double yVam = bestsCache->meanMaxArray(RideFile::vam).value(296);
         ymax = 100 * ceil(yVam / 100); // index of xMin for Time
@@ -1899,6 +1962,9 @@ CPPlot::setRide(RideItem *rideItem)
     // HAVE BEEN REFRESHED ABOVE
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     plotModel();
+
+    // We also add a line for linear model when plotting work
+    plotLinearWorkModel();
 
     // now replot please
     replot();

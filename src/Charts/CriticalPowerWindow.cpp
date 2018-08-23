@@ -513,6 +513,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(fitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fitChanged()));
     connect(fitdataCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fitChanged()));
+    connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelParametersChanged()));
     connect(anI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(anI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(aeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
@@ -1261,7 +1262,7 @@ CriticalPowerWindow::rideSelected()
 
         // Refresh aggregated curve (ride added/filter changed)
         if (season.prior() == 0) cpPlot->setDateRange(season.getStart(), season.getEnd()); // fixed
-        else cpPlot->setDateRange(myRideItem->dateTime.date().addDays(season.prior()), myRideItem->dateTime.date());
+        else if (myRideItem) cpPlot->setDateRange(myRideItem->dateTime.date().addDays(season.prior()), myRideItem->dateTime.date());
     }
 
     if (!amVisible()) return;
@@ -1598,7 +1599,7 @@ CriticalPowerWindow::addSeries()
 void
 CriticalPowerWindow::updateOptions(CriticalSeriesType series)
 {
-    if ((series == watts || series == wattsKg || series == kph || series == aPower || series == aPowerKg) && modelCombo->currentIndex() >= 1) {
+    if ((series == work || series == watts || series == wattsKg || series == kph || series == aPower || series == aPowerKg) && modelCombo->currentIndex() >= 1) {
         helperWidget()->show();
     } else {
         helperWidget()->hide();
