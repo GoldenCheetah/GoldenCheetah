@@ -86,6 +86,7 @@ int Season::prior()
     if (id() == QUuid("{00000000-0000-0000-0000-000000000009}")) return -180;
     if (id() == QUuid("{00000000-0000-0000-0000-000000000010}")) return -365;
     if (id() == QUuid("{00000000-0000-0000-0000-000000000015}")) return -42;
+    if (id() == QUuid("{00000000-0000-0000-0000-000000000016}")) return -1;
     return 0;
 }
 
@@ -369,6 +370,13 @@ Seasons::readSeasons()
     season.setStart(wstart.addDays(-7));
     season.setEnd(wend.addDays(-7));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000014}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 24 hours"));
+    season.setType(Season::temporary);
+    season.setStart(today.addDays(-1)); // today plus previous 6
+    season.setEnd(today);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000016}"));
     seasons.append(season);
 
     season.setName(tr("Last 7 days"));
