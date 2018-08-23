@@ -221,5 +221,8 @@ class CPPlot : public QwtPlot
 
         // performance tests data
         QVector<double> testtime, testpower;
+
+        // remember the ymax we computed
+        double ymax;
 };
 #endif // _GC_CPPlot_h

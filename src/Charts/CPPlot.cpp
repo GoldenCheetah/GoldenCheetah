@@ -35,6 +35,7 @@
 #include <qwt_symbol.h>
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_div.h>
 #include <qwt_color_map.h>
 #include <algorithm> // for std::lower_bound
 
@@ -67,7 +68,7 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     xAxisLinearOnSpeed(true),
 
     // curves and plot objects
-    rideCurve(NULL), modelCurve(NULL), effortCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), workModelCurve(NULL), pdModel(NULL)
+    rideCurve(NULL), modelCurve(NULL), effortCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), workModelCurve(NULL), pdModel(NULL), ymax(0)
 
 {
     setAutoFillBackground(true);
@@ -695,6 +696,15 @@ CPPlot::plotModel()
 
     }
     zoomer->setZoomBase(false);
+
+    // make sure that PMax isn't off the top of the chart
+    // since ymax is generally only calculated from bests data
+    // but with some models and using performance tests only
+    // Pmax is often higher than the test values (they're for
+    // 3-20 mins typically so well short of pmax).
+    if (!showDelta && rideSeries == RideFile::watts && pdModel && pdModel->PMax() > ymax) {
+        if (pdModel->PMax() > ymax) setAxisScale(yLeft, 0, pdModel->PMax());
+    }
 }
 
 void
@@ -2836,7 +2846,7 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         baseline = compareIntervals[0].rideFileCache()->meanMaxArray(rideSeries);
     }
 
-    double ymax = 0;
+    ymax = 0;
     double ymin = 0;
     double xmax = 0;
     double xmin = 1.0f/60.0f - 0.001f;
@@ -2938,10 +2948,10 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
     if (!showDelta && rideSeries == RideFile::watts) {
 
         // set ymax to nearest 100 if power
-        int max = ymax * 1.1f;
-        max = ((max/100) + 1) * 100;
+        ymax = ymax * 1.1f;
+        ymax = ((ymax/100) + 1) * 100;
 
-        setAxisScale(yLeft, ymin, max);
+        setAxisScale(yLeft, ymin, ymax);
 
     } else {
 
