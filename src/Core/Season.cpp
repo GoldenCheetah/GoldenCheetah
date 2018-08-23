@@ -402,7 +402,7 @@ Seasons::readSeasons()
     season.setName(tr("Last 6 weeks"));
     season.setType(Season::temporary);
     season.setEnd(today);
-    season.setStart(today.addDays(-42));
+    season.setStart(today.addDays(-41));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000015}"));
     seasons.append(season);
 
