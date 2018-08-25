@@ -703,7 +703,7 @@ CPPlot::plotModel()
     // Pmax is often higher than the test values (they're for
     // 3-20 mins typically so well short of pmax).
     if (!showDelta && rideSeries == RideFile::watts && pdModel && pdModel->PMax() > ymax) {
-        if (pdModel->PMax() > ymax) setAxisScale(yLeft, 0, pdModel->PMax());
+        if (pdModel->PMax() > ymax) setAxisScale(yLeft, 0, pdModel->PMax() * 1.1f);
     }
 }
 

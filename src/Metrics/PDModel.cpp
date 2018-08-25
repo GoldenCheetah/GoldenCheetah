@@ -176,11 +176,26 @@ PDModel::deriveCPParameters(int model)
         // get vector of residuals
         QVector<double> residuals(t.size());
         double errtot=0;
+        double sse=0;
+        double meany=0;
         for(int i=0; i<t.size(); i++){
-            double err = p[i] - y(t[i]/60.0f);
-            errtot += err; // for mean
-            residuals[i]=err;
+            double py = y(t[i]/60.0f);  // predicted y
+            meany += p[i];              // calculatng mean divided at end
+            double err = p[i] - py;     // error for this point
+            errtot += err;              // for mean errors divided at end
+            sse += err*err;             // sum of squared errors for r2 calc
+            residuals[i]=err;           // vector of residuals
         }
+
+        // lets use to calc R2
+        meany /= double(t.size());
+        double sv=0;
+        for(int i=0; i<t.size(); i++) {
+            sv += (p[i]-meany) * (p[i]-meany);
+        }
+        double R2=1-(sse/sv);
+
+        // carry on with RMSE
         double mean = errtot/double(t.size());
         errtot = 0;
 
@@ -190,7 +205,7 @@ PDModel::deriveCPParameters(int model)
 
         // RMSE
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts [LR] %2 points").arg(RMSE, 0, 'f', 2).arg(t.size());
+        fitsummary = QString("RMSE %1 watts R2=%3 [LR] %2 points").arg(RMSE, 0, 'f', 2).arg(t.size()).arg(R2, 0, 'f', 3);
 
     } else if (fit == LeastSquares && this->nparms() > 0) {
     // only try lmfit if the model supports that
