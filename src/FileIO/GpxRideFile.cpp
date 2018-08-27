@@ -83,12 +83,16 @@ GpxFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool w
         QDomElement trkseg = doc.createElement("trkseg");
         trk.appendChild(trkseg);        
 
+        QLocale cLocale(QLocale::Language::C);
+
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             QDomElement trkpt = doc.createElement("trkpt");
             trkseg.appendChild(trkpt);
 
-            trkpt.setAttribute("lat", point->lat);
-            trkpt.setAttribute("lon", point->lon);
+            QString strLat = cLocale.toString(point->lat, 'g', 12);
+            trkpt.setAttribute("lat", strLat);
+            QString strLon = cLocale.toString(point->lon, 'g', 12);
+            trkpt.setAttribute("lon", strLon);
 
             // GPX standard requires <ele>, if present, to be first
             if (withAlt && ride->areDataPresent()->alt) {
