@@ -424,8 +424,11 @@ contains(DEFINES, "GC_WANT_R") {
     isEmpty(LIBUSB_INCLUDE) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
     isEmpty(LIBUSB_LIBS)    {
         # needs fixing for msvc toolchain
-        unix  { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib -lusb }
-        win32 { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib/gcc -lusb }
+        _LIBUSB_GCC_LIBNAME = usb
+        isEqual(LIBUSB_USE_V_1, true) _LIBUSB_GCC_LIBNAME = usb-1.0
+
+        unix  { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib -l$${_LIBUSB_GCC_LIBNAME} }
+        win32 { LIBUSB_LIBS = -L$${LIBUSB_INSTALL}/lib/gcc -l$${_LIBUSB_GCC_LIBNAME} }
     }
 
     DEFINES     += GC_HAVE_LIBUSB
@@ -433,10 +436,21 @@ contains(DEFINES, "GC_WANT_R") {
     LIBS        += $${LIBUSB_LIBS}
 
     # lots of dependents
-    SOURCES     += Train/LibUsb.cpp Train/EzUsb.c Train/Fortius.cpp Train/FortiusController.cpp \
+    SOURCES     += Train/LibUsb.cpp Train/Fortius.cpp Train/FortiusController.cpp \
                    Train/Imagic.cpp Train/ImagicController.cpp
-    HEADERS     += Train/LibUsb.h Train/EzUsb.h Train/Fortius.cpp Train/FortiusController.h \
+    HEADERS     += Train/LibUsb.h Train/Fortius.cpp Train/FortiusController.h \
                    Train/Imagic.h Train/ImagicController.h
+
+    !isEqual(LIBUSB_USE_V_1, true) {
+        SOURCES += Train/EzUsb.c
+        HEADERS += Train/EzUsb.h
+    }
+
+    isEqual(LIBUSB_USE_V_1, true) {
+        DEFINES += LIBUSB_V_1
+        SOURCES += Train/EzUsb-1.0.c
+        HEADERS += Train/EzUsb-1.0.h
+    }
 }
 
 
