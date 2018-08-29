@@ -2802,6 +2802,7 @@ struct FitFileReaderState
                 case 53: /* speed zone */
                 case 55: /* monitoring */
                 case 72: /* training file (undocumented) : new since garmin 800 */
+                    break;
                 case HRV_MSG_NUM:
 		  decodeHRV(def, values);
 		  break; /* hrv */
