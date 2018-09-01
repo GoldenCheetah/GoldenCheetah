@@ -1374,15 +1374,18 @@ CPPlot::plotBests(RideItem *rideItem)
                     filtertime.resize(0);
                     filterpower.clear();
                     filterpower.resize(0);
+                    QVector<double> filterwork;
+
                     for(int i=0; i<t.count(); i++) {
                         if (t[i] >0) {
                             filtertime << t[i];
-                            filterpower << p[i] * (criticalSeries == CriticalPowerWindow::work ? (t[i]*60/1000.0f) : 1.0f);
+                            filterpower << p[i]; // used to fit as well as plot
+                            filterwork << p[i] * (t[i]*60/1000.0f);
                         }
                     }
 
                     // only show filtered data
-                    curve->setSamples(filtertime.data(), filterpower.data(), filterpower.count());
+                    curve->setSamples(filtertime.data(), criticalSeries == CriticalPowerWindow::work ? filterwork.data() : filterpower.data(), filterpower.count());
 
                 } else {
 
