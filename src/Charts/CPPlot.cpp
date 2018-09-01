@@ -1254,7 +1254,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                if (criticalSeries == CriticalPowerWindow::work)
+                if (criticalSeries == CriticalPowerWindow::work && !filterBest)
                     sym->setSize(2*dpiXFactor);
                 else
                     sym->setSize((filterBest ? 8 : 4) *dpiXFactor);
@@ -1273,7 +1273,7 @@ CPPlot::plotBests(RideItem *rideItem)
             else
                 curve->setBrush(QBrush(fill));
 
-            if (criticalSeries == CriticalPowerWindow::work)
+            if (criticalSeries == CriticalPowerWindow::work && !filterBest)
                 curve->setSamples(time, work);
             else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
                 curve->setSamples(bestsCache->meanMaxArray(rideSeries).data()+1, wprime.data(), maxNonZero-1);
@@ -1377,7 +1377,7 @@ CPPlot::plotBests(RideItem *rideItem)
                     for(int i=0; i<t.count(); i++) {
                         if (t[i] >0) {
                             filtertime << t[i];
-                            filterpower << p[i];
+                            filterpower << p[i] * (criticalSeries == CriticalPowerWindow::work ? (t[i]*60/1000.0f) : 1.0f);
                         }
                     }
 
