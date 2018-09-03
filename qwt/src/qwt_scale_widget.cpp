@@ -451,7 +451,7 @@ void QwtScaleWidget::draw( QPainter *painter ) const
 }
 
 /*!
-  Calculate the the rectangle for the color bar
+  Calculate the rectangle for the color bar
 
   \param rect Bounding rectangle for all components of the scale
   \return Rectangle for the color bar

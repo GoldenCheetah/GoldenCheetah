@@ -125,7 +125,7 @@ QwtSlider::QwtSlider( QWidget *parent ):
   Construct a slider in QwtSlider::Trough style
 
   When orientation is Qt::Vertical the scale will be aligned to
-  the left - otherwise at the the top of the slider.
+  the left - otherwise at the top of the slider.
 
   The scale is initialized to [0.0, 100.0] and the value set to 0.0.
 
