@@ -75,10 +75,10 @@ public:
     */
     void setData( QwtSeriesData<T> *series );
 
-    //! \return the the series data
+    //! \return the series data
     QwtSeriesData<T> *data();
 
-    //! \return the the series data
+    //! \return the series data
     const QwtSeriesData<T> *data() const;
 
     /*!

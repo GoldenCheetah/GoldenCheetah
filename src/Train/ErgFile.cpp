@@ -396,7 +396,7 @@ void ErgFile::parseComputrainer(QString p)
 
         // Code plagiarised from CsvRideFile.
         // the readLine() method doesn't handle old Macintosh CR line endings
-        // this workaround will load the the entire file if it has CR endings
+        // this workaround will load the entire file if it has CR endings
         // then split and loop through each line
         // otherwise, there will be nothing to split and it will read each line as expected.
         QString linesIn = (p != "" ? stringStream.readLine() : ergFile.readLine());

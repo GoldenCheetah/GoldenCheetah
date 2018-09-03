@@ -267,7 +267,7 @@ QWT_EXPORT QRectF qwtBoundingRect(
     Binary search for a sorted series of samples
 
     qwtUpperSampleIndex returns the index of sample that is the upper bound
-    of value. Is the the value smaller than the smallest value the return
+    of value. Is the value smaller than the smallest value the return
     value will be 0. Is the value greater or equal than the largest
     value the return value will be -1.
 

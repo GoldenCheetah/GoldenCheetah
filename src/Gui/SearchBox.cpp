@@ -456,7 +456,7 @@ SearchBox::addNamed()
 }
 
 //
-// Working with the the autocompleter
+// Working with the autocompleter
 //
 void SearchBox::setCompleter(DataFilterCompleter *completer)
 {

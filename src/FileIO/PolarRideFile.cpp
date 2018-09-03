@@ -63,7 +63,7 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
-    // endings this workaround will load the the entire file if it
+    // endings this workaround will load the entire file if it
     // has CR endings then split and loop through each line
     // otherwise, there will be nothing to split and it will read
     // each line as expected.
@@ -212,7 +212,7 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
-    // endings this workaround will load the the entire file if it
+    // endings this workaround will load the entire file if it
     // has CR endings then split and loop through each line
     // otherwise, there will be nothing to split and it will read
     // each line as expected.
