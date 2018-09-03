@@ -624,7 +624,7 @@ QColor PMCData::rrColor(double value, QColor defaultColor)
 // User descriptions for the 4 series
 QString PMCData::ltsDescription()
 {
-    return tr("CTL/LTS : Chronic Training Load/Long Term Stress. The the dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.");
+    return tr("CTL/LTS : Chronic Training Load/Long Term Stress. The dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.");
 }
 
 QString PMCData::stsDescription()
