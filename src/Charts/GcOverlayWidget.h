@@ -66,6 +66,7 @@ public slots:
 
     // events
     void paintEvent (QPaintEvent *event);
+    void setLabel(); // when name changes
     //void resizeEvent(QResizeEvent *);
     //bool eventFilter(QObject *object, QEvent *e); // trap resize
     void configChanged(qint32);
@@ -74,6 +75,12 @@ public slots:
     void setCurrentIndex(int index);
     void scrollLeft();   // scroll left action
     void scrollRight();  // scroll right action
+
+    // set the title
+    void setTitle(int index, QString text) {
+        items[index].name = text;
+        setLabel();
+    }
 
 signals:
 

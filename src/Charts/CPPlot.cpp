@@ -40,6 +40,7 @@
 #include <algorithm> // for std::lower_bound
 
 #include "CriticalPowerWindow.h"
+#include "GcOverlayWidget.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "LogTimeScaleDraw.h"
@@ -370,6 +371,9 @@ CPPlot::initModel()
 
     if (pdModel) {
 
+        // Model helper
+        parent->overlayWidget->setTitle(0, pdModel->name());
+
         if (fit == 0 || model >= 3) { //!!! always envelope fit the ecp, ward-smith and velo model
 
             // envelope fit always uses all data
@@ -400,6 +404,11 @@ CPPlot::initModel()
 
         updateModelHelper();
         parent->setSummary(pdModel->fitsummary);
+
+   } else {
+
+        // Model helper
+        parent->overlayWidget->setTitle(0, tr("No Model"));
    }
 
     #if GC_HAVE_MODEL_LABS

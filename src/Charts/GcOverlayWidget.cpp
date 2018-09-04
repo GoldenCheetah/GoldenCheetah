@@ -139,14 +139,20 @@ void
 GcOverlayWidget::setCurrentIndex(int index)
 {
     if (initial || index != stack->currentIndex()) {
-        titleLabel->setText(items.at(index).name);
         stack->setCurrentIndex(index);
+        setLabel();
 
         // tell everyone we changed
         emit currentIndexChanged(index);
 
         initial = false;
     }
+}
+
+void
+GcOverlayWidget::setLabel()
+{
+    titleLabel->setText(items.at(stack->currentIndex()).name);
 }
 
 int
