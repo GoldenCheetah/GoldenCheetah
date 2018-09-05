@@ -372,7 +372,7 @@ CPPlot::initModel()
     if (pdModel) {
 
         // Model helper
-        parent->overlayWidget->setTitle(0, pdModel->name());
+        parent->overlayWidget->setTitle(0, (fit > 1 ? tr("Energy/Time ") : tr("")) + pdModel->name());
 
         if (fit == 0 || model >= 3) { //!!! always envelope fit the ecp, ward-smith and velo model
 
