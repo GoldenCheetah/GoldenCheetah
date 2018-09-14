@@ -2131,6 +2131,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->addItem(tr("Simple Average"));
     trendType->setCurrentIndex(metricDetail->trendtype);
 
+    QLabel *ignoreZerosLbl = new QLabel(tr("Ignore Zeros"));
+    ignoreZeros = new QCheckBox("", this);
+    ignoreZeros->setChecked(metricDetail->ignoreZeros);
+
     // add to grid
     grid->addWidget(filter, 0,0);
     grid->addWidget(dataFilter, 0,1,1,3);
@@ -2156,6 +2160,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(curveColor, 9,1);
     grid->addWidget(fill, 10,0);
     grid->addWidget(fillCurve, 10,1);
+    grid->addWidget(ignoreZerosLbl, 11,0);
+    grid->addWidget(ignoreZeros, 11,1);
     grid->addWidget(topN, 4,2);
     grid->addWidget(showBest, 4,3);
     grid->addWidget(bottomN, 5,2);
@@ -2579,6 +2585,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
     metricDetail->fillCurve = fillCurve->isChecked();
+    metricDetail->ignoreZeros = ignoreZeros->isChecked();
     metricDetail->labels = labels->isChecked();
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
