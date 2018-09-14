@@ -599,9 +599,17 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
-        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER)
-                ? new QwtPlotGappedCurve(metricDetail.uname, 1)
-                : new QwtPlotCurve(metricDetail.uname);
+        QwtPlotCurve *current;
+        if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER) {
+            current = new QwtPlotGappedCurve(metricDetail.uname, 1);
+        } else {
+            if (metricDetail.ignoreZeros){
+                current = new QwtPlotGappedCurve(metricDetail.uname, 1);
+            } else {
+                current = new QwtPlotCurve(metricDetail.uname);
+            }
+        }
+
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
         if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_BANISTER) {
@@ -1776,7 +1784,13 @@ LTMPlot::setCompareData(LTMSettings *set)
             //qDebug()<<"Create curve data.."<<timer.elapsed();
 
             // Create a curve
-            QwtPlotCurve *current = new QwtPlotCurve(cd.name);
+            QwtPlotCurve *current;
+            if (metricDetail.ignoreZeros) {
+                current = new QwtPlotGappedCurve(cd.name, 1);
+            } else {
+                current = new QwtPlotCurve(cd.name);
+            }
+
             if (metricDetail.type == METRIC_BEST)
                 curves.insert(cd.name, current);
             else
