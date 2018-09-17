@@ -273,6 +273,8 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     todayButton->addItem(tr("Choose Date"));
     cancelButton = new QPushButton(tr("Cancel"));
     abortButton = new QPushButton(tr("Abort"));
+    saveButton = new QPushButton(tr("Save"));
+    finishButton = new QPushButton(tr("Finish"));
     //overFiles = new QCheckBox(tr("Overwrite Existing Files"));  // deprecate for this release... XXX
     // initially the cancel, overwrite and today widgets are hidden
     // they only appear whilst we are asking the user for dates
@@ -285,6 +287,8 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
 
     // NOTE: abort button morphs into save and finish button later
     connect(abortButton, SIGNAL(clicked()), this, SLOT(abortClicked()));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
+    connect(finishButton, SIGNAL(clicked()), this, SLOT(finishClicked()));
 
     // only used when editing dates
     connect(todayButton, SIGNAL(activated(int)), this, SLOT(todayClicked(int)));
@@ -380,6 +384,10 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     // buttons->addWidget(overFiles); // deprecate for this release... XXX
     buttons->addWidget(cancelButton);
     buttons->addWidget(abortButton);
+    buttons->addWidget(saveButton);
+    buttons->addWidget(finishButton);
+    // Set Initial ProcessButtonState to abort
+    setProcessButtonState(ProcessButtonState::AbortState);
 
     QVBoxLayout *contents = new QVBoxLayout(this);
     if (autoImportMode) {
@@ -754,7 +762,7 @@ RideImportWizard::process()
        if (!isActiveWindow()) activateWindow();
    }
    // Wait for user to press save
-   abortButton->setText(tr("Save"));
+   setProcessButtonState(ProcessButtonState::SaveState);
    aborted = false;
 
    cancelButton->setHidden(false);
@@ -769,14 +777,14 @@ RideImportWizard::process()
       // and confirm overwrite files rather than importing
       // without user intervention
 
-      abortButton->setDisabled(false);
+      setProcessButtonState(ProcessButtonState::SaveState);
       activateSave();
-      if (autoImportStealth) abortClicked();  // simulate "Save" by User
+      if (autoImportStealth) saveClicked();  // simulate "Save" by User
 
    } else {
 
       // de-activate Save button until the dates and times are sorted
-      abortButton->setDisabled(true);
+      saveButton->setDisabled(true);
    }
    connect(tableWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(activateSave()));
 
@@ -784,9 +792,9 @@ RideImportWizard::process()
    if (autoImportMode && filenames.count()== 0) {
        cancelButton->setHidden(true);
        todayButton->setHidden(true);
-       abortButton->setDisabled(false);
+       finishButton->setDisabled(false);
        phaseLabel->setText(tr("No files for automatic import selected."));
-       abortButton->setText(tr("Finish"));
+       setProcessButtonState(ProcessButtonState::FinishState);
        aborted = false;
    }
 
@@ -818,7 +826,7 @@ RideImportWizard::activateSave()
         if (t->text() == "") return;
    }
    // if you got here then all entries that need a date have a date
-   abortButton->setDisabled(false);
+   saveButton->setDisabled(false);
 }
 
 // the code here is tedious. checking for conditions about total ride time
@@ -950,24 +958,40 @@ struct cpi_file_info {
     QString file, inname, outname;
 };
 
+void
+RideImportWizard::setProcessButtonState(ProcessButtonState state)
+{
+    abortButton->hide();
+    saveButton->hide();
+    finishButton->hide();
+
+    switch(state){
+        case ProcessButtonState::AbortState: // Show abort
+            abortButton->show();
+            break;
+        case ProcessButtonState::SaveState: // Show save button
+            saveButton->show();
+            break;
+        case ProcessButtonState::FinishState: // Show finish button
+            finishButton->show();
+            break;
+    }
+}
 
 void
 RideImportWizard::abortClicked()
 {
-    // NOTE: abort button morphs into save and finish button later - so all 3 variants are processed here
-
-    // if done when labelled abort we kill off this dialog
-    QString label = abortButton->text();
-
     // Process "ABORT"
-    if (label == tr("Abort")) {
-        hide();
-        aborted=true; // terminated. I'll be back.
-        return;
-    }
+    hide();
+    aborted=true; // terminated. I'll be back.
+    return;
 
+}
+
+void
+RideImportWizard::finishClicked()
+{
     // Process "FINISH"
-    if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
        if (autoImportStealth) {
@@ -976,14 +1000,20 @@ RideImportWizard::abortClicked()
        }
        done(0);
        return;
-    }
 
-    // Process "SAVE"
+}
+
+void
+RideImportWizard::saveClicked()
+{
+
+   // Process "SAVE"
 
     // SAVE STEP 2 - set the labels and make the text un-editable
     phaseLabel->setText(tr("Step 4 of 4: Save to Library"));
 
-    abortButton->setText(tr("Abort"));
+
+    setProcessButtonState(ProcessButtonState::AbortState);
     aborted = false;
     cancelButton->setHidden(true);
     todayButton->setHidden(true);
@@ -1145,7 +1175,7 @@ RideImportWizard::abortClicked()
             .arg(filenames.count(), 1, 10, zero);
     progressBar->setValue(progressBar->maximum());
     phaseLabel->setText(donemessage);
-    abortButton->setText(tr("Finish"));
+    setProcessButtonState(ProcessButtonState::FinishState);
     aborted = false;
     if (autoImportStealth) {
         abortClicked();  // simulate pressing the "Finish" button - even if the window got visible

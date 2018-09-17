@@ -40,6 +40,7 @@ class RideImportWizard : public QDialog
 {
     Q_OBJECT
     G_OBJECT
+    Q_ENUMS(ProcessState);
 
 
 public:
@@ -61,12 +62,19 @@ public:
 
 private slots:
     void abortClicked();
+    void saveClicked();
+    void finishClicked();
     void cancelClicked();
     void todayClicked(int index);
     // void overClicked(); // deprecate for this release... XXX
     void activateSave();
 
 private:
+    enum class ProcessButtonState{
+        AbortState,
+        SaveState,
+        FinishState
+    };
     void init(QList<QString> files, Context *context);
     bool moveFile(const QString &source, const QString &target);
 
@@ -84,7 +92,9 @@ private:
     QTableWidget *tableWidget;
     QTableWidget *directoryWidget;
     QProgressBar *progressBar;
-    QPushButton *abortButton; // also used for save and finish
+    QPushButton *abortButton; // don't use for save and finish
+    QPushButton *saveButton;
+    QPushButton *finishButton;
     QPushButton *cancelButton; // cancel when asking for dates
     QComboBox *todayButton;    // set date to today when asking for dates
     // QCheckBox *overFiles;      // chance to set overwrite when asking for dates // deprecate for this release... XXX
@@ -94,7 +104,7 @@ private:
 
     QStringList deleteMe; // list of temp files created during import
 
-
+    void setProcessButtonState(ProcessButtonState state);
 };
 
 // Item Delegate for Editing Date and Time of Ride inside the
