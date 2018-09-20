@@ -659,6 +659,8 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new ANTlocalController(this, &Devices[i]);
             // connect slot for receiving remote control commands
             connect(Devices[i].controller, SIGNAL(remoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
+            // connect slot for receiving rrData
+            connect(Devices[i].controller, SIGNAL(rrData(uint16_t,uint8_t,uint8_t)), this, SLOT(rrData(uint16_t,uint8_t,uint8_t)));
 #ifdef QT_BLUETOOTH_LIB
         } else if (Devices.at(i).type == DEV_BT40) {
             Devices[i].controller = new BT40Controller(this, &Devices[i]);
@@ -2695,6 +2697,12 @@ TrainSidebar::remoteControl(uint16_t command)
     default:
         break;
     }
+}
+
+// HRV R-R data received
+void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
+{
+    fprintf(stderr, "R-R: %d ms, HR=%d, count=%d\n", rrtime, bpm, count); fflush(stderr);
 }
 
 // connect/disconnect automatically when view changes

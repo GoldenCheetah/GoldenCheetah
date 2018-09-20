@@ -108,6 +108,7 @@ class ANTChannel : public QObject {
         int    messages_dropped;
         qint64 lastMessageTimestamp; // for time comparisons
         qint64 lastMessageTimestamp2;
+        uint16_t lastHRmeasurement;
 
         unsigned char rx_burst_data[RX_BURST_DATA_LEN];
         int           rx_burst_data_index;
@@ -228,7 +229,7 @@ class ANTChannel : public QObject {
         void broadcastTimerStop(int number);
 
         // signal instantly on data receipt for R-R data
-        void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+        void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
         // signal for passing remote control commands
         void antRemoteControl(uint16_t command);

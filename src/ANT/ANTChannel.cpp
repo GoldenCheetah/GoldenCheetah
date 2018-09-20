@@ -63,6 +63,7 @@ ANTChannel::init()
     lastMessageTimestamp = lastMessageTimestamp2 = parent->getElapsedTime();
     blacklisted=0;
     sc_speed_active = sc_cadence_active = 0;
+    lastHRmeasurement = 0;
 }
 
 //
@@ -734,23 +735,44 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            // HR
            case CHANNEL_TYPE_HR:
            {
-               // Heart rate
-               uint16_t time = antMessage.measurementTime - lastMessage.measurementTime;
-               if (time) {
+               // Heart rate separate from R-R
+               if (antMessage.instantHeartrate >0) {
+
                    nullCount = 0;
                    parent->setBPM(antMessage.instantHeartrate);
                    value2 = value = antMessage.instantHeartrate;
 
-                    // lets emit a signal for collected HR R-R data
-                    emit rrData(antMessage.measurementTime, antMessage.heartrateBeats, antMessage.instantHeartrate);
-
                } else {
+
                    nullCount++;
                    if (nullCount >= 12) {
                         parent->setBPM(0); // 12 according to the docs
                         value2 = value = 0;
                     }
                }
+
+               // R-R
+               if (antMessage.measurementTime && // non-zero is a must !
+                   ((antMessage.heartrateBeats == lastMessage.heartrateBeats+1) || // incremental
+                    (antMessage.heartrateBeats == 0 && lastMessage.heartrateBeats == 255))) { // rollover
+
+
+                    if (lastHRmeasurement) {
+
+                        // rollover works becuase using unsigned 16bit arithmetic
+                        uint16_t rrtime = antMessage.measurementTime - lastHRmeasurement;
+
+                        // convert to microsecs to 1/1024th of secs
+                        double rrusecs = rrtime;
+                        rrusecs = rrusecs * 1000.00 / 1024.00;
+
+                        emit rrData(rrusecs, antMessage.heartrateBeats, antMessage.instantHeartrate);
+                    }
+
+                    // for next time
+                    lastHRmeasurement = antMessage.measurementTime;
+               }
+
            }
            break;
 

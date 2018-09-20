@@ -202,6 +202,9 @@ class TrainSidebar : public GcWindow
         // slot for receiving remote control commands
         void remoteControl(uint16_t);
 
+        // HRV R-R data being saved away
+        void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+
     protected:
 
         friend class ::MultiDeviceDialog;

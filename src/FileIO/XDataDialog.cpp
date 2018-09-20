@@ -33,6 +33,9 @@ XDataDialog::XDataDialog(QWidget *parent) : QDialog(parent), item(NULL)
 {
 
     setWindowTitle("XData");
+    setMinimumWidth(300*dpiXFactor);
+    setMinimumHeight(450*dpiXFactor);
+
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
