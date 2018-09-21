@@ -267,6 +267,7 @@ class TrainSidebar : public GcWindow
         int displaymode;
 
         QFile *recordFile;      // where we record!
+        QFile *rrFile;          // r-r records, if any received.
         ErgFile *ergFile;       // workout file
         VideoSyncFile *videosyncFile;       // videosync file
 
