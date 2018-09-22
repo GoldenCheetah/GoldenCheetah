@@ -752,27 +752,36 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                }
 
                // R-R
-               if (antMessage.measurementTime && // non-zero is a must !
+               // If HRM send both lastMeasurementTime and prevMeasurementTime
+               // use that. Otherwise fall back to using lastMeasurementTime
+               // from previous message if the number of heartbeats has increased
+               // by one.
+               uint16_t rrtime = 0;
+               if (antMessage.lastMeasurementTime != 0 && // Both last- and prevMeasTime should be set
+                   antMessage.prevMeasurementTime != 0 &&
+                   antMessage.heartrateBeats != lastMessage.heartrateBeats) { // It's a new measurement
+
+                   // rollover works because using unsigned 16bit arithmetic
+                   rrtime = uint16_t(antMessage.lastMeasurementTime - antMessage.prevMeasurementTime);
+               } else if (antMessage.lastMeasurementTime != 0 && // non-zero is a must !
                    ((antMessage.heartrateBeats == lastMessage.heartrateBeats+1) || // incremental
                     (antMessage.heartrateBeats == 0 && lastMessage.heartrateBeats == 255))) { // rollover
 
 
                     if (lastHRmeasurement) {
-
-                        // rollover works becuase using unsigned 16bit arithmetic
-                        uint16_t rrtime = antMessage.measurementTime - lastHRmeasurement;
-
-                        // convert to microsecs to 1/1024th of secs
-                        double rrusecs = rrtime;
-                        rrusecs = rrusecs * 1000.00 / 1024.00;
-
-                        emit rrData(rrusecs, antMessage.heartrateBeats, antMessage.instantHeartrate);
+                        // rollover works because using unsigned 16bit arithmetic
+                        rrtime = antMessage.lastMeasurementTime - lastHRmeasurement;
                     }
 
                     // for next time
-                    lastHRmeasurement = antMessage.measurementTime;
+                    lastHRmeasurement = antMessage.lastMeasurementTime;
                }
-
+               if (rrtime != 0) {
+                   // convert to millisecs to 1/1024th of secs
+                   double rrmsecs = rrtime;
+                   rrmsecs = rrmsecs * 1000.00 / 1024.00;
+                   emit rrData(rrmsecs, antMessage.heartrateBeats, antMessage.instantHeartrate);
+               }
            }
            break;
 

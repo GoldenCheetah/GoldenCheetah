@@ -383,15 +383,24 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 // insist upon page 0 or page 4 being present
                 switch (data_page) {
                 case 0:
+                    {
+                        // Page 0 only contains time of last heartbeat
+                        // so propagate that and
+                        lastMeasurementTime = message[8] + (message[9]<<8);
+                    }
+                break;
                 case 4:
                     {
-                        measurementTime = message[8] + (message[9]<<8);
+                        // Page 4 contains both time of last heartbeat and
+                        // the time of the previous one.
+                        lastMeasurementTime = message[8] + (message[9]<<8);
+                        prevMeasurementTime = message[6] + (message[7]<<8);
                     }
                     break;
 
                 default:
                     // ignore
-                    measurementTime = 0;
+                    lastMeasurementTime = 0;
                     break;
                 }
             }
@@ -824,7 +833,8 @@ void ANTMessage::init()
     data_page = frequency = deviceType = transmitPower = searchTimeout = 0;
     transmissionType = networkNumber = channelType = channel = 0;
     channelPeriod = deviceNumber = 0;
-    wheelMeasurementTime = crankMeasurementTime = measurementTime = 0;
+    wheelMeasurementTime = crankMeasurementTime = lastMeasurementTime = 0;
+    prevMeasurementTime = 0;
     instantHeartrate = heartrateBeats = 0;
     eventCount = 0;
     wheelRevolutions = crankRevolutions = 0;
