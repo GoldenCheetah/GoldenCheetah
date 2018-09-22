@@ -183,7 +183,7 @@ OverviewWindow::setConfiguration(QString config)
         newCard(tr("Notes"), 0, 4, 13, Card::META, "Notes");
 
         // column 1
-        newCard(tr("HRV"), 1, 0, 9, Card::METRIC, "rMSSD");
+        newCard(tr("HRV rMSSD"), 1, 0, 9, Card::METRIC, "rMSSD");
         newCard(tr("Heartrate"), 1, 1, 5, Card::METRIC, "average_hr");
         newCard(tr("Heartrate Zones"), 1, 2, 11, Card::ZONE, RideFile::hr);
         newCard(tr("Climbing"), 1, 3, 5, Card::METRIC, "elevation_gain");
