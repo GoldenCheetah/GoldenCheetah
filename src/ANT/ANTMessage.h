@@ -135,7 +135,7 @@ class ANTMessage {
         uint8_t eventCount;
         bool pedalPowerContribution; // power - if true, right pedal power % of contribution is filled in "pedalPower"
         uint8_t pedalPower; // power - if pedalPowerContribution is true, % contribution of right pedal
-        uint16_t measurementTime, wheelMeasurementTime, crankMeasurementTime;
+        uint16_t lastMeasurementTime, prevMeasurementTime, wheelMeasurementTime, crankMeasurementTime;
         uint8_t heartrateBeats, instantHeartrate; // heartrate
         uint16_t slope, period, torque; // power
         uint16_t sumPower, instantPower; // power
