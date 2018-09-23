@@ -1098,10 +1098,10 @@ CPPlot::plotTests(RideItem *rideitem)
                         test->setSymbol(sym);
                         test->setValue(duration/60.00f, watts);
 
-                        QString desc = QString("%3\n%1%4\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
+                        QString desc = QString("%3\n%1 %4\n%2").arg(watts,0, 'f', rideSeries == RideFile::watts ? 0 : 2)
                                                              .arg(interval_to_str(duration))
                                                              .arg(interval->name)
-                                                             .arg(RideFile::unitName(rideSeries, context));
+                                                             .arg(criticalSeries == CriticalPowerWindow::work ? tr("kJ") : RideFile::unitName(rideSeries, context));
                         QwtText text(desc);
                         QFont font; // default
                         font.setPointSize(8);
