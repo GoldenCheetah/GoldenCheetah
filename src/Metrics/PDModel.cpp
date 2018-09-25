@@ -205,7 +205,7 @@ PDModel::deriveCPParameters(int model)
 
         // RMSE
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts R2=%3 [LR] %2 points").arg(RMSE, 0, 'f', 2).arg(t.size()).arg(R2, 0, 'f', 3);
+        fitsummary = QString("RMSE %1 watts R<sup>2</sup>=%3 [LR] %2 points").arg(RMSE, 0, 'f', 2).arg(t.size()).arg(R2, 0, 'f', 3);
 
     } else if (fit == LeastSquares && this->nparms() > 0) {
     // only try lmfit if the model supports that
