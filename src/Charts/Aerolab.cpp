@@ -91,7 +91,7 @@ IntervalItem *IntervalAerolabData::intervalNum
     int number
 ) const
 {
-    if (number >= 0 && aerolab->rideItem->intervalsSelected().count() > number)
+    if (aerolab->rideItem && number >= 0 && aerolab->rideItem->intervalsSelected().count() > number)
         return aerolab->rideItem->intervalsSelected().at(number);
 
     return NULL;
@@ -102,7 +102,8 @@ IntervalItem *IntervalAerolabData::intervalNum
 // ------------------------------------------------------------------------------------------------------------
 int IntervalAerolabData::intervalCount() const
 {
-    return aerolab->rideItem->intervalsSelected().count();
+    if (aerolab->rideItem) return aerolab->rideItem->intervalsSelected().count();
+    return 0;
 }
 /*
  * INTERVAL HIGHLIGHTING CURVE
@@ -285,6 +286,8 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
   double small_number = 0.00001;
 
   rideItem = _rideItem;
+  if (rideItem == NULL || rideItem->ride() == NULL) return;
+
   RideFile *ride = rideItem->ride();
 
   veArray.clear();
@@ -770,6 +773,8 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
     // HARD-CODED DATA: p1->kph
     const double vfactor = 3.600;
     const double g = KG_FORCE_PER_METER;
+
+    if (rideItem == NULL || rideItem->ride() == NULL) return (tr("No ride selected"));
     RideFile *ride = rideItem->ride();
     QString errMsg;
 

@@ -369,9 +369,8 @@ AerolabWindow::configChanged(qint32)
 void
 AerolabWindow::rideSelected() {
 
-  if (!amVisible()) return;
-
   RideItem *ride = myRideItem;
+  if (!amVisible() || ride == NULL || ride->ride() == NULL) return;
 
   commentEdit->setText("");
 
@@ -661,10 +660,7 @@ AerolabWindow::zoomInterval(IntervalItem *which) {
 void AerolabWindow::intervalSelected()
 {
     RideItem *ride = myRideItem;
-    if ( !ride )
-    {
-        return;
-    }
+    if (!amVisible() || ride == NULL || ride->ride() == NULL) return;
 
     // set the elevation data
     refresh(ride, true);
@@ -701,6 +697,8 @@ void AerolabWindow::saveParametersInRide()
 
 bool AerolabWindow::hasNewParametersInRide()
 {
+    if (rideItem() == NULL || rideItem()->ride() == NULL) return false;
+
     bool newValues = false;
 
     if (rideItem()->ride()->getTag("Total Weight", "0").toDouble() != aerolab->getTotalMass()) {
