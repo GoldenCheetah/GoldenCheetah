@@ -53,7 +53,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   crrLabel = new QLabel(tr("Crr"), this);
   crrLabel->setFixedWidth(labelWidth1);
   crrLineEdit = new QLineEdit();
-  crrLineEdit->setFixedWidth(75);
+  crrLineEdit->setFixedWidth(75*dpiXFactor);
   crrLineEdit->setText(QString("%1").arg(aerolab->getCrr()) );
   /*crrQLCDNumber    = new QLCDNumber(7);
   crrQLCDNumber->setMode(QLCDNumber::Dec);
@@ -76,7 +76,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   cdaLabel = new QLabel(tr("CdA"), this);
   cdaLabel->setFixedWidth(labelWidth1);
   cdaLineEdit = new QLineEdit();
-  cdaLineEdit->setFixedWidth(75);
+  cdaLineEdit->setFixedWidth(75*dpiXFactor);
   cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
   /*cdaQLCDNumber    = new QLCDNumber(7);
   cdaQLCDNumber->setMode(QLCDNumber::Dec);
@@ -99,7 +99,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   etaLabel = new QLabel(tr("Eta"), this);
   etaLabel->setFixedWidth(labelWidth1);
   etaLineEdit = new QLineEdit();
-  etaLineEdit->setFixedWidth(75);
+  etaLineEdit->setFixedWidth(75*dpiXFactor);
   etaLineEdit->setText(QString("%1").arg(aerolab->getEta()) );
   /*etaQLCDNumber    = new QLCDNumber(7);
   etaQLCDNumber->setMode(QLCDNumber::Dec);
@@ -140,7 +140,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   mLabel = new QLabel(tr("Total Mass (kg)"), this);
   mLabel->setFixedWidth(labelWidth2);
   mLineEdit = new QLineEdit();
-  mLineEdit->setFixedWidth(70);
+  mLineEdit->setFixedWidth(70 * dpiXFactor);
   mLineEdit->setText(QString("%1").arg(aerolab->getTotalMass()) );
   /*mQLCDNumber    = new QLCDNumber(7);
   mQLCDNumber->setMode(QLCDNumber::Dec);
@@ -163,7 +163,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   rhoLabel = new QLabel(tr("Rho (kg/m^3)"), this);
   rhoLabel->setFixedWidth(labelWidth2);
   rhoLineEdit = new QLineEdit();
-  rhoLineEdit->setFixedWidth(70);
+  rhoLineEdit->setFixedWidth(70*dpiXFactor);
   rhoLineEdit->setText(QString("%1").arg(aerolab->getRho()) );
   /*rhoQLCDNumber    = new QLCDNumber(7);
   rhoQLCDNumber->setMode(QLCDNumber::Dec);
@@ -186,7 +186,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   eoffsetLabel = new QLabel(tr("Eoffset (m)"), this);
   eoffsetLabel->setFixedWidth(labelWidth2);
   eoffsetLineEdit = new QLineEdit();
-  eoffsetLineEdit->setFixedWidth(70);
+  eoffsetLineEdit->setFixedWidth(70 * dpiXFactor);
   eoffsetLineEdit->setText(QString("%1").arg(aerolab->getEoffset()) );
   /*eoffsetQLCDNumber    = new QLCDNumber(7);
   eoffsetQLCDNumber->setMode(QLCDNumber::Dec);
