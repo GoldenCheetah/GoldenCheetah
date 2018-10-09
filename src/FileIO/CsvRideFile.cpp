@@ -128,6 +128,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *rowSeries=NULL;
     XDataSeries *trainSeries=NULL;
     XDataSeries *rrSeries=NULL;
+    XDataSeries *ibikeSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -243,6 +244,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setFileFormat("iBike CSV (csv)");
                     unitsHeader = 5;
                     iBikeVersion = line.section( ',', 1, 1 ).toInt();
+
                     ++lineno;
                     continue;
                 }
@@ -421,6 +423,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     recInterval = (int)line.section(',',4,4).toDouble();
                     rideFile->setDeviceType(line.section(',',26,26));
                     rideFile->setTag("Device Info", line.section(',',20,21).remove(QChar('"')));
+
+                    ibikeSeries = new XDataSeries();
+                    ibikeSeries->name = "AERO";
+                    ibikeSeries->valuename << "CALC-POWER";
+                    ibikeSeries->unitname << "W";
+                    //ibikeSeries->valuename << "CdA";
+                    //ibikeSeries->unitname << "m^2";
                 }
             }
 
@@ -699,18 +708,32 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // For iBike software version 11 or higher:
                     // use "power" field until a the "dfpm" field becomes non-zero.
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
+                     QString timestamp = line.section( ',', 14, 14);
+                     if (timestamp.length()>0){
+                         minutes = startTime.secsTo(QDateTime::fromString(timestamp, Qt::ISODate))/60.0;
+                     }
                      nm = 0; //no torque
                      kph = line.section(',', 0, 0).toDouble();
                      dfpm = line.section( ',', 11, 11).toDouble();
                      headwind = line.section(',', 1, 1).toDouble();
+                     km = line.section(',', 3, 3).toDouble();
+
                      if( iBikeVersion >= 11 && ( dfpm > 0.0 || dfpmExists ) ) {
                          dfpmExists = true;
                          watts = dfpm;
+
+                         XDataPoint *p = new XDataPoint();
+                         p->secs = minutes*60.0;
+                         p->km = km;
+                         p->number[0] = line.section(',', 2, 2).toDouble();
+                         p->number[1] = line.section(',', 16, 16).toDouble();
+
+                         ibikeSeries->datapoints.append(p);
                      }
                      else {
                          watts = line.section(',', 2, 2).toDouble();
                      }
-                     km = line.section(',', 3, 3).toDouble();
+
                      cad = line.section(',', 4, 4).toDouble();
                      hr = line.section(',', 5, 5).toDouble();
                      alt = line.section(',', 6, 6).toDouble();
@@ -1188,6 +1211,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             rideFile->addXData("TRAIN", trainSeries);
         else
             delete trainSeries;
+    }
+
+    if (ibikeSeries != NULL) {
+        if (ibikeSeries->datapoints.count()>0)
+            rideFile->addXData("AERO", ibikeSeries);
+        else
+            delete ibikeSeries;
     }
 
     // did we actually read any samples?
