@@ -403,6 +403,16 @@ struct FitFileReaderState
 
                 default: return QString("Quarq %1").arg(prod);
             }
+        } else if (manu == 8 ) {
+            // iBike
+            if (prod == -1)
+                return "iBike";
+
+            switch (prod) {
+                case 2054: return "iBike AeroPod";
+
+                default: return QString("iBike %1").arg(prod);
+            }
         } else if (manu == 9 ) {
             // Powertap
             if (prod == -1)
@@ -482,6 +492,15 @@ struct FitFileReaderState
             switch(prod) {
                   case 2: return "BSX Insight 2";
                   default: return QString("BSX %1").arg(prod);
+            }
+        } else if (manu == 115) {
+            // igpsport
+            if (prod == -1)
+                return "igpsport";
+
+            switch(prod) {
+                  case 2: return "BSX Insight 2";
+                  default: return QString("igpsport %1").arg(prod);
             }
         } else if (manu == 260) {
             // Zwift
