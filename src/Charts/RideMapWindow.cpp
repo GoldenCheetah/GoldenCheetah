@@ -531,13 +531,11 @@ void RideMapWindow::createHtml()
            // zoom the map to the polylinev
            //"    map.fitBounds(routeYellow.getBounds());\n"
 
-
-
-
             // Listen mouse events
-            //"    google.maps.event.addListener(routeYellow, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-            //"    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-            //"    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
+            "routeYellow.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
+            "routeYellow.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
+            "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+            "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
 
             "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
@@ -769,7 +767,7 @@ void RideMapWindow::createHtml()
             "    webBridge.drawOverlays();\n"
 
             // Liste mouse events
-            //"    map.on('mousedown', function(event) { webBridge.mouseup(); });\n"
+            "    map.on('mouseup', function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n"
 
 
             "}\n"
@@ -819,21 +817,23 @@ RideMapWindow::drawShadedRoute()
                     code += QString("path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
             }
         } else if (mapCombo->currentIndex() == OSM) {
-            if (count == 0) {
+            /*if (count == 0) {
                 code = QString("{\n"
                        "   var polyline = new L.Polyline([]);\n"
                        "   polyline.addTo(map);\n"
                        "   path = polyline.getLatLngs();\n");
 
                 // Listen mouse events
-                /*code += QString("polyline.on('mousedown', function(event) { webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-                                "polyline.on('mouseup',   function(event) { webBridge.mouseup(); });\n"
-                                "polyline.on('mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n");*/
+                code += QString("polyline.on('mousedown', function(event) { alert('mousedown');webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
+                                "polyline.on('mouseup',   function(event) { alert('mouseup');L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n"
+                                "polyline.on('click',   function(event) { alert('click');L.DomEvent.stopPropagation(event); });\n"
+                                //"polyline.on('mouseover', function(event) { alert('mouseover');webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
+                                );
 
             } else {
                 if (rfp->lat || rfp->lon)
                     code += QString("path.push(new L.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-            }
+            }*/
         }
 
         // running total of time
@@ -891,9 +891,18 @@ RideMapWindow::drawShadedRoute()
 
 void
 RideMapWindow::clearTempInterval() {
-    QString code = QString( "{ \n"
+    QString code;
+
+    if (mapCombo->currentIndex() == GOOGLE) {
+        code = QString( "{ \n"
                             "    tmpIntervalHighlighter.getPath().clear();\n"
                             "}\n" );
+    } if (mapCombo->currentIndex() == OSM) {
+        code = QString( "{ \n"
+                            "    if (tmpIntervalHighlighter)\n"
+                            "       tmpIntervalHighlighter.setLatLngs([]);\n"
+                            "}\n" );
+    }
 
 #ifdef NOWEBKIT
     view->page()->runJavaScript(code);
@@ -904,8 +913,10 @@ RideMapWindow::clearTempInterval() {
 
 void
 RideMapWindow::drawTempInterval(IntervalItem *current) {
+    QString code;
 
-    QString code = QString( "{ \n"
+    if (mapCombo->currentIndex() == GOOGLE) {
+        code = QString( "{ \n"
                     // interval will be drawn with these options
                     "    var polyOptions = {\n"
                     "        strokeColor: '#00FFFF',\n"
@@ -922,13 +933,37 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
 
                     "    var path = tmpIntervalHighlighter.getPath();\n"
                     "    path.clear();\n");
+    }
+    if (mapCombo->currentIndex() == OSM) {
+        code = QString( "{ \n"
+                    // interval will be drawn with these options
+                    "    var polyOptions = {\n"
+                    "        stroke: true,\n"
+                    "        color: '#00FFFF',\n"
+                    "        opacity: 0.6,\n"
+                    "        weight: 10,\n"
+                    "        zIndex: -1\n"  // put at the bottom
+                    "    }\n"
 
+                    "    if (!tmpIntervalHighlighter) {\n"
+                    "       tmpIntervalHighlighter = new L.Polyline([], polyOptions);\n"
+                    "       tmpIntervalHighlighter.addTo(map);\n"
+                    "       tmpIntervalHighlighter.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n" // map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false});
+                    "    } \n"
+
+                    "    tmpIntervalHighlighter.setLatLngs([]);\n"
+                    "    \n");
+    }
     foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
         if (rfp->secs+myRideItem->ride()->recIntSecs() > current->start
             && rfp->secs< current->stop) {
 
             if (rfp->lat || rfp->lon) {
-                code += QString("    path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+                if (mapCombo->currentIndex() == GOOGLE) {
+                    code += QString("    path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+                } else if (mapCombo->currentIndex() == GOOGLE) {
+                    code += QString("    path.push(new L.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+                }
             }
         }
     }
@@ -1313,7 +1348,7 @@ MapWebBridge::searchPoint(double lat, double lng)
 
 void
 MapWebBridge::hoverPath(double lat, double lng)
-{
+{   
     if (point) {
 
         RideItem *rideItem = mw->property("ride").value<RideItem*>();
@@ -1327,9 +1362,11 @@ MapWebBridge::hoverPath(double lat, double lng)
 
                 QList<RideFilePoint*> list = searchPoint(lat, lng);
 
+
                 if (list.count() > 0)  {
 
                     RideFilePoint* secondPoint = list.at(0);
+                    //qDebug()<< "hoverPath" << secondPoint->lat << secondPoint->lon;
 
                     if (secondPoint->secs>point->secs) {
                         last->rideInterval->start = last->start = point->secs;
@@ -1352,7 +1389,8 @@ MapWebBridge::hoverPath(double lat, double lng)
 
                     // update charts etc
                     context->notifyIntervalsChanged();
-                 }
+                 } else
+                    qDebug()<< "hoverPath no point";
             }
         }
 
@@ -1373,9 +1411,10 @@ MapWebBridge::clickPath(double lat, double lng)
     QString name = QString(tr("Selection #%1 ")).arg(selection);
     QList<RideFilePoint*> list = searchPoint(lat, lng);
 
-    if (list.count() > 0)  {
 
+    if (list.count() > 0)  {
         point = list.at(0);
+        //qDebug()<< "clickPath" << point->lat << point->lon;
 
         IntervalItem *add = rideItem->newInterval(name, point->secs, point->secs, 0, 0, Qt::black, false);
         add->selected = true;
@@ -1384,6 +1423,7 @@ MapWebBridge::clickPath(double lat, double lng)
         context->notifyIntervalsUpdate(rideItem);
 
     } else {
+        qDebug()<< "clickPath: no point";
         point = NULL;
     }
 }
