@@ -44,7 +44,9 @@
 #include "SeasonParser.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#ifdef GC_HAVE_ICAL
 #include "CalDAV.h" // upload Events to remote calendar
+#endif
 
 // named searchs
 #include "FreeSearch.h"

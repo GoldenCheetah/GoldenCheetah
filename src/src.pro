@@ -409,8 +409,8 @@ contains(DEFINES, "GC_WANT_R") {
     LIBS        += $${ICAL_LIBS}
 
     # add caldav and diary functions
-    HEADERS     += Core/ICalendar.h Charts/DiaryWindow.h Cloud/CalDAV.h
-    SOURCES     += Core/ICalendar.cpp Charts/DiaryWindow.cpp Cloud/CalDAV.cpp
+    HEADERS     += Core/ICalendar.h Charts/DiaryWindow.h Cloud/CalDAV.h Cloud/CalDAVCloud.h
+    SOURCES     += Core/ICalendar.cpp Charts/DiaryWindow.cpp Cloud/CalDAV.cpp Cloud/CalDAVCloud.cpp
 }
 
 
@@ -679,7 +679,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 }
 
 # cloud services
-HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalDAVCloud.h Cloud/CalendarDownload.h Cloud/CloudService.h \
+HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
@@ -773,7 +773,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 }
 
 ## Cloud Services / Web resources
-SOURCES += Cloud/BodyMeasuresDownload.cpp Cloud/CalDAVCloud.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
+SOURCES += Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
