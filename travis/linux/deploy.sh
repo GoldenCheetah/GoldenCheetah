@@ -22,14 +22,19 @@ EOF
 # Icon
 cp ./src/Resources/images/gc.png appdir/
 
+### Add OpenSSL libs
+mkdir appdir/lib
+cp /usr/lib/x86_64-linux-gnu/libssl.so appdir/lib
+cp /usr/lib/x86_64-linux-gnu/libcrypto.so appdir/lib
+
 ### Download current version of linuxdeployqt
 wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
 chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
-### Deploy to AppDir and generate AppImage
+### Deploy to appdir and generate AppImage
 # -qmake=path-to-qmake-used-for-build option is necessary if the right qmakei
 # version is not first in PATH, check using qmake --version
-./linuxdeployqt-continuous-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3 -appimage
+./linuxdeployqt-continuous-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -appimage
 
 ### Cleanup
 rm linuxdeployqt-continuous-x86_64.AppImage
