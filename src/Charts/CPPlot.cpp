@@ -151,7 +151,7 @@ CPPlot::setAxisTitle(int axis, QString label)
 
 // change the date range for the 'bests' curve
 void
-CPPlot::setDateRange(const QDate &start, const QDate &end)
+CPPlot::setDateRange(const QDate &start, const QDate &end, bool stale)
 {
 
     // wipe out current - calculate will reinstate
@@ -160,7 +160,7 @@ CPPlot::setDateRange(const QDate &start, const QDate &end)
 
     // check they actually changed, to avoid ridefilecache aggregation
     // which is an expensive function
-    if (startDate != istart || endDate != iend) {
+    if (startDate != istart || endDate != iend || stale) {
 
         startDate = istart;
         endDate = iend;

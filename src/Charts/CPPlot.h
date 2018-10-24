@@ -64,7 +64,7 @@ class CPPlot : public QwtPlot
 
         // setters
         void setRide(RideItem *rideItem);
-        void setDateRange(const QDate &start, const QDate &end);
+        void setDateRange(const QDate &start, const QDate &end, bool stale=false);
         void setShowPercent(bool x);
         void setShowTest(bool x);
         void setShowBest(bool x);
