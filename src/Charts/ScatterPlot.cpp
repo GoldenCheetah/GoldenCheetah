@@ -136,7 +136,7 @@ QString ScatterPlot::describeType(int type, bool longer, bool metric)
             case MODEL_INTERVAL : return (tr("Interval Number"));
             case MODEL_LAT : return (tr("Latitude (degree offset)"));
             case MODEL_LONG : return (tr("Longitude (degree offset)"));
-            case MODEL_CPV : return (tr("Circumferential Pedal Velocity (cm/s)"));
+            case MODEL_CPV : return (tr("Circumferential Pedal Velocity (m/s)"));
             case MODEL_AEPF : return (tr("Average Effective Pedal Force (N)"));
 
             // these you need to do yourself cause there is some
