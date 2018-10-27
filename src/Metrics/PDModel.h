@@ -33,7 +33,7 @@
 //
 // 1. setData is used to provide 'bests' power data in 1s intervals
 //
-// 2. PDModels can be used as a data provider to a QwtPlotCurve 
+// 2. PDModels can be used as a data provider to a QwtPlotCurve
 //    since (QwtPlotCurve::setData(*QwtSyntheticPointData)
 //    the data is returned via double y(double x) const which
 //    the sub-classes must implement
@@ -58,12 +58,14 @@
 #define PDMODEL_MAXT 18000 // maximum value for t we will provide p(t) for
 #define PDMODEL_INTERVAL 1 // intervals used in seconds; 0t, 1t, 2t .. 18000t
 
+
 class PDModel : public QObject, public QwtSyntheticPointData
 {
     Q_OBJECT
 
     public:
 
+        enum parmtype { PmaxParm, CPParm, WParm, None };
 
         enum fittype { Envelope=0,                 // envelope fit
                        LeastSquares=1,             // uses Levenberg-Marquardt Damped Least Squares
@@ -142,8 +144,10 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         // calculate the fit summary
         void calcSummary();
-
         QString fitsummary;
+
+        // provide a ranking string for a parameter estimate
+        static QString rank(parmtype t, double value);
 
     protected:
 
@@ -481,4 +485,30 @@ class ExtendedModel : public PDModel
         void deriveExtCPParameters();
 };
 
-#endif 
+
+// ranking values for CP, Pmax and W' is done against the normalised
+// distributions that emerged from analysis of the GC OpenData contributed
+// by users since 2018
+//
+// The mean (mu) and std deviataion (sigma) values describe the normal
+// distribution such that percentiled can then be calculated using
+// z-scores.
+//
+// So we record the mu and sigma values for each paramater estimate
+// for the general population so we can then rank a user's value
+// using z-scores to identify the percentile it is from
+struct power_profile {
+    public:
+    PDModel::parmtype type;
+    double mu, sigma;
+};
+struct ztable {
+    public:
+    double zscore;
+    int percentile; // table has from 10-99 last entry is zero
+};
+extern power_profile POWER_PROFILE[];
+extern ztable PD_ZTABLE[];
+
+
+#endif

@@ -726,29 +726,28 @@ CPPlot::updateModelHelper()
     if (criticalSeries == CriticalPowerWindow::work || rideSeries == RideFile::watts || rideSeries == RideFile::aPower) {
 
         // Reset Rank
-        cpw->titleRank->setText(tr("Rank"));
+        cpw->titleRank->setText(tr("Percentile"));
 
         //WPrime
         cpw->wprimeTitle->setText(tr("W'"));
-        if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
-        else cpw->wprimeValue->setText(tr("n/a"));
+        if (pdModel->hasWPrime()) {
+            cpw->wprimeValue->setText(QString(tr("%1 kJ")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
+            cpw->wprimeRank->setText(PDModel::rank(PDModel::WParm,pdModel->WPrime()));
+        } else {
+            cpw->wprimeValue->setText("");
+            cpw->wprimeRank->setText("");
+        }
 
         //CP
         cpw->cpTitle->setText(tr("CP"));
         cpw->cpValue->setText(QString(tr("%1 w")).arg(pdModel->CP(), 0, 'f', 0));
-        cpw->cpRank->setText(tr("n/a"));
+        cpw->cpRank->setText(PDModel::rank(PDModel::CPParm,pdModel->CP()));
 
         // P-MAX and P-MAX ranking
         cpw->pmaxTitle->setText(tr("Pmax"));
         if (pdModel->hasPMax()) {
             cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
-
-            // Reference 22.5W/kg -> untrained 8W/kg
-            int _pMaxLevel = 15 * (pdModel->PMax() / context->athlete->getWeight(QDate::currentDate()) - 8) / (23-8) ;
-            if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
-                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
-            else
-                cpw->pmaxRank->setText(tr("n/a"));
+            cpw->pmaxRank->setText(PDModel::rank(PDModel::PmaxParm, pdModel->PMax()));
 
         } else  {
             cpw->pmaxValue->setText(tr("n/a"));
