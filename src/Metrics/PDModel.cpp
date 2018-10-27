@@ -41,6 +41,7 @@ struct ztable PD_ZTABLE[] = {
     {  1.645, 95 },
     {  2.054, 98 },
     {  2.326, 99 },
+    {  4.000, 100 },
     {  0, 0 } // tail marker
 };
 
@@ -73,7 +74,7 @@ PDModel::rank(PDModel::parmtype type, double value)
     QString returning = "10%";
     for(int i=0; PD_ZTABLE[i].percentile != 0; i++) {
         if (value > (mu + (PD_ZTABLE[i].zscore * sigma)))
-            returning = QString("%1%").arg(PD_ZTABLE[i].percentile);
+            returning = QString("%1%").arg(PD_ZTABLE[i+1].percentile);
         else
             break;
     }
