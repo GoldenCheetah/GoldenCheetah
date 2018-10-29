@@ -30,7 +30,7 @@ before_install:
 - sh travis/install-qt.sh
 ##- brew install $QT
 - brew install libical
-##- brew install libusb libusb-compat # no longer needed?
+- brew install libusb libusb-compat
 - brew install srmio
 - brew install libsamplerate
 - rm -rf '/usr/local/include/c++'
