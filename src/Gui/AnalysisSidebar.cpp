@@ -727,7 +727,7 @@ AnalysisSidebar::createPerfTestIntervalSelected()
     if (activeInterval && context->currentRideItem()) {
 
         // just clone it as a user interval
-        const_cast<RideItem*>(context->currentRideItem())->newInterval("Performance Test",
+        const_cast<RideItem*>(context->currentRideItem())->newInterval(tr("Performance Test"),
                                                                        activeInterval->start, activeInterval->stop,
                                                                        activeInterval->startKM, activeInterval->stopKM,
                                                                        Qt::red, true);
