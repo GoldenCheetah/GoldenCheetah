@@ -1,0 +1,70 @@
+#include <QApplication>
+#include <QtConcurrent>
+
+#include "FixPyRunner.h"
+#include "PythonEmbed.h"
+
+FixPyRunner::FixPyRunner(Context *context)
+    : context(context)
+{
+}
+
+int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
+{
+    if (source.isEmpty()) {
+        return 1;
+    }
+
+    // hourglass .. for long running ones this helps user know its busy
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    // set to defaults with gc applied
+    python->cancelled = false;
+
+    QString line = source;
+    int result = 0;
+
+    try {
+
+        // replace $$ with script identifier (to avoid shared data)
+        line = line.replace("$$", scriptKey);
+
+        // run it
+        FixPyRunParams params;
+        params.context = context;
+        params.script = QString(line);
+
+        QFutureWatcher<void>watcher;
+        QFuture<void>f = QtConcurrent::run(execScript, &params);
+
+        // wait for it to finish -- remember ESC can be pressed to cancel
+        watcher.setFuture(f);
+        QEventLoop loop;
+        connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
+
+        // output on console
+        if (python->messages.count()) {
+            errText = python->messages.join("\n");
+        }
+
+    } catch(std::exception& ex) {
+        errText = QString("\n%1\n%2").arg(QString(ex.what())).arg(python->messages.join(""));
+        result = 2;
+    } catch(...) {
+        errText = QString("\nerror: general exception.\n%1").arg(python->messages.join(""));
+        result = 3;
+    }
+
+    python->messages.clear();
+
+    // reset cursor
+    QApplication::restoreOverrideCursor();
+
+    return result;
+}
+
+void FixPyRunner::execScript(FixPyRunParams *params)
+{
+    python->runline(ScriptContext(params->context), params->script);
+}

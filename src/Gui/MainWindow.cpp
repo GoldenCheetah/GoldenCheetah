@@ -81,6 +81,7 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#include "FixPyScriptsDialog.h"
 
 // GUI Widgets
 #include "Tab.h"
@@ -519,6 +520,23 @@ MainWindow::MainWindow(const QDir &home)
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, i.key());
         }
+    }
+
+    if (python) {
+        // add custom python fix entry to edit menu
+        QMenu *pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
+
+        QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
+        foreach (FixPyScript *fixPyScript, fixPyScripts) {
+            QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
+            pyFixesMenu->addAction(action);
+            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+            toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
+        }
+
+        pyFixesMenu->addSeparator();
+        pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
+        pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
     }
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
@@ -1065,9 +1083,23 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
     if (rideitem) {
-        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
-        p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
-        p->exec();
+        if (name.startsWith("_fix_py_")) {
+            name = name.remove(0, 8);
+
+            FixPyScript *script = fixPySettings->getScript(name);
+            if (script == nullptr) {
+                return;
+            }
+
+            QString errText;
+            FixPyRunner pyRunner(currentTab->context);
+            pyRunner.run(script->source, script->iniKey, errText);
+            QMessageBox::information(this, "GoldenCheetah", errText);
+        } else {
+            ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
+            p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+            p->exec();
+        }
     }
 }
 
@@ -2170,6 +2202,16 @@ MainWindow::ridesAutoImport() {
 
     currentTab->context->athlete->importFilesWhenOpeningAthlete();
 
+}
+
+void MainWindow::showManageFixPyScriptsDlg() {
+    ManageFixPyScriptsDialog dlg(currentTab->context);
+    dlg.exec();
+}
+
+void MainWindow::showCreateFixPyScriptDlg() {
+    EditFixPyScriptDialog dlg(currentTab->context, nullptr, this);
+    dlg.exec();
 }
 
 // grow/shrink searchbox if there is space...

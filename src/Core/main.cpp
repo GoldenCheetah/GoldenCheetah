@@ -26,6 +26,7 @@
 #include "GcUpgrade.h"
 #include "IdleTimer.h"
 #include "PowerProfile.h"
+#include "FixPySettings.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -94,6 +95,7 @@ void terminate(int code)
 
     // tidy up static stuff (our globals) that are not tied
     // to a mainwindow instance (which will be deleted on close)
+    delete fixPySettings;
     delete appsettings;
     application->exit();
 

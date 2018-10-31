@@ -234,6 +234,10 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
+        // Python fix scripts
+        void showManageFixPyScriptsDlg();
+        void showCreateFixPyScriptDlg();
+
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();

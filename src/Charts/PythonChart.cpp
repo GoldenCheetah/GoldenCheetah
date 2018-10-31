@@ -38,9 +38,9 @@
 // unique identifier for each chart
 static int id=0;
 
-PythonConsole::PythonConsole(Context *context, PythonChart *parent)
+PythonConsole::PythonConsole(Context *context, PythonHost *pythonHost, QWidget *parent)
     : QTextEdit(parent)
-    , context(context), localEchoEnabled(true), parent(parent)
+    , context(context), localEchoEnabled(true), pythonHost(pythonHost)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
@@ -188,8 +188,10 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             //qDebug()<<"RUN:" << line;
 
             // set the context for the call
-            python->canvas = parent->canvas;
-            python->chart = parent;
+            if (pythonHost->chart()) {
+                python->canvas = pythonHost->chart()->canvas;
+                python->chart = pythonHost->chart();
+            }
 
             try {
 
@@ -314,7 +316,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         setScript("##\n## Python program will run on selection.\n##\n");
 
         leftsplitter->addWidget(script);
-        console = new PythonConsole(context, this);
+        console = new PythonConsole(context, this, this);
         console->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         leftsplitter->addWidget(console);
 

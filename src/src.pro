@@ -284,6 +284,11 @@ contains(DEFINES, "GC_WANT_PYTHON") {
             SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp
             DEFINES += GC_HAVE_PYTHON
 
+            ## Python data processors
+            HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
+                       FileIO/FixPyScript.h
+            SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp
+
          } else {
             # QT5 but not 5.5 or higher
             message($$notsupported)
