@@ -108,21 +108,27 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    QHBoxLayout *nameLayout = new QHBoxLayout;
-    QLabel *scriptNameLbl = new QLabel(tr("Name:"));
-    scriptName = new QLineEdit(fix ? fix->name : "");
-    nameLayout->addWidget(scriptNameLbl);
-    nameLayout->addWidget(scriptName);
-    mainLayout->addLayout(nameLayout);
+    QSplitter *outerSplitter = new QSplitter(Qt::Horizontal);
+    outerSplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    outerSplitter->setHandleWidth(1);
 
     QSplitter *splitter = new QSplitter(Qt::Vertical);
     splitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     splitter->setHandleWidth(1);
 
     // LHS
-    QGroupBox *scriptBox = new QGroupBox;
+    QFrame *scriptBox = new QFrame;
+    scriptBox->setFrameStyle(QFrame::NoFrame);
     QVBoxLayout *scriptLayout = new QVBoxLayout;
+    scriptLayout->setContentsMargins(0, 0, 0, 10);
     scriptBox->setLayout(scriptLayout);
+
+    QHBoxLayout *nameLayout = new QHBoxLayout;
+    QLabel *scriptNameLbl = new QLabel(tr("Name:"));
+    scriptName = new QLineEdit(fix ? fix->name : "");
+    nameLayout->addWidget(scriptNameLbl);
+    nameLayout->addWidget(scriptName);
+    scriptLayout->addLayout(nameLayout);
 
     script = new QTextEdit;
     script->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -148,7 +154,19 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     console->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     splitter->addWidget(console);
 
-    mainLayout->addWidget(splitter);
+    outerSplitter->addWidget(splitter);
+
+    // ride editor
+    GcChartWindow *win = GcWindowRegistry::newGcWindow(GcWindowTypes::RideEditor, context);
+    win->setProperty("nomenu", true);
+
+    RideItem *notconst = (RideItem*)context->currentRideItem();
+    win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+    DateRange dr = context->currentDateRange();
+    win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+    outerSplitter->addWidget(win);
+
+    mainLayout->addWidget(outerSplitter);
 
     QPushButton *save = new QPushButton(tr("Save"));
     QPushButton *cancel = new QPushButton(tr("Cancel"));

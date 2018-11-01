@@ -2081,7 +2081,7 @@ EditorData::insertRows(int row, int count)
 //
 // Find Dialog
 //
-FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
+FindDialog::FindDialog(RideEditor *rideEditor) : QDialog(rideEditor), rideEditor(rideEditor)
 {
     // setup the basic window settings; nonmodal, ontop and delete on close
     setWindowTitle("Search");
@@ -2955,7 +2955,7 @@ PasteSpecialDialog::columnChanged()
     }
 }
 
-AnomalyDialog::AnomalyDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
+AnomalyDialog::AnomalyDialog(RideEditor *rideEditor) : QDialog(rideEditor), rideEditor(rideEditor)
 {
     // setup the basic window settings; nonmodal, ontop and delete on close
     setWindowTitle(tr("Anomalies"));
