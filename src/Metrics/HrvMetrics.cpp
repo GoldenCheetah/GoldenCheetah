@@ -741,6 +741,7 @@ public:
         setName(tr("Rest LF"));
         setMetricUnits(tr("msec^2"));
         setImperialUnits(tr("msec^2"));
+        setPrecision(4);
         setType(RideMetric::Average);
         setDescription(tr("Low Frequency Power HRV, measured at rest"));
     }
@@ -778,6 +779,7 @@ public:
         setName(tr("Rest HF"));
         setMetricUnits(tr("msec^2"));
         setImperialUnits(tr("msec^2"));
+        setPrecision(4);
         setType(RideMetric::Average);
         setDescription(tr("High Frequency Power HRV, measured at rest"));
     }
