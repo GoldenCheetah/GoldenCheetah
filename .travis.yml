@@ -41,12 +41,6 @@ before_install:
 - sudo chmod -R +w /usr/local
 - curl -O https://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
 - hdiutil mount D2XX1.2.2.dmg
-- git clone --branch 0.98 https://github.com/kypeli/kQOAuth.git kQOAuth-0.98
-- cd kQOAuth-0.98
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
-- CC=clang CXX=clang++ make -j2 qmake_all
-- CC=clang CXX=clang++ sudo make install
-- cd ..
 before_script:
 - mkdir D2XX
 - cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
@@ -68,11 +62,6 @@ before_script:
 - sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 - sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
 - sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx.1.2.2|" src/gcconfig.pri
-- sed -i "" "s|#\(KQOAUTH_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(KQOAUTH_INCLUDE =.*\)|\1 \$\$[QT_INSTALL_LIBS]/kqoauth.framework/Headers|"
-  src/gcconfig.pri
-- sed -i "" "s|#\(KQOAUTH_LIBS =.*\)|\1 -F\$\$[QT_INSTALL_LIBS] -framework kqoauth|"
-  src/gcconfig.pri
 ## Disable KML for now
 #- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
 #- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom -lkmlconvenience -lkmlengine -lkmlbase -lexpect|" src/gcconfig.pri
