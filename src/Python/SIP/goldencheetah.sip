@@ -177,5 +177,8 @@ public:
     // working with intervals
     PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
     PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) /TransferBAck/;
+
+    // editing data
+    bool deleteActivitySample(int index = -1, PyObject *activity = NULL) const;
 };
 

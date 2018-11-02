@@ -72,6 +72,8 @@ class Bindings {
         PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
         PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) const;
 
+        // editing data
+        bool deleteActivitySample(int index = -1, PyObject *activity = NULL) const;
     private:
         // find a RideItem by DateTime
         RideItem* fromDateTime(PyObject* activity=NULL) const;

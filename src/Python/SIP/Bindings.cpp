@@ -1408,6 +1408,41 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
     return dict;
 }
 
+bool
+Bindings::deleteActivitySample(int index, PyObject *activity) const
+{
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    if (readOnly) return false;
+
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == NULL) return false;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return false;
+
+    RideFile* f = item->ride();
+    if (f == NULL) return false;
+
+    // count the samples
+    int pCount = 0;
+    RideFileIterator it(f, python->contexts.value(threadid()).spec);
+    while (it.hasNext()) { it.next(); pCount++; }
+
+    if (index < 0) index += pCount;
+    if (index < 0 || index >= pCount) return false;
+
+    QList<RideFile *> *editedRideFiles = python->contexts.value(threadid()).editedRideFiles;
+    if (!readOnly && editedRideFiles && !editedRideFiles->contains(f)) {
+        f->command->startLUW(QString("Python_%1").arg(threadid()));
+        editedRideFiles->append(f);
+    }
+
+    f->command->deletePoints(index, 1);
+    return true;
+}
+
 PythonDataSeries*
 Bindings::metrics(QString metric, bool all, QString filter) const
 {
