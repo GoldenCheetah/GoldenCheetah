@@ -262,10 +262,14 @@ void EditFixPyScriptDialog::runClicked()
     QString key = QUuid::createUuid().toString();
     key = key.replace("-", "_");
 
+    setUpdatesEnabled(false);
+
     QString errText;
     FixPyRunner pyRunner(context);
     pyRunner.run(script->toPlainText(), "_" + key, errText);
     if (!errText.isEmpty()) {
         console->putData(errText);
     }
+
+    setUpdatesEnabled(true);
 }

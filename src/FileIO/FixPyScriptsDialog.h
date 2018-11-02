@@ -35,6 +35,7 @@ public:
     EditFixPyScriptDialog(Context *, FixPyScript *fix, QWidget *parent);
 
     PythonChart *chart() { return nullptr; }
+    bool readOnly() { return false; }
 
 private slots:
     void saveClicked();

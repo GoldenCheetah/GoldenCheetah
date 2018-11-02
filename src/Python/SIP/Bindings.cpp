@@ -563,11 +563,19 @@ Bindings::series(int type, PyObject* activity) const
     int pCount = 0;
     RideFileIterator it(f, python->contexts.value(threadid()).spec);
     while (it.hasNext()) { it.next(); pCount++; }
-    PythonDataSeries* ds = new PythonDataSeries(seriesName(type), pCount);
+    RideFile::SeriesType seriesType = static_cast<RideFile::SeriesType>(type);
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    QList<RideFile *> *editedRideFiles = python->contexts.value(threadid()).editedRideFiles;
+    if (!readOnly && editedRideFiles && !editedRideFiles->contains(f)) {
+        f->command->startLUW(QString("Python_%1").arg(threadid()));
+        editedRideFiles->append(f);
+    }
+
+    PythonDataSeries* ds = new PythonDataSeries(seriesName(type), pCount, readOnly, seriesType, f);
     it.toFront();
     for(int i=0; i<pCount && it.hasNext(); i++) {
         struct RideFilePoint *point = it.next();
-        ds->data[i] = point->value(static_cast<RideFile::SeriesType>(type));
+        ds->data[i] = point->value(seriesType);
     }
 
     return ds;
@@ -764,13 +772,21 @@ Bindings::seriesPresent(int type, PyObject* activity) const
     return item->ride()->isDataPresent(static_cast<RideFile::SeriesType>(type));
 }
 
-PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count) : name(name), count(count), data(NULL)
+PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count, bool readOnly, RideFile::SeriesType seriesType, RideFile *rideFile)
+    : name(name), count(count), data(NULL), readOnly(readOnly), seriesType(seriesType), rideFile(rideFile)
+{
+    if (count > 0) data = new double[count];
+}
+
+PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count) : name(name), count(count), data(NULL),
+    readOnly(true), seriesType(RideFile::none), rideFile(NULL)
 {
     if (count > 0) data = new double[count];
 }
 
 // default constructor and copy constructor
-PythonDataSeries::PythonDataSeries() : name(QString()), count(0), data(NULL) {}
+PythonDataSeries::PythonDataSeries() : name(QString()), count(0), data(NULL),
+    readOnly(true), seriesType(RideFile::none), rideFile(NULL) {}
 PythonDataSeries::PythonDataSeries(PythonDataSeries *clone)
 {
     *this = *clone;
@@ -780,6 +796,7 @@ PythonDataSeries::~PythonDataSeries()
 {
     if (data) delete[] data;
     data=NULL;
+    rideFile = NULL;
 }
 
 PyObject*

@@ -1,6 +1,7 @@
 #include <QString>
 #include "RideFile.h"
 #include "RideFileCache.h"
+#include "RideFileCommand.h"
 
 #undef slots
 #include <Python.h>
@@ -9,6 +10,7 @@
 class PythonDataSeries {
 
     public:
+        PythonDataSeries(QString name, Py_ssize_t count, bool readOnly, RideFile::SeriesType seriesType, RideFile *rideFile);
         PythonDataSeries(QString name, Py_ssize_t count);
         PythonDataSeries(PythonDataSeries*);
         PythonDataSeries();
@@ -17,6 +19,10 @@ class PythonDataSeries {
         QString name;
         Py_ssize_t count;
         double *data;
+
+        bool readOnly;
+        int seriesType;
+        RideFile *rideFile;
 };
 
 class Bindings {

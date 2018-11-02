@@ -3,6 +3,7 @@
 
 #include "FixPyRunner.h"
 #include "PythonEmbed.h"
+#include "RideFileCommand.h"
 
 FixPyRunner::FixPyRunner(Context *context)
     : context(context)
@@ -66,5 +67,11 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
 
 void FixPyRunner::execScript(FixPyRunParams *params)
 {
-    python->runline(ScriptContext(params->context), params->script);
+    QList<RideFile *> editedRideFiles;
+    python->runline(ScriptContext(params->context, nullptr, nullptr, Specification(), false, &editedRideFiles), params->script);
+
+    // finish up commands on edited rides
+    foreach (RideFile *f, editedRideFiles) {
+        f->command->endLUW();
+    }
 }

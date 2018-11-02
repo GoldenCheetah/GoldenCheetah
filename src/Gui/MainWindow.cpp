@@ -1093,8 +1093,9 @@ void MainWindow::manualProcess(QString name)
 
             QString errText;
             FixPyRunner pyRunner(currentTab->context);
-            pyRunner.run(script->source, script->iniKey, errText);
-            QMessageBox::information(this, "GoldenCheetah", errText);
+            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
+                QMessageBox::critical(this, "GoldenCheetah", errText);
+            }
         } else {
             ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
             p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!

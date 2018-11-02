@@ -36,14 +36,18 @@ extern PythonEmbed *python;
 class ScriptContext {
     public:
 
-        ScriptContext(Context *context=NULL, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), bool interactiveShell=false)
-            : context(context), item(item), metrics(metrics), spec(spec), interactiveShell(interactiveShell) {}
+        ScriptContext(Context *context=NULL, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), bool interactiveShell=false,
+                      bool readOnly = true, QList<RideFile *> *editedRideFiles = NULL)
+            : context(context), item(item), metrics(metrics), spec(spec), interactiveShell(interactiveShell), readOnly(readOnly), editedRideFiles(editedRideFiles) {}
 
         Context *context;
         RideItem *item;
         const QHash<QString,RideMetric*> *metrics;
         Specification spec;
         bool interactiveShell;
+
+        bool readOnly;
+        QList<RideFile *> *editedRideFiles;
 };
 
 // a plain C++ class, no QObject stuff

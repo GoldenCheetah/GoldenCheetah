@@ -22,6 +22,7 @@
 
 #include "Colors.h"
 #include "TabView.h"
+#include "RideFileCommand.h"
 
 #include <QtConcurrent>
 
@@ -198,8 +199,15 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 // replace $$ with chart identifier (to avoid shared data)
                 line = line.replace("$$", chartid);
 
+                bool readOnly = pythonHost->readOnly();
+                QList<RideFile *> editedRideFiles;
                 python->cancelled = false;
-                python->runline(ScriptContext(context, nullptr, nullptr, Specification(), true), line);
+                python->runline(ScriptContext(context, nullptr, nullptr, Specification(), true, readOnly, &editedRideFiles), line);
+
+                // finish up commands on edited rides
+                foreach (RideFile *f, editedRideFiles) {
+                    f->command->endLUW();
+                }
 
                 // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));

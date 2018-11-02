@@ -43,6 +43,7 @@ class PythonChart;
 class PythonHost {
 public:
     virtual PythonChart *chart() = 0;
+    virtual bool readOnly() = 0;
 };
 
 // a console widget to type commands and display response
@@ -118,6 +119,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
         void setState(QString);
 
         PythonChart *chart() { return this; }
+        bool readOnly() { return true; }
 
     signals:
         void setUrl(QUrl);
