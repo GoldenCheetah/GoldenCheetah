@@ -46,6 +46,7 @@
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
+#include "DaumController.h"
 #endif
 #include "ANTlocalController.h"
 #include "NullController.h"
@@ -646,6 +647,8 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new KettlerController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_KETTLER_RACER) {
             Devices[i].controller = new KettlerRacerController(this, &Devices[i]);
+        } else if (Devices.at(i).type == DEV_DAUM) {
+            Devices[i].controller = new DaumController(this, &Devices[i]);
 #endif
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
