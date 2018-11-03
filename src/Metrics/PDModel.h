@@ -65,8 +65,6 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
     public:
 
-        enum parmtype { PmaxParm, CPParm, WParm, None };
-
         enum fittype { Envelope=0,                 // envelope fit
                        LeastSquares=1,             // uses Levenberg-Marquardt Damped Least Squares
                        LinearRegression=2         // using slope and intercept of linear regression
@@ -145,9 +143,6 @@ class PDModel : public QObject, public QwtSyntheticPointData
         // calculate the fit summary
         void calcSummary();
         QString fitsummary;
-
-        // provide a ranking string for a parameter estimate
-        static QString rank(parmtype t, double value);
 
     protected:
 
@@ -484,31 +479,5 @@ class ExtendedModel : public PDModel
     private:
         void deriveExtCPParameters();
 };
-
-
-// ranking values for CP, Pmax and W' is done against the normalised
-// distributions that emerged from analysis of the GC OpenData contributed
-// by users since 2018
-//
-// The mean (mu) and std deviataion (sigma) values describe the normal
-// distribution such that percentiled can then be calculated using
-// z-scores.
-//
-// So we record the mu and sigma values for each paramater estimate
-// for the general population so we can then rank a user's value
-// using z-scores to identify the percentile it is from
-struct power_profile {
-    public:
-    PDModel::parmtype type;
-    double mu, sigma;
-};
-struct ztable {
-    public:
-    double zscore;
-    int percentile; // table has from 10-99 last entry is zero
-};
-extern power_profile POWER_PROFILE[];
-extern ztable PD_ZTABLE[];
-
 
 #endif

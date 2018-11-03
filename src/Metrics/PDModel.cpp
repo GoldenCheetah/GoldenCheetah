@@ -20,67 +20,6 @@
 #include "LTMTrend.h"
 #include "lmcurve.h"
 
-struct ztable PD_ZTABLE[] = {
-    { -1.282, 10 },
-    {  -1.04, 15 },
-    { -0.842, 20 },
-    { -0.674, 25 },
-    { -0.524, 30 },
-    {  -0.39, 35 },
-    { -0.253, 40 },
-    {  -0.13, 45 },
-    {      0, 50 },
-    {   0.13, 55 },
-    {  0.253, 60 },
-    {   0.39, 65 },
-    {  0.524, 70 },
-    {  0.674, 75 },
-    {  0.842, 80 },
-    {   1.04, 85 },
-    {  1.282, 90 },
-    {  1.645, 95 },
-    {  2.054, 98 },
-    {  2.326, 99 },
-    {  4.000, 100 },
-    {  0, 0 } // tail marker
-};
-
-// derived from GC OpenData (see https://osf.io/6hfpz/)
-struct power_profile POWER_PROFILE[] = {
-    { PDModel::CPParm, 264.5, 58.8 },           // 264.5w is mean wattage
-    { PDModel::WParm, 17566.8, 7212.9 },        // 17.5kJ is mean W'
-    { PDModel::PmaxParm, 1143.4, 408.0},        // 1143.4 is mean Pmax
-    { PDModel::None, 0, 0 }
-};
-
-QString
-PDModel::rank(PDModel::parmtype type, double value)
-{
-    // is this a supported parmtype, get mu and sigma
-    double mu=-1, sigma=-1;
-    for(int i=0; POWER_PROFILE[i].type != PDModel::None; i++) {
-        if (POWER_PROFILE[i].type == type) {
-            mu = POWER_PROFILE[i].mu;
-            sigma = POWER_PROFILE[i].sigma;
-            break;
-        }
-    }
-
-    // unknown?
-    if (mu < 0 && sigma < 0) return ("");
-
-    // lets work through the zscore till the value we have
-    // is no longer within the percentile
-    QString returning = "10%";
-    for(int i=0; PD_ZTABLE[i].percentile != 0; i++) {
-        if (value > (mu + (PD_ZTABLE[i].zscore * sigma)))
-            returning = QString("%1%").arg(PD_ZTABLE[i+1].percentile);
-        else
-            break;
-    }
-    return returning;
-}
-
 //extern ztable PD_ZTABLE;
 // base class for all models
 PDModel::PDModel(Context *context) :
