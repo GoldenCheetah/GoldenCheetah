@@ -180,5 +180,6 @@ public:
 
     // editing data
     bool deleteActivitySample(int index = -1, PyObject *activity = NULL) const;
+    bool deleteSeries(int type, PyObject *activity = NULL) const;
 };
 

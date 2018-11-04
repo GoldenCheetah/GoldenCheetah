@@ -1443,6 +1443,34 @@ Bindings::deleteActivitySample(int index, PyObject *activity) const
     return true;
 }
 
+bool
+Bindings::deleteSeries(int type, PyObject *activity) const
+{
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    if (readOnly) return false;
+
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == NULL) return false;
+
+    RideItem* item = fromDateTime(activity);
+    if (item == NULL) item = python->contexts.value(threadid()).item;
+    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
+    if (item == NULL) return false;
+
+    RideFile* f = item->ride();
+    if (f == NULL) return false;
+
+    QList<RideFile *> *editedRideFiles = python->contexts.value(threadid()).editedRideFiles;
+    if (!readOnly && editedRideFiles && !editedRideFiles->contains(f)) {
+        f->command->startLUW(QString("Python_%1").arg(threadid()));
+        editedRideFiles->append(f);
+    }
+
+    RideFile::SeriesType seriesType = static_cast<RideFile::SeriesType>(type);
+    f->command->setDataPresent(seriesType, false);
+    return true;
+}
+
 PythonDataSeries*
 Bindings::metrics(QString metric, bool all, QString filter) const
 {
