@@ -85,10 +85,11 @@ bool Daum::discover(QString dev) {
 }
 
 void Daum::setLoad(double load) {
-    int local_load = (int)load;
+    const unsigned int minDeviceLoad = 25;
+    unsigned int local_load = (unsigned int)load;
     QMutexLocker locker(&pvars);
     if (local_load > maxDeviceLoad_) { local_load = maxDeviceLoad_; }
-    if (local_load < 25) { local_load = 25; }
+    if (local_load < minDeviceLoad) { local_load = minDeviceLoad; }
     qDebug() << "setLoad(): " << local_load;
     loadToWrite_ = local_load;
 }
@@ -136,6 +137,7 @@ bool Daum::openPort(QString dev) {
 bool Daum::closePort() {
     QMutexLocker locker(&pvars);
     delete serial_dev_; serial_dev_ = 0;
+    return true;
 }
 
 void Daum::run() {
