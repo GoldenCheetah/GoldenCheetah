@@ -63,6 +63,9 @@ DeviceTypes::DeviceTypes()
       { DEV_KETTLER_RACER,       DEV_SERIAL,  (char *) "Kettler Racer",true,    false,
         tr("Kettler Racer serial device ") ,
         ":images/devices/kettler_ex1.png"                                        },
+      { DEV_DAUM, DEV_SERIAL, (char *)"Daum Cockpit" ,true, false,
+        tr("Daum Serial Device ") ,
+        ":images/activity.png"},
 #endif
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,

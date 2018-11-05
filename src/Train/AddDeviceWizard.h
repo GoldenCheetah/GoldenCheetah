@@ -36,6 +36,7 @@
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
+#include "DaumController.h"
 #endif
 #include "ANTlocalController.h"
 #include "ANTChannel.h"
