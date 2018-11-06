@@ -165,6 +165,8 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
         QMessageBox oops(QMessageBox::Critical, tr("Fix Elevation Data not possible"),
                          tr("The following problem occured: %1").arg(err));
         oops.exec();
+        // close LUW
+        ride->command->endLUW();
         return false;
     }
 
@@ -286,6 +288,8 @@ FetchElevationDataFromMapQuest(QString latLngCollection)
         throw QString(QObject::tr("Monthly free plan limit exceeded"));
     if (elevationJSON.contains("Bad Request"))
         throw QString(QObject::tr("Bad request"));
+    if (elevationJSON.contains("Gateway Timeout"))
+        throw QString(QObject::tr("Gateway Timeout"));
     if (error != QNetworkReply::NoError)
         throw QString(QObject::tr("Networkerror: %1")).arg(error);
 
