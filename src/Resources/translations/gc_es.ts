@@ -7711,12 +7711,12 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="54"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="94"/>
         <source>Day Summary</source>
-        <translation>Resúmen Diario</translation>
+        <translation>Resumen Diario</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="95"/>
@@ -7726,7 +7726,7 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="96"/>
         <source>Monthly Summary</source>
-        <translation>Resúmen Mensual</translation>
+        <translation>Resumen Mensual</translation>
     </message>
     <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="364"/>
@@ -11232,12 +11232,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="715"/>
         <source>Summary: No errors detected - upgrade successful</source>
-        <translation>Resúmen: Sin errores detectados - actualización exitosa</translation>
+        <translation>Resumen: Sin errores detectados - actualización exitosa</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="718"/>
         <source>Summary: %1 errors detected - please check log details before proceeding</source>
-        <translation>Resúmen: %1 errores detectados - por favor verifique los detalles en el registro antes de continuar</translation>
+        <translation>Resumen: %1 errores detectados - por favor verifique los detalles en el registro antes de continuar</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="721"/>
@@ -11368,7 +11368,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="90"/>
         <source>Activity Summary</source>
-        <translation>Resúmen de Actividad</translation>
+        <translation>Resumen de Actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="83"/>
@@ -11388,7 +11388,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="92"/>
         <source>Summary and Details</source>
-        <translation>Resúmen y Detalles</translation>
+        <translation>Resumen y Detalles</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="93"/>
@@ -11463,7 +11463,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="109"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="110"/>
@@ -12542,7 +12542,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="245"/>
         <source>Overview/summary of the selected data range - data shown in &apos;Athlete&apos;s Best&apos; are configurable</source>
-        <translation>Resúmen del rango de fechas seleccionados, los datos que se muestran son configurables</translation>
+        <translation>Resumen del rango de fechas seleccionados, los datos que se muestran son configurables</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="247"/>
@@ -12640,7 +12640,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
-        <translation>Métricas que se muestran en &apos;Resúmen&apos;</translation>
+        <translation>Métricas que se muestran en &apos;Resumen&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
@@ -12932,7 +12932,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1548"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1549"/>
@@ -14008,7 +14008,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/ICalendar.cpp" line="109"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="110"/>
@@ -14325,7 +14325,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="36"/>
         <source>Interval Summary</source>
-        <translation>Resúmen de Intervalos</translation>
+        <translation>Resumen de Intervalos</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="87"/>
@@ -15075,7 +15075,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="218"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="501"/>
@@ -17978,7 +17978,7 @@ Podrá importar o descargar los datos antes de combinarlos y ajustar manualmente
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="421"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="422"/>
@@ -24480,7 +24480,7 @@ Saltando archivo...</translation>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="389"/>
         <source>Summary</source>
-        <translation>Resúmen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="402"/>
@@ -26129,7 +26129,7 @@ formato GoldenCheetah. ¿Confirma?</translation>
     <message>
         <location filename="../../FileIO/Snippets.cpp" line="78"/>
         <source>Snippet export</source>
-        <translation>Exportar Resúmen</translation>
+        <translation>Exportar Resumen</translation>
     </message>
 </context>
 <context>
