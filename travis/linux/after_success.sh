@@ -1,14 +1,20 @@
-#!/bin/sh
+#!/bin/bash
+set -ev
+export PATH=/opt/qt59/bin:$PATH
+export LD_LIBRARY_PATH=/opt/qt59/lib/x86_64-linux-gnu:/opt/qt59/lib:$LD_LIBRARY_PATH
 
-### This script should be run from GoldenCheetah root directory after build
-if [ ! -x src/GoldenCheetah ]
-then echo "Build GoldenCheetah and execute from distribution root"; exit 1
+### This script should be run from GoldenCheetah src directory after build
+cd src
+if [ ! -x ./GoldenCheetah ]
+then echo "Build GoldenCheetah and execute from distribution src"; exit 1
 fi
+echo "Checking GoldenCheetah.app can execute"
+./GoldenCheetah --help
 
 ### Create AppDir and start populating
 mkdir -p appdir
 # Executable
-cp src/GoldenCheetah appdir
+cp GoldenCheetah appdir
 # Desktop file
 cat >appdir/GoldenCheetah.desktop <<EOF
 [Desktop Entry]
@@ -20,7 +26,7 @@ Exec=GoldenCheetah
 Icon=gc
 EOF
 # Icon
-cp ./src/Resources/images/gc.png appdir/
+cp Resources/images/gc.png appdir/
 
 ### Add OpenSSL libs
 mkdir appdir/lib
@@ -28,7 +34,7 @@ cp /usr/lib/x86_64-linux-gnu/libssl.so appdir/lib
 cp /usr/lib/x86_64-linux-gnu/libcrypto.so appdir/lib
 
 ### Download current version of linuxdeployqt
-wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
 chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
 ### Deploy to appdir and generate AppImage
@@ -40,9 +46,15 @@ chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 rm linuxdeployqt-continuous-x86_64.AppImage
 rm -rf appdir
 
-### Minimum Test - Result is ./GoldenCheetah-x86_64.AppImage
 if [ ! -x ./GoldenCheetah-x86_64.AppImage ]
 then echo "AppImage not generated, check the errors"; exit 1
 fi
-./GoldenCheetah-x86_64.AppImage --version
+echo "Renaming AppImage file to branch and build number ready for deploy"
+mv GoldenCheetah-x86_64.AppImage $FINAL_NAME
+ls -l $FINAL_NAME
+### Minimum Test - Result is ./GoldenCheetah-x86_64.AppImage
+./$FINAL_NAME --version
+### upload for testing
+curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+cd ${TRAVIS_BUILD_DIR}
 exit
