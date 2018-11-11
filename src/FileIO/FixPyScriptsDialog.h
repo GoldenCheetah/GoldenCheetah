@@ -37,12 +37,16 @@ public:
     PythonChart *chart() { return nullptr; }
     bool readOnly() { return false; }
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 private slots:
     void saveClicked();
     void runClicked();
 
 private:
     void setScript(QString string);
+    bool isModified();
 
     Context *context;
     FixPyScript *pyFixScript;

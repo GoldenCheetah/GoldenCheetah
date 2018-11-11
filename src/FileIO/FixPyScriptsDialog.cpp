@@ -168,7 +168,7 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
 
     mainLayout->addWidget(outerSplitter);
 
-    QPushButton *save = new QPushButton(tr("Save"));
+    QPushButton *save = new QPushButton(tr("Save and close"));
     QPushButton *cancel = new QPushButton(tr("Cancel"));
     QHBoxLayout *buttons = new QHBoxLayout();
     buttons->addStretch();
@@ -182,6 +182,34 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
+void EditFixPyScriptDialog::closeEvent(QCloseEvent *event)
+{
+    if (!isModified()) {
+        event->accept();
+        return;
+    }
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("The Python Fix has been modified."));
+    msgBox.setInformativeText(tr("Do you want to save your changes?"));
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    int result = msgBox.exec();
+
+    switch (result) {
+    case QMessageBox::Save:
+        event->ignore();
+        saveClicked();
+        break;
+    case QMessageBox::Discard:
+        event->accept();
+        break;
+    case QMessageBox::Cancel:
+        event->ignore();
+        break;
+    }
+}
+
 void EditFixPyScriptDialog::setScript(QString string)
 {
     if (python && script) {
@@ -190,6 +218,12 @@ void EditFixPyScriptDialog::setScript(QString string)
     }
 
     text = string;
+}
+
+bool EditFixPyScriptDialog::isModified()
+{
+    return scriptName->isModified() ||
+           script->document()->isModified();
 }
 
 void EditFixPyScriptDialog::saveClicked()
