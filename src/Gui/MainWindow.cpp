@@ -524,19 +524,8 @@ MainWindow::MainWindow(const QDir &home)
 
     if (python) {
         // add custom python fix entry to edit menu
-        QMenu *pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
-
-        QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
-        foreach (FixPyScript *fixPyScript, fixPyScripts) {
-            QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
-            pyFixesMenu->addAction(action);
-            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
-            toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
-        }
-
-        pyFixesMenu->addSeparator();
-        pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
-        pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
+        pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
+        connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
     }
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
@@ -2203,6 +2192,23 @@ MainWindow::ridesAutoImport() {
 
     currentTab->context->athlete->importFilesWhenOpeningAthlete();
 
+}
+
+void MainWindow::buildPyFixesMenu()
+{
+    pyFixesMenu->clear();
+
+    QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
+    foreach (FixPyScript *fixPyScript, fixPyScripts) {
+        QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
+        pyFixesMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+        toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
+    }
+
+    pyFixesMenu->addSeparator();
+    pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
+    pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
 }
 
 void MainWindow::showManageFixPyScriptsDlg() {

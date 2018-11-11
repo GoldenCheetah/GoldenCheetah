@@ -235,6 +235,7 @@ class MainWindow : public QMainWindow
         void ridesAutoImport();
 
         // Python fix scripts
+        void buildPyFixesMenu();
         void showManageFixPyScriptsDlg();
         void showCreateFixPyScriptDlg();
 
@@ -304,7 +305,7 @@ class MainWindow : public QMainWindow
 
         // Miscellany
         QSignalMapper *toolMapper;
-
+        QMenu *pyFixesMenu;
 
 #ifdef GC_HAS_CLOUD_DB
         CloudDBVersionClient *versionClient;
