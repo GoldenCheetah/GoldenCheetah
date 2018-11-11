@@ -164,6 +164,19 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp wahooMACSV("GroundContactTime,MotionCount,MotionPowerZ,Cadence,MotionPowerX,WorkoutActive,Timestamp,Smoothness,MotionPowerY,_ID,VerticalOscillation,", Qt::CaseInsensitive);
     QRegExp rp3CSV ("\"id\",\"workout_interval_id\",\"ref\",\"stroke_number\",\"power\",\"avg_power\",\"stroke_rate\",\"time\",\"stroke_length\",\"distance\",\"distance_per_stroke\",\"estimated_500m_time\",\"energy_per_stroke\",\"energy_sum\",\"pulse\",\"work_per_pulse\",\"peak_force\",\"peak_force_pos\",\"rel_peak_force_pos\",\"drive_time\",\"recover_time\",\"k\",\"curve_data\",\"stroke_number_in_interval\",\"avg_calculated_power\"", Qt::CaseSensitive);
 
+
+    // X-trainer format
+    //starting with:
+    //ver,4,113,848
+    //col,time,pulse,rpm,watt,climb%,km/t
+    //1,97,88,186,0,29
+    //2,99,91,192,0,29
+    //3,102,92,196,0,30
+    //4,103,92,195,0,30
+    // note the first column after the header is the time
+
+    QRegExp xtrainCSV("ver,[0-9]+,[0-9]+,[0-9]+");
+
     int recInterval = 1;
 
     if (!file.open(QFile::ReadOnly)) {
@@ -178,6 +191,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int iBikeInterval = 0;
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
+
+    int xTrainVersion  = 0;
 
     //UNUSED int timestampIndex=-1;
     int secsIndex=-1;
@@ -248,6 +263,19 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                 }
+
+                else if(xtrainCSV.indexIn(line) != -1) {
+                    csvType = xtrain;
+                    rideFile->setDeviceType("xtrainCSV");
+                    rideFile->setFileFormat("xtrainCSV");
+                    unitsHeader = 2;
+                    xTrainVersion = line.section( ',', 1, 1 ).toInt();
+
+                    ++lineno;
+                    continue;
+                }
+
+
                 else if(motoActvCSV.indexIn(line) != -1) {
                     csvType = motoactv;
                     rideFile->setDeviceType("MotoACTV");
@@ -755,6 +783,26 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         headwind *= KM_PER_MILE;
                     }
 
+
+                } else if (csvType == xtrain) {
+                    // this must be xtrain
+                    // ignore lines with wrong number of entries
+                    if (line.split(",").count() != 6) continue;
+
+                    minutes = (recInterval * lineno - unitsHeader)/60.0;
+                    nm = 0; //no torque
+                    hr = line.section(',', 1, 1).toDouble();
+                    cad = line.section(',', 2, 2).toDouble();
+                    watts = line.section(',', 3, 3).toDouble();
+                    slope = line.section(',', 4, 4).toDouble()/10;
+                    kph = line.section(',', 5, 5).toDouble();
+
+                    // derive distance from speed
+                    km = lastKM + (kph/3600.0f);
+                    lastKM = km;
+
+
+
                 } else if (csvType == moxy)  {
 
                     // we get crappy lines with no data so ignore them
@@ -1138,7 +1186,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
     // less than 2 data points is not a valid ride file
     else {
-        errors << "Insufficient valid data in file \"" + file.fileName() + "\".";
+        errors << "Insufficient valid data in file \"" + file.fileName() + "\". ";
         delete rideFile;
         file.close();
         return NULL;
@@ -1178,6 +1226,18 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             rideFile->setStartTime(datetime);
         } else {
 
+            // Could be Tryyyyddmmhhmm.csv (case insensitive)
+            // X-trainer file
+            rideTime.setPattern("Tr(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)[^\\.]*\\.csv$");
+            if (rideTime.indexIn(file.fileName()) >= 0) {
+                QDateTime datetime(QDate(rideTime.cap(1).toInt(),
+                                         rideTime.cap(2).toInt(),
+                                         rideTime.cap(3).toInt()),
+                                   QTime(rideTime.cap(4).toInt(),
+                                         rideTime.cap(5).toInt()));
+                rideFile->setStartTime(datetime);
+        } else {
+
             // is it in poweragent format "name yyyy-mm-dd hh-mm-ss.csv"
             rideTime.setPattern("(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d) (\\d\\d)-(\\d\\d)-(\\d\\d)\\.csv$");
             if (rideTime.indexIn(file.fileName()) >=0) {
@@ -1203,7 +1263,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             }
         }
     }
-
+ }
     if (csvType == rowpro) rideFile->setTag("Sport","Row");
 
     if (trainSeries != NULL) {
