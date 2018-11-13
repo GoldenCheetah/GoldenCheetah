@@ -77,7 +77,7 @@ struct PowerProfile {
     QMap <double, QVector<double> > values;    // key is percentile; 99.99, 1, 95 etc
 };
 typedef PowerProfile PowerProfile;
-extern PowerProfile powerProfile;
+extern PowerProfile powerProfile, powerProfileWPK;
 extern void initPowerProfile();
 
 #endif

@@ -59,7 +59,7 @@ PowerPercentile::rank(type x, double value)
     return "10%";
 }
 
-PowerProfile powerProfile;
+PowerProfile powerProfile, powerProfileWPK;
 void initPowerProfile()
 {
     // read in data from resources
@@ -102,5 +102,46 @@ void initPowerProfile()
 
         }
         pp.close();
+    }
+    // read in data from resources
+    lineno=0;
+    QFile pw(":data/powerprofilewpk.csv");
+    if (pw.open(QIODevice::ReadOnly)) {
+
+        QTextStream is(&pw);
+
+        while (!is.atEnd()) {
+
+            // readit and setup structures
+            QString row=is.readLine();
+            lineno++;
+
+            // first line is headers, Percentile followed by 1,2,3 ... 36000
+            switch (lineno) {
+
+                case 1:
+                {
+                    foreach(QString head, row.split(",")) {
+                        if (head != "Percentile") {
+                            powerProfileWPK.seconds << head.toDouble() / 60.0f; // cpplot wants in minutes
+                        }
+                    }
+                }
+                break;
+
+                default:
+                {
+                    QVector<double> values;
+                    QStringList tokens = row.split(",");
+                    double percentile = tokens[0].toDouble();
+                    powerProfileWPK.percentiles << percentile;
+                    for(int i=1; i<tokens.count(); i++) values << tokens[i].toDouble();
+                    powerProfileWPK.values.insert(percentile, values);
+                }
+                break;
+            }
+
+        }
+        pw.close();
     }
 }

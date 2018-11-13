@@ -718,6 +718,9 @@ CPPlot::plotModel()
     }
 
     // if we're showing the power profile, must be at least 1500
+    if (ymax < 20 && showPP && rideSeries == RideFile::wattsKg) {
+        setAxisScale(yLeft, 0, (ymax=20));
+    }
     if (ymax < 1500 && showPP && rideSeries == RideFile::watts) {
         setAxisScale(yLeft, 0, (ymax=1500));
     }
@@ -1144,10 +1147,11 @@ void
 CPPlot::plotPowerProfile()
 {
     // lots of reasons not to !
-    if (rideSeries != RideFile::watts  || showPP == false || profileCurves.count()) return;
+    if ((rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg)  || showPP == false || profileCurves.count()) return;
 
     // plot the power profile curves
-    foreach (double percentile, powerProfile.percentiles) {
+    struct PowerProfile *p = rideSeries == RideFile::watts ? &powerProfile : &powerProfileWPK;
+    foreach (double percentile, p->percentiles) {
 
         // for now we don't bother with upper and lower bounds
         //if (percentile > 95 || percentile < 5) continue;
@@ -1171,7 +1175,7 @@ CPPlot::plotPowerProfile()
         if (percentile > 51 || percentile < 49) gridpen.setStyle(Qt::DotLine);
         curve->setCurveFitter(new QwtSplineCurveFitter());
         curve->setPen(gridpen);
-        curve->setSamples(powerProfile.seconds.constData(), powerProfile.values.value(percentile).constData(), powerProfile.seconds.count());
+        curve->setSamples(p->seconds.constData(), p->values.value(percentile).constData(), p->seconds.count());
         curve->attach(this);
         profileCurves << curve;
     }
@@ -1690,13 +1694,19 @@ CPPlot::plotBests(RideItem *rideItem)
         if (rideSeries == RideFile::watts && showPP && max<1500) max=1500;
 
         setAxisScale(yLeft, 0, max);
-    }
-    else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+
+    } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
         setAxisScale(yLeft, 0, 1.5*pdModel->WPrime());
-    }
-    else if (criticalSeries == CriticalPowerWindow::vam) {
+
+    } else if (criticalSeries == CriticalPowerWindow::vam) {
         // VAM is very big anyway - so just 5% headroom
         setAxisScale(yLeft, 0, 1.05*ymax);
+
+    } else if (rideSeries == RideFile::wattsKg && showPP) {
+        ymax *= 1.1;
+        if (ymax<20) ymax = 20;
+        setAxisScale(yLeft, 0, ymax);
+
     } else {
 
         // or just add 10% headroom
@@ -2882,6 +2892,11 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         if (showPP && max < 1500) max=1500;
         setAxisScale(yLeft, 0, max);
 
+    } else if (showPP && rideSeries == RideFile::wattsKg) {
+        ymax *=1.1;
+        if (ymax<20) ymax = 20;
+
+        setAxisScale(yLeft, 0, ymax);
     } else {
 
         // or just add 10% headroom
@@ -3028,6 +3043,12 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         if (showPP && ymax<1500) ymax=1500;
 
         setAxisScale(yLeft, ymin, ymax);
+
+    } else if (showPP && rideSeries == RideFile::wattsKg) {
+        ymax *=1.1;
+        if (ymax<20) ymax = 20;
+
+        setAxisScale(yLeft, 0, ymax);
 
     } else {
 

@@ -180,5 +180,6 @@
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>
+        <file>data/powerprofilewpk.csv</file>
     </qresource>
 </RCC>
