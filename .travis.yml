@@ -1,14 +1,13 @@
 branches:
 - master
 language:
-- objective-c
-compiler:
-- clang
-- gcc
+- c++
+os:
+- osx
+- linux
 env:
-  matrix:
-  - BRANCH=master QT=qt5 QT_PATH=qt5 WEBKIT=0
   global:
+  - BRANCH=master
   - secure: iqYW7f3//ZkMVzeCEarYn0S0DqKjFU9juBh0KF6WTlUsKX902Jtsk7dFoJlNDYBf63HLgV+wW2Hc6MxI9sGiUkom0gY9/To/aeGIJFGEX2sLm/e0Ok3qN521FA0Q/OiCFsD0RC6J+yrHxzI+rf8Z1rujceUsz2KgsrfAjYYv+BY=
   - secure: C6f58PXwvvHeVOjCLbyDRjgyF0tk+bXjCNUDur8VJLhJEGNdnrt+rH+d3azYaX0n348ZnQZ14as4M4rHjN1A/3DRbdUdOS7PQZrkj/n363ck1tvYOG/tzYqkEcVoQyjIJ7ZoTuBXDQry/VJmLxQjM0glTa2upNFHMOMwqZNkF+I=
   - secure: mgf181ok4rJTHxAdSaeIb/OzUx7PQc6UjJYfhJQcZDjN1Nou+Um6OHpnooMHeEq0CdGuLSiv2xVmuQnRjI5MfG5re/a3l39hSzi9tPLWi1y7uOLCtQFooJw3H+LhiKZcgAtEnkTmEhUCEu5uZ7cp4lWhrQZWCR5mCDNtJrGHjiw=
@@ -23,101 +22,27 @@ env:
   - secure: QXyyyutxesRVae/WFi75dxlNw2qTyWc6WQ3vmRER9BFhlrNtt8lmE+M6ghMDOhxigzSXWxHcG9r66BLOw4DML7AXg4f3NIAIYuYQrpfsWQ1TKGC/vVvIPDlNBKL62zSOoNowjup1HfZpB575wl4JkmHjoMPDfQ4yM/JVR+MKmIM=
   - secure: lefpL3SB8yN0Vn1R2e0hAFpJgFnu4rJ/vn7DucSKQvJ61K7t3LrUHFXElDQGFZMbytx4OJDeYsJtrccrIHjcsSAEIyW8TTcwn5/JopnyeQ3ukV5AYpEoQusym09XKru9E7awqvnZrXz6mdoIum5JP7+H116mPN4vsvz5nkNWxeg=
   - secure: RAGPq/thN9x6STNueDbeJWGUN75OLNcUVUkLHI/eZwPrkMaiQPfxIaJ+8eO2PszDcBojw3eYVhzbRvLnLiXmHL3buwD6oXMTyYnxGzCZ61DeDQ2cQa8ynKmRim5JL3viKMqtdyasXVoGf/u0GqMsgaLcqN6e/vXuXMGu6kkUPEQ=
+  matrix:
+    include:
+      - os: osx
+        compiler: clang
+      - os: linux
+        dist: trusty
+        sudo: required
+        compiler: gcc
 before_install:
-## try early just to check, can delete later
-- date
-- brew update
-- sh travis/install-qt.sh
-##- brew install $QT
-- brew install libical
-- brew install libusb libusb-compat
-- brew install srmio
-- brew install libsamplerate
-- rm -rf '/usr/local/include/c++'
-- brew install r
-- brew install brewsci/science/lmfit
-## Disable KML for now
-##- brew install --HEAD travis/libkml.rb
-- sudo chmod -R +w /usr/local
-- curl -O https://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
-- hdiutil mount D2XX1.2.2.dmg
+- travis/$TRAVIS_OS_NAME/before_install.sh
 before_script:
-- mkdir D2XX
-- cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
-- sudo cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib /usr/local/lib
-- cp /Volumes/release/D2XX/bin/*.h D2XX
-- sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|"
-  src/FileIO/D2XX.cpp
-- cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
-- cp src/gcconfig.pri.in src/gcconfig.pri
-- /usr/local/opt/$QT_PATH/bin/lupdate src/src.pro
-- if [[ "$WEBKIT" == "0" ]]; then echo DEFINES += NOWEBKIT >> src/gcconfig.pri; fi
-- sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
-- sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/$QT_PATH/bin/lrelease|"
-  src/gcconfig.pri
-- sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch
-  x86_64|" src/gcconfig.pri
-- sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
-- sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
-- sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
-- sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx.1.2.2|" src/gcconfig.pri
-## Disable KML for now
-#- sed -i "" "s|#\(KML_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-#- sed -i "" "s|#\(KML_LIBS    =.*\)|\1 -L/usr/local/lib -lkmlxsd -lkmlregionator -lkmldom -lkmlconvenience -lkmlengine -lkmlbase -lexpect|" src/gcconfig.pri
-- sed -i "" "s|#\(ICAL_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(ICAL_LIBS    =.*\)|\1 -L/usr/local/lib -lical|" src/gcconfig.pri
-- sed -i "" "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(LIBUSB_LIBS    =.*\)|\1 -L/usr/local/lib -lusb -lusb-1.0|" src/gcconfig.pri
-- sed -i "" "s|#\(SAMPLERATE_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(SAMPLERATE_LIBS =\).*|\1 -L/usr/local/lib -lsamplerate|" src/gcconfig.pri
-- sed -i "" "s|#\(LMFIT_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-- sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
-- sed -i "" "s|#\(HTPATH = ../httpserver.*\)|\1 |" src/gcconfig.pri
-- sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
-##- sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri ## we want this for now XXX till AVKit fixup
-##- sed -i "" "s|#\(DEFINES += GC_VIDEO_QUICKTIME.*\)|\1 |" src/gcconfig.pri ## QT is deprecated, don't build with it.
-##Issues with c++11 and stdlib on travis and dependencies
-- sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
-- echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
-- sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_STRAVA_CLIENT_SECRET__/"$GC_STRAVA_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_DROPBOX_CLIENT_SECRET__/"$GC_DROPBOX_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_CYCLINGANALYTICS_CLIENT_SECRET__/"$GC_CYCLINGANALYTICS_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_TWITTER_CONSUMER_SECRET__/"$GC_TWITTER_CONSUMER_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_DROPBOX_CLIENT_ID__/"$GC_DROPBOX_CLIENT_ID"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_MAPQUESTAPI_KEY__/"$GC_MAPQUESTAPI_KEY"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_CLOUD_DB_BASIC_AUTH__/"$GC_CLOUD_DB_BASIC_AUTH"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_CLOUD_DB_APP_NAME__/"$GC_CLOUD_DB_APP_NAME"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_GOOGLE_DRIVE_CLIENT_ID__/"$GC_GOOGLE_DRIVE_CLIENT_ID"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_GOOGLE_DRIVE_CLIENT_SECRET__/"$GC_GOOGLE_DRIVE_CLIENT_SECRET"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_GOOGLE_DRIVE_API_KEY__/"$GC_GOOGLE_DRIVE_API_KEY"/" src/Core/Secrets.h
-- sed -i "" "s/__GC_TODAYSPLAN_CLIENT_SECRET__/"$GC_TODAYSPLAN_CLIENT_SECRET"/" src/Core/Secrets.h
-- cat src/gcconfig.pri
+- travis/$TRAVIS_OS_NAME/before_script.sh
 script:
-- CC=clang CXX=clang++ /usr/local/opt/$QT_PATH/bin/qmake -makefile -recursive QMAKE_CXXFLAGS_WARN_ON+="-Wno-unused-private-field -Wno-c++11-narrowing"
-- CC=clang CXX=clang++ make qmake_all
-- CC=clang CXX=clang++ make -j4 sub-qwt --silent
-- CC=clang CXX=clang++ make -j4 sub-src
+- travis/$TRAVIS_OS_NAME/script.sh
 after_success:
-- cd src
-- echo "Checking GoldenCheetah.app can execute"
-- GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
-- echo "About to create dmg file and fix up"
-- /usr/local/opt/$QT_PATH/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
-- python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/$QT_PATH
-- echo "Cleaning up installed QT libraries from $QT"
-- brew remove $QT
-- echo "Renaming dmg file to branch and build number ready for deploy"
-- export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.dmg
-- mv GoldenCheetah.dmg $FINAL_NAME
-- ls -l $FINAL_NAME
-- echo "Mounting dmg file and testing it can execute"
-- hdiutil mount $FINAL_NAME
-- cd /Volumes/GoldenCheetah
-- GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
-- echo "Make sure we are back in the Travis build directory"
-- cd $TRAVIS_BUILD_DIR
+- if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+    export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.dmg;
+  else
+    export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.AppImage;
+  fi
+- travis/$TRAVIS_OS_NAME/after_success.sh
 deploy:
   provider: releases
   api_key:
