@@ -17,10 +17,12 @@
  */
 
 #include <QString>
+#include <QList>
+#include <QVector>
 
 #ifndef GC_PowerProfile
 #define GC_PowerProfile 1
-struct PowerProfile {
+struct PowerPercentile {
 
         public:
 
@@ -65,7 +67,17 @@ struct PowerProfile {
         // return a string that ranks the value for the type
        static QString rank(type x, double value);
 };
+
+typedef PowerPercentile PowerPercentile;
+extern PowerPercentile powerPercentile[];
+
+struct PowerProfile {
+    QList<double> percentiles;                 // list of percentiles we have data for
+    QVector <double> seconds;                     // t values from 1 .. 36000
+    QMap <double, QVector<double> > values;    // key is percentile; 99.99, 1, 95 etc
+};
 typedef PowerProfile PowerProfile;
-extern PowerProfile powerProfile[];
+extern PowerProfile powerProfile;
+extern void initPowerProfile();
 
 #endif

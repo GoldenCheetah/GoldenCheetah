@@ -204,6 +204,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     shadeCheck->setChecked(true);
     cl->addRow(shading, shadeCheck);
 
+    showPPCheck = new QCheckBox(this);
+    showPPCheck->setChecked(false); // default off
+    QLabel *pp = new QLabel(tr("Show Power Profile"));
+    cl->addRow(pp, showPPCheck);
+
     showGridCheck = new QCheckBox(this);
     showGridCheck->setChecked(true); // default on
     QLabel *gridify = new QLabel(tr("Show grid"));
@@ -537,6 +542,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(shadeCheck, SIGNAL(stateChanged(int)), this, SLOT(shadingSelected(int)));
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showEffortCheck, SIGNAL(stateChanged(int)), this, SLOT(showEffortChanged(int)));
+    connect(showPPCheck, SIGNAL(stateChanged(int)), this, SLOT(showPPChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(showCSLinearCheck, SIGNAL(stateChanged(int)), this, SLOT(showCSLinearChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
@@ -1830,6 +1836,16 @@ void
 CriticalPowerWindow::showEffortChanged(int state)
 {
     cpPlot->setShowEffort(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::showPPChanged(int state)
+{
+    cpPlot->setShowPP(state);
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());

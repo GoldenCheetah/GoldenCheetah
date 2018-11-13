@@ -25,6 +25,7 @@
 #include "Colors.h"
 #include "GcUpgrade.h"
 #include "IdleTimer.h"
+#include "PowerProfile.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -323,6 +324,9 @@ main(int argc, char *argv[])
     application = new QApplication(argc, argv);
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
+
+    // read defaults
+    initPowerProfile();
 
     // set default colors
     GCColor::setupColors();

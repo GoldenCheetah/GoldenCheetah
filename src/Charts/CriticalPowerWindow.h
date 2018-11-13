@@ -70,6 +70,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int sani2 READ sanI2 WRITE setSanI2 USER true)
     Q_PROPERTY(int laei1 READ laeI1 WRITE setLaeI1 USER true)
     Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
+    Q_PROPERTY(bool showPP READ showPP WRITE setShowPP USER true)
 
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -222,6 +223,9 @@ class CriticalPowerWindow : public GcChartWindow
         bool showPercent() { return showPercentCheck->isChecked(); }
         void setShowPercent(bool x) { return showPercentCheck->setChecked(x); }
 
+        bool showPP() { return showPPCheck->isChecked(); }
+        void setShowPP(bool x) { return showPPCheck->setChecked(x); }
+
     protected slots:
         void forceReplot();
         void newRideAdded(RideItem*);
@@ -233,6 +237,7 @@ class CriticalPowerWindow : public GcChartWindow
         void seasonSelected(int season);
         void shadingSelected(int shading);
         void showEffortChanged(int check);
+        void showPPChanged(int check);
         void showHeatChanged(int check);
         void showCSLinearChanged(int state);
         void showHeatByDateChanged(int check);
@@ -305,6 +310,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *shadeCheck;
         QCheckBox *shadeIntervalsCheck;
         QCheckBox *showEffortCheck;
+        QCheckBox *showPPCheck;
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;

@@ -19,7 +19,10 @@
 
 #include "PowerProfile.h"
 
-struct PowerProfile powerProfile[]={
+#include <QFile>
+#include <QTextStream>
+
+struct PowerPercentile powerPercentile[]={
 
 // based upon V0.2 of the OpenData Power profile
 { 99.99,593.3736,8.511083789,540.6868,7.28851235,492.9682,6.873482126,459.8246216,6.39594671,436.4760517,6.267013201,39929.81539,661.8325434,2495.3434,39.4455708 },
@@ -46,12 +49,58 @@ struct PowerProfile powerProfile[]={
 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }};
 
 QString
-PowerProfile::rank(type x, double value)
+PowerPercentile::rank(type x, double value)
 {
-    for(int i=0; powerProfile[i].percentile > 0; i++) {
-        if (value > powerProfile[i].value(x)) {
-            return QString("%1%").arg(powerProfile[i].percentile);
+    for(int i=0; powerPercentile[i].percentile > 0; i++) {
+        if (value > powerPercentile[i].value(x)) {
+            return QString("%1%").arg(powerPercentile[i].percentile);
         }
     }
     return "10%";
+}
+
+PowerProfile powerProfile;
+void initPowerProfile()
+{
+    // read in data from resources
+    int lineno=0;
+    QFile pp(":data/powerprofile.csv");
+    if (pp.open(QIODevice::ReadOnly)) {
+
+        QTextStream is(&pp);
+
+        while (!is.atEnd()) {
+
+            // readit and setup structures
+            QString row=is.readLine();
+            lineno++;
+
+            // first line is headers, Percentile followed by 1,2,3 ... 36000
+            switch (lineno) {
+
+                case 1:
+                {
+                    foreach(QString head, row.split(",")) {
+                        if (head != "Percentile") {
+                            powerProfile.seconds << head.toDouble() / 60.0f; // cpplot wants in minutes
+                        }
+                    }
+                }
+                break;
+
+                default:
+                {
+                    QVector<double> values;
+                    QStringList tokens = row.split(",");
+                    double percentile = tokens[0].toDouble();
+                    powerProfile.percentiles << percentile;
+                    for(int i=1; i<tokens.count(); i++) values << tokens[i].toDouble();
+                    powerProfile.values.insert(percentile, values);
+                }
+                break;
+            }
+
+        }
+        pp.close();
+    }
 }
