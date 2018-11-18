@@ -81,7 +81,9 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#ifdef GC_WANT_PYTHON
 #include "FixPyScriptsDialog.h"
+#endif
 
 // GUI Widgets
 #include "Tab.h"
@@ -522,11 +524,12 @@ MainWindow::MainWindow(const QDir &home)
         }
     }
 
-    if (python) {
-        // add custom python fix entry to edit menu
-        pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
-        connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
-    }
+#ifdef GC_WANT_PYTHON
+    // add custom python fix entry to edit menu
+    pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
+    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
+#endif
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -1072,6 +1075,8 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
     if (rideitem) {
+
+#ifdef GC_WANT_PYTHON
         if (name.startsWith("_fix_py_")) {
             name = name.remove(0, 8);
 
@@ -1085,11 +1090,14 @@ void MainWindow::manualProcess(QString name)
             if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
                 QMessageBox::critical(this, "GoldenCheetah", errText);
             }
-        } else {
-            ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
-            p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
-            p->exec();
+
+            return;
         }
+#endif
+
+        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
+        p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+        p->exec();
     }
 }
 
@@ -2194,6 +2202,13 @@ MainWindow::ridesAutoImport() {
 
 }
 
+#ifdef GC_WANT_PYTHON
+void MainWindow::onEditMenuAboutToShow()
+{
+    bool embedPython = appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool();
+    pyFixesMenu->menuAction()->setVisible(embedPython);
+}
+
 void MainWindow::buildPyFixesMenu()
 {
     pyFixesMenu->clear();
@@ -2220,6 +2235,7 @@ void MainWindow::showCreateFixPyScriptDlg() {
     EditFixPyScriptDialog dlg(currentTab->context, nullptr, this);
     dlg.exec();
 }
+#endif
 
 // grow/shrink searchbox if there is space...
 void

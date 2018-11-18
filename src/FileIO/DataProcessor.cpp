@@ -23,7 +23,10 @@
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
 #include "FixPySettings.h"
+#endif
 
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
@@ -34,6 +37,11 @@ DataProcessorFactory &DataProcessorFactory::instance()
 
 bool DataProcessorFactory::autoprocess = true;
 
+DataProcessorFactory::~DataProcessorFactory()
+{
+    qDeleteAll(processors);
+}
+
 bool
 DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 {
@@ -42,10 +50,21 @@ DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
     return true;
 }
 
+void
+DataProcessorFactory::unregisterProcessor(QString name)
+{
+    if (!processors.contains(name)) return;
+    DataProcessor *processor = processors.value(name);
+    processors.remove(name);
+    delete processor;
+}
+
 QMap<QString, DataProcessor *>
 DataProcessorFactory::getProcessors(bool coreProcessorsOnly) const
 {
+#ifdef GC_WANT_PYTHON
     fixPySettings->initialize();
+#endif
 
     if (!coreProcessorsOnly) return processors;
 
@@ -69,7 +88,9 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     // check if autoProcess is allow at all
     if (!autoprocess) return false;
 
+#ifdef GC_WANT_PYTHON
     fixPySettings->initialize();
+#endif
 
     bool changed = false;
 

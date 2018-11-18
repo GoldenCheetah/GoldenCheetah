@@ -14,6 +14,7 @@ public:
     ~FixPySettings();
 
     void initialize();
+    void disableFixPy();
     QList<FixPyScript *> getScripts();
     FixPyScript *getScript(QString name);
     FixPyScript *createScript(QString name);

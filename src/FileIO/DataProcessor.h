@@ -94,8 +94,10 @@ class DataProcessorFactory {
 
     public:
 
+        ~DataProcessorFactory();
         static DataProcessorFactory &instance();
         bool registerProcessor(QString name, DataProcessor *processor);
+        void unregisterProcessor(QString name);
         QMap<QString,DataProcessor*> getProcessors(bool coreProcessorsOnly = false) const;
         bool autoProcess(RideFile *, QString mode, QString op); // run auto processes (after open rideFile)
         void setAutoProcessRule(bool b) { autoprocess = b; } // allows to switch autoprocess off (e.g. for Upgrades)

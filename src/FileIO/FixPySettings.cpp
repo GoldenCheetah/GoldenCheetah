@@ -4,6 +4,7 @@
 #include <QSettings>
 
 #include "FixPySettings.h"
+#include "Settings.h"
 #include "MainWindow.h"
 #include "FixPyDataProcessor.h"
 
@@ -109,7 +110,7 @@ void FixPySettings::save()
 
 void FixPySettings::initialize()
 {
-    if (isInitialied) {
+    if (isInitialied || !appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool()) {
         return;
     }
 
@@ -164,6 +165,19 @@ void FixPySettings::initialize()
     }
 
     save();
+}
+
+void FixPySettings::disableFixPy()
+{
+    if (!isInitialied) return;
+    isInitialied = false;
+
+    foreach (FixPyScript *s, scripts) {
+        DataProcessorFactory::instance().unregisterProcessor(s->name);
+    }
+
+    qDeleteAll(scripts);
+    scripts.clear();
 }
 
 bool FixPySettings::readPyFixFile(QString fixName, QString fixPath, QString iniKey)
