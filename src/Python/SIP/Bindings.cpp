@@ -14,6 +14,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+#include "DataProcessor.h"
 
 #include "Bindings.h"
 
@@ -1429,6 +1430,20 @@ Bindings::deleteSeries(int type, PyObject *activity) const
     RideFile::SeriesType seriesType = static_cast<RideFile::SeriesType>(type);
     f->command->setDataPresent(seriesType, false);
     return true;
+}
+
+bool
+Bindings::postProcess(QString processor, PyObject *activity) const
+{
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    if (readOnly) return false;
+
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
+
+    DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processor, nullptr);
+    if (!dp) return false;
+    return dp->postProcess(f, nullptr, "PYTHON");
 }
 
 PythonDataSeries*

@@ -19,7 +19,7 @@ class FixPyRunner : public QObject
     Q_OBJECT
 
 public:
-    FixPyRunner(Context *context = nullptr, RideFile *rideFile = nullptr);
+    FixPyRunner(Context *context = nullptr, RideFile *rideFile = nullptr, bool useNewThread = true);
 
     int run(QString source, QString scriptKey, QString &errText);
     static void execScript(FixPyRunParams *params);
@@ -27,6 +27,7 @@ public:
 private:
     Context *context;
     RideFile *rideFile;
+    bool useNewThread;
 };
 
 #endif // FIXPYRUNNER_H

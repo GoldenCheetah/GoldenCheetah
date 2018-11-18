@@ -20,10 +20,10 @@ FixPyDataProcessor::FixPyDataProcessor(FixPyScript *pyScript)
 bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *settings, QString op)
 {
     Q_UNUSED(settings);
-    Q_UNUSED(op);
 
     QString errText;
-    FixPyRunner pyRunner(nullptr, rideFile);
+    bool useNewThread = op != "PYTHON";
+    FixPyRunner pyRunner(nullptr, rideFile, useNewThread);
     return pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
 }
 

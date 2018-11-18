@@ -5,8 +5,8 @@
 #include "PythonEmbed.h"
 #include "RideFileCommand.h"
 
-FixPyRunner::FixPyRunner(Context *context, RideFile *rideFile)
-    : context(context), rideFile(rideFile)
+FixPyRunner::FixPyRunner(Context *context, RideFile *rideFile, bool useNewThread)
+    : context(context), rideFile(rideFile), useNewThread(useNewThread)
 {
 }
 
@@ -36,14 +36,18 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
         params.rideFile = rideFile;
         params.script = QString(line);
 
-        QFutureWatcher<void>watcher;
-        QFuture<void>f = QtConcurrent::run(execScript, &params);
+        if (useNewThread) {
+            QFutureWatcher<void> watcher;
+            QFuture<void> f = QtConcurrent::run(execScript, &params);
 
-        // wait for it to finish -- remember ESC can be pressed to cancel
-        watcher.setFuture(f);
-        QEventLoop loop;
-        connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
-        loop.exec();
+            // wait for it to finish -- remember ESC can be pressed to cancel
+            watcher.setFuture(f);
+            QEventLoop loop;
+            connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
+        } else {
+            execScript(&params);
+        }
 
         // output on console
         if (python->messages.count()) {
