@@ -13,9 +13,10 @@ public:
     FixPySettings();
     ~FixPySettings();
 
+    void initialize();
     QList<FixPyScript *> getScripts();
     FixPyScript *getScript(QString name);
-    FixPyScript *createScript();
+    FixPyScript *createScript(QString name);
     void deleteScript(QString name);
 
     void save();
@@ -24,7 +25,6 @@ private:
     const QString PYFIXES_DIR_NAME = ".pyfixes";
     const QString PYFIXES_SETTINGS_FILE_NAME = "configglobal-pyfixes.ini";
 
-    void initialize();
     bool readPyFixFile(QString fixName, QString fixPath, QString iniKey);
     int getMaxKey();
 

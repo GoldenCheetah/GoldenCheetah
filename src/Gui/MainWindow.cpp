@@ -503,7 +503,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors();
+    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
 
     if (processors.count()) {
 

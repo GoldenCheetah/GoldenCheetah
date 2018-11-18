@@ -274,7 +274,7 @@ void EditFixPyScriptDialog::saveClicked()
     }
 
     if (pyFixScript == nullptr) {
-        pyFixScript = fixPySettings->createScript();
+        pyFixScript = fixPySettings->createScript(name);
     }
 
     // remember old path, for clean up

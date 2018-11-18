@@ -23,6 +23,7 @@
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
+#include "FixPySettings.h"
 
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
@@ -41,6 +42,24 @@ DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
     return true;
 }
 
+QMap<QString, DataProcessor *>
+DataProcessorFactory::getProcessors(bool coreProcessorsOnly) const
+{
+    fixPySettings->initialize();
+
+    if (!coreProcessorsOnly) return processors;
+
+    QMap<QString, DataProcessor *> coreProcessors;
+    QMapIterator<QString, DataProcessor*> i(processors);
+    i.toFront();
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()->isCoreProcessor()) coreProcessors.insert(i.key(), i.value());
+    }
+
+    return coreProcessors;
+}
+
 bool
 DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 {
@@ -49,6 +68,8 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 
     // check if autoProcess is allow at all
     if (!autoprocess) return false;
+
+    fixPySettings->initialize();
 
     bool changed = false;
 

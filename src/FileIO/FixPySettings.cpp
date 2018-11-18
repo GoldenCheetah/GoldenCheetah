@@ -5,6 +5,7 @@
 
 #include "FixPySettings.h"
 #include "MainWindow.h"
+#include "FixPyDataProcessor.h"
 
 FixPySettings::FixPySettings()
     : isInitialied(false), scripts()
@@ -36,9 +37,12 @@ FixPyScript *FixPySettings::getScript(QString name)
     return nullptr;
 }
 
-FixPyScript *FixPySettings::createScript()
+FixPyScript *FixPySettings::createScript(QString name)
 {
     FixPyScript *script = new FixPyScript;
+    script->name = name;
+    FixPyDataProcessor *fixPyDp = new FixPyDataProcessor(script);
+    DataProcessorFactory::instance().registerProcessor(name, fixPyDp);
     scripts.append(script);
     return script;
 }
@@ -172,8 +176,7 @@ bool FixPySettings::readPyFixFile(QString fixName, QString fixPath, QString iniK
     QTextStream in(&pyFile);
     QString fixSource = in.readAll();
 
-    FixPyScript *script = createScript();
-    script->name = fixName;
+    FixPyScript *script = createScript(fixName);
     script->path = fixPath;
     script->source = fixSource;
     script->iniKey = iniKey;

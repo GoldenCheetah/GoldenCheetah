@@ -36,12 +36,15 @@ extern PythonEmbed *python;
 class ScriptContext {
     public:
 
-        ScriptContext(Context *context=NULL, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), bool interactiveShell=false,
-                      bool readOnly = true, QList<RideFile *> *editedRideFiles = NULL)
-            : context(context), item(item), metrics(metrics), spec(spec), interactiveShell(interactiveShell), readOnly(readOnly), editedRideFiles(editedRideFiles) {}
+        ScriptContext(Context *context=NULL, RideItem *item=NULL, RideFile *rideFile = NULL,
+                      const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(),
+                      bool interactiveShell=false, bool readOnly = true, QList<RideFile *> *editedRideFiles = NULL)
+            : context(context), item(item), rideFile(rideFile), metrics(metrics), spec(spec),
+              interactiveShell(interactiveShell), readOnly(readOnly), editedRideFiles(editedRideFiles) {}
 
         Context *context;
         RideItem *item;
+        RideFile *rideFile;
         const QHash<QString,RideMetric*> *metrics;
         Specification spec;
         bool interactiveShell;

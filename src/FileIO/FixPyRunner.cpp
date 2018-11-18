@@ -5,8 +5,8 @@
 #include "PythonEmbed.h"
 #include "RideFileCommand.h"
 
-FixPyRunner::FixPyRunner(Context *context)
-    : context(context)
+FixPyRunner::FixPyRunner(Context *context, RideFile *rideFile)
+    : context(context), rideFile(rideFile)
 {
 }
 
@@ -33,6 +33,7 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
         // run it
         FixPyRunParams params;
         params.context = context;
+        params.rideFile = rideFile;
         params.script = QString(line);
 
         QFutureWatcher<void>watcher;
@@ -68,7 +69,8 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
 void FixPyRunner::execScript(FixPyRunParams *params)
 {
     QList<RideFile *> editedRideFiles;
-    python->runline(ScriptContext(params->context, nullptr, nullptr, Specification(), false, &editedRideFiles), params->script);
+    python->runline(ScriptContext(params->context, nullptr, params->rideFile, nullptr,
+                                  Specification(), false, &editedRideFiles), params->script);
 
     // finish up commands on edited rides
     foreach (RideFile *f, editedRideFiles) {

@@ -78,6 +78,7 @@ class Bindings {
     private:
         // find a RideItem by DateTime
         RideItem* fromDateTime(PyObject* activity=NULL) const;
+        RideFile *selectRideFile(PyObject *activity = nullptr) const;
 
         // get a dict populated with metrics and metadata
         PyObject* activityMetrics(RideItem* item) const;

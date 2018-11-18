@@ -544,20 +544,34 @@ Bindings::fromDateTime(PyObject* activity) const
     return NULL;
 }
 
+RideFile *
+Bindings::selectRideFile(PyObject *activity) const
+{
+    RideFile *f;
+    RideItem* item = fromDateTime(activity);
+    if (item && item->ride()) return item->ride();
+
+    f = python->contexts.value(threadid()).rideFile;
+    if (f) return f;
+
+    item = python->contexts.value(threadid()).item;
+    if (item && item->ride()) return item->ride();
+
+    Context *context = python->contexts.value(threadid()).context;
+    if (context) {
+        item = const_cast<RideItem*>(context->currentRideItem());
+        if (item && item->ride()) return item->ride();
+    }
+
+    return nullptr;
+}
+
 // get the data series for the currently selected ride
 PythonDataSeries*
 Bindings::series(int type, PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return NULL;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return NULL;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return NULL;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return nullptr;
 
     // count the included points, create data series output and copy data
     int pCount = 0;
@@ -585,16 +599,8 @@ Bindings::series(int type, PyObject* activity) const
 PythonDataSeries*
 Bindings::activityWbal(PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return NULL;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return NULL;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return NULL;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return nullptr;
 
     f->recalculateDerivedSeries();
     WPrime *w = f->wprimeData();
@@ -634,16 +640,8 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
         case 3: xjoin = RideFile::RESAMPLE; break;
     }
 
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return NULL;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return NULL;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return NULL;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
     XDataSeries *xds = f->xdata()[name];
@@ -670,16 +668,8 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
 PythonDataSeries*
 Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return NULL;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return NULL;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return NULL;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
     XDataSeries *xds = f->xdata()[name];
@@ -719,16 +709,8 @@ Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
 PyObject*
 Bindings::xdataNames(QString name, PyObject* activity) const
 {
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return NULL;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return NULL;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return NULL;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return nullptr;
 
     QStringList namelist;
     if (name.isEmpty())
@@ -760,16 +742,10 @@ Bindings::seriesName(int type) const
 bool
 Bindings::seriesPresent(int type, PyObject* activity) const
 {
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
 
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return false;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return NULL;
-
-    return item->ride()->isDataPresent(static_cast<RideFile::SeriesType>(type));
+    return f->isDataPresent(static_cast<RideFile::SeriesType>(type));
 }
 
 PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count, bool readOnly, RideFile::SeriesType seriesType, RideFile *rideFile)
@@ -1414,16 +1390,8 @@ Bindings::deleteActivitySample(int index, PyObject *activity) const
     bool readOnly = python->contexts.value(threadid()).readOnly;
     if (readOnly) return false;
 
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return false;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return false;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return false;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
 
     // count the samples
     int pCount = 0;
@@ -1449,16 +1417,8 @@ Bindings::deleteSeries(int type, PyObject *activity) const
     bool readOnly = python->contexts.value(threadid()).readOnly;
     if (readOnly) return false;
 
-    Context *context = python->contexts.value(threadid()).context;
-    if (context == NULL) return false;
-
-    RideItem* item = fromDateTime(activity);
-    if (item == NULL) item = python->contexts.value(threadid()).item;
-    if (item == NULL) item = const_cast<RideItem*>(context->currentRideItem());
-    if (item == NULL) return false;
-
-    RideFile* f = item->ride();
-    if (f == NULL) return false;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
 
     QList<RideFile *> *editedRideFiles = python->contexts.value(threadid()).editedRideFiles;
     if (!readOnly && editedRideFiles && !editedRideFiles->contains(f)) {

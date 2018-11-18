@@ -202,7 +202,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 bool readOnly = pythonHost->readOnly();
                 QList<RideFile *> editedRideFiles;
                 python->cancelled = false;
-                python->runline(ScriptContext(context, nullptr, nullptr, Specification(), true, readOnly, &editedRideFiles), line);
+                python->runline(ScriptContext(context, nullptr, nullptr, nullptr, Specification(), true, readOnly, &editedRideFiles), line);
 
                 // finish up commands on edited rides
                 foreach (RideFile *f, editedRideFiles) {
