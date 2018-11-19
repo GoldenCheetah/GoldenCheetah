@@ -1342,7 +1342,7 @@ LTMWindow::dataTable(bool html)
                     summary = summary.arg(v);
                 } else {
                     // no precision
-                    summary = summary.arg(QString("%1").arg(columns[j].y[row], 0, 'f', 0));
+                    summary = summary.arg(QString("%1").arg(columns[j].y[row], 0, 'f', 1));
                 }
 
                 //
