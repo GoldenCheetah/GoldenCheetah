@@ -511,7 +511,8 @@ LTMPopup::rideSelected()
             metrics->setText(setSummaryHTML(have));
 
             notes->setText(""); //! stop crash (?)
-            notes->setText(have->getText("Notes", ""));
+            // Use calendar text for more information and to allow customization
+            notes->setText(have->getText("Calendar Text", ""));
         }
     }
     resizeEvent(NULL);
