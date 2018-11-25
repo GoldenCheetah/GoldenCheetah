@@ -205,7 +205,7 @@ Library::importFiles(Context *context, QStringList files)
             if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
 
                 QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                    QString(tr("%1 already exists in workout library: %2")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+                    QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
             }
 
             // still add it, it may noit have been scanned...
