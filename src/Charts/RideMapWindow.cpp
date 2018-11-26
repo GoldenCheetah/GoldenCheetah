@@ -64,7 +64,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     // map choice
     mapCombo= new QComboBox(this);
     mapCombo->addItem(tr("OpenStreetMap"));
-    mapCombo->addItem(tr("Google"));
+    mapCombo->setDisabled(true);
 
     setMapType(mapType); // validate mapType and set current index in mapCombo
 
@@ -404,15 +404,12 @@ void RideMapWindow::createHtml()
     "   #map-canvas { height: 100% }\n"
     "</style>\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
-        // Load Google Map v3 API
-        currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM\"></script> \n");
-    } else if (mapCombo->currentIndex() == OSM) {
-        // Load leaflet (1.3.4) API
-        currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.css\" /> \n");
-        currentPage += QString("<script type=\"text/javascript\" src=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.js\" ></script> \n");
 
-    }
+
+    // Load leaflet (v1.3.4) API
+    currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.css\" /> \n");
+    currentPage += QString("<script type=\"text/javascript\" src=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.js\" ></script> \n");
+
 
 #ifdef NOWEBKIT
     currentPage += QString("<script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n");
@@ -466,81 +463,46 @@ void RideMapWindow::createHtml()
     "}\n"
     "\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
 
-        // when we have style options we draw the route in cplotmarker colors
-        // and no opacity since its just a stylised map used for dashboards or
-        // small thumbnails.
-        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
+    // when we have style options we draw the route in cplotmarker colors
+    // and no opacity since its just a stylised map used for dashboards or
+    // small thumbnails.
+    currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
-            // route will be drawn with these options
-            "    var routeOptionsYellow = {\n"
-            "        strokeColor: '%1',\n"
-            "        strokeOpacity: %2,\n"
-            "        strokeWeight: 10,\n"
-            "        zIndex: -2\n"
-            "    };\n"
-
-            // create the route Polyline
-            "    var routeYellow = new google.maps.Polyline(routeOptionsYellow);\n"
-            "    routeYellow.setMap(map);\n"
-
-            // lastly, populate the route path
-            "    var path = routeYellow.getPath();\n"
-            "    var j=0;\n"
-            "    while (j < latlons.length) { \n"
-            "        path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
-            "        j += 2;\n"
-            "    }\n"
-
-            // Listen mouse events
-            "    google.maps.event.addListener(routeYellow, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
-
-            "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-                  .arg(styleoptions == "" ? 0.4f : 1.0f);
-    } else if (mapCombo->currentIndex() == OSM){
-        // when we have style options we draw the route in cplotmarker colors
-        // and no opacity since its just a stylised map used for dashboards or
-        // small thumbnails.
-        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
-
-            // route will be drawn with these options
-            "    var routeOptionsYellow = {\n"
-            "        stroke : true,\n"
-            "        color: '%1',\n"
-            "        opacity: %2,\n"
-            "        weight: 10,\n"
-            "        zIndex: -2\n"
-            "    };\n"
+        // route will be drawn with these options
+        "    var routeOptionsYellow = {\n"
+        "        stroke : true,\n"
+        "        color: '%1',\n"
+        "        opacity: %2,\n"
+        "        weight: 10,\n"
+        "        zIndex: -2\n"
+        "    };\n"
 
 
-           // lastly, populate the route path
-           "    var path = [];\n"
-           "    var j=0;\n"
-           "    while (j < latlons.length) { \n"
-           "        path.push(new L.LatLng(latlons[j], latlons[j+1]));\n"
-           "        j += 2;\n"
-           "    };\n"
+       // lastly, populate the route path
+       "    var path = [];\n"
+       "    var j=0;\n"
+       "    while (j < latlons.length) { \n"
+       "        path.push(new L.LatLng(latlons[j], latlons[j+1]));\n"
+       "        j += 2;\n"
+       "    };\n"
 
 
 
-            // create the route Polyline
-           "    var routeYellow = new L.Polyline(path, routeOptionsYellow).addTo(map);\n"
-           // zoom the map to the polylinev
-           //"    map.fitBounds(routeYellow.getBounds());\n"
+        // create the route Polyline
+       "    var routeYellow = new L.Polyline(path, routeOptionsYellow).addTo(map);\n"
+       // zoom the map to the polylinev
+       //"    map.fitBounds(routeYellow.getBounds());\n"
 
-            // Listen mouse events
-            "routeYellow.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
-            "routeYellow.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
-            "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
-            "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+        // Listen mouse events
+        "routeYellow.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
+        "routeYellow.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
+        "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+        "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
 
-            "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-                  .arg(styleoptions == "" ? 0.4f : 1.0f);
-    }
+        "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
+              .arg(styleoptions == "" ? 0.4f : 1.0f);
 
     currentPage += QString("function drawIntervals() { \n"
     // how many to draw?
@@ -557,13 +519,10 @@ void RideMapWindow::createHtml()
     "    while (j) {\n"
     "       var highlighted = intervalList.pop();\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
-        currentPage += QString(""
-        "       highlighted.setMap(null);\n");
-    } else if (mapCombo->currentIndex() == OSM) {
-        currentPage += QString(""
-        "       map.removeLayer(highlighted);\n");
-    }
+
+    currentPage += QString(""
+    "       map.removeLayer(highlighted);\n");
+
 
     currentPage += QString(""
     "       j--;\n"
@@ -579,202 +538,94 @@ void RideMapWindow::createHtml()
     "   }\n"
     "}\n");
 
-    if (mapCombo->currentIndex() == GOOGLE) {
-        currentPage += QString("function drawInterval(latlons) { \n"
-            // intervals will be drawn with these options
-            "   var polyOptions = {\n"
-            "       strokeColor: '#0000FF',\n"
-            "       strokeOpacity: 0.6,\n"
-            "       strokeWeight: 10,\n"
-            "       zIndex: -1\n"  // put at the bottom
-            "   }\n"
-            "   var intervalHighlighter = new google.maps.Polyline(polyOptions);\n"
-            "   intervalHighlighter.setMap(map);\n"
-            "   intervalList.push(intervalHighlighter);\n"
-            "   var path = intervalHighlighter.getPath();\n"
-            "   var j=0;\n"
-            "   while (j<latlons.length) {\n"
-            "       path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
-            "       j += 2;\n"
-            "   }\n"
-            "}\n"
-
-            // initialise function called when map loaded
-            "function initialize() {\n");
-
-        if (styleoptions == "") {
-
-            // TERRAIN style map please and make it draggable
-            // note that because QT webkit offers touch/gesture
-            // support the Google API only supports dragging
-            // via gestures - this is alrady registered as a bug
-            // with the google map team
-            currentPage += QString(""
-            "    var controlOptions = {\n"
-            "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
-            "    };\n");
-
-        } else {
-
-            // USER DEFINED STYLE OPTIONS
-            currentPage += QString(""
-            "var styledMapType = new google.maps.StyledMapType( %1 "
-            " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
-        }
-
-        currentPage += QString(
-            "    var myOptions = {\n"
-            "      draggable: true,\n"
-            "      mapTypeControlOptions: { mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain', 'styled_map'] },\n"
-            "      mapTypeId: %1,\n"
-            "      disableDefaultUI: %2,\n"
-            "      tilt: 45,\n"
-            "      streetViewControl: false,\n"
-            "    };\n").arg(styleoptions != "" ? "'styled_map'" : "google.maps.MapTypeId.TERRAIN")
-                       .arg(styleoptions != "" ? "true" : "false");
 
 
-
-        currentPage += QString(""
-           // setup the map, and fit to contain the limits of the route
-           "    map = new google.maps.Map(document.getElementById('map-canvas'), myOptions);\n"
-           "    var sw = new google.maps.LatLng(%1,%2);\n"  // .ARG 1, 2
-           "    var ne = new google.maps.LatLng(%3,%4);\n"  // .ARG 3, 4
-           "    var bounds = new google.maps.LatLngBounds(sw,ne);\n"
-           "    map.fitBounds(bounds);\n").arg(minLat,0,'g',GPS_COORD_TO_STRING).
-                arg(minLon,0,'g',GPS_COORD_TO_STRING).
-                arg(maxLat,0,'g',GPS_COORD_TO_STRING).
-                arg(maxLon,0,'g',GPS_COORD_TO_STRING);
+    currentPage += QString("function drawInterval(latlons) { \n"
+        // intervals will be drawn with these options
+        "   var polyOptions = {\n"
+        "       stroke : true,\n"
+        "       color: '#0000FF',\n"
+        "       opacity: 0.6,\n"
+        "       weight: 10,\n"
+        "       zIndex: -1\n"  // put at the bottom
+        "   }\n"
 
 
-        if (styleoptions != "") {
-            currentPage += QString(""
-            "   map.mapTypes.set('styled_map', styledMapType);\n"
-            "   map.setMapTypeId('styled_map');\n");
-        }
+        "   var path = [];\n"
+        "   var j=0;\n"
+        "   while (j<latlons.length) {\n"
+        "       path.push([latlons[j], latlons[j+1]]);\n"
+        "       j += 2;\n"
+        "   }\n"
 
-        currentPage += QString(""
-            // add the bike layer, useful in some areas, but coverage
-            // is limited, US gets best coverage at this point (Summer 2011)
-            "    var bikeLayer = new google.maps.BicyclingLayer();\n"
-            "    bikeLayer.setMap(map);\n");
+        "   var intervalHighlighter = L.polyline(path, polyOptions).addTo(map);\n"
+        "   intervalList.push(intervalHighlighter);\n"
 
+        "}\n"
 
-        currentPage += QString(""
-            // initialise local variables
-            "    markerList = new Array();\n"
-            "    intervalList = new Array();\n"
-            "    polyList = new Array();\n"
-
-            // draw the main route data, getting the geo
-            // data from the webbridge - reduces data sent/received
-            // to the map server and makes the UI pretty snappy
-            "    drawRoute();\n"
-            "    drawIntervals();\n"
-            // catch signals to redraw intervals
-            "    webBridge.drawIntervals.connect(drawIntervals);\n"
-
-            // we're done now let the C++ side draw its overlays
-            "    webBridge.drawOverlays();\n"
-
-            // Liste mouse events
-            "    google.maps.event.addListener(map, 'mouseup', function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
+        // initialise function called when map loaded
+        "function initialize() {\n");
 
 
-            "}\n"
-            "</script>\n");
+    currentPage += QString(""
+        // TERRAIN style map please and make it draggable
+        // note that because QT webkit offers touch/gesture
+        // support the Google API only supports dragging
+        // via gestures - this is alrady registered as a bug
+        // with the google map team
+        "    var controlOptions = {\n"
+        //"      style: google.maps.MapTypeControlStyle.DEFAULT\n"
+        "    };\n"
+        "    var myOptions = {\n"
+        "      draggable: true,\n"
+        "      mapTypeId: \"OSM\",\n"
+        "      mapTypeControl: false,\n"
+        "      streetViewControl: false,\n"
+        "      tilt: 45,\n"
+        "    };\n");
 
 
-    } else if (mapCombo->currentIndex() == OSM) {
+    currentPage += QString(""
+       // setup the map, and fit to contain the limits of the route
+       "    map = new L.map('map-canvas');\n"
+       "    map.fitBounds([[%1, %2], [%3, %4]]);\n").
+         arg(minLat,0,'g',GPS_COORD_TO_STRING).
+         arg(minLon,0,'g',GPS_COORD_TO_STRING).
+         arg(maxLat,0,'g',GPS_COORD_TO_STRING).
+         arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
-        currentPage += QString("function drawInterval(latlons) { \n"
-            // intervals will be drawn with these options
-            "   var polyOptions = {\n"
-            "       stroke : true,\n"
-            "       color: '#0000FF',\n"
-            "       opacity: 0.6,\n"
-            "       weight: 10,\n"
-            "       zIndex: -1\n"  // put at the bottom
-            "   }\n"
-
-
-            "   var path = [];\n"
-            "   var j=0;\n"
-            "   while (j<latlons.length) {\n"
-            "       path.push([latlons[j], latlons[j+1]]);\n"
-            "       j += 2;\n"
-            "   }\n"
-
-            "   var intervalHighlighter = L.polyline(path, polyOptions).addTo(map);\n"
-            "   intervalList.push(intervalHighlighter);\n"
-
-            "}\n"
-
-            // initialise function called when map loaded
-            "function initialize() {\n");
-
-
-        currentPage += QString(""
-            // TERRAIN style map please and make it draggable
-            // note that because QT webkit offers touch/gesture
-            // support the Google API only supports dragging
-            // via gestures - this is alrady registered as a bug
-            // with the google map team
-            "    var controlOptions = {\n"
-            //"      style: google.maps.MapTypeControlStyle.DEFAULT\n"
-            "    };\n"
-            "    var myOptions = {\n"
-            "      draggable: true,\n"
-            "      mapTypeId: \"OSM\",\n"
-            "      mapTypeControl: false,\n"
-            "      streetViewControl: false,\n"
-            "      tilt: 45,\n"
-            "    };\n");
-
-
-        currentPage += QString(""
-           // setup the map, and fit to contain the limits of the route
-           "    map = new L.map('map-canvas');\n"
-           "    map.fitBounds([[%1, %2], [%3, %4]]);\n").
-             arg(minLat,0,'g',GPS_COORD_TO_STRING).
-             arg(minLon,0,'g',GPS_COORD_TO_STRING).
-             arg(maxLat,0,'g',GPS_COORD_TO_STRING).
-             arg(maxLon,0,'g',GPS_COORD_TO_STRING);
-
-        currentPage += QString(""
-            "    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {"
-            "                 attribution: '&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors',"
-            "                 maxZoom: 18"
-            "              }).addTo(map);\n");
+    currentPage += QString(""
+        "    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {"
+        "                 attribution: '&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors',"
+        "                 maxZoom: 18"
+        "              }).addTo(map);\n");
 
 
 
-        currentPage += QString(""
-            // initialise local variables
-            "    markerList = new Array();\n"
-            "    intervalList = new Array();\n"
-            "    polyList = new Array();\n"
+    currentPage += QString(""
+        // initialise local variables
+        "    markerList = new Array();\n"
+        "    intervalList = new Array();\n"
+        "    polyList = new Array();\n"
 
-            // draw the main route data, getting the geo
-            // data from the webbridge - reduces data sent/received
-            // to the map server and makes the UI pretty snappy
-            "    drawRoute();\n"
-            "    drawIntervals();\n"
-            // catch signals to redraw intervals
-            "    webBridge.drawIntervals.connect(drawIntervals);\n"
+        // draw the main route data, getting the geo
+        // data from the webbridge - reduces data sent/received
+        // to the map server and makes the UI pretty snappy
+        "    drawRoute();\n"
+        "    drawIntervals();\n"
+        // catch signals to redraw intervals
+        "    webBridge.drawIntervals.connect(drawIntervals);\n"
 
-            // we're done now let the C++ side draw its overlays
-            "    webBridge.drawOverlays();\n"
+        // we're done now let the C++ side draw its overlays
+        "    webBridge.drawOverlays();\n"
 
-            // Liste mouse events
-            "    map.on('mouseup', function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n"
-
-
-            "}\n"
-            "</script>\n");
+        // Liste mouse events
+        "    map.on('mouseup', function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n"
 
 
-    }
+        "}\n"
+        "</script>\n");
+
 
     // the main page is rather trivial
     currentPage += QString("</body>\n"
@@ -802,39 +653,24 @@ RideMapWindow::drawShadedRoute()
     QString code;
 
     foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
-        if (mapCombo->currentIndex() == GOOGLE) {
-            if (count == 0) {
-                code = QString("{\nvar polyline = new google.maps.Polyline();\n"
-                       "   polyline.setMap(map);\n"
-                       "   path = polyline.getPath();\n");
+        // Still TODO see https://gis.stackexchange.com/questions/90193/color-code-a-leaflet-polyline-based-on-additional-values-e-g-altitude-speed
+        /*if (count == 0) {
+            code = QString("{\n"
+                   "   var polyline = new L.Polyline([]);\n"
+                   "   polyline.addTo(map);\n"
+                   "   path = polyline.getLatLngs();\n");
 
-                // Listen mouse events
-                code += QString("google.maps.event.addListener(polyline, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-                                "google.maps.event.addListener(polyline, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-                                "google.maps.event.addListener(polyline, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n");
-            } else {
-                if (rfp->lat || rfp->lon)
-                    code += QString("path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-            }
-        } else if (mapCombo->currentIndex() == OSM) {
-            /*if (count == 0) {
-                code = QString("{\n"
-                       "   var polyline = new L.Polyline([]);\n"
-                       "   polyline.addTo(map);\n"
-                       "   path = polyline.getLatLngs();\n");
+            // Listen mouse events
+            code += QString("polyline.on('mousedown', function(event) { alert('mousedown');webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
+                            "polyline.on('mouseup',   function(event) { alert('mouseup');L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n"
+                            "polyline.on('click',   function(event) { alert('click');L.DomEvent.stopPropagation(event); });\n"
+                            //"polyline.on('mouseover', function(event) { alert('mouseover');webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
+                            );
 
-                // Listen mouse events
-                code += QString("polyline.on('mousedown', function(event) { alert('mousedown');webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-                                "polyline.on('mouseup',   function(event) { alert('mouseup');L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n"
-                                "polyline.on('click',   function(event) { alert('click');L.DomEvent.stopPropagation(event); });\n"
-                                //"polyline.on('mouseover', function(event) { alert('mouseover');webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
-                                );
-
-            } else {
-                if (rfp->lat || rfp->lon)
-                    code += QString("path.push(new L.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-            }*/
-        }
+        } else {
+            if (rfp->lat || rfp->lon)
+                code += QString("path.push(new L.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+        }*/
 
         // running total of time
         rtime += rfp->secs - prevtime;
@@ -851,32 +687,20 @@ RideMapWindow::drawShadedRoute()
             // add tooltip junk
             count = rwatts = rtime = 0;
 
-            if (mapCombo->currentIndex() == GOOGLE) {
-                // color the polyline
-                code += QString("var polyOptions = {\n"
-                                "    strokeColor: '%1',\n"
-                                "    strokeWeight: 3,\n"
-                                "    strokeOpacity: %2,\n" // for out and backs, we need both
-                                "    zIndex: 0,\n"
-                                "}\n"
-                                "polyline.setOptions(polyOptions);\n"
-                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                                      .arg(styleoptions == "" ? 0.5f : 1.0f);
 
-            } else if (mapCombo->currentIndex() == OSM) {
-                // color the polyline
-                code += QString("var polyOptions = {\n"
-                                "    stroke : true,\n"
-                                "    color: '%1',\n"
-                                "    weight: 3,\n"
-                                "    opacity: %2,\n" // for out and backs, we need both
-                                "    zIndex: 0,\n"
-                                "}\n"
-                                "polyline.setStyle(polyOptions);\n"
-                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                                      .arg(styleoptions == "" ? 0.5f : 1.0f);
+            // color the polyline
+            code += QString("var polyOptions = {\n"
+                            "    stroke : true,\n"
+                            "    color: '%1',\n"
+                            "    weight: 3,\n"
+                            "    opacity: %2,\n" // for out and backs, we need both
+                            "    zIndex: 0,\n"
+                            "}\n"
+                            "polyline.setStyle(polyOptions);\n"
+                            "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
+                                  .arg(styleoptions == "" ? 0.5f : 1.0f);
 
-            }
+
 
         #ifdef NOWEBKIT
             view->page()->runJavaScript(code);
@@ -893,16 +717,12 @@ void
 RideMapWindow::clearTempInterval() {
     QString code;
 
-    if (mapCombo->currentIndex() == GOOGLE) {
-        code = QString( "{ \n"
-                            "    tmpIntervalHighlighter.getPath().clear();\n"
-                            "}\n" );
-    } if (mapCombo->currentIndex() == OSM) {
-        code = QString( "{ \n"
-                            "    if (tmpIntervalHighlighter)\n"
-                            "       tmpIntervalHighlighter.setLatLngs([]);\n"
-                            "}\n" );
-    }
+
+    code = QString( "{ \n"
+                        "    if (tmpIntervalHighlighter)\n"
+                        "       tmpIntervalHighlighter.setLatLngs([]);\n"
+                        "}\n" );
+
 
 #ifdef NOWEBKIT
     view->page()->runJavaScript(code);
@@ -915,55 +735,32 @@ void
 RideMapWindow::drawTempInterval(IntervalItem *current) {
     QString code;
 
-    if (mapCombo->currentIndex() == GOOGLE) {
-        code = QString( "{ \n"
-                    // interval will be drawn with these options
-                    "    var polyOptions = {\n"
-                    "        strokeColor: '#00FFFF',\n"
-                    "        strokeOpacity: 0.6,\n"
-                    "        strokeWeight: 10,\n"
-                    "        zIndex: -1\n"  // put at the bottom
-                    "    }\n"
 
-                    "    if (!tmpIntervalHighlighter) {\n"
-                    "       tmpIntervalHighlighter = new google.maps.Polyline(polyOptions);\n"
-                    "       tmpIntervalHighlighter.setMap(map);\n"
-                    "       google.maps.event.addListener(tmpIntervalHighlighter, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-                    "    } \n"
+    code = QString( "{ \n"
+                // interval will be drawn with these options
+                "    var polyOptions = {\n"
+                "        stroke: true,\n"
+                "        color: '#00FFFF',\n"
+                "        opacity: 0.6,\n"
+                "        weight: 10,\n"
+                "        zIndex: -1\n"  // put at the bottom
+                "    }\n"
 
-                    "    var path = tmpIntervalHighlighter.getPath();\n"
-                    "    path.clear();\n");
-    }
-    if (mapCombo->currentIndex() == OSM) {
-        code = QString( "{ \n"
-                    // interval will be drawn with these options
-                    "    var polyOptions = {\n"
-                    "        stroke: true,\n"
-                    "        color: '#00FFFF',\n"
-                    "        opacity: 0.6,\n"
-                    "        weight: 10,\n"
-                    "        zIndex: -1\n"  // put at the bottom
-                    "    }\n"
+                "    if (!tmpIntervalHighlighter) {\n"
+                "       tmpIntervalHighlighter = new L.Polyline([], polyOptions);\n"
+                "       tmpIntervalHighlighter.addTo(map);\n"
+                "       tmpIntervalHighlighter.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n" // map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false});
+                "    } \n"
 
-                    "    if (!tmpIntervalHighlighter) {\n"
-                    "       tmpIntervalHighlighter = new L.Polyline([], polyOptions);\n"
-                    "       tmpIntervalHighlighter.addTo(map);\n"
-                    "       tmpIntervalHighlighter.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n" // map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false});
-                    "    } \n"
+                "    tmpIntervalHighlighter.setLatLngs([]);\n"
+                "    \n");
 
-                    "    tmpIntervalHighlighter.setLatLngs([]);\n"
-                    "    \n");
-    }
     foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
         if (rfp->secs+myRideItem->ride()->recIntSecs() > current->start
             && rfp->secs< current->stop) {
 
             if (rfp->lat || rfp->lon) {
-                if (mapCombo->currentIndex() == GOOGLE) {
-                    code += QString("    path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-                } else if (mapCombo->currentIndex() == GOOGLE) {
-                    code += QString("    path.push(new L.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-                }
+                code += QString("    path.push(new L.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
             }
         }
     }
@@ -1023,52 +820,35 @@ RideMapWindow::createMarkers()
                                 points[points.count()-1]->lon) < 100 ? true : false;
 
     if (loop) {
-        if (mapCombo->currentIndex() == GOOGLE) {
-            code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
-                       "var image = new google.maps.MarkerImage('qrc:images/maps/loop.png');"
-                       "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                       "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
-        } else if (mapCombo->currentIndex() == OSM) {
-            code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                       "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png'});"
-                       "var marker = new L.marker(latlng, { icon: image });"
-                       "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
-        }
+        code = QString("{ var latlng = new L.LatLng(%1,%2);"
+                   "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png'});"
+                   "var marker = new L.marker(latlng, { icon: image });"
+                   "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
+
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
     #else
         view->page()->mainFrame()->evaluateJavaScript(code);
     #endif
     } else {
-        // start / finish markers
-        if (mapCombo->currentIndex() == GOOGLE) {
-            code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
-                       "var image = new google.maps.MarkerImage('qrc:images/maps/cycling.png');"
-                       "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                       "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
-        } else if (mapCombo->currentIndex() == OSM) {
-            code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                       "var image = new L.icon({iconUrl:'qrc:images/maps/cycling.png'});"
-                       "var marker = new L.marker(latlng, { icon: image });"
-                       "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
-        }
+        // start marker
+        code = QString("{ var latlng = new L.LatLng(%1,%2);"
+                   "var image = new L.icon({iconUrl:'qrc:images/maps/cycling.png'});"
+                   "var marker = new L.marker(latlng, { icon: image });"
+                   "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
+
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
     #else
         view->page()->mainFrame()->evaluateJavaScript(code);
     #endif
 
-        if (mapCombo->currentIndex() == GOOGLE) {
-            code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
-                       "var image = new google.maps.MarkerImage('qrc:images/maps/finish.png');"
-                       "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                       "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
-        } else if (mapCombo->currentIndex() == OSM) {
-            code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                       "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png'});"
-                       "var marker = new L.marker(latlng, { icon: image });"
-                       "marker.addTo(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
-        }
+        // finish marker
+        code = QString("{ var latlng = new L.LatLng(%1,%2);"
+                   "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png'});"
+                   "var marker = new L.marker(latlng, { icon: image });"
+                   "marker.addTo(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
+
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
     #else
@@ -1114,19 +894,11 @@ RideMapWindow::createMarkers()
                 lastlat = stoplat;
                 lastlon = stoplon;
 
-                if (mapCombo->currentIndex() == GOOGLE) {
-                    code = QString(
-                        "{ var latlng = new google.maps.LatLng(%1,%2);"
-                        "var image = new google.maps.MarkerImage('qrc:images/maps/cycling_feed.png');"
-                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                        "marker.setMap(map);"
-                    "}").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-                } else if (mapCombo->currentIndex() == OSM) {
-                    code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                               "var image = new L.icon({iconUrl:'qrc:images/maps/cycling_feed.png'});"
-                               "var marker = new L.marker(latlng, { icon: image });"
-                               "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
-                }
+                code = QString("{ var latlng = new L.LatLng(%1,%2);"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/cycling_feed.png'});"
+                           "var marker = new L.marker(latlng, { icon: image });"
+                           "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+
 
             #ifdef NOWEBKIT
                 view->page()->runJavaScript(code);
@@ -1149,23 +921,24 @@ RideMapWindow::createMarkers()
 
         int offset = myRideItem->ride()->intervalBeginSecs(x->start);
 
-        if (mapCombo->currentIndex() == GOOGLE) {
-            code = QString(
-                "{"
-                "   var latlng = new google.maps.LatLng(%1,%2);"
-                "   var marker = new google.maps.Marker({ title: '%3', animation: google.maps.Animation.DROP, position: latlng });"
-                "   marker.setMap(map);"
-                "   markerList.push(marker);" // keep track of those suckers
-                "   google.maps.event.addListener(marker, 'click', function(event) { webBridge.toggleInterval(%4); });"
-                "   google.maps.event.addListener(marker, 'mouseover', function(event) { webBridge.hoverInterval(%4); });"
-                "   google.maps.event.addListener(marker, 'mouseout', function(event) { webBridge.clearHover(); });"
-                "}")
-                                        .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
-                                        .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
-                                        .arg(x->name)
-                                        .arg(interval)
-                                        ;
-        }
+        // TODO Interval Markers
+        /*
+        code = QString(
+            "{"
+            "   var latlng = new google.maps.LatLng(%1,%2);"
+            "   var marker = new google.maps.Marker({ title: '%3', animation: google.maps.Animation.DROP, position: latlng });"
+            "   marker.setMap(map);"
+            "   markerList.push(marker);" // keep track of those suckers
+            "   google.maps.event.addListener(marker, 'click', function(event) { webBridge.toggleInterval(%4); });"
+            "   google.maps.event.addListener(marker, 'mouseover', function(event) { webBridge.hoverInterval(%4); });"
+            "   google.maps.event.addListener(marker, 'mouseout', function(event) { webBridge.clearHover(); });"
+            "}")
+                                    .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
+                                    .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
+                                    .arg(x->name)
+                                    .arg(interval)
+                                    ;
+        */
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
     #else
@@ -1211,16 +984,17 @@ void RideMapWindow::zoomInterval(IntervalItem *which)
     // now zoom to interval
     QString code;
 
-    if (mapCombo->currentIndex() == GOOGLE) {
-        code= QString("{ var southwest = new google.maps.LatLng(%1, %2);\n"
-                               "var northeast = new google.maps.LatLng(%3, %4);\n"
-                               "var bounds = new google.maps.LatLngBounds(southwest, northeast);\n"
-                               "map.fitBounds(bounds);\n }")
-                        .arg(minLat,0,'g',GPS_COORD_TO_STRING)
-                        .arg(minLon,0,'g',GPS_COORD_TO_STRING)
-                        .arg(maxLat,0,'g',GPS_COORD_TO_STRING)
-                        .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
-    }
+    // TODO Zoom on interval
+    /*
+    code= QString("{ var southwest = new google.maps.LatLng(%1, %2);\n"
+                           "var northeast = new google.maps.LatLng(%3, %4);\n"
+                           "var bounds = new google.maps.LatLngBounds(southwest, northeast);\n"
+                           "map.fitBounds(bounds);\n }")
+                    .arg(minLat,0,'g',GPS_COORD_TO_STRING)
+                    .arg(minLon,0,'g',GPS_COORD_TO_STRING)
+                    .arg(maxLat,0,'g',GPS_COORD_TO_STRING)
+                    .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
+    */
 #ifdef NOWEBKIT
     view->page()->runJavaScript(code);
 #else
