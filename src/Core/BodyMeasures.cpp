@@ -32,12 +32,12 @@ BodyMeasure::getFingerprint() const
 {
     quint64 x = 0;
 
-    x += weightkg;
-    x += fatkg;
-    x += musclekg;
-    x += boneskg;
-    x += leankg;
-    x += fatpercent;
+    x += 1000.0 * weightkg;
+    x += 1000.0 * fatkg;
+    x += 1000.0 * musclekg;
+    x += 1000.0 * boneskg;
+    x += 1000.0 * leankg;
+    x += 1000.0 * fatpercent;
 
     QByteArray ba = QByteArray::number(x);
 
