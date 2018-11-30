@@ -296,6 +296,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     mcl->addRow(new QLabel(tr("Data to fit")), fitdataCombo);
 
     mcl->addRow(new QLabel(tr(" ")));
+
+    modelDecayLabel = new QLabel(tr("CP and W' Decay"));
+    modelDecayCheck = new QCheckBox(this);
+    mcl->addRow(modelDecayLabel, modelDecayCheck);
+    mcl->addRow(new QLabel(tr(" ")));
+
     intervalLabel = new QLabel(tr("Search Interval"));
     secondsLabel = new QLabel(tr("(seconds)"));
     mcl->addRow(intervalLabel, secondsLabel);
@@ -527,6 +533,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(sanI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(modelDecayCheck, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
     connect(velo1, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
     connect(velo2, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
     connect(velo3, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
@@ -764,6 +771,8 @@ CriticalPowerWindow::modelChanged()
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // No default values !
             break;
@@ -774,6 +783,8 @@ CriticalPowerWindow::modelChanged()
             velo1->show();
             velo2->show();
             velo3->show();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // intentional fallthrough
             // and drop through into case 1 below ...
@@ -795,6 +806,8 @@ CriticalPowerWindow::modelChanged()
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // Default values: class 2-3mins 10-20 model
             anI1SpinBox->setValue(120);
@@ -821,6 +834,8 @@ CriticalPowerWindow::modelChanged()
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
+            modelDecayLabel->show();
+            modelDecayCheck->show();
 
             // Default values
             anI1SpinBox->setValue(180);
@@ -846,6 +861,8 @@ CriticalPowerWindow::modelChanged()
             laeLabel->show();
             laeI1SpinBox->show();
             laeI2SpinBox->show();         
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // Default values
             sanI1SpinBox->setValue(20);
@@ -909,7 +926,8 @@ CriticalPowerWindow::modelParametersChanged()
                         modelCombo->currentIndex(),
                         variant(),
                         fitCombo->currentIndex(),
-                        fitdataCombo->currentIndex());
+                        fitdataCombo->currentIndex(),
+                        modelDecay());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {

@@ -251,6 +251,8 @@ class CP3Model : public PDModel
     public:
         CP3Model(Context *context);
 
+        bool modelDecay;    // should we apply CP + W' decay constants?
+
         // synthetic data for a curve
         virtual double y(double t) const;
 

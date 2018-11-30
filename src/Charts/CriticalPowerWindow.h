@@ -62,6 +62,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int fit READ fit WRITE setFit USER true)
     Q_PROPERTY(int fitdata READ fitdata WRITE setFitdata USER true)
     Q_PROPERTY(int variant READ variant WRITE setVariant USER true)
+    Q_PROPERTY(bool modelDecay READ modelDecay WRITE setModelDecay USER true)
     Q_PROPERTY(int ani1 READ anI1 WRITE setAnI1 USER true)
     Q_PROPERTY(int ani2 READ anI2 WRITE setAnI2 USER true)
     Q_PROPERTY(int aei1 READ aeI1 WRITE setAeI1 USER true)
@@ -107,6 +108,9 @@ class CriticalPowerWindow : public GcChartWindow
 
         int cpModel() const { return modelCombo->currentIndex(); }
         void setCPModel(int x) { modelCombo->setCurrentIndex(x); }
+
+        bool modelDecay() const { return modelDecayCheck->isChecked(); }
+        void setModelDecay(bool x) { modelDecayCheck->setChecked(x); }
 
         int fit() const { return fitCombo->currentIndex(); }
         void setFit(int x) { fitCombo->setCurrentIndex(x); }
@@ -299,6 +303,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpintTodayValue;
         QLabel *cpintAllValue;
         QLabel *cpintCPValue;
+        QLabel *modelDecayLabel;
         QComboBox *seriesCombo;
         QComboBox *modelCombo;
         QComboBox *fitCombo;
@@ -320,6 +325,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showGridCheck;
         QCheckBox *rPercent, *rHeat, *rDelta, *rDeltaPercent;
         QCheckBox *showCSLinearCheck;
+        QCheckBox *modelDecayCheck;
         QLabel *showCSLinearLabel;
         QwtPlotPicker *picker;
         QwtPlotGrid *grid;

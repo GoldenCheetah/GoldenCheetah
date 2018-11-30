@@ -544,6 +544,7 @@ CP3Model::CP3Model(Context *context) :
     aeI2=1200;
 
     model = 1;
+    modelDecay = false;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
     connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
@@ -559,8 +560,20 @@ CP3Model::y(double t) const
     // adjust to seconds
     if (minutes) t *= 60.00f;
 
+    // decay value (75% at 10 hrs)
+    double cpdecay=1.0;
+    double wdecay=1.0;
+
+    // just use a constant for now - it modifies CP/W' so should adjust to
+    // athlete without needing to be fitted (?)
+    if (modelDecay) {
+        cpdecay = 2.0-(1.0/exp(-0.000009*t));
+        wdecay = 2.0-(1.0/exp(-0.000025*t));
+    }
+    // typical values: CP=285.355547 tau=0.500000 t0=0.381158
+
     // classic model - W' / t + CP
-    return cp * (double(1.00f)+tau /(((double(t)/double(60))+t0)));
+    return (cp*cpdecay) * (double(1.00f)+(tau*wdecay) /(((double(t)/double(60))+t0)));
 }
 
 // 2 parameter model can calculate these
