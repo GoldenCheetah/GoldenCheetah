@@ -81,7 +81,9 @@ class MapWebBridge : public QObject
         RideMapWindow *mw;
 
         RideFilePoint* point;
-        int selection;
+        bool m_startDrag = false;
+        bool m_drag = false;
+        int selection = 1;
 
         QList<RideFilePoint*> searchPoint(double lat, double lng);
 
@@ -184,7 +186,7 @@ class RideMapWindow : public GcChartWindow
         void clearTempInterval();
 
     private:
-    
+
         bool first;
         QString styleoptions;
 
