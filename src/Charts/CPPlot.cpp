@@ -1067,6 +1067,7 @@ CPPlot::plotTests(RideItem *rideitem)
         // honoring chart settings and filters, lets set the list of
         // rides we will search for performance tests...
         FilterSet fs;
+        fs.addFilter(parent->searchBox->isFiltered(), SearchFilterBox::matches(context, parent->searchBox->filter())); // chart settings
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         Specification spec;
