@@ -1033,16 +1033,20 @@ RideMapWindow::createMarkers()
     #endif
     } else {
         // start / finish markers
+        QString marker = "qrc:images/maps/cycling.png";
+        if (myRideItem->isRun)
+            marker = "qrc:images/maps/running.png";
+
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/cycling.png'});"
+                           "var image = new L.icon({iconUrl:'%3'});"
                            "var marker = new L.marker(latlng, { icon: image });"
-                           "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
+                           "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         } else if (mapCombo->currentIndex() == GOOGLE) {
             code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
-                       "var image = new google.maps.MarkerImage('qrc:images/maps/cycling.png');"
+                       "var image = new google.maps.MarkerImage('%3');"
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                       "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
+                       "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         }
     #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
@@ -1099,6 +1103,10 @@ RideMapWindow::createMarkers()
             stoplon = rfp->lon;
         }
 
+        QString marker = "qrc:images/maps/cycling_feed.png";
+        if (myRideItem->isRun)
+            marker = "qrc:images/maps/running_feed.png";
+
         if (stoptime > BEERANDBURRITO) { // 3 minutes is more than a traffic light stop dude.
 
             if ((!lastlat && !lastlon) || distanceBetween(lastlat, lastlon, stoplat, stoplon)>100) {
@@ -1107,16 +1115,16 @@ RideMapWindow::createMarkers()
 
                 if (mapCombo->currentIndex() == OSM) {
                     code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                                   "var image = new L.icon({iconUrl:'qrc:images/maps/cycling_feed.png'});"
+                                   "var image = new L.icon({iconUrl:'%3'});"
                                    "var marker = new L.marker(latlng, { icon: image });"
-                                   "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+                                   "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 } else if (mapCombo->currentIndex() == GOOGLE) {
                     code = QString(
                         "{ var latlng = new google.maps.LatLng(%1,%2);"
-                        "var image = new google.maps.MarkerImage('qrc:images/maps/cycling_feed.png');"
+                        "var image = new google.maps.MarkerImage('%3');"
                         "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                         "marker.setMap(map);"
-                    "}").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
+                    "}").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 }
             #ifdef NOWEBKIT
                 view->page()->runJavaScript(code);
