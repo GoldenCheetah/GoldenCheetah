@@ -1076,7 +1076,8 @@ CPPlot::plotTests(RideItem *rideitem)
 
         foreach(RideItem *r, context->athlete->rideCache->rides()) {
             // does it match ?
-            if (spec.pass(r)) rides << r;
+            if ((r->isSwim == isSwim) && (r->isRun == isRun) && spec.pass(r))
+                rides << r;
         }
 
         foreach (RideItem *item, rides) {
