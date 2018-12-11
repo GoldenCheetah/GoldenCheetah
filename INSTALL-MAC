@@ -20,8 +20,6 @@ CONTENTS
 2. ADDING OPTIONAL DEPENDENCIES
    - FTDI D2XX
    - SRMIO
-   - kQOAuth
-   - QwtPlot3d
    - libkml
    - libusb
    - libical
@@ -238,8 +236,6 @@ $ open src/GoldenCheetah.app
 ===============================
 
    - SRMIO
-   - kQOAuth
-   - QwtPlot3d
    - libkml
    - libusb
    - libical
@@ -255,24 +251,7 @@ should be taken into account.
 SRMIO (git)
 ./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" CPPFLAGS=-I/usr/local/D2XX/ --disable-dependency-tracking
 
-2.2 kQOAuth - For OAuth Authentication
---------------------------------------
-
-kQOauth (0.98)
-
-qmake
-
-
-2.3 QwtPlot3d - For 3d plot support
------------------------------------
-
-qwtplot3d (maintain_0_2_x)
-
-Add the following to qwtplot3d.pro:
-CONFIG += x86_64 static
-QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.7.sdk
-
-2.4 libkml - For export to Google Earth
+2.2 libkml - For export to Google Earth
 ---------------------------------------
 
 expat (2.0.1)
@@ -284,7 +263,7 @@ libkml (pulled down from the svn repo)
 
 note: the added CXXFLAGS helped clear the -Werror flag that stopped compilation.
 
-2.5 libusb - For Garmin USB2 stick support
+2.3 libusb - For Garmin USB2 stick support
 ------------------------------------------
 
 libusb (0.1.12)
@@ -301,7 +280,7 @@ make install
 
 note: that the sed line updates some commands in libtool.  not sure why the arch clags are not getting passed.  
 
-2.6 libical
+2.4 libical
 -----------
 
 libical (0.46)
