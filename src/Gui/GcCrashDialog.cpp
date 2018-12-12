@@ -43,10 +43,6 @@
 #include "QtMacVideoWindow.h"
 #endif
 
-#ifdef GC_HAVE_QWTPLOT3D
-#include "qwt3d_global.h"
-#endif
-
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
 #endif
@@ -213,15 +209,6 @@ QString GcCrashDialog::versionHTML()
     d2xx = "yes";
     #endif
 
-    // -- QWTPLOT3D ----
-    QString qwtplot3d = "none";
-
-    #ifdef GC_HAVE_QWTPLOT3D
-    qwtplot3d = QString::number(QWT3D_MAJOR_VERSION) + "."
-            + QString::number(QWT3D_MINOR_VERSION) + "."
-            + QString::number(QWT3D_PATCH_VERSION);
-    #endif
-
     // -- KML ----
     QString kml = "none";
 
@@ -293,7 +280,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
             "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%7</td></tr>"
             "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
@@ -315,7 +301,6 @@ QString GcCrashDialog::versionHTML()
             .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(d2xx)
-            .arg(qwtplot3d)
             .arg(kml)
             .arg(ical)
             .arg(usbxpress)
