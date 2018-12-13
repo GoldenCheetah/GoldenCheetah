@@ -820,6 +820,7 @@ void PaceZones::write(QDir home)
     QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly)) {
         QTextStream stream(&file);
+        stream.setCodec("UTF-8");
         stream << strzones;
         file.close();
     } else {
