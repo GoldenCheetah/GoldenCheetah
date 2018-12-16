@@ -689,6 +689,62 @@ struct FitFileReaderState
         rideFile->setDeviceType(getManuProd(manu, prod));
     }
 
+
+    void decodePhysiologicalMetrics(const FitDefinition &def, int,
+                                    const std::vector<FitValue>& values) {
+        int i = 0;
+
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 7:   // METmax: 1 METmax = VO2max * 3.5, scale 65536
+                    rideFile->setTag("VO2max detected", QString::number(round(value / 65536.0 * 3.5 * 10.0) / 10.0));
+                    break;
+
+                case 4:   // Aerobic Training Effect, scale 10
+                    rideFile->setTag("Aerobic Training Effect", QString::number(value/10.0));
+                    break;
+
+                case 20:   // Anaerobic Training Effect, scale 10
+                    rideFile->setTag("Anaerobic Training Effect", QString::number(value/10.0));
+                    break;
+
+                case 9:   // Recovery Time, minutes
+                    rideFile->setTag("Recovery Time", QString::number(round(value/60.0)));
+                    break;
+
+                case 17:   // Performance Condition
+                    rideFile->setTag("Performance Condition", QString::number(value));
+                    break;
+
+                case 14:   // If watch detected Running Lactate Threshold Heart Rate, bpm
+                    if(rideFile->isRun() && value > 0){
+                        rideFile->setTag("LTHR detected", QString::number(value));
+                    }
+                    break;
+
+                case 15:   // If watch detected Running Lactate Threshold Speed, m/s
+                    if(rideFile->isRun() && value > 0){
+                        rideFile->setTag("LTS detected", QString::number(value/100.0));
+                    }
+                    break;
+
+
+                default: ; // do nothing
+            }
+
+
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
+                printf("decodePhysiologicalMetrics  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
+            }
+        }
+    }
+
     void decodeSession(const FitDefinition &def, int,
                        const std::vector<FitValue>& values) {
         int i = 0;
@@ -2794,6 +2850,9 @@ struct FitFileReaderState
                     decodeDeveloperFieldDescription(def, time_offset, values);
                     break;
 
+                case 140: /* undocumented Garmin/Firstbeat specific metrics */
+                    decodePhysiologicalMetrics(def, time_offset, values);
+                    break;
 
                 case 1: /* capabilities, device settings and timezone */ break;
                 case 2: decodeDeviceSettings(def, time_offset, values); break;
@@ -2843,7 +2902,6 @@ struct FitFileReaderState
                 case 125: /* unknown */
                 case 131: /* cadence zone */
 
-                case 140: /* unknown */
                 case 141: /* unknown */
                 case 145: /* memo glob */
                 case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
