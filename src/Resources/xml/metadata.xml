@@ -264,6 +264,55 @@
 			<fielddiary>0</fielddiary>
 		</field>
 		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"VO2max detected"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Aerobic Training Effect"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Anaerobic Training Effect"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Recovery Time"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Performance Condition"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"LTHR detected"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"LTS detected"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
 			<fieldtab>""</fieldtab>
 			<fieldname>"Calendar Text"</fieldname>
 			<fieldtype>1</fieldtype>
