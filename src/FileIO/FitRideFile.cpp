@@ -2724,6 +2724,11 @@ struct FitFileReaderState
                         RideFile::SeriesType series = getSeriesForNative(field.num);
                         nativeName = rideFile->symbolForSeries(series);
                     }
+                    if (field.deve_idx>-1) {
+                        QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
+                        FitDeveField deveField = local_deve_fields[key];
+                        nativeName = deveField.name.c_str();
+                    }
                     printf( " field: type=%d num=%d %s size=%d(%d) ",
                         field.type, field.num, nativeName.toStdString().c_str(), field.size, size);
                     if (value.type == SingleValue) {
@@ -2734,6 +2739,8 @@ struct FitFileReaderState
                     }
                     else if (value.type == StringValue)
                         printf( "value=%s\n", value.s.c_str() );
+                    else if (value.type == FloatValue)
+                        printf( "value=%f\n", value.f );
                     else if (value.type == ListValue) {
                         printf( "values=");
                         for (int i=0;i<value.list.count();i++) {
