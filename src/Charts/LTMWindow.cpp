@@ -215,6 +215,7 @@ LTMWindow::LTMWindow(Context *context) :
             << tr("All");
     rGroupBy->setStrings(strings);
     rGroupBy->setValue(0);
+    rGroupBy->setMinimumWidth(100);
 
     revealLayout->addWidget(rGroupBy);
     rData = new QCheckBox(tr("Data Table"), this);
