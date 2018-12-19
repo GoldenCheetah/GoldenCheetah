@@ -284,7 +284,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // Google MAP key
     //
     QVariant googleMapKey = appsettings->value(this, GC_GOOGLE_MAP_API_KEY, "");
-    if (rDir == "0") rDir = "";
     googleMapLabel = new QLabel(tr("Google Map API KEY"));
     googleMapKeyEdit = new QLineEdit;
     googleMapKeyEdit->setText(googleMapKey.toString());
