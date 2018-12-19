@@ -280,19 +280,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
 #endif
 
-    //
-    // Google MAP key
-    //
-    QVariant googleMapKey = appsettings->value(this, GC_GOOGLE_MAP_API_KEY, "");
-    googleMapLabel = new QLabel(tr("Google Map API KEY"));
-    googleMapKeyEdit = new QLineEdit;
-    googleMapKeyEdit->setText(googleMapKey.toString());
-
-    configLayout->addWidget(googleMapLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(googleMapKeyEdit, 8 + offset,1);
-    offset++;
-
-
     // save away initial values
     b4.unit = unitCombo->currentIndex();
     b4.hyst = elevationHysteresis.toFloat();
@@ -347,7 +334,6 @@ GeneralPage::saveClicked()
 #ifdef GC_WANT_PYTHON
     appsettings->setValue(GC_PYTHON_HOME, pythonDirectory->text());
 #endif
-    appsettings->setValue(GC_GOOGLE_MAP_API_KEY, googleMapKeyEdit->text());
 
 #if QT_VERSION >= 0x050000
     // update to reflect the state - if hidden user hasn't been asked yet to

@@ -65,10 +65,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     // map choice
     mapCombo= new QComboBox(this);
     mapCombo->addItem(tr("OpenStreetMap"));
-    if (appsettings->value(this, GC_GOOGLE_MAP_API_KEY, "").toString() != "") // Google Deve API
-        mapCombo->addItem(tr("Google"));
-    else
-        mapCombo->setDisabled(true);
+    mapCombo->addItem(tr("Google"));
 
     setMapType(mapType); // validate mapType and set current index in mapCombo
 
@@ -98,6 +95,9 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     osmTSUrl = new QLineEdit("");
     osmTSUrl->setFixedWidth(250);
 
+    gkey = new QLineEdit("");
+    gkeylabel = new QLabel(tr("Google API key"));
+
     // set default Tile Server and URL
     tileCombo->setCurrentIndex(0);
     setTileServerUrlForTileType(0);
@@ -105,6 +105,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(osmTSTitle);
     commonLayout->addRow(osmTSLabel, tileCombo);
     commonLayout->addRow(osmTSUrlLabel, osmTSUrl);
+    commonLayout->addRow(gkeylabel, gkey);
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
@@ -207,6 +208,8 @@ RideMapWindow::setCustomTSWidgetVisible(bool value)
     osmTSUrlLabel->setVisible(value);
     osmTSUrl->setVisible(value);
     tileCombo->setVisible(value);
+    gkeylabel->setVisible(!value);
+    gkey->setVisible(!value);
 }
 
 void
@@ -415,7 +418,7 @@ void RideMapWindow::createHtml()
         currentPage += QString("<script type=\"text/javascript\" src=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.js\" integrity=\"sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==\" crossorigin=\"\"></script> \n");
     } else if (mapCombo->currentIndex() == GOOGLE) {
         // Load Google Map v3 API
-        currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(appsettings->value(this,GC_GOOGLE_MAP_API_KEY, "").toString());
+        currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(gkey->text());
     }
 
 #ifdef NOWEBKIT

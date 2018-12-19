@@ -134,10 +134,6 @@
 // Location of Python Installation - follows PYTHONHOME semantics
 #define GC_PYTHON_HOME                       "<system>pythonhome"
 
-// Goolge MAP API key to enable Google Map
-#define GC_GOOGLE_MAP_API_KEY           "<system>google-map/api-key"
-
-
 // --------------------------------------------------------------------
 // Global Properties - Stored in "root" of the active Athlete Directory
 // --------------------------------------------------------------------

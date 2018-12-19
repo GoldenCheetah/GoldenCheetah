@@ -133,9 +133,6 @@ class GeneralPage : public QWidget
         QLineEdit *rDirectory;
         QLabel *rLabel;
 #endif
-        QLabel *googleMapLabel;
-        QLineEdit *googleMapKeyEdit;
-
         QLabel *langLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;

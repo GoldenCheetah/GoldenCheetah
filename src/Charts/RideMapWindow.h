@@ -128,6 +128,7 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showfullplot READ showFullPlot WRITE setFullPlot USER true)
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
+    Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
     Q_PROPERTY(QString styleoptions READ getStyleOptions WRITE setStyleOptions  USER false)
 
     public:
@@ -166,6 +167,10 @@ class RideMapWindow : public GcChartWindow
         QString getStyleOptions() const { return styleoptions; }
         void setStyleOptions(QString x) { styleoptions=x; }
 
+        QString googleKey() const { return gkey->text(); }
+        void setGoogleKey(QString x) { gkey->setText(x); }
+
+
     public slots:
         void mapTypeSelected(int x);
         void tileTypeSelected(int x);
@@ -194,6 +199,9 @@ class RideMapWindow : public GcChartWindow
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
+
+        QLineEdit *gkey;
+        QLabel *gkeylabel;
 
         Context *context;
         QVBoxLayout *layout;
