@@ -678,6 +678,7 @@ QStringList RideFileFactory::suffixes() const
 {
     QStringList returning = readFuncs_.keys();
     returning += "zip";
+    returning += "gz";
     return returning;
 }
 
