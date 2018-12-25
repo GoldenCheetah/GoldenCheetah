@@ -631,10 +631,10 @@ void RideMapWindow::createHtml()
                                arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
         currentPage += QString(""
-                               "    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {"
+                               "    L.tileLayer('%1/{z}/{x}/{y}.png', {"
                                "                 attribution: '&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors',"
                                "                 maxZoom: 18"
-                               "              }).addTo(map);\n");
+                               "              }).addTo(map);\n").arg(osmTSUrl->text());
 
         currentPage += QString(""
                                // initialise local variables
