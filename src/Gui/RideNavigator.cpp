@@ -1333,9 +1333,9 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     }
     scrollarea->setWidget(but);
 
-    but->setFixedWidth(230* dpiXFactor);
-    scrollarea->setFixedWidth(250* dpiXFactor);
-    setFixedWidth(250* dpiXFactor);
+    but->setFixedWidth((but->width()+10)* dpiXFactor);
+    scrollarea->setFixedWidth((but->width()+20)* dpiXFactor);
+    setFixedWidth((but->width()+20)* dpiXFactor);
 }
 
 void
