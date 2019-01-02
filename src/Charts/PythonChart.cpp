@@ -197,7 +197,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 line = line.replace("$$", chartid);
 
                 python->cancelled = false;
-                python->runline(ScriptContext(context), line);
+                python->runline(ScriptContext(context, nullptr, nullptr, Specification(), true), line);
 
                 // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));

@@ -311,7 +311,17 @@ void PythonEmbed::runline(ScriptContext scriptContext, QString line)
 
     // run and generate errors etc
     messages.clear();
-    PyRun_SimpleString(line.toStdString().c_str());
+
+    if (scriptContext.interactiveShell) {
+        PyObject *m, *d, *v;
+        m = PyImport_AddModule("__main__");
+        d = PyModule_GetDict(m);
+        v = PyRun_StringFlags(line.toStdString().c_str(), Py_single_input, d, d, 0);
+        if (v) Py_DECREF(v);
+    } else {
+        PyRun_SimpleString(line.toStdString().c_str());
+    }
+
     PyErr_Print();
     PyErr_Clear(); //and clear them !
 
