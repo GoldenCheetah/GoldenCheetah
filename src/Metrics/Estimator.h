@@ -31,6 +31,16 @@
 #include <QScrollArea>
 #include <QPushButton>
 
+class Performance {
+
+    public:
+        Performance(QDate when, double power, double duration, double powerIndex) :
+            when(when), power(power), duration(duration), powerIndex(powerIndex) {}
+
+        QDate when;
+        double power, duration, powerIndex;
+};
+
 class Estimator : public QThread {
 
     Q_OBJECT
@@ -61,6 +71,7 @@ class Estimator : public QThread {
         Context *context;
         QMutex lock;
         QList<PDEstimate> estimates;
+        QList<Performance> performances;
         QVector<RideItem*> rides; // worklist
         QTimer singleshot;
 

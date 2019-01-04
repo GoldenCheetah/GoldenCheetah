@@ -24,6 +24,8 @@
 #include "RideCacheModel.h"
 #include "Specification.h"
 
+#include "Banister.h"
+
 #ifndef ESTIMATOR_DEBUG
 #define ESTIMATOR_DEBUG false
 #endif
@@ -166,9 +168,9 @@ Estimator::run()
 
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
-    // bests data from the previous 12 weeks
-    RollingBests bests(12);
-    RollingBests bestsWPK(12);
+    // bests data from the previous 6 weeks
+    RollingBests bests(6);
+    RollingBests bestsWPK(6);
 
     // clear any previous calculations
     QList<PDEstimate> est;
@@ -240,8 +242,27 @@ Estimator::run()
         // months is a rolling 3 months sets of bests
         QVector<float> wpk; // for getting the wpk values
 
-        // don't include RUNS ..................................................vvvvv
-        bests.addBests(RideFileCache::meanMaxPowerFor(context, wpk, begin, end, false));
+        // don't include RUNS .........................................................vvvvv
+        QVector<float> week = RideFileCache::meanMaxPowerFor(context, wpk, begin, end, false);
+
+        // lets extract the best performance of the week first.
+        // only care about performances between 3-20 minutes.
+        Performance bestperformance(end,0,0,0);
+        for (int t=180; t<week.length() && t<1200; t++) {
+
+            double p = double(week[t]);
+            if (week[t]<=0) continue;
+
+            double pix = powerIndex(p, t);
+            if (pix > bestperformance.powerIndex) {
+                bestperformance.duration = t;
+                bestperformance.power = p;
+                bestperformance.powerIndex = pix;
+            }
+        }
+        if (bestperformance.duration > 0) performances << bestperformance;
+
+        bests.addBests(week);
         bestsWPK.addBests(wpk);
 
         // we now have the data
@@ -310,5 +331,9 @@ Estimator::run()
     estimates = est;
     lock.unlock();
 
+    // debug dump peak performances
+    foreach(Performance p, performances) {
+        printd("%f Peak: %f for %f secs on %s\n", p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
+    }
     printd("Estimates end\n");
 }
