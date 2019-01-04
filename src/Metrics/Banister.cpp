@@ -48,6 +48,23 @@ const double typical_CP = 261,
 // and also useful to normalise TTEs for use in the Banister model as a
 // performance measurement.
 //
+
+double powerIndex(double averagepower, double duration)
+{
+    // so now lets work out what the 3p model says the
+    // typical athlete would do for the same duration
+    //
+    // P(t) = W' / (t - (W'/(CP-Pmax))) + CP
+    double typicalpower = (typical_WPrime / (duration - (typical_WPrime/(typical_CP-typical_Pmax)))) + typical_CP;
+
+    // make sure we got a sensible value
+    if (typicalpower < 0 || typicalpower > 2500)  return 0;
+
+    // we could convert to linear work time model before
+    // indexing, but they cancel out so no value in doing so
+    return(100.0 * averagepower/typicalpower);
+}
+
 class PowerIndex : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(PowerIndex)
     public:
@@ -100,24 +117,13 @@ class PowerIndex : public RideMetric {
             return;
         }
 
-        // so now lets work out what the 3p model says the
-        // typical athlete would do for the same duration
-        //
-        // P(t) = W' / (t - (W'/(CP-Pmax))) + CP
-        //
-        double typicalpower = (typical_WPrime / (duration - (typical_WPrime/(typical_CP-typical_Pmax)))) + typical_CP;
-
-        // make sure we got a sensible value
-        if (typicalpower < 0 || typicalpower > 2500) {
-            setValue(RideFile::NIL);
-            setCount(0);
-            return;
-        }
+        // calculate power index, 0=out of bounds
+        double pix = powerIndex(averagepower, duration);
 
         // we could convert to linear work time model before
         // indexing, but they cancel out so no value in doing so
-        setValue(100.0 * averagepower/typicalpower);
-        setCount(1);
+        setValue(pix);
+        setCount(pix > 0 ? 1 : 0);
     }
 
     MetricClass classification() const { return Undefined; }

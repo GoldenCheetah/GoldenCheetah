@@ -23,4 +23,7 @@
 // using floats because they are typically used in calculations
 // that require float precision (the actual values are integers)
 extern const double typical_CP, typical_WPrime, typical_Pmax;
+
+// calculate power index, used to model in cp plot too
+extern double powerIndex(double averagepower, double duration);
 #endif

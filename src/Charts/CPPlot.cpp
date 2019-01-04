@@ -25,6 +25,7 @@
 #include "CPPlot.h"
 #include "PowerProfile.h"
 #include "RideCache.h"
+#include "Banister.h"
 
 #include <QDebug>
 #include <qwt_series_data.h>
@@ -1384,7 +1385,7 @@ CPPlot::plotBests(RideItem *rideItem)
                     // away from a linear regression
 
                     // the best we found is stored in here
-                    struct { int i; double p, t, d; } keep;
+                    struct { int i; double p, t, d, pix; } keep;
 
                     for(int i=0; i<t.count(); i++) {
 
@@ -1399,6 +1400,7 @@ CPPlot::plotBests(RideItem *rideItem)
                             keep.i=i;
                             keep.p=p[i];
                             keep.t=t[i];
+                            keep.pix=powerIndex(keep.p, keep.t);
 
                             // but clear since we iterate beyond
                             if (i>0) { // always keep pmax point
@@ -1413,8 +1415,10 @@ CPPlot::plotBests(RideItem *rideItem)
 
                                     // if its beloe the line multiply distance by -1
                                     double d = (p[x] * t[x] * 60.0f) - ((slope * t[x] * 60.00f) + intercept);
+                                    double pix = powerIndex(p[x],t[x]);
 
-                                    if (keep.d < d) {
+                                    // use the regression for shorter durations and 3p for longer
+                                    if ((keep.t < 120 && keep.d < d) || (keep.t >= 120 && keep.pix < pix)) {
                                         keep.d = d;
                                         keep.i = x;
                                         keep.p = p[x];
