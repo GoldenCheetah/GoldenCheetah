@@ -134,6 +134,9 @@ class LTMPlot : public QwtPlot
         // create curve data from Measure (Body, Hrv)
         void createMeasureData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
+        // create curve data from Measure (Body, Hrv)
+        void createPerformanceData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
+
         // create a curve based upon TOD
         void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 

@@ -170,7 +170,7 @@ class RideFileCache
         static bool checkStale(Context *context, RideItem*item);
 
         // Just get mean max values for power & wpk for a ride
-        static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to, bool wantruns=true);
+        static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to, QVector<QDate> *dates, bool wantruns=true);
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QString filename);
 
         // Fast standalone search reads input and outputs into ride_bests

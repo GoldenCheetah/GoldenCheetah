@@ -303,7 +303,7 @@ static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType serie
     return 0;
 }
 
-QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to, bool wantruns)
+QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to, QVector<QDate>*dates, bool wantruns)
 {
     QVector<float> returning;
     QVector<float> returningwpk;
@@ -321,6 +321,12 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
 
             // first time through the whole thing is going to be best
             returning =  meanMaxPowerFor(context, returningwpk, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
+
+            // set a;; dates to this
+            if (dates) {
+                dates->resize(returning.size());
+                for(int i=0; i<dates->size(); i++) (*dates)[i]=item->dateTime.date();
+            }
             first = false;
 
         } else {
@@ -332,10 +338,15 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
 
             // do we need to increase the returning array?
             if (returning.size() < ridebest.size()) returning.resize(ridebest.size());
+            if (dates && dates->size() < ridebest.size()) dates->resize(ridebest.size());
 
             // now update where its a better number
-            for (int i=0; i<ridebest.size(); i++)
-                if (ridebest[i] > returning[i]) returning[i] = ridebest[i];
+            for (int i=0; i<ridebest.size(); i++) {
+                if (ridebest[i] > returning[i]) {
+                    returning[i] = ridebest[i];
+                    (*dates)[i]=item->dateTime.date();
+                }
+           }
 
             // do we need to increase the returning array?
             if (returningwpk.size() < thiswpk.size()) returningwpk.resize(thiswpk.size());

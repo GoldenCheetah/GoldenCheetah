@@ -170,6 +170,7 @@ class EditMetricDetailDialog : public QDialog
         void stressName();
         void estimateName();
         void measureName();
+        void performanceName();
 
         void modelChanged();
         void estimateChanged();
@@ -181,9 +182,9 @@ class EditMetricDetailDialog : public QDialog
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure, *choosePerformance;
         QButtonGroup *group;
-        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget, *performanceWidget;
         QStackedWidget *typeStack;
 
         // filter
@@ -217,6 +218,10 @@ class EditMetricDetailDialog : public QDialog
         // measure
         QComboBox *measureGroupSelect; // Body, Hrv
         QComboBox *measureFieldSelect; // Weight, RMSSD, etc.
+
+        // performances
+        QCheckBox *weeklyPerfCheck;
+        QCheckBox *performanceTestCheck;
 
         QComboBox *curveStyle,
                   *curveSymbol;

@@ -1312,6 +1312,9 @@ LTMTool::refreshCustomTable(int indexSelectedItem)
             t->setText(tr("Formula"));
         else if (metricDetail.type == 9)
             t->setText(tr("Measure"));
+        else if (metricDetail.type == 10)
+            t->setText(tr("Performance"));
+
 
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,0,t);
@@ -1319,7 +1322,7 @@ LTMTool::refreshCustomTable(int indexSelectedItem)
         t = new QTableWidgetItem();
         if (metricDetail.type == 8) {
             t->setText(metricDetail.formula);
-        } else if (metricDetail.type != 5 && metricDetail.type != 6 && metricDetail.type != 9)
+        } else if (metricDetail.type != 5 && metricDetail.type != 6 && metricDetail.type != 9 && metricDetail.type != 10)
             t->setText(metricDetail.name);
         else {
             // text description for peak && measure
@@ -1604,6 +1607,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     chooseStress = new QRadioButton(tr("Stress"), this);
     chooseFormula = new QRadioButton(tr("Formula"), this);
     chooseMeasure = new QRadioButton(tr("Measure"), this);
+    choosePerformance = new QRadioButton(tr("Performance"), this);
 
     // put them into a button group because we
     // also have radio buttons for watts per kilo / absolute
@@ -1614,6 +1618,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     group->addButton(chooseStress);
     group->addButton(chooseFormula);
     group->addButton(chooseMeasure);
+    group->addButton(choosePerformance);
 
     // uncheck them all
     chooseMetric->setChecked(false);
@@ -1622,6 +1627,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     chooseStress->setChecked(false);
     chooseFormula->setChecked(false);
     chooseMeasure->setChecked(false);
+    choosePerformance->setChecked(false);
 
     // which one ?
     switch (metricDetail->type) {
@@ -1643,6 +1649,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     case 9:
         chooseMeasure->setChecked(true);
         break;
+    case 10:
+        choosePerformance->setChecked(true);
+        break;
     }
 
     QVBoxLayout *radioButtons = new QVBoxLayout;
@@ -1653,6 +1662,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     radioButtons->addWidget(chooseStress);
     radioButtons->addWidget(chooseFormula);
     radioButtons->addWidget(chooseMeasure);
+    radioButtons->addWidget(choosePerformance);
     radioButtons->addStretch();
 
     // bests selection
@@ -1815,6 +1825,19 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     }
     formulaEdit->setText(metricDetail->formula);
     formulaType->setCurrentIndex(formulaType->findData(metricDetail->formulaType));
+
+    // performance settings
+    performanceWidget=new QWidget(this);
+    QVBoxLayout *perfLayout = new QVBoxLayout(performanceWidget);
+    weeklyPerfCheck = new QCheckBox(tr("Weekly Best Performances"));
+    performanceTestCheck = new QCheckBox(tr("Performance Tests"));
+    perfLayout->addStretch();
+    perfLayout->addWidget(performanceTestCheck);
+    perfLayout->addWidget(weeklyPerfCheck);
+    perfLayout->addStretch();
+
+    performanceTestCheck->setChecked(metricDetail->tests);
+    weeklyPerfCheck->setChecked(metricDetail->perfs);
 
     // get suitably formated list
     QList<QString> list;
@@ -1980,6 +2003,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     typeStack->addWidget(estimateWidget);
     typeStack->addWidget(formulaWidget);
     typeStack->addWidget(measureWidget);
+    typeStack->addWidget(performanceWidget);
     typeStack->setCurrentIndex(chooseMetric->isChecked() ? 0 : (chooseBest->isChecked() ? 1 : 2));
 
     // Grid
@@ -2142,6 +2166,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseStress, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseFormula, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseMeasure, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
+    connect(choosePerformance, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(modelSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(estimateSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(estimateChanged()));
     connect(estimateDuration, SIGNAL(valueChanged(double)), this, SLOT(estimateName()));
@@ -2153,6 +2178,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseStress, SIGNAL(toggled(bool)), this, SLOT(stressName()));
     connect(chooseEstimate, SIGNAL(toggled(bool)), this, SLOT(estimateName()));
     connect(chooseMeasure, SIGNAL(toggled(bool)), this, SLOT(measureName()));
+    connect(choosePerformance, SIGNAL(toggled(bool)), this, SLOT(performanceName()));
     connect(stressTypeSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(stressName()));
     connect(chooseMetric, SIGNAL(toggled(bool)), this, SLOT(metricSelected()));
     connect(duration, SIGNAL(valueChanged(double)), this, SLOT(bestName()));
@@ -2182,6 +2208,7 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         formulaWidget->hide();
         measureWidget->hide();
+        performanceWidget->hide();
         typeStack->setCurrentIndex(0);
     }
 
@@ -2192,6 +2219,7 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         formulaWidget->hide();
         measureWidget->hide();
+        performanceWidget->hide();
         typeStack->setCurrentIndex(1);
     }
 
@@ -2202,6 +2230,7 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         formulaWidget->hide();
         measureWidget->hide();
+        performanceWidget->hide();
         typeStack->setCurrentIndex(2);
     }
 
@@ -2212,6 +2241,7 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->show();
         formulaWidget->hide();
         measureWidget->hide();
+        performanceWidget->hide();
         typeStack->setCurrentIndex(0);
     }
 
@@ -2222,6 +2252,7 @@ EditMetricDetailDialog::typeChanged()
         estimateWidget->hide();
         stressWidget->hide();
         measureWidget->hide();
+        performanceWidget->hide();
         typeStack->setCurrentIndex(3);
     }
 
@@ -2232,7 +2263,18 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->hide();
         estimateWidget->hide();
         stressWidget->hide();
+        performanceWidget->hide();
         typeStack->setCurrentIndex(4);
+    }
+
+    if (choosePerformance->isChecked()) {
+        performanceWidget->show();
+        formulaWidget->hide();
+        bestWidget->hide();
+        metricWidget->hide();
+        estimateWidget->hide();
+        stressWidget->hide();
+        typeStack->setCurrentIndex(5);
     }
     adjustSize();
 }
@@ -2302,6 +2344,20 @@ EditMetricDetailDialog::measureName()
     userName->setText(desc);
     userUnits->setText(context->athlete->measures->getFieldUnits(measureGroup, measureField));
     metricDetail->symbol = desc.replace(" ", "_");
+}
+
+void
+EditMetricDetailDialog::performanceName()
+{
+    // only for performances!
+    if (choosePerformance->isChecked() == false) return;
+
+    if (userName->text() == "")  userName->setText(tr("Performances"));
+    if (userUnits->text() == "") userUnits->setText(tr("Power Index"));
+    metricDetail->symbol=QString(tr("Performances_%1_%2"))
+                            .arg(metricDetail->tests ? 'Y' : 'N')
+                            .arg(metricDetail->perfs ? 'Y' : 'N');
+
 }
 
 void
@@ -2409,6 +2465,7 @@ EditMetricDetailDialog::applyClicked()
     else if (chooseStress->isChecked()) metricDetail->type = 7; // stress
     else if (chooseFormula->isChecked()) metricDetail->type = 8; // stress
     else if (chooseMeasure->isChecked()) metricDetail->type = 9; // measure
+    else if (choosePerformance->isChecked()) metricDetail->type = 10; // measure
 
     metricDetail->estimateDuration = estimateDuration->value();
     switch (estimateDurationUnits->currentIndex()) {
@@ -2425,6 +2482,7 @@ EditMetricDetailDialog::applyClicked()
         case 2 :
         default: metricDetail->duration_units = 3600; break;
     }
+
     metricDetail->datafilter = dataFilter->filter();
     metricDetail->wpk = wpk->isChecked();
     metricDetail->series = seriesList.at(dataSeries->currentIndex());
@@ -2449,6 +2507,8 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->formulaType = static_cast<RideMetric::MetricType>(formulaType->itemData(formulaType->currentIndex()).toInt());
     metricDetail->measureGroup = measureGroupSelect->currentIndex();
     metricDetail->measureField = measureFieldSelect->currentIndex();
+    metricDetail->tests = performanceTestCheck->isChecked();
+    metricDetail->perfs = weeklyPerfCheck->isChecked();
     accept();
 }
 

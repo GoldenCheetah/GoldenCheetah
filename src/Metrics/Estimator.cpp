@@ -174,6 +174,7 @@ Estimator::run()
 
     // clear any previous calculations
     QList<PDEstimate> est;
+    QList<Performance> perfs;
 
     // we do this by aggregating power data into bests
     // for each month, and having a rolling set of 3 aggregates
@@ -242,8 +243,9 @@ Estimator::run()
         // months is a rolling 3 months sets of bests
         QVector<float> wpk; // for getting the wpk values
 
-        // don't include RUNS .........................................................vvvvv
-        QVector<float> week = RideFileCache::meanMaxPowerFor(context, wpk, begin, end, false);
+        // don't include RUNS .....................................................................vvvvv
+        QVector<QDate> weekdates;
+        QVector<float> week = RideFileCache::meanMaxPowerFor(context, wpk, begin, end, &weekdates, false);
 
         // lets extract the best performance of the week first.
         // only care about performances between 3-20 minutes.
@@ -258,9 +260,10 @@ Estimator::run()
                 bestperformance.duration = t;
                 bestperformance.power = p;
                 bestperformance.powerIndex = pix;
+                bestperformance.when = weekdates[t];
             }
         }
-        if (bestperformance.duration > 0) performances << bestperformance;
+        if (bestperformance.duration > 0) perfs << bestperformance;
 
         bests.addBests(week);
         bestsWPK.addBests(wpk);
@@ -329,6 +332,7 @@ Estimator::run()
     // now update them
     lock.lock();
     estimates = est;
+    performances = perfs;
     lock.unlock();
 
     // debug dump peak performances
@@ -336,4 +340,13 @@ Estimator::run()
         printd("%f Peak: %f for %f secs on %s\n", p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
     }
     printd("Estimates end\n");
+}
+
+Performance Estimator::getPerformanceForDate(QDate date)
+{
+    // serial search is ok as low numberish - always takes first as should be no dupes
+    foreach(Performance p, performances) {
+        if (p.when == date) return p;
+    }
+    return Performance(QDate(),0,0,0);
 }

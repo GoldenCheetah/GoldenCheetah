@@ -34,10 +34,10 @@
 class Performance {
 
     public:
-        Performance(QDate when, double power, double duration, double powerIndex) :
-            when(when), power(power), duration(duration), powerIndex(powerIndex) {}
+        Performance(QDate wc, double power, double duration, double powerIndex) :
+            weekcommencing(wc), power(power), duration(duration), powerIndex(powerIndex) {}
 
-        QDate when;
+        QDate when, weekcommencing;
         double power, duration, powerIndex;
 };
 
@@ -63,6 +63,9 @@ class Estimator : public QThread {
 
         // setup and run estimators
         void calculate();
+
+        // get a performance for a given day
+        Performance getPerformanceForDate(QDate date);
 
     protected:
 

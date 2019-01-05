@@ -74,7 +74,7 @@ class PowerIndex : public RideMetric {
         setSymbol("power_index");
         setInternalName("Power Index");
         setPrecision(1);
-        setType(Average); // not even sure aggregation makes sense
+        setType(Peak); // not even sure aggregation makes sense
     }
     void initialize() {
         setName(tr("Power Index"));
