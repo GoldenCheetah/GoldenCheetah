@@ -116,6 +116,9 @@ class LTMPlot : public QwtPlot
         int groupForDate(QDate , int);
         void createCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
+        // create curve data from Banister
+        void createBanisterData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
+
         // create curve data from PMCData
         void createPMCData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 

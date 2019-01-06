@@ -171,6 +171,7 @@ class EditMetricDetailDialog : public QDialog
         void estimateName();
         void measureName();
         void performanceName();
+        void banisterName();
 
         void modelChanged();
         void estimateChanged();
@@ -182,9 +183,9 @@ class EditMetricDetailDialog : public QDialog
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure, *choosePerformance;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure, *choosePerformance, *chooseBanister;
         QButtonGroup *group;
-        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget, *performanceWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget, *performanceWidget, *banisterWidget;
         QStackedWidget *typeStack;
 
         // filter
@@ -210,6 +211,9 @@ class EditMetricDetailDialog : public QDialog
 
         // stress
         QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
+
+        // banister
+        QComboBox *banisterTypeSelect; // PTE, NTE, Performance
 
         // formula
         DataFilterEdit *formulaEdit; // edit your formula

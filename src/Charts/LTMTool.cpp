@@ -1314,6 +1314,8 @@ LTMTool::refreshCustomTable(int indexSelectedItem)
             t->setText(tr("Measure"));
         else if (metricDetail.type == 10)
             t->setText(tr("Performance"));
+        else if (metricDetail.type == 11)
+            t->setText(tr("Banister"));
 
 
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
@@ -1322,7 +1324,7 @@ LTMTool::refreshCustomTable(int indexSelectedItem)
         t = new QTableWidgetItem();
         if (metricDetail.type == 8) {
             t->setText(metricDetail.formula);
-        } else if (metricDetail.type != 5 && metricDetail.type != 6 && metricDetail.type != 9 && metricDetail.type != 10)
+        } else if (metricDetail.type != 5 && metricDetail.type != 6 && metricDetail.type != 9  && metricDetail.type != 10 && metricDetail.type != 11)
             t->setText(metricDetail.name);
         else {
             // text description for peak && measure
@@ -1604,10 +1606,11 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     chooseMetric = new QRadioButton(tr("Metric"), this);
     chooseBest = new QRadioButton(tr("Best"), this);
     chooseEstimate = new QRadioButton(tr("Estimate"), this);
-    chooseStress = new QRadioButton(tr("Stress"), this);
+    chooseStress = new QRadioButton(tr("PMC"), this);
     chooseFormula = new QRadioButton(tr("Formula"), this);
     chooseMeasure = new QRadioButton(tr("Measure"), this);
     choosePerformance = new QRadioButton(tr("Performance"), this);
+    chooseBanister = new QRadioButton(tr("Banister"), this);
 
     // put them into a button group because we
     // also have radio buttons for watts per kilo / absolute
@@ -1616,9 +1619,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     group->addButton(chooseBest);
     group->addButton(chooseEstimate);
     group->addButton(chooseStress);
+    group->addButton(chooseBanister);
+    group->addButton(choosePerformance);
     group->addButton(chooseFormula);
     group->addButton(chooseMeasure);
-    group->addButton(choosePerformance);
 
     // uncheck them all
     chooseMetric->setChecked(false);
@@ -1628,6 +1632,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     chooseFormula->setChecked(false);
     chooseMeasure->setChecked(false);
     choosePerformance->setChecked(false);
+    chooseBanister->setChecked(false);
 
     // which one ?
     switch (metricDetail->type) {
@@ -1652,6 +1657,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     case 10:
         choosePerformance->setChecked(true);
         break;
+    case 11:
+        chooseBanister->setChecked(true);
     }
 
     QVBoxLayout *radioButtons = new QVBoxLayout;
@@ -1660,9 +1667,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     radioButtons->addWidget(chooseBest);
     radioButtons->addWidget(chooseEstimate);
     radioButtons->addWidget(chooseStress);
+    radioButtons->addWidget(chooseBanister);
+    radioButtons->addWidget(choosePerformance);
     radioButtons->addWidget(chooseFormula);
     radioButtons->addWidget(chooseMeasure);
-    radioButtons->addWidget(choosePerformance);
     radioButtons->addStretch();
 
     // bests selection
@@ -1930,6 +1938,22 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     stressLayout->addWidget(new QLabel(tr("Stress Type"), this));
     stressLayout->addWidget(stressTypeSelect);
 
+    // banister selection
+    banisterTypeSelect = new QComboBox(this);
+    banisterTypeSelect->addItem(tr("Negative Training Effect (NTE)"), BANISTER_NTE);
+    banisterTypeSelect->addItem(tr("Positive Training Effect (PTE)"), BANISTER_PTE);
+    banisterTypeSelect->addItem(tr("Performance (Power Index)"),  BANISTER_PERFORMANCE);
+    banisterTypeSelect->setCurrentIndex(metricDetail->stressType < 3 ? metricDetail->stressType : 2);
+
+    banisterWidget = new QWidget(this);
+    banisterWidget->setContentsMargins(0,0,0,0);
+    QHBoxLayout *banisterLayout = new QHBoxLayout(banisterWidget);
+    banisterLayout->setContentsMargins(0,0,0,0);
+    banisterLayout->setSpacing(5 *dpiXFactor);
+    banisterLayout->addWidget(new QLabel(tr("Curve Type"), this));
+    banisterLayout->addWidget(banisterTypeSelect);
+
+
     metricWidget = new QWidget(this);
     metricWidget->setContentsMargins(0,0,0,0);
     QVBoxLayout *metricLayout = new QVBoxLayout(metricWidget);
@@ -1941,6 +1965,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // and add the stress selector to this widget
     // too as we reuse it for stress selection
     metricLayout->addWidget(stressWidget);
+    metricLayout->addWidget(banisterWidget);
 
 #ifdef Q_OS_MAC
     metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -2167,6 +2192,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseFormula, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(chooseMeasure, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(choosePerformance, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
+    connect(chooseBanister, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(modelSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(estimateSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(estimateChanged()));
     connect(estimateDuration, SIGNAL(valueChanged(double)), this, SLOT(estimateName()));
@@ -2209,6 +2235,7 @@ EditMetricDetailDialog::typeChanged()
         formulaWidget->hide();
         measureWidget->hide();
         performanceWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(0);
     }
 
@@ -2220,6 +2247,7 @@ EditMetricDetailDialog::typeChanged()
         formulaWidget->hide();
         measureWidget->hide();
         performanceWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(1);
     }
 
@@ -2231,6 +2259,7 @@ EditMetricDetailDialog::typeChanged()
         formulaWidget->hide();
         measureWidget->hide();
         performanceWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(2);
     }
 
@@ -2242,6 +2271,7 @@ EditMetricDetailDialog::typeChanged()
         formulaWidget->hide();
         measureWidget->hide();
         performanceWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(0);
     }
 
@@ -2253,6 +2283,7 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         measureWidget->hide();
         performanceWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(3);
     }
 
@@ -2264,6 +2295,7 @@ EditMetricDetailDialog::typeChanged()
         estimateWidget->hide();
         stressWidget->hide();
         performanceWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(4);
     }
 
@@ -2274,7 +2306,20 @@ EditMetricDetailDialog::typeChanged()
         metricWidget->hide();
         estimateWidget->hide();
         stressWidget->hide();
+        banisterWidget->hide();
         typeStack->setCurrentIndex(5);
+    }
+
+    if (chooseBanister->isChecked()) {
+        bestWidget->hide();
+        metricWidget->show();
+        estimateWidget->hide();
+        stressWidget->hide();
+        formulaWidget->hide();
+        measureWidget->hide();
+        performanceWidget->hide();
+        banisterWidget->show();
+        typeStack->setCurrentIndex(0);
     }
     adjustSize();
 }
@@ -2299,6 +2344,29 @@ EditMetricDetailDialog::stressName()
     case 1: metricDetail->bestSymbol += "_sts"; break;
     case 2: metricDetail->bestSymbol += "_sb"; break;
     case 3: metricDetail->bestSymbol += "_rr"; break;
+    }
+
+}
+
+void
+EditMetricDetailDialog::banisterName()
+{
+    // used when adding the generated curve to the curves
+    // map in LTMPlot, we need to be able to differentiate
+    // between adding the metric to a chart and adding
+    // a stress series to a chart
+
+    // only for bests!
+    if (chooseBanister->isChecked() == false) return;
+
+    // re-use bestSymbol like PMC does
+    metricDetail->bestSymbol = metricDetail->symbol;
+
+    // append type
+    switch(stressTypeSelect->currentIndex()) {
+    case 0: metricDetail->bestSymbol += "_nte"; break;
+    case 1: metricDetail->bestSymbol += "_pte"; break;
+    case 2: metricDetail->bestSymbol += "_perf"; break;
     }
 
 }
@@ -2438,6 +2506,8 @@ EditMetricDetailDialog::metricSelected()
 
     (*metricDetail) = ltmTool->metrics[index]; // overwrite!
 
+    // make the banister name
+    if (chooseStress->isChecked()) banisterName();
     // make the stress name
     if (chooseStress->isChecked()) stressName();
 }
@@ -2466,6 +2536,7 @@ EditMetricDetailDialog::applyClicked()
     else if (chooseFormula->isChecked()) metricDetail->type = 8; // stress
     else if (chooseMeasure->isChecked()) metricDetail->type = 9; // measure
     else if (choosePerformance->isChecked()) metricDetail->type = 10; // measure
+    else if (chooseBanister->isChecked()) metricDetail->type = 11; // banister
 
     metricDetail->estimateDuration = estimateDuration->value();
     switch (estimateDurationUnits->currentIndex()) {
@@ -2502,7 +2573,8 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();
     metricDetail->trendtype = trendType->currentIndex();
-    metricDetail->stressType = stressTypeSelect->currentIndex();
+    if (chooseStress->isChecked()) metricDetail->stressType = stressTypeSelect->currentIndex();
+    if (chooseBanister->isChecked()) metricDetail->stressType = banisterTypeSelect->currentIndex();
     metricDetail->formula = formulaEdit->toPlainText();
     metricDetail->formulaType = static_cast<RideMetric::MetricType>(formulaType->itemData(formulaType->currentIndex()).toInt());
     metricDetail->measureGroup = measureGroupSelect->currentIndex();

@@ -74,6 +74,7 @@ class RideBest;
 #define METRIC_FORMULA     8
 #define METRIC_D_MEASURE   9
 #define METRIC_PERFORMANCE 10
+#define METRIC_BANISTER    11
 
 // type of estimate
 #define ESTIMATE_WPRIME  0
@@ -97,6 +98,11 @@ class RideBest;
 #define STRESS_EXPECTED_LTS 9
 #define STRESS_EXPECTED_SB  10
 #define STRESS_EXPECTED_RR  11
+
+// type of banister curve
+#define BANISTER_NTE         0
+#define BANISTER_PTE         1
+#define BANISTER_PERFORMANCE 2
 
 // type of values
 #define VALUES_CALCULATED   0
