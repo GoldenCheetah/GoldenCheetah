@@ -52,8 +52,9 @@ class RideBest;
 // 16        14 Aug 2015 Mark Liversedge  Added curve specific filter
 // 17        01 Nov 2017 Ale Martinez     Added Daily Measure type (Body/Hrv)
 // 18        05 Jan 2018 Mark Liversedge  Performance tests and weekly performances
+// 19        07 Jan 2018 Mark Liversedge  Flagged as possibly submaximal weekly best
 
-#define LTM_VERSION_NUMBER 18
+#define LTM_VERSION_NUMBER 19
 
 // group by settings
 #define LTM_DAY     1
@@ -157,6 +158,7 @@ class MetricDetail {
     // for PERFORMANCES
     bool tests;
     bool perfs;
+    bool submax;
 
     // GENERAL SETTINGS FOR A METRIC
     QString uname, uunits; // user specified name and units (axis choice)

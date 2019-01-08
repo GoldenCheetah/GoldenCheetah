@@ -49,6 +49,26 @@ const double typical_CP = 261,
 // performance measurement.
 //
 
+Banister::Banister(Context *context, QString symbol, double t1, double t2, double k1, double k2)
+{
+    // todo
+}
+
+Banister::~Banister()
+{
+    // todo
+}
+void Banister::refit()
+{
+    // todo
+}
+
+void Banister::refresh()
+{
+    // todo
+}
+
+// power index metric
 double powerIndex(double averagepower, double duration)
 {
     // so now lets work out what the 3p model says the

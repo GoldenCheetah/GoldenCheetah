@@ -261,6 +261,9 @@ Estimator::run()
                 bestperformance.power = p;
                 bestperformance.powerIndex = pix;
                 bestperformance.when = weekdates[t];
+
+                // for filter, saves having to convert as we go
+                bestperformance.x = bestperformance.when.toJulianDay();
             }
         }
         if (bestperformance.duration > 0) perfs << bestperformance;
@@ -329,6 +332,9 @@ Estimator::run()
     // add a dummy entry if we have no estimates to stop constantly trying to refresh
     if (est.count() == 0)  est << PDEstimate();
 
+    // filter performances
+    perfs = filter(perfs);
+
     // now update them
     lock.lock();
     estimates = est;
@@ -349,4 +355,84 @@ Performance Estimator::getPerformanceForDate(QDate date)
         if (p.when == date) return p;
     }
     return Performance(QDate(),0,0,0);
+}
+
+//
+// Filter will mark performances as submaximal but does not remove them
+//
+
+// fast mechanism for vector without needing to calculate angles
+// basic idea stolen from the graham's scan algorithm (it may also predate that)
+// see: https://en.wikipedia.org/wiki/Graham_scan
+// 0 means colinear (straight), +ve means left turn -ve means right turn
+static double crossProduct(const Performance &origin, const Performance &A, const Performance &B)
+{
+    return (A.x - origin.x) * (B.powerIndex - origin.powerIndex) - (A.powerIndex - origin.powerIndex) * (B.x - origin.x);
+}
+
+//
+// Adapted convex hull, but only upper hull using monotone search
+// search ahead is limited too, so we do keep intermediate points in the hull
+//
+QList<Performance>
+Estimator::filter(QList<Performance> perfs)
+{
+    QList<Performance> returning;
+
+    if (perfs.length() < 3) return perfs;
+
+    int index = 2;
+    Performance origin = perfs[0];
+    Performance last = perfs[1];
+    returning << origin;
+    returning << last;
+
+    while (index< perfs.length()) {
+
+        // you get the first 2 regardless, we could tidy up later (todo)
+        if (index < 2) returning << perfs[index];
+        else {
+            // is the next point a left or right turn?
+            double cross = crossProduct(origin, last, perfs[index]);
+
+            // is it higher or left turn ?
+            if (perfs[index].powerIndex > perfs[index-1].powerIndex || cross >= 0) {  // collinear or better
+                returning << perfs[index];
+                origin=last;
+                last=perfs[index];
+            } else {
+
+                // worse, so lets look at the next 4 points and
+                // pick whichever is best
+                double max=cross;
+                int chosen=0;
+                for (int k=1; k<8 && index+k < perfs.length(); k++) {
+                    cross = crossProduct(origin, last, perfs[index+k]);
+                    if (cross >= 0) {
+                        chosen=k;    // use this one and stop looking
+                        break;
+                    } else if (cross > max) {
+                        max = cross;
+                        chosen=k;
+                    }
+                }
+
+                // skip forward to chosen marking submax
+                for(int j=0; j<chosen && (index+j) < perfs.length(); j++) {
+                    perfs[index+j].submaximal = true;
+                    returning << perfs[index+j];
+                }
+
+                // choose this one
+                origin = last;
+                last = perfs[index+chosen];
+                returning << last;
+                index += chosen;
+            }
+        }
+        // onto "next"
+        index++;
+     }
+
+    return returning;
 }

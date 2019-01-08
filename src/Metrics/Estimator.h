@@ -35,10 +35,13 @@ class Performance {
 
     public:
         Performance(QDate wc, double power, double duration, double powerIndex) :
-            weekcommencing(wc), power(power), duration(duration), powerIndex(powerIndex) {}
+            weekcommencing(wc), power(power), duration(duration), powerIndex(powerIndex), submaximal(false) {}
 
         QDate when, weekcommencing;
         double power, duration, powerIndex;
+        bool submaximal; // set by the filter, user can choose to include.
+
+        double x; // different units, but basically when as a julian day
 };
 
 class Estimator : public QThread {
@@ -58,6 +61,9 @@ class Estimator : public QThread {
 
         // cancel any pending/running and kick off with 15 sec delay
         void refresh();
+
+        // filter marks performances as submax
+        QList<Performance> filter(QList<Performance>);
 
     public slots:
 

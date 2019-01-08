@@ -226,6 +226,7 @@ class EditMetricDetailDialog : public QDialog
         // performances
         QCheckBox *weeklyPerfCheck;
         QCheckBox *performanceTestCheck;
+        QCheckBox *submaxWeeklyPerfCheck;
 
         QComboBox *curveStyle,
                   *curveSymbol;

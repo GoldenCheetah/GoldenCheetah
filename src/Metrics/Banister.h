@@ -16,6 +16,12 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "RideMetric.h"
+#include "Context.h"
+#include <QObject>
+#include <QDate>
+#include <QVector>
+
 #ifndef GC_Banister_h
 #define GC_Banister_h 1
 
@@ -26,4 +32,41 @@ extern const double typical_CP, typical_WPrime, typical_Pmax;
 
 // calculate power index, used to model in cp plot too
 extern double powerIndex(double averagepower, double duration);
+
+
+struct banisterData{
+    double score,       // TRIMP, BikeScore etc for day
+           nte,         // Negative Training Effect
+           pte,         // Positive Training Effect
+           perf;        // Performance (nte+pte)
+};
+
+class Banister : public QObject {
+
+    Q_OBJECT
+
+public:
+
+    Banister(Context *context, QString symbol, double t1, double t2, double k1=0, double k2=0);
+    ~Banister();
+
+    // model parameters
+    double k1, k2;
+    double t1, t2;
+
+    // metric
+    RideMetric *metric;
+    QDate start, stop;
+    int days;
+
+    QVector<banisterData> data;
+
+public slots:
+    void refresh();
+    void refit();
+
+private:
+    Context *context;
+
+};
 #endif

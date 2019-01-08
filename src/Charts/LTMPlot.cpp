@@ -654,7 +654,7 @@ LTMPlot::setData(LTMSettings *set)
 
                 QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                 QString trendSymbol = QString("%1_trend")
-                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                        metricDetail.bestSymbol : metricDetail.symbol);
 
                 QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -692,7 +692,7 @@ LTMPlot::setData(LTMSettings *set)
             if (metricDetail.trendtype == 2 && count > 3) {
                 QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                 QString trendSymbol = QString("%1_trend")
-                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                        metricDetail.bestSymbol : metricDetail.symbol);
 
                 QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -734,7 +734,7 @@ LTMPlot::setData(LTMSettings *set)
             if (metricDetail.trendtype == 3 && count > 5) {
                 QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                 QString trendSymbol = QString("%1_trend")
-                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                        metricDetail.bestSymbol : metricDetail.symbol);
 
                 QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -967,7 +967,7 @@ LTMPlot::setData(LTMSettings *set)
                 topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
             QString topSymbol = QString("%1_%2")
-                                .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                     metricDetail.bestSymbol : metricDetail.symbol).arg(topName);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
             top->setItemAttribute(QwtPlotItem::Legend, false);
@@ -1823,7 +1823,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                     QString trendName = QString(tr("%1 %2 trend")).arg(cd.name).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
-                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -1859,7 +1859,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 if (metricDetail.trendtype == 2 && count > 3) {
                     QString trendName = QString(tr("%1 %2 trend")).arg(cd.name).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
-                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -1900,7 +1900,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 if (metricDetail.trendtype == 3 && count > 5) {
                     QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
-                                           .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                           .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                            metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -2081,7 +2081,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 // lets setup a curve with this data then!
                 QString topName = QString(tr("%1 %2 Best")).arg(cd.name).arg(metricDetail.uname);
                 QString topSymbol = QString("%1_%2")
-                                    .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                    .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                         metricDetail.bestSymbol : metricDetail.symbol).arg(topName);
                 QwtPlotCurve *top = new QwtPlotCurve(topName);
                 top->setItemAttribute(QwtPlotItem::Legend, false);
@@ -3900,9 +3900,9 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
                     p=tests.value(item->dateTime.date(), p);
 
                     // work out interval duration and power
-                    double secs=item->getForSymbol("workout_time");
-                    double power=item->getForSymbol("average_power");
-                    double pix=powerIndex(power,secs);
+                    double secs=i->getForSymbol("workout_time");
+                    double power=i->getForSymbol("average_power");
+                    double pix=i->getForSymbol("power_index");
 
                     if (pix > p.powerIndex) {
                         // we have a better one
@@ -3933,7 +3933,12 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
         if (metricDetail.perfs && value <= 0) {
             // is there a weekly performance today?
             Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date);
-            value = p.powerIndex;
+            if (!p.submaximal) value = p.powerIndex;
+        }
+        if (metricDetail.submax && value <= 0) {
+            // is there a submax weekly performance today?
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date);
+            if (p.submaximal) value = p.powerIndex;
         }
 
         if (value || wantZero) {

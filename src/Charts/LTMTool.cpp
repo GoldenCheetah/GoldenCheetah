@@ -1838,14 +1838,17 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     performanceWidget=new QWidget(this);
     QVBoxLayout *perfLayout = new QVBoxLayout(performanceWidget);
     weeklyPerfCheck = new QCheckBox(tr("Weekly Best Performances"));
+    submaxWeeklyPerfCheck = new QCheckBox(tr("Submaximal Weekly Best"));
     performanceTestCheck = new QCheckBox(tr("Performance Tests"));
     perfLayout->addStretch();
     perfLayout->addWidget(performanceTestCheck);
     perfLayout->addWidget(weeklyPerfCheck);
+    perfLayout->addWidget(submaxWeeklyPerfCheck);
     perfLayout->addStretch();
 
     performanceTestCheck->setChecked(metricDetail->tests);
     weeklyPerfCheck->setChecked(metricDetail->perfs);
+    submaxWeeklyPerfCheck->setChecked(metricDetail->submax);
 
     // get suitably formated list
     QList<QString> list;
@@ -2422,10 +2425,6 @@ EditMetricDetailDialog::performanceName()
 
     if (userName->text() == "")  userName->setText(tr("Performances"));
     if (userUnits->text() == "") userUnits->setText(tr("Power Index"));
-    metricDetail->symbol=QString(tr("Performances_%1_%2"))
-                            .arg(metricDetail->tests ? 'Y' : 'N')
-                            .arg(metricDetail->perfs ? 'Y' : 'N');
-
 }
 
 void
@@ -2538,6 +2537,12 @@ EditMetricDetailDialog::applyClicked()
     else if (choosePerformance->isChecked()) metricDetail->type = 10; // measure
     else if (chooseBanister->isChecked()) metricDetail->type = 11; // banister
 
+    if (choosePerformance->isChecked()) {
+        metricDetail->symbol=QString(tr("Performances_%1_%2_%3"))
+                            .arg(performanceTestCheck->isChecked() ? 'Y' : 'N')
+                            .arg(submaxWeeklyPerfCheck->isChecked() ? 'Y' : 'N')
+                            .arg(weeklyPerfCheck->isChecked() ? 'Y' : 'N');
+    }
     metricDetail->estimateDuration = estimateDuration->value();
     switch (estimateDurationUnits->currentIndex()) {
         case 0 : metricDetail->estimateDuration_units = 1; break;
@@ -2581,6 +2586,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->measureField = measureFieldSelect->currentIndex();
     metricDetail->tests = performanceTestCheck->isChecked();
     metricDetail->perfs = weeklyPerfCheck->isChecked();
+    metricDetail->submax = submaxWeeklyPerfCheck->isChecked();
     accept();
 }
 
