@@ -34,7 +34,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG               false // debug traces
+#define FIT_DEBUG               true // debug traces
 #define FIT_DEBUG_LEVEL         4    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
@@ -1341,14 +1341,17 @@ struct FitFileReaderState
 
     void decodeLap(const FitDefinition &def, int time_offset,
                    const std::vector<FitValue>& values) {
-        time_t time = 0;
+        time_t iniTime;
         if (time_offset > 0)
-            time = last_time + time_offset;
+            iniTime = last_time + time_offset;
         else
-            time = last_time;
+            iniTime = last_time;
+
+        time_t time = iniTime;
         int i = 0;
         time_t this_start_time = 0;
         double total_distance = 0.0;
+        double total_elapsed_time = 0.0;
 
         QString lap_name;
 
@@ -1381,8 +1384,12 @@ struct FitFileReaderState
                 case 9:
                     total_distance = value.v / 100000.0;
                     break;
+                case 7:
+                    total_elapsed_time = value.v / 1000.0;
+                    break;
                 case 24:
                     //lap_trigger = value.v;
+
 
                 // other data (ignored at present):
                 case 254: // lap nbr
@@ -1390,7 +1397,7 @@ struct FitFileReaderState
                 case 4: // start_position_lon
                 case 5: // end_position_lat
                 case 6: // end_position_lon
-                case 7: // total_elapsed_time = value.v / 1000.0;
+
                 case 8: // total_timer_time
                 case 10: // total_cycles
                 case 11: // total calories
@@ -1420,6 +1427,10 @@ struct FitFileReaderState
                 return;
             }
         }
+        if (time == iniTime && total_elapsed_time > 0) {
+            time = iniTime + total_elapsed_time - 1;
+        }
+
         if (isLapSwim) {
             // Fill empty laps due to false starts or pauses in some devices
             // s.t. Garmin 910xt - cap to avoid crashes on bad data
