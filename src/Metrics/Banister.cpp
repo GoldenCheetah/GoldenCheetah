@@ -16,6 +16,20 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+//
+// for info on Banister impulse response modeling see:
+// "Modeling human performance in running" (1990)
+//     R. Hugh Morton, John R. Fitz Clarke and Eric W. Banister.
+//
+// for advice on implementation and optimization see:
+// "Rationale and resources for teaching the mathematical modeling
+//  of athletic training and performance" (2013)
+//     David C. Clarke, Philip F. Skiba
+//
+// see the spreadsheet "Clarke_Rationale_2013s.xlsx" in this repo
+// in the doc/contrib folder.
+//
+
 #include "Banister.h"
 
 #include "RideMetric.h"
