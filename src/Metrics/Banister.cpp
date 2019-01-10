@@ -41,6 +41,7 @@
 #include "IntervalItem.h"
 #include "IntervalItem.h"
 #include "LTMOutliers.h"
+#include "LTMSettings.h"
 #include "Units.h"
 #include "Zones.h"
 #include "cmath"
