@@ -56,6 +56,7 @@ public:
 
     double f(double t, const double *p);
     void combine(banisterFit other);
+    void compute(long startIndex, long stopIndex);
 
     long startIndex, stopIndex;
     QDate startDate, stopDate;

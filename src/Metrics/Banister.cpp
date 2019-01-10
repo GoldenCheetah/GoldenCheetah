@@ -345,30 +345,35 @@ banisterFit::f(double d, const double *parms)
         p0 = parms[4];
 
         //printd("fit iter %s to %s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", startDate.toString().toStdString().c_str(), stopDate.toString().toStdString().c_str(), k1,k2,t1,t2,p0); // too much info even in debug, unless you want it
-
-        // ack, we need to recompute our window using the parameters supplied
-        bool first = true;
-        for (int index=startIndex; index < stopIndex; index++) {
-
-            // g and h are just accumulated training load with different decay parameters
-            if (first) {
-                parent->data[index].g =  parent->data[index].h = 0;
-                first = false;
-            } else {
-                parent->data[index].g = (parent->data[index-1].g * exp (-1/t1)) + parent->data[index].score;
-                parent->data[index].h = (parent->data[index-1].h * exp (-1/t2)) + parent->data[index].score;
-            }
-
-            // apply coefficients
-            parent->data[index].pte = parent->data[index].g * k1;
-            parent->data[index].nte = parent->data[index].h * k2;
-            parent->data[index].perf = p0 + parent->data[index].pte - parent->data[index].nte;
-        }
+        compute(startIndex, stopIndex);
     }
 
     // return previously computed
     //printd("result perf(%s)=%g vs test=%g\n", parent->start.addDays(d).toString().toStdString().c_str(),parent->data[int(d)].perf, parent->data[int(d)].test);
     return parent->data[int(d)].perf;
+}
+
+void
+banisterFit::compute(long start, long stop)
+{
+    // ack, we need to recompute our window using the parameters supplied
+    bool first = true;
+    for (int index=start; index < stop; index++) {
+
+        // g and h are just accumulated training load with different decay parameters
+        if (first) {
+            parent->data[index].g =  parent->data[index].h = 0;
+            first = false;
+        } else {
+            parent->data[index].g = (parent->data[index-1].g * exp (-1/t1)) + parent->data[index].score;
+            parent->data[index].h = (parent->data[index-1].h * exp (-1/t2)) + parent->data[index].score;
+        }
+
+        // apply coefficients
+        parent->data[index].pte = parent->data[index].g * k1;
+        parent->data[index].nte = parent->data[index].h * k2;
+        parent->data[index].perf = p0 + parent->data[index].pte - parent->data[index].nte;
+    }
 }
 
 void
@@ -421,6 +426,16 @@ void Banister::fit()
             printd("window %d %s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", i, lm_infmsg[status.outcome], prior[0], prior[1], prior[2], prior[3], prior[4]);
         }
     }
+
+#if 0 // doesn't really make sense for now
+    // fill curves
+    for(int i=0; i<windows.length(); i++) {
+        if (i < (windows.length()-1))
+            windows[i].compute(windows[i].stopIndex, windows[i+1].startIndex);
+        else
+            windows[i].compute(windows[i].stopIndex, data.length());
+    }
+#endif
 }
 
 //
