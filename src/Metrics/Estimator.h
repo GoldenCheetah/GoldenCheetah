@@ -44,6 +44,7 @@ class Performance {
         double x; // different units, but basically when as a julian day
 };
 
+class Banister;
 class Estimator : public QThread {
 
     Q_OBJECT
@@ -76,6 +77,7 @@ class Estimator : public QThread {
     protected:
 
         friend class ::Athlete;
+        friend class ::Banister;
 
         Context *context;
         QMutex lock;

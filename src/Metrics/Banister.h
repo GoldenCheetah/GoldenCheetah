@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "Context.h"
+#include "Estimator.h"
 #include <QObject>
 #include <QDate>
 #include <QVector>
@@ -33,12 +34,39 @@ extern const double typical_CP, typical_WPrime, typical_Pmax;
 // calculate power index, used to model in cp plot too
 extern double powerIndex(double averagepower, double duration);
 
+// gap with no training that constitutes break in seasons
+extern const int typical_SeasonBreak;
 
-struct banisterData{
+class banisterData{
+public:
+    banisterData() : score(0), nte(0), pte(0), perf(0), test(0) {}
     double score,       // TRIMP, BikeScore etc for day
+           g,           // accumulated load with t1 decay for pte
+           h,           // accumulated load with t2 decay for nte
            nte,         // Negative Training Effect
            pte,         // Positive Training Effect
-           perf;        // Performance (nte+pte)
+           perf,        // Performance (nte+pte)
+           test;        // test value
+};
+
+class Banister;
+class banisterFit {
+public:
+    banisterFit(Banister *parent) : p0(0),k1(0),k2(0),t1(0),t2(0),tests(0),testoffset(-1),parent(parent) {}
+
+    double f(double t, const double *p);
+    void combine(banisterFit other);
+
+    long startIndex, stopIndex;
+    QDate startDate, stopDate;
+
+    double p0,k1,k2,t1,t2;
+
+    // for indexing into banister::performanceDay and banister::performanceScore
+    int tests;
+    int testoffset;
+
+    Banister *parent;
 };
 
 class Banister : public QObject {
@@ -48,22 +76,39 @@ class Banister : public QObject {
 public:
 
     Banister(Context *context, QString symbol, double t1, double t2, double k1=0, double k2=0);
-    ~Banister();
+    double value(QDate date, int type);
 
-    // model parameters
-    double k1, k2;
-    double t1, t2;
+    // model parameters - initial 'priors' to use
+    QString symbol;         // load metric
+    double k1, k2;          // nte/pte coefficients
+    double t1, t2;          // nte/pte decay constants
 
     // metric
     RideMetric *metric;
-    QDate start, stop;
-    int days;
 
+    QDate start, stop;
+    long long days;
+
+    // curves
+    double meanscore; // whats the average non-zero ride score (used for scaling)
+    long rides;       // how many rides are there with a non-zero score
+
+    // time series data
     QVector<banisterData> data;
 
+    // fitting windows with parameter estimates
+    // window effectively a season
+    QList<banisterFit> windows;
+
+    // performances as double
+    int performances;
+    QVector<double> performanceDay, performanceScore;
+
 public slots:
-    void refresh();
-    void refit();
+
+    void init();        // reset previous fits
+    void refresh();     // collect data from rides etc
+    void fit();         // perform fits along windows
 
 private:
     Context *context;

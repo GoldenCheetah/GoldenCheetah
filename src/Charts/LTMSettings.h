@@ -104,6 +104,7 @@ class RideBest;
 #define BANISTER_NTE         0
 #define BANISTER_PTE         1
 #define BANISTER_PERFORMANCE 2
+#define BANISTER_CP          3
 
 // type of values
 #define VALUES_CALCULATED   0

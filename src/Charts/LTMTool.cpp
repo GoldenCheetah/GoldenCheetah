@@ -1946,7 +1946,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     banisterTypeSelect->addItem(tr("Negative Training Effect (NTE)"), BANISTER_NTE);
     banisterTypeSelect->addItem(tr("Positive Training Effect (PTE)"), BANISTER_PTE);
     banisterTypeSelect->addItem(tr("Performance (Power Index)"),  BANISTER_PERFORMANCE);
-    banisterTypeSelect->setCurrentIndex(metricDetail->stressType < 3 ? metricDetail->stressType : 2);
+    banisterTypeSelect->addItem(tr("Predicted CP (Watts)"),  BANISTER_CP);
+    banisterTypeSelect->setCurrentIndex(metricDetail->stressType < 4 ? metricDetail->stressType : 2);
 
     banisterWidget = new QWidget(this);
     banisterWidget->setContentsMargins(0,0,0,0);
@@ -2209,6 +2210,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseMeasure, SIGNAL(toggled(bool)), this, SLOT(measureName()));
     connect(choosePerformance, SIGNAL(toggled(bool)), this, SLOT(performanceName()));
     connect(stressTypeSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(stressName()));
+    connect(banisterTypeSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(banisterName()));
     connect(chooseMetric, SIGNAL(toggled(bool)), this, SLOT(metricSelected()));
     connect(duration, SIGNAL(valueChanged(double)), this, SLOT(bestName()));
     connect(durationUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(bestName()));
@@ -2366,10 +2368,11 @@ EditMetricDetailDialog::banisterName()
     metricDetail->bestSymbol = metricDetail->symbol;
 
     // append type
-    switch(stressTypeSelect->currentIndex()) {
+    switch(banisterTypeSelect->currentIndex()) {
     case 0: metricDetail->bestSymbol += "_nte"; break;
     case 1: metricDetail->bestSymbol += "_pte"; break;
     case 2: metricDetail->bestSymbol += "_perf"; break;
+    case 3: metricDetail->bestSymbol += "_cp"; break;
     }
 
 }
@@ -2431,7 +2434,7 @@ void
 EditMetricDetailDialog::metricSelected()
 {
     // only in metric mode
-    if (!chooseMetric->isChecked() && !chooseStress->isChecked()) return;
+    if (!chooseMetric->isChecked() && !chooseStress->isChecked() && !chooseBanister->isChecked()) return;
 
     // user selected a different metric
     // so update accordingly
@@ -2440,73 +2443,76 @@ EditMetricDetailDialog::metricSelected()
     // out of bounds !
     if (index < 0 || index >= ltmTool->metrics.count()) return;
 
-    userName->setText(ltmTool->metrics[index].uname);
-    userUnits->setText(ltmTool->metrics[index].uunits);
-    curveSmooth->setChecked(ltmTool->metrics[index].smooth);
-    fillCurve->setChecked(ltmTool->metrics[index].fillCurve);
-    labels->setChecked(ltmTool->metrics[index].labels);
-    stack->setChecked(ltmTool->metrics[index].stack);
-    showBest->setValue(ltmTool->metrics[index].topN);
-    showOut->setValue(ltmTool->metrics[index].topOut);
-    baseLine->setValue(ltmTool->metrics[index].baseline);
-    penColor = ltmTool->metrics[index].penColor;
-    trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
-    setButtonIcon(penColor);
+    if (!chooseBanister->isChecked()) {
 
-    // curve style
-    switch (ltmTool->metrics[index].curveStyle) {
+        userName->setText(ltmTool->metrics[index].uname);
+        userUnits->setText(ltmTool->metrics[index].uunits);
+        curveSmooth->setChecked(ltmTool->metrics[index].smooth);
+        fillCurve->setChecked(ltmTool->metrics[index].fillCurve);
+        labels->setChecked(ltmTool->metrics[index].labels);
+        stack->setChecked(ltmTool->metrics[index].stack);
+        showBest->setValue(ltmTool->metrics[index].topN);
+        showOut->setValue(ltmTool->metrics[index].topOut);
+        baseLine->setValue(ltmTool->metrics[index].baseline);
+        penColor = ltmTool->metrics[index].penColor;
+        trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
+        setButtonIcon(penColor);
+
+        // curve style
+        switch (ltmTool->metrics[index].curveStyle) {
       
-    case QwtPlotCurve::Steps:
-        curveStyle->setCurrentIndex(0);
-        break;
-    case QwtPlotCurve::Lines:
-        curveStyle->setCurrentIndex(1);
-        break;
-    case QwtPlotCurve::Sticks:
-        curveStyle->setCurrentIndex(2);
-        break;
-    case QwtPlotCurve::Dots:
-    default:
-        curveStyle->setCurrentIndex(3);
-        break;
+        case QwtPlotCurve::Steps:
+            curveStyle->setCurrentIndex(0);
+            break;
+        case QwtPlotCurve::Lines:
+            curveStyle->setCurrentIndex(1);
+            break;
+        case QwtPlotCurve::Sticks:
+            curveStyle->setCurrentIndex(2);
+            break;
+        case QwtPlotCurve::Dots:
+        default:
+            curveStyle->setCurrentIndex(3);
+            break;
 
-    }
+        }
 
-    // curveSymbol
-    switch (ltmTool->metrics[index].symbolStyle) {
+        // curveSymbol
+        switch (ltmTool->metrics[index].symbolStyle) {
       
-    case QwtSymbol::NoSymbol:
-        curveSymbol->setCurrentIndex(0);
-        break;
-    case QwtSymbol::Ellipse:
-        curveSymbol->setCurrentIndex(1);
-        break;
-    case QwtSymbol::Rect:
-        curveSymbol->setCurrentIndex(2);
-        break;
-    case QwtSymbol::Diamond:
-        curveSymbol->setCurrentIndex(3);
-        break;
-    case QwtSymbol::Triangle:
-        curveSymbol->setCurrentIndex(4);
-        break;
-    case QwtSymbol::XCross:
-        curveSymbol->setCurrentIndex(5);
-        break;
-    case QwtSymbol::Hexagon:
-        curveSymbol->setCurrentIndex(6);
-        break;
-    case QwtSymbol::Star1:
-    default:
-        curveSymbol->setCurrentIndex(7);
-        break;
+        case QwtSymbol::NoSymbol:
+            curveSymbol->setCurrentIndex(0);
+            break;
+        case QwtSymbol::Ellipse:
+            curveSymbol->setCurrentIndex(1);
+            break;
+        case QwtSymbol::Rect:
+            curveSymbol->setCurrentIndex(2);
+            break;
+        case QwtSymbol::Diamond:
+            curveSymbol->setCurrentIndex(3);
+            break;
+        case QwtSymbol::Triangle:
+            curveSymbol->setCurrentIndex(4);
+            break;
+        case QwtSymbol::XCross:
+            curveSymbol->setCurrentIndex(5);
+            break;
+        case QwtSymbol::Hexagon:
+            curveSymbol->setCurrentIndex(6);
+            break;
+        case QwtSymbol::Star1:
+        default:
+            curveSymbol->setCurrentIndex(7);
+            break;
 
+        }
     }
 
     (*metricDetail) = ltmTool->metrics[index]; // overwrite!
 
     // make the banister name
-    if (chooseStress->isChecked()) banisterName();
+    if (chooseBanister->isChecked()) banisterName();
     // make the stress name
     if (chooseStress->isChecked()) stressName();
 }

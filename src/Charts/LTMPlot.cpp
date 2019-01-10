@@ -449,9 +449,10 @@ LTMPlot::setData(LTMSettings *set)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
-        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
+        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_BANISTER) {
+            //fprintf(stderr, "insert curve %s, %s\n", metricDetail.uname.toStdString().c_str(), metricDetail.bestSymbol.toStdString().c_str()); fflush(stderr);
             curves.insert(metricDetail.bestSymbol, current);
-        else
+        } else
             curves.insert(metricDetail.symbol, current);
         stacks.insert(current, stackcounter+1);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
@@ -603,9 +604,10 @@ LTMPlot::setData(LTMSettings *set)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
-        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
+        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_BANISTER) {
+            //fprintf(stderr, "insert curve %s, %s\n", metricDetail.uname.toStdString().c_str(), metricDetail.bestSymbol.toStdString().c_str()); fflush(stderr);
             curves.insert(metricDetail.bestSymbol, current);
-        else
+        } else
             curves.insert(metricDetail.symbol, current);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -3546,110 +3548,11 @@ void
 LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
-    n=0;
-#if 0
-    QString scoreType;
-    int stressType = STRESS_LTS;
+    // banister model
+    Banister f(context, metricDetail.symbol, 0,0,0,0);
 
-    // create a custom set of summary metric data!
-    if (metricDetail.type == METRIC_PM) {
-        int valuesType = VALUES_CALCULATED;
-
-        QString symbol = metricDetail.symbol;
-        if (symbol.startsWith("planned_")) {
-            valuesType = VALUES_PLANNED;
-            symbol = symbol.right(symbol.length()-8);
-        } else if (symbol.startsWith("expected_")) {
-            valuesType = VALUES_EXPECTED;
-            symbol = symbol.right(symbol.length()-9);
-        }
-
-        if (symbol.startsWith("skiba")) {
-            scoreType = "skiba_bike_score";
-        } else if (symbol.startsWith("antiss")) {
-            scoreType = "antiss_score";
-        } else if (symbol.startsWith("atiss")) {
-            scoreType = "atiss_score";
-        } else if (symbol.startsWith("coggan")) {
-            scoreType = "coggan_tss";
-        } else if (symbol.startsWith("daniels")) {
-            scoreType = "daniels_points";
-        } else if (symbol.startsWith("trimp")) {
-            scoreType = "trimp_points";
-        } else if (symbol.startsWith("work")) {
-            scoreType = "total_work";
-        } else if (symbol.startsWith("cp_")) {
-            scoreType = "skiba_cp_exp";
-        } else if (symbol.startsWith("wprime")) {
-            scoreType = "skiba_wprime_exp";
-        } else if (symbol.startsWith("distance")) {
-            scoreType = "total_distance";
-        } else if (symbol.startsWith("triscore")) {
-            scoreType = "triscore";
-        }
-
-        stressType = STRESS_LTS; // if in doubt
-        if (valuesType == VALUES_CALCULATED) {
-            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
-                stressType = STRESS_LTS;
-            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
-                stressType = STRESS_STS;
-            else if (metricDetail.symbol.endsWith("sb"))
-                stressType = STRESS_SB;
-            else if (metricDetail.symbol.endsWith("lr"))
-                stressType = STRESS_RR;
-        }
-        else if (valuesType == VALUES_PLANNED) {
-            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
-                stressType = STRESS_PLANNED_LTS;
-            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
-                stressType = STRESS_PLANNED_STS;
-            else if (metricDetail.symbol.endsWith("sb"))
-                stressType = STRESS_PLANNED_SB;
-            else if (metricDetail.symbol.endsWith("lr"))
-                stressType = STRESS_PLANNED_RR;
-        }
-        else if (valuesType == VALUES_EXPECTED) {
-            if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl"))
-                stressType = STRESS_EXPECTED_LTS;
-            else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl"))
-                stressType = STRESS_EXPECTED_STS;
-            else if (metricDetail.symbol.endsWith("sb"))
-                stressType = STRESS_EXPECTED_SB;
-            else if (metricDetail.symbol.endsWith("lr"))
-                stressType = STRESS_EXPECTED_RR;
-        }
-    } else {
-
-        scoreType = metricDetail.symbol; // just use the selected metric
-        stressType = metricDetail.stressType;
-    }
-
-
-    // initial state
-    PMCData *athletePMC = NULL;
-    PMCData *localPMC = NULL;
-    n = 0;
-
-    // create local PMC if filtered
-    if (!SearchFilterBox::isNull(metricDetail.datafilter) || settings->specification.isFiltered()) {
-
-        // don't filter for date range!!
-        Specification allDates = settings->specification;
-
-        // curve specific filter
-        if (!SearchFilterBox::isNull(metricDetail.datafilter))
-            allDates.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
-
-        allDates.setDateRange(DateRange(QDate(),QDate()));
-        localPMC = new PMCData(context, allDates, scoreType);
-    }
-
-    // use global one if not filtered
-    if (!localPMC) athletePMC = context->athlete->getPMCFor(scoreType);
-
-    // point to the right one
-    PMCData *pmcData = localPMC ? localPMC : athletePMC;
+    // perform fit (date range todo)
+    f.fit();
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
                     - groupForDate(settings->start.date(), settings->groupBy);
@@ -3676,57 +3579,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = 0.0f;
-
-        switch (stressType) {
-        case STRESS_LTS:
-            value = pmcData->lts(date);
-            break;
-        case STRESS_STS:
-            value = pmcData->sts(date);
-            break;
-        case STRESS_SB:
-            value = pmcData->sb(date);
-            break;
-        case STRESS_RR:
-            value = pmcData->rr(date);
-            break;
-        case STRESS_PLANNED_LTS:
-            value = pmcData->plannedLts(date);
-            break;
-        case STRESS_PLANNED_STS:
-            value = pmcData->plannedSts(date);
-            break;
-        case STRESS_PLANNED_SB:
-            value = pmcData->plannedSb(date);
-            break;
-        case STRESS_PLANNED_RR:
-            value = pmcData->plannedRr(date);
-            break;
-        case STRESS_EXPECTED_LTS:
-            value = pmcData->expectedLts(date);
-            if (past)
-                plotData = false;
-            break;
-        case STRESS_EXPECTED_STS:
-            value = pmcData->expectedSts(date);
-            if (past)
-                plotData = false;
-            break;
-        case STRESS_EXPECTED_SB:
-            value = pmcData->expectedSb(date);
-            if (past)
-                plotData = false;
-            break;
-        case STRESS_EXPECTED_RR:
-            value = pmcData->expectedRr(date);
-            if (past)
-                plotData = false;
-            break;
-        default:
-            value = 0;
-            break;
-        }
+        double value = f.value(date, metricDetail.stressType);
 
         if (plotData && (value || wantZero)) {
             unsigned long seconds = 1;
@@ -3785,11 +3638,8 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
             lastDay = currentDay;
         }
     }
-
-    // wipe away local
-    if (localPMC) delete localPMC;
-#endif
 }
+
 void
 LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
