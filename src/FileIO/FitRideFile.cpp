@@ -3328,7 +3328,10 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     write_int32(array, value, true);
 
     // 6. sport
-    write_int8(array, 2);
+    // Export as bike, run or swim, default sport is bike. 
+    // todo: support all sports based on tag "Sport"
+    int sport = ride->isRun() ? 1 : ride->isSwim() ? 5 : 2;
+    write_int8(array, sport);
 
     // 7. sub sport
     write_int8(array, 0);
@@ -3524,7 +3527,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         num_fields ++;
         write_field_definition(fields, 3, 1, 2); // heart_rate (3)
     }
-    if ( withCad && ride->areDataPresent()->cad ) {
+    if ( withCad && (ride->areDataPresent()->cad || (ride->isRun() && ride->areDataPresent()->rcad)) ) {
         num_fields ++;
         write_field_definition(fields, 4, 1, 2); // cadence (4)
     }
@@ -3545,7 +3548,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         num_fields ++;
         write_field_definition(fields, 13, 1, 2); // temperature (13)
     }
-    if ( (type&2)==1 ) {
+    if ( (type&2)==2 ) {
         num_fields ++;
         write_field_definition(fields, 30, 1, 2); // left_right_balance (30)
     }
@@ -3597,6 +3600,10 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( withCad && ride->areDataPresent()->cad ) {
             write_int8(ridePoint, point->cad);
         }
+        // In runs, cadence is saved in 'rcad' instead of 'cad'
+        if (withCad && ride->isRun() && ride->areDataPresent()->rcad){
+            write_int8(ridePoint, point->rcad);
+        }
         if ( ride->areDataPresent()->km ) {
             write_int32(ridePoint, point->km * 100000, true);
         }
@@ -3611,7 +3618,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( (type&1)==1) {
             write_int8(ridePoint, point->temp);
         }
-        if ( (type&2)==1 ) {
+        if ( (type&2)==2 ) {
             write_int8(ridePoint, point->lrbalance);
         }
 
