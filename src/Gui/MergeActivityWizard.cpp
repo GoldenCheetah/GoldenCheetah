@@ -931,7 +931,7 @@ MergeStrategy::clicked(QString p)
 MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Adjust Alignment"));
-    setSubTitle(tr("Adjust merge alignment in time"));
+    setSubTitle(tr("Adjust merge alignment in time (use cursor and pgDown/pgUp keys for precise alignment)"));
 
     // need more space on this page!
     setContentsMargins(0,0,0,0);
@@ -1032,6 +1032,11 @@ MergeAdjust::initializePage()
     adjustSlider->setMinimum(-1 * wizard->combined->dataPoints().count());
     adjustSlider->setMaximum(wizard->combined->dataPoints().count());
     adjustSlider->setValue(wizard->offset2 - wizard->offset1);
+
+    // allow slider to be controlled by keyboard
+    adjustSlider->setSingleStep(1);
+    adjustSlider->setPageStep(10);
+    adjustSlider->setFocusPolicy(Qt::StrongFocus);
 }
 
 void 
