@@ -3549,10 +3549,13 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     // banister model
-    Banister f(context, metricDetail.symbol, 0,0,0,0);
+    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, 0,0);
 
-    // perform fit (date range todo)
-    f.fit();
+    // should never happen...
+    if (banister==NULL) {
+        n=0;
+        return;
+    }
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
                     - groupForDate(settings->start.date(), settings->groupBy);
@@ -3579,7 +3582,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = f.value(date, metricDetail.stressType);
+        double value = banister->value(date, metricDetail.stressType);
 
         if (plotData && (value || wantZero)) {
             unsigned long seconds = 1;

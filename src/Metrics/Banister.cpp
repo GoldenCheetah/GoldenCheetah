@@ -101,8 +101,14 @@ const int typical_SeasonBreak = 42;
 //
 //
 Banister::Banister(Context *context, QString symbol, double t1, double t2, double k1, double k2) :
-    symbol(symbol), k1(k1), k2(k2), t1(t1), t2(t2), days(0), context(context)
+    symbol(symbol), k1(k1), k2(k2), t1(t1), t2(t2), days(0), context(context), isstale(true)
 {
+    // when they all change we are ready to invalidate and refresh
+    // don't worry about upstream events, this is what we are dependant on
+    connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(invalidate()));
+    connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(refresh()));
+
+    // refresh
     refresh();
 }
 
@@ -112,12 +118,15 @@ Banister::value(QDate date, int type)
 {
     // check in range
     if (date > stop || date < start) return 0;
-    int index=date.toJulianDay()-start.toJulianDay();
+
+    // offset, bouinds check just in case.
+    long index=date.toJulianDay()-start.toJulianDay();
+    if (index <0 || index>=data.length()) return 0;
 
     switch(type) {
-    case BANISTER_NTE: return data[index].nte;
-    case BANISTER_PTE: return data[index].pte;
-    case BANISTER_CP: return data[index].perf * typical_CP / 100;
+    case BANISTER_NTE: return data[index].h;
+    case BANISTER_PTE: return data[index].g;
+    case BANISTER_CP: return data[index].perf > 0 ? data[index].perf * typical_CP / 100 : 0; // avoid -ve values and divzero
     default:
     case BANISTER_PERFORMANCE: return data[index].perf;
     }
@@ -143,8 +152,19 @@ Banister::init()
 }
 
 void
+Banister::invalidate()
+{
+    isstale=true;
+}
+void
 Banister::refresh()
 {
+    // not stale
+    if (!isstale) return;
+
+    // unstale
+    isstale=false;
+
     // clear
     init();
 
@@ -325,6 +345,11 @@ Banister::refresh()
                 f.tests, f.testoffset,
                 f.stopIndex-f.startIndex);
     }
+
+    //
+    // EXTRACT PARAMETERS WITH A FIT
+    //
+    fit();
 }
 
 

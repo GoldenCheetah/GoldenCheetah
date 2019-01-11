@@ -62,6 +62,7 @@ class Tab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;
+class Banister;
 
 class Athlete : public QObject
 {
@@ -110,6 +111,10 @@ class Athlete : public QObject
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
         PMCData *getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsDays = -1, int ltsDays = -1); // no Specification used!
         QMap<QString, PMCData*> pmcData; // all the different PMC series
+
+        // Banister Data
+        Banister *getBanisterFor(QString metricName, int t1, int t2); // t1/t2 not used yet
+        QMap<QString, Banister*> banisterData;
 
         // athlete measures
         // note ride can override if passed

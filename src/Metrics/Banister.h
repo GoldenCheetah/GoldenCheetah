@@ -39,7 +39,7 @@ extern const int typical_SeasonBreak;
 
 class banisterData{
 public:
-    banisterData() : score(0), nte(0), pte(0), perf(0), test(0) {}
+    banisterData() : score(0), g(0), h(0), nte(0), pte(0), perf(0), test(0) {}
     double score,       // TRIMP, BikeScore etc for day
            g,           // accumulated load with t1 decay for pte
            h,           // accumulated load with t2 decay for nte
@@ -108,11 +108,13 @@ public:
 public slots:
 
     void init();        // reset previous fits
+    void invalidate();  // mark as stale
     void refresh();     // collect data from rides etc
     void fit();         // perform fits along windows
 
 private:
     Context *context;
+    bool isstale;
 
 };
 #endif
