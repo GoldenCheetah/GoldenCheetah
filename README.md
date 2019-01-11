@@ -33,8 +33,6 @@ OSX: [![Build Status](https://travis-ci.org/GoldenCheetah/GoldenCheetah.svg?bran
 
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
 
-[![Coverity Status](https://scan.coverity.com/projects/7503/badge.svg)](https://scan.coverity.com/projects/goldencheetah-goldencheetah)
-
 Alternatively, official builds are available from http://www.goldencheetah.org
 
 whilst the latest developer builds are available from https://github.com/GoldenCheetah/GoldenCheetah/releases
