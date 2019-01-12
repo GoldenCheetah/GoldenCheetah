@@ -250,7 +250,7 @@ Estimator::run()
         // lets extract the best performance of the week first.
         // only care about performances between 3-20 minutes.
         Performance bestperformance(end,0,0,0);
-        for (int t=180; t<week.length() && t<1200; t++) {
+        for (int t=240; t<week.length() && t<3600; t++) {
 
             double p = double(week[t]);
             if (week[t]<=0) continue;
@@ -395,8 +395,8 @@ Estimator::filter(QList<Performance> perfs)
             // is the next point a left or right turn?
             double cross = crossProduct(origin, last, perfs[index]);
 
-            // is it higher or left turn ?
-            if (perfs[index].powerIndex > perfs[index-1].powerIndex || cross >= 0) {  // collinear or better
+            // is it higher? no brainer
+            if (perfs[index].powerIndex > perfs[index-1].powerIndex) {  // collinear or better
                 returning << perfs[index];
                 origin=last;
                 last=perfs[index];
@@ -408,6 +408,7 @@ Estimator::filter(QList<Performance> perfs)
                 int chosen=0;
                 for (int k=1; k<8 && index+k < perfs.length(); k++) {
                     cross = crossProduct(origin, last, perfs[index+k]);
+                    // 2% or higher -or- heading in right direction
                     if (cross >= 0) {
                         chosen=k;    // use this one and stop looking
                         break;
@@ -424,7 +425,7 @@ Estimator::filter(QList<Performance> perfs)
                 }
 
                 // choose this one
-                origin = last;
+                //origin = last; stick to last one that was higher
                 last = perfs[index+chosen];
                 returning << last;
                 index += chosen;

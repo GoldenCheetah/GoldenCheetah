@@ -83,6 +83,7 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QCheckBox *showData;
         QCheckBox *showEvents;
+        QCheckBox *showBanister;
         QCheckBox *showStack;
         QSlider *stackSlider;
 

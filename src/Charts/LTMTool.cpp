@@ -112,6 +112,10 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     showEvents = new QCheckBox(tr("Show Events"));
     basicsettingsLayout->addRow(new QLabel(""), showEvents);
 
+    showBanister = new QCheckBox(tr("Show Banister Helper"));
+    showBanister->setChecked(true); //enable by default
+    basicsettingsLayout->addRow(new QLabel(""), showBanister);
+
     stackSlider = new QSlider(Qt::Horizontal,this);
     stackSlider->setMinimum(0);
     stackSlider->setMaximum(7);

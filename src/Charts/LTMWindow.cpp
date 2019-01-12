@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "Banister.h"
 #include "RideCache.h"
 #include "RideFileCache.h"
 #include "Settings.h"
@@ -32,6 +33,7 @@
 #include "float.h"
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
+#include "GcOverlayWidget.h"
 
 #ifdef NOWEBKIT
 #include <QWebEngineSettings>
@@ -57,7 +59,7 @@
 #include <qwt_plot_marker.h>
 
 LTMWindow::LTMWindow(Context *context) :
-            GcChartWindow(context), context(context), dirty(true), stackDirty(true), compareDirty(true)
+            GcChartWindow(context), context(context), dirty(true), stackDirty(true), compareDirty(true), firstshow(true)
 {
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
@@ -253,6 +255,45 @@ LTMWindow::LTMWindow(Context *context) :
 
     ltmTool = new LTMTool(context, &settings);
 
+    // the banister overlay
+    QWidget *ban=new QWidget(this);
+    addHelper(tr("Banister Model"), ban);
+
+    QGridLayout *bang= new QGridLayout(ban);
+    bang->setColumnStretch(0, 40);
+    bang->setColumnStretch(1, 30);
+    bang->setColumnStretch(2, 20);
+
+    // interactive elements
+    banCombo = new QComboBox(this);
+    banT1 = new QDoubleSpinBox(this);
+    banT2 = new QDoubleSpinBox(this);
+
+    // labels etc
+    ilabel = new QLabel(tr("Impulse Metric"), this);
+    plabel = new QLabel(tr("Peak CP"), this);
+    peaklabel = new QLabel(this);
+    peaklabel->setText("296w on 3rd July");
+    t1label1 = new QLabel(tr("Positive decay"), this);
+    t1label2 = new QLabel(tr("days"), this);
+    t2label1 = new QLabel(tr("Negative decay"), this);
+    t2label2 = new QLabel(tr("days"), this);
+    RMSElabel = new QLabel(this);
+    RMSElabel->setText("RMSE 2.9 for 22 tests.");
+
+    // add to layout
+    bang->addWidget(ilabel,0,0);
+    bang->addWidget(banCombo,0,1,1,2,Qt::AlignLeft);
+    bang->addWidget(plabel, 1,0);
+    bang->addWidget(peaklabel,1,1,1,2,Qt::AlignLeft);
+    bang->addWidget(t1label1,2,0);
+    bang->addWidget(banT1,2,1);
+    bang->addWidget(t1label2,2,2);
+    bang->addWidget(t2label1,3,0);
+    bang->addWidget(banT2,3,1);
+    bang->addWidget(t2label2,3,2);
+    bang->addWidget(RMSElabel,4,0,1,3);
+
     // initialise
     settings.ltmTool = ltmTool;
     settings.groupBy = LTM_DAY;
@@ -310,6 +351,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(scrollLeft, SIGNAL(clicked()), this, SLOT(moveLeft()));
     connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
 
+    // refresh banister data when combo changes
+    connect(banCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister(int)));
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -325,9 +368,152 @@ LTMWindow::hideBasic()
 }
 
 void
+LTMWindow::showBanister(bool relevant)
+{
+    RideMetricFactory &factory = RideMetricFactory::instance();
+
+    if (relevant && banister()) {
+
+        // we reset the combo so lets remember where we were at
+        int remember=0;
+        if (banCombo->count()) remember=banCombo->currentIndex();
+
+        QStringList symbols;
+
+        // lets setup the widgets
+        banCombo->clear();
+        foreach(MetricDetail metricDetail, settings.metrics) {
+            if (metricDetail.type == METRIC_BANISTER) {
+                if (!symbols.contains(metricDetail.symbol)) {
+                    const RideMetric *m = factory.rideMetric(metricDetail.symbol);
+                    if (m) {
+                        symbols << metricDetail.symbol;
+
+                        // bloody TM in bikescore is TEE DEE US
+                        QString name=m->name();
+                        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+                        banCombo->addItem(name, QVariant(metricDetail.symbol));
+                    }
+                }
+            }
+        }
+
+        // go back to remembered value
+        if (remember < banCombo->count()) banCombo->setCurrentIndex(remember);
+
+        // now get the metric values etc
+        refreshBanister(banCombo->currentIndex());
+        overlayWidget->show();
+
+    } else {
+
+        // ignore it
+        overlayWidget->hide();
+    }
+}
+
+bool
+LTMWindow::event(QEvent *event)
+{
+    // nasty nasty nasty hack to move widgets as soon as the widget geometry
+    // is set properly by the layout system, by default the width is 100 and
+    // we wait for it to be set properly then put our helper widget on the RHS
+    if (event->type() == QEvent::Resize && geometry().width() != 100) {
+
+        // put somewhere nice on first show
+        if (firstshow) {
+            firstshow = false;
+            helperWidget()->resize(400*dpiXFactor, 150*dpiYFactor);
+            helperWidget()->move(mainWidget()->geometry().width()-(500*dpiXFactor), 90*dpiYFactor);
+        }
+
+        // if off the screen move on screen
+        if (helperWidget()->geometry().x() > geometry().width()) {
+            helperWidget()->move(mainWidget()->geometry().width()-(500*dpiXFactor), 90*dpiYFactor);
+        }
+    }
+    return QWidget::event(event);
+}
+
+void
+LTMWindow::refreshBanister(int index)
+{
+    if (index >= 0 && index < banCombo->count()) {
+
+        // lookup and set
+        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(),0,0);
+        banT1->setValue(banister->t1);
+        banT2->setValue(banister->t2);
+
+        int CP=0;
+        QDate when = banister->getPeakCP(settings.start.date(), settings.end.date(), CP);
+
+        // set peak label
+        if (CP >0 && when != QDate()) peaklabel ->setText(QString("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
+        else peaklabel->setText("");
+
+        // set RMSE for current view
+        int count;
+        double RMSE = banister->RMSE(settings.start.date(), settings.end.date(), count);
+        if (count && RMSE >0) RMSElabel->setText(QString("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
+        else RMSElabel->setText("");
+
+    } else {
+        // clear
+        peaklabel->setText("");
+        RMSElabel->setText("");
+    }
+}
+
+void
 LTMWindow::configChanged(qint32)
 {
+    // tinted palette for headings etc
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+
+    // inverted palette for data etc
+    QPalette whitepalette;
+    whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+
+    QFont font;
+    font.setPointSize(12); // reasonably big
+    ilabel->setFont(font);
+    plabel->setFont(font);
+    t1label1->setFont(font);
+    t1label2->setFont(font);
+    plabel->setFont(font);
+    peaklabel->setFont(font);
+    t2label1->setFont(font);
+    t2label2->setFont(font);
+    RMSElabel->setFont(font);
+    banT1->setFont(font);
+    banT2->setFont(font);
+    banCombo->setFont(font);
+
+    ilabel->setPalette(palette);
+    plabel->setPalette(palette);
+    t1label1->setPalette(palette);
+    t1label2->setPalette(palette);
+    plabel->setPalette(palette);
+    peaklabel->setPalette(whitepalette);
+    t2label1->setPalette(palette);
+    t2label2->setPalette(palette);
+    RMSElabel->setPalette(whitepalette);
+
 #ifndef Q_OS_MAC
+    banT1->setStyleSheet(TabView::ourStyleSheet());
+    banT2->setStyleSheet(TabView::ourStyleSheet());
+    banCombo->setStyleSheet(TabView::ourStyleSheet());
     plotArea->setStyleSheet(TabView::ourStyleSheet());
     compareplotArea->setStyleSheet(TabView::ourStyleSheet());
 #endif
