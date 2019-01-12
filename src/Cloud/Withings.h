@@ -34,7 +34,7 @@ class Withings : public CloudService {
         CloudService *clone(Context *context) { return new Withings(context); }
 
         QString id() const { return "Withings"; }
-        QString uiName() const { return tr("Nokia Health (Withings)"); }
+        QString uiName() const { return tr("Withings"); }
         QString description() const { return (tr("Download weight, body fat etc from the connected health specialists.")); }
         QImage logo() const { return QImage(":images/services/withings.png"); }
 

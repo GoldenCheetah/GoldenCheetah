@@ -189,7 +189,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if (site == WITHINGS) {
 
-        urlstr = QString("https://account.health.nokia.com/oauth2_user/authorize2?");
+        urlstr = QString("https://account.withings.com/oauth2_user/authorize2?");
         urlstr.append("redirect_uri=http://www.goldencheetah.org&");
         urlstr.append("scope=user.info,user.metrics&");
         urlstr.append("response_type=code&");
@@ -327,7 +327,7 @@ OAuthDialog::urlChanged(const QUrl &url)
                 authheader = QString("%1:%1").arg("xert_public");
             } else if (site == WITHINGS) {
 
-                urlstr = QString("https://account.health.nokia.com/oauth2/token?");
+                urlstr = QString("https://account.withings.com/oauth2/token?");
                 params.addQueryItem("client_id", GC_NOKIA_CLIENT_ID);
                 params.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET);
                 params.addQueryItem("redirect_uri","http://www.goldencheetah.org");
@@ -629,7 +629,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
 
 
-            QString info = QString(tr("Withings/Nokia authorization was successful."));
+            QString info = QString(tr("Withings authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 

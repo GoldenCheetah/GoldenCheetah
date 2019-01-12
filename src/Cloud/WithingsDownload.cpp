@@ -139,7 +139,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                 params.addQueryItem("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
 
 
-                QUrl url = QUrl( "https://api.health.nokia.com/measure?" + params.toString() );
+                QUrl url = QUrl( "https://wbsapi.withings.net/measure?" + params.toString() );
 
                 printd("URL: %s\n", url.url().toStdString().c_str());
 
