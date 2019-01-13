@@ -34,7 +34,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG               true // debug traces
+#define FIT_DEBUG               false // debug traces
 #define FIT_DEBUG_LEVEL         4    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
@@ -1347,7 +1347,7 @@ struct FitFileReaderState
         else
             iniTime = last_time;
 
-        time_t time = iniTime;
+        time_t time = 0;
         int i = 0;
         time_t this_start_time = 0;
         double total_distance = 0.0;
@@ -1418,6 +1418,11 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
+
+        if (time == 0 && total_elapsed_time > 0) {
+            time = iniTime + total_elapsed_time - 1;
+        }
+
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -1426,10 +1431,7 @@ struct FitFileReaderState
                 errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
                 return;
             }
-        }
-        if (time == iniTime && total_elapsed_time > 0) {
-            time = iniTime + total_elapsed_time - 1;
-        }
+        } 
 
         if (isLapSwim) {
             // Fill empty laps due to false starts or pauses in some devices
