@@ -37,7 +37,7 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose the download or import source"));
-    downloadWithings = new QRadioButton(tr("Nokia Health (Withings)"));
+    downloadWithings = new QRadioButton(tr("Withings"));
     downloadTP = new QRadioButton(tr("Today's Plan"));
     downloadCSV = new QRadioButton(tr("Import CSV file"));
     QVBoxLayout *vbox1 = new QVBoxLayout;
