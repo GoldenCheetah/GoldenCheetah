@@ -392,13 +392,13 @@ Banister::refresh()
     }
 
     //
-    // EXPAND A FITTING WINDOW WHERE <8 TESTS (5 just not enough)
+    // EXPAND A FITTING WINDOW WHERE <5 TESTS (5 just not enough to get going...)
     //
     int i=0;
     while(i < windows.length() && windows.count() > 1) {
 
         // combine and remove prior
-        if (windows[i].tests < 8 && i>0) {
+        if (windows[i].tests < 5 && i>0) {
             windows[i].combine(windows[i-1]);
             windows.removeAt(--i);
         } else i++;
@@ -424,18 +424,15 @@ banisterFit::f(double d, const double *parms)
 {
     if (k1 > parms[0] || k1 < parms[0] ||
         k2 > parms[1] || k2 < parms[1] ||
-        //t1 > parms[2] || t1 < parms[2] ||
-        //t2 > parms[3] || t2 < parms[3] ||
-        p0 > parms[4] || p0 < parms[4]) {
+        p0 > parms[2] || p0 < parms[2]) {
 
         // we'll keep the parameters passed
         k1 = parms[0];
         k2 = parms[1];
-        //t1 = parms[2];
-        //t2 = parms[3];
+        p0 = parms[2];
+        // we fixed t1/t2 (for now)
         t1 = parent->t1;
         t2 = parent->t2;
-        p0 = parms[4];
 
         //printd("fit iter %s to %s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", startDate.toString().toStdString().c_str(), stopDate.toString().toStdString().c_str(), k1,k2,t1,t2,p0); // too much info even in debug, unless you want it
         compute(startIndex, stopIndex);
@@ -458,8 +455,8 @@ banisterFit::compute(long start, long stop)
             parent->data[index].g =  parent->data[index].h = 0;
             first = false;
         } else {
-            parent->data[index].g = (parent->data[index-1].g * exp (-1/t1)) + parent->data[index].score;
-            parent->data[index].h = (parent->data[index-1].h * exp (-1/t2)) + parent->data[index].score;
+            parent->data[index].g = (parent->data[index-1].g * exp (-1/parent->t1)) + parent->data[index].score;
+            parent->data[index].h = (parent->data[index-1].h * exp (-1/parent->t2)) + parent->data[index].score;
         }
 
         // apply coefficients
@@ -491,25 +488,35 @@ static double calllmfitf(double t, const double *p) {
 return static_cast<banisterFit*>(calllmfitmodel)->f(t, p);
 
 }
+
+void Banister::setDecay(double one, double two)
+{
+    // we will need to refit too...
+    t1 = one;
+    t2 = two;
+
+    // no need to refresh, just refit
+    fit();
+
+}
 void Banister::fit()
 {
     for(int i=0; i<windows.length(); i++) {
 
-        double prior[5]={ k1, k2, t1, t2, performanceScore[windows[i].testoffset] };
+        double prior[3]={ k1, k2, performanceScore[windows[i].testoffset] };
 
         lm_control_struct control = lm_control_double;
         control.patience = 1000; // more than this and there really is a problem
         lm_status_struct status;
 
-        printd("fitting window %d start=%s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", i, windows[i].startDate.toString().toStdString().c_str(), prior[0], prior[1], prior[2], prior[3], prior[4]);
+        printd("fitting window %d start=%s [k1=%g k2=%g p0=%g]\n", i, windows[i].startDate.toString().toStdString().c_str(), prior[0], prior[1], prior[2]);
 
         // use forwarder via global variable, so mutex around this !
         calllmfit.lock();
         calllmfitmodel=&windows[i];
 
-
         //fprintf(stderr, "Fitting ...\n" ); fflush(stderr);
-        lmcurve(6, prior, windows[i].tests, performanceDay.constData()+windows[i].testoffset, performanceScore.constData()+windows[i].testoffset,
+        lmcurve(3, prior, windows[i].tests, performanceDay.constData()+windows[i].testoffset, performanceScore.constData()+windows[i].testoffset,
                 calllmfitf, &control, &status);
 
         // release for others
@@ -518,7 +525,7 @@ void Banister::fit()
         if (status.outcome >= 0) {
             int n=0;
             double x=RMSE(windows[i].startDate, windows[i].stopDate, n);
-            printd("RMSE %g for %d points: window %d %s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", x, n, i, lm_infmsg[status.outcome], prior[0], prior[1], prior[2], prior[3], prior[4]);
+            printd("RMSE %g for %d points: window %d %s [k1=%g k2=%g p0=%g]\n", x, n, i, lm_infmsg[status.outcome], prior[0], prior[1], prior[2]);
         }
     }
 

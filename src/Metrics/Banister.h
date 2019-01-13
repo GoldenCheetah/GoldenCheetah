@@ -77,7 +77,6 @@ class Banister : public QObject {
 public:
 
     Banister(Context *context, QString symbol, double t1, double t2, double k1=0, double k2=0);
-
     double value(QDate date, int type);
 
     // utility
@@ -115,6 +114,7 @@ public slots:
     void init();        // reset previous fits
     void invalidate();  // mark as stale
     void refresh();     // collect data from rides etc
+    void setDecay(double t1, double t2); // adjust the t1/t2 parameters
     void fit();         // perform fits along windows
 
 private:

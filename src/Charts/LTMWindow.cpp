@@ -271,7 +271,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     // labels etc
     ilabel = new QLabel(tr("Impulse Metric"), this);
-    plabel = new QLabel(tr("Peak CP"), this);
+    plabel = new QLabel(tr("Peak"), this);
     peaklabel = new QLabel(this);
     peaklabel->setText("296w on 3rd July");
     t1label1 = new QLabel(tr("Positive decay"), this);
@@ -316,6 +316,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool->applyButton, SIGNAL(clicked(bool)), this, SLOT(applyClicked(void)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
+    connect(ltmTool->showBanister, SIGNAL(stateChanged(int)), this, SLOT(refresh()));
     connect(rData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
     connect(ltmTool->showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
@@ -353,6 +354,8 @@ LTMWindow::LTMWindow(Context *context) :
 
     // refresh banister data when combo changes
     connect(banCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister(int)));
+    connect(banT1, SIGNAL(valueChanged(double)), this, SLOT(tuneBanister()));
+    connect(banT2, SIGNAL(valueChanged(double)), this, SLOT(tuneBanister()));
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -436,6 +439,28 @@ LTMWindow::event(QEvent *event)
     return QWidget::event(event);
 }
 
+void
+LTMWindow::tuneBanister()
+{
+
+    // if we have a banister...
+    if (banCombo->count() && banT1->value() >0 && banT2->value()>0) {
+
+        // lookup and set
+        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(),0,0);
+
+        // when user adjusts the t1/t2 parameters we need to refit
+        if (banT1->value() < banister->t1 || banT1->value() > banister->t1 ||
+            banT2->value() < banister->t2 || banT2->value() > banister->t2) {
+
+            // lets adjust it them
+            banister->setDecay(banT1->value(), banT2->value());
+        }
+
+        // replot
+        refreshPlot();
+    }
+}
 void
 LTMWindow::refreshBanister(int index)
 {
