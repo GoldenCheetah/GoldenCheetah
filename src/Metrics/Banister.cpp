@@ -60,7 +60,7 @@ const double typical_CP = 261,
 // used to control breaking into windows, but the performance is good enough
 // that we don't need to, and more data stops the fit from going bad.
 const int typical_SeasonBreak = 42;
-const int typical_SeasonSize = 10000; // set so high windows never happen
+const int typical_SeasonSize = 700; // a good couple of years needed
 
 // for debugging
 #ifndef BANISTER_DEBUG
@@ -392,16 +392,15 @@ Banister::refresh()
     }
 
     //
-    // EXPAND A FITTING WINDOW WHERE <5 TESTS (5 just not enough to get going...)
+    // EXPAND A FITTING WINDOW
     //
-    int i=0;
-    while(i < windows.length() && windows.count() > 1) {
+    for(int i=windows.count()-1; i>0 && windows.count() > 1; i--) {
 
         // combine and remove prior
-        if (windows[i].tests < 5 && i>0) {
+        if (windows[i].tests < 5 || windows[i].stopIndex-windows[i].startIndex < typical_SeasonSize) {
             windows[i].combine(windows[i-1]);
-            windows.removeAt(--i);
-        } else i++;
+            windows.removeAt(i-1);
+        }
     }
 
     foreach(banisterFit f, windows) {
