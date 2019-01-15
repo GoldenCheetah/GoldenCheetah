@@ -230,9 +230,14 @@ Banister::refresh()
     QDate f, l;
     if (context->athlete->rideCache->rides().count()) {
 
-        // set date range - extend to a year after last ride
+        // always start on first ride
         f= context->athlete->rideCache->rides().first()->dateTime.date();
-        l= context->athlete->rideCache->rides().last()->dateTime.date().addYears(1);
+
+        // set date range - extend to a year after last ride
+        // or a year from today whichever is later
+        QDate lastride = context->athlete->rideCache->rides().last()->dateTime.date().addYears(1);
+        QDate yearaway = QDate::currentDate().addYears(1);
+        l = yearaway > lastride ? yearaway : lastride;
 
     } else
         return;

@@ -689,12 +689,14 @@ LTMWindow::refreshPlot()
         if (isCompare()) {
 
             // COMPARE PLOTS
+            showBanister(false); // never
             stackWidget->setCurrentIndex(3);
             refreshCompare();
 
         } else if (ltmTool->showData->isChecked()) {
 
             //  DATA TABLE
+            showBanister(false); // never
             stackWidget->setCurrentIndex(1);
             refreshDataTable();
 
