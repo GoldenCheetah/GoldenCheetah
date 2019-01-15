@@ -403,6 +403,12 @@ Banister::refresh()
         }
     }
 
+    // make them contiguous
+    for(int i=0; i<windows.count(); i++) {
+        if (i<(windows.count()-1)) windows[i].stopIndex = windows[i+1].stopIndex;
+        else  windows[i].stopIndex = data.length()-1;
+    }
+
     foreach(banisterFit f, windows) {
         printd("post combined window: %s to %s, %d tests (from %d) season %ld days\n",
                 f.startDate.toString().toStdString().c_str(),
