@@ -207,6 +207,10 @@ Banister::init()
     // default values
     k1=0.2;
     k2=0.2;
+
+    // t1,t2 if set to zero?
+    if (t1<=0) t1=50;
+    if (t2<=0) t2=11;
 }
 
 void

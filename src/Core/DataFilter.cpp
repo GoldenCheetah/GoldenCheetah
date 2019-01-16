@@ -24,6 +24,7 @@
 #include "RideNavigator.h"
 #include "RideFileCache.h"
 #include "PMCData.h"
+#include "Banister.h"
 #include "VDOTCalculator.h"
 #include "DataProcessor.h"
 #include <QDebug>
@@ -128,6 +129,10 @@ static struct {
 
     // how many performance tests in the ride?
     { "tests", 0 },
+
+    // banister function
+    { "banister", 2 }, // banister(metric, nte|pte|perf|cp)
+
     // add new ones above this line
     { "", -1 }
 };
@@ -171,6 +176,9 @@ DataFilter::builtins()
             for (int g=0; g<groupSymbols.count(); g++)
                 foreach (QString fieldSymbol, measures.getFieldSymbols(g))
                     returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
+        } else if (i == 44) {
+            // banister
+            returning << "banister(metric, nte|pte|perf|cp)";
         } else {
             QString function;
             function = DataFilterFunctions[i].name + "(";
@@ -370,6 +378,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
 
                 // isRun isa special, we may add more later (e.g. date)
                 if (!sym.compare("Date", Qt::CaseInsensitive) ||
+                    !sym.compare("banister", Qt::CaseInsensitive) ||
                     !sym.compare("best", Qt::CaseInsensitive) ||
                     !sym.compare("tiz", Qt::CaseInsensitive) ||
                     !sym.compare("const", Qt::CaseInsensitive) ||
@@ -1174,6 +1183,34 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
 
+                } else if (leaf->function == "banister") {
+
+                    // 2 or more
+                    if (leaf->fparms.count() != 2) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be banister(metric, nte|pte|perf|cp)"));
+                    } else {
+
+                        Leaf *first=leaf->fparms[0];
+                        Leaf *second=leaf->fparms[1];
+
+                        // check metric name is valid
+                        QString metric = first->signature();
+                        QString lookup = df->lookupMap.value(metric, "");
+                        if (lookup == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString("unknown metric '%1'.").arg(metric);
+                        }
+
+                        // check value
+                        QString value = second->signature();
+                        QRegExp banSymbols("^(nte|pte|perf|cp)$", Qt::CaseInsensitive);
+                        if (!banSymbols.exactMatch(value)) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString("unknown %1, should be nte,pte,perf or cp.").arg(value);
+                        }
+                    }
+
                 } else if (leaf->function == "XDATA") {
 
                     leaf->dynamic = false;
@@ -1888,6 +1925,27 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             if (symbol == "units") {
                 return Result(m->context->athlete->useMetricUnits ? 1 : 0);
             }
+        }
+
+        // banister
+        if (leaf->function == "banister") {
+            Leaf *first=leaf->fparms[0];
+            Leaf *second=leaf->fparms[1];
+
+            // check metric name is valid
+            QString metric = df->lookupMap.value(first->signature(), "");
+            QString value = second->signature();
+            QDate when = m->dateTime.date();
+            Banister *banister = m->context->athlete->getBanisterFor(metric, 0,0);
+            int type = BANISTER_PERFORMANCE;
+
+            if (value == "nte") type = BANISTER_NTE;
+            if (value == "pte") type = BANISTER_PTE;
+            if (value == "perf") type = BANISTER_PERFORMANCE;
+            if (value == "cp") type = BANISTER_CP;
+
+            // value for the date..
+            return Result(banister->value(when, type));
         }
 
         // get here for tiz and best
