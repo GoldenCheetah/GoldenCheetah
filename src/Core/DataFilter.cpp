@@ -25,6 +25,7 @@
 #include "RideFileCache.h"
 #include "PMCData.h"
 #include "Banister.h"
+#include "LTMSettings.h"
 #include "VDOTCalculator.h"
 #include "DataProcessor.h"
 #include <QDebug>
