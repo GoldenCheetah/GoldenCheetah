@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "MainWindow.h"
 #include "HelpWhatsThis.h"
+#include "LocationInterpolation.h"
 
 // minimum R-squared fit when trying to find offsets to
 // merge ride files. Lower numbers mean happier to take
@@ -258,6 +259,7 @@ MergeActivityWizard::analyse()
             break;
 
     case 3: // align end
+        {
             int offset = ride1->dataPoints().count() - ride2->dataPoints().count();
             if (offset < 0) {
                 offset1 = abs(offset);
@@ -266,7 +268,143 @@ MergeActivityWizard::analyse()
                 offset2 = abs(offset);
                 offset1 = 0;
             }
-            break;
+        }
+        break;
+
+    case 4: // merge (and interpolate) on distance
+            // In this case merge iterator will find its own way populating samples with data
+            // from ride2 samples that have overlapped distance.
+        offset1 = 0;
+        offset2 = 0;
+        break;
+    }
+}
+
+// Distance merge:
+// Each data point in both rides has a distance. This merge pulls selected properties
+// from ride2 data onto ride1, keeping distance in sync and interpolating location
+// from ride1's distance and ride2's location data.
+void
+MergeActivityWizard::mergeRideSamplesByDistance()
+{
+    offset1 = 0;
+    offset2 = 0;
+
+    RideFilePoint last;
+
+    GeoPointInterpolator gpi;
+
+    int j = 0;  // copy index
+    int ii = 0; // interpolation index
+    int ride1nextdistanceindex = 0;
+    double ride1nextdistance = 0.0;
+
+    for (int i = 0; i < ride1->dataPoints().count(); i++) {
+
+        // fresh point
+        RideFilePoint add;
+        add.secs = i * recIntSecs;
+        add.km = last.km; // if not getting copied at least stay in same place!
+
+        // fold in ride 1 values
+        if (offset1 <= i && i < ride1->dataPoints().count() + offset1) {
+
+            RideFilePoint source = *(ride1->dataPoints()[i - offset1]);
+
+            // copy across the data we want
+            QMapIterator<RideFile::SeriesType, QCheckBox*> io(leftSeries);
+            while (io.hasNext()) {
+                io.next();
+                // we want this series !
+                if (io.value()->isChecked()) {
+                    add.setValue(io.key(), source.value(io.key()));
+                }
+            }
+        }
+
+        // maintain ride1 'nextdistance' index and distance (used for interpolating slope.)
+        if (add.km >= ride1nextdistance) {
+            while (offset1 <= ride1nextdistanceindex && ride1nextdistanceindex < ride1->dataPoints().count() + offset1) {
+                RideFilePoint* point = (ride1->dataPoints()[ride1nextdistanceindex - offset1]);
+                if (point->km != add.km) {
+                    ride1nextdistance = point->km;
+                    break;
+                }
+
+                ride1nextdistanceindex++;
+            }
+        }
+
+        // Additional samples to interpolator
+        while (gpi.WantsInput(add.km)) {
+            if (ii < ride2->dataPoints().count()) {
+                const RideFilePoint * pii = (ride2->dataPoints()[ii]);
+                geolocation geo(pii->lat, pii->lon, pii->alt);
+                gpi.Push(pii->km, geo);
+
+                ii++;
+            } else {
+                gpi.NotifyInputComplete();
+                break;
+            }
+        }
+
+        // Maintain ride2 copy index
+        while ((j < ride2->dataPoints().count()) && (ride2->dataPoints()[j]->km < add.km)) {
+            j++;
+        }
+
+        // Compute interpolated location from current distance.
+        geolocation interpLoc = gpi.Interpolate(add.km);
+
+        RideFilePoint source = *(ride2->dataPoints()[j]);
+
+        // fold in ride 2 values
+        {
+            // copy across the data we want
+            QMapIterator<RideFile::SeriesType, QCheckBox*> io(rightSeries);
+            while (io.hasNext()) {
+                io.next();
+                // we want this series !
+                if (io.value()->isChecked()) {
+                    // For location data substitute interpolated value for ride2 value.
+                    switch (io.key()) {
+                    case RideFile::lat:
+                        add.setValue(io.key(), interpLoc.Lat());
+                        break;
+                    case RideFile::lon:
+                        add.setValue(io.key(), interpLoc.Long());
+                        break;
+                    case RideFile::alt:
+                        add.setValue(io.key(), interpLoc.Alt());
+                        break;
+                    case RideFile::slope:
+                        {
+                            // Obtain interpolated future altitude using next unique ride1 distance
+                            // since that location is of the next altitude that will be recorded.
+                            // This is more stable than using the actual point slope at current
+                            // location and ensures that slope will match recorded altitudes.
+                            double slope = 0.0;
+                            if (ride1nextdistance != add.km)
+                            {
+                                geolocation interpLocE = gpi.Interpolate(ride1nextdistance);
+                                double altitudeDeltaM = (interpLocE.Alt() - interpLoc.Alt());
+                                double distanceDeltaM = 1000 * (ride1nextdistance - add.km);
+                                slope = 100.0 * (altitudeDeltaM / distanceDeltaM);
+                            }
+                            add.setValue(io.key(), slope);
+                        }
+                        break;
+                    default:
+                        add.setValue(io.key(), source.value(io.key()));
+                        break;
+                    }
+                }
+            }
+        }
+
+        combined->appendPoint(add);
+        last = add;
     }
 }
 
@@ -360,7 +498,11 @@ MergeActivityWizard::combine()
                                   interval->name);
         }
 
-    } else { // MERGE
+    }
+    else if(strategy == 4) {
+        mergeRideSamplesByDistance();
+    }
+    else { // MERGE
 
         RideFilePoint last;
 
@@ -878,6 +1020,12 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
     mapper->setMapping(p, "right");
     layout->addWidget(p);
 
+    // start at same time
+    p = new QCommandLinkButton(tr("Interpolate location data based upon distance"),
+        tr("Merge the two activity streams, interpolating location and slope values based upon mutual distance."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "distance");
+    layout->addWidget(p);
     label = new QLabel("", this);
     layout->addWidget(label);
 
@@ -916,6 +1064,8 @@ MergeStrategy::clicked(QString p)
         wizard->strategy = 2; // merge ...
     } else if (p == "right" ) {
         wizard->strategy = 3; // merge ...
+    } else if (p == "distance") {
+        wizard->strategy = 4; // merge ...
     }
 
     // now run strategy and get on
