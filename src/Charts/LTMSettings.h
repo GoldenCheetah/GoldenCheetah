@@ -53,8 +53,9 @@ class RideBest;
 // 17        01 Nov 2017 Ale Martinez     Added Daily Measure type (Body/Hrv)
 // 18        05 Jan 2018 Mark Liversedge  Performance tests and weekly performances
 // 19        07 Jan 2018 Mark Liversedge  Flagged as possibly submaximal weekly best
+// 20        14 Sep 2018 Riccio Clista    Added IgnoreZeros
 
-#define LTM_VERSION_NUMBER 19
+#define LTM_VERSION_NUMBER 20
 
 // group by settings
 #define LTM_DAY     1
@@ -120,7 +121,8 @@ class MetricDetail {
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
-                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false), curve(NULL) {}
+                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false),
+                     ignoreZeros(false), curve(NULL) {}
 
     bool operator< (MetricDetail right) const { return name < right.name; }
 
@@ -198,6 +200,9 @@ class MetricDetail {
 
     // text labels against values
     bool labels;
+
+    // ignore zeros in plot
+    bool ignoreZeros;
 
     // curve on the chart to spot this...
     QwtPlotCurve *curve;
