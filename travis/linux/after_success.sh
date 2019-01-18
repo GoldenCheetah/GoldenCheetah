@@ -46,13 +46,13 @@ chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 rm linuxdeployqt-continuous-x86_64.AppImage
 rm -rf appdir
 
-if [ ! -x ./GoldenCheetah-x86_64.AppImage ]
+if [ ! -x ./GoldenCheetah*.AppImage ]
 then echo "AppImage not generated, check the errors"; exit 1
 fi
 echo "Renaming AppImage file to branch and build number ready for deploy"
-mv GoldenCheetah-x86_64.AppImage $FINAL_NAME
+mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
-### Minimum Test - Result is ./GoldenCheetah-x86_64.AppImage
+### Minimum Test
 ./$FINAL_NAME --version
 ### upload for testing
 curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
