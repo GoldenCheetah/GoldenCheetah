@@ -24,6 +24,7 @@ Name=GoldenCheetah
 Comment=Cycling Power Analysis Software.
 Exec=GoldenCheetah
 Icon=gc
+Categories=Science;Sports;
 EOF
 # Icon
 cp Resources/images/gc.png appdir/
