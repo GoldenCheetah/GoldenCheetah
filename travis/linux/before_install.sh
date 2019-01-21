@@ -8,8 +8,12 @@ sudo apt-get install -qq qt5-default qt59base qt59tools qt59serialport qt59svg\
 
 sudo apt-get install -qq libglu1-mesa-dev libgstreamer0.10-0 libgstreamer-plugins-base0.10-0
 sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
-sudo apt-get install -qq libvlc-dev libvlccore-dev
 sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
+
+# Add VLC 2.2.8
+sudo add-apt-repository -y ppa:jonathonf/vlc
+sudo apt-get update -qq
+sudo apt-get install -qq libvlc-dev libvlccore-dev
 
 # R 3.5
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
