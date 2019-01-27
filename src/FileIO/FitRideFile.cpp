@@ -3601,7 +3601,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             write_int8(ridePoint, point->cad);
         }
         // In runs, cadence is saved in 'rcad' instead of 'cad'
-        if (withCad && ride->isRun() && ride->areDataPresent()->rcad){
+        else if (withCad && ride->isRun() && ride->areDataPresent()->rcad){
             write_int8(ridePoint, point->rcad);
         }
         if ( ride->areDataPresent()->km ) {
