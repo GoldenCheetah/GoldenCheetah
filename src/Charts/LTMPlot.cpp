@@ -449,7 +449,7 @@ LTMPlot::setData(LTMSettings *set)
         if (count <= 0) continue;
 
         // Create a curve
-        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER)
+        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE)
                 ? new QwtPlotGappedCurve(metricDetail.uname, 1)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
@@ -604,7 +604,7 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
-        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER)
+        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE)
                 ? new QwtPlotGappedCurve(metricDetail.uname, 1)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
