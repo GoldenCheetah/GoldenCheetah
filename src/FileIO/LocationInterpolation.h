@@ -130,6 +130,7 @@ public:
 
 class TwoPointInterpolator
 {
+public:
     virtual xyz InterpolateNext(xyz p0, xyz p1) = 0;
 };
 
@@ -177,6 +178,10 @@ public:
 
     SlidingWindow() : m_ElementExists(0) {}
 
+    void Reset() {
+        m_ElementExists.reset();
+    }
+
     unsigned Count() const { return (unsigned)m_ElementExists.count(); }
 
     T& pm1()               { return std::get<0>(m_Window); }
@@ -220,7 +225,7 @@ public:
 // Class maintains queue of user points and interpolator. Interpolator has
 // separate copy of points since it may operate on synthesized points when
 // window is not full. Window only holds user points.
-template <typename T_TwoPointInterpolator> class UnitCatmullRomInterpolator3DWindow : T_TwoPointInterpolator
+template <typename T_TwoPointInterpolator> class UnitCatmullRomInterpolator3DWindow : public T_TwoPointInterpolator
 {
     UnitCatmullRomInterpolator3D m_Interpolator;
     SlidingWindow<xyz>           m_PointWindow;
@@ -229,6 +234,11 @@ template <typename T_TwoPointInterpolator> class UnitCatmullRomInterpolator3DWin
 public:
 
     UnitCatmullRomInterpolator3DWindow() : m_DidChange(true) {}
+
+    void Reset() {
+        m_PointWindow.Reset();
+        m_DidChange = true;
+    }
 
     // Add points to interpolation queue.
     // Do something reasonable with partially filled queue.
@@ -390,6 +400,13 @@ public:
     void NotifyInputComplete()
     {
         m_fInputComplete = true;
+    }
+
+    void Reset()
+    {
+        m_fInputComplete = false;
+        m_Interpolator.Reset();
+        m_DistanceWindow.Reset();
     }
 
     bool WantsInput(double distance) const
