@@ -137,10 +137,10 @@ Slerper::Slerper(geolocation g0, geolocation g1) :
     m_g0(g0),
     m_g1(g1),
     m_x0(m_g0.toxyz()),
-    m_x0_magnitude(m_x0.magnitude()),
     m_x1(m_g1.toxyz()),
     m_x0_norm(m_x0.normalize()),
-    m_x1_norm(m_x1.normalize())
+    m_x1_norm(m_x1.normalize()),
+    m_x0_magnitude(m_x0.magnitude())
 {
     m_angle = atan2(m_x0_norm.cross(m_x1_norm).magnitude(), m_x0_norm.dot(m_x1_norm));
     m_sin_angle = sin(m_angle);

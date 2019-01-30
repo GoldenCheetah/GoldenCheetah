@@ -284,7 +284,7 @@ public:
                     e = &p1;
                     pr = &p2;
                 }
-                *pr = InterpolateNext(*s, *e);
+                *pr = this->InterpolateNext(*s, *e);
             }
             break;
 
@@ -323,8 +323,8 @@ public:
                     e1 = pr0;
                 }
 
-                *pr0 = InterpolateNext(*s0, *e0);
-                *pr1 = InterpolateNext(*s1, *e1);
+                *pr0 = this->InterpolateNext(*s0, *e0);
+                *pr1 = this->InterpolateNext(*s1, *e1);
             }
             break;
 
