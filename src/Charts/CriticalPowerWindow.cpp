@@ -235,6 +235,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QLabel *heaties = new QLabel(tr("Show Sustained Efforts"));
     cl->addRow(heaties, showEffortCheck);
 
+    showPowerIndexCheck = new QCheckBox(this);
+    showPowerIndexCheck->setChecked(false); // default off
+    QLabel *indexify = new QLabel(tr("Show as Power Index"));
+    cl->addRow(indexify, showPowerIndexCheck);
+
     showPercentCheck = new QCheckBox(this);
     showPercentCheck->setChecked(false); // default off
     QLabel *percentify = new QLabel(tr("Show as percentage"));
@@ -561,6 +566,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showPowerIndexCheck, SIGNAL(stateChanged(int)), this, SLOT(showPowerIndexChanged(int)));
     connect(showTestCheck, SIGNAL(stateChanged(int)), this, SLOT(showTestChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
     connect(filterBestCheck, SIGNAL(stateChanged(int)), this, SLOT(filterBestChanged(int)));
@@ -1840,8 +1846,20 @@ CriticalPowerWindow::showBestChanged(int state)
 void
 CriticalPowerWindow::showPercentChanged(int state)
 {
+    if (state) showPowerIndexCheck->setChecked(false);
     cpPlot->setShowPercent(state);
     rPercent->setChecked(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::showPowerIndexChanged(int state)
+{
+    if (state) showPercentCheck->setChecked(false);
+    cpPlot->setShowPowerIndex(state);
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());

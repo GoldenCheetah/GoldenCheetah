@@ -66,6 +66,7 @@ class CPPlot : public QwtPlot
         void setRide(RideItem *rideItem);
         void setDateRange(const QDate &start, const QDate &end, bool stale=false);
         void setShowPercent(bool x);
+        void setShowPowerIndex(bool x);
         void setShowTest(bool x);
         void setShowBest(bool x);
         void setFilterBest(bool x);
@@ -175,6 +176,7 @@ class CPPlot : public QwtPlot
         bool showTest;
         bool showBest;
         bool filterBest;
+        bool showPowerIndex;
         bool showPercent;
         bool showHeat;
         bool showEffort;

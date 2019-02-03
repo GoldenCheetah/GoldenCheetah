@@ -53,6 +53,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(bool showTest READ showTest WRITE setShowTest USER true)
     Q_PROPERTY(bool filterBest READ filterBest WRITE setFilterBest USER true)
     Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
+    Q_PROPERTY(bool showPowerIndex READ showPowerIndex WRITE setShowPowerIndex USER true)
     Q_PROPERTY(bool showGrid READ showGrid WRITE setShowGrid USER true)
 
     // for retro compatibility
@@ -224,6 +225,9 @@ class CriticalPowerWindow : public GcChartWindow
         bool showTest() { return showTestCheck->isChecked(); }
         void setShowTest(bool x) { return showTestCheck->setChecked(x); }
 
+        bool showPowerIndex() { return showPowerIndexCheck->isChecked(); }
+        void setShowPowerIndex(bool x) { return showPowerIndexCheck->setChecked(x); }
+
         bool showPercent() { return showPercentCheck->isChecked(); }
         void setShowPercent(bool x) { return showPercentCheck->setChecked(x); }
 
@@ -246,6 +250,7 @@ class CriticalPowerWindow : public GcChartWindow
         void showCSLinearChanged(int state);
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
+        void showPowerIndexChanged(int check);
         void showBestChanged(int check);
         void showTestChanged(int check);
         void filterBestChanged(int check);
@@ -319,6 +324,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;
+        QCheckBox *showPowerIndexCheck;
         QCheckBox *showBestCheck;
         QCheckBox *showTestCheck;
         QCheckBox *filterBestCheck;

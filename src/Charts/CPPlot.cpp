@@ -67,7 +67,7 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showTest(true), showBest(true), filterBest(false), showPercent(false), showHeat(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
     xAxisLinearOnSpeed(true),
 
@@ -673,7 +673,7 @@ CPPlot::plotModel()
         heatCurve->attach(this);
     }
 
-    setAxisVisible(yRight, showHeat || (showPercent && rideCurve));
+    setAxisVisible(yRight, showHeat || ((showPowerIndex||showPercent) && rideCurve));
 
    // setAxisVisible(yRight, showHeat || showPercent);
 
@@ -1922,6 +1922,30 @@ CPPlot::plotRide(RideItem *rideItem)
             if (showHeat) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
             else setAxisTitle(yRight, tr("Percent of Best"));
 
+        } else if (showPowerIndex && bestsCache && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts)) {
+
+            // plot as power index if its a power series
+            QVector<double> samples(timeArray.size());
+
+            // power index ify from the cache and always use watts regardless
+            for(int i=0; i <samples.size() && i < rideItem->fileCache()->meanMaxArray(RideFile::watts).size() &&
+                    i <bestsCache->meanMaxArray(rideSeries).size(); i++) {
+
+                samples[i] = powerIndex(rideItem->fileCache()->meanMaxArray(rideSeries)[i], i+1);
+            }
+            rideCurve->setSamples(timeArray.data() + 1, samples.data() + 1,
+                                  maxNonZero > 0 ? maxNonZero-1 : 0);
+
+            // did we get over 100% .. because if so
+            // we need to set the maxY on the RHS to reflect that
+            int max = rideCurve->maxYValue();
+            if (max < 1) max = 1;
+            else max = max * 1.05f;
+            setAxisScale(yRight, 0, max); // always 100
+
+            // set the right titles in case both Heat and Percent of best is show
+            setAxisTitle(yRight, tr("Power Index"));
+
         } else {
 
             // JUST A NORMAL CURVE
@@ -1936,8 +1960,8 @@ CPPlot::plotRide(RideItem *rideItem)
 
     // which axis should it be on?
     // and also make sure its visible
-    rideCurve->setYAxis(showPercent ? yRight : yLeft);
-    setAxisVisible(yRight, showPercent || showHeat);
+    rideCurve->setYAxis((showPercent||showPowerIndex) ? yRight : yLeft);
+    setAxisVisible(yRight, showPercent || showPowerIndex || showHeat);
     rideCurve->attach(this);
 
     zoomer->setZoomBase(false);
@@ -2125,10 +2149,13 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         } else {
 
             // eg: "### watts"
-            units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+            if (showPercent) units2 = tr("%1 Percent").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            else if (showPowerIndex) units2 = tr("%1 Power Index").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            else units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                                 .arg(RideFile::unitName(rideSeries, context));
         }
-        
+
+#if 0
 		// for the current ride curve, add a percent of rider's actual best.
         if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
 
@@ -2140,7 +2167,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 					.arg((yvalue *100)/ bestY, 0, 'f', 0)
 					.arg(tr("Percent of Best"));
 			}
-		}
+        }
+#endif
 
 
         // for speed series add pace with units according to settings
@@ -2256,6 +2284,14 @@ CPPlot::setShowHeat(bool x)
 }
 
 void
+CPPlot::setShowPowerIndex(bool x)
+{
+    showPowerIndex = x;
+    showPercent = showPowerIndex ? false : showPercent;
+    clearCurves();
+}
+
+void
 CPPlot::setShowPP(bool x)
 {
     showPP = x;
@@ -2294,6 +2330,7 @@ void
 CPPlot::setShowPercent(bool x)
 {
     showPercent = x;
+    showPowerIndex = showPercent ? false : showPowerIndex;
 }
 
 void
