@@ -773,7 +773,12 @@ PythonDataSeries::PythonDataSeries(QString name, Py_ssize_t count) : name(name),
 PythonDataSeries::PythonDataSeries() : name(QString()), count(0), data(NULL) {}
 PythonDataSeries::PythonDataSeries(PythonDataSeries *clone)
 {
-    *this = *clone;
+    if (clone) *this = *clone;
+    else {
+        name = QString();
+        count = 0;
+        data = NULL;
+    }
 }
 
 PythonDataSeries::~PythonDataSeries()
