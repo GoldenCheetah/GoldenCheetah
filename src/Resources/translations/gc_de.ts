@@ -30202,7 +30202,7 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
     <message>
         <location filename="../../Metrics/Zones.cpp" line="44"/>
         <source>Neuromuscular</source>
-        <translation>Neuromuskulär</translation>
+        <translation>Neuromuskulaer</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="163"/>
