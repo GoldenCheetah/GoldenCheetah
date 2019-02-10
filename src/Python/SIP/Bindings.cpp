@@ -1386,6 +1386,46 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
 }
 
 bool
+Bindings::createXDataSeries(QString name, QString series, QString seriesUnit, PyObject *activity) const
+{
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    if (readOnly) return false;
+
+    if (series == "secs" || series == "km")
+        return false; // invalid series name
+
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
+
+    XDataSeries *xds = nullptr;
+    if (f->xdata().contains(name)) {
+        xds = f->xdata()[name];
+        if (xds->valuename.contains(series))
+            return false; // XData series exists already
+    }
+
+    QList<RideFile *> *editedRideFiles = python->contexts.value(threadid()).editedRideFiles;
+    if (editedRideFiles && !editedRideFiles->contains(f)) {
+        f->command->startLUW(QString("Python_%1").arg(threadid()));
+        editedRideFiles->append(f);
+    }
+
+    // create xdata if not exists
+    if (xds == nullptr) {
+        xds = new XDataSeries();
+        xds->name = name;
+        xds->valuename << series;
+        xds->unitname << seriesUnit;
+        f->command->addXData(xds);
+    } else {
+        // add series for existing xdata
+        f->command->addXDataSeries(name, series, seriesUnit);
+    }
+
+    return true;
+}
+
+bool
 Bindings::deleteActivitySample(int index, PyObject *activity) const
 {
     bool readOnly = python->contexts.value(threadid()).readOnly;

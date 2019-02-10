@@ -73,6 +73,7 @@ class Bindings {
         PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) const;
 
         // editing data
+        bool createXDataSeries(QString name, QString series, QString seriesUnit, PyObject *activity=NULL) const;
         bool deleteActivitySample(int index = -1, PyObject *activity = NULL) const;
         bool deleteSeries(int type, PyObject *activity = NULL) const;
         bool postProcess(QString processor, PyObject *activity = NULL) const;
