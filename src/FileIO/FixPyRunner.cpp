@@ -73,8 +73,8 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
 void FixPyRunner::execScript(FixPyRunParams *params)
 {
     QList<RideFile *> editedRideFiles;
-    python->runline(ScriptContext(params->context, nullptr, params->rideFile, nullptr,
-                                  Specification(), false, &editedRideFiles), params->script);
+    python->runline(ScriptContext(params->context, params->rideFile, false,
+                                  false, &editedRideFiles), params->script);
 
     // finish up commands on edited rides
     foreach (RideFile *f, editedRideFiles) {
