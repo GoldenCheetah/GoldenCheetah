@@ -1,3 +1,6 @@
+#ifndef _Bindings_h
+#define _Bindings_h
+
 #include <QString>
 #include "RideFile.h"
 #include "RideFileCache.h"
@@ -23,6 +26,34 @@ class PythonDataSeries {
         bool readOnly;
         int seriesType;
         RideFile *rideFile;
+};
+
+class PythonXDataSeries {
+    public:
+        PythonXDataSeries(QString xdata, QString series, QString unit, int count, bool readOnly, RideFile *rideFile);
+        PythonXDataSeries(PythonXDataSeries*);
+        PythonXDataSeries();
+
+        QString name() const { return QString("%1_%2").arg(xdata).arg(series); }
+
+        double get(int i) const { return data[i]; }
+        bool set(int i, double value);
+
+        void *rawDataPtr() { return (void*) data.data(); }
+        int count() const { return data.count(); }
+
+        QString xdata;
+        QString series;
+        int colIdx;
+        QString unit;
+
+        bool readOnly;
+        RideFile *rideFile;
+
+        QVector<Py_ssize_t> shape;
+
+    private:
+        QVector<double> data;
 };
 
 class Bindings {
@@ -53,7 +84,7 @@ class Bindings {
         PythonDataSeries *series(int type, PyObject* activity=NULL) const;
         PythonDataSeries *activityWbal(PyObject* activity=NULL) const;
         PythonDataSeries *xdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) const;
-        PythonDataSeries *xdataSeries(QString name, QString series, PyObject* activity=NULL) const;
+        PythonXDataSeries *xdataSeries(QString name, QString series, PyObject* activity=NULL) const;
         PyObject* xdataNames(QString name=QString(), PyObject* activity=NULL) const;
 
         // working with metrics
@@ -94,3 +125,5 @@ class Bindings {
         PyObject* seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile::SeriesType> series, QList<int> durations) const;
 
 };
+
+#endif // _Bindings_h

@@ -6,7 +6,7 @@
 
 #include "sipAPIgoldencheetah.h"
 
-#line 131 "goldencheetah.sip"
+#line 199 "goldencheetah.sip"
 //#include "Bindings.h"
 #line 12 "./sipgoldencheetahBindings.cpp"
 
@@ -16,6 +16,9 @@
 #line 59 "goldencheetah.sip"
 #include "Bindings.h"
 #line 19 "./sipgoldencheetahBindings.cpp"
+#line 131 "goldencheetah.sip"
+#include "Bindings.h"
+#line 22 "./sipgoldencheetahBindings.cpp"
 
 
 extern "C" {static PyObject *meth_Bindings_threadid(PyObject *, PyObject *);}
@@ -492,13 +495,13 @@ static PyObject *meth_Bindings_xdataSeries(PyObject *sipSelf, PyObject *sipArgs,
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|P0", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, &a2))
         {
-             ::PythonDataSeries*sipRes;
+             ::PythonXDataSeries*sipRes;
 
-            sipRes = new  ::PythonDataSeries(sipCpp->xdataSeries(*a0,*a1,a2));
+            sipRes = new  ::PythonXDataSeries(sipCpp->xdataSeries(*a0,*a1,a2));
             sipReleaseType(a0,sipType_QString,a0State);
             sipReleaseType(a1,sipType_QString,a1State);
 
-            return sipConvertFromNewType(sipRes,sipType_PythonDataSeries,Py_None);
+            return sipConvertFromNewType(sipRes,sipType_PythonXDataSeries,Py_None);
         }
     }
 

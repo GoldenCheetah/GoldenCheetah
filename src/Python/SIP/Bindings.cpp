@@ -666,8 +666,7 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
 }
 
 // get the xdata series for the currently selected ride, without interpolation
-PythonDataSeries*
-Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
+PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
 {
     RideFile *f = selectRideFile(activity);
     if (f == nullptr) return nullptr;
@@ -681,6 +680,13 @@ Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
     else if (series != "secs" && series != "km")
         return NULL; // No such XData name
 
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    QList<RideFile *> *editedRideFiles = python->contexts.value(threadid()).editedRideFiles;
+    if (!readOnly && editedRideFiles && !editedRideFiles->contains(f)) {
+        f->command->startLUW(QString("Python_%1").arg(threadid()));
+        editedRideFiles->append(f);
+    }
+
     // count the included points, create data series output and copy data
     Specification spec(python->contexts.value(threadid()).spec);
     IntervalItem* it = spec.interval();
@@ -691,7 +697,8 @@ Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
         pCount++;
     }
 
-    PythonDataSeries* ds = new PythonDataSeries(QString("%1_%2").arg(name).arg(series), pCount);
+    PythonXDataSeries* ds = new PythonXDataSeries(name, series, valueIdx >= 0 ? xds->unitname[valueIdx] : "",
+                                                  pCount, readOnly, f);
 
     int idx = 0;
     foreach(XDataPoint* p, xds->datapoints) {
@@ -701,7 +708,7 @@ Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
         if (valueIdx >= 0) val = p->number[valueIdx];
         else if (series == "secs") val = p->secs;
         else if (series == "km") val = p->km;
-        ds->data[idx++] = val;
+        ds->set(idx++, val);
     }
 
     return ds;
@@ -774,6 +781,51 @@ PythonDataSeries::~PythonDataSeries()
     if (data) delete[] data;
     data=NULL;
     rideFile = NULL;
+}
+
+PythonXDataSeries::PythonXDataSeries(QString xdata, QString series, QString unit, int count, bool readOnly, RideFile *rideFile)
+    : xdata(xdata), series(series), colIdx(-1), unit(unit), readOnly(readOnly), rideFile(rideFile), shape(1), data(count)
+{
+    shape[0] = count >= 0 ? count : 0;
+}
+
+PythonXDataSeries::PythonXDataSeries(PythonXDataSeries *clone)
+{
+    if (clone) *this = *clone;
+    else {
+        colIdx = -1;
+        readOnly = true;
+        rideFile = nullptr;
+        shape = QVector<Py_ssize_t>(1);
+    }
+}
+
+PythonXDataSeries::PythonXDataSeries()
+    : colIdx(-1), readOnly(true), rideFile(nullptr), shape(1)
+{
+}
+
+bool PythonXDataSeries::set(int i, double value)
+{
+    if (rideFile) {
+        if (colIdx == -1) {
+            XDataSeries *xds = rideFile->xdata(xdata);
+            if (xds->valuename.contains(series))
+                colIdx = xds->valuename.indexOf(series) + 2;
+            else if (series == "secs") colIdx = 0;
+            else if (series == "km") colIdx = 1;
+            else colIdx = -2;
+        }
+
+        if (colIdx == -2) {
+            return false; // No such XData series
+        }
+
+        rideFile->command->setXDataPointValue(xdata, i, colIdx, value);
+    }
+
+    data[i] = value;
+    return true;
 }
 
 PyObject*
