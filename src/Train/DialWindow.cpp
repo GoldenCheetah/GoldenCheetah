@@ -499,6 +499,21 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
+    case RealtimeData::Latitude:
+    case RealtimeData::Longitude:
+        {
+            // These 2 fields should be treated as generic location update
+            double lat = rtData.value(RealtimeData::Latitude);
+            double lon = rtData.value(RealtimeData::Longitude);
+    
+            valueLabel->setText(QString("Lon:%1\nLat:%2").arg(lat, 0, 'f', 10).arg(lon, 0, 'f', 10));
+        }
+        break;
+
+    case RealtimeData::Altitude:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -648,6 +663,9 @@ void DialWindow::seriesChanged()
            foreground = GColor(CRTE);
            break;
 
+    case RealtimeData::Altitude:
+           foreground = GColor(CALTITUDE);
+           break;
     }
 
     // ugh. we use style sheets because palettes don't work on labels

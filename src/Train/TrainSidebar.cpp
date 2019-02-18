@@ -353,6 +353,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displaySpeed = displayCadence = slope = load = 0;
     displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
     displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
+    displayLatitude = displayLongitude = displayAltitude = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -503,7 +504,7 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
             // and call any training method
             //
             // KEY        FUNCTION
-            //            Start() - will pause/unpause if running 
+            //            Start() - will pause/unpause if running
             //            Stop() - will end workout
             //            Pause() - pause only
             //            UnPause() - unpause
@@ -845,7 +846,7 @@ TrainSidebar::updateMetricLapDistance()
     if (lapmarker == -1) {
         displayLapDistance = 0;
         return;
-    } 
+    }
 
     displayLapDistance = (currentposition - lapmarker) / (double) 1000;
 }
@@ -873,7 +874,7 @@ TrainSidebar::updateMetricLapDistanceRemaining()
         // In this case, there are either no lap markers, or we are in last lap (and so no next lap)
         displayLapDistanceRemaining = -1;
         return;
-    } 
+    }
 
     displayLapDistanceRemaining = (lapmarker - currentposition) / (double) 1000;
 }
@@ -1451,6 +1452,9 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayTHB  = rtData.gettHb();
     displayO2HB = rtData.getO2Hb();
     displayHHB = rtData.getHHb();
+    displayLatitude = rtData.getLatitude();
+    displayLongitude = rtData.getLongitude();
+    displayAltitude = rtData.getAltitude();
     // Gradient not supported
     return;
 }
@@ -1540,12 +1544,12 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
         // disabling the screen saver on a Mac instead of
         // temporarily adjusting/disabling the user preferences
         // for screen saving and power management. Makes sense.
-        
+
         CFStringRef reasonForActivity = CFSTR("TrainSidebar::guiUpdate");
         IOPMAssertionID assertionID;
         IOReturn suspendSreensaverSuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
 #endif
-        
+
         if(calibrating) {
             foreach(int dev, activeDevices) { // Do for selected device only
                 RealtimeData local = rtData;
@@ -1680,6 +1684,21 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
+                // Update location data
+                if (ergFile) {
+                    geolocation geoloc;
+                    if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc))
+                    {
+                        displayLatitude = geoloc.Lat();
+                        displayLongitude = geoloc.Long();
+                        displayAltitude = geoloc.Alt();
+
+                        rtData.setLatitude(displayLatitude);
+                        rtData.setLongitude(displayLongitude);
+                        rtData.setAltitude(displayAltitude);
+                    }
+                }
+
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
                 lap_msecs = lap_elapsed_msec + lap_time.elapsed();
@@ -1754,6 +1773,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayTHB = rtData.gettHb();
             displayO2HB = rtData.getO2Hb();
             displayHHB = rtData.getHHb();
+            displayLatitude = rtData.getLatitude();
+            displayLongitude = rtData.getLongitude();
+            displayAltitude = rtData.getAltitude();
 
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces
@@ -1814,7 +1836,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 context->notifySetNow(rtData.getMsecs());
             }
         }
-        
+
 #ifdef Q_OS_MAC
         if (suspendSreensaverSuccess == kIOReturnSuccess)
         {
@@ -1877,6 +1899,25 @@ void TrainSidebar::warnnoConfig()
     QMessageBox::warning(this, tr("No Devices Configured"), tr("Please configure a device in Preferences."));
 }
 
+template<class T, typename T_GetMethod, typename T_SetMethod, typename T_arg>
+struct ScopedOp
+{
+    T* m_pt;
+    T_SetMethod m_setMethod;
+    T_arg m_argSave;
+
+    ScopedOp(T* pt, T_GetMethod getMethod, T_SetMethod setMethod, T_arg argNew) : m_pt(pt), m_setMethod(setMethod) {
+        m_argSave = (m_pt->*getMethod)();
+        (m_pt->*m_setMethod)(argNew);
+    }
+
+    virtual ~ScopedOp() { (m_pt->*m_setMethod)(m_argSave); }
+};
+
+struct ScopedPrecision : ScopedOp<QTextStream, int (QTextStream::*)() const, void (QTextStream::*)(int), int> {
+    ScopedPrecision(QTextStream* pc, int tempPrecision) : ScopedOp::ScopedOp(pc, &QTextStream::realNumberPrecision, &QTextStream::setRealNumberPrecision, tempPrecision) {}
+};
+
 //----------------------------------------------------------------------
 // DISK UPDATE FUNCTIONS
 //----------------------------------------------------------------------
@@ -1884,7 +1925,7 @@ void TrainSidebar::diskUpdate()
 {
     int  secs;
 
-    long torq = 0, altitude = 0;
+    long torq = 0;
     QTextStream recordFileStream(recordFile);
 
     if (calibrating) return;
@@ -1902,11 +1943,20 @@ void TrainSidebar::diskUpdate()
                         << "," << displayDistance
                         << "," << displaySpeed
                         << "," << torq
-                        << "," << displayPower
-                        << "," << altitude
-                        << "," // lon
-                        << "," // lat
-                        << "," // headwind
+                        << "," << displayPower;
+
+    // QTextStream default precision is 6, location data needs much more than that.
+    // Avoid extra precision for other fields since it isn't needed and would grow
+    // the intermediate file for no reason.
+    {
+        ScopedPrecision tempPrecision(&recordFileStream, 20);
+
+        recordFileStream << "," << displayAltitude
+                         << "," << displayLongitude
+                         << "," << displayLatitude;
+    }
+
+    recordFileStream    << "," // headwind
                         << "," // slope
                         << "," // temp
                         << "," << (displayLap + displayWorkoutLap)
@@ -1958,6 +2008,14 @@ void TrainSidebar::loadUpdate()
         }
     } else {
         slope = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
+
+        geolocation geoloc;
+        if (ergFile->locationAt(displayWorkoutDistance * 1000, curLap, geoloc))
+        {
+            displayLatitude = geoloc.Lat();
+            displayLongitude = geoloc.Long();
+            displayAltitude = geoloc.Alt();
+        }
 
         if(displayWorkoutLap != curLap)
         {
@@ -2439,7 +2497,7 @@ void TrainSidebar::adjustIntensity(int value)
                     add.val = last.val / from * to;
 
                     // recalibrate altitude if gradient changing
-                    if (context->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) add.y = last.y + ((add.x-last.x) * (add.val/100));
                     else add.y = add.val;
 
                     context->currentErgFile()->Points.insert(i, add);
@@ -2455,7 +2513,7 @@ void TrainSidebar::adjustIntensity(int value)
 
             // recalibrate altitude if in CRS mode
             p->val = p->val / from * to;
-            if (context->currentErgFile()->format == CRS) {
+            if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) {
                 if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
             }
             else p->y = p->val;

@@ -29,6 +29,7 @@ RealtimeData::RealtimeData()
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
     lrbalance = rte = lte = lps = rps = 0.0;
+    latitude = longitude = altitude = 0.0;
     trainerStatusAvailable = false;
     trainerReady = true;
     trainerRunning = true;
@@ -384,6 +385,15 @@ double RealtimeData::value(DataSeries series) const
     case Slope: return slope;
         break;
 
+    case Latitude: return latitude;
+        break;
+
+    case Longitude: return longitude;
+        break;
+
+    case Altitude: return altitude;
+        break;
+
     case None:
     default:
         return 0;
@@ -444,6 +454,9 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << LapDistance;
         seriesList << LapDistanceRemaining;
         seriesList << ErgTimeRemaining;
+        seriesList << Latitude;
+        seriesList << Longitude;
+        seriesList << Altitude;
     }
     return seriesList;
 }
@@ -584,6 +597,15 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case LapDistanceRemaining: return tr("Lap Distance Remaining");
         break;
+
+    case Latitude: return tr("Latitude");
+        break;
+
+    case Longitude: return tr("Longitude");
+        break;
+
+    case Altitude: return tr("Altitude");
+        break;
     }
 }
 
@@ -617,3 +639,11 @@ long RealtimeData::getLap() const
 {
     return lap;
 }
+
+double RealtimeData::getLatitude() const { return latitude; }
+double RealtimeData::getLongitude() const { return longitude; }
+double RealtimeData::getAltitude() const { return altitude; }
+
+void RealtimeData::setLatitude(double d) { latitude = d; }
+void RealtimeData::setLongitude(double d) { longitude = d; }
+void RealtimeData::setAltitude(double d) { altitude = d; }

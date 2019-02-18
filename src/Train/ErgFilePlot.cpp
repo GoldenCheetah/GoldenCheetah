@@ -24,7 +24,7 @@
 // Bridge between QwtPlot and ErgFile to avoid having to
 // create a separate array for the ergfile data, we plot
 // directly from the ErgFile points array
-double ErgFileData::x(size_t i) const { 
+double ErgFileData::x(size_t i) const {
     if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).x;
     else return 0;
 }
@@ -247,7 +247,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     CPMarker->setYAxis(QwtPlot::yLeft);
     CPMarker->setYValue(274);
     CPMarker->attach(this);
-    
+
 
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
@@ -310,7 +310,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
     if (ergfile) {
 
         // is this by distance or time?
-        bydist = (ergfile->format == CRS) ? true : false;
+        bydist = (ergfile->format == CRS || ergfile->format == CRS_LOC) ? true : false;
 
         if (bydist == true) {
 

@@ -34,7 +34,7 @@ xyz geolocation::toxyz()
     //
     // D. Rose (2014).
     // "Converting between Earth-Centered, Earth Fixed and Geodetic Coordinates"
-    // 
+    //
 
     //Convert Lat, Lon, Altitude to Earth-Centered-Earth-Fixed (ECEF)
     //Input is a three element array containing lat, lon (rads) and alt (m)
@@ -63,7 +63,7 @@ geolocation xyz::togeolocation()
     //
     // D. Rose (2014).
     // "Converting between Earth-Centered, Earth Fixed and Geodetic Coordinates"
-    // 
+    //
 
     //Convert Earth-Centered-Earth-Fixed (ECEF) to lat, Lon, Altitude
     //Input is a three element array containing x, y, z in meters

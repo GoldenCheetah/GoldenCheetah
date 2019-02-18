@@ -16,6 +16,9 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#if !defined(_LOCATION_INTERPOLATION_H)
+#define _LOCATION_INTERPOLATION_H
+
 #include <tuple>
 #include <bitset>
 #include "qwt_math.h"
@@ -29,6 +32,8 @@ class v3
 public:
 
     v3(double a, double b, double c) : m_t(a, b, c) {};
+
+    v3(const v3& o) : m_t(o.m_t) {}
 
     double  x() const { return std::get<0>(m_t); }
     double  y() const { return std::get<1>(m_t); }
@@ -79,7 +84,7 @@ struct xyz : public v3
     geolocation togeolocation();
 };
 
-struct geolocation : v3 
+struct geolocation : v3
 {
     double Lat()  const { return x(); }
     double Long() const { return y(); }
@@ -139,12 +144,12 @@ struct LinearTwoPointInterpolator : public TwoPointInterpolator
     xyz InterpolateNext(xyz p0, xyz p1);
 };
 
-struct SphericalTwoPointInterpolator : public TwoPointInterpolator 
+struct SphericalTwoPointInterpolator : public TwoPointInterpolator
 {
     xyz InterpolateNext(xyz p0, xyz p1);
 };
 
-class UnitCatmullRomInterpolator 
+class UnitCatmullRomInterpolator
 {
     std::tuple<double, double, double, double> m_p;
 
@@ -156,7 +161,7 @@ public:
     double Interpolate(double u);
 };
 
-class UnitCatmullRomInterpolator3D 
+class UnitCatmullRomInterpolator3D
 {
     UnitCatmullRomInterpolator x, y, z;
 
@@ -428,6 +433,17 @@ public:
         return r;
     }
 
+    bool GetBracket(double &d0, double &d1)
+    {
+        if (!m_DistanceWindow.hasp0() || !m_DistanceWindow.hasp1())
+            return false;
+
+        d0 = m_DistanceWindow.p0();
+        d1 = m_DistanceWindow.p1();
+
+        return true;
+    }
+
     xyz Interpolate(double distance)
     {
         // Continue to advance queue after input is complete.
@@ -479,3 +495,5 @@ public:
 
     void Push(double distance, geolocation point);
 };
+
+#endif

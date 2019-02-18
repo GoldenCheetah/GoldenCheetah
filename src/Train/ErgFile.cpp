@@ -38,6 +38,7 @@ static bool setSupported()
     ::supported << ".crs";
     ::supported << ".pgmf";
     ::supported << ".zwo";
+    ::supported << ".gpx";
     return true;
 }
 static bool isinit = setSupported();
@@ -99,6 +100,7 @@ void ErgFile::reload()
     // like we do with ride files if we end up with lots of different formats
     if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
     else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
+    else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
     else parseComputrainer();
 
 }
@@ -115,6 +117,7 @@ void ErgFile::parseZwift()
     MaxWatts = 0;       // maxWatts in this ergfile (scaling)
     valid = false;             // did it parse ok?
     rightPoint = leftPoint = 0;
+    interpolatorReadIndex = 0;
     format = ERG; // default to couse until we know
     Points.clear();
     Laps.clear();
@@ -153,6 +156,7 @@ void ErgFile::parseZwift()
         Duration = Points.last().x;      // last is the end point in msecs
         leftPoint = 0;
         rightPoint = 1;
+        interpolatorReadIndex = 0;
 
         // calculate climbing etc
         calculateMetrics();
@@ -171,6 +175,7 @@ void ErgFile::parseTacx()
     MaxWatts = 0;       // maxWatts in this ergfile (scaling)
     valid = false;             // did it parse ok?
     rightPoint = leftPoint = 0;
+    interpolatorReadIndex = 0;
     format = CRS; // default to couse until we know
     Points.clear();
     Laps.clear();
@@ -333,6 +338,7 @@ void ErgFile::parseTacx()
         Duration = Points.last().x;      // last is the end point in msecs
         leftPoint = 0;
         rightPoint = 1;
+        interpolatorReadIndex = 0;
 
         // calculate climbing etc
         calculateMetrics();
@@ -586,12 +592,137 @@ void ErgFile::parseComputrainer(QString p)
 
         leftPoint = 0;
         rightPoint = 1;
+        interpolatorReadIndex = 0;
 
         calculateMetrics();
 
     } else {
         valid = false;
     }
+}
+
+// parse gpx into ergfile
+void ErgFile::parseGpx()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;            // FTP this file was targetted at
+    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
+    valid = false;             // did it parse ok?
+    rightPoint = leftPoint = 0;
+    interpolatorReadIndex = 0;
+    format = mode = CRS;
+    Points.clear();
+    Laps.clear();
+
+    static double km = 0;
+
+    QFile gpxFile(filename);
+
+    // open the file
+    if (gpxFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
+        valid = false;
+        return;
+    }
+
+    // Instantiate ride
+    //RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
+    //    QStringList &errors, QList<RideFile*> *rideList) const
+
+    QStringList errors_;
+    RideFile* ride = RideFileFactory::instance().openRideFile(context, gpxFile, errors_);
+    if (ride == NULL)
+    {
+        valid = false;
+        return;
+    }
+
+    // Enumerate the data types that are available from this gpx.
+    bool fHasKm    = ride->areDataPresent()->km;
+    bool fHasLat   = ride->areDataPresent()->lat;
+    bool fHasLon   = ride->areDataPresent()->lon;
+    bool fHasAlt   = ride->areDataPresent()->alt;
+    bool fHasSlope = ride->areDataPresent()->slope;
+
+    if (fHasLat && fHasLon)
+    {
+        format = mode = CRS_LOC;
+    }
+
+    if (fHasKm && fHasSlope) {}     // same as crs file
+    else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
+    else {
+        valid = false;
+        return;
+    }
+
+    int pointCount = ride->dataPoints().count();
+
+    RideFilePoint* prevPoint = NULL;
+    RideFilePoint* point = NULL;
+    RideFilePoint* nextPoint = (ride->dataPoints()[0]);
+    double alt = 0;
+    for (int i = 0; i < pointCount; i++) {
+        ErgFilePoint add;
+
+        prevPoint = point;
+        point = nextPoint;
+        nextPoint = ((i + 1) < pointCount) ? (ride->dataPoints()[i + 1]) : NULL;
+
+        // Determine slope to next point
+        double slope = 0.0;
+
+        if (fHasAlt)
+            alt = point->alt;
+
+        if (fHasSlope) {
+            slope = point->slope;
+
+            if (!fHasAlt && prevPoint)
+            {
+                alt += ((slope * (point->km - prevPoint->km))) / 100.0;
+            }
+
+        } else if (nextPoint && fHasAlt)
+        {
+            double km0 = point->km;
+            double alt0 = point->alt / 1000;
+
+            double km1 = nextPoint->km;
+            double alt1 = nextPoint->alt / 1000;
+
+            slope = 100 * (alt1 - alt0) / (km1 - km0);
+        }
+
+        add.x   = 1000 * point->km; // record distance in meters
+        add.y   = alt;
+        add.val = slope;
+
+        if (fHasLat) add.lat = point->lat;
+        if (fHasLon) add.lon = point->lon;
+
+        if (add.y > MaxWatts) MaxWatts = add.y;
+
+        Points.append(add);
+    }
+
+    gpxFile.close();
+
+    valid = true;
+
+    // set ErgFile duration
+    Duration = Points.last().x;      // end point in meters
+
+    leftPoint = 0;                   // setup initial sample bracketing
+    rightPoint = 1;
+    interpolatorReadIndex = 0;
+
+    // calculate climbing etc
+    calculateMetrics();
 }
 
 // convert points to set of sections
@@ -622,7 +753,7 @@ ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
+    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS || format == CRS_LOC) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
@@ -632,6 +763,7 @@ ErgFile::save(QStringList &errors)
     if (format==ERG) typestring = "ERG";
     if (format==MRC) typestring = "MRC";
     if (format==CRS) typestring = "CRS";
+    if (format == CRS_LOC) typestring = "CRS";
     if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
@@ -1023,6 +1155,86 @@ ErgFile::gradientAt(long x, int &lapnum)
     return Points.at(leftPoint).val;
 }
 
+// Returns true if a location is determined, otherwise returns false.
+bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
+{
+    if (!isValid()) return false; // not a valid ergfile
+
+    // is it in bounds?
+    if (meters < 0 || meters > Duration) return false;
+
+    // No location unless... format contains location...
+    if (format != CRS_LOC)  return 1;
+
+    if (Laps.count() > 0) {
+        int lap = 0;
+        for (int i = 0; i<Laps.count(); i++) {
+            if (meters >= Laps.at(i).x) lap += 1;
+        }
+        lapnum = lap;
+
+    }
+    else lapnum = 0;
+
+    // Ensure that interpolator is correctly primed for this request.
+
+    // find right section of the file
+    while (meters < Points.at(leftPoint).x || meters > Points.at(rightPoint).x) {
+        if (meters < Points.at(leftPoint).x) {
+            leftPoint--;
+            rightPoint--;
+        }
+        else if (meters > Points.at(rightPoint).x) {
+            leftPoint++;
+            rightPoint++;
+        }
+    }
+
+    // At this point leftpoint and rightpoint bracket the query distance. Three cases:
+    // Bracket Covered: If query bracket compatible with the current interpolation bracket then simply interpolate
+    // Bracket Ahead:   If query bracket is ahead of current interpolation bracket then feed points to interpolator until it matches.
+    // Bracket Behind:  New bracket is behind current interpolation bracket then interpolator must be reset and new values fed in.
+
+    double d0, d1;
+
+    if (!gpi.GetBracket(d0, d1))
+    {
+        interpolatorReadIndex = 0;
+        gpi.Reset();
+    } else if (d0 > Points.at(leftPoint).x) {
+        // Current bracket is ahead of interpolator so reset and set index back
+        // so interpolator will be re-primed.
+        gpi.Reset();
+        interpolatorReadIndex = (leftPoint > 0) ? leftPoint - 1 : leftPoint;
+    } else {
+        // Otherwise interpolatorReadIndex is set reasonably.
+        // Is possible to skip ahead though...
+        if (interpolatorReadIndex < rightPoint - 4)
+        {
+            interpolatorReadIndex = rightPoint - 4;
+        }
+    }
+
+    // Push points until distance satisfied
+    while (gpi.WantsInput(meters)) {
+        if (interpolatorReadIndex < Points.count()) {
+            const ErgFilePoint * pii = &(Points.at(interpolatorReadIndex));
+            geolocation geo(pii->lat, pii->lon, pii->y);
+            gpi.Push(pii->x, geo);
+
+            interpolatorReadIndex++;
+        }
+        else {
+            gpi.NotifyInputComplete();
+            break;
+        }
+    }
+
+    geoLoc = gpi.Interpolate(meters);
+
+    return true;
+}
+
 // Retrieve the offset for the start of next lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for next lap.
@@ -1068,7 +1280,7 @@ ErgFile::calculateMetrics()
     // is it valid?
     if (!isValid()) return;
 
-    if (format == CRS) {
+    if (format == CRS || format == CRS_LOC) {
 
         ErgFilePoint last;
         bool first = true;
