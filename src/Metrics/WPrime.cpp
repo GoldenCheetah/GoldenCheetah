@@ -491,7 +491,7 @@ WPrime::setErg(ErgFile *input)
     }
 
     // no data or no power data then forget it.
-    bool bydist = (input->format == CRS) ? true : false;
+    bool bydist = (input->format == CRS || input->format == CRS_LOC) ? true : false;
     if (!input->isValid() || bydist) {
         return; // needs to be a valid erg file...
     }
