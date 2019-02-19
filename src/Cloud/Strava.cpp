@@ -178,7 +178,8 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 
                     //Strava has full path, we just want the file name
                     add->label = QFileInfo(each["name"].toString()).fileName();
-                    add->id = QString("%1").arg(each["id"].toInt());
+                    add->id = QString("%1").arg(each["id"].toVariant().toULongLong());
+
                     add->isDir = false;
                     add->distance = each["distance"].toDouble()/1000.0;
                     add->duration = each["elapsed_time"].toInt();
@@ -829,7 +830,7 @@ Strava::prepareResponse(QByteArray* data)
             }
 
         } else {
-            addSamples(ride, QString("%1").arg(each["id"].toInt()));
+            addSamples(ride, QString("%1").arg(each["id"].toVariant().toULongLong()));
             // laps?
             if (!each["laps"].isNull()) {
                 QJsonArray laps = each["laps"].toArray();
