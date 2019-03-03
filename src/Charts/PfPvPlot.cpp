@@ -1073,7 +1073,7 @@ PfPvPlot::recalc()
                 double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-                if (aepf < 255 && aepf > maxAEPF) maxAEPF = aepf;
+                if (aepf < 2500 && aepf > maxAEPF) maxAEPF = aepf;
                 if (cpv > maxCPV) maxCPV = cpv;
             }
         }
