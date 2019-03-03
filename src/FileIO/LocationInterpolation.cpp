@@ -243,6 +243,11 @@ geolocation GeoPointInterpolator::Interpolate(double distance)
     return DistancePointInterpolator::Interpolate(distance).togeolocation();
 }
 
+bool GeoPointInterpolator::GetBracket(double &d0, double &d1)
+{
+    return DistancePointInterpolator::GetBracket(d0, d1);
+}
+
 void GeoPointInterpolator::Push(double distance, geolocation point)
 {
     DistancePointInterpolator::Push(distance, point.toxyz());

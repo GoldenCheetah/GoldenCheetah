@@ -492,6 +492,7 @@ public:
     GeoPointInterpolator() : DistancePointInterpolator() {}
 
     geolocation Interpolate(double distance);
+    bool GetBracket(double &d0, double &d1);
 
     void Push(double distance, geolocation point);
 };
