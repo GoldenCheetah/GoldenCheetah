@@ -20,7 +20,7 @@
 #define _LOCATION_INTERPOLATION_H
 
 #include <tuple>
-#include <bitset>
+
 #include "qwt_math.h"
 
 struct geolocation;
@@ -173,11 +173,40 @@ public:
     xyz Interpolate(double frac);
 };
 
+// Visual studio has an error in how it compiles bitset that prevents
+// us from mixing it with qt headers >= 5.12.0. The toolchain error will
+// allegedly be fixed in vs2019 so roll our own for this very limited case.
+template <size_t T_bitsize> class MyBitset
+{
+    static_assert(T_bitsize <= 32, "T_bitsize must be <= 32.");
+    static_assert(T_bitsize >= 1,  "T_bitsize must be >= 1.");
+
+    unsigned m_mask;
+
+    unsigned popcnt(unsigned x) const {
+        x = x - ((x >> 1) & 0x55555555);
+        x = (x & 0x33333333) + ((x >> 2) & 0x33333333);  
+        return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+    }
+
+    void truncate() { m_mask &= (((unsigned)(-1 << (32 - T_bitsize))) >> (32 - T_bitsize)); }
+
+public:
+
+    MyBitset(unsigned m) : m_mask(m) {}
+    void reset()                           { m_mask = 0; }
+    bool test(unsigned u) const            { return ((m_mask >> u) & 1) != 0; }
+    void set(unsigned u)                   { m_mask |= (1 << u); truncate(); }
+    unsigned count() const                 { return popcnt(m_mask); }
+    MyBitset<T_bitsize>& operator <<=(unsigned u) { m_mask <<= u; truncate(); return (*this); }
+};
+
 // 4 element sliding window to hold interpolation points
 template <typename T> class SlidingWindow
 {
     std::tuple<T, T, T, T> m_Window;
-    std::bitset<4>         m_ElementExists;
+    MyBitset<4>            m_ElementExists;
+    //std::bitset<4>         m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
 
 public:
 
@@ -489,10 +518,9 @@ class GeoPointInterpolator : public DistancePointInterpolator<SphericalTwoPointI
 {
 public:
 
-    GeoPointInterpolator() : DistancePointInterpolator() {}
+    GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>() {}
 
     geolocation Interpolate(double distance);
-    bool GetBracket(double &d0, double &d1);
 
     void Push(double distance, geolocation point);
 };
