@@ -240,10 +240,10 @@ xyz UnitCatmullRomInterpolator3D::Interpolate(double frac)
 
 geolocation GeoPointInterpolator::Interpolate(double distance)
 {
-    return DistancePointInterpolator::Interpolate(distance).togeolocation();
+    return DistancePointInterpolator<SphericalTwoPointInterpolator>::Interpolate(distance).togeolocation();
 }
 
 void GeoPointInterpolator::Push(double distance, geolocation point)
 {
-    DistancePointInterpolator::Push(distance, point.toxyz());
+    DistancePointInterpolator<SphericalTwoPointInterpolator>::Push(distance, point.toxyz());
 }
