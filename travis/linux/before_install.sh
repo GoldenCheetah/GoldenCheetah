@@ -4,7 +4,7 @@ set -ev
 sudo add-apt-repository -y ppa:beineri/opt-qt597-trusty
 sudo apt-get update -qq
 sudo apt-get install -qq qt5-default qt59base qt59tools qt59serialport qt59svg\
- qt59multimedia qt59connectivity qt59webengine qt59charts-no-lgpl qt59networkauth-no-lgpl
+ qt59multimedia qt59connectivity qt59webengine qt59charts-no-lgpl qt59networkauth-no-lgpl qt59translations
 
 sudo apt-get install -qq libglu1-mesa-dev libgstreamer0.10-0 libgstreamer-plugins-base0.10-0
 sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
