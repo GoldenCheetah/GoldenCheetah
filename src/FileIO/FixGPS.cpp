@@ -22,6 +22,7 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
+#include "LocationInterpolation.h"
 
 // Config widget used by the Preferences/Options config panes
 class FixGPS;
@@ -76,6 +77,12 @@ class FixGPS : public DataProcessor {
 
 static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix GPS errors"), new FixGPS());
 
+bool IsReasonableGeoLocation(geolocation *ploc) {
+    return  (ploc->Lat()  && ploc->Lat()  >= double(-90)  && ploc->Lat()  <= double(90) &&
+             ploc->Long() && ploc->Long() >= double(-180) && ploc->Long() <= double(180) &&
+             ploc->Alt() >= -1000 && ploc->Alt() < 10000);
+}
+
 bool
 FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op)
 {
@@ -86,52 +93,62 @@ FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op)
     if (!ride || ride->areDataPresent()->lat == false || ride->areDataPresent()->lon == false)
         return false;
 
+    // Interpolate altitude if its available.
+    bool fHasAlt = ride->areDataPresent()->alt;
+
     int errors=0;
 
     ride->command->startLUW("Fix GPS Errors");
 
-    int lastgood = -1;  // where did we last have decent GPS data?
-    for (int i=0; i<ride->dataPoints().count(); i++) {
-        // is this one decent?
-        if (ride->dataPoints()[i]->lat && ride->dataPoints()[i]->lat >= double(-90) && ride->dataPoints()[i]->lat <= double(90) &&
-            ride->dataPoints()[i]->lon && ride->dataPoints()[i]->lon >= double(-180) && ride->dataPoints()[i]->lon <= double(180)) {
+    GeoPointInterpolator gpi;
+    int ii = 0; // interpolation input index
 
-            if (lastgood != -1 && (lastgood+1) != i) {
-                // interpolate from last good to here
-                // then set last good to here
-                double deltaLat = (ride->dataPoints()[i]->lat - ride->dataPoints()[lastgood]->lat) / double(i-lastgood);
-                double deltaLon = (ride->dataPoints()[i]->lon - ride->dataPoints()[lastgood]->lon) / double(i-lastgood);
-                for (int j=lastgood+1; j<i; j++) {
-                    ride->command->setPointValue(j, RideFile::lat, ride->dataPoints()[lastgood]->lat + (double(j-lastgood)*deltaLat));
-                    ride->command->setPointValue(j, RideFile::lon, ride->dataPoints()[lastgood]->lon + (double(j-lastgood)*deltaLon));
-                    errors++;
+    for (int i=0; i<ride->dataPoints().count(); i++) {
+        const RideFilePoint * pi = (ride->dataPoints()[i]);
+        geolocation curLoc(pi->lat, pi->lon, fHasAlt ? pi->alt : 0.0);
+
+        // Activate interpolation if this sample isn't reasonable.
+        if (!IsReasonableGeoLocation(&curLoc))
+        {
+            double km = pi->km;
+
+            // Feed interpolator until it has samples that span current distance.
+            while (gpi.WantsInput(km)) {
+                if (ii < ride->dataPoints().count()) {
+                    const RideFilePoint * pii = (ride->dataPoints()[ii]);
+                    geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
+
+                    // Only feed reasonable locations to interpolator
+                    if (IsReasonableGeoLocation(&geo)) {
+                        gpi.Push(pii->km, geo);
+                    }
+                    ii++;
                 }
-            } else if (lastgood == -1) {
-                // fill to front
-                for (int j=0; j<i; j++) {
-                    ride->command->setPointValue(j, RideFile::lat, ride->dataPoints()[i]->lat);
-                    ride->command->setPointValue(j, RideFile::lon, ride->dataPoints()[i]->lon);
-                    errors++;
+                else {
+                    gpi.NotifyInputComplete();
+                    break;
                 }
             }
-            lastgood = i;
+
+            geolocation interpLoc = gpi.Interpolate(km);
+
+            ride->command->setPointValue(i, RideFile::lat, interpLoc.Lat());
+            ride->command->setPointValue(i, RideFile::lon, interpLoc.Long());
+
+            if (fHasAlt) {
+                ride->command->setPointValue(i, RideFile::alt, interpLoc.Alt());
+            }
+
+            errors++;
         }
     }
 
-    // fill to end...
-    if (lastgood != -1 && lastgood != (ride->dataPoints().count()-1)) {
-       // fill from lastgood to end with lastgood
-        for (int j=lastgood+1; j<ride->dataPoints().count(); j++) {
-            ride->command->setPointValue(j, RideFile::lat, ride->dataPoints()[lastgood]->lat);
-            ride->command->setPointValue(j, RideFile::lon, ride->dataPoints()[lastgood]->lon);
-            errors++;
-        }
-    } 
     ride->command->endLUW();
 
     if (errors) {
         ride->setTag("GPS errors", QString("%1").arg(errors));
         return true;
-    } else
-        return false;
+    }
+
+    return false;
 }
