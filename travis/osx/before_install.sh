@@ -10,7 +10,6 @@ brew install srmio
 brew install libsamplerate
 rm -rf '/usr/local/include/c++'
 brew install r
-brew install brewsci/science/lmfit
 ## Disable KML for now
 ## brew install --HEAD travis/libkml.rb
 sudo chmod -R +w /usr/local
