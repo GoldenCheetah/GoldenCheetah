@@ -525,6 +525,15 @@ AllPlotObject::setUserData(QList<UserData*>user)
         add.color = userdata->color;
         add.color.setAlpha(200);
 
+#if 0 // just for testing zones, will be deleted shortly XXX
+        // set zones - just for testing during development of zone curve
+        QVector<QwtZone> zones;
+        zones << QwtZone(210, Qt::green);
+        zones << QwtZone(300, Qt::yellow);
+        zones << QwtZone(9999, Qt::red);
+        add.curve->setZones(zones);
+#endif
+
         QPen pen;
         pen.setWidth(1.0);
         pen.setColor(userdata->color);
