@@ -21,7 +21,7 @@
 static double radianstodegrees(double r) { return r * (360.0 / (2 * M_PI)); }
 static double degreestoradians(double d) { return d * (2 * M_PI / 360.0); }
 
-xyz geolocation::toxyz()
+xyz geolocation::toxyz() const
 {
     // Approach developed by:
     //
@@ -52,7 +52,7 @@ xyz geolocation::toxyz()
     return(xyz(dx, dy, dz));                             //Return x, y, z in ECEF
 }
 
-geolocation xyz::togeolocation()
+geolocation xyz::togeolocation() const
 {
     // Approach developed by:
     // (Olson, D.K. (1996).

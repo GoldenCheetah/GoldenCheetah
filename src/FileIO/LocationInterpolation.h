@@ -81,7 +81,11 @@ struct xyz : public v3
     //    qDebug() << "< X:" << x() << " y:" << y() << " z:" << z() << " >";
     //}
 
-    geolocation togeolocation();
+    double DistanceFrom(const xyz& from) const {
+        return this->subtract(from).magnitude();
+    }
+
+    geolocation togeolocation() const;
 };
 
 struct geolocation : v3
@@ -102,7 +106,23 @@ struct geolocation : v3
     //    qDebug() << "< Lat:" << Lat() << " Long:" << Long() << " Alt:" << Alt() << " >";
     //}
 
-    xyz toxyz();
+    xyz toxyz() const;
+
+    double DistanceFrom(const geolocation& from) const {
+        xyz x0 = from.toxyz();
+        xyz x1 = this->toxyz();
+
+        double dist = x1.subtract(x0).magnitude();
+
+        return dist;
+    }
+
+    bool IsReasonableGeoLocation () const {
+        return  (this->Lat() &&  this->Lat()  >= double(-90)  && this->Lat()  <= double(90) &&
+                 this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
+                 this->Alt() >= -1000 && this->Alt() < 10000);
+    }
+
 };
 
 // Class to wrap classic game spherical interpolation
@@ -511,6 +531,141 @@ public:
         }
 
         return m_Interpolator.Interpolate(frac);
+    }
+
+private:
+
+    struct CalcSplineLengthBracketPair
+    {
+        double d0, d1;
+
+        CalcSplineLengthBracketPair() {}
+        CalcSplineLengthBracketPair(double a0, double a1) : d0(a0), d1(a1) {}
+    };
+
+    // A static sized (static sized/frame allocatable) worklist for pushing and popping stuffs.
+    template <typename T, int T_count> class CalcSplineLengthWorklist
+    {
+        static_assert(T_count > 0 && T_count <= 64, "Worklist element count must be within 1 and 64");
+
+        T m_worklist[T_count];
+        int m_idx; // points to first unused element in worklist
+
+    public:
+
+        CalcSplineLengthWorklist() : m_idx(0) {}
+
+        unsigned EmptySlots() const {
+            return T_count - m_idx;
+        }
+
+        bool Push(T rT) {
+            if (m_idx >= T_count)
+                return false;
+
+            m_worklist[m_idx] = rT;
+            m_idx++;
+            return true;
+        }
+
+        bool Pop(T& rT) {
+            if (m_idx == 0) return false;
+
+            m_idx--;
+            rT = m_worklist[m_idx];
+            return true;
+        }
+    };
+
+public:
+
+    //
+    // SplineLength: Estimate path distance across bracketed spline range.
+    //
+    // Estimation is necessary here because there is no closed form for length of cubic spline.
+    //
+    // Cubic spline has 4 control points. The interpolation is only valid within the middle 2 points.
+    // I call these middle two points the 'bracket'.
+    //
+    // Method takes two distances within the bracket and estimates the length of the spline that is
+    // interpolated between those two interpolated points.
+    //
+    // Estimation technique I use :
+    //
+    // 1 Break provided distance range into 3 equidistant distance ranges (4 distances)
+    // 2 Interpolate location for each of those 4 locations
+    // 3 Compute 'linear distance': the geometric distance from first to last location.
+    // 4 Compute 'quad distance': the sum of geometric distance between those 4 locations.
+    // 5 Examine ratio of linear distance / quad distance.
+    //   a If below threshold accumulate the summed quad distance
+    //   b If above threshold then push the 3 ranges onto worklist and goto 1
+    //
+    double SplineLength(double d0, double d1, double thresholdLimit = 0.000001)
+    {
+        double bracketStart, bracketEnd;
+
+        // Ensure:
+        // - bracket exists
+        // - requested range is within bracket
+        // - range is ordered
+        if (!this->GetBracket(bracketStart, bracketEnd)
+            || d0 < bracketStart
+            || d0 > bracketEnd
+            || d1 < bracketStart
+            || d1 > bracketEnd
+            || d0 > d1)
+        {
+            return 0.0;
+        }
+
+        double finalLength = 0.0;
+
+        static const unsigned s_worklistSize = 32;
+        CalcSplineLengthWorklist<CalcSplineLengthBracketPair, s_worklistSize> worklist;
+
+        // Push initial range for processing.
+        if (!worklist.Push(CalcSplineLengthBracketPair(d0, d1)))
+            return 0.0;
+
+        CalcSplineLengthBracketPair workitem;
+        while (worklist.Pop(workitem)) {
+            d0 = workitem.d0;
+            d1 = workitem.d1;
+
+            // Step 1
+            const double quarterspan = (d1 - d0) / 4;
+            const double inter0 = d0 + quarterspan;
+            const double inter1 = d0 + quarterspan + quarterspan;
+
+            // Step 2
+            const xyz pm1 = this->Interpolate(d0);
+            const xyz  p0 = this->Interpolate(inter0);
+            const xyz  p1 = this->Interpolate(inter1);
+            const xyz  p2 = this->Interpolate(d1);
+
+            // Step 3
+            double linearDistance = p2.DistanceFrom(pm1);
+            if (linearDistance == 0.0)
+                break;
+
+            // Step 4
+            double quadDistance = p2.DistanceFrom(p1) + p1.DistanceFrom(p0) + p0.DistanceFrom(pm1);
+
+            // Step 5
+            double difference = fabs(quadDistance / linearDistance) - 1.0;
+
+            // 5A: Settle for quaddistance if threshold met or no more room on worklist.
+            if (difference < thresholdLimit || worklist.EmptySlots() < 3) {
+                finalLength += quadDistance;
+            } else {
+                // 5B: otherwise push the 3 new subsegments onto worklist.
+                worklist.Push(CalcSplineLengthBracketPair(d0,     inter0));
+                worklist.Push(CalcSplineLengthBracketPair(inter0, inter1));
+                worklist.Push(CalcSplineLengthBracketPair(inter1, d1));
+            }
+        }
+
+        return finalLength;
     }
 };
 
