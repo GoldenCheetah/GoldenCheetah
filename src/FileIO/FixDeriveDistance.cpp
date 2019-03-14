@@ -24,8 +24,7 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
-
-#define pi 3.14159265358979323846
+#include "LocationInterpolation.h"
 
 // Config widget used by the Preferences/Options config panes
 class FixDeriveDistance;
@@ -109,12 +108,8 @@ class FixDeriveDistance : public DataProcessor {
 static bool FixDeriveDistanceAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Distance Values"), new FixDeriveDistance());
 
 double _deg2rad(double deg) {
-  return (deg * pi / 180);
+  return (deg * M_PI / 180);
 }
-
-#include "LocationInterpolation.h"
-
-#pragma optimize("", off)
 
 bool
 FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
