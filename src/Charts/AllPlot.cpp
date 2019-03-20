@@ -492,6 +492,31 @@ AllPlotObject::AllPlotObject(AllPlot *plot, QList<UserData*> user) : plot(plot)
 
 }
 
+QVector<QwtZone>
+AllPlotObject::parseZoneString(QString zstring)
+{
+    QVector<QwtZone> returning;
+
+    // split zstring into ; delimetered tokens
+    foreach(QString entry, zstring.split(";")) {
+
+        // need value, colorname
+        QStringList toks = entry.split(",");
+        if (toks.count()!=2) continue;
+        bool ok;
+        double lim=toks[0].toDouble(&ok);
+        if (!ok) continue;
+        QColor col;
+        col.setNamedColor(toks[1]);
+        if (!col.isValid()) continue;
+
+        // well that worked!
+        returning << QwtZone(lim,col);
+
+    }
+    return returning;
+}
+
 void 
 AllPlotObject::setUserData(QList<UserData*>user)
 {
@@ -525,12 +550,16 @@ AllPlotObject::setUserData(QList<UserData*>user)
         add.color = userdata->color;
         add.color.setAlpha(200);
 
+        // set zones
+        QVector<QwtZone> zones = parseZoneString(userdata->zstring);
+        if (zones.count()>0) add.curve->setZones(zones);
+
         QPen pen;
         pen.setWidth(1.0);
         pen.setColor(userdata->color);
         add.curve->setPen(pen);
 
-        if (plot->fill) {
+        if (plot->fill || zones.count()>0) {
             QColor p = add.color;
             p.setAlpha(64);
             add.curve->setBrush(QBrush(p));

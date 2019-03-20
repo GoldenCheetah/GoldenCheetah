@@ -348,6 +348,7 @@ struct UserObject {
     QVector<double> array;
     QVector<double> smooth;
     QwtPlotGappedCurve    *curve;
+    QVector<QwtZone> zones;
     QColor          color;
 };
 
@@ -370,6 +371,7 @@ class AllPlotObject : public QObject
     void setColor(QColor color); // set ALL curves the same color
     void hideUnwanted(); // hide curves we are not interested in
                          // using setVisible ...
+    QVector<QwtZone> parseZoneString(QString zstring);
 
     QwtPlotGrid *grid;
     QVector<QwtPlotMarker*> d_mrk;

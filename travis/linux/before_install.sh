@@ -13,7 +13,7 @@ sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
 # Add VLC 2.2.8
 sudo add-apt-repository -y ppa:jonathonf/vlc
 sudo apt-get update -qq
-sudo apt-get install -qq libvlc-dev libvlccore-dev
+sudo apt-get install -qq vlc libvlc-dev libvlccore-dev
 
 # R 3.5
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
