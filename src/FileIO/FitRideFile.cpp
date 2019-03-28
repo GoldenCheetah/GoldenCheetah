@@ -584,11 +584,23 @@ struct FitFileReaderState
     QString getNameForExtraNative(int native_num) {
         switch (native_num) {
 
+            case 40: // STANCE_TIME_PERCENT
+                    return "STANCETIMEPERCENT"; // Stance Time Percent
+
+            case 42: // ACTIVITY_TYPE
+                    return "ACTIVITYTYPE"; // Activity Type
+
             case 47: // COMBINED_PEDAL_SMOOTHNES
                     return "COMBINEDSMOOTHNESS"; //Combined Pedal Smoothness
 
             case 81: // BATTERY_SOC
                     return "BATTERYSOC";
+
+            case 83: // VERTICAL_RATIO
+                    return "VERTICALRATIO"; // Vertical Ratio
+
+            case 85: // STEP_LENGTH
+                    return "STEPLENGTH"; // Step Length
 
             default:
                     return QString("FIELD_%1").arg(native_num);
@@ -597,6 +609,13 @@ struct FitFileReaderState
 
     float getScaleForExtraNative(int native_num) {
         switch (native_num) {
+
+            case 40: // STANCE_TIME_PERCENT
+            case 83: // VERTICAL_RATIO
+                    return 100.0;
+
+            case 85: // STEP_LENGTH
+                    return 10.0;
 
             case 47: // COMBINED_PEDAL_SMOOTHNES
             case 81: // BATTERY_SOC
@@ -1625,8 +1644,9 @@ struct FitFileReaderState
                                 rvert = value / 100.0f;
                              break;
 
-                    //case 40: // GROUND CONTACT TIME PERCENT
-                             //break;
+                    case 40: // GROUND CONTACT TIME PERCENT
+                             native_num = -1;
+                             break;
 
                     case 41: // GROUND CONTACT TIME
                              if (!native_profile && field.deve_idx>-1)
@@ -1635,10 +1655,9 @@ struct FitFileReaderState
                                 rcontact = value / 10.0f;
                              break;
 
-                    //case 42: // ACTIVITY_TYPE
-                    //         // TODO We should know/test value for run
-                    //         run = true;
-                    //         break;
+                    case 42: // ACTIVITY_TYPE
+                             native_num = -1;
+                             break;
 
                     case 43: // LEFT_TORQUE_EFFECTIVENESS
                              leftTorqueEff = value / 2.0;
@@ -1703,8 +1722,14 @@ struct FitFileReaderState
                              rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
                              break;
+                    case 83: // VERTICAL_RATIO
+                             native_num = -1;
+                             break;
                     case 84: // Left right balance
                              lrbalance = value/100.0;
+                             break;
+                    case 85: // STEP_LENGTH
+                             native_num = -1;
                              break;
 
                     case 87: // ???

@@ -43,7 +43,7 @@ class LeftRightBalance : public RideMetric {
         setImperialUnits(tr("%"));
         setType(RideMetric::Average);
         setPrecision(1);
-        setDescription(tr("Left/Right Balance shows the proportion of power coming from each pedal."));
+        setDescription(tr("Left/Right Balance shows the proportion of power coming from each pedal for rides and the proportion of Ground Contact Time from each leg for runs."));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -60,7 +60,7 @@ class LeftRightBalance : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->cad && point->lrbalance > 0.0f) {
+            if ((point->cad || point->rcad) && point->lrbalance > 0.0f) {
                 total += point->lrbalance;
                 ++count;
             }
