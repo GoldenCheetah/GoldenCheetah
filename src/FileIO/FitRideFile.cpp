@@ -602,6 +602,9 @@ struct FitFileReaderState
             case 85: // STEP_LENGTH
                     return "STEPLENGTH"; // Step Length
 
+            case 90: // PERFORMANCE_CONDITION
+                    return "PERFORMANCECONDITION"; // Performance Contition
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -1735,6 +1738,9 @@ struct FitFileReaderState
                     case 87: // ???
                              break;
 
+                    case 90: // PERFORMANCE_CONDITION
+                             native_num = -1;
+                             break;
 
                     default:
                             unknown_record_fields.insert(native_num);
