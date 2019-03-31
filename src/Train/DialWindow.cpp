@@ -501,13 +501,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Latitude:
     case RealtimeData::Longitude:
-        {
-            // These 2 fields should be treated as generic location update
-            double lat = rtData.value(RealtimeData::Latitude);
-            double lon = rtData.value(RealtimeData::Longitude);
-    
-            valueLabel->setText(QString("Lon:%1\nLat:%2").arg(lat, 0, 'f', 10).arg(lon, 0, 'f', 10));
-        }
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 8));
         break;
 
     case RealtimeData::Altitude:
