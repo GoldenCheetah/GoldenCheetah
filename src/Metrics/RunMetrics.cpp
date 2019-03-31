@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "RideItem.h"
+#include "RideFile.h"
 #include "LTMOutliers.h"
 #include "Units.h"
 #include "Zones.h"
@@ -236,7 +237,7 @@ struct AvgRunVerticalOscillation  : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->rcontact > 0) {
+            if (point->rvert > 0) {
                 total += point->rvert;
                 ++count;
             }
@@ -439,5 +440,185 @@ struct AvgStrideLength  : public RideMetric {
 
 static bool avgStrideLengthAdded =
     RideMetricFactory::instance().addMetric(AvgStrideLength());
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct AvgRunVerticalRatio  : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgRunVerticalRatio)
+
+    double total, count;
+
+    public:
+
+    AvgRunVerticalRatio()
+    {
+        setSymbol("average_run_vert_ratio");
+        setInternalName("Average Vertical Ratio");
+    }
+
+    void initialize() {
+        setName(tr("Average Vertical Ratio"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setPrecision(1);
+        setType(RideMetric::Average);
+        setDescription(tr("Average Vertical Ratio (%): Vertical Oscillation / Step Length"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        total = count = 0;
+
+        int idx = 0;
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            double vert_ratio = item->ride()->xdataValue(point, idx, "EXTRA", "VERTICALRATIO", RideFile::SPARSE);
+            if (point->rcad > 0 && vert_ratio > 0) {
+                total += vert_ratio;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : count);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("R") && ride->isRun); }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new AvgRunVerticalRatio(*this); }
+};
+
+static bool avgRunVerticalRatio =
+    RideMetricFactory::instance().addMetric(AvgRunVerticalRatio());
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct AvgRunStanceTimePercent  : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgRunStanceTimePercent)
+
+    double total, count;
+
+    public:
+
+    AvgRunStanceTimePercent()
+    {
+        setSymbol("average_run_stance_time_percent");
+        setInternalName("Average Stance Time Percent");
+    }
+
+    void initialize() {
+        setName(tr("Average Stance Time Percent"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setPrecision(1);
+        setType(RideMetric::Average);
+        setDescription(tr("Average Stance Time Percent (%): Ground Contact Time / Step Time"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        total = count = 0;
+
+        int idx = 0;
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            double stance_time_pct = item->ride()->xdataValue(point, idx, "EXTRA", "STANCETIMEPERCENT", RideFile::SPARSE);
+            if (point->rcad > 0 && stance_time_pct > 0) {
+                total += stance_time_pct;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : count);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("R") && ride->isRun); }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new AvgRunStanceTimePercent(*this); }
+};
+
+static bool avgRunStanceTimePercent =
+    RideMetricFactory::instance().addMetric(AvgRunStanceTimePercent());
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct AvgStepLength  : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgStepLength)
+
+    double total, count;
+
+    public:
+
+    AvgStepLength()
+    {
+        setSymbol("average_step_length");
+        setInternalName("Average Step Length");
+    }
+
+    void initialize() {
+        setName(tr("Average Step Length"));
+        setMetricUnits(tr("mm"));
+        setImperialUnits(tr("mm"));
+        setPrecision(0);
+        setType(RideMetric::Average);
+        setDescription(tr("Average Step Length: average single step (L to R / R to L) length in mm"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        total = count = 0;
+
+        int idx = 0;
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+
+            double step_length = item->ride()->xdataValue(point, idx, "EXTRA", "STEPLENGTH", RideFile::SPARSE);
+            if (point->rcad > 0 && step_length > 0) {
+                total += step_length;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : count);
+        setCount(count);
+    }
+
+    bool isRelevantForRide(const RideItem *ride) const { return (ride->present.contains("S") && ride->present.contains("C") && ride->isRun); }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new AvgStepLength(*this); }
+};
+
+static bool avgStepLengthAdded =
+    RideMetricFactory::instance().addMetric(AvgStepLength());
 
 //////////////////////////////////////////////////////////////////////////////

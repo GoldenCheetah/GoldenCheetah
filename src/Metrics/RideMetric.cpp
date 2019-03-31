@@ -157,7 +157,8 @@
 // 147 06  May 2018 Ale Martinez       Added PeakHr metrics and HrZone
 // 148 27  Jul 2018 Ale Martinez       Changed Hrv Measures to retrun 0 when no record for the date
 // 149 04  Jan 2019 Mark Liversedge    PowerIndex metric to score performance tests/intervals/rides vs typical athlete PD curve
-int DBSchemaVersion = 149;
+// 150 28  Mar 2019 Ale Martinez       Additional Running Dynamics metrics
+int DBSchemaVersion = 150;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
