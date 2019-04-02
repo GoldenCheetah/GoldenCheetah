@@ -94,6 +94,14 @@ ErgFile::fromContent(QString contents, Context *context)
     return p;
 }
 
+ErgFile *
+ErgFile::fromContent2(QString contents, Context *context)
+{
+    ErgFile *p = new ErgFile(context);
+    p->parseErg2(contents);
+    return p;
+}
+
 void ErgFile::reload()
 {
     // which parser to call? NOTE: we should look at moving to an ergfile factory
@@ -101,6 +109,7 @@ void ErgFile::reload()
     if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
     else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
+    else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
     else parseComputrainer();
 
 }
@@ -160,6 +169,66 @@ void ErgFile::parseZwift()
 
         // calculate climbing etc
         calculateMetrics();
+    }
+}
+
+void ErgFile::parseErg2(QString p)
+{
+    QFile ergFile(filename);
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;            // FTP this file was targetted at
+    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
+    valid = false;             // did it parse ok?
+    rightPoint = leftPoint = 0;
+    interpolatorReadIndex = 0;
+    format = ERG; // default to couse until we know
+    Points.clear();
+    Laps.clear();
+
+    // open the file
+    if (p == "" && ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
+        valid = false;
+        return;
+    }
+    // ok. opened ok lets parse.
+    QTextStream inputStream(&ergFile);
+    QTextStream stringStream(&p);
+    if (p != "") inputStream.setString(&p); // use a string not a file!
+
+    QJsonParseError parseError;
+    QByteArray byteArray = inputStream.readAll().toUtf8();
+    QJsonDocument document = QJsonDocument::fromJson(byteArray, &parseError);
+
+    if (parseError.error == QJsonParseError::NoError) {
+
+        QJsonObject object = document.object();
+
+        QJsonArray segments = object["segments"].toArray();
+
+        int time = 0;
+        if (segments.size()>0) {
+            for(int i=0; i<segments.size(); i++) {
+                QJsonArray segment = segments.at(i).toArray();
+
+                ErgFilePoint add;
+                add.x = time;
+                add.val = add.y = int((segment.at(1).toDouble() /100.00) * CP);
+                Points.append(add);
+
+                time += segment.at(0).toDouble() * 60000;// from mins to 1000ths of a second
+                add.x = time;
+                add.val = add.y = int((segment.at(2).toDouble() /100.00) * CP);
+                Points.append(add);
+            }
+        }
+
+        qDebug() << "document" << object["title"];
+        valid = true;
     }
 }
 

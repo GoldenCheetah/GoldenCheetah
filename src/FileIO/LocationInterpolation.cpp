@@ -81,7 +81,7 @@ geolocation xyz::togeolocation() const
     double x = xyz::x();
     double y = xyz::y();
     double z = xyz::z();
-    double zp = abs(z);
+    double zp = std::abs(z);
     double w2 = x*x + y*y;
     double w = sqrt(w2);
     double r2 = w2 + z*z;

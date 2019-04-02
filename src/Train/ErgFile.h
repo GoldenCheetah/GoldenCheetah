@@ -45,6 +45,7 @@
 #define MRC     2
 #define CRS     3
 #define CRS_LOC 4
+#define ERG2    5
 
 class ErgFilePoint
 {
@@ -103,7 +104,9 @@ class ErgFile
         void setFrom(ErgFile *f); // clone an existing workout
         bool save(QStringList &errors); // save back, with changes
 
-        static ErgFile *fromContent(QString, Context *); // read from memory
+        static ErgFile *fromContent(QString, Context *); // read from memory *.erg
+        static ErgFile *fromContent2(QString, Context *); // read from memory *.erg2
+
         static bool isWorkout(QString); // is this a supported workout?
 
         void reload();          // reload after messed about
@@ -112,6 +115,7 @@ class ErgFile
         void parseTacx();       // its a pgmf file
         void parseZwift();      // its a zwo file (zwift xml)
         void parseGpx();        // its a gpx...
+        void parseErg2(QString p = "");       // ergdb
 
         bool isValid();         // is the file valid or not?
         double Cp;
