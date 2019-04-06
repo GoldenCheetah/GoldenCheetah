@@ -145,6 +145,7 @@ bool PaceZones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
+    fileStream.setCodec("UTF-8");
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");

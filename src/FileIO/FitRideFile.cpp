@@ -135,7 +135,7 @@ struct FitFileReaderState
     int last_event;
     int last_msg_type;
     double frac_time; // to carry sub-second length time in pool swimming
-    double last_lap_end; // to align laps for drill mode in pool swimming
+    double last_altitude; // to avoid problems when records lacks altitude
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
@@ -152,7 +152,7 @@ struct FitFileReaderState
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
         devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1), frac_time(0.0),
-        last_lap_end(0.0)
+        last_altitude(0.0)
     {}
 
     struct TruncatedRead {};
@@ -1502,7 +1502,7 @@ struct FitFileReaderState
         if (time_offset > -1)
             time = last_reference_time + time_offset; // was last_time + time_offset
 
-        double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = RideFile::NA;
+        double alt = last_altitude, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = RideFile::NA;
         double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0, headwind = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
 
@@ -1981,6 +1981,7 @@ struct FitFileReaderState
 
         last_time = time;
         last_distance = km;
+        last_altitude = alt;
 
         if (p_deve != NULL) {
             p_deve->secs = secs;
