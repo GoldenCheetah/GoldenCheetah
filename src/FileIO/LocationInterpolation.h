@@ -633,9 +633,9 @@ public:
             d1 = workitem.d1;
 
             // Step 1
-            const double quarterspan = (d1 - d0) / 4;
-            const double inter0 = d0 + quarterspan;
-            const double inter1 = d0 + quarterspan + quarterspan;
+            const double thirdspan = (d1 - d0) / 3;
+            const double inter0 = d0 + thirdspan;
+            const double inter1 = d0 + thirdspan + thirdspan;
 
             // Step 2
             const xyz pm1 = this->Interpolate(d0);
@@ -645,18 +645,22 @@ public:
 
             // Step 3
             double linearDistance = p2.DistanceFrom(pm1);
-            if (linearDistance == 0.0)
+            if (linearDistance < 0.000001)
                 break;
 
             // Step 4
-            double quadDistance = p2.DistanceFrom(p1) + p1.DistanceFrom(p0) + p0.DistanceFrom(pm1);
+            double span0 = p0.DistanceFrom(pm1);
+            double span1 = p1.DistanceFrom(p0);
+            double span2 = p2.DistanceFrom(p1);
+
+            double arcDistance = span0 + span1 + span2;
 
             // Step 5
-            double difference = fabs(quadDistance / linearDistance) - 1.0;
+            double difference = fabs(arcDistance / linearDistance) - 1.0;
 
             // 5A: Settle for quaddistance if threshold met or no more room on worklist.
             if (difference < thresholdLimit || worklist.EmptySlots() < 3) {
-                finalLength += quadDistance;
+                finalLength += arcDistance;
             } else {
                 // 5B: otherwise push the 3 new subsegments onto worklist.
                 worklist.Push(CalcSplineLengthBracketPair(d0,     inter0));
