@@ -53,8 +53,9 @@ class RideBest;
 // 17        01 Nov 2017 Ale Martinez     Added Daily Measure type (Body/Hrv)
 // 18        05 Jan 2018 Mark Liversedge  Performance tests and weekly performances
 // 19        07 Jan 2018 Mark Liversedge  Flagged as possibly submaximal weekly best
+// 20        15 Apr 2019 Ale Martinez     Added run flag to Estimate
 
-#define LTM_VERSION_NUMBER 19
+#define LTM_VERSION_NUMBER 20
 
 // group by settings
 #define LTM_DAY     1
@@ -133,6 +134,7 @@ class MetricDetail {
     int estimateDuration;       // n x units below for seconds
     int estimateDuration_units; // 1=secs, 60=mins, 3600=hours
     bool wpk; // absolute or wpk 
+    bool run; // cycling or running
 
     // for FORMULAs
     QString formula;

@@ -104,7 +104,7 @@ class Athlete : public QObject
         CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
-        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, bool run);
         QList<PDEstimate> getPDEstimates();
 
         // PMC Data
