@@ -1212,10 +1212,11 @@ MainWindow::dropEvent(QDropEvent *event)
     // is this a chart file ?
     QStringList filenames;
     QList<LTMSettings> imported;
-    QStringList list;
+    QStringList list, workouts;
     for(int i=0; i<urls.count(); i++) {
 
         QString filename = QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath();
+        fprintf(stderr, "%s\n", filename.toStdString().c_str()); fflush(stderr);
 
         if (filename.endsWith(".gchart", Qt::CaseInsensitive)) {
             // add to the list of charts to import
@@ -1236,6 +1237,8 @@ MainWindow::dropEvent(QDropEvent *event)
             xmlReader.parse(source);
             imported += handler.getSettings();
 
+        } else if (ErgFile::isWorkout(filename)) {
+            workouts << filename;
         } else {
             filenames.append(filename);
         }
@@ -1263,18 +1266,15 @@ MainWindow::dropEvent(QDropEvent *event)
     // are there any .gcharts to import?
     if (list.count())  importCharts(list);
 
+    // import workouts
+    if (workouts.count()) Library::importFiles(currentTab->context, filenames, true);
+
     // if there is anything left, process based upon view...
     if (filenames.count()) {
 
-        if (currentTab->currentView() != 3) { // we're not on train view
-
-            // We have something to process then
-            RideImportWizard *dialog = new RideImportWizard (filenames, currentTab->context);
-            dialog->process(); // do it!
-
-        } else {
-            Library::importFiles(currentTab->context, filenames);
-        }
+        // We have something to process then
+        RideImportWizard *dialog = new RideImportWizard (filenames, currentTab->context);
+        dialog->process(); // do it!
     }
     return;
 }

@@ -91,7 +91,7 @@ Library::initialise(QDir home)
 }
 
 void
-Library::importFiles(Context *context, QStringList files)
+Library::importFiles(Context *context, QStringList files, bool forcedialog)
 {
     QStringList videos, workouts, videosyncs;
     MediaHelper helper;
@@ -133,7 +133,7 @@ Library::importFiles(Context *context, QStringList files)
 
     // with only 1 of each max, lets import without any
     // fuss and select the items imported
-    if (videos.count()<=1 && workouts.count() <= 1 && videosyncs.count() <= 1) {
+    if (!forcedialog && videos.count()<=1 && workouts.count() <= 1 && videosyncs.count() <= 1) {
 
         trainDB->startLUW();
 
