@@ -4,7 +4,7 @@ cd src
 echo "Checking GoldenCheetah.app can execute"
 GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
 echo "About to create dmg file and fix up"
-/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -dmg
+/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs hfs+ -dmg
 python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/qt5
 echo "Cleaning up installed QT libraries from qt5"
 brew remove qt5
