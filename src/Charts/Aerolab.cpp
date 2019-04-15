@@ -782,7 +782,7 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         if(( dataPresent->alt || constantAlt )  && dataPresent->watts) {
             double dt = ride->recIntSecs();
-            int npoints = ride->dataPoints().size();
+            int npoints = ride->dataPoints().size() + 1;
 #ifdef Q_CC_MSVC
             double* X1 = new double[npoints];
             double* X2 = new double[npoints];
