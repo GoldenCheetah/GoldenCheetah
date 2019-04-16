@@ -3073,6 +3073,9 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     // loop through all the estimate data
     foreach(PDEstimate est, context->athlete->getPDEstimates()) {
 
+        // skip if not the requested sport
+        if (est.run != metricDetail.run) continue;
+
         // wpk skip for now
         if (est.wpk != metricDetail.wpk) continue;
 

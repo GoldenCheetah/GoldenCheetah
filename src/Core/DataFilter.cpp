@@ -2165,7 +2165,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     // get the PD Estimate for this date - note we always work with the absolulte
                     // power estimates in formulas, since the user can just divide by config(weight)
                     // or Athlete_Weight (which takes into account values stored in ride files.
-                    PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false);
+                    // Bike or Run models are used according to activity type
+                    PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->isRun);
 
                     // no model estimate for this date
                     if (pde.parameters.count() == 0) return Result(0);

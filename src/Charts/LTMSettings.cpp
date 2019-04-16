@@ -222,6 +222,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.estimateDuration;
         out<<metric.estimateDuration_units;
         out<<metric.wpk;
+        out<<metric.run;
         out<<metric.stressType;
         out<<metric.units;
         out<<metric.formula;
@@ -340,6 +341,9 @@ while(counter-- && !in.atEnd()) {
         }
         if (version >= 11) {
             in >> m.wpk;
+        }
+        if (version >= 20) {
+            in >> m.run;
         }
         if (version >= 12) {
             in >> m.stressType;

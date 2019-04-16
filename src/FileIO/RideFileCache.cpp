@@ -314,7 +314,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
 
         if (item->dateTime.date() < from || item->dateTime.date() > to) continue; // not one we want
 
-        if (item->isRun && !wantruns) continue; // they don't want runs
+        if (item->isRun != wantruns) continue; // they don't want these
 
         // get the power data
         if (first == true) {

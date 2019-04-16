@@ -87,7 +87,7 @@ class RideSummaryWindow : public GcChartWindow
         bool isCompare() const { return ((ridesummary && context->isCompareIntervals)
                                       || (!ridesummary && context->isCompareDateRanges)); }
 
-        void getPDEstimates();
+        void getPDEstimates(bool run);
 
     protected slots:
 

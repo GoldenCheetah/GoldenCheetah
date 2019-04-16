@@ -584,11 +584,11 @@ Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 }
 
 PDEstimate
-Athlete::getPDEstimateFor(QDate date, QString model, bool wpk)
+Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, bool run)
 {
     // whats the estimate for this date
     foreach(PDEstimate est, getPDEstimates()) {
-        if (est.model == model && est.wpk == wpk && est.from <= date && est.to >= date)
+        if (est.model == model && est.wpk == wpk && est.run == run && est.from <= date && est.to >= date)
             return est;
     }
     return PDEstimate();
