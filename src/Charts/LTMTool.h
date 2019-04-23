@@ -209,7 +209,6 @@ class EditMetricDetailDialog : public QDialog
         QDoubleSpinBox *estimateDuration;
         QComboBox *estimateDurationUnits;
         QRadioButton *abs, *wpk;
-        QRadioButton *bik, *run;
 
         // stress
         QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
