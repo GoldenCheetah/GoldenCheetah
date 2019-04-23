@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
 # Add recent Qt dependency ppa, update on a newer qt version.
-sudo add-apt-repository -y ppa:beineri/opt-qt597-trusty
+sudo add-apt-repository -y ppa:beineri/opt-qt597-xenial
 sudo apt-get update -qq
 sudo apt-get install -qq qt5-default qt59base qt59tools qt59serialport qt59svg\
  qt59multimedia qt59connectivity qt59webengine qt59charts-no-lgpl qt59networkauth-no-lgpl qt59translations
@@ -17,7 +17,7 @@ sudo apt-get install -qq vlc libvlc-dev libvlccore-dev
 
 # R 3.5
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
-sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu trusty-cran35/"
+sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/"
 sudo apt-get update -qq
 sudo apt-get install r-base-dev
 R --version

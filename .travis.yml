@@ -1,10 +1,10 @@
 branches:
 - master
-language:
-- c++
 os:
 - osx
 - linux
+dist: xenial
+language: c++
 env:
   global:
   - BRANCH=master
@@ -32,8 +32,6 @@ env:
         osx_image: xcode10.1
         compiler: clang
       - os: linux
-        dist: trusty
-        sudo: required
         compiler: gcc
 before_install:
 - travis/$TRAVIS_OS_NAME/before_install.sh
