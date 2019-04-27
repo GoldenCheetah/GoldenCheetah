@@ -863,9 +863,11 @@ AnalysisSidebar::editRoute()
         context->athlete->rideCache->cancel();
 
         QString name = activeInterval->name;
-        editInterval();
-        if (name != activeInterval->name) {
-            context->athlete->routes->renameRoute(activeInterval->route, activeInterval->name);
+        RenameIntervalDialog dialog(name, this);
+        dialog.setFixedWidth(320);
+
+        if (dialog.exec() && name != activeInterval->name) {
+            context->athlete->routes->renameRoute(activeInterval->route, name);
 
             // loop through rides finding intervals on this route
             foreach(RideItem *ride, context->athlete->rideCache->rides()) {
