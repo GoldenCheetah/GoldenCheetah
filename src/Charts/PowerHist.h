@@ -42,6 +42,7 @@
 #include <qwt_scale_draw.h>
 #include <qsettings.h>
 #include <qvariant.h>
+#include <algorithm> // for std::min()
 
 
 class QwtPlotCurve;
@@ -213,6 +214,9 @@ class PowerHist : public QwtPlot
         bool shadeZones() const; // check if zone shading is both wanted and possible
         bool shadeHRZones() const; // check if zone shading is both wanted and possible
         bool shadePaceZones() const; // check if zone shading is both wanted and possible
+
+        // Warning: the chart crashes when precision > 2
+        static int validatePrecision(int precision) { return std::min(precision, 2); }
 
         // plot settings
         RideItem *rideItem;
