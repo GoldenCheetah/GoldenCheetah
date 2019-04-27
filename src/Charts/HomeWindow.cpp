@@ -1667,8 +1667,8 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
     table->setColumnCount(3);
     QStringList headings;
     headings<<"";
-    headings<<"View";
-    headings<<"Title";
+    headings<<tr("View");
+    headings<<tr("Title");
     table->setHorizontalHeaderLabels(headings);
     table->setSortingEnabled(false);
     table->verticalHeader()->hide();
