@@ -159,7 +159,7 @@ void WorkoutEditorGradient::insertDataRow(int row)
     // distance
     table->setItem(row,0,new WorkoutItemDouble());
     // grade
-    table->setItem(row,1,new WorkoutItemDoubleRange<-5,5>());
+    table->setItem(row,1,new WorkoutItemDoubleRange<-20,20>());
 }
 
 ///  Workout Summary
@@ -667,7 +667,7 @@ void ImportPage::initializePage()
         QLabel *gradeLabel = new QLabel(tr("Maximum Grade"));
         gradeBox = new QSpinBox();
         gradeBox->setValue(5);
-        gradeBox->setMaximum(8);
+        gradeBox->setMaximum(20);
         gradeBox->setMinimum(0);
         gradeBox->setToolTip(tr("Maximum supported grade is 8"));
         connect(gradeBox,SIGNAL(valueChanged(int)),this,SLOT(updatePlot()));
