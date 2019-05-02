@@ -843,7 +843,7 @@ Strava::prepareResponse(QByteArray* data)
                     if (lap_start == 0)
                         lap_start = last_lap;
 
-                    double start = ride->getPoint(lap["start_index"].toInt(), RideFile::secs).toDouble();
+                    double start = ride->getPoint(lap_start, RideFile::secs).toDouble();
                     double end = start + lap["elapsed_time"].toDouble();
                     last_lap = end;
 
