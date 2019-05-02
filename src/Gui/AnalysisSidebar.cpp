@@ -804,6 +804,17 @@ AnalysisSidebar::deleteIntervalSelected()
     QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
 
     if (userIntervals) {
+        // Are you sure ?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to delete selected interval?"));
+        QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        // nope, don't want to
+        if(msgBox.clickedButton() != deleteButton) return;
 
         QList <QTreeWidgetItem*> deleteList;
 
@@ -825,7 +836,7 @@ AnalysisSidebar::deleteIntervalSelected()
                     QMessageBox::warning(this, tr("Delete Interval"), tr("Unable to delete interval"));
                 }
             }
-        }
+        } 
 
         // now wipe the trees
         foreach (QTreeWidgetItem*item, deleteList) {
@@ -841,6 +852,18 @@ AnalysisSidebar::deleteRoute()
 {
     // stop tracking this route across rides
     if (activeInterval) {
+
+        // Are you sure ?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to stop tracking this segment?"));
+        QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        // nope, don't want to
+        if(msgBox.clickedButton() != deleteButton) return;
 
         // if refresh is running cancel it !
         context->athlete->rideCache->cancel();
