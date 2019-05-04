@@ -159,7 +159,7 @@ void WorkoutEditorGradient::insertDataRow(int row)
     // distance
     table->setItem(row,0,new WorkoutItemDouble());
     // grade
-    table->setItem(row,1,new WorkoutItemDoubleRange<-20,20>());
+    table->setItem(row,1,new WorkoutItemDoubleRange<-40,40>());
 }
 
 ///  Workout Summary
@@ -548,7 +548,7 @@ void GradientPage::initializePage()
     metricUnits = hackContext->athlete->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
-    setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is 5."));
+    setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is +-40."));
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
@@ -666,10 +666,10 @@ void ImportPage::initializePage()
         spinGroupBox->setTitle(tr("Smoothing Parameters"));
         QLabel *gradeLabel = new QLabel(tr("Maximum Grade"));
         gradeBox = new QSpinBox();
-        gradeBox->setValue(5);
-        gradeBox->setMaximum(20);
-        gradeBox->setMinimum(0);
-        gradeBox->setToolTip(tr("Maximum supported grade is 8"));
+        gradeBox->setValue(20);
+        gradeBox->setMaximum(40);
+        gradeBox->setMinimum(-40);
+        gradeBox->setToolTip(tr("Maximum supported grade is +-40"));
         connect(gradeBox,SIGNAL(valueChanged(int)),this,SLOT(updatePlot()));
 
         segmentBox = new QSpinBox();
