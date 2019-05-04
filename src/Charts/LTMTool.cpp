@@ -1794,29 +1794,11 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estwpk->addWidget(wpk);
     estwpk->addStretch();
 
-    // estimate for rides or runs ?
-    bik = new QRadioButton(tr("Bike"), this);
-    run = new QRadioButton(tr("Run"), this);
-    run->setChecked(metricDetail->run);
-    bik->setChecked(!metricDetail->run);
-    // put them into a button group because we
-    // also have radio buttons for watts per kilo / absolute
-    QButtonGroup* runGroup = new QButtonGroup(this);
-    runGroup->addButton(bik);
-    runGroup->addButton(run);
-
-    QHBoxLayout *estrun = new QHBoxLayout;
-    estrun->addStretch();
-    estrun->addWidget(bik);
-    estrun->addWidget(run);
-    estrun->addStretch();
-
     estimateLayout->addStretch();
     estimateLayout->addWidget(modelSelect);
     estimateLayout->addWidget(estimateSelect);
     estimateLayout->addLayout(estbestLayout);
     estimateLayout->addLayout(estwpk);
-    estimateLayout->addLayout(estrun);
     estimateLayout->addStretch();
 
     // estimate selection
@@ -2589,7 +2571,6 @@ EditMetricDetailDialog::applyClicked()
 
     metricDetail->datafilter = dataFilter->filter();
     metricDetail->wpk = wpk->isChecked();
-    metricDetail->run = run->isChecked();
     metricDetail->series = seriesList.at(dataSeries->currentIndex());
     metricDetail->model = models[modelSelect->currentIndex()]->code();
     metricDetail->estimate = estimateSelect->currentIndex(); // 0 - 5

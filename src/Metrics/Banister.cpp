@@ -188,7 +188,6 @@ Banister::getPeakCP(QDate from, QDate to, int &CP)
     }
     CP = max;
 
-    // RMSE
     return start.addDays(index);
 }
 
@@ -279,39 +278,20 @@ Banister::refresh()
         if (score>0) {
             rides++;
             meanscore += score; // averaged at end
-        }
 
-        // get best scoring performance *test* in the ride
-        double todaybest=0;
-        foreach(IntervalItem *i, item->intervals()) {
-            if (i->istest()) {
-                double pix=i->getForSymbol("power_index");
-                if (pix > todaybest)  todaybest = pix;
+            // get best scoring performance *test* in the ride
+            double todaybest=0;
+            foreach(IntervalItem *i, item->intervals()) {
+                if (i->istest()) {
+                    double pix=i->getForSymbol("power_index");
+                    if (pix > todaybest)  todaybest = pix;
+                }
             }
-        }
 
-        // is there a performance test already there for today?
-        if (todaybest > 0) {
-            if (performances > 0 && performanceDay[performances-1] == day) {
-                if (performanceScore[performances-1] < todaybest)
-                    performanceScore[performances-1] = todaybest;
-            } else {
-                performanceDay[performances] = day;
-                performanceScore[performances] = todaybest;
-                performances++;
-            }
-        }
-
-        // if we didn't find a performance test in the ride lets see if there
-        // is a weekly performance already identified
-        if (!(todaybest > 0)) {
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date());
-            if (!p.submaximal && p.powerIndex > 0) {
-
-                // its not submax
-                todaybest = p.powerIndex;
+            // is there a performance test already there for today?
+            if (todaybest > 0) {
                 if (performances > 0 && performanceDay[performances-1] == day) {
-                    if (performanceScore[performances-1] < todaybest) // validating with '<=' not '<' is vital for 2-a-days
+                    if (performanceScore[performances-1] < todaybest)
                         performanceScore[performances-1] = todaybest;
                 } else {
                     performanceDay[performances] = day;
@@ -319,12 +299,31 @@ Banister::refresh()
                     performances++;
                 }
             }
-        }
 
-        // add more space
-        if (performances == performanceDay.size()) {
-            performanceDay.resize(performanceDay.size() + (days/2));
-            performanceScore.resize(performanceDay.size() + (days/2));
+            // if we didn't find a performance test in the ride lets see if there
+            // is a weekly performance already identified
+            if (!(todaybest > 0)) {
+                Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date(), item->isRun);
+                if (!p.submaximal && p.powerIndex > 0) {
+
+                    // its not submax
+                    todaybest = p.powerIndex;
+                    if (performances > 0 && performanceDay[performances-1] == day) {
+                        if (performanceScore[performances-1] < todaybest) // validating with '<=' not '<' is vital for 2-a-days
+                            performanceScore[performances-1] = todaybest;
+                    } else {
+                        performanceDay[performances] = day;
+                        performanceScore[performances] = todaybest;
+                        performances++;
+                    }
+                }
+            }
+
+            // add more space
+            if (performances == performanceDay.size()) {
+                performanceDay.resize(performanceDay.size() + (days/2));
+                performanceScore.resize(performanceDay.size() + (days/2));
+            }
         }
     }
 
@@ -566,8 +565,10 @@ void Banister::fit()
 //
 
 // power index metric
-double powerIndex(double averagepower, double duration)
+double powerIndex(double averagepower, double duration, bool isRun)
 {
+    Q_UNUSED(isRun); // TODO: different parameters for Running
+
     // so now lets work out what the 3p model says the
     // typical athlete would do for the same duration
     //
@@ -635,7 +636,7 @@ class PowerIndex : public RideMetric {
         }
 
         // calculate power index, 0=out of bounds
-        double pix = powerIndex(averagepower, duration);
+        double pix = powerIndex(averagepower, duration, item->isRun);
 
         // we could convert to linear work time model before
         // indexing, but they cancel out so no value in doing so
