@@ -76,9 +76,9 @@
 #include "windows.h"
 #endif
 
-#include <cmath> // isnan and isinf
 #include "TrainDB.h"
 #include "Library.h"
+#include "PhysicsUtility.h"
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context)
 {
@@ -1603,6 +1603,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
         } else {
             rtData.setLoad(load); // always set load..
             rtData.setSlope(slope); // always set load..
+            rtData.setAltitude(displayAltitude); // always set display altitude
 
             // fetch the right data from each device...
             foreach(int dev, activeDevices) {
@@ -1777,33 +1778,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
 
-            // virtual speed
-            double crr = 0.004f; // typical for asphalt surfaces
-            double g = 9.81;     // g constant 9.81 m/s
-            double weight = context->athlete->getWeight(QDate::currentDate());
-            double m = weight ? weight + 8 : 83; // default to 75kg weight, plus 8kg bike
-            double sl = slope / 100; // 10% = 0.1
-            double ad = 1.226f; // default air density at sea level
-            double cdA = 0.5f; // typical
-            double pw = rtData.getWatts();
+            double weightKG = context->athlete->getWeight(QDate::currentDate()) + 10; // 10kg bike
+            double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
 
-            // algorithm supplied by Tom Compton
-            // from www.AnalyticCycling.com
-            // 3.6 * ... converts from meters per second to kph
-            double vs = 3.6f * (
-            (-2*pow(2,0.3333333333333333)*(crr*m + g*m*sl)) /
-                pow(54*pow(ad,2)*pow(cdA,2)*pw +
-                sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) +
-                864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
-                g*m*sl,3)),0.3333333333333333) +
-                pow(54*pow(ad,2)*pow(cdA,2)*pw +
-                sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) +
-                864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
-                g*m*sl,3)),0.3333333333333333)/
-                (3.*pow(2,0.3333333333333333)*ad*cdA));
-
-            // just in case...
-            if (std::isnan(vs) || std::isinf(vs)) vs = 0.00f;
             rtData.setVirtualSpeed(vs);
 
             // W'bal on the fly
