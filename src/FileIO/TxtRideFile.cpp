@@ -530,6 +530,13 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     } else {
         // RR File
 
+        file.close(); // start again (seek did weird things on Linux, bug (?)
+        if (!file.open(QFile::ReadOnly)) {
+            errors << ("Could not open ride file: \"" + file.fileName() + "\"");
+            return NULL;
+        }
+        QTextStream is(&file);
+
         // Lets construct our rideFile
         RideFile *rideFile = new RideFile();
         rideFile->setDeviceType("R-R");
@@ -542,8 +549,11 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         hrvXdata->unitname << "msecs";
 
         double secs = 0.0;
-        do {
+        while (!is.atEnd()) {
             double rr;
+
+            line = is.readLine();
+            tokens = line.split(QRegExp("[ \t]"), QString::SkipEmptyParts);
 
             if (rrType == RR_Type2 && tokens.count() > 1) rr = tokens[1].toDouble();
             else if (rrType == RR_Type1 && tokens.count() > 0) rr = tokens[0].toDouble();
@@ -562,10 +572,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             hrvXdata->datapoints.append(p);
 
             secs += rr;
-
-            line = in.readLine();
-            tokens = line.split(QRegExp("[ \t]"), QString::SkipEmptyParts);
-        } while (!in.atEnd());
+        }
 
         if (hrvXdata->datapoints.count()>0)
             rideFile->addXData("HRV", hrvXdata);
