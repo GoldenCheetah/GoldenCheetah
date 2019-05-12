@@ -548,6 +548,10 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         hrvXdata->valuename << "R-R";
         hrvXdata->unitname << "msecs";
 
+        // using EWMA filtered R-R
+        double ewmaRR = -1.0;
+        const double ewmaTC = 5.0;
+        int iSecs = 0;
         double secs = 0.0;
         while (!is.atEnd()) {
             double rr;
@@ -561,9 +565,14 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
             if (rr > 30) rr /= 1000.0; // convert to seconds if milliseconds
 
-            double bpm = rr>0.0 ? 60.0/rr : 0.0; // HR without filtering
+            // HR EWMA filtered
+            if (ewmaRR < 0.0) ewmaRR = rr;
+            else ewmaRR += (rr - ewmaRR)/ewmaTC;
+            double bpm = ewmaRR>0.0 ? 60.0/ewmaRR : 0.0;
 
-            rideFile->appendPoint(secs, 0.0, bpm, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+            for (; iSecs < secs + rr; iSecs++) {
+                rideFile->appendPoint(iSecs, 0.0, bpm, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+            }
 
             XDataPoint *p = new XDataPoint();
             p->secs = secs;
