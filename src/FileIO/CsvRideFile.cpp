@@ -452,6 +452,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setDeviceType(line.section(',',26,26));
                     rideFile->setTag("Device Info", line.section(',',20,21).remove(QChar('"')));
 
+                    // Prefill aerolab with ibike data
+                    rideFile->setTag("Total Weight", QString("%1").arg(line.section(',',0,0)));
+                    rideFile->setTag("aerolab.Cda", QString("%1").arg(line.section(',',16,16)));
+                    rideFile->setTag("aerolab.Crr", QString("%1").arg(line.section(',',17,17)));
+
                     ibikeSeries = new XDataSeries();
                     ibikeSeries->name = "AERO";
                     ibikeSeries->valuename << "CALC-POWER";
@@ -575,6 +580,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     tempType = degC;
                 else if (degFUnits.indexIn(line) != -1)
                     tempType = degF;
+
+                // Convert Total Weight
+                double weight = rideFile->getTag("Total Weight", "0").toDouble();
+                if (weight>0) {
+                    weight = weight / LB_PER_KG;
+                    rideFile->setTag("Total Weight", QString("%1").arg(weight));
+
+                }
 
             } else if (lineno > unitsHeader) {
                 double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
