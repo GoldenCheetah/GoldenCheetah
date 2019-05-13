@@ -583,7 +583,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                 // Convert Total Weight
                 double weight = rideFile->getTag("Total Weight", "0").toDouble();
-                if (weight>0) {
+                if (!metric & weight>0) {
+                    // keep weight in metric
                     weight = weight / LB_PER_KG;
                     rideFile->setTag("Total Weight", QString("%1").arg(weight));
 
