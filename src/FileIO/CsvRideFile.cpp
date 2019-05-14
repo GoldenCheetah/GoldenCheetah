@@ -450,6 +450,18 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // the trailing zeroes in the configuration area seem to be causing an error
                     // the number is in the format 5.000000
                     recInterval = (int)line.section(',',4,4).toDouble();
+
+
+                    if (line.section(',',18).startsWith('"')) {
+                        // We have a note
+                        // note can have ","
+                        QString notes = line.section(',',18).section('"',1,1);
+                        qDebug()<<notes;
+                        line.remove(notes);
+                        rideFile->setTag("Notes", notes);
+                    }
+
+
                     rideFile->setDeviceType(line.section(',',26,26));
                     rideFile->setTag("Device Info", line.section(',',20,21).remove(QChar('"')));
 
