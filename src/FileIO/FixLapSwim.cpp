@@ -148,8 +148,6 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     // Stroke Type or Duration are mandatory, Strokes only to compute cadence
     if (typeIdx == -1 || durationIdx == -1) return false;
 
-    // get the Smart Recording parameters
-    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
@@ -192,7 +190,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
        // only fill 100x the maximal smart recording gap defined
        // in preferences - we don't want to crash / stall on bad
        // or corrupt files
-       if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
+       if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
            QVector<struct RideFilePoint> newRows;
            kph = 3600.0 * length_distance / length_duration;
            if (length_distance == 0.0) interval++; // pauses mark laps
