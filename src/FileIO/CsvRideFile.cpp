@@ -737,12 +737,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                } else if (csvType == ibike) {
-                    // this must be
+                    // this must be ibike
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
-                    // reading recording interval from config data in  csv file
+                    // reading recording interval from config data in ibike csv file
                     //
-                    // For  software version 11 or higher:
+                    // For ibike software version 11 or higher:
                     // use "power" field until a the "dfpm" field becomes non-zero.
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
                      QString timestamp = line.section( ',', 14, 14);
@@ -790,8 +790,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         kph *= KM_PER_MILE;
                         alt *= METERS_PER_FOOT;
                         headwind *= KM_PER_MILE;
+                        // Temperature for english (not metric) is always degF
                         temp = (temp - FAHRENHEIT_ADD_CENTIGRADE) / FAHRENHEIT_PER_CENTIGRADE;
-
                     }
 
 
