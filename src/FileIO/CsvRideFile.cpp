@@ -259,6 +259,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setFileFormat("iBike CSV (csv)");
                     unitsHeader = 5;
                     iBikeVersion = line.section( ',', 1, 1 ).toInt();
+                    metric = line.section( ',', 2, 2 ) == "metric";
 
                     ++lineno;
                     continue;
@@ -453,7 +454,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setTag("Device Info", line.section(',',20,21).remove(QChar('"')));
 
                     // Prefill aerolab with ibike data
-                    rideFile->setTag("Total Weight", QString("%1").arg(line.section(',',0,0)));
+                    double weight = line.section(',',0,0).toDouble();
+                    if (!metric)
+                       weight *= KG_PER_LB;
+                    rideFile->setTag("Total Weight", QString("%1").arg(weight));
                     rideFile->setTag("aerolab.Cda", QString("%1").arg(line.section(',',16,16)));
                     rideFile->setTag("aerolab.Crr", QString("%1").arg(line.section(',',17,17)));
 
@@ -563,7 +567,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
 
-            } else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro && csvType != rp3) {
+            } else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro && csvType != rp3 && csvType != ibike) {
 
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
@@ -580,15 +584,6 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     tempType = degC;
                 else if (degFUnits.indexIn(line) != -1)
                     tempType = degF;
-
-                // Convert Total Weight
-                double weight = rideFile->getTag("Total Weight", "0").toDouble();
-                if (!metric & weight>0) {
-                    // keep weight in metric
-                    weight = weight / LB_PER_KG;
-                    rideFile->setTag("Total Weight", QString("%1").arg(weight));
-
-                }
 
             } else if (lineno > unitsHeader) {
                 double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
@@ -742,12 +737,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                } else if (csvType == ibike) {
-                    // this must be iBike
+                    // this must be
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
-                    // reading recording interval from config data in ibike csv file
+                    // reading recording interval from config data in  csv file
                     //
-                    // For iBike software version 11 or higher:
+                    // For  software version 11 or higher:
                     // use "power" field until a the "dfpm" field becomes non-zero.
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
                      QString timestamp = line.section( ',', 14, 14);
@@ -795,6 +790,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         kph *= KM_PER_MILE;
                         alt *= METERS_PER_FOOT;
                         headwind *= KM_PER_MILE;
+                        temp = (temp - FAHRENHEIT_ADD_CENTIGRADE) / FAHRENHEIT_PER_CENTIGRADE;
+
                     }
 
 
