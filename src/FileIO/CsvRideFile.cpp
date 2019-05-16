@@ -477,8 +477,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ibikeSeries->name = "AERO";
                     ibikeSeries->valuename << "CALC-POWER";
                     ibikeSeries->unitname << "W";
-                    //ibikeSeries->valuename << "CdA";
-                    //ibikeSeries->unitname << "m^2";
+                    ibikeSeries->valuename << "Rho";
+                    ibikeSeries->unitname << "kg/m^3";
                 }
             }
 
@@ -774,8 +774,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                          XDataPoint *p = new XDataPoint();
                          p->secs = minutes*60.0;
                          p->km = km;
-                         p->number[0] = line.section(',', 2, 2).toDouble();
-                         p->number[1] = line.section(',', 16, 16).toDouble();
+                         p->number[0] = line.section(',', 2, 2).toDouble();  // CALC-POWER
+                         p->number[1] = line.section(',', 17, 17).toDouble();  // Rho
 
                          ibikeSeries->datapoints.append(p);
                      }
