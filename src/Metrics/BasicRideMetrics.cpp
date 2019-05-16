@@ -143,7 +143,7 @@ class WorkoutTime : public RideMetric {
         setName(tr("Duration"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
-        setDescription(tr("Total Duration"));
+        setDescription(tr("Total Duration including pauses a.k.a. Elapsed Time"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -173,6 +173,54 @@ class WorkoutTime : public RideMetric {
 
 static bool workoutTimeAdded =
     RideMetricFactory::instance().addMetric(WorkoutTime());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class TimeRecording : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TimeRecording)
+    double secsRecording;
+
+    public:
+
+    TimeRecording() : secsRecording(0.0)
+    {
+        setSymbol("time_recording");
+        setInternalName("Time Recording");
+    }
+
+    bool isTime() const { return true; }
+
+    void initialize() {
+        setName(tr("Time Recording"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time when device was recording, excludes gaps in recording due to pauses or missing samples"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        secsRecording = 0;
+
+        // loop through and count
+        for (RideFileIterator it(item->ride(), spec); it.hasNext(); it.next())
+            secsRecording += item->ride()->recIntSecs();
+        setValue(secsRecording);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new TimeRecording(*this); }
+};
+
+static bool timeRecordingAdded =
+    RideMetricFactory::instance().addMetric(TimeRecording());
 
 //////////////////////////////////////////////////////////////////////////////
 

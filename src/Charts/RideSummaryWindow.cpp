@@ -473,6 +473,7 @@ RideSummaryWindow::htmlSummary()
     static const QStringList columnNames = QStringList() << tr("Totals") << tr("Averages") << tr("Maximums") << tr("Metrics");
     static const QStringList totalColumn = QStringList()
         << "workout_time"
+        << "time_recording"
         << "time_riding"
         << "total_distance"
         << "ride_count"
@@ -1626,6 +1627,7 @@ RideSummaryWindow::htmlCompareSummary() const
     static const QStringList columnNames = QStringList() << tr("Totals") << tr("Averages") << tr("Maximums") << tr("Metrics*");
     static const QStringList totalColumn = QStringList()
         << "workout_time"
+        << "time_recording"
         << "time_riding"
         << "total_distance"
         << "ride_count"
