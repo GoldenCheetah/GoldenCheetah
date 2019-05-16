@@ -2787,7 +2787,7 @@ class AvgLTE : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->lte || item->ride()->dataPoints().count() == 0) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->lte) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2842,7 +2842,7 @@ class AvgRTE : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->rte || item->ride()->dataPoints().count() == 0) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->rte) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2896,7 +2896,7 @@ class AvgLPS : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->lps || item->ride()->dataPoints().count() == 0) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->lps) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2950,7 +2950,7 @@ class AvgRPS : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->rps || item->ride()->dataPoints().count() == 0) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->rps) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
