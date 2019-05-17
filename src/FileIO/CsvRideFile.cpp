@@ -480,6 +480,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ibikeSeries->valuename << "Rho";
                     ibikeSeries->unitname << "kg/m^3";
                 }
+                // If Timestamp present, take the first one as start time.
+                // It is not guaranteed to be equal to the timestamp at line 2
+                // when merged with external GPS data.
+                else if (lineno == 6)
+                {
+                   QString timestamp = line.section( ',', 14, 14);
+                     if (timestamp.length()>0){
+                         startTime = QDateTime::fromString(timestamp, Qt::ISODate);
+                     }
+                }
             }
 
             if (csvType == freemotion) {
