@@ -346,6 +346,7 @@ class PaceZonePTime1 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -390,6 +391,7 @@ class PaceZonePTime2 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -434,6 +436,7 @@ class PaceZonePTime3 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -478,6 +481,7 @@ class PaceZonePTime4 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -522,6 +526,7 @@ class PaceZonePTime5 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -566,6 +571,7 @@ class PaceZonePTime6 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -610,6 +616,7 @@ class PaceZonePTime7 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -654,6 +661,7 @@ class PaceZonePTime8 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -698,6 +706,7 @@ class PaceZonePTime9 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -742,6 +751,7 @@ class PaceZonePTime10 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }

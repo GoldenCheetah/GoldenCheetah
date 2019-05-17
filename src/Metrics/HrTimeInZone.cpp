@@ -338,6 +338,7 @@ class HrZonePTime1 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -382,6 +383,7 @@ class HrZonePTime2 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -426,6 +428,7 @@ class HrZonePTime3 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -470,6 +473,7 @@ class HrZonePTime4 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -514,6 +518,7 @@ class HrZonePTime5 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -558,6 +563,7 @@ class HrZonePTime6 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -602,6 +608,7 @@ class HrZonePTime7 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -646,6 +653,7 @@ class HrZonePTime8 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -689,6 +697,7 @@ class HrZonePTime9 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }
@@ -732,6 +741,7 @@ class HrZonePTime10 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
         bool canAggregate() { return false; }
         void aggregateWith(const RideMetric &) {}
     MetricClass classification() const { return Undefined; }

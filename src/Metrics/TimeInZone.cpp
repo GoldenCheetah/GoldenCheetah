@@ -337,6 +337,7 @@ class ZonePTime1 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime1(*this); }
@@ -379,6 +380,7 @@ class ZonePTime2 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime2(*this); }
@@ -421,6 +423,7 @@ class ZonePTime3 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime3(*this); }
@@ -463,6 +466,7 @@ class ZonePTime4 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime4(*this); }
@@ -505,6 +509,7 @@ class ZonePTime5 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime5(*this); }
@@ -547,6 +552,7 @@ class ZonePTime6 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime6(*this); }
@@ -589,6 +595,7 @@ class ZonePTime7 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime7(*this); }
@@ -631,6 +638,7 @@ class ZonePTime8 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime8(*this); }
@@ -673,6 +681,7 @@ class ZonePTime9 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime9(*this); }
@@ -715,6 +724,7 @@ class ZonePTime10 : public RideMetric {
             setCount(time);
         }
 
+        bool aggregateZero() const { return true; }
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }
         RideMetric *clone() const { return new ZonePTime10(*this); }
