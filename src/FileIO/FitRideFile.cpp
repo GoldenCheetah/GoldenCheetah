@@ -537,6 +537,13 @@ struct FitFileReaderState
         } else if (manu == 284) {
             // Rouvy
             return "Rouvy";
+        } else if (manu == 289) {
+            // Hammerhead
+            // currently not setting product ids
+            switch (prod) {
+                case -1: return "Hammerhead";
+                default: return QString("Hammerhead %1").arg(prod);
+            }
         } else {
             QString name = "Unknown FIT Device";
             return name + QString(" %1:%2").arg(manu).arg(prod);
