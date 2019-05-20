@@ -60,16 +60,19 @@ class ZoneTime : public RideMetric {
             return;
         }
 
+        double totalSecs = 0.0;
         seconds = 0;
 
         // iterate and compute
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
+            totalSecs += item->ride()->recIntSecs();
             if (item->context->athlete->zones(item->isRun)->whichZone(item->zoneRange, point->watts) == level)
                 seconds += item->ride()->recIntSecs();
         }
         setValue(seconds);
+        setCount(totalSecs);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -326,10 +329,9 @@ class ZonePTime1 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L1"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L1")->count();
             double inzone = deps.value("time_in_zone_L1")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -369,10 +371,9 @@ class ZonePTime2 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L2"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L2")->count();
             double inzone = deps.value("time_in_zone_L2")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -412,10 +413,9 @@ class ZonePTime3 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L3"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L3")->count();
             double inzone = deps.value("time_in_zone_L3")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -455,10 +455,9 @@ class ZonePTime4 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L4"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L4")->count();
             double inzone = deps.value("time_in_zone_L4")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -498,10 +497,9 @@ class ZonePTime5 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L5"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L5")->count();
             double inzone = deps.value("time_in_zone_L5")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -541,10 +539,9 @@ class ZonePTime6 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L6"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L6")->count();
             double inzone = deps.value("time_in_zone_L6")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -584,10 +581,9 @@ class ZonePTime7 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L7"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L7")->count();
             double inzone = deps.value("time_in_zone_L7")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -627,10 +623,9 @@ class ZonePTime8 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L8"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L8")->count();
             double inzone = deps.value("time_in_zone_L8")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -670,10 +665,9 @@ class ZonePTime9 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L9"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L9")->count();
             double inzone = deps.value("time_in_zone_L9")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -713,10 +707,9 @@ class ZonePTime10 : public RideMetric {
     void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
 
             assert(deps.contains("time_in_zone_L10"));
-            assert(deps.contains("time_recording"));
 
             // compute
-            double time = deps.value("time_recording")->value(true);
+            double time = deps.value("time_in_zone_L10")->count();
             double inzone = deps.value("time_in_zone_L10")->value(true);
 
             if (time && inzone) setValue((inzone / time) * 100.00);
@@ -743,43 +736,33 @@ static bool addAllZones() {
     RideMetricFactory::instance().addMetric(ZoneTime10());
     QVector<QString> deps;
     deps.append("time_in_zone_L1");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime1(), &deps);
     deps.clear();
     deps.append("time_in_zone_L2");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime2(), &deps);
     deps.clear();
     deps.append("time_in_zone_L3");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime3(), &deps);
     deps.clear();
     deps.append("time_in_zone_L4");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime4(), &deps);
     deps.clear();
     deps.append("time_in_zone_L5");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime5(), &deps);
     deps.clear();
     deps.append("time_in_zone_L6");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime6(), &deps);
     deps.clear();
     deps.append("time_in_zone_L7");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime7(), &deps);
     deps.clear();
     deps.append("time_in_zone_L8");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime8(), &deps);
     deps.clear();
     deps.append("time_in_zone_L9");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime9(), &deps);
     deps.clear();
     deps.append("time_in_zone_L10");
-    deps.append("time_recording");
     RideMetricFactory::instance().addMetric(ZonePTime10(), &deps);
     return true;
 }
