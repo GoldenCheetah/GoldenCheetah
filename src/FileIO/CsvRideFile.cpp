@@ -780,18 +780,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      if( iBikeVersion >= 11 && ( dfpm > 0.0 || dfpmExists ) ) {
                          dfpmExists = true;
                          watts = dfpm;
-
-                         XDataPoint *p = new XDataPoint();
-                         p->secs = minutes*60.0;
-                         p->km = km;
-                         p->number[0] = line.section(',', 2, 2).toDouble();  // CALC-POWER
-                         p->number[1] = line.section(',', 17, 17).toDouble();  // Rho
-
-                         ibikeSeries->datapoints.append(p);
                      }
                      else {
                          watts = line.section(',', 2, 2).toDouble();
                      }
+                     XDataPoint *p = new XDataPoint();
+                     p->secs = minutes*60.0;
+                     p->km = km;
+                     p->number[0] = line.section(',', 2, 2).toDouble();  // CALC-POWER
+                     p->number[1] = line.section(',', 17, 17).toDouble();  // Rho
+                     ibikeSeries->datapoints.append(p);
 
                      cad = line.section(',', 4, 4).toDouble();
                      hr = line.section(',', 5, 5).toDouble();
