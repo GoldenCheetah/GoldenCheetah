@@ -619,6 +619,9 @@ struct FitFileReaderState
             case 90: // PERFORMANCE_CONDITION
                     return "PERFORMANCECONDITION"; // Performance Contition
 
+            case 108: // to confirm : RESPIRATIONRATE
+                return "RESPIRATIONRATE"; // Performance Contition
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -637,6 +640,9 @@ struct FitFileReaderState
             case 47: // COMBINED_PEDAL_SMOOTHNES
             case 81: // BATTERY_SOC
                     return 2.0;
+
+            case 108: // RESPIRATIONRATE
+                return 100.0;
 
             default:
                     return 1.0;
