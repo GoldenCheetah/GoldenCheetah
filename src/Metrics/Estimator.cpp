@@ -207,9 +207,9 @@ Estimator::run()
 
     // if we don't have 2 rides or more then skip this but add a blank estimate
     if (from == to || to == QDate()) {
-        printd("Estimator ends, less than 2 rides with power data.\n");
+        printd("%s Estimator ends, less than 2 rides with power data.\n", isRun ? "Run" : "Bike");
         est << PDEstimate();
-        return;
+        continue;
     }
 
     // set up the models we support
