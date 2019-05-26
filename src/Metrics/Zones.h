@@ -61,13 +61,14 @@ struct ZoneRange {
     int cp;
     int ftp;
     int wprime; // aka awc
+    int tau;
     int pmax;
     QList<ZoneInfo> zones;
     bool zonesSetFromCP;
     ZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), cp(0), ftp(0), wprime(0), pmax(0), zonesSetFromCP(false) {}
-    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int pmax) :
-        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
+        begin(b), end(e), cp(0), ftp(0), wprime(0), tau(0), pmax(0), zonesSetFromCP(false) {}
+    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int _tau, int pmax) :
+        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), tau(_tau), pmax(pmax), zonesSetFromCP(false) {}
 
     // used by qSort()
     bool operator< (ZoneRange right) const {
@@ -131,8 +132,8 @@ class Zones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax);
-        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax);
+        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _tau, int _pmax);
+        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _tau, int _pmax);
         void addZoneRange();
 
         // Get / Set ZoneRange details
@@ -146,6 +147,8 @@ class Zones : public QObject
         void setFTP(int rnum, int ftp);
         int getWprime(int rnum) const;
         void setWprime(int rnum, int wprime);
+        int getTau(int rnum) const;
+        void setTau(int rnum, int tau);
         int getPmax(int rnum) const;
         void setPmax(int rnum, int pmax);
 
@@ -159,7 +162,7 @@ class Zones : public QObject
         //
         // read and write power.zones
         //
-        bool read(QFile &file);
+        bool read(QFile &file, int defaulttau = 300);
         void write(QDir home);
         const QString &fileName() const { return fileName_; }
         const QString &errorString() const { return err; }

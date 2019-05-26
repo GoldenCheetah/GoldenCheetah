@@ -891,6 +891,7 @@ class CPPage : public QWidget
         QDoubleSpinBox *cpEdit;
         QDoubleSpinBox *ftpEdit;
         QDoubleSpinBox *wEdit;
+        QDoubleSpinBox *tauEdit;
         QDoubleSpinBox *pmaxEdit;
 
         Context *context;

@@ -4108,13 +4108,15 @@ ZonePage::ZonePage(Context *context) : context(context)
     tabs = new QTabWidget(this);
     layout->addWidget(tabs);
 
+    // read tau from athlete settings to migrate it from there to the power zones
+    int defaulttau = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
     for (int i=0; i < nSports; i++) {
         zones[i] = new Zones(i > 0);
 
         // get current config by reading it in (leave mainwindow zones alone)
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones[i]->fileName());
         if (zonesFile.exists()) {
-            zones[i]->read(zonesFile);
+            zones[i]->read(zonesFile, defaulttau);
             zonesFile.close();
             b4Fingerprint[i] = zones[i]->getFingerprint(); // remember original state
         }
@@ -4148,6 +4150,10 @@ ZonePage::saveClicked()
 {
     qint32 changed = 0;
     qint32 cppageChanged = 0;
+
+    // read tau from athlete settings to migrate it from there to the power zones
+    int defaulttau = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
+
     // write
     for (int i=0; i < nSports; i++) {
         zones[i]->setScheme(schemePage[i]->getScheme());
@@ -4155,11 +4161,11 @@ ZonePage::saveClicked()
 
         // re-read Zones in case it changed
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[i]->fileName());
-        context->athlete->zones_[i]->read(zonesFile);
+        context->athlete->zones_[i]->read(zonesFile, defaulttau);
         if (i == 1 && context->athlete->zones_[i]->getRangeSize() == 0) { // No running Power zones
             // Start with Cycling Power zones for backward compatibilty
             QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[0]->fileName());
-            if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile);
+            if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile, defaulttau);
         }
 
         // use CP for FTP?
@@ -4383,6 +4389,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     QLabel *cpLabel = new QLabel(tr("Critical Power"));
     QLabel *ftpLabel = new QLabel(tr("FTP"));
     QLabel *wLabel = new QLabel(tr("W'"));
+    QLabel *tauLabel = new QLabel(tr("Tau"));
     QLabel *pmaxLabel = new QLabel(tr("Pmax"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
@@ -4414,6 +4421,12 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     wEdit->setSingleStep(100);
     wEdit->setDecimals(0);
 
+    tauEdit = new QDoubleSpinBox;
+    tauEdit->setMinimum(0);
+    tauEdit->setMaximum(1000);
+    tauEdit->setSingleStep(1);
+    tauEdit->setDecimals(0);
+
     pmaxEdit = new QDoubleSpinBox;
     pmaxEdit->setMinimum(0);
     pmaxEdit->setMaximum(3000);
@@ -4431,6 +4444,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
 
     actionButtons->addWidget(wLabel);
     actionButtons->addWidget(wEdit);
+    actionButtons->addWidget(tauLabel);
+    actionButtons->addWidget(tauEdit);
     actionButtons->addWidget(pmaxLabel);
     actionButtons->addWidget(pmaxEdit);
     actionButtons->addStretch();
@@ -4470,6 +4485,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(ftpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(tauEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
@@ -4495,6 +4511,7 @@ CPPage::saveClicked()
 void
 CPPage::initializeRanges() {
     bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0? true : false);
+    bool useTau = appsettings->value(this, GC_WBALFORM, "diff").toString() != "diff";
 
     int column = 0;
 
@@ -4512,6 +4529,7 @@ CPPage::initializeRanges() {
     }
 
     ranges->headerItem()->setText(column++, tr("W'"));
+    if (useTau) ranges->headerItem()->setText(column++, tr("Tau"));
     ranges->headerItem()->setText(column++, tr("Pmax"));
 
     if (resize)
@@ -4554,6 +4572,12 @@ CPPage::initializeRanges() {
         add->setText(column, QString("%1").arg(zones_->getWprime(i)));
         add->setFont(column++, font);
 
+        if (useTau) {
+            // Tau
+            add->setText(column, QString("%1").arg(zones_->getTau(i)));
+            add->setFont(column++, font);
+        }
+
         // Pmax
         add->setText(column, QString("%1").arg(zones_->getPmax(i)));
         add->setFont(column++, font);
@@ -4583,9 +4607,11 @@ CPPage::addClicked()
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
 
+    int tau = tauEdit->value() ? tauEdit->value() : 300;
+
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
-    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
+    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, tau, pmax);
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -4607,6 +4633,11 @@ CPPage::addClicked()
 
     // W'
     add->setText(column++, QString("%1").arg(wp));
+
+    // Tau
+    if (appsettings->value(this, GC_WBALFORM, "diff").toString() != "diff") {
+        add->setText(column++, QString("%1").arg(tau));
+    }
 
     // Pmax
     add->setText(column++, QString("%1").arg(pmax));
@@ -4633,6 +4664,8 @@ CPPage::editClicked()
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
 
+    int tau = tauEdit->value() ? tauEdit->value() : 300;
+
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
     QTreeWidgetItem *edit = ranges->selectedItems().at(0);
@@ -4658,6 +4691,12 @@ CPPage::editClicked()
     // W'
     zones_->setWprime(index, wp);
     edit->setText(columns++, QString("%1").arg(wp));
+
+    // Tau
+    if (appsettings->value(this, GC_WBALFORM, "diff").toString() != "diff") {
+        zones_->setTau(index, tau);
+        edit->setText(columns++, QString("%1").arg(tau));
+    }
 
     // Pmax
     zones_->setPmax(index, pmax);
@@ -4721,10 +4760,13 @@ CPPage::rangeEdited()
         int wp = wEdit->value();
         int owp = zones_->getWprime(index);
 
+        int tau = tauEdit->value();
+        int otau = zones_->getTau(index);
+
         int pmax = pmaxEdit->value();
         int opmax = zones_->getPmax(index);
 
-        if (date != odate || cp != ocp || ftp != oftp || wp != owp || pmax != opmax)
+        if (date != odate || cp != ocp || ftp != oftp || wp != owp || tau != otau || pmax != opmax)
             updateButton->show();
         else
             updateButton->hide();
@@ -4753,6 +4795,7 @@ CPPage::rangeSelectionChanged()
         cpEdit->setValue(zones_->getCP(index));
         ftpEdit->setValue(zones_->getFTP(index));
         wEdit->setValue(zones_->getWprime(index));
+        tauEdit->setValue(zones_->getTau(index));
         pmaxEdit->setValue(zones_->getPmax(index));
 
         if (current.zonesSetFromCP) {
