@@ -686,11 +686,13 @@ TrainSidebar::configChanged(qint32)
     // Athlete
     FTP=285; // default to 285 if zones are not set
     WPRIME = 20000;
+    TAU = 300;
 
     int range = context->athlete->zones(false)->whichRange(QDate::currentDate());
     if (range != -1) {
         FTP = context->athlete->zones(false)->getCP(range);
         WPRIME = context->athlete->zones(false)->getWprime(range);
+        TAU = context->athlete->zones(false)->getTau(range);
     }
 }
 
@@ -1785,8 +1787,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // W'bal on the fly
             // using Dave Waterworth's reformulation
-            double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
-
             // any watts expended in last 200msec?
             double JOULES = double(rtData.getWatts() - FTP) / 5.00f;
             if (JOULES < 0) JOULES = 0;

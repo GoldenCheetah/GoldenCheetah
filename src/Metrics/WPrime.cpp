@@ -177,6 +177,7 @@ WPrime::setRide(RideFile *input)
         int zoneRange = input->context->athlete->zones(input->isRun())->whichRange(input->startTime().date());
         CP = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getCP(zoneRange) : 0;
         WPRIME = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getWprime(zoneRange) : 0;
+        TAU = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getTau(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = input->getTag("CP","0").toInt();
@@ -370,7 +371,7 @@ WPrime::setRide(RideFile *input)
 }
 
 void
-WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
+WPrime::setWatts(QVector<int>&wattsArray, int CP, int WPRIME, int TAU)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
@@ -406,8 +407,6 @@ WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
                 countBelowCP++;
             } else EXP += value; // total expenditure above CP
         }
-
-        TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
         // lets run forward from 0s to end of ride
         values.resize(last+1);
@@ -483,11 +482,13 @@ WPrime::setErg(ErgFile *input)
     // Get CP
     CP = 250; // defaults
     WPRIME = 20000;
+    TAU = 300;
 
     if (input->context->athlete->zones(false)) {
         int zoneRange = input->context->athlete->zones(false)->whichRange(QDate::currentDate());
         CP = zoneRange >= 0 ? input->context->athlete->zones(false)->getCP(zoneRange) : 250;
         WPRIME = zoneRange >= 0 ? input->context->athlete->zones(false)->getWprime(zoneRange) : 20000;
+        TAU = zoneRange >= 0 ? input->context->athlete->zones(false)->getTau(zoneRange) : 300;
     }
 
     // no data or no power data then forget it.
@@ -523,8 +524,6 @@ WPrime::setErg(ErgFile *input)
                 countBelowCP++;
             } else EXP += value; // total expenditure above CP
         }
-
-        TAU = appsettings->cvalue(input->context->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
         // lets run forward from 0s to end of ride
         values.resize(last+1);

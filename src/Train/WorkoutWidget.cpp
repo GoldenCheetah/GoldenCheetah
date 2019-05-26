@@ -1546,6 +1546,7 @@ WorkoutWidget::recompute(bool editing)
 
     // get CP/FTP to use in calculation
     int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+    int TAU = context->athlete->zones(false)->getTau(rnum);
     int CP = context->athlete->zones(false)->getCP(rnum);
     int PMAX = context->athlete->zones(false)->getPmax(rnum);
     int FTP = context->athlete->zones(false)->getFTP(rnum);
@@ -1640,7 +1641,7 @@ WorkoutWidget::recompute(bool editing)
     //
     // COMPUTE W'BAL
     //
-    wpBal.setWatts(context, wattsArray, CP, WPRIME);
+    wpBal.setWatts(wattsArray, CP, WPRIME, TAU);
 
     //
     // MEAN MAX [works but need to think about UI]
