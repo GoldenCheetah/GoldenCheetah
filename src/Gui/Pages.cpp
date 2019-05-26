@@ -809,16 +809,6 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 #endif
 
     //
-    // W'bal Tau
-    //
-    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
-    wbaltau = new QSpinBox(this);
-    wbaltau->setMinimum(30);
-    wbaltau->setMaximum(1200);
-    wbaltau->setSingleStep(10);
-    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
-
-    //
     // Performance manager
     //
 
@@ -843,9 +833,6 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
-    grid->addWidget(wbaltaulabel, 9, 0, alignment);
-    grid->addWidget(wbaltau, 9, 1, alignment);
-
     grid->addWidget(perfManSTSLabel, 10, 0, alignment);
     grid->addWidget(perfManSTSavg, 10, 1, alignment);
     grid->addWidget(perfManLTSLabel, 11, 0, alignment);
@@ -867,9 +854,6 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 qint32
 AboutModelPage::saveClicked()
 {
-    // W'bal Tau
-    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
-
     // Performance Manager
     appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
     appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());

@@ -310,8 +310,6 @@ class AboutModelPage : public QWidget
     private:
         Context *context;
 
-        QLabel *wbaltaulabel;
-        QSpinBox *wbaltau;
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
         QLineEdit *perfManSTSavg;
