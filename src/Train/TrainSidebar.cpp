@@ -2375,7 +2375,7 @@ void TrainSidebar::Higher()
         else slope += 0.1;
 
         if (load >1500) load = 1500;
-        if (slope >15) slope = 15;
+        if (slope >40) slope = 40;
 
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
@@ -2401,7 +2401,7 @@ void TrainSidebar::Lower()
         else slope -= 0.1;
 
         if (load <0) load = 0;
-        if (slope <-10) slope = -10;
+        if (slope <-40) slope = -40;
 
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
