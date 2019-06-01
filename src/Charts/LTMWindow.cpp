@@ -1543,6 +1543,7 @@ LTMWindow::dataTable(bool html)
                 else summary += ", %1";
 
                 // now format the actual value....
+                QString valueString;
                 const RideMetric *m = settings.metrics[j].metric;
                 if (m != NULL) {
 
@@ -1551,13 +1552,17 @@ LTMWindow::dataTable(bool html)
                     if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision=1;
 
                     // we have a metric so lets be precise ...
-                    QString v = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
+                    valueString = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
 
-                    summary = summary.arg(v);
                 } else {
                     // no precision
-                    summary = summary.arg(QString("%1").arg(columns[j].y[row], 0, 'f', 1));
+                    valueString = QString("%1").arg(columns[j].y[row], 0, 'f', 1);
                 }
+                // Format minutes in sexagesimal format
+                if (LTMPlot::isMinutes(settings.metrics[j].uunits))
+                    valueString = time_to_string(columns[j].y[row]*60, true);
+
+                summary = summary.arg(valueString);
 
                 //
                 if (hdatas.at(j).contains(row)) {
