@@ -993,6 +993,8 @@ ErgFile::save(QStringList &errors)
         out << "[COURSE DATA]\n";
 
         bool first=true;
+        long lastLap = 0;
+        double lastPointX = 0;
         foreach(ErgFilePoint p, Points) {
 
             // output watts as a percent of CP
@@ -1001,6 +1003,22 @@ ErgFile::save(QStringList &errors)
 
             // we scale back if needed
             if (CP) watts = (double(p.y)/CP) * 100.0f;
+
+            // check if a lap marker should be inserted
+            foreach(ErgFileLap l, Laps) {
+                bool addLap = false;
+                if (l.x == p.x && lastLap != l.x) {
+                    // this is the case where a lap marker matches a load marker
+                    addLap = true;
+                } else if (l.x > lastPointX && l.x < p.x) {
+                    // this is the case when a lap marker exist between two load markers
+                    addLap = true;
+                }
+                if (addLap) {
+                    out <<QString("%1    LAP\n").arg(minutes, 0, 'f', 2);
+                    lastLap = l.x;
+                }
+            }
 
             if (first) {
                 first=false;
@@ -1013,6 +1031,8 @@ ErgFile::save(QStringList &errors)
 
             // output in minutes and watts percent with no precision
             out <<QString("%1    %2\n").arg(minutes, 0, 'f', 2).arg(watts, 0, 'f', 0);
+
+            lastPointX = p.x;
         }
 
         out << "[END COURSE DATA]\n";
