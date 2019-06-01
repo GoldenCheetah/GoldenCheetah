@@ -1885,8 +1885,55 @@ WorkoutWidget::qwkcode()
         for(int j=i+1; j<sections.count(); j++) {
             if (sections[j] == sections[i])
                 count++;
-            else
+            else {
+                // don't process any interval tails or such, if we don't have a set
+                if (count == 1)
+                    break;
+
+                // check whether j is the last interval of the set
+                bool isTrailingInterval = false;
+                QStringList section1Parts = sections[i].split('r');
+                if (section1Parts.length() > 1) {
+                    QStringList section2Parts = sections[j].split('r');
+                    QString section2Part1 = section2Parts[0];
+
+                    // if it has an r marker, remove it (only applies to one-part-only sections)
+                    section2Part1.remove('L');
+
+                    // compare the main interval parts of the sections
+                    if (section2Part1 == section1Parts[0]) {
+                        // it is indeed the trailing part of an interval set
+                        isTrailingInterval = true;
+                        count++;
+
+                        // now insert the recovery part (if there is one), so we don't loose it
+                        if (section2Parts.length() > 1) {
+                            sections.insert(j + 1, section2Parts[1]);
+
+                            // find point index of recovery part and insert it
+                            int section2Part2PointIdx = blockp.indexOf(sectionp[j]) + 1;
+                            sectionp.insert(j + 1, blockp[section2Part2PointIdx]);
+                        }
+                    }
+                }
+
+                // now we need to check, whether this interval sets finishes with a recovery interval
+                // this only needs to be done if we've not already dealt with this interval set and
+                // found a trailing interval
+                if (!isTrailingInterval) {
+                    // just add the recovery part of the last section
+                    QStringList prevSectionParts = sections[j - 1].split('r');
+                    if (prevSectionParts.length() > 1) {
+                        sections.insert(j, prevSectionParts[1]);
+
+                        // find point index of recovery part and insert it
+                        int prevSectionPart2PointIdx = blockp.indexOf(sectionp[j - 1]) + 1;
+                        sectionp.insert(j, blockp[prevSectionPart2PointIdx]);
+                    }
+                }
+
                 break; // stop when end of matches
+            }
         }
 
         // multiple or no ..
@@ -2155,7 +2202,7 @@ WorkoutWidget::apply(QString code)
                 }
 
                 // RECOVERY
-                if (t2 > 0) {
+                if (t2 > 0 && i < count - 1) {
                     if (w3 != watts) {
                         index++;
                         new WWPoint(this, secs, w3);
