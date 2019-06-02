@@ -1882,37 +1882,44 @@ WorkoutWidget::qwkcode()
 
         // count dupes
         int count=1;
-        for(int j=i+1; j<sections.count(); j++) {
-            if (sections[j] == sections[i])
+
+        // start at 1 section after i and go 1 beyond the actual section count, so we
+        // can postprocess the last section in the loop (which is referenced by j - 1)
+        for(int j=i+1; j<sections.count() + 1; j++) {
+
+            // only compare if j is still in range, otherwise go to else for post processing
+            if (j < sections.count() && sections[j] == sections[i])
                 count++;
             else {
                 // don't process any interval tails or such, if we don't have a set
                 if (count == 1)
                     break;
 
-                // check whether j is the last interval of the set
+                // check whether j is the last interval of the set, if we're still in range
                 bool isTrailingInterval = false;
-                QStringList section1Parts = sections[i].split('r');
-                if (section1Parts.length() > 1) {
-                    QStringList section2Parts = sections[j].split('r');
-                    QString section2Part1 = section2Parts[0];
+                if (j < sections.count()) {
+                    QStringList section1Parts = sections[i].split('r');
+                    if (section1Parts.length() > 1) {
+                        QStringList section2Parts = sections[j].split('r');
+                        QString section2Part1 = section2Parts[0];
 
-                    // if it has an r marker, remove it (only applies to one-part-only sections)
-                    section2Part1.remove('L');
+                        // if it has an r marker, remove it (only applies to one-part-only sections)
+                        section2Part1.remove('L');
 
-                    // compare the main interval parts of the sections
-                    if (section2Part1 == section1Parts[0]) {
-                        // it is indeed the trailing part of an interval set
-                        isTrailingInterval = true;
-                        count++;
+                        // compare the main interval parts of the sections
+                        if (section2Part1 == section1Parts[0]) {
+                            // it is indeed the trailing part of an interval set
+                            isTrailingInterval = true;
+                            count++;
 
-                        // now insert the recovery part (if there is one), so we don't loose it
-                        if (section2Parts.length() > 1) {
-                            sections.insert(j + 1, section2Parts[1]);
+                            // now insert the recovery part (if there is one), so we don't loose it
+                            if (section2Parts.length() > 1) {
+                                sections.insert(j + 1, section2Parts[1]);
 
-                            // find point index of recovery part and insert it
-                            int section2Part2PointIdx = blockp.indexOf(sectionp[j]) + 1;
-                            sectionp.insert(j + 1, blockp[section2Part2PointIdx]);
+                                // find point index of recovery part and insert it
+                                int section2Part2PointIdx = blockp.indexOf(sectionp[j]) + 1;
+                                sectionp.insert(j + 1, blockp[section2Part2PointIdx]);
+                            }
                         }
                     }
                 }
