@@ -374,6 +374,7 @@ struct FitFileReaderState
                 case 2604: return "Garmin Fenix 5x";
                 case 2691: return "Garmin FR935";
                 case 2697: return "Garmin Fenix 5";
+                case 2713: return "Garmin Edge 1030";
                 case 2886: case 2888: return "Garmin FR645";
                 case 2900: return "Garmin Fenix 5s +";
                 case 3110: return "Garmin Fenix 5 +";
@@ -498,6 +499,14 @@ struct FitFileReaderState
             switch(prod) {
                   case 2: return "BSX Insight 2";
                   default: return QString("BSX %1").arg(prod);
+            }
+        } else if (manu == 107) {
+            // Magene
+            if (prod == -1)
+                return "Magene";
+
+            switch(prod) {
+                  default: return QString("Magene %1").arg(prod);
             }
         } else if (manu == 115) {
             // igpsport
@@ -1732,18 +1741,46 @@ struct FitFileReaderState
                     case 69: // ? Left Power Phase ?
                              leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopDeathCenter>360) {
+                                 leftTopDeathCenter = 0;
+                             }
+                             if (leftBottomDeathCenter>360) {
+                                 leftBottomDeathCenter = 0;
+                             }
                              break;
                     case 70: // ? Left Peak Phase  ?
                              leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopPeakPowerPhase>360) {
+                                 leftTopPeakPowerPhase = 0;
+                             }
+                             if (leftBottomPeakPowerPhase>360) {
+                                 leftBottomPeakPowerPhase = 0;
+                             }
                              break;
                     case 71: // ? Right Power Phase ?
                              rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopDeathCenter>360) {
+                                 rightTopDeathCenter = 0;
+                             }
+                             if (rightBottomDeathCenter>360) {
+                                 rightBottomDeathCenter = 0;
+                             }
                              break;
                     case 72: // ? Right Peak Phase  ?
                              rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopPeakPowerPhase>360) {
+                                 rightTopPeakPowerPhase = 0;
+                             }
+                             if (rightBottomPeakPowerPhase>360) {
+                                 rightBottomPeakPowerPhase = 0;
+                             }
                              break;
                     case 83: // VERTICAL_RATIO
                              native_num = -1;
