@@ -1882,11 +1882,35 @@ WorkoutWidget::qwkcode()
 
         // count dupes
         int count=1;
-        for(int j=i+1; j<sections.count(); j++) {
-            if (sections[j] == sections[i])
+
+        // start at 1 section after i and go 1 beyond the actual section count, so we
+        // can postprocess the last section in the loop (which is referenced by j - 1)
+        for(int j=i+1; j<sections.count() + 1; j++) {
+
+            // only compare if j is still in range, otherwise go to else for post processing
+            if (j < sections.count() && sections[j] == sections[i])
                 count++;
-            else
+            else {
+                // check if the last section has a recovery block and if so, split it
+                if (count == 1) {
+                    bool hasLapMarker = sections[j - 1].endsWith('L');
+                    QStringList prevSectionParts = sections[j - 1].split('r');
+                    if (prevSectionParts.length() > 1) {
+                        // strip the recovery block from the section and preserve lap marker
+                        sections[j - 1] = prevSectionParts[0] + (hasLapMarker ? "L" : "");
+
+                        // insert the recovery block as a new section
+                        sections.insert(j, prevSectionParts[1]);
+
+                        // find point index of recovery part and insert it
+                        int prevSectionPart2PointIdx = blockp.indexOf(sectionp[j - 1]) + 1;
+                        sectionp.insert(j, blockp[prevSectionPart2PointIdx]);
+                    }
+
+                    break;
+                }
                 break; // stop when end of matches
+            }
         }
 
         // multiple or no ..
