@@ -290,6 +290,8 @@ FetchElevationDataFromMapQuest(QString latLngCollection)
         throw QString(QObject::tr("Bad request"));
     if (elevationJSON.contains("Gateway Timeout"))
         throw QString(QObject::tr("Gateway Timeout"));
+    if (error == QNetworkReply::TimeoutError)
+        throw QString(QObject::tr("Connection to remote server timed out"));
     if (error != QNetworkReply::NoError)
         throw QString(QObject::tr("Networkerror: %1")).arg(error);
 

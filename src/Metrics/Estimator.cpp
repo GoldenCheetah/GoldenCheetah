@@ -207,9 +207,9 @@ Estimator::run()
 
     // if we don't have 2 rides or more then skip this but add a blank estimate
     if (from == to || to == QDate()) {
-        printd("Estimator ends, less than 2 rides with power data.\n");
+        printd("%s Estimator ends, less than 2 rides with power data.\n", isRun ? "Run" : "Bike");
         est << PDEstimate();
-        return;
+        continue;
     }
 
     // set up the models we support
@@ -262,12 +262,13 @@ Estimator::run()
             double p = double(week[t]);
             if (week[t]<=0) continue;
 
-            double pix = powerIndex(p, t);
+            double pix = powerIndex(p, t, isRun);
             if (pix > bestperformance.powerIndex) {
                 bestperformance.duration = t;
                 bestperformance.power = p;
                 bestperformance.powerIndex = pix;
                 bestperformance.when = weekdates[t];
+                bestperformance.run = isRun;
 
                 // for filter, saves having to convert as we go
                 bestperformance.x = bestperformance.when.toJulianDay();
@@ -350,23 +351,23 @@ Estimator::run()
         performances = perfs;
     } else {
         estimates.append(est);
-        // performances.append(perfs); // TODO running performances
+        performances.append(perfs);
     }
     lock.unlock();
 
     // debug dump peak performances
     foreach(Performance p, performances) {
-        printd("%f Peak: %f for %f secs on %s\n", p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
+        printd("%s %f Peak: %f for %f secs on %s\n", p.run ? "Run" : "Bike", p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
     }
     printd("%s Estimates end.\n", isRun ? "Run" : "Bike");
   }
 }
 
-Performance Estimator::getPerformanceForDate(QDate date)
+Performance Estimator::getPerformanceForDate(QDate date, bool wantrun)
 {
     // serial search is ok as low numberish - always takes first as should be no dupes
     foreach(Performance p, performances) {
-        if (p.when == date) return p;
+        if (p.when == date && p.run == wantrun) return p;
     }
     return Performance(QDate(),0,0,0);
 }

@@ -532,8 +532,10 @@ void RideCache::save(bool opendata, QString filename)
                 int index = factory.rideMetric(name)->index();
 
                 // don't output 0, nan or inf values, they're set to 0 by default
-                if (!std::isinf(item->metrics()[index]) && !std::isnan(item->metrics()[index]) &&
-                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f)) {
+                // unless aggregateZero indicates the count is relevant
+                if ((!std::isinf(item->metrics()[index]) && !std::isnan(item->metrics()[index]) &&
+                    (item->metrics()[index] > 0.00f || item->metrics()[index] < 0.00f)) ||
+                    (item->metrics()[index] == 0.00f && item->counts()[index] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
                     if (!firstMetric) stream << ",\n";
                     firstMetric = false;
 
@@ -765,7 +767,9 @@ void RideCache::save(bool opendata, QString filename)
                             int index = factory.rideMetric(name)->index();
         
                             // don't output 0 values, they're set to 0 by default
-                            if (interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) {
+                            // unless aggregateZero indicates the count is relevant
+                            if ((interval->metrics()[index] > 0.00f || interval->metrics()[index] < 0.00f) ||
+                                (item->metrics()[index] == 0.00f && item->counts()[i] > 1.0 && factory.rideMetric(name)->aggregateZero())) {
                                 if (!firstMetric) stream << ",\n";
                                 firstMetric = false;
 

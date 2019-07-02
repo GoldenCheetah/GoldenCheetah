@@ -68,7 +68,7 @@ class FixDerivePowerConfig : public DataProcessorConfig
             cdALabel = new QLabel(tr("CdA"));
             draftMLabel = new QLabel(tr("Draft mult."));
             windSpeedLabel = new QLabel(tr("Wind (kph)"));
-            windHeadingLabel = new QLabel(tr(", heading"));
+            windHeadingLabel = new QLabel(tr(", direction"));
 
             bikeWeight = new QDoubleSpinBox();
             bikeWeight->setMaximum(99.9);

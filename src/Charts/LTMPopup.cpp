@@ -368,6 +368,7 @@ LTMPopup::setSummaryHTML(RideItem *item)
     // main totals
     const QStringList totalColumn = QStringList()
         << "workout_time"
+        << "time_recording"
         << "time_riding"
         << (item->isSwim ? "distance_swim" : "total_distance")
         << "total_work"

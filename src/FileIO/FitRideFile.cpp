@@ -321,12 +321,10 @@ struct FitFileReaderState
     QString getManuProd(int manu, int prod) {
         if (manu == 1) {
             // Garmin
-            if (prod == -1)
-                return "Garmin";
-
             // Product IDs can be found in c/fit_example.h in the FIT SDK.
             // Multiple product IDs refer to different regions e.g. China, Japan etc. 
             switch (prod) {
+                case -1: return "Garmin";
                 case 473: case 474: case 475: case 494: return "Garmin FR301";
                 case 717: case 987: return "Garmin FR405";
                 case 782: return "Garmin FR50";
@@ -374,6 +372,13 @@ struct FitFileReaderState
                 case 2604: return "Garmin Fenix 5x";
                 case 2691: return "Garmin FR935";
                 case 2697: return "Garmin Fenix 5";
+                case 2713: return "Garmin Edge 1030";
+                case 2886: case 2888: return "Garmin FR645";
+                case 2900: return "Garmin Fenix 5s +";
+                case 3110: return "Garmin Fenix 5 +";
+                case 3111: return "Garmin Fenix 5x +";
+                case 3112: return "Garmin Edge 520 +";
+                case 3113: return "Garmin FR945";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -381,11 +386,9 @@ struct FitFileReaderState
             }
         } else if (manu == 6 ) {
             // SRM
-            if (prod == -1)
-                return "SRM";
-
             // powercontrol now uses FIT files from PC8
             switch (prod) {
+                case -1: return "SRM";
                 case 6: return "SRM PC6";
                 case 7: return "SRM PC7";
                 case 8: return "SRM PC8";
@@ -393,32 +396,23 @@ struct FitFileReaderState
             }
         } else if (manu == 7 ) {
             // Quarq
-            if (prod == -1)
-                return "Quarq";
-
             switch (prod) {
+                case -1: return "Quarq";
                 case 1: return "Quarq Cinqo";
-
                 case 9479: return "Quarq DZERO";
-
                 default: return QString("Quarq %1").arg(prod);
             }
         } else if (manu == 8 ) {
             // iBike
-            if (prod == -1)
-                return "iBike";
-
             switch (prod) {
+                case -1: return "iBike";
                 case 2054: return "iBike AeroPod";
-
                 default: return QString("iBike %1").arg(prod);
             }
         } else if (manu == 9 ) {
             // Powertap
-            if (prod == -1)
-                return "Powertap";
-
             switch (prod) {
+                case -1: return "Powertap";
                 case 14: return "Joule 2.0";
                 case 18: return "Joule";
                 case 19: return "Joule GPS";
@@ -426,32 +420,25 @@ struct FitFileReaderState
                 case 272: return "Powertap C1";
                 case 288: return "Powertap P1";
                 case 4096: return "Powertap G3";
-
                 default: return QString("Powertap Device %1").arg(prod);
             }
         } else if (manu == 13 ) {
             // dynastream_oem
-            if (prod == -1)
-                return "Dynastream";
-
             switch (prod) {
+                case -1: return "Dynastream";
                 default: return QString("Dynastream %1").arg(prod);
             }
         } else if (manu == 29 ) {
             // saxonar
-            if (prod == -1)
-                return "Power2max";
-
             switch (prod) {
+                case -1: return "Power2max";
                 case 1031: return "Power2max S";
                 default: return QString("Power2max %1").arg(prod);
             }
         } else if (manu == 32) {
             // wahoo
-            if (prod == -1)
-                return "Wahoo";
-
             switch (prod) {
+                case -1: return "Wahoo";
                 case 0: return "Wahoo fitness";
                 case 28: return "Wahoo ELEMNT";
                 case 31: return "Wahoo ELEMNT BOLT";
@@ -459,19 +446,15 @@ struct FitFileReaderState
             }
         } else if (manu == 38) {
              // o_synce
-            if (prod == -1)
-                return "o_synce";
-
             switch (prod) {
+                case -1: return "o_synce";
                 case 1: return "o_synce navi2coach";
                 default: return QString("o_synce %1").arg(prod);
             }
         } else if (manu == 48) {
-            if (prod == -1)
-                return "Pioneer";
-
             // Pioneer
             switch (prod) {
+                case -1:  return "Pioneer";
                 case 2: return "Pioneer SGX-CA500";
                 default: return QString("Pioneer %1").arg(prod);
             }
@@ -486,21 +469,32 @@ struct FitFileReaderState
             return "Stryd";
         } else if (manu == 98) {
             // BSX
+            switch(prod) {
+                case -1: return "BSX";
+                case 2: return "BSX Insight 2";
+                default: return QString("BSX %1").arg(prod);
+            }
+        } else if (manu == 107) {
+            // Magene
             if (prod == -1)
-                return "BSX";
+                return "Magene";
 
             switch(prod) {
-                  case 2: return "BSX Insight 2";
-                  default: return QString("BSX %1").arg(prod);
+                  default: return QString("Magene %1").arg(prod);
             }
         } else if (manu == 115) {
             // igpsport
-            if (prod == -1)
-                return "igpsport";
-
             switch(prod) {
-                  case 2: return "BSX Insight 2";
-                  default: return QString("igpsport %1").arg(prod);
+                case -1: return "igpsport";
+                default: return QString("igpsport %1").arg(prod);
+            }
+        } else if (manu == 258) {
+            // Lezyne
+            switch (prod) {
+                case -1: return "Lezyne";
+                case 6: return "Lezyne Micro-GPS";
+                case 11: return "Lezyne MegaXL";
+                default: return QString("Lezyne %1").arg(prod);
             }
         } else if (manu == 260) {
             // Zwift
@@ -514,6 +508,13 @@ struct FitFileReaderState
         } else if (manu == 284) {
             // Rouvy
             return "Rouvy";
+        } else if (manu == 289) {
+            // Hammerhead
+            // currently not setting product ids
+            switch (prod) {
+                case -1: return "Hammerhead";
+                default: return QString("Hammerhead %1").arg(prod);
+            }
         } else {
             QString name = "Unknown FIT Device";
             return name + QString(" %1:%2").arg(manu).arg(prod);
@@ -605,6 +606,9 @@ struct FitFileReaderState
             case 90: // PERFORMANCE_CONDITION
                     return "PERFORMANCECONDITION"; // Performance Contition
 
+            case 108: // to confirm : RESPIRATIONRATE
+                return "RESPIRATIONRATE"; // Performance Contition
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -623,6 +627,9 @@ struct FitFileReaderState
             case 47: // COMBINED_PEDAL_SMOOTHNES
             case 81: // BATTERY_SOC
                     return 2.0;
+
+            case 108: // RESPIRATIONRATE
+                return 100.0;
 
             default:
                     return 1.0;
@@ -1712,18 +1719,46 @@ struct FitFileReaderState
                     case 69: // ? Left Power Phase ?
                              leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopDeathCenter>360) {
+                                 leftTopDeathCenter = 0;
+                             }
+                             if (leftBottomDeathCenter>360) {
+                                 leftBottomDeathCenter = 0;
+                             }
                              break;
                     case 70: // ? Left Peak Phase  ?
                              leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopPeakPowerPhase>360) {
+                                 leftTopPeakPowerPhase = 0;
+                             }
+                             if (leftBottomPeakPowerPhase>360) {
+                                 leftBottomPeakPowerPhase = 0;
+                             }
                              break;
                     case 71: // ? Right Power Phase ?
                              rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopDeathCenter>360) {
+                                 rightTopDeathCenter = 0;
+                             }
+                             if (rightBottomDeathCenter>360) {
+                                 rightBottomDeathCenter = 0;
+                             }
                              break;
                     case 72: // ? Right Peak Phase  ?
                              rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopPeakPowerPhase>360) {
+                                 rightTopPeakPowerPhase = 0;
+                             }
+                             if (rightBottomPeakPowerPhase>360) {
+                                 rightBottomPeakPowerPhase = 0;
+                             }
                              break;
                     case 83: // VERTICAL_RATIO
                              native_num = -1;

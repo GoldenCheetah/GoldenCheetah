@@ -835,10 +835,19 @@ Strava::prepareResponse(QByteArray* data)
             if (!each["laps"].isNull()) {
                 QJsonArray laps = each["laps"].toArray();
 
+                double last_lap = 0.0;
                 foreach (QJsonValue value, laps) {
                     QJsonObject lap = value.toObject();
-                    double start = ride->getPoint(lap["start_index"].toInt(), RideFile::secs).toDouble();
+
+                    int lap_start = lap["start_index"].toInt();  
+
+                    double start = ride->getPoint(lap_start, RideFile::secs).toDouble();
+                    if (last_lap == 0)
+                        last_lap = start;
                     double end = start + lap["elapsed_time"].toDouble();
+
+                    last_lap = end;
+
                     ride->addInterval(RideFileInterval::USER, start, end, lap["name"].toString());
                 }
 

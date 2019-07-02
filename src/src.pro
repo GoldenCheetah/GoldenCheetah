@@ -692,7 +692,7 @@ HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Cor
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
-           Core/Measures.h Core/BodyMeasures.h Core/HrvMeasures.h
+           Core/Measures.h Core/BodyMeasures.h Core/HrvMeasures.h Core/BlinnSolver.h
 
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
@@ -738,7 +738,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/DeviceTypes.h Train/DialWindow.h Train/ErgDBDownloadDialog.h Train/ErgDB.h Train/ErgFile.h Train/ErgFilePlot.h \
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
-           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h
+           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/TodaysPlanWorkoutDownload.h
@@ -786,7 +786,7 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
-           Core/Measures.cpp Core/BodyMeasures.cpp Core/HrvMeasures.cpp
+           Core/Measures.cpp Core/BodyMeasures.cpp Core/HrvMeasures.cpp  Core/BlinnSolver.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
@@ -844,7 +844,7 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/DeviceTypes.cpp Train/DialWindow.cpp Train/ErgDB.cpp Train/ErgDBDownloadDialog.cpp Train/ErgFile.cpp Train/ErgFilePlot.cpp \
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
-           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp
+           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     SOURCES  += Train/TodaysPlanWorkoutDownload.cpp

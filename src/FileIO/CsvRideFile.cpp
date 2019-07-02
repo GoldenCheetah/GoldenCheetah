@@ -259,6 +259,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setFileFormat("iBike CSV (csv)");
                     unitsHeader = 5;
                     iBikeVersion = line.section( ',', 1, 1 ).toInt();
+                    metric = line.section( ',', 2, 2 ) == "metric";
 
                     ++lineno;
                     continue;
@@ -449,15 +450,42 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // the trailing zeroes in the configuration area seem to be causing an error
                     // the number is in the format 5.000000
                     recInterval = (int)line.section(',',4,4).toDouble();
+
+                    if (line.section(',',18).startsWith('"')) {
+                        // We have a note
+                        // note can have ","
+                        QString notes = line.section(',',18).section('"',1,1);
+                        line.remove(notes);
+                        rideFile->setTag("Notes", notes);
+                    }
+
                     rideFile->setDeviceType(line.section(',',26,26));
                     rideFile->setTag("Device Info", line.section(',',20,21).remove(QChar('"')));
+
+                    // Prefill aerolab with ibike data
+                    double weight = line.section(',',0,0).toDouble();
+                    if (!metric)
+                       weight *= KG_PER_LB;
+                    rideFile->setTag("Total Weight", QString("%1").arg(weight));
+                    rideFile->setTag("aerolab.Cda", QString("%1").arg(line.section(',',16,16)));
+                    rideFile->setTag("aerolab.Crr", QString("%1").arg(line.section(',',17,17)));
 
                     ibikeSeries = new XDataSeries();
                     ibikeSeries->name = "AERO";
                     ibikeSeries->valuename << "CALC-POWER";
                     ibikeSeries->unitname << "W";
-                    //ibikeSeries->valuename << "CdA";
-                    //ibikeSeries->unitname << "m^2";
+                    ibikeSeries->valuename << "Rho";
+                    ibikeSeries->unitname << "kg/m^3";
+                }
+                // If Timestamp present, take the first one as start time.
+                // It is not guaranteed to be equal to the timestamp at line 2
+                // when merged with external GPS data.
+                else if (lineno == 6)
+                {
+                   QString timestamp = line.section( ',', 14, 14);
+                     if (timestamp.length()>0){
+                         startTime = QDateTime::fromString(timestamp, Qt::ISODate);
+                     }
                 }
             }
 
@@ -558,7 +586,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
 
-            } else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro && csvType != rp3) {
+            } else if (lineno == unitsHeader && csvType != moxy && csvType != peripedal && csvType != rowpro && csvType != rp3 && csvType != ibike) {
 
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
@@ -728,12 +756,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                } else if (csvType == ibike) {
-                    // this must be iBike
+                    // this must be ibike
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
                     // reading recording interval from config data in ibike csv file
                     //
-                    // For iBike software version 11 or higher:
+                    // For ibike software version 11 or higher:
                     // use "power" field until a the "dfpm" field becomes non-zero.
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
                      QString timestamp = line.section( ',', 14, 14);
@@ -749,18 +777,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      if( iBikeVersion >= 11 && ( dfpm > 0.0 || dfpmExists ) ) {
                          dfpmExists = true;
                          watts = dfpm;
-
-                         XDataPoint *p = new XDataPoint();
-                         p->secs = minutes*60.0;
-                         p->km = km;
-                         p->number[0] = line.section(',', 2, 2).toDouble();
-                         p->number[1] = line.section(',', 16, 16).toDouble();
-
-                         ibikeSeries->datapoints.append(p);
                      }
                      else {
                          watts = line.section(',', 2, 2).toDouble();
                      }
+                     XDataPoint *p = new XDataPoint();
+                     p->secs = minutes*60.0;
+                     p->km = km;
+                     p->number[0] = line.section(',', 2, 2).toDouble();  // CALC-POWER
+                     p->number[1] = line.section(',', 17, 17).toDouble();  // Rho
+                     ibikeSeries->datapoints.append(p);
 
                      cad = line.section(',', 4, 4).toDouble();
                      hr = line.section(',', 5, 5).toDouble();
@@ -781,6 +807,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         kph *= KM_PER_MILE;
                         alt *= METERS_PER_FOOT;
                         headwind *= KM_PER_MILE;
+                        // Temperature for english (not metric) is always degF
+                        temp = (temp - FAHRENHEIT_ADD_CENTIGRADE) / FAHRENHEIT_PER_CENTIGRADE;
                     }
 
 

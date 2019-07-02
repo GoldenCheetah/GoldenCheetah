@@ -40,6 +40,7 @@ class Performance {
         QDate when, weekcommencing;
         double power, duration, powerIndex;
         bool submaximal; // set by the filter, user can choose to include.
+        bool run; // indicates a Running with power performance
 
         double x; // different units, but basically when as a julian day
 };
@@ -72,7 +73,7 @@ class Estimator : public QThread {
         void calculate();
 
         // get a performance for a given day
-        Performance getPerformanceForDate(QDate date);
+        Performance getPerformanceForDate(QDate date, bool wantrun);
 
     protected:
 

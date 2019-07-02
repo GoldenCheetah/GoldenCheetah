@@ -530,6 +530,13 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     } else {
         // RR File
 
+        file.close(); // start again (seek did weird things on Linux, bug (?)
+        if (!file.open(QFile::ReadOnly)) {
+            errors << ("Could not open ride file: \"" + file.fileName() + "\"");
+            return NULL;
+        }
+        QTextStream is(&file);
+
         // Lets construct our rideFile
         RideFile *rideFile = new RideFile();
         rideFile->setDeviceType("R-R");
@@ -541,9 +548,16 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         hrvXdata->valuename << "R-R";
         hrvXdata->unitname << "msecs";
 
+        // using EWMA filtered R-R
+        double ewmaRR = -1.0;
+        const double ewmaTC = 5.0;
+        int iSecs = 0;
         double secs = 0.0;
-        do {
+        while (!is.atEnd()) {
             double rr;
+
+            line = is.readLine();
+            tokens = line.split(QRegExp("[ \t]"), QString::SkipEmptyParts);
 
             if (rrType == RR_Type2 && tokens.count() > 1) rr = tokens[1].toDouble();
             else if (rrType == RR_Type1 && tokens.count() > 0) rr = tokens[0].toDouble();
@@ -551,9 +565,14 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
             if (rr > 30) rr /= 1000.0; // convert to seconds if milliseconds
 
-            double bpm = rr>0.0 ? 60.0/rr : 0.0; // HR without filtering
+            // HR EWMA filtered
+            if (ewmaRR < 0.0) ewmaRR = rr;
+            else ewmaRR += (rr - ewmaRR)/ewmaTC;
+            double bpm = ewmaRR>0.0 ? 60.0/ewmaRR : 0.0;
 
-            rideFile->appendPoint(secs, 0.0, bpm, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+            for (; iSecs < secs + rr; iSecs++) {
+                rideFile->appendPoint(iSecs, 0.0, bpm, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, RideFile::NA, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
+            }
 
             XDataPoint *p = new XDataPoint();
             p->secs = secs;
@@ -562,10 +581,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             hrvXdata->datapoints.append(p);
 
             secs += rr;
-
-            line = in.readLine();
-            tokens = line.split(QRegExp("[ \t]"), QString::SkipEmptyParts);
-        } while (!in.atEnd());
+        }
 
         if (hrvXdata->datapoints.count()>0)
             rideFile->addXData("HRV", hrvXdata);
