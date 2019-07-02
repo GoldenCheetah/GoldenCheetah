@@ -492,6 +492,7 @@ struct FitFileReaderState
             // Lezyne
             switch (prod) {
                 case -1: return "Lezyne";
+                case 4: return "Lezyne Super GPS";
                 case 6: return "Lezyne Micro-GPS";
                 case 11: return "Lezyne MegaXL";
                 default: return QString("Lezyne %1").arg(prod);
