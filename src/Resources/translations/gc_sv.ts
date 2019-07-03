@@ -20773,7 +20773,7 @@ Inga Aktiviteter att importera.
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
-        <source>PolarFlow authorization was successful.</source>
+        <source>Polar Flow authorization was successful.</source>
         <translation>Polar Flow auktoriseringen lyckades.</translation>
     </message>
     <message>
@@ -23245,18 +23245,18 @@ Vill du göra detta?</translation>
     <name>PolarFlow</name>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
-        <source>Network Problem reading PolarFlow data</source>
+        <source>Network Problem reading Polar Flow data</source>
         <translation>Nätverksproblem vid läsning av Polar Flow data</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
-        <source>problem parsing PolarFlow data</source>
+        <source>problem parsing Polar Flow data</source>
         <translation>problem vid behandling av Polar Flow data</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
-        <source>You must authorise with Today&apos;s Plan first</source>
-        <translation>Du måste först auktorisera med Today&apos;s Plan</translation>
+        <source>You must authorise with Polar Flow first</source>
+        <translation>Du måste först auktorisera med Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>
