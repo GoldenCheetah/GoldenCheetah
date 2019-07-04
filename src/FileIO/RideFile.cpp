@@ -479,7 +479,8 @@ RideFile::formatValueWithUnit(double value, SeriesType series, Conversion conver
     if (series == RideFile::kph && conversion == RideFile::pace)
         return kphToPace(value, useMetricUnits, isSwim);
     else
-        return QString("%1%2").arg(value).arg(unitName(series, context));
+        return QString("%1%2").arg(round(value)).arg(unitName(series, context));
+        //TODO: make the rounding series dependent
 }
 
 void

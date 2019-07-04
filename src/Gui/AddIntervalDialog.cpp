@@ -767,7 +767,7 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
     while (!bests.empty() && (results.size() < maxIntervals)) {
         AddedInterval candidate = bests.takeFirst();
 
-        QString name = "#%1 %2%3  (%4w)";
+        QString name = "#%1 %2%3";
         name = name.arg(results.count()+1);
 
         if (typeTime)  {
@@ -816,7 +816,8 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
                 name = name.arg("km");
             }
         }
-        name = name.arg(round(candidate.avg));
+        if (candidate.avg > 0) // add average watts only if present
+            name = name + QString("  (%4w)").arg(round(candidate.avg));
         candidate.name = name;
 
         results.append(candidate);
@@ -958,7 +959,7 @@ AddIntervalDialog::findPeaks(Context *context, bool typeTime, const RideFile *ri
                 }
             }
             name += " (%4)";
-            name = name.arg(ride->formatValueWithUnit(round(candidate.avg), series, conversion, context, ride->isSwim()));
+            name = name.arg(ride->formatValueWithUnit(candidate.avg, series, conversion, context, ride->isSwim()));
 
             candidate.name = name;
             name = "";
