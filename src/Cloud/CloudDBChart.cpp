@@ -1318,8 +1318,8 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
 
        email->setText(appsettings->cvalue(athlete, GC_CLOUDDB_EMAIL, "").toString());
    }
-   // regexp: simple e-mail validation / also allow long domain types
-   QRegExp email_rx("^.+@[a-zA-Z_]+\\.[a-zA-Z]{2,10}$");
+   // regexp: simple e-mail validation / also allow long domain types & subdomains
+   QRegExp email_rx("^.+@([a-zA-Z_]+\\.)+[a-zA-Z]{2,10}$");
    QValidator *email_validator = new QRegExpValidator(email_rx, this);
    email->setValidator(email_validator);
    emailOk = !email->text().isEmpty(); // email from properties is ok when loaded
