@@ -1953,14 +1953,30 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     banisterTypeSelect->addItem(tr("Predicted CP (Watts)"),  BANISTER_CP);
     banisterTypeSelect->setCurrentIndex(metricDetail->stressType < 4 ? metricDetail->stressType : 2);
 
+    // banister performance metric
+    banisterPerfMetric = new QComboBox(this);
+    foreach(MetricDetail metric, ltmTool->metrics)
+        if (metric.metric != NULL && metric.metric->type() == RideMetric::Peak)
+            banisterPerfMetric->addItem(metric.name,  metric.symbol);
+    banisterPerfMetric->setCurrentIndex(banisterPerfMetric->findData(metricDetail->perfSymbol));
+
     banisterWidget = new QWidget(this);
     banisterWidget->setContentsMargins(0,0,0,0);
-    QHBoxLayout *banisterLayout = new QHBoxLayout(banisterWidget);
-    banisterLayout->setContentsMargins(0,0,0,0);
-    banisterLayout->setSpacing(5 *dpiXFactor);
-    banisterLayout->addWidget(new QLabel(tr("Curve Type"), this));
-    banisterLayout->addWidget(banisterTypeSelect);
+    QVBoxLayout *banisterLayout = new QVBoxLayout(banisterWidget);
 
+    QHBoxLayout *banisterTypeLayout = new QHBoxLayout();
+    banisterTypeLayout->setContentsMargins(0,0,0,0);
+    banisterTypeLayout->setSpacing(5 *dpiXFactor);
+    banisterTypeLayout->addWidget(new QLabel(tr("Curve Type"), this));
+    banisterTypeLayout->addWidget(banisterTypeSelect);
+    banisterLayout->addLayout(banisterTypeLayout);
+
+    QHBoxLayout *banisterPerfLayout = new QHBoxLayout();
+    banisterPerfLayout->setContentsMargins(0,0,0,0);
+    banisterPerfLayout->setSpacing(5 *dpiXFactor);
+    banisterPerfLayout->addWidget(new QLabel(tr("Perf. Metric"), this));
+    banisterPerfLayout->addWidget(banisterPerfMetric);
+    banisterLayout->addLayout(banisterPerfLayout);
 
     metricWidget = new QWidget(this);
     metricWidget->setContentsMargins(0,0,0,0);
@@ -2369,7 +2385,7 @@ EditMetricDetailDialog::banisterName()
     if (chooseBanister->isChecked() == false) return;
 
     // re-use bestSymbol like PMC does
-    metricDetail->bestSymbol = metricDetail->symbol;
+    metricDetail->bestSymbol = metricDetail->symbol+"_"+metricDetail->perfSymbol;
 
     // append type
     switch(banisterTypeSelect->currentIndex()) {
@@ -2589,7 +2605,10 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->stack = stack->isChecked();
     metricDetail->trendtype = trendType->currentIndex();
     if (chooseStress->isChecked()) metricDetail->stressType = stressTypeSelect->currentIndex();
-    if (chooseBanister->isChecked()) metricDetail->stressType = banisterTypeSelect->currentIndex();
+    if (chooseBanister->isChecked()) {
+        metricDetail->stressType = banisterTypeSelect->currentIndex();
+        metricDetail->perfSymbol = banisterPerfMetric->currentData().toString();
+    }
     metricDetail->formula = formulaEdit->toPlainText();
     metricDetail->formulaType = static_cast<RideMetric::MetricType>(formulaType->itemData(formulaType->currentIndex()).toInt());
     metricDetail->measureGroup = measureGroupSelect->currentIndex();

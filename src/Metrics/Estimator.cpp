@@ -205,10 +205,9 @@ Estimator::run()
         }
     }
 
-    // if we don't have 2 rides or more then skip this but add a blank estimate
+    // if we don't have 2 rides or more then skip this
     if (from == to || to == QDate()) {
         printd("%s Estimator ends, less than 2 rides with power data.\n", isRun ? "Run" : "Bike");
-        est << PDEstimate();
         continue;
     }
 
@@ -337,9 +336,6 @@ Estimator::run()
         // go forward a week
         date = date.addDays(7);
     }
-
-    // add a dummy entry if we have no estimates to stop constantly trying to refresh
-    if (est.count() == 0)  est << PDEstimate();
 
     // filter performances
     perfs = filter(perfs);
