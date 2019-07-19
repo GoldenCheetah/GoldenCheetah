@@ -272,7 +272,7 @@ Banister::refresh()
         // load measure
         double score = item->getForSymbol(symbol);
         long day = item->dateTime.date().toJulianDay() - start.toJulianDay();
-        data[day].score = score;
+        data[day].score += score;
 
         // average out measures
         if (score>0) {
