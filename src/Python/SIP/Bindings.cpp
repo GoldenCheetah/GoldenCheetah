@@ -808,23 +808,71 @@ PythonXDataSeries::PythonXDataSeries()
 bool PythonXDataSeries::set(int i, double value)
 {
     if (rideFile) {
-        if (colIdx == -1) {
-            XDataSeries *xds = rideFile->xdata(xdata);
-            if (xds->valuename.contains(series))
-                colIdx = xds->valuename.indexOf(series) + 2;
-            else if (series == "secs") colIdx = 0;
-            else if (series == "km") colIdx = 1;
-            else colIdx = -2;
-        }
-
-        if (colIdx == -2) {
-            return false; // No such XData series
+        if (!setColIdx()){
+            return false;
         }
 
         rideFile->command->setXDataPointValue(xdata, i, colIdx, value);
     }
 
     data[i] = value;
+    return true;
+}
+
+bool PythonXDataSeries::add(double value)
+{
+    if (rideFile) {
+        if (!setColIdx()){
+            return false;
+        }
+
+        QVector<XDataPoint *> xDataPoints(1);
+        xDataPoints[0] = new XDataPoint;
+        int i = rideFile->xdata(xdata)->datapoints.count();
+
+        rideFile->command->appendXDataPoints(xdata, xDataPoints);
+        rideFile->command->setXDataPointValue(xdata, i, colIdx, value);
+    }
+
+    data.append(value);
+    shape[0] = data.count();
+    return true;
+}
+
+bool PythonXDataSeries::remove(int i)
+{
+    if (rideFile) {
+        if (!setColIdx()){
+            return false;
+        }
+
+        rideFile->command->deleteXDataPoints(xdata, i, 1);
+    }
+
+    data.removeAt(i);
+    shape[0] = data.count();
+    return true;
+}
+
+bool PythonXDataSeries::setColIdx()
+{
+    if (colIdx > -1) {
+        return true;
+    }
+
+    if (colIdx == -1) {
+        XDataSeries *xds = rideFile->xdata(xdata);
+        if (xds->valuename.contains(series))
+            colIdx = xds->valuename.indexOf(series) + 2;
+        else if (series == "secs") colIdx = 0;
+        else if (series == "km") colIdx = 1;
+        else colIdx = -2;
+    }
+
+    if (colIdx == -2) {
+        return false; // No such XData series
+    }
+
     return true;
 }
 

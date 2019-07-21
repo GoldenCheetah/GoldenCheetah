@@ -15,6 +15,94 @@
 #line 16 "./sipgoldencheetahPythonXDataSeries.cpp"
 
 
+extern "C" {static PyObject *meth_PythonXDataSeries_append(PyObject *, PyObject *);}
+static PyObject *meth_PythonXDataSeries_append(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        double a0;
+         ::PythonXDataSeries *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "Bd", &sipSelf, sipType_PythonXDataSeries, &sipCpp, &a0))
+        {
+            sipErrorState sipError = sipErrorNone;
+
+#line 193 "goldencheetah.sip"
+        if (sipCpp->readOnly) {
+            PyErr_SetString(PyExc_AttributeError, "Object is read-only");
+            sipError = sipErrorFail;
+        } else {
+            if (!sipCpp->add(a0)) {
+                PyErr_SetString(PyExc_RuntimeError, "XData series does not exist");
+            }
+        }
+#line 41 "./sipgoldencheetahPythonXDataSeries.cpp"
+
+            if (sipError == sipErrorFail)
+                return 0;
+
+            if (sipError == sipErrorNone)
+            {
+            Py_INCREF(Py_None);
+            return Py_None;
+            }
+
+            sipAddException(sipError, &sipParseErr);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_PythonXDataSeries, sipName_append, NULL);
+
+    return NULL;
+}
+
+
+extern "C" {static PyObject *meth_PythonXDataSeries_remove(PyObject *, PyObject *);}
+static PyObject *meth_PythonXDataSeries_remove(PyObject *sipSelf, PyObject *sipArgs)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+        long a0;
+         ::PythonXDataSeries *sipCpp;
+
+        if (sipParseArgs(&sipParseErr, sipArgs, "Bl", &sipSelf, sipType_PythonXDataSeries, &sipCpp, &a0))
+        {
+            sipErrorState sipError = sipErrorNone;
+
+#line 204 "goldencheetah.sip"
+        if (sipCpp->readOnly) {
+            PyErr_SetString(PyExc_AttributeError, "Object is read-only");
+            sipError = sipErrorFail;
+        } else {
+            if (!sipCpp->remove(a0)) {
+                PyErr_SetString(PyExc_RuntimeError, "XData series does not exist");
+            }
+        }
+#line 85 "./sipgoldencheetahPythonXDataSeries.cpp"
+
+            if (sipError == sipErrorFail)
+                return 0;
+
+            if (sipError == sipErrorNone)
+            {
+            Py_INCREF(Py_None);
+            return Py_None;
+            }
+
+            sipAddException(sipError, &sipParseErr);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_PythonXDataSeries, sipName_remove, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static int slot_PythonXDataSeries___setitem__(PyObject *,PyObject *);}
 static int slot_PythonXDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArgs)
 {
@@ -48,7 +136,7 @@ static int slot_PythonXDataSeries___setitem__(PyObject *sipSelf,PyObject *sipArg
                 sipError = sipErrorFail;
             }
         }
-#line 52 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 140 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return -1;
@@ -95,7 +183,7 @@ static PyObject *slot_PythonXDataSeries___getitem__(PyObject *sipSelf,PyObject *
             PyErr_SetString(PyExc_IndexError, "Index out of range");
             sipError = sipErrorFail;
         }
-#line 99 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 187 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             if (sipError == sipErrorFail)
                 return 0;
@@ -131,7 +219,7 @@ static SIP_SSIZE_T slot_PythonXDataSeries___len__(PyObject *sipSelf)
 
 #line 162 "goldencheetah.sip"
         sipRes = sipCpp->count();
-#line 135 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 223 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             return sipRes;
         }
@@ -156,7 +244,7 @@ static PyObject *slot_PythonXDataSeries___str__(PyObject *sipSelf)
 
 #line 158 "goldencheetah.sip"
         sipRes = new QString(sipCpp->name());
-#line 160 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 248 "./sipgoldencheetahPythonXDataSeries.cpp"
 
             return sipConvertFromNewType(sipRes,sipType_QString,NULL);
         }
@@ -196,7 +284,7 @@ static int getbuffer_PythonXDataSeries(PyObject *sipSelf, void *sipCppV, Py_buff
 
     Py_INCREF(sipSelf);  // need to increase the reference count
     sipRes = 0;
-#line 200 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 288 "./sipgoldencheetahPythonXDataSeries.cpp"
 
     return sipRes;
 }
@@ -209,7 +297,7 @@ static void releasebuffer_PythonXDataSeries(PyObject *, void *, Py_buffer *)
 {
 #line 152 "goldencheetah.sip"
     // we do not require any special release function
-#line 213 "./sipgoldencheetahPythonXDataSeries.cpp"
+#line 301 "./sipgoldencheetahPythonXDataSeries.cpp"
 }
 #endif
 
@@ -284,6 +372,12 @@ static sipPySlotDef slots_PythonXDataSeries[] = {
 };
 
 
+static PyMethodDef methods_PythonXDataSeries[] = {
+    {SIP_MLNAME_CAST(sipName_append), meth_PythonXDataSeries_append, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_remove), meth_PythonXDataSeries_remove, METH_VARARGS, NULL}
+};
+
+
 sipClassTypeDef sipTypeDef_goldencheetah_PythonXDataSeries = {
     {
         -1,
@@ -297,7 +391,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_PythonXDataSeries = {
     {
         sipNameNr_PythonXDataSeries,
         {0, 0, 1},
-        0, 0,
+        2, methods_PythonXDataSeries,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

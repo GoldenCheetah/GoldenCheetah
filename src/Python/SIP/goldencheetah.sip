@@ -188,6 +188,28 @@ public:
             }
         }
         %End
+    void append(double);
+        %MethodCode
+        if (sipCpp->readOnly) {
+            PyErr_SetString(PyExc_AttributeError, "Object is read-only");
+            sipError = sipErrorFail;
+        } else {
+            if (!sipCpp->add(a0)) {
+                PyErr_SetString(PyExc_RuntimeError, "XData series does not exist");
+            }
+        }
+        %End
+    void remove(long);
+        %MethodCode
+        if (sipCpp->readOnly) {
+            PyErr_SetString(PyExc_AttributeError, "Object is read-only");
+            sipError = sipErrorFail;
+        } else {
+            if (!sipCpp->remove(a0)) {
+                PyErr_SetString(PyExc_RuntimeError, "XData series does not exist");
+            }
+        }
+        %End
 };
 
 //

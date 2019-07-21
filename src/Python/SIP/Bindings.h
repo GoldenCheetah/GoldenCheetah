@@ -38,6 +38,8 @@ class PythonXDataSeries {
 
         double get(int i) const { return data[i]; }
         bool set(int i, double value);
+        bool add(double value);
+        bool remove(int i);
 
         void *rawDataPtr() { return (void*) data.data(); }
         int count() const { return data.count(); }
@@ -53,6 +55,8 @@ class PythonXDataSeries {
         QVector<Py_ssize_t> shape;
 
     private:
+        bool setColIdx();
+
         QVector<double> data;
 };
 
