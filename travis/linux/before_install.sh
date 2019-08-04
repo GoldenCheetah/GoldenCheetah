@@ -15,8 +15,8 @@ sudo add-apt-repository -y ppa:jonathonf/vlc
 sudo apt-get update -qq
 sudo apt-get install -qq vlc libvlc-dev libvlccore-dev
 
-# R 3.5
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+# R 3.6
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
 sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/"
 sudo apt-get update -qq
 sudo apt-get install r-base-dev

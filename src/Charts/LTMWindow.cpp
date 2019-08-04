@@ -266,11 +266,13 @@ LTMWindow::LTMWindow(Context *context) :
 
     // interactive elements
     banCombo = new QComboBox(this);
+    banPerf = new QComboBox(this);
     banT1 = new QDoubleSpinBox(this);
     banT2 = new QDoubleSpinBox(this);
 
     // labels etc
     ilabel = new QLabel(tr("Impulse Metric"), this);
+    perflabel = new QLabel(tr("Perf. Metric"), this);
     plabel = new QLabel(tr("Peak"), this);
     peaklabel = new QLabel(this);
     peaklabel->setText("296w on 3rd July");
@@ -284,15 +286,17 @@ LTMWindow::LTMWindow(Context *context) :
     // add to layout
     bang->addWidget(ilabel,0,0);
     bang->addWidget(banCombo,0,1,1,2,Qt::AlignLeft);
-    bang->addWidget(plabel, 1,0);
-    bang->addWidget(peaklabel,1,1,1,2,Qt::AlignLeft);
-    bang->addWidget(t1label1,2,0);
-    bang->addWidget(banT1,2,1);
-    bang->addWidget(t1label2,2,2);
-    bang->addWidget(t2label1,3,0);
-    bang->addWidget(banT2,3,1);
-    bang->addWidget(t2label2,3,2);
-    bang->addWidget(RMSElabel,4,0,1,3);
+    bang->addWidget(perflabel,1,0);
+    bang->addWidget(banPerf,1,1,1,2,Qt::AlignLeft);
+    bang->addWidget(plabel, 2,0);
+    bang->addWidget(peaklabel,2,1,1,2,Qt::AlignLeft);
+    bang->addWidget(t1label1,3,0);
+    bang->addWidget(banT1,3,1);
+    bang->addWidget(t1label2,3,2);
+    bang->addWidget(t2label1,4,0);
+    bang->addWidget(banT2,4,1);
+    bang->addWidget(t2label2,4,2);
+    bang->addWidget(RMSElabel,5,0,1,3);
 
     // initialise
     settings.ltmTool = ltmTool;
@@ -353,7 +357,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
 
     // refresh banister data when combo changes
-    connect(banCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister(int)));
+    connect(banCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister()));
+    connect(banPerf, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister()));
     connect(banT1, SIGNAL(valueChanged(double)), this, SLOT(tuneBanister()));
     connect(banT2, SIGNAL(valueChanged(double)), this, SLOT(tuneBanister()));
     configChanged(CONFIG_APPEARANCE);
@@ -380,11 +385,15 @@ LTMWindow::showBanister(bool relevant)
         // we reset the combo so lets remember where we were at
         int remember=0;
         if (banCombo->count()) remember=banCombo->currentIndex();
+        int rememberPerf=0;
+        if (banPerf->count()) rememberPerf=banPerf->currentIndex();
 
         QStringList symbols;
+        QStringList perfSymbols;
 
         // lets setup the widgets
         banCombo->clear();
+        banPerf->clear();
         foreach(MetricDetail metricDetail, settings.metrics) {
             if (metricDetail.type == METRIC_BANISTER) {
                 if (!symbols.contains(metricDetail.symbol)) {
@@ -399,14 +408,22 @@ LTMWindow::showBanister(bool relevant)
                         banCombo->addItem(name, QVariant(metricDetail.symbol));
                     }
                 }
+                if (!perfSymbols.contains(metricDetail.perfSymbol)) {
+                    const RideMetric *m = factory.rideMetric(metricDetail.perfSymbol);
+                    if (m) {
+                        perfSymbols << metricDetail.perfSymbol;
+                        banPerf->addItem(m->name(), QVariant(metricDetail.perfSymbol));
+                    }
+                }
             }
         }
 
         // go back to remembered value
         if (remember < banCombo->count()) banCombo->setCurrentIndex(remember);
+        if (rememberPerf < banPerf->count()) banPerf->setCurrentIndex(rememberPerf);
 
         // now get the metric values etc
-        refreshBanister(banCombo->currentIndex());
+        refreshBanister();
         overlayWidget->show();
 
     } else {
@@ -444,10 +461,10 @@ LTMWindow::tuneBanister()
 {
 
     // if we have a banister...
-    if (banCombo->count() && banT1->value() >0 && banT2->value()>0) {
+    if (banCombo->count() && banPerf->count() && banT1->value() >0 && banT2->value()>0) {
 
         // lookup and set
-        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(),0,0);
+        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(), banPerf->currentData().toString(),0,0);
 
         // when user adjusts the t1/t2 parameters we need to refit
         if (banT1->value() < banister->t1 || banT1->value() > banister->t1 ||
@@ -462,20 +479,25 @@ LTMWindow::tuneBanister()
     }
 }
 void
-LTMWindow::refreshBanister(int index)
+LTMWindow::refreshBanister()
 {
-    if (index >= 0 && index < banCombo->count()) {
+    int index = banCombo->currentIndex();
+    int perfIndex = banPerf->currentIndex();
+
+    if (index >= 0 && perfIndex >= 0) {
 
         // lookup and set
-        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(),0,0);
+        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(), banPerf->currentData().toString(),0,0);
         banT1->setValue(banister->t1);
         banT2->setValue(banister->t2);
 
+        double perf=0.0;
         int CP=0;
-        QDate when = banister->getPeakCP(settings.start.date(), settings.end.date(), CP);
+        QDate when = banister->getPeakPerf(settings.start.date(), settings.end.date(), perf, CP);
 
         // set peak label
         if (CP >0 && when != QDate()) peaklabel ->setText(QString("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
+        else if (perf >0.0 && when != QDate()) peaklabel ->setText(QString("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
         else peaklabel->setText("");
 
         // set RMSE for current view
@@ -513,6 +535,7 @@ LTMWindow::configChanged(qint32)
     QFont font;
     font.setPointSize(12); // reasonably big
     ilabel->setFont(font);
+    perflabel->setFont(font);
     plabel->setFont(font);
     t1label1->setFont(font);
     t1label2->setFont(font);
@@ -524,8 +547,10 @@ LTMWindow::configChanged(qint32)
     banT1->setFont(font);
     banT2->setFont(font);
     banCombo->setFont(font);
+    banPerf->setFont(font);
 
     ilabel->setPalette(palette);
+    perflabel->setPalette(palette);
     plabel->setPalette(palette);
     t1label1->setPalette(palette);
     t1label2->setPalette(palette);

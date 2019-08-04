@@ -102,8 +102,8 @@ const int typical_SeasonSize = 700; // a good couple of years needed
 // e.g. supramaximal work to pmax, above threshold to v02max etc.
 //
 //
-Banister::Banister(Context *context, QString symbol, double t1, double t2, double k1, double k2) :
-    symbol(symbol), k1(k1), k2(k2), t1(t1), t2(t2), days(0), context(context), isstale(true)
+Banister::Banister(Context *context, QString symbol, QString perf_symbol, double t1, double t2, double k1, double k2) :
+    symbol(symbol), perf_symbol(perf_symbol), k1(k1), k2(k2), t1(t1), t2(t2), days(0), context(context), isstale(true)
 {
     // when they all change we are ready to invalidate and refresh
     // don't worry about upstream events, this is what we are dependant on
@@ -134,7 +134,7 @@ Banister::value(QDate date, int type)
     switch(type) {
     case BANISTER_NTE: return data[index].h;
     case BANISTER_PTE: return data[index].g;
-    case BANISTER_CP: return data[index].perf > 0 ? data[index].perf * typical_CP / 100 : 0; // avoid -ve values and divzero
+    case BANISTER_CP: return perf_symbol == "power_index" && data[index].perf > 0 ? data[index].perf * typical_CP / 100 : 0; // avoid -ve values and divzero
     default:
     case BANISTER_PERFORMANCE: return data[index].perf;
     }
@@ -167,7 +167,7 @@ Banister::RMSE(QDate from, QDate to, int &count)
 }
 
 QDate
-Banister::getPeakCP(QDate from, QDate to, int &CP)
+Banister::getPeakPerf(QDate from, QDate to, double &perf, int &CP)
 {
     // not sure it makes much sense to only look at
     // a portion of the curve, but lets do as asked
@@ -177,16 +177,18 @@ Banister::getPeakCP(QDate from, QDate to, int &CP)
     // check bounds
     if ((stopi-starti)<= 0 || starti < 0 || starti > data.length() || stopi < 0 || stopi > data.length()) return QDate();
 
-    int max=0;
+    double max=0.0;
     int index=-1;
     while(starti < stopi) {
-        if ((data[starti].perf * typical_CP / 100) > max) {
-            max = (data[starti].perf * typical_CP / 100);
+        if (data[starti].perf > max) {
+            max = data[starti].perf;
             index = starti;
         }
         starti++;
     }
-    CP = max;
+    perf = max;
+    // We compute CP only when performance metric is power_index
+    CP = (perf_symbol == "power_index") ? max * typical_CP / 100.0 : 0;
 
     return start.addDays(index);
 }
@@ -283,7 +285,7 @@ Banister::refresh()
             double todaybest=0;
             foreach(IntervalItem *i, item->intervals()) {
                 if (i->istest()) {
-                    double pix=i->getForSymbol("power_index");
+                    double pix=i->getForSymbol(perf_symbol);
                     if (pix > todaybest)  todaybest = pix;
                 }
             }
@@ -302,7 +304,8 @@ Banister::refresh()
 
             // if we didn't find a performance test in the ride lets see if there
             // is a weekly performance already identified
-            if (!(todaybest > 0)) {
+            // This applies only when performance metric is power_index
+            if (!(todaybest > 0) && perf_symbol == "power_index") {
                 Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date(), item->isRun);
                 if (!p.submaximal && p.powerIndex > 0) {
 
@@ -334,7 +337,7 @@ Banister::refresh()
     // the performanceDay and performanceScore vectors are just there
     // for model fitting calls to lmcurve.
     for(int i=0; i<performances; i++) {
-        printd("Performance %d on day=%g score=%g\n", i, performanceDay[i], performanceScore[i]);
+        printd("Performance %d on day=%g performance score=%g\n", i, performanceDay[i], performanceScore[i]);
         data[performanceDay[i]].test = performanceScore[i];
     }
 
