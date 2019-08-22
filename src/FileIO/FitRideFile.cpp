@@ -509,7 +509,7 @@ struct FitFileReaderState
                 case -1: return "Favero";
                 default: return QString("Favero %1").arg(prod);
             }
-        }else if (manu == 267) {
+        } else if (manu == 267) {
             // Bryton
             return "Bryton";
         } else if (manu == 282) {
@@ -2816,11 +2816,19 @@ struct FitFileReaderState
 
                     case 8: // FLOAT32
                         size = 4;
-                        value.type = FloatValue;
-                        value.f = read_float32(&count);
-                        if (value.f != value.f) // No NAN
-                            value.f = 0;
-                        size = field.size;
+                        if (field.size==size) {
+                            value.type = FloatValue;
+                            value.f = read_float32(&count);
+                            if (value.f != value.f) // No NAN
+                                value.f = 0;
+                        } else { // Multi-values
+                            value.type = ListValue;
+                            value.list.clear();
+                            for (int i=0;i<field.size/size;i++) {
+                                value.list.append(read_float32(&count));
+                            }
+                            size = field.size;
+                        }
                         break;
 
                     //case 9: // FLOAT64
