@@ -166,6 +166,7 @@ class MainWindow : public QMainWindow
         void setSubChartMenu();
         void setChartMenu(QMenu *);
         void addChart(QAction*);
+        void importChart();
 
         // menus to reflect cloud
         void setUploadMenu();

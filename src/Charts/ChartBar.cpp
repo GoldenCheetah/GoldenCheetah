@@ -122,6 +122,8 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     barMenu = new QMenu("Add");
     chartMenu = barMenu->addMenu(tr("Add Chart"));
 
+    barMenu->addAction(tr("Import Chart..."), context->mainWindow, SLOT(importChart()));
+
 #ifdef GC_HAS_CLOUD_DB
     barMenu->addAction(tr("Upload Chart..."), context->mainWindow, SLOT(exportChartToCloudDB()));
     barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));

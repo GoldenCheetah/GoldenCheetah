@@ -554,6 +554,7 @@ MainWindow::MainWindow(const QDir &home)
 #endif
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
+    viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
 #ifdef GC_HAS_CLOUD_DB
     viewMenu->addAction(tr("Upload Chart..."), this, SLOT(exportChartToCloudDB()));
     viewMenu->addAction(tr("Download Chart..."), this, SLOT(addChartFromCloudDB()));
@@ -818,6 +819,18 @@ MainWindow::addChart(QAction*action)
     }
     if (id != GcWindowTypes::None)
         currentTab->addChart(id); // called from MainWindow to inset chart
+}
+
+void
+MainWindow::importChart()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Chart file to import"), "", tr("GoldenCheetah Chart Files (*.gchart)"));
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Chart"), tr("No chart file selected!"));
+    } else {
+        importCharts(QStringList()<<fileName);
+    }
 }
 
 #ifdef GC_HAS_CLOUD_DB
