@@ -36,12 +36,12 @@ Do you want to temporarily disable the service?</source>
         <translation>El servicio Garmin Express está activo en esta computadora.
 Esto puede bloquear el acceso de GoldenCheetah al accesorio ANT+.
 
-¿Quiere deshabilitar temporariamente el servicio?</translation>
+¿Quiere deshabilitar temporáriamente el servicio?</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="84"/>
         <source>Failed stopping Garmin Express service</source>
-        <translation>No se pudo detener el serivicio Garmin Express</translation>
+        <translation>No se pudo detener el servicio Garmin Express</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="85"/>
@@ -335,7 +335,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="99"/>
         <source>Sync activities with services like Today&apos;s Plan, Strava, Dropbox and Google Drive</source>
-        <translation>Syncroniza actividades con servicios como Today&apos;s Plan, Strava, Dropbox y Google Drive</translation>
+        <translation>Sincronizar actividades con servicios como Today&apos;s Plan, Strava, Dropbox y Google Drive</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
@@ -345,12 +345,12 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Sync measurements such as weight, body fat, HRV and sleep.</source>
-        <translation>Sincroniza mediciones tales como peso, grasa corporal, VFC y sueño.</translation>
+        <translation>Sincronizar mediciones tales como peso, grasa corporal, VFC y sueño.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation>Sincroniza entrenamientos planificados a calendarios WebDAV, CalDAV y Google.</translation>
+        <translation>Sincronizar entrenamientos planificados a calendarios WebDAV, CalDAV y Google.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
@@ -786,7 +786,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1317"/>
         <source>Selected by default</source>
-        <translation>Seleccionado por defecto</translation>
+        <translation>Seleccionado por omisión</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1324"/>
@@ -860,7 +860,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="688"/>
         <source>Sync on start</source>
-        <translation>Syncronizar al arranque</translation>
+        <translation>Sincronizar al arranque</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="690"/>
@@ -901,7 +901,7 @@ On Linux and Apple computers you will need to extract it from the VR Software CD
 Please take care to ensure that the file is the latest version of the Firmware file.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it. </source>
-        <translation>Los rodillos Tacs Fortius requieren un archivo de firmwar que es provisto por Tacs BV. Este archivo tiene restricciones para ser distribuído con GoldenCheetah.
+        <translation>Los rodillos Tacs Fortius requieren un archivo de firmwar que es provisto por Tacs BV. Este archivo tiene restricciones para ser distribuido con GoldenCheetah.
 
 En windows típicamente está instalado en c:\windows\system32 y se llama &apos;FortiusSWPID1942Renum.hex&apos;.
 
@@ -961,7 +961,7 @@ On later TTS cds it is in support\drivers_usb_interface\32
 Place a copy of this file somewhere on this PC and reference it above.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it in place. </source>
-        <translation>Los rodillos Tacs Imagic requieren la carga de un archivo de firmware. Este firmware está incluído dentro del controlador de dispositivo I-magic.sys, el cual es provisto por Tacs BV. Este archivo tiene restricciones para ser distribuído con GoldenCheetah.
+        <translation>Los rodillos Tacs Imagic requieren la carga de un archivo de firmware. Este firmware está incluido dentro del controlador de dispositivo I-magic.sys, el cual es provisto por Tacs BV. Este archivo tiene restricciones para ser distribuido con GoldenCheetah.
 En sistemas windows con Tacx Fortius/Imagic instaladado típicamente se puede encontrar en c:\windows\system32.
 
 Alternativamente se lo puede extraer del CD con el software Tacx
@@ -1319,7 +1319,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="302"/>
         <source>If your device is not found you can select the device port manually by using the selection box below.</source>
-        <translation>Si su dispositivo no fué encontrado usted puede seleccionar el puerto manualmente utilizando el diálogo de selección más abajo.</translation>
+        <translation>Si su dispositivo no fue encontrado usted puede seleccionar el puerto manualmente utilizando el diálogo de selección más abajo.</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="307"/>
@@ -1413,7 +1413,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="519"/>
         <source>Sync on startup</source>
-        <translation>Syncronizar al arranque</translation>
+        <translation>Sincronizar al arranque</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="520"/>
@@ -1462,7 +1462,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Metrics/AerobicDecoupling.cpp" line="56"/>
         <source>Aerobic Decoupling</source>
-        <translation>Desacopl. Aeróbico</translation>
+        <translation>Desacoplamiento Aeróbico</translation>
     </message>
     <message>
         <location filename="../../Metrics/AerobicDecoupling.cpp" line="58"/>
@@ -2783,7 +2783,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="458"/>
         <source>Reset to default</source>
-        <translation>Restablecer Columnas por defecto</translation>
+        <translation>Restablecer Columnas por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="484"/>
@@ -3219,7 +3219,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="93"/>
         <source>Any unsaved data will not be included into the backup .zip file.</source>
-        <translation>Los datos no guardados no serán incluídos en el archivo .zip de resguardo.</translation>
+        <translation>Los datos no guardados no serán incluidos en el archivo .zip de resguardo.</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="94"/>
@@ -3252,7 +3252,7 @@ Presione Siguiente para Continuar
         <location filename="../../FileIO/AthleteBackup.cpp" line="146"/>
         <location filename="../../FileIO/AthleteBackup.cpp" line="152"/>
         <source>Directory %1 not available. No backup .zip file created for athlete %2.</source>
-        <translation>El directorio %1 no está disponible. No se creará un achivo .zip de resguardo para el atleta %2.</translation>
+        <translation>El directorio %1 no está disponible. No se creará un archivo .zip de resguardo para el atleta %2.</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="172"/>
@@ -3454,7 +3454,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="574"/>
         <source>Weight in kg or lbs: first from Athlete body measurements, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation>Peso en kg o libras: originado en mediciones, datos de la actividad o configuración del atleta con un valor por defecto de 75kg, en ese orden</translation>
+        <translation>Peso en kg o libras: originado en mediciones, datos de la actividad o configuración del atleta con un valor por omisión de 75kg, en ese orden</translation>
     </message>
 </context>
 <context>
@@ -3741,7 +3741,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2779"/>
         <source>Average Left Torque Effectiveness</source>
-        <translation>Efectividade Media Pedal Izq</translation>
+        <translation>Efectividad Media Pedal Izq</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2780"/>
@@ -3911,7 +3911,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2834"/>
         <source>Average Right Torque Effectiveness</source>
-        <translation>Efectividade Media Pedal Der</translation>
+        <translation>Efectividad Media Pedal Der</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2835"/>
@@ -4153,7 +4153,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1160"/>
         <source>Average total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
-        <translation>Concentración Total Media de Hemoblobina. Los gramos totales de hemoglobina por decilitro.</translation>
+        <translation>Concentración Total Media de Hemoglobina. Los gramos totales de hemoglobina por decilitro.</translation>
     </message>
 </context>
 <context>
@@ -4251,7 +4251,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="124"/>
         <source>Overwrite existing files</source>
-        <translation>Sobreescribir archivo existente</translation>
+        <translation>Sobrescribir archivo existente</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchExportDialog.cpp" line="125"/>
@@ -4634,7 +4634,7 @@ Presione Siguiente para Continuar
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="404"/>
         <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to BikeStress it can be computed as 100 * hours * (Relative Intensity)^2</source>
-        <translation>La puntuación del estres generado por el entrenamiento de ciclismo del Dr. Skiba tiene en cuenta la duración e intensidad relativa de la sesión de entrenamiento, similar a BikeStress se puede calcular como 100 * horas * (Intensidad Relativa)^2</translation>
+        <translation>La puntuación del estrés generado por el entrenamiento de ciclismo del Dr. Skiba tiene en cuenta la duración e intensidad relativa de la sesión de entrenamiento, similar a BikeStress se puede calcular como 100 * horas * (Intensidad Relativa)^2</translation>
     </message>
 </context>
 <context>
@@ -5172,7 +5172,7 @@ Comencemos la configuración.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4803"/>
         <source>Maximum of 10 zones reached.</source>
-        <translation>Se alcancó el máximo de 10 zonas.</translation>
+        <translation>Se alcanzó el máximo de 10 zonas.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4828"/>
@@ -5700,7 +5700,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="6232"/>
         <source>Maximum of 10 zones reached.</source>
-        <translation>Se alcancó el máximo de 10 zonas.</translation>
+        <translation>Se alcanzó el máximo de 10 zonas.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="6255"/>
@@ -5856,12 +5856,17 @@ ddd, dd MMM yyyy</source>
         <translation>Agregar Gráfico</translation>
     </message>
     <message>
-        <location filename="../../Charts/ChartBar.cpp" line="126"/>
+        <location filename="../../Charts/ChartBar.cpp" line="125"/>
+        <source>Import Chart...</source>
+        <translation>Importar Gráfico...</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/ChartBar.cpp" line="128"/>
         <source>Upload Chart...</source>
         <translation>Publicar Gráfico...</translation>
     </message>
     <message>
-        <location filename="../../Charts/ChartBar.cpp" line="127"/>
+        <location filename="../../Charts/ChartBar.cpp" line="129"/>
         <source>Download Chart...</source>
         <translation>Descargar Gráfico...</translation>
     </message>
@@ -5954,7 +5959,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="56"/>
         <source>&lt;center&gt;&lt;b&gt;What is GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;You have requested a function with shares or retrieves GoldenCheetah configuration artifacts like chart definitions, worksouts, custom metrics,... in a cloud based data storage extension which is running on Google App Engine in a data center of variable location as provided by Google and/or choosen by the GoldenCheetah team.&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Privacy Rules for Sharing Artifacts&lt;/b&gt;&lt;br&gt;By sharing an artifact to CloudDB you agree to provide it under &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. When sharing you are asked to enter a &apos;Nickname&apos; and an &apos;Email-Address&apos; which are stored together with a unique identifier (which is automatically created for your athlete) in the CloudDB. This data is only used to support the CloudDB service and will not be disclosed or shared for other purposes (e.g. advertisement).&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Rules for Importing Artifacts&lt;/b&gt;&lt;br&gt;By importing an artifact from CloudDB you accept the license agreement &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Any artifcats are provided as-is without warranty of any kind, either expressed or implied, including, but not limited to, the implied warrenty of fitness for a particular purpose. The entire risk related to the quality of the artifact is with you. There is no liability regarding damages to your data trough the use of any of the artifacts and there will be no quality check/ensurance by the GoldenCheetah team for the provided artifacts.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Availability Disclaimer&lt;/b&gt;&lt;br&gt;The service is provisioned free-of-charge to the users of GoldenCheetah. There is no guarantee nor service level agreement on the 7x24 availabiliy of CloudDB services. The GoldenCheetah team has the right to delete artifacts from the CloudDB at any time and without prior notice to the providing user (e.g. due to quality issues, or due to limitations in storage capacity). The GoldenCheetah team has the right to suspend or stop the complete service or parts of the service at any time and without prior notice to the users.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Rules&lt;/b&gt;&lt;br&gt;The use of the service is exclusively granted to GoldenCheetah users - and the only permitted way to access any of the artifacts is through the GoldenCheetah application. Any attempt to access CloudDB data directly is forbidden and will either be blocked or may even end in suspending or stopping the service in general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Accept or Reject&lt;/b&gt;&lt;br&gt;By pressing &apos;Accept the rules and conditions of CloudDB&apos; you confirm that you have read and fully understood the above text and you agree to follow all of these. This decision is recorded so that you will not asked again when using CloudDB related functions. &lt;br&gt;&lt;br&gt;If you are not sure you can choose &apos;Reject and don&apos;t use CloudDB&apos;. In this case this agreement request will appear again whenever you request to use a CloudDB related function in GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Source Code&lt;/b&gt;&lt;br&gt;The source code of CloudDB is published under &apos;GNU AFFERO GENERAL PUBLIC LICENSE Version 3&apos; here: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</source>
-        <translation>&lt;center&gt;&lt;b&gt;GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;CloudDB permite compartir elementos de configuración de GoldenCheetah tales como gráficos, entrenamientos, métricas personalizadas,... en una base de datos compartida que utiliza Google App Engine en centros de datos de diferentes ubicaciones provista por Google y/o elegidas por el equipo de GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;Licencia y Privacidad de elementos compartidos&lt;/b&gt;&lt;br&gt;Al compartir un elemento en CloudDB usted acuerda ofrecer el mismo bajo la &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Licencia Creative Common 4.0&lt;/a&gt;. Ale compartir se le solicitará ingresar un &apos;Apodo&apos; y una &apos;Dirección de Correo Electrónico&apos; los cuales serán almacendado junto con un identificador único (que será generado automáticamente para su &apos;Atleta&apos;) en la CloudDB. Estos datos solo se utilizan para dar soporte al servicio CloudDB y no seran publicados o utilizados para otros propósitos (Ej. publicidad).&lt;br&gt;&lt;center&gt;&lt;b&gt;Licencia y Reglas para importar elementos&lt;/b&gt;&lt;br&gt;Al importar un elemento descargado de CloudDB usted acepta el acuerdo de licencia &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Licencia Creative Common 4.0&lt;/a&gt;. Todos los elementos ofrecidos se proveen sin garantía de ningún tipo, ni expresa ni implícita, incluyendo pero no limitada a, la garantía de adecuación para cualquier propósito. El riesgo sobre la calidad de los elementos descargados es de vuestra exclusiva responsabilidad. No hay ninguna responsabilidad en cuanto a daños a los datos a través del uso de cualquiera de los elementos descargados y no existe ninguna verificación de calidad o aseguramiento por parte del equipo de GoldenCheetah por los elementos proporcionados.&lt;br&gt;&lt;center&gt;&lt;b&gt;Descargo sobre la disponibilidad del servicio CloudDB&lt;/b&gt;&lt;br&gt;El servicio se ofrece libre de costo a los usuarios de GoldenCheetah. No hay ninguna garantía o acuerdo de nivel de servicio sobre la disponibilidad 7x24 de los servicios CloudDB. El equipo GoldenCheetah se reserva el derecho a eliminar elementos de CloudDB en cualquier momento y sin notificación previa al proveedor (Ej. debido a problemas de calidad o limitaciones en la capacidad de almacenamiento). El equipo GoldenCheetah se reserva el derecho de suspender o detener completamente el servicio parcialmente o en su totalidad en cualquier momento y sin necesidad de notificación previa a los usuarios.&lt;br&gt;&lt;center&gt;&lt;b&gt;Reglas del servicio CloudDB&lt;/b&gt;&lt;br&gt;El uso del servicio se otorga exclusivamente a los usuarios de GoldenCheetah - y el único modo permitido de acceso a los elementos es mediante la aplicación GoldenCheetah. Cualquier intento de acceder a los datos de CloudDB de manera directa está prohibido y sera bloqueado o puede conducir a la suspensión o detención del servicio en general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Aceptar o Rechazar&lt;/b&gt;&lt;br&gt;Al presionar &apos;Aceptar las Reglas y Condiciones de CloudDB&apos; usted confirma que ha leído y entiende completamente el texto anterior y acuerda su cumplimiento. Esta decisión será registrada de manera que no se le vuelva a consultar cada vez que utilize funciones relacionadas con CloudDB. &lt;br&gt;&lt;br&gt;Si usted no está seguro puede presionar &apos;Rechazar y no usar CloudDB&apos;. En este caso esta solicitud de acuerdo volverá a aparecer cada vez que usted intente utilizar una función relacionada con CloudDB en GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;Código Fuente de CloudDB&lt;/b&gt;&lt;br&gt;El código fuente de CloudDB se publica bajo la &apos;Licencia Pública General GNU AFFERO Version 3&apos; en el: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;Repositorio CloudDB&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;CloudDB permite compartir elementos de configuración de GoldenCheetah tales como gráficos, entrenamientos, métricas personalizadas,... en una base de datos compartida que utiliza Google App Engine en centros de datos de diferentes ubicaciones provista por Google y/o elegidas por el equipo de GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;Licencia y Privacidad de elementos compartidos&lt;/b&gt;&lt;br&gt;Al compartir un elemento en CloudDB usted acuerda ofrecer el mismo bajo la &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Licencia Creative Common 4.0&lt;/a&gt;. Ale compartir se le solicitará ingresar un &apos;Apodo&apos; y una &apos;Dirección de Correo Electrónico&apos; los cuales serán almacenado junto con un identificador único (que será generado automáticamente para su &apos;Atleta&apos;) en la CloudDB. Estos datos solo se utilizan para dar soporte al servicio CloudDB y no seran publicados o utilizados para otros propósitos (Ej. publicidad).&lt;br&gt;&lt;center&gt;&lt;b&gt;Licencia y Reglas para importar elementos&lt;/b&gt;&lt;br&gt;Al importar un elemento descargado de CloudDB usted acepta el acuerdo de licencia &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Licencia Creative Common 4.0&lt;/a&gt;. Todos los elementos ofrecidos se proveen sin garantía de ningún tipo, ni expresa ni implícita, incluyendo pero no limitada a, la garantía de adecuación para cualquier propósito. El riesgo sobre la calidad de los elementos descargados es de vuestra exclusiva responsabilidad. No hay ninguna responsabilidad en cuanto a daños a los datos a través del uso de cualquiera de los elementos descargados y no existe ninguna verificación de calidad o aseguramiento por parte del equipo de GoldenCheetah por los elementos proporcionados.&lt;br&gt;&lt;center&gt;&lt;b&gt;Descargo sobre la disponibilidad del servicio CloudDB&lt;/b&gt;&lt;br&gt;El servicio se ofrece libre de costo a los usuarios de GoldenCheetah. No hay ninguna garantía o acuerdo de nivel de servicio sobre la disponibilidad 7x24 de los servicios CloudDB. El equipo GoldenCheetah se reserva el derecho a eliminar elementos de CloudDB en cualquier momento y sin notificación previa al proveedor (Ej. debido a problemas de calidad o limitaciones en la capacidad de almacenamiento). El equipo GoldenCheetah se reserva el derecho de suspender o detener completamente el servicio parcialmente o en su totalidad en cualquier momento y sin necesidad de notificación previa a los usuarios.&lt;br&gt;&lt;center&gt;&lt;b&gt;Reglas del servicio CloudDB&lt;/b&gt;&lt;br&gt;El uso del servicio se otorga exclusivamente a los usuarios de GoldenCheetah - y el único modo permitido de acceso a los elementos es mediante la aplicación GoldenCheetah. Cualquier intento de acceder a los datos de CloudDB de manera directa está prohibido y sera bloqueado o puede conducir a la suspensión o detención del servicio en general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Aceptar o Rechazar&lt;/b&gt;&lt;br&gt;Al presionar &apos;Aceptar las Reglas y Condiciones de CloudDB&apos; usted confirma que ha leído y entiende completamente el texto anterior y acuerda su cumplimiento. Esta decisión será registrada de manera que no se le vuelva a consultar cada vez que utilize funciones relacionadas con CloudDB. &lt;br&gt;&lt;br&gt;Si usted no está seguro puede presionar &apos;Rechazar y no usar CloudDB&apos;. En este caso esta solicitud de acuerdo volverá a aparecer cada vez que usted intente utilizar una función relacionada con CloudDB en GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;Código Fuente de CloudDB&lt;/b&gt;&lt;br&gt;El código fuente de CloudDB se publica bajo la &apos;Licencia Pública General GNU AFFERO Version 3&apos; en el: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;Repositorio CloudDB&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="112"/>
@@ -6010,7 +6015,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="469"/>
         <source>My Charts</source>
-        <translation>Mis Gŕaficos</translation>
+        <translation>Mis Gráficos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="475"/>
@@ -6046,7 +6051,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="637"/>
         <source>Select charts to download</source>
-        <translation>Seleccionar Gŕaficos para Descargar</translation>
+        <translation>Seleccionar Gráficos para Descargar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="709"/>
@@ -6150,7 +6155,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="633"/>
         <source>Curator chart maintenance - Curate, Edit or Delete Charts</source>
-        <translation>Curadoría de Gráficos - Curar, Editar o Eliminar Gráficos</translation>
+        <translation>Curadoria de Gráficos - Curar, Editar o Eliminar Gráficos</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="740"/>
@@ -6645,7 +6650,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="858"/>
         <source>Overwrite existing files</source>
-        <translation>Sobreescribir archivos existentes</translation>
+        <translation>Sobrescribir archivos existentes</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="907"/>
@@ -6664,7 +6669,7 @@ Are you sure?</source>
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
         <translation>Los cambios en actividades que no fueron guardadas no pueden ser sincronizados
 
-Esto puede conducir a inconsistencias entre sus activides locales en GoldenCheetah y las actividades cargadas en línea. Recomendamos guardar las actividades modificadas antes de continuar.</translation>
+Esto puede conducir a inconsistencias entre sus actividades locales en GoldenCheetah y las actividades cargadas en línea. Recomendamos guardar las actividades modificadas antes de continuar.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1024"/>
@@ -7853,7 +7858,7 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Gui/Pages.cpp" line="3972"/>
         <source>Default Value</source>
-        <translation>Valor por Defecto</translation>
+        <translation>Valor por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4049"/>
@@ -8110,12 +8115,12 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="379"/>
         <source>The activity starting at %1 appears to have already been downloaded.  Do you want to overwrite the previous download?</source>
-        <translation>La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobreescribir?</translation>
+        <translation>La actividad que comienza en %1 parece ya haber sido descargada. La quiere sobrescribir?</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="420"/>
         <source>Failed to rename %1 to %2</source>
-        <translation>Falló renombral %1 a %2</translation>
+        <translation>Falló renombrar %1 a %2</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="470"/>
@@ -8776,38 +8781,38 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
 <context>
     <name>EditNamedSearches</name>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="236"/>
+        <location filename="../../Core/NamedSearch.cpp" line="234"/>
         <source>Manage Filters</source>
         <translation>Administrar Filtros</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="251"/>
-        <location filename="../../Core/NamedSearch.cpp" line="282"/>
+        <location filename="../../Core/NamedSearch.cpp" line="249"/>
+        <location filename="../../Core/NamedSearch.cpp" line="280"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="257"/>
+        <location filename="../../Core/NamedSearch.cpp" line="255"/>
         <source>Filter</source>
         <translation>Filtro</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="266"/>
+        <location filename="../../Core/NamedSearch.cpp" line="264"/>
         <source>Add</source>
         <translation>Agregar</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="268"/>
+        <location filename="../../Core/NamedSearch.cpp" line="266"/>
         <source>Update</source>
         <translation>Modificar</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="283"/>
+        <location filename="../../Core/NamedSearch.cpp" line="281"/>
         <source>Query</source>
         <translation>Consulta</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="298"/>
+        <location filename="../../Core/NamedSearch.cpp" line="296"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -9320,7 +9325,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="92"/>
         <source>Overwrite existing workouts</source>
-        <translation>Sobreescribir entrenamientos existentes</translation>
+        <translation>Sobrescribir entrenamientos existentes</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="93"/>
@@ -9879,7 +9884,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="65"/>
         <source>When recording with an iBike AeroPod (in HR mode) the CdA data is sent as HR. This tool will update the activity file to move the values from HR into the XData.CdA series.</source>
-        <translation>Cuando se utiliza iBike AeroPod en modo FC el CdA se registra como FC. Esta herramiento actualizará el archivo de actividad moviendo los valores de FC a la serie XData de nombre CdA.</translation>
+        <translation>Cuando se utiliza iBike AeroPod en modo FC el CdA se registra como FC. Esta herramienta actualizará el archivo de actividad moviendo los valores de FC a la serie XData de nombre CdA.</translation>
     </message>
 </context>
 <context>
@@ -10067,7 +10072,7 @@ REQUIERE CONEXIÓN A INTERNET.</translation>
     <message>
         <location filename="../../FileIO/FixFreewheeling.cpp" line="47"/>
         <source>ANT+ crank based power meters will send  3 duplicate values for power and cadence when the  rider starts to freewheel. The duplicates should  not be retained. This tool removes the duplicates.</source>
-        <translation>Algunos medidores de potencia ANT+ basados en las palancas/bielas envian 3 valores duplicados de potencia y candencia cuando el ciclista deja de pedalear. Estos duplicados deberían ser eliminados. Esta herramienta lo hace.</translation>
+        <translation>Algunos medidores de potencia ANT+ basados en las palancas/bielas envían 3 valores duplicados de potencia y candencia cuando el ciclista deja de pedalear. Estos duplicados deberían ser eliminados. Esta herramienta lo hace.</translation>
     </message>
 </context>
 <context>
@@ -10216,7 +10221,7 @@ Longitud de Piscina (m) permite redefinir este parámetro si el valor es &gt;0</
     <message>
         <location filename="../../FileIO/FixMoxy.cpp" line="67"/>
         <source>When recording from the Moxy or BSX Insight in Speed and cadence mode the SmO2 and tHb data is sent as cadence and speed respectively. This tool will update the activity file to move the values from speed and cadence into the Moxy series.</source>
-        <translation>Cuando los registros Moxy o BSX se realizan en modo Velocidad y Cadencia los datos SmO2 y tHg se envía como cadencia y velocidad respectivamente. Esta herramientoa actualiza el archivo de actividad para mover los valores de velocidad y cadencia a las series Moxy.</translation>
+        <translation>Cuando los registros Moxy o BSX se realizan en modo Velocidad y Cadencia los datos SmO2 y tHg se envía como cadencia y velocidad respectivamente. Esta herramienta actualiza el archivo de actividad para mover los valores de velocidad y cadencia a las series Moxy.</translation>
     </message>
 </context>
 <context>
@@ -10448,7 +10453,7 @@ Utiliza los siguientes parámetros:
 
 Máximo absoluto - define un valor máximo absoluto para los vatios y suavizará los valores por encima de este valor que hayan sido identificados como anómalos (por ej. que no guarden relación con los datos adyacentes)
 
-Variacion máxima: (%) - los valores que superen este porcentaje de variación respecto a la media móvil de los anteriores 30 segundos serán suavizados.</translation>
+Variación máxima: (%) - los valores que superen este porcentaje de variación respecto a la media móvil de los anteriores 30 segundos serán suavizados.</translation>
     </message>
 </context>
 <context>
@@ -10471,7 +10476,7 @@ Variacion máxima: (%) - los valores que superen este porcentaje de variación r
         <source>Adjusting torque values allows you to uplift or degrade the torque values when the calibration of your power meter was incorrect. It takes a single parameter:
 
 Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).</source>
-        <translation>El ajuste de par permite corregir los valores de par cuando la calibración (puesta a cero) del medidor de potencia fué incorrecta. Utiliza un solo parámetro:
+        <translation>El ajuste de par permite corregir los valores de par cuando la calibración (puesta a cero) del medidor de potencia fue incorrecta. Utiliza un solo parámetro:
 
 Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro para modificar los valores de par. Se pueden usar valores negativos (Ej. &quot;1.2nm&quot; o &quot;-0.5pi&quot;).</translation>
     </message>
@@ -10988,7 +10993,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/Colors.cpp" line="209"/>
         <source>Default Dial Color</source>
-        <translation>Color por defecto Dial</translation>
+        <translation>Color por omisión Dial</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="210"/>
@@ -11098,7 +11103,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="1094"/>
         <source>Standard charts without configuration cannot be uploaded to the GoldenCheetah Cloud.</source>
-        <translation>Los gráficos estandar sin configuración propia no se pueden publicar en GoldenCheetah CloudDB.</translation>
+        <translation>Los gráficos estándar sin configuración propia no se pueden publicar en GoldenCheetah CloudDB.</translation>
     </message>
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="1101"/>
@@ -11377,7 +11382,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="710"/>
         <source>%1 converted activity source files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 achivos de actividad convertidos movidos al subdirectorio: %2 - fallaron %3</translation>
+        <translation>%1 archivos de actividad convertidos movidos al subdirectorio: %2 - fallaron %3</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="715"/>
@@ -11392,7 +11397,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="721"/>
         <source>&lt;center&gt;&lt;br&gt;After choosing &apos;Proceed to Athlete&apos;, the system will open the athlete window using the converted data. Depending on the errors this might lead to follow-up errors and incomplete athlete data. You may either fix the error(s) in your directory directly, or go back to your last backup and correct the error(s) in the source data. &lt;br&gt;The upgrade process will be done again each time you open the athlete, until the conversion was successful - and had no more errors.&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;br&gt;Luego de elegir &apos;Continuar con el atleta&apos;, el sistema abrirá la ventana del atleta usando los datos convertidos. Dependiendo de los error ocurridos durante la conversión es puede conducir a otros errores y datos incompletos. Usted puede corregir los errores en su directorio directamente o, volver al último respaldo y corregir los errores en los datos originales. &lt;br&gt;El proceso de actualización será repetido cada vez que abra el atleta, hasta que la conversión sea existosa - y no se reporten errores.&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;br&gt;Luego de elegir &apos;Continuar con el atleta&apos;, el sistema abrirá la ventana del atleta usando los datos convertidos. Dependiendo de los error ocurridos durante la conversión es puede conducir a otros errores y datos incompletos. Usted puede corregir los errores en su directorio directamente o, volver al último respaldo y corregir los errores en los datos originales. &lt;br&gt;El proceso de actualización será repetido cada vez que abra el atleta, hasta que la conversión sea exitosa - y no se reporten errores.&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="728"/>
@@ -11415,7 +11420,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="845"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
-        <translation>&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorioa del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;Como primera medida resguarde sus datos de &apos;Atleta&apos;!&lt;br&gt;&lt;b&gt;Por favor lea cuidadosamente antes de continuar!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Con la versión 3.2 el directorio del &apos;Atleta&apos; ha sido reestructurado agregando un conjunto de subdirectorios que almacenan los diferentes tipos de archivos de GoldenCheetah.&lt;br&gt;&lt;br&gt;La nueva estructura es:&lt;br&gt;-&gt; Archivos de Actividades: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Configuración: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Descarga: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Importación: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Entrenamientos: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de cache: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Calendario: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Archivos de Registro: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Archivos Temporarios: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;&lt;br&gt;El proceso de actualización creará la nueva estructura de directorios y moverá los archivos existentes a los nuevos directorios. Durante la actualización todos los archivos de actividad serán convertidos al formato nativo GoldenCheetah .JSON y movidos al directorio&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;. Los archivos originales se moverán al directorio &lt;samp&gt;/imports&lt;/samp&gt;.&lt;br&gt;&lt;br&gt;Comenzando con la version 3.2 todos los archivos descargados desde cualquier dispositivo o importados serán convertidos al formato GoldenCheetah .JSON durante el proceso. Los archivos originales se almacenaran, dependiendo del origen, en el directorio &lt;samp&gt;/downloads&lt;/samp&gt; o &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt;r.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Por favor asegúrese de tener resguardo de sus datos de atleta antes de continuar con la actualización. No podemos hacernos responsables de cualquier pérdida de datos durante el proceso. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="884"/>
@@ -12313,7 +12318,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
         <source>Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries</source>
-        <translation>Analisis de un número de actividades (ej. un rango de fechas) como PMC, vista de métricas de largo plazo, ... y resúmenes de datos</translation>
+        <translation>Análisis de un número de actividades (ej. un rango de fechas) como PMC, vista de métricas de largo plazo, ... y resúmenes de datos</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="73"/>
@@ -12390,17 +12395,17 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="136"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
-        <translation>Búsqueda de archivos de Entrenamiento y Video en un conjunto configurale de carpetas para agregar a la biblioteca de entrenamientos y videos para rodillo</translation>
+        <translation>Búsqueda de archivos de Entrenamiento y Video en un conjunto configurable de carpetas para agregar a la biblioteca de entrenamientos y videos para rodillo</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="75"/>
         <source>Analysis of a single activity with diagrams like activity plot, W&apos;bal, ... and Chung&apos;s Aerolab</source>
-        <translation>Análsis de una actividad con diagramas, gráficos, resúmenes e histogramas</translation>
+        <translation>Análisis de una actividad con diagramas, gráficos, resúmenes e histogramas</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
-        <translation>Activa / Desactvar el Panel de Comparación, el cual permite comparar actividades, intervalos o rangos de fechas, incluso entre atletas</translation>
+        <translation>Activa / Desactivar el Panel de Comparación, el cual permite comparar actividades, intervalos o rangos de fechas, incluso entre atletas</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="104"/>
@@ -12540,7 +12545,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="183"/>
         <source>Date range, data grouping settings which apply to a single chart</source>
-        <translation>Rango de Fechas, utilizado para seleccionar el rango de actividades incluídas en el gráfico</translation>
+        <translation>Rango de Fechas, utilizado para seleccionar el rango de actividades incluidas en el gráfico</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="187"/>
@@ -12701,7 +12706,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="244"/>
         <source>Chung&apos;s Aerolab analysis</source>
-        <translation>Análsis Aerodinámico para pruebas de Campo</translation>
+        <translation>Análisis Aerodinámico para pruebas de Campo</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="247"/>
@@ -12784,12 +12789,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="307"/>
         <source>Definition of default value(s) for data fields</source>
-        <translation>Definición de valores por defecto para campos de datos</translation>
+        <translation>Definición de valores por omisión para campos de datos</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="309"/>
         <source>Definition of processing default parameters for the fix, adjust,... tools</source>
-        <translation>Definición de paramétros por defecto para las herramientas de corrección y ajuste de archivos de actividad</translation>
+        <translation>Definición de parámetros por omisión para las herramientas de corrección y ajuste de archivos de actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
@@ -12945,7 +12950,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="725"/>
         <source>Are you sure you want to remove the chart?</source>
-        <translation>Confirma elminación del gráfico?</translation>
+        <translation>Confirma eliminación del gráfico?</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="726"/>
@@ -13101,7 +13106,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1589"/>
         <source>Target Power</source>
-        <translation>Potencia Objectivo</translation>
+        <translation>Potencia Objetivo</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1590"/>
@@ -13282,7 +13287,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/Pages.cpp" line="5078"/>
         <source>Maximum of 10 zones reached.</source>
-        <translation>Se alcancó el máximo de 10 zonas.</translation>
+        <translation>Se alcanzó el máximo de 10 zonas.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5111"/>
@@ -13465,7 +13470,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/Pages.cpp" line="4969"/>
         <source>Default</source>
-        <translation>Por defecto</translation>
+        <translation>Por omisión</translation>
     </message>
 </context>
 <context>
@@ -13702,12 +13707,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="183"/>
         <source>HR Zone defaults must be specified at head of %1 file</source>
-        <translation>Los valores por defecto deben especificarse al comienzo del archivo %1</translation>
+        <translation>Los valores por omisión deben especificarse al comienzo del archivo %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="189"/>
         <source>Only one set of zone defaults may be specified in %1 file</source>
-        <translation>Solo un conjunto de valores por defecto se pueden especificar en el archivo %1</translation>
+        <translation>Solo un conjunto de valores por omisión se pueden especificar en el archivo %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="211"/>
@@ -14837,7 +14842,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="87"/>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="111"/>
         <source>select an interval for summary info</source>
-        <translation>seleccionar un intervalo para resúmen</translation>
+        <translation>seleccionar un intervalo para resumen</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="259"/>
@@ -14927,7 +14932,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="362"/>
         <source>Read summary...</source>
-        <translation>Leyendo resúmen...</translation>
+        <translation>Leyendo resumen...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="394"/>
@@ -15048,7 +15053,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="50"/>
         <source>Participate in academic studies sharing data via google drive.</source>
-        <translation>Participar en estudios académicos compartiendo datos via Google Drive.</translation>
+        <translation>Participar en estudios académicos compartiendo datos vía Google Drive.</translation>
     </message>
 </context>
 <context>
@@ -15851,7 +15856,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1515"/>
         <source>Reset to default</source>
-        <translation>Restablecer Gráficos por defecto</translation>
+        <translation>Restablecer Gráficos por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1608"/>
@@ -15877,7 +15882,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1670"/>
         <source>You are about to reset the chart sidebar to the default setup</source>
-        <translation>Está por reconfigurar la barra lateral de gráficos a su estado por defecto</translation>
+        <translation>Está por reconfigurar la barra lateral de gráficos a su estado por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1671"/>
@@ -16560,7 +16565,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1503"/>
         <source>Coggan Chronic Training Load</source>
-        <translation>Coggan Carga de Entremiento Crónica</translation>
+        <translation>Coggan Carga de Entrenamiento Crónica</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1504"/>
@@ -16645,7 +16650,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Gui/Pages.cpp" line="5536"/>
         <source>Maximum of 10 zones reached.</source>
-        <translation>Se alcancó el máximo de 10 zonas.</translation>
+        <translation>Se alcanzó el máximo de 10 zonas.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5571"/>
@@ -16767,7 +16772,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1102"/>
         <source>Index must be numeric.</source>
-        <translation>Los indices tienen que ser numéricos.</translation>
+        <translation>Los índices tienen que ser numéricos.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1122"/>
@@ -16817,12 +16822,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1244"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
-        <translation>XDATA espera uno de los siguientes simbolos: sparse, repeat, interpolate o resample, como tercer parámetro.</translation>
+        <translation>XDATA espera uno de los siguientes símbolos: sparse, repeat, interpolate o resample, como tercer parámetro.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1251"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
-        <translation>XDATA espera uno de los siguientes simbolos: sparse, repeat, interpolate o resample, como tercer parámetro. (%1)</translation>
+        <translation>XDATA espera uno de los siguientes símbolos: sparse, repeat, interpolate o resample, como tercer parámetro. (%1)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1274"/>
@@ -16877,7 +16882,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1382"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
-        <translation>la función &apos;%1&apos; espera %2 parametro(2) no %3</translation>
+        <translation>la función &apos;%1&apos; espera %2 parámetro(s) no %3</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1394"/>
@@ -17248,8 +17253,8 @@ encendido y muestra &quot;PC-Link&quot;</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1827"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1798"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -17374,34 +17379,34 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Buscar intervalos...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1334"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
         <source>Select Activity</source>
         <translation>Elegir Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1334"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1514"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1527"/>
         <source>No activity selected!</source>
         <translation>No hay actividad seleccionada!</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1360"/>
         <source>Export Activity</source>
         <translation>Exportar Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1400"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1413"/>
         <source>Export Failed</source>
         <translation>Falló la Exportación</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1490"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1502"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1503"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1515"/>
         <source>No activity selected</source>
         <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1492"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1505"/>
         <source>Current activity contains no data to split</source>
         <translation>La actividad seleccionada no tiene datos para dividir</translation>
     </message>
@@ -17582,78 +17587,103 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Tendencias</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="562"/>
+        <location filename="../../Gui/MainWindow.cpp" line="557"/>
+        <source>Import Chart...</source>
+        <translation>Importar Gráfico...</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="563"/>
         <source>Reset Layout</source>
         <translation>Restablecer Diseño</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="563"/>
+        <location filename="../../Gui/MainWindow.cpp" line="564"/>
         <source>Tabbed not Tiled</source>
         <translation>Vista con Pestañas</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="576"/>
+        <location filename="../../Gui/MainWindow.cpp" line="577"/>
         <source>&amp;Help Overview</source>
         <translation>Opciones de &amp;Ayuda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="580"/>
+        <location filename="../../Gui/MainWindow.cpp" line="581"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>Foro de &amp;Discusión y Soporte</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1048"/>
-        <source>You are about to reset all charts to the default setup</source>
-        <translation>Está por reconfigurar todos los gráficos a su estado por defecto</translation>
+        <location filename="../../Gui/MainWindow.cpp" line="827"/>
+        <source>Select Chart file to import</source>
+        <translation>Seleccionar archivo de Gŕafico para importar</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1049"/>
+        <location filename="../../Gui/MainWindow.cpp" line="827"/>
+        <source>GoldenCheetah Chart Files (*.gchart)</source>
+        <translation>Archivos de Gráficos GoldenCheetah (*.gchart)</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="830"/>
+        <source>Import Chart</source>
+        <translation>Importar Gráfico</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="830"/>
+        <source>No chart file selected!</source>
+        <translation>Ningún archivo de gráfico seleccionado!</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="1061"/>
+        <source>You are about to reset all charts to the default setup</source>
+        <translation>Está por reconfigurar todos los gráficos a su estado por omisión</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="1062"/>
         <source>Do you want to continue?</source>
         <translation>¿Desea continuar?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1257"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Chart Import</source>
         <translation>Importar Gráfico</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1517"/>
         <source>Current activity contains no data to merge</source>
         <translation>La actividad seleccionada no tiene datos para combinar</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1827"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1798"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Nuevo Atleta...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1936"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1949"/>
         <source>Refresh in Progress</source>
         <translation>Actualización en Curso</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="575"/>
+        <location filename="../../Gui/MainWindow.cpp" line="576"/>
         <source>&amp;Help</source>
         <translation>&amp;Ayuda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="578"/>
+        <location filename="../../Gui/MainWindow.cpp" line="579"/>
         <source>&amp;User Guide</source>
         <translation>Guía de &amp;Usuario</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="579"/>
+        <location filename="../../Gui/MainWindow.cpp" line="580"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>&amp;Registrar un error o requerimiento</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="582"/>
+        <location filename="../../Gui/MainWindow.cpp" line="583"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>&amp;Acerca de GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1514"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1527"/>
         <source>Delete Activity</source>
         <translation>Eliminar Actividad</translation>
     </message>
@@ -17708,55 +17738,55 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation>Curar Gráficos</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="558"/>
+        <location filename="../../Gui/MainWindow.cpp" line="559"/>
         <source>Upload Chart...</source>
         <translation>Publicar Gráfico...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="559"/>
+        <location filename="../../Gui/MainWindow.cpp" line="560"/>
         <source>Download Chart...</source>
         <translation>Descargar Gráfico...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="946"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1660"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="959"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Activity Import</source>
         <translation>Importar Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="946"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1660"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="959"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>No es posible cerrar la ventana del atleta mientras se está realizando una importación de actividades en segundo plano...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1257"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Imported %1 metric charts</source>
         <translation>%1 Gráficos Importados</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1401"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1414"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1438"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1451"/>
         <source>There is no currently selected activity to save.</source>
         <translation>No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1490"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1492"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1502"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1503"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1505"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1515"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1517"/>
         <source>Split Activity</source>
         <translation>Dividir Actividad</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1994"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2016"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2007"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2029"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -17765,49 +17795,49 @@ Please check your preference settings.</source>
 Por favor verifique sus preferencias.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2233"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>CloudDB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2233"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>Este atleta no está registrado como curador - por favor contacte al equipo GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1422"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1963"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1435"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1976"/>
         <source>Import from File</source>
         <translation>Importar de Archivo</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1437"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1450"/>
         <source>No Activity To Save</source>
         <translation>No hay actividad para Guardar</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1520"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1533"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Confirma que quiere eliminar la actividad:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1942"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1955"/>
         <source>Export Metrics</source>
         <translation>Exportar Métricas</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1942"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1955"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Variables Separada por Comas (*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1993"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2015"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2006"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2028"/>
         <source>Workout Directory Invalid</source>
         <translation>Directorio de Entrenamientos Inválido</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1522"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1535"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -17955,7 +17985,7 @@ Por favor verifique sus preferencias.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="260"/>
         <source>BikeStress: </source>
-        <translation>BikeStress: </translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="267"/>
@@ -18413,12 +18443,12 @@ Si presiona continuar la actividad se guardará, sino quiere continuar vuelva at
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="929"/>
         <source>Merge data series from one recording into the current activity where different types of data (e.g. O2 data from a Moxy) have been  recorded by different devices. Taking care to align the data in time.</source>
-        <translation>Cominar series de datos desde un archivo en la actividad actual con distintos tipos de datos registrados por diferentes dispositivos (Ej. datos de O2 de Moxy) tomando en cuenta la alineación de los datos en el tiempo.</translation>
+        <translation>Combinar series de datos desde un archivo en la actividad actual con distintos tipos de datos registrados por diferentes dispositivos (Ej. datos de O2 de Moxy) tomando en cuenta la alineación de los datos en el tiempo.</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="937"/>
         <source>Join Data to form a longer activity</source>
-        <translation>Cominar los datos para formar una actividad más prolongada</translation>
+        <translation>Combinar los datos para formar una actividad más prolongada</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="938"/>
@@ -18586,7 +18616,7 @@ Si presiona continuar la actividad se guardará, sino quiere continuar vuelva at
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="591"/>
         <source>Combine Activities</source>
-        <translation>Cominar Actividades</translation>
+        <translation>Combinar Actividades</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="592"/>
@@ -18618,7 +18648,7 @@ Podrá importar o descargar los datos antes de combinarlos y ajustar manualmente
     <message>
         <location filename="../../Gui/Pages.cpp" line="3342"/>
         <source>Defaults</source>
-        <translation>Valores por defecto</translation>
+        <translation>Valores por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3343"/>
@@ -18886,7 +18916,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="35"/>
         <source>Make sure the Moxy is connected via USB</source>
-        <translation>Asegúrese que el Moxy está conectado via USB</translation>
+        <translation>Asegúrese que el Moxy está conectado vía USB</translation>
     </message>
 </context>
 <context>
@@ -18900,17 +18930,17 @@ Sin actividades encontradas para importar.
 <context>
     <name>NamedSearches</name>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="95"/>
+        <location filename="../../Core/NamedSearch.cpp" line="93"/>
         <source>Swim</source>
         <translation>Natación</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="98"/>
+        <location filename="../../Core/NamedSearch.cpp" line="96"/>
         <source>Bike</source>
         <translation>Ciclismo</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="101"/>
+        <location filename="../../Core/NamedSearch.cpp" line="99"/>
         <source>Run</source>
         <translation>Carrera</translation>
     </message>
@@ -19203,7 +19233,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="632"/>
         <source>Withings authorization was successful.</source>
-        <translation>La autorización de Withings fué exitosa.</translation>
+        <translation>La autorización de Withings fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="514"/>
@@ -19227,17 +19257,17 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="522"/>
         <source>SportTracks authorization was successful.</source>
-        <translation>La autorizaciónd de SportTracks fue exitosa.</translation>
+        <translation>La autorización de SportTracks fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
         <source>Polar Flow authorization was successful.</source>
-        <translation>La autorizaciónd de Polar Flow fue exitosa.</translation>
+        <translation>La autorización de Polar Flow fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
         <source>Strava authorization was successful.</source>
-        <translation>La autorizaciónd de Strava fue exitosa.</translation>
+        <translation>La autorización de Strava fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="573"/>
@@ -19262,7 +19292,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="607"/>
         <source>Today&apos;s Plan authorization was successful.</source>
-        <translation>La autorizaciónd de Today&apos;s Plan fue exitosa.</translation>
+        <translation>La autorización de Today&apos;s Plan fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="641"/>
@@ -19277,7 +19307,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="501"/>
         <source>Error retrieving authoriation credentials</source>
-        <translation>Error recuperanto credenciales de autorización</translation>
+        <translation>Error recuperando credenciales de autorización</translation>
     </message>
 </context>
 <context>
@@ -19348,7 +19378,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="383"/>
         <source>We have started a new project to collect user activity data to enable researchers, coaches and others to develop new models and solutions using real world data.&lt;p&gt;All data that is shared is &lt;b&gt;anonymous&lt;/b&gt; and cannot be traced back to the original user, no personal data is shared and the workout data is limited to Power, Heartrate, Altitude, Cadence and Distance data along with metrics and distributions. No personally identifiable information is collected at all.&lt;p&gt;The data will be published to the general public in exactly the same format you have provided it in. And you can choose to remove your data at any time. You can also choose to opt out again in athlete preferences.&lt;p&gt;&lt;center&gt;Your data will only be sent once every year or so.&lt;/center&gt;&lt;br&gt;&lt;b&gt;WE WILL NOT&lt;/b&gt;:&lt;p&gt;- Collect personal information &lt;p&gt;- Collect GPS information &lt;p&gt;- Collect notes or other metadata  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;WE WILL&lt;/b&gt;:&lt;p&gt;- Collect basic athlete info: Gender, Year of Birth and UUID&lt;p&gt;- Collect basic activity samples for HR, Cadence, Power, Distance, Altitude&lt;p&gt;- Collect metrics for every activity stored for this athlete&lt;p&gt;- Collect distribution and mean-max aggregates of activity data&lt;p&gt;&lt;p&gt;&lt;br&gt;We publish the data at the &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; as an &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData project&lt;/a&gt; open to everyone. &lt;p&gt;We have also setup an &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github project&lt;/a&gt; to publish tools for working with the dataset.&lt;p&gt;</source>
-        <translation>Hemos iniciado un nuevo proyecto para recolectar datos de actividad de los usuarios y permitir que investigadores, entrenadores y otros desarrollen nuevos modelos y soluciones utilizando datos del mundo real.&lt;p&gt;Todos los datos compartidos serán &lt;b&gt;anónimos&lt;/b&gt; y no podrán ser relacionados con el usuario original, ningún dato personal es compartido y la información de los entrenamientos se limita a datos de: Potencia, Frecuencia Cardíaca, Altimetría, Cadencia y Distancia junto con métricas y distribuciones derivadas de los anteriores. No se recolecta ninguna información de identificación personal, en absoluto.&lt;p&gt;Los datos serán publicados para el público en general en exáctamente el mismo formato que usted los ha generado. Usted puede elegir remover sus datos en cualquier momento. Usted también puede elegir no continuar con la recolección en Preferencias/Opciones.&lt;p&gt;&lt;center&gt;Sus datos serán enviados aproximadamente una vez por año.&lt;/center&gt;&lt;br&gt;&lt;b&gt;NOSOTROS NO&lt;/b&gt;:&lt;p&gt;- recolectamos información personal &lt;p&gt;- recolectamos información de posiciones GPS &lt;p&gt;- recolectamos Notas u otros metadatos  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;NOSOTROS SI&lt;/b&gt;:&lt;p&gt;- Recolectamos información básica del usuario: Género, Año de nacimiento y UUID&lt;p&gt;- Recolectamos muestras de datos de: FC, Cadencia, Potencia, Distancia, Altimetría&lt;p&gt;-Recolectamos métricas para cada Actividad de este atleta&lt;p&gt;-Recolectamos distribuciones y promedios máximos agregados de los datos de actividad&lt;p&gt;&lt;p&gt;&lt;br&gt;Nosotros publicamos los datos en &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; como un &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;proyecto OpenData&lt;/a&gt; abierto a todo el mundo. &lt;p&gt;Nosotrs tambien hemos creado un &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;proyecto OpenData en github&lt;/a&gt; para publicar herramientas para trabajar con estas bases de datos.&lt;p&gt;</translation>
+        <translation>Hemos iniciado un nuevo proyecto para recolectar datos de actividad de los usuarios y permitir que investigadores, entrenadores y otros desarrollen nuevos modelos y soluciones utilizando datos del mundo real.&lt;p&gt;Todos los datos compartidos serán &lt;b&gt;anónimos&lt;/b&gt; y no podrán ser relacionados con el usuario original, ningún dato personal es compartido y la información de los entrenamientos se limita a datos de: Potencia, Frecuencia Cardíaca, Altimetría, Cadencia y Distancia junto con métricas y distribuciones derivadas de los anteriores. No se recolecta ninguna información de identificación personal, en absoluto.&lt;p&gt;Los datos serán publicados para el público en general en exactamente el mismo formato que usted los ha generado. Usted puede elegir remover sus datos en cualquier momento. Usted también puede elegir no continuar con la recolección en Preferencias/Opciones.&lt;p&gt;&lt;center&gt;Sus datos serán enviados aproximadamente una vez por año.&lt;/center&gt;&lt;br&gt;&lt;b&gt;NOSOTROS NO&lt;/b&gt;:&lt;p&gt;- recolectamos información personal &lt;p&gt;- recolectamos información de posiciones GPS &lt;p&gt;- recolectamos Notas u otros metadatos  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;NOSOTROS SI&lt;/b&gt;:&lt;p&gt;- Recolectamos información básica del usuario: Género, Año de nacimiento y UUID&lt;p&gt;- Recolectamos muestras de datos de: FC, Cadencia, Potencia, Distancia, Altimetría&lt;p&gt;-Recolectamos métricas para cada Actividad de este atleta&lt;p&gt;-Recolectamos distribuciones y promedios máximos agregados de los datos de actividad&lt;p&gt;&lt;p&gt;&lt;br&gt;Nosotros publicamos los datos en &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; como un &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;proyecto OpenData&lt;/a&gt; abierto a todo el mundo. &lt;p&gt;Nosotros también hemos creado un &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;proyecto OpenData en github&lt;/a&gt; para publicar herramientas para trabajar con estas bases de datos.&lt;p&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="416"/>
@@ -19494,7 +19524,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Metrics/PDModel.h" line="117"/>
         <source>Functional Threshold Power. The highest power that a rider can maintain in a quasi-steady state without fatiguing for approximately one hour.</source>
-        <translation>Potencia en el Umbral Funcional: La potencia más alta que se puede mantener en un estado cuasi estacionario por aproximádamente una hora sin fatiga.</translation>
+        <translation>Potencia en el Umbral Funcional: La potencia más alta que se puede mantener en un estado cuasi estacionario por aproximadamente una hora sin fatiga.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="118"/>
@@ -19507,12 +19537,12 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="627"/>
         <source>CTL/LTS : Chronic Training Load/Long Term Stress. The dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.</source>
-        <translation>CTL/ELP: Carga de entrenamiento crónica/Estrés de largo Plazo. Es la dosis de entrenamiento acumulada en un período prolongado de tiempo, calculada como un promedio móvil exponencial de la métrica de carga de entrenamiento seleccionada en un período de 4 a 8 semanas, 42 días por defecto. Se suele afirmar que está relacionada con la condición física.</translation>
+        <translation>CTL/ELP: Carga de entrenamiento crónica/Estrés de largo Plazo. Es la dosis de entrenamiento acumulada en un período prolongado de tiempo, calculada como un promedio móvil exponencial de la métrica de carga de entrenamiento seleccionada en un período de 4 a 8 semanas, 42 días por omisión. Se suele afirmar que está relacionada con la condición física.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="632"/>
         <source>ATL/STS : Acute Training Load/Short Term Stress. The dose of training that you accumulated over a short period of time, computed as an exponentially weighted moving average of the selected Training Load metric from 3 to 10 days in general, 7 by default. It is claimed to relate to your fatigue.</source>
-        <translation>ATL/ECP: Carga de entrenamiento aguda/Estrés de corto Plazo. Es la dosis de entrenamiento acumulada en un período corto de tiempo, calculada como un promedio móvil exponencial de la métrica de carga de entrenamiento seleccionada en un período de 3 a 10 días, 7 días por defecto. Se suele afirmar que está relacionada con la fatiga.</translation>
+        <translation>ATL/ECP: Carga de entrenamiento aguda/Estrés de corto Plazo. Es la dosis de entrenamiento acumulada en un período corto de tiempo, calculada como un promedio móvil exponencial de la métrica de carga de entrenamiento seleccionada en un período de 3 a 10 días, 7 días por omisión. Se suele afirmar que está relacionada con la fatiga.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="637"/>
@@ -19588,7 +19618,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Gui/Pages.cpp" line="5804"/>
         <source>Maximum of 10 zones reached.</source>
-        <translation>Se alcancó el máximo de 10 zonas.</translation>
+        <translation>Se alcanzó el máximo de 10 zonas.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5827"/>
@@ -19781,7 +19811,7 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Gui/Pages.cpp" line="5713"/>
         <source>Default</source>
-        <translation>Por defecto</translation>
+        <translation>Por omisión</translation>
     </message>
 </context>
 <context>
@@ -20025,12 +20055,12 @@ Sin actividades encontradas para importar.
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="198"/>
         <source>Zone defaults must be specified at head of %1 file</source>
-        <translation>Los valores por defecto deben especificarse al comienzo del archivo %1</translation>
+        <translation>Los valores por omisión deben especificarse al comienzo del archivo %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="204"/>
         <source>Only one set of zone defaults may be specified in %1 file</source>
-        <translation>Solo un conjunto de valores por defecto se pueden especificar en el archivo %1</translation>
+        <translation>Solo un conjunto de valores por omisión se pueden especificar en el archivo %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/PaceZones.cpp" line="230"/>
@@ -22145,8 +22175,8 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>Bicicleta</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1494"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2518"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1509"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2533"/>
         <location filename="../../FileIO/TcxParser.cpp" line="410"/>
         <source>Lap %1</source>
         <translation>Int %1</translation>
@@ -22246,7 +22276,7 @@ yyyy</source>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="57"/>
         <location filename="../../Core/HrvMeasures.cpp" line="59"/>
-        <location filename="../../Core/NamedSearch.cpp" line="197"/>
+        <location filename="../../Core/NamedSearch.cpp" line="195"/>
         <location filename="../../Core/RouteParser.cpp" line="108"/>
         <location filename="../../Core/SeasonParser.cpp" line="179"/>
         <location filename="../../FileIO/RideAutoImportConfig.cpp" line="158"/>
@@ -22282,7 +22312,7 @@ yyyy</source>
         <translation>Problemas Guardando Biblioteca de Entrenamientos</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="196"/>
+        <location filename="../../Core/NamedSearch.cpp" line="194"/>
         <source>Problem Saving Named Search Configuration</source>
         <translation>Problemas Guardando Configuración de Filtros</translation>
     </message>
@@ -22828,7 +22858,7 @@ Python deshabilitado en preferencias.</translation>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="538"/>
         <source>Target Power</source>
-        <translation>Potencia Objectivo</translation>
+        <translation>Potencia Objetivo</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="541"/>
@@ -24468,7 +24498,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="494"/>
         <source>Error - Opendata summary.</source>
-        <translation>Error   Resúmen OpenData.</translation>
+        <translation>Error   Resumen OpenData.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="506"/>
@@ -25345,7 +25375,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="969"/>
         <source>Default Weight</source>
-        <translation>Peso por Defecto</translation>
+        <translation>Peso por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="992"/>
@@ -25483,7 +25513,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="388"/>
         <source>Strokes per length, counting the arm using the watch plus time in seconds, Pool Length defaults to 50m for open water swims</source>
-        <translation>Brazadas por largo, contando solo el brazo que lleva el reloj, más el tiempo en segundos, el largo de piscina se toma de los metadatos y tiene un valor por defecto de 50m cuando no está definido, ej. natación en aguas abiertas</translation>
+        <translation>Brazadas por largo, contando solo el brazo que lleva el reloj, más el tiempo en segundos, el largo de piscina se toma de los metadatos y tiene un valor por omisión de 50m cuando no está definido, ej. natación en aguas abiertas</translation>
     </message>
 </context>
 <context>
@@ -26156,7 +26186,7 @@ formato GoldenCheetah. ¿Confirma?
     <message>
         <location filename="../../Gui/Pages.cpp" line="4246"/>
         <source>Maximum of 10 zones reached.</source>
-        <translation>Se alcancó el máximo de 10 zonas.</translation>
+        <translation>Se alcanzó el máximo de 10 zonas.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4269"/>
@@ -27320,7 +27350,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="318"/>
         <source>Strokes per length, counting the arm using the watch, Pool Length defaults to 50m for open water swims</source>
-        <translation>Brazadas por largo, contando solo el brazo que lleva el reloj, la longitud de piscina tiene un valor por defecto de 50 para natación en aguas abiertas</translation>
+        <translation>Brazadas por largo, contando solo el brazo que lleva el reloj, la longitud de piscina tiene un valor por omisión de 50 para natación en aguas abiertas</translation>
     </message>
 </context>
 <context>
@@ -27571,7 +27601,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Gui/Colors.cpp" line="605"/>
         <source>Default</source>
-        <translation>Por defecto</translation>
+        <translation>Por omisión</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="613"/>
@@ -27811,7 +27841,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="100"/>
         <source>Overwrite existing workouts</source>
-        <translation>Sobreescribir entrenamientos existentes</translation>
+        <translation>Sobrescribir entrenamientos existentes</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="101"/>
@@ -28580,7 +28610,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="390"/>
         <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming. On zero fallback to TRIMP Zonal Points for HR based score.</source>
-        <translation>TriScore es una métrica del estres del entrenamiento combinado en base a las definiciones del Dr. Skiba: BikeScore para ciclismo, GOVSS para carrera y SwimScore para natación. Cuando el resultado es cero se recurre Puntos TRIMP por Zona como último recurso.</translation>
+        <translation>TriScore es una métrica del estrés del entrenamiento combinado en base a las definiciones del Dr. Skiba: BikeScore para ciclismo, GOVSS para carrera y SwimScore para natación. Cuando el resultado es cero se recurre Puntos TRIMP por Zona como último recurso.</translation>
     </message>
 </context>
 <context>
@@ -29055,7 +29085,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="963"/>
         <source>W&apos; Power is the average power produce while power is above CP.</source>
-        <translation>Es la potencia media producidad mientras la potencia estuvo por encima de la PC.</translation>
+        <translation>Es la potencia media producida mientras la potencia estuvo por encima de la PC.</translation>
     </message>
 </context>
 <context>
@@ -29365,9 +29395,9 @@ Presionar F3 en el controlador al finalizar.</translation>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
-        <translation>Por favor tenga en cuenta que, cuando importa o arrastra y suelta videos en la biblitoteca NO copiamos el archivo, solo agregamos una REFERENCIA al mismo. En cambio SI copiamos los entrenamientos y archivos de videoSync dado que son más pequeños.
+        <translation>Por favor tenga en cuenta que, cuando importa o arrastra y suelta videos en la biblioteca NO copiamos el archivo, solo agregamos una REFERENCIA al mismo. En cambio SI copiamos los entrenamientos y archivos de videoSync dado que son más pequeños.
 
-Usted puede eliminar las referencias cuando administra la biblitoteca usando el menú de contexto</translation>
+Usted puede eliminar las referencias cuando administra la biblioteca usando el menú de contexto</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="781"/>
@@ -30015,7 +30045,7 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
     <message>
         <location filename="../../Gui/Pages.cpp" line="4142"/>
         <source>Default</source>
-        <translation>Por defecto</translation>
+        <translation>Por omisión</translation>
     </message>
 </context>
 <context>
@@ -30259,12 +30289,12 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
     <message>
         <location filename="../../Metrics/Zones.cpp" line="164"/>
         <source>Zone defaults must be specified at head of %1 file</source>
-        <translation>Los valores por defecto deben especificarse al comienzo del archivo %1</translation>
+        <translation>Los valores por omisión deben especificarse al comienzo del archivo %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="170"/>
         <source>Only one set of zone defaults may be specified in %1 file</source>
-        <translation>Solo un conjunto de valores por defecto se pueden especificar en el archivo %1</translation>
+        <translation>Solo un conjunto de valores por omisión se pueden especificar en el archivo %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="196"/>
@@ -30281,7 +30311,8 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
         <location filename="../../Metrics/Zones.cpp" line="353"/>
         <source>attempt to set zone based on % of CP without setting CP in line number %1.
 </source>
-        <translation>se intenta establecer una zona basada en % de PC sin establecer PC en línea número %1.</translation>
+        <translation>se intenta establecer una zona basada en % de PC sin establecer PC en línea número %1.
+</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="394"/>
@@ -30292,7 +30323,8 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
         <location filename="../../Metrics/Zones.cpp" line="447"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
-        <translation>Estableciendo fecha de fin del rango %1 para fecha de comienzo del rango %2.</translation>
+        <translation>Estableciendo fecha de fin del rango %1 para fecha de comienzo del rango %2.
+</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="457"/>
@@ -30371,7 +30403,7 @@ Usted puede eliminar las referencias cuando administra la biblitoteca usando el 
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="208"/>
         <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aBikeStress it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
-        <translation>Puntuación del estres de Skiba, que tiene en cuenta la duración y la intensidad, ajustada para considerar el efecto de la altura, similar al aBikeStress</translation>
+        <translation>Puntuación del estrés de Skiba, que tiene en cuenta la duración y la intensidad, ajustada para considerar el efecto de la altura, similar al aBikeStress</translation>
     </message>
 </context>
 <context>
