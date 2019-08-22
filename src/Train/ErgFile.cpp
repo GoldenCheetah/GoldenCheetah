@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <unordered_map>
 #include "ErgFile.h"
 #include "Athlete.h"
 
@@ -28,6 +29,21 @@
 #include <stdint.h>
 #include "Units.h"
 #include "Utils.h"
+
+namespace
+{
+static const std::unordered_map<TimeFormat, int> timeFormatMultiplier =
+{
+    { TimeFormat::SECONDS, 1000 }
+    ,{ TimeFormat::MINUTES, 60000 }
+};
+
+double getTimeInMsec(double time, TimeFormat timeFormat)
+{
+    auto multiplier = timeFormatMultiplier.at(timeFormat);
+    return multiplier * time;
+}
+} // namespace
 
 // Supported file types
 static QStringList supported;
@@ -447,8 +463,8 @@ void ErgFile::parseComputrainer(QString p)
     QRegExp settings("^([^=]*)=[ \\t]*([^=\\n\\r\\t]*).*$", Qt::CaseInsensitive);
 
     // format setting for ergformat
-    QRegExp ergformat("^[;]*(MINUTES[ \\t]+WATTS).*$", Qt::CaseInsensitive);
-    QRegExp mrcformat("^[;]*(MINUTES[ \\t]+(PERCENT|FTP)).*$", Qt::CaseInsensitive);
+    QRegExp ergformat("^[;]*((MINUTES|SECONDS)[ \\t]+WATTS).*$", Qt::CaseInsensitive);
+    QRegExp mrcformat("^[;]*((MINUTES|SECONDS)[ \\t]+(PERCENT|FTP)).*$", Qt::CaseInsensitive);
     QRegExp crsformat("^[;]*(DISTANCE[ \\t]+GRADE[ \\t]+WIND).*$", Qt::CaseInsensitive);
 
     // time watts records
@@ -497,9 +513,11 @@ void ErgFile::parseComputrainer(QString p)
             } else if (ergformat.exactMatch(line)) {
                 // save away the format
                 mode = format = ERG;
+                timeFormat = line.contains("MINUTES") ? TimeFormat::MINUTES : TimeFormat::SECONDS;
             } else if (mrcformat.exactMatch(line)) {
                 // save away the format
                 mode = format = MRC;
+                timeFormat = line.contains("MINUTES") ? TimeFormat::MINUTES : TimeFormat::SECONDS;
             } else if (crsformat.exactMatch(line)) {
                 // save away the format
                 mode = format = CRS;
@@ -558,7 +576,7 @@ void ErgFile::parseComputrainer(QString p)
                 // we have mins watts line
                 ErgFilePoint add;
 
-                add.x = absoluteWatts.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
+                add.x = getTimeInMsec(absoluteWatts.cap(1).toDouble(), timeFormat);
                 add.val = add.y = round(absoluteWatts.cap(2).toDouble());             // plain watts
 
                 switch (format) {
