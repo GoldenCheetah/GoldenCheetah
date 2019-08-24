@@ -2764,7 +2764,7 @@ RideFile::recalculateDerivedSeries(bool force)
 
         for(int i=0; i<hrArray.count(); i++) {
             double x_pred = a1 * x;
-            double v_pred = (a1  * a1 ) * (v+gamma);
+            double v_pred = (a1  * a1 ) * v + gamma;
 
             double z = hrArray[i];
             double c_vc = 2.0f *  b2 * x_pred + b1;
