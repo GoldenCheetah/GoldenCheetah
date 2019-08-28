@@ -1003,6 +1003,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="59"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="535"/>
         <source>Peak Power</source>
         <translation>功率峰值</translation>
     </message>
@@ -1043,11 +1044,13 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="79"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="538"/>
         <source>Peak Speed</source>
         <translation>速度峰值</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="84"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="541"/>
         <source>Peak Pace</source>
         <translation>段速峰值</translation>
     </message>
@@ -1135,6 +1138,11 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <location filename="../../Gui/AddIntervalDialog.cpp" line="501"/>
         <source>No activity selected!</source>
         <translation>未選擇任何活動紀錄！</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="544"/>
+        <source>Peak HR</source>
+        <translation>最高心率</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="630"/>
@@ -1680,473 +1688,473 @@ Press Next to Continue
 <context>
     <name>AllPlot</name>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3856"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4569"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4572"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3865"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4578"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4581"/>
         <source>Power</source>
         <translation>輸出功率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4484"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4493"/>
         <source>Heart Rate</source>
         <translation>心率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3840"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4547"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4554"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7040"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3849"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4556"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4563"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7050"/>
         <source>Speed</source>
         <translation>速度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2981"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2989"/>
         <source>Percent</source>
         <translation>百分比</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3764"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4466"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4469"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3773"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4475"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4478"/>
         <source>Cadence</source>
         <translation>迴轉數</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3780"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4487"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3789"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4496"/>
         <source>Heartrate</source>
         <translation>心率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3796"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4502"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4505"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3805"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4511"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4514"/>
         <source>Acceleration</source>
         <translation>加速率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3804"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4511"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4514"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3813"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4520"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4523"/>
         <source>Power Delta</source>
         <translation>功率差</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3812"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4520"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4523"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3821"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4529"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4532"/>
         <source>Cadence Delta</source>
         <translation>迴轉數差</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3820"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4529"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4532"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3829"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4538"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4541"/>
         <source>Torque Delta</source>
         <translation>扭矩差</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3828"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4538"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4541"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3837"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4547"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4550"/>
         <source>Heartrate Delta</source>
         <translation>心率差</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3866"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4587"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3875"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4596"/>
         <source>W&apos;bal</source>
         <translation>W&apos;Bal</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3875"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4594"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4598"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3884"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4603"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4607"/>
         <source>Altitude</source>
         <translation>標高</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3896"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4620"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4622"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3905"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4629"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4631"/>
         <source>Headwind</source>
         <translation>逆風</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3904"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4628"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4631"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3913"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4637"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4640"/>
         <source>Temperature</source>
         <translation>溫度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3848"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4560"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4563"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3857"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4569"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4572"/>
         <source>Torque</source>
         <translation>扭矩</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2854"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4578"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2862"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4587"/>
         <source>W&apos; Balance (kJ)</source>
         <translation>W&apos;Bal (kJ)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2893"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2901"/>
         <source>RR</source>
         <translation>RR</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2904"/>
-        <location filename="../../Charts/AllPlot.cpp" line="2952"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2912"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2960"/>
         <source>Core Temperature</source>
         <translation>核心溫度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2911"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3968"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4700"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4703"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2919"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3977"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4709"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4712"/>
         <source>SmO2</source>
         <translation>SmO2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2986"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3888"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4611"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4614"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2994"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4620"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4623"/>
         <source>Slope</source>
         <translation>坡度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3036"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3067"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3075"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7064"/>
         <source>Hb</source>
         <translation>Hb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3260"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3268"/>
         <source>** Minimum CP=%1 **</source>
         <translation>** 最小 CP=%1 **</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3262"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3270"/>
         <source>** Check W&apos; is set correctly **</source>
         <translation>** 確認 W&apos; 已正確設定 **</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3267"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3275"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 match &gt;2kJ (%5 kJ) %6</source>
         <translation>Tau=%1, CP=%2, W&apos;=%3, %4 匹配 &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3270"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3278"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 matches &gt;2kJ (%5 kJ) %6</source>
         <translation>Tau=%1, CP=%2, W&apos;=%3, %4 匹配 &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3772"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4475"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4478"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3781"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4484"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4487"/>
         <source>Core Temp</source>
         <translation>核心溫度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3788"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4493"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4496"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7056"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3797"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4502"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4505"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7066"/>
         <source>R-R</source>
         <translation>R-R</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3879"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4600"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4604"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3888"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4609"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4613"/>
         <source>Alt/Slope</source>
         <translation>高度/坡度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3912"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4637"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4640"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3921"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4646"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4649"/>
         <source>Anaerobic TISS</source>
         <translation>無氧TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3920"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4646"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4649"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3929"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4655"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4658"/>
         <source>Aerobic TISS</source>
         <translation>有氧TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3928"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4655"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4658"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3937"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4664"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4667"/>
         <source>IsoPower</source>
         <translation>IsoPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3936"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4664"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4667"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3945"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4673"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4676"/>
         <source>Vertical Oscillation</source>
         <translation>重直振幅</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3944"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4673"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4676"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3953"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4682"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4685"/>
         <source>Run Cadence</source>
         <translation>跑動步頻</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3952"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4682"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4685"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3961"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4691"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4694"/>
         <source>GCT</source>
         <translation>GCT</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3960"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4691"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4694"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3969"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4700"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4703"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7068"/>
         <source>Gear Ratio</source>
         <translation>齒輪比</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3976"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4709"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4712"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3985"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4718"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4721"/>
         <source>tHb</source>
         <translation>tHb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3984"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4718"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4721"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3993"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4727"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4730"/>
         <source>O2Hb</source>
         <translation>O2Hb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3992"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4727"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4730"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4001"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4736"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4739"/>
         <source>HHb</source>
         <translation>HHb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4000"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4736"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4739"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4009"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4745"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4748"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4008"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4745"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4748"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4017"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4754"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4757"/>
         <source>Left Pedal Smoothness</source>
         <translation>左踏板平滑度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4016"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4754"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4757"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4025"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4763"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4766"/>
         <source>Right Pedal Smoothness</source>
         <translation>右踏板平滑度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4024"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4763"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4766"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4033"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4772"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4775"/>
         <source>Left Torque Efficiency</source>
         <translation>左扭矩效率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4032"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4772"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4775"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4041"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4781"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4784"/>
         <source>Right Torque Efficiency</source>
         <translation>右扭矩效率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4043"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4788"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4052"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4797"/>
         <source>Left/Right Pedal Center Offset</source>
         <translation>左右踏板施力偏移PCO</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4051"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4795"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4797"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4060"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4804"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4806"/>
         <source>Left Power Phase</source>
         <translation>左側功率分佈PP</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4059"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4804"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4806"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4068"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4813"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4815"/>
         <source>Right Power Phase</source>
         <translation>右側功率分佈PP</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4067"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4813"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4815"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4076"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4822"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4824"/>
         <source>Left Peak Power Phase</source>
         <translation>左側峰值功率分佈PP</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4075"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4822"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4824"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4084"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4831"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4833"/>
         <source>Right Peak Power Phase</source>
         <translation>右側峰值功率分佈PP</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4085"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4836"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4094"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4845"/>
         <source>L/R Balance</source>
         <translation>左/右平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4093"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4842"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4845"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4102"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4851"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4854"/>
         <source>aPower</source>
         <translation>aPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4580"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4589"/>
         <source>Matches</source>
         <translation>匹配項目</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4782"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4791"/>
         <source>Left Pedal Center Offset</source>
         <translation>左側踏板施力偏移PCO</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4785"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4794"/>
         <source>Right Pedal Center Offset</source>
         <translation>右側踏板施力偏移PCO</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4830"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4839"/>
         <source>Left Balance</source>
         <translation>左平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4832"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4841"/>
         <source>Right Balance</source>
         <translation>右平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
         <source>min/km</source>
         <translation>min/km</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
         <source>min/mile</source>
         <translation>min/mi</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7045"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7049"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7055"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7059"/>
         <source>
 %1 %2</source>
         <translation>
 %1 %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7048"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
         <source>min/100m</source>
         <translation>min/100m</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7048"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
         <source>min/100yd</source>
         <translation>min/100yd</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7051"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7061"/>
         <source>W&apos;</source>
         <translation>W&apos;</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2595"/>
-        <location filename="../../Charts/AllPlot.cpp" line="2601"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2603"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2609"/>
         <source>Match</source>
         <translation>匹配</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2725"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2733"/>
         <source>Power Ref</source>
         <translation>功率基準</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2735"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2743"/>
         <source>Heart Rate Ref</source>
         <translation>心率基準</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2746"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2754"/>
         <source>Cadence Ref</source>
         <translation>迴轉數基準</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2846"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2854"/>
         <source>TISS</source>
         <translation>TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2878"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2886"/>
         <source>Watts</source>
         <translation>w</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2905"/>
         <source>BPM</source>
         <translation>bpm</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2918"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2926"/>
         <source>RPM</source>
         <translation>rpm</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3015"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3023"/>
         <source>KPH</source>
         <translation>kph</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3015"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3023"/>
         <source>MPH</source>
         <translation>mph</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3052"/>
         <source>Nm</source>
         <translation>Nm</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3052"/>
         <source>ftLb</source>
         <translation>ftLb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3093"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3101"/>
         <source>Meters</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3093"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3101"/>
         <source>Feet</source>
         <translation>ft</translation>
     </message>
@@ -6228,12 +6236,17 @@ ddd, dd MMM yyyy</source>
         <translation>新增圖表</translation>
     </message>
     <message>
-        <location filename="../../Charts/ChartBar.cpp" line="126"/>
+        <location filename="../../Charts/ChartBar.cpp" line="125"/>
+        <source>Import Chart...</source>
+        <translation>匯入圖表...</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/ChartBar.cpp" line="128"/>
         <source>Upload Chart...</source>
         <translation>上傳圖表...</translation>
     </message>
     <message>
-        <location filename="../../Charts/ChartBar.cpp" line="127"/>
+        <location filename="../../Charts/ChartBar.cpp" line="129"/>
         <source>Download Chart...</source>
         <translation>下載圖表...</translation>
     </message>
@@ -8480,8 +8493,8 @@ Click Cancel to exit.</source>
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1608"/>
-        <location filename="../../Core/DataFilter.cpp" line="1647"/>
+        <location filename="../../Core/DataFilter.cpp" line="1617"/>
+        <location filename="../../Core/DataFilter.cpp" line="1656"/>
         <source>malformed expression.</source>
         <translation>表達式格式有誤。</translation>
     </message>
@@ -9275,12 +9288,12 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation type="obsolete">設定</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2049"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2065"/>
         <source>Name</source>
         <translation>名稱</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2050"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2066"/>
         <source>Axis Label / Units</source>
         <translation>軸標籤／單位</translation>
     </message>
@@ -9480,227 +9493,232 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation>預估CP (w)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1961"/>
+        <location filename="../../Charts/LTMTool.cpp" line="1970"/>
         <source>Curve Type</source>
         <translation>曲線種類</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1991"/>
+        <location filename="../../Charts/LTMTool.cpp" line="1977"/>
+        <source>Perf. Metric</source>
+        <translation>能力計測量</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMTool.cpp" line="2007"/>
         <source>Metadata Field</source>
         <translation>附加參數欄位</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1992"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2008"/>
         <source>PMC metric</source>
         <translation>PMC計測量</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2017"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2033"/>
         <source>Measure Group</source>
         <translation>量測組別</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2025"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2041"/>
         <source>Measure Field</source>
         <translation>量測欄位</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2045"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2061"/>
         <source>Filter</source>
         <translation>過濾器</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2056"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2072"/>
         <source>Style</source>
         <translation>風格</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2058"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2074"/>
         <source>Bar</source>
         <translation>長條</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2059"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2075"/>
         <source>Line</source>
         <translation>線</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2060"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2076"/>
         <source>Sticks</source>
         <translation>蠋</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2061"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2077"/>
         <source>Dots</source>
         <translation>點</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2064"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2080"/>
         <source>Stack</source>
         <translation>堆疊</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2069"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2085"/>
         <source>Symbol</source>
         <translation>符號</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2071"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2087"/>
         <source>None</source>
         <translation>無</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2072"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2088"/>
         <source>Circle</source>
         <translation>圓</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2073"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2089"/>
         <source>Square</source>
         <translation>方</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2074"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2090"/>
         <source>Diamond</source>
         <translation>鑽</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2075"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2091"/>
         <source>Triangle</source>
         <translation>三角</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2076"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2092"/>
         <source>Cross</source>
         <translation>交叉</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2077"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2093"/>
         <source>Hexagon</source>
         <translation>六角</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2078"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2094"/>
         <source>Star</source>
         <translation>星</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2081"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2097"/>
         <source>Color</source>
         <translation>色彩</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2084"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2100"/>
         <source>Fill curve</source>
         <translation>填滿曲線</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2088"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2104"/>
         <source>Data labels</source>
         <translation>資訊標籤</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2095"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2111"/>
         <source>Highlight Highest</source>
         <translation>標記最高值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2103"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2119"/>
         <source>Highlight Lowest</source>
         <translation>標記最低值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2111"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2127"/>
         <source>Highlight Outliers</source>
         <translation>標記異值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2119"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2135"/>
         <source>Baseline</source>
         <translation>基準</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2127"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2143"/>
         <source>Smooth Curve</source>
         <translation>平滑化曲線</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2131"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2147"/>
         <source>No trend Line</source>
         <translation>無趨勢曲線</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2132"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2148"/>
         <source>Linear Trend</source>
         <translation>線性趨勢</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2133"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2149"/>
         <source>Quadratic Trend</source>
         <translation>二次趨勢</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2134"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2150"/>
         <source>Moving Average</source>
         <translation>移動平均</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2135"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2151"/>
         <source>Simple Average</source>
         <translation>簡單平均</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2180"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2196"/>
         <source>&amp;OK</source>
         <translation>OK(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2181"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2197"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2394"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2410"/>
         <source>Peak %1</source>
         <translation>%1峰值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2396"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2412"/>
         <source> second </source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2397"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2413"/>
         <source> minute </source>
         <translation>min</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2399"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2415"/>
         <source> hour </source>
         <translation>hr</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2419"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2435"/>
         <source>%1 - %2</source>
         <translation>%1 - %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2433"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2449"/>
         <source>Performances</source>
         <translation>個人表現</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2434"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2450"/>
         <source>Power Index</source>
         <translation>功率指數</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2551"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2567"/>
         <source>Performances_%1_%2_%3</source>
         <translation>個人表現 %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2641"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2660"/>
         <source>Choose Metric Color</source>
         <translation>指定計測量顏色</translation>
     </message>
@@ -9708,38 +9726,38 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
 <context>
     <name>EditNamedSearches</name>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="236"/>
+        <location filename="../../Core/NamedSearch.cpp" line="234"/>
         <source>Manage Filters</source>
         <translation>過濾器管理</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="251"/>
-        <location filename="../../Core/NamedSearch.cpp" line="282"/>
+        <location filename="../../Core/NamedSearch.cpp" line="249"/>
+        <location filename="../../Core/NamedSearch.cpp" line="280"/>
         <source>Name</source>
         <translation>名稱</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="257"/>
+        <location filename="../../Core/NamedSearch.cpp" line="255"/>
         <source>Filter</source>
         <translation>過濾器</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="266"/>
+        <location filename="../../Core/NamedSearch.cpp" line="264"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="268"/>
+        <location filename="../../Core/NamedSearch.cpp" line="266"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="283"/>
+        <location filename="../../Core/NamedSearch.cpp" line="281"/>
         <source>Query</source>
         <translation>查詢</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="298"/>
+        <location filename="../../Core/NamedSearch.cpp" line="296"/>
         <source>Delete</source>
         <translation>刪除</translation>
     </message>
@@ -10961,8 +10979,12 @@ This process will populate distance information (and override existing distance 
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
-        <source>, heading</source>
+        <source>, direction</source>
         <translation> 風向</translation>
+    </message>
+    <message>
+        <source>, heading</source>
+        <translation type="vanished"> 風向</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="130"/>
@@ -11315,8 +11337,12 @@ This tools convert to revolutions or cycles per minute</source>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="65"/>
-        <source>, heading</source>
+        <source>, direction</source>
         <translation> 風向</translation>
+    </message>
+    <message>
+        <source>, heading</source>
+        <translation type="vanished"> 風向</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="108"/>
@@ -17950,7 +17976,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="217"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1319"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1344"/>
         <source>All</source>
         <translation>全部</translation>
     </message>
@@ -17975,100 +18001,105 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>Banister模型</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="273"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="274"/>
         <source>Impulse Metric</source>
         <translation>衝量</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="274"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="275"/>
+        <source>Perf. Metric</source>
+        <translation>能力計測量</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="276"/>
         <source>Peak</source>
         <translation>峰值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="277"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="279"/>
         <source>Positive decay</source>
         <translation>正衰減</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="278"/>
         <location filename="../../Charts/LTMWindow.cpp" line="280"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="282"/>
         <source>days</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="279"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="281"/>
         <source>Negative decay</source>
         <translation>負衰減</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1300"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1325"/>
         <source> grouped by </source>
         <translation>分組方式：</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1304"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1329"/>
         <source>day</source>
         <translation>日</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1307"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1332"/>
         <source>week</source>
         <translation>週</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1310"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1335"/>
         <source>month</source>
         <translation>月</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1313"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1338"/>
         <source>year</source>
         <translation>年</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1316"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1341"/>
         <source>time of day</source>
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1501"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1551"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1526"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1577"/>
         <source>seconds</source>
         <translation>s</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1402"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1404"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1427"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1429"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1477"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1502"/>
         <source>Coggan Acute Training Load</source>
         <translation>Coggan ATL</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1478"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1503"/>
         <source>Coggan Chronic Training Load</source>
         <translation>Coggan CTL</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1479"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1504"/>
         <source>Coggan Training Stress Balance</source>
         <translation>Coggan TSB</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1501"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1526"/>
         <source>hours</source>
         <translation>hr</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1595"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1625"/>
         <source>Export Chart Config</source>
         <translation>匯出圖表設定</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1608"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1638"/>
         <source>Save Chart Data as CSV</source>
         <translation>匯出圖表資料至CSV</translation>
     </message>
@@ -18322,113 +18353,117 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>which函數需要至少2個參數。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1192"/>
         <source>should be banister(metric, nte|pte|perf|cp)</source>
-        <translation>banister函數格式(metric, nte|pte|perf|cp)</translation>
+        <translation type="vanished">banister函數格式(metric, nte|pte|perf|cp)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1221"/>
+        <location filename="../../Core/DataFilter.cpp" line="1192"/>
+        <source>should be banister(load_metric, perf_metric, nte|pte|perf|cp)</source>
+        <translation>banister函數格式(load_metric, perf_metric, nte|pte|perf|cp)</translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="1230"/>
         <source>XDATA needs 3 parameters.</source>
         <translation>XDATA需要3個參數。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1228"/>
+        <location filename="../../Core/DataFilter.cpp" line="1237"/>
         <source>XDATA expects a string for first two parameters</source>
         <translation>XDATA前2個參數必須為字串。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1235"/>
+        <location filename="../../Core/DataFilter.cpp" line="1244"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
         <translation>XDATA第3個參數必須為關鍵字：sparse，repeat，interpolate或resample。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1242"/>
+        <location filename="../../Core/DataFilter.cpp" line="1251"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
         <translation>XDATA第3個參數必須為關鍵字：sparse，repeat，interpolate或resample。(%1)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1265"/>
+        <location filename="../../Core/DataFilter.cpp" line="1274"/>
         <source>XDATA_UNITS needs 2 parameters.</source>
         <translation>XDATA_UNITS需要2個參數。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1272"/>
+        <location filename="../../Core/DataFilter.cpp" line="1281"/>
         <source>XDATA_UNITS expects a string for first two parameters</source>
         <translation>XDATA_UNITS前2個參數必須為字串。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1287"/>
+        <location filename="../../Core/DataFilter.cpp" line="1296"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
         <translation>isset/set/unset之首參數應為指涉對象欄位或計測量。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1300"/>
+        <location filename="../../Core/DataFilter.cpp" line="1309"/>
         <source>%1 is not supported in isset/set/unset operations</source>
         <translation>%1不支援 isset/set/unset 之動作</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1310"/>
+        <location filename="../../Core/DataFilter.cpp" line="1319"/>
         <source>isset has one parameter, a symbol to check.</source>
         <translation>isset應附指涉對象參數。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1317"/>
+        <location filename="../../Core/DataFilter.cpp" line="1326"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
         <translation>set函數需要3個參數：對象，數值及表示式。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1318"/>
+        <location filename="../../Core/DataFilter.cpp" line="1327"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
         <translation>unset函數需要2個參數：對象及表示式。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1336"/>
+        <location filename="../../Core/DataFilter.cpp" line="1345"/>
         <source>estimate function expects model name as first parameter.</source>
         <translation>預估功能之首參數需為模型名稱</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1342"/>
+        <location filename="../../Core/DataFilter.cpp" line="1351"/>
         <source>estimate function expects model name as first parameter</source>
         <translation>預估功能之首參數需為模型名稱</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1353"/>
+        <location filename="../../Core/DataFilter.cpp" line="1362"/>
         <source>estimate function expects parameter or duration as second parameter</source>
         <translation>預估功能需有第二參數，應為模型參數或持續時間</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1373"/>
+        <location filename="../../Core/DataFilter.cpp" line="1382"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
         <translation>功能函數%1預期%2個參數，收到%3個</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1385"/>
+        <location filename="../../Core/DataFilter.cpp" line="1394"/>
         <source>unknown function %1</source>
         <translation>未知的函數%1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1395"/>
+        <location filename="../../Core/DataFilter.cpp" line="1404"/>
         <source>unary negation on a string!</source>
         <translation>不能設定字串為負！</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1415"/>
-        <location filename="../../Core/DataFilter.cpp" line="1432"/>
+        <location filename="../../Core/DataFilter.cpp" line="1424"/>
+        <location filename="../../Core/DataFilter.cpp" line="1441"/>
         <source>variables must be numeric.</source>
         <translation>變量必須為數字。</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1441"/>
+        <location filename="../../Core/DataFilter.cpp" line="1450"/>
         <source>assignment must be to a symbol.</source>
         <translation>必須提供指涉對象</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1454"/>
+        <location filename="../../Core/DataFilter.cpp" line="1463"/>
         <source>comparing strings with numbers</source>
         <translation>無法將字串與數字比較</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1461"/>
+        <location filename="../../Core/DataFilter.cpp" line="1470"/>
         <source>using a string operations with a number</source>
         <translation>字串函數不適用數字</translation>
     </message>
@@ -18821,8 +18856,8 @@ Skipping file...</source>
         <translation type="obsolete">新建(&amp;N)...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1827"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1798"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -18890,7 +18925,7 @@ Skipping file...</source>
         <translation type="obsolete">分割活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1514"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1527"/>
         <source>Delete Activity</source>
         <translation>刪除活動紀錄</translation>
     </message>
@@ -18983,21 +19018,41 @@ Skipping file...</source>
         <translation>編集圖表</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="946"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1660"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="827"/>
+        <source>Select Chart file to import</source>
+        <translation>選擇要匯入圖表檔案</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="827"/>
+        <source>GoldenCheetah Chart Files (*.gchart)</source>
+        <translation>GoldenCheetah圖表檔(*.gchart)</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="830"/>
+        <source>Import Chart</source>
+        <translation>匯入圖表</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="830"/>
+        <source>No chart file selected!</source>
+        <translation>未選擇圖表檔案。</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="959"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Activity Import</source>
         <translation>匯入活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="946"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1660"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="959"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>活動紀錄背景匯入進行中，無法關閉運動員視窗...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1257"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Chart Import</source>
         <translation>圖表匯入</translation>
     </message>
@@ -19006,52 +19061,52 @@ Skipping file...</source>
         <translation type="obsolete">匯入 %1 圖表</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1401"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1414"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>匯出活動紀錄失敗，請確認權限</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1437"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1450"/>
         <source>No Activity To Save</source>
         <translation>沒有活動紀錄可儲存</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1438"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1451"/>
         <source>There is no currently selected activity to save.</source>
         <translation>並無選中的活動紀錄可儲存。</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1490"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1492"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1502"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1503"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1505"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1515"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1517"/>
         <source>Split Activity</source>
         <translation>分割活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1490"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1502"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1503"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1515"/>
         <source>No activity selected</source>
         <translation>未選擇活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1492"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1505"/>
         <source>Current activity contains no data to split</source>
         <translation>目前的活動紀錄不包合可分割的資料</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1517"/>
         <source>Current activity contains no data to merge</source>
         <translation>目前的活動紀錄不包合可整併的資料</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1520"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1533"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>你想要刪除活動紀錄：</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1994"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2016"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2007"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2029"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -19060,12 +19115,12 @@ Please check your preference settings.</source>
 請檢查您的設定。</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2233"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>CloudDB</source>
         <translation>CloudDB</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2233"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>目前運動員非注冊編集者，請聯繫Golden Cheetah團隊</translation>
     </message>
@@ -19208,28 +19263,28 @@ Please check your preference settings.</source>
         <translation>活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="563"/>
+        <location filename="../../Gui/MainWindow.cpp" line="564"/>
         <source>Tabbed not Tiled</source>
         <translation>以頁籤表示</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1048"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1061"/>
         <source>You are about to reset all charts to the default setup</source>
         <translation>你即將重置所有的圖表至預設狀態</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1049"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1062"/>
         <source>Do you want to continue?</source>
         <translation>要繼續嗎？</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1257"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Imported %1 metric charts</source>
         <translation>匯入%1計測方式圖表</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1827"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1798"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
         <source>&amp;New Athlete...</source>
         <translation>新建運動員資料(&amp;N)</translation>
     </message>
@@ -19243,23 +19298,23 @@ Please check your preference settings.</source>
         <translation>尋找區段...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1334"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
         <source>Select Activity</source>
         <translation>選擇活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1334"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1514"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1527"/>
         <source>No activity selected!</source>
         <translation>未選擇活動紀錄!</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1360"/>
         <source>Export Activity</source>
         <translation>匯出活動紀錄</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1400"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1413"/>
         <source>Export Failed</source>
         <translation>匯出失敗</translation>
     </message>
@@ -19472,47 +19527,52 @@ Please check your preference settings.</source>
         <translation>趨勢</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="558"/>
+        <location filename="../../Gui/MainWindow.cpp" line="557"/>
+        <source>Import Chart...</source>
+        <translation>匯入圖表...</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="559"/>
         <source>Upload Chart...</source>
         <translation>上傳圖表...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="559"/>
+        <location filename="../../Gui/MainWindow.cpp" line="560"/>
         <source>Download Chart...</source>
         <translation>下載圖表...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="562"/>
+        <location filename="../../Gui/MainWindow.cpp" line="563"/>
         <source>Reset Layout</source>
         <translation>重置編排</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="575"/>
+        <location filename="../../Gui/MainWindow.cpp" line="576"/>
         <source>&amp;Help</source>
         <translation>說明(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="576"/>
+        <location filename="../../Gui/MainWindow.cpp" line="577"/>
         <source>&amp;Help Overview</source>
         <translation>線上協助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="578"/>
+        <location filename="../../Gui/MainWindow.cpp" line="579"/>
         <source>&amp;User Guide</source>
         <translation>使用指引(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="579"/>
+        <location filename="../../Gui/MainWindow.cpp" line="580"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>提報問題或新功能提案(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="580"/>
+        <location filename="../../Gui/MainWindow.cpp" line="581"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>討論區(&amp;D)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="582"/>
+        <location filename="../../Gui/MainWindow.cpp" line="583"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>關於Golden Cheetah(&amp;A)</translation>
     </message>
@@ -19581,29 +19641,29 @@ Please check your preference settings.</source>
         <translation type="obsolete">%1 無法開檔及寫入</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1422"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1963"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1435"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1976"/>
         <source>Import from File</source>
         <translation>從檔案匯入</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1936"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1949"/>
         <source>Refresh in Progress</source>
         <translation>刷新中</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1942"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1955"/>
         <source>Export Metrics</source>
         <translation>匯出計測量</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1942"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1955"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>(*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1993"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2015"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2006"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2028"/>
         <source>Workout Directory Invalid</source>
         <translation>無效的訓練課表檔案夾</translation>
     </message>
@@ -19684,7 +19744,7 @@ Please check your preference settings.</source>
         <translation type="obsolete">關於GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1522"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1535"/>
         <source>Delete</source>
         <translation>刪除</translation>
     </message>
@@ -21313,17 +21373,17 @@ No rides found to import.
 <context>
     <name>NamedSearches</name>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="95"/>
+        <location filename="../../Core/NamedSearch.cpp" line="93"/>
         <source>Swim</source>
         <translation>游泳</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="98"/>
+        <location filename="../../Core/NamedSearch.cpp" line="96"/>
         <source>Bike</source>
         <translation>騎車</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="101"/>
+        <location filename="../../Core/NamedSearch.cpp" line="99"/>
         <source>Run</source>
         <translation>跑步</translation>
     </message>
@@ -24197,6 +24257,7 @@ Do you want to continue?</source>
         <translation>無法解譯Polar Flow資料</translation>
     </message>
     <message>
+        <location filename="../../Cloud/PolarFlow.cpp" line="87"/>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
         <source>You must authorise with Polar Flow first</source>
         <translation>必須先授權Polar Flow</translation>
@@ -24401,14 +24462,14 @@ Do you want to continue?</source>
 <context>
     <name>PowerIndex</name>
     <message>
-        <location filename="../../Metrics/Banister.cpp" line="598"/>
         <location filename="../../Metrics/Banister.cpp" line="601"/>
+        <location filename="../../Metrics/Banister.cpp" line="604"/>
         <source>Power Index</source>
         <translation>功率指數</translation>
     </message>
     <message>
-        <location filename="../../Metrics/Banister.cpp" line="599"/>
-        <location filename="../../Metrics/Banister.cpp" line="600"/>
+        <location filename="../../Metrics/Banister.cpp" line="602"/>
+        <location filename="../../Metrics/Banister.cpp" line="603"/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -24635,8 +24696,8 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>騎車</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1506"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2502"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1509"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2533"/>
         <location filename="../../FileIO/TcxParser.cpp" line="410"/>
         <source>Lap %1</source>
         <translation>第%1圈</translation>
@@ -24746,7 +24807,7 @@ M月d日</translation>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="57"/>
         <location filename="../../Core/HrvMeasures.cpp" line="59"/>
-        <location filename="../../Core/NamedSearch.cpp" line="197"/>
+        <location filename="../../Core/NamedSearch.cpp" line="195"/>
         <location filename="../../Core/RouteParser.cpp" line="108"/>
         <location filename="../../Core/SeasonParser.cpp" line="179"/>
         <location filename="../../FileIO/RideAutoImportConfig.cpp" line="158"/>
@@ -24782,7 +24843,7 @@ M月d日</translation>
         <translation>儲存至訓練課表資料庫發生問題</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="196"/>
+        <location filename="../../Core/NamedSearch.cpp" line="194"/>
         <source>Problem Saving Named Search Configuration</source>
         <translation>儲存至搜尋設定檔發生問題</translation>
     </message>
