@@ -25,7 +25,7 @@
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="73"/>
         <source>Found Garmin Express service</source>
-        <translation type="unfinished"></translation>
+        <translation>Garmin Express service gevonden</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="74"/>
@@ -33,18 +33,22 @@
 This can block GoldenCheetah from accessing your ANT+ stick.
 
 Do you want to temporarily disable the service?</source>
-        <translation type="unfinished"></translation>
+        <translation>De Garmin Express service is actief op deze computer.
+Dit kan GoldenCheetah de toegang blokkeren tot de ANT+ stick.
+
+Wil je deze service tijdelijk uitzetten?</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="84"/>
         <source>Failed stopping Garmin Express service</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij het stoppen van de Garmin Express service</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="85"/>
         <source>GoldenCheetah failed to stop the Garmin Express service.
 It might be necessary to manually disable it.</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah kon de Garmin Express service.niet stoppen
+Misschien is het handmatig stoppen hiervan nodig.</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="164"/>
@@ -83,10 +87,6 @@ It might be necessary to manually disable it.</source>
         <translation>Versie</translation>
     </message>
     <message>
-        <source>Config</source>
-        <translation type="vanished">Configuratie</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AboutDialog.cpp" line="35"/>
         <source>Contributors</source>
         <translation>Medewerkers</translation>
@@ -97,34 +97,31 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="814"/>
         <source>W&apos;bal tau (s)</source>
-        <translation type="unfinished">W&apos;bal tau (s)</translation>
+        <translatorcomment>W&apos;bal tau (s)</translatorcomment>
+        <translation>W&apos;bal tau (s)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="825"/>
         <source>STS average (days)</source>
-        <translation type="unfinished">STS gemiddelde (dagen)</translation>
+        <translation>STS gemiddelde (dagen)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="826"/>
         <source>LTS average (days)</source>
-        <translation type="unfinished">LTS gemiddelde (dagen)</translation>
+        <translation>LTS gemiddelde (dagen)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="841"/>
         <source>PMC Stress Balance Today</source>
-        <translation type="unfinished">PMC Stress Balans Vandaag</translation>
+        <translation>PMC Stress Balans Vandaag</translation>
     </message>
 </context>
 <context>
     <name>AboutPage</name>
     <message>
-        <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeStress, IsoPower, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Wielersport Vermogen Analyse Software&lt;br&gt;voor Linux, Mac, en Windows&lt;p&gt;GoldenCheetah is gelicenseerd onder de&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Broncode kan worden verkregen van&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activiteiten bestanden en andere data zijn opgeslagen in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks gebruikt met toestemming&lt;br&gt;BikeStress, IsoPower, IF met dank aan &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower, SwimScore met dank aan &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;De lichaamskerntemperatuur module is ontwikkeld door de&lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; en het patent ervan in aanvraag&lt;br&gt;&lt;/center&gt;</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;voor Linux, Mac, en Windows&lt;p&gt;GoldenCheetah is gelicenceerdionder de&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code kan verkregen worden van&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activiteitenbestanden en andere data zijn opgeslagen in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks gebruikt met toestemming&lt;br&gt;BikeScore, xPower, SwimScore toestemming of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module werd ontwikkeld door &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; het patent is in aanvraag&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -149,19 +146,19 @@ It might be necessary to manually disable it.</source>
         <location filename="../../Gui/Pages.cpp" line="733"/>
         <location filename="../../Gui/Pages.cpp" line="738"/>
         <source>Height (%1)</source>
-        <translation type="unfinished">Lengte (%1)</translation>
+        <translation>Lengte (%1)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="595"/>
         <location filename="../../Gui/Pages.cpp" line="733"/>
         <source>cm</source>
-        <translation type="unfinished">cm</translation>
+        <translation>cm</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="595"/>
         <location filename="../../Gui/Pages.cpp" line="738"/>
         <source>in</source>
-        <translation type="unfinished">in</translation>
+        <translation>in</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="607"/>
@@ -189,22 +186,6 @@ It might be necessary to manually disable it.</source>
         <translation>mm</translation>
     </message>
     <message>
-        <source>Auto Backup Folder</source>
-        <translation type="vanished">Auto Backup Map</translation>
-    </message>
-    <message>
-        <source>Browse</source>
-        <translation type="vanished">Bladeren</translation>
-    </message>
-    <message>
-        <source>Auto Backup execution every</source>
-        <translation type="vanished">Auto Backup uitvoering ieder</translation>
-    </message>
-    <message>
-        <source>times the athlete is closed - 0 means never</source>
-        <translation type="vanished">keren dat de atleet is gesloten - 0 betekent nooit</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="747"/>
         <source>Choose Picture</source>
         <translation>Kies Afbeelding</translation>
@@ -213,10 +194,6 @@ It might be necessary to manually disable it.</source>
         <location filename="../../Gui/Pages.cpp" line="748"/>
         <source>Images (*.png *.jpg *.bmp)</source>
         <translation>Afbeeldingen (*.png *.jpg *.bmp)</translation>
-    </message>
-    <message>
-        <source>Choose Backup Directory</source>
-        <translation type="vanished">Kies Backup Map</translation>
     </message>
 </context>
 <context>
@@ -276,12 +253,12 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="440"/>
         <source>Coached Athletes</source>
-        <translation type="unfinished"></translation>
+        <translation>Gecoachte Atleten</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="441"/>
         <source>Select Athlete for this account</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer een Atleet voor deze account</translation>
     </message>
 </context>
 <context>
@@ -289,54 +266,54 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="255"/>
         <source>Service Credentials </source>
-        <translation type="unfinished"></translation>
+        <translation>Service login gegevens </translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="256"/>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="345"/>
         <source>Credentials and authorisation</source>
-        <translation type="unfinished"></translation>
+        <translation>Login gegevens en autorisatie</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="274"/>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="287"/>
         <source>Authorise</source>
-        <translation type="unfinished">Toestaan</translation>
+        <translation>Toestaan</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="283"/>
         <source>URL</source>
-        <translation type="unfinished">URL</translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="284"/>
         <source>Key (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleutel (optioneel)</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="285"/>
         <source>Username</source>
-        <translation type="unfinished">Gebruikersnaam</translation>
+        <translation>Gebruikersnaam</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="286"/>
         <source>Password</source>
-        <translation type="unfinished">Wachtwoord</translation>
+        <translation>Wachtwoord</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="288"/>
         <source>Token</source>
-        <translation type="unfinished"></translation>
+        <translation>Herkenningsteken</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="289"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Bericht</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="368"/>
         <source>%1 Credentials and authorisation</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 login gegevens en autorisatie</translation>
     </message>
 </context>
 <context>
@@ -344,46 +321,42 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="88"/>
         <source>Service Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Service Type</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="89"/>
         <source>What type of Service are you adding an account for ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voor wat voor type Service wil je een account toevoegen ?</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="99"/>
         <source>Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Activiteiten</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="99"/>
         <source>Sync activities with services like Today&apos;s Plan, Strava, Dropbox and Google Drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync activiteiten met services zoals Today&apos;s Plan, Strava, Dropbox en Google Drive</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Metingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Sync measurements such as weight, body fat, HRV and sleep.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync metingen zoals gewicht, lichaamsvet, HRV en slaap.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Measures</source>
-        <translation type="obsolete">Metingen</translation>
+        <translation>Sync geplande workouts met WebDAV en CalDAV kalenders zoals Google Calendar.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Calendar</source>
-        <translation type="unfinished">Kalender</translation>
+        <translation>Kalender</translation>
     </message>
 </context>
 <context>
@@ -391,12 +364,12 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="60"/>
         <source>Add Cloud Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Cloud Wizard toevoegen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="68"/>
         <source>Edit Account Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Account Details</translation>
     </message>
 </context>
 <context>
@@ -404,17 +377,17 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="216"/>
         <source>Terms of Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Servicevoorwaarden</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="217"/>
         <source>Your consent is needed</source>
-        <translation type="unfinished"></translation>
+        <translation>Je toestemming is nodig</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="227"/>
         <source>Accept</source>
-        <translation type="unfinished"></translation>
+        <translation>Accepteer</translation>
     </message>
 </context>
 <context>
@@ -442,7 +415,7 @@ It might be necessary to manually disable it.</source>
         <source>We will now add a new device with the configuration shown below. Please take a moment to review and then click Finish to add the device and complete this wizard, or press the Back button to make amendments.
 
 </source>
-        <translation>We gan nu een apparaat toevoegen met de configuratie zoals hieronder. Neem alstublieft een moment om het te controleren en klik Bewaar om het apparaat toe te voegen en deze assistent af te sluiten, of klik op de Terug knop om aanpassingen te doen.
+        <translation>We gaan nu een apparaat toevoegen met de configuratie zoals hieronder. Neem alstublieft een moment om het te controleren en klik Bewaar om het apparaat toe te voegen en deze assistent af te sluiten, of klik op de Terug knop om aanpassingen te doen.
 
 </translation>
     </message>
@@ -842,58 +815,58 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="632"/>
         <source>Done</source>
-        <translation type="unfinished">Voltooid</translation>
+        <translation>Voltooid</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="633"/>
         <source>Add Cloud Account</source>
-        <translation type="unfinished"></translation>
+        <translation>Cloud Account toevoegen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="658"/>
         <source>URL</source>
-        <translation type="unfinished">URL</translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="659"/>
         <source>Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Sleutel</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="660"/>
         <source>Username</source>
-        <translation type="unfinished">Gebruikersnaam</translation>
+        <translation>Gebruikersnaam</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="661"/>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="684"/>
         <source>Password</source>
-        <translation type="unfinished">Wachtwoord</translation>
+        <translation>Wachtwoord</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="662"/>
         <source>Token</source>
-        <translation type="unfinished"></translation>
+        <translation>Herkenningsteken</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="663"/>
         <source>Folder</source>
-        <translation type="unfinished">Map</translation>
+        <translation>Map</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="664"/>
         <source>Athlete ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Athlete ID</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="688"/>
         <source>Sync on start</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync tijdens start</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="690"/>
         <source>Sync on import</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync tijdens import</translation>
     </message>
 </context>
 <context>
@@ -960,22 +933,22 @@ Als je besluit te kopiëren naar de bibliotheek zal het bestand in de GoldenChee
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="586"/>
         <source>Select Device driver</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer Apparaat driver</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="587"/>
         <source>Select Driver for Tacx Imagic</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer Driver voor Tacx Imagic</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="590"/>
         <source>Browse</source>
-        <translation type="unfinished">Bladeren</translation>
+        <translation>Bladeren</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="591"/>
         <source>Copy to Library</source>
-        <translation type="unfinished">Kopieer naar Bibliotheek</translation>
+        <translation>Kopieer naar Bibliotheek</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="597"/>
@@ -989,22 +962,30 @@ On later TTS cds it is in support\drivers_usb_interface\32
 Place a copy of this file somewhere on this PC and reference it above.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it in place. </source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Imagic trainers gebruiken een firmware bestand. Deze firmware is toegevoegd aan de device driver I-magic.sys dat geleverd wordt door Tacx BV. Dat bestand is auteursrechtelijk beschermd en kan daardoor niet gedistribueerd worden met GoldenCheetah.
+
+Als alternatief kan je dit bestand van een Tacx software CD halen
+Op oudere Fortius cds is dit terug te vinden in  FortiusInstall\Support\driver_imagic.
+Op latere TTS cd&apos;s in support\drivers_usb_interface\32
+
+Maak een copy van dit bestand op deze PC en refereer er naar hierboven.
+
+Als je besluit te kopiëren naar de bibliotheek zal het bestand in de GoldenCheetah bibliotheek geplaatst worden, anders zullen we er een referentie gebruiken. </translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="611"/>
         <source>File:</source>
-        <translation type="unfinished">Bestand:</translation>
+        <translation>Bestand:</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="667"/>
         <source>Open File</source>
-        <translation type="unfinished">Open Bestand</translation>
+        <translation>Open Bestand</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="667"/>
         <source>Tacx Device driver (*.sys)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Device driver (*.sys)</translation>
     </message>
 </context>
 <context>
@@ -1017,10 +998,11 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="51"/>
         <source>Method: </source>
-        <translation>Methode:</translation>
+        <translation>Methode: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="59"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="535"/>
         <source>Peak Power</source>
         <translation>Piekvermogen</translation>
     </message>
@@ -1041,11 +1023,13 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="79"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="538"/>
         <source>Peak Speed</source>
         <translation>Topsnelheid</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="84"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="541"/>
         <source>Peak Pace</source>
         <translation>Piektempo</translation>
     </message>
@@ -1057,7 +1041,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="97"/>
         <source>Type: </source>
-        <translation>Type:</translation>
+        <translation>Type: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="100"/>
@@ -1072,7 +1056,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="116"/>
         <source>Length: </source>
-        <translation>Lengte:</translation>
+        <translation>Lengte: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="119"/>
@@ -1087,7 +1071,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="133"/>
         <source>Time: </source>
-        <translation>Tijd:</translation>
+        <translation>Tijd: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="138"/>
@@ -1107,12 +1091,12 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="165"/>
         <source>Distance: </source>
-        <translation>Afstand:</translation>
+        <translation>Afstand: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="189"/>
         <source>How many to find: </source>
-        <translation>Hoeveel resultaten:</translation>
+        <translation>Hoeveel resultaten: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="204"/>
@@ -1122,7 +1106,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="222"/>
         <source>Minimum Ascent: </source>
-        <translation>Minimum Stijging:</translation>
+        <translation>Minimum Stijging: </translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="240"/>
@@ -1160,6 +1144,11 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <location filename="../../Gui/AddIntervalDialog.cpp" line="555"/>
         <source>Interval length must be greater than zero!</source>
         <translation>Intervallengte moet groter zijn dan nul!</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="544"/>
+        <source>Peak HR</source>
+        <translation>Piek HR</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="630"/>
@@ -1396,12 +1385,12 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="135"/>
         <source>Account Type</source>
-        <translation type="unfinished">Accounttype</translation>
+        <translation>Accounttype</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="136"/>
         <source>Select the cloud service type</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer het cloud service type</translation>
     </message>
 </context>
 <context>
@@ -1409,42 +1398,42 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="498"/>
         <source>Cloud Service Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cloud Service Instellingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="514"/>
         <source>Folder</source>
-        <translation type="unfinished">Map</translation>
+        <translation>Map</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="518"/>
         <source>Browse</source>
-        <translation type="unfinished">Bladeren</translation>
+        <translation>Bladeren</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="519"/>
         <source>Sync on startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync tijdens opstarten</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="520"/>
         <source>Sync on import</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync tijdens import</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="538"/>
         <source>Service Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Service Instellingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="608"/>
         <source>Connection Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinding Mislukt</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="615"/>
         <source>Choose Athlete Directory</source>
-        <translation type="unfinished">Kies Atleet Map</translation>
+        <translation>Kies Atleet Map</translation>
     </message>
 </context>
 <context>
@@ -1518,7 +1507,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="579"/>
         <source>Distance </source>
-        <translation>Afstand</translation>
+        <translation>Afstand </translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="581"/>
@@ -1528,7 +1517,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="777"/>
         <source>No ride selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen rit gekozen</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="882"/>
@@ -1576,7 +1565,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="122"/>
         <source>Comment</source>
-        <translation type="unfinished">Commentaar</translation>
+        <translation>Commentaar</translation>
     </message>
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="140"/>
@@ -1621,7 +1610,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="228"/>
         <source>&amp;Save parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bewaar parameters</translation>
     </message>
     <message>
         <location filename="../../Charts/AerolabWindow.cpp" line="637"/>
@@ -1632,475 +1621,475 @@ Klik Volgende om verder te gaan
 <context>
     <name>AllPlot</name>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2595"/>
-        <location filename="../../Charts/AllPlot.cpp" line="2601"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2603"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2609"/>
         <source>Match</source>
         <translation>Match</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2725"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2733"/>
         <source>Power Ref</source>
         <translation>Vermogen Ref</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2735"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2743"/>
         <source>Heart Rate Ref</source>
         <translation>Hartslag Ref</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2746"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2754"/>
         <source>Cadence Ref</source>
         <translation>Cadans Ref</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2846"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2854"/>
         <source>TISS</source>
         <translation>TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2854"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4578"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2862"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4587"/>
         <source>W&apos; Balance (kJ)</source>
         <translation>W&apos; Balans (kJ)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2878"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2886"/>
         <source>Watts</source>
         <translation>Watts</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2893"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2901"/>
         <source>RR</source>
-        <translation type="unfinished"></translation>
+        <translation>RR</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2905"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2904"/>
-        <location filename="../../Charts/AllPlot.cpp" line="2952"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2912"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2960"/>
         <source>Core Temperature</source>
         <translation>Kerntemperatuur</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2911"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3968"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4700"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4703"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2919"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3977"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4709"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4712"/>
         <source>SmO2</source>
         <translation>SmO2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2918"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2926"/>
         <source>RPM</source>
         <translation>RPM</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2981"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2989"/>
         <source>Percent</source>
         <translation>Procent</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2986"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3888"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4611"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4614"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2994"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4620"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4623"/>
         <source>Slope</source>
         <translation>Helling</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3015"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3023"/>
         <source>KPH</source>
         <translation>KPH</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3015"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3023"/>
         <source>MPH</source>
         <translation>MPH</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3036"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3067"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3075"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7064"/>
         <source>Hb</source>
         <translation>Hb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3052"/>
         <source>Nm</source>
         <translation>Nm</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3052"/>
         <source>ftLb</source>
         <translation>ftLb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3093"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3101"/>
         <source>Meters</source>
         <translation>Meters</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3093"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3101"/>
         <source>Feet</source>
         <translation>Voet</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3260"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3268"/>
         <source>** Minimum CP=%1 **</source>
         <translation>** Minimum CP=%1 **</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3262"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3270"/>
         <source>** Check W&apos; is set correctly **</source>
         <translation>** Check of W&apos; is correct is ingesteld**</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3267"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3275"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 match &gt;2kJ (%5 kJ) %6</source>
         <translation>Tau=%1, CP=%2, W&apos;=%3, %4 match &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3270"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3278"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 matches &gt;2kJ (%5 kJ) %6</source>
         <translation>Tau=%1, CP=%2, W&apos;=%3, %4 matches &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3764"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4466"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4469"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3773"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4475"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4478"/>
         <source>Cadence</source>
         <translation>Cadans</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3772"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4475"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4478"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3781"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4484"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4487"/>
         <source>Core Temp</source>
         <translation>Kerntemperatuur</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3780"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4487"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3789"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4496"/>
         <source>Heartrate</source>
         <translation>Hartslag</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3788"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4493"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4496"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7056"/>
-        <source>R-R</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3796"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3797"/>
         <location filename="../../Charts/AllPlot.cpp" line="4502"/>
         <location filename="../../Charts/AllPlot.cpp" line="4505"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7066"/>
+        <source>R-R</source>
+        <translation>R R</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/AllPlot.cpp" line="3805"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4511"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4514"/>
         <source>Acceleration</source>
         <translation>Versnelling</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3804"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4511"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4514"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3813"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4520"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4523"/>
         <source>Power Delta</source>
         <translation>Vermogen Delta</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3812"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4520"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4523"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3821"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4529"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4532"/>
         <source>Cadence Delta</source>
         <translation>Cadans Delta</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3820"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4529"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4532"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3829"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4538"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4541"/>
         <source>Torque Delta</source>
         <translation>Koppel Delta</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3828"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4538"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4541"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3837"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4547"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4550"/>
         <source>Heartrate Delta</source>
         <translation>Hartslag Delta</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3840"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4547"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4554"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7040"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3849"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4556"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4563"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7050"/>
         <source>Speed</source>
         <translation>Snelheid</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3848"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4560"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4563"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3857"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4569"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4572"/>
         <source>Torque</source>
         <translation>Koppel</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3856"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4569"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4572"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3865"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4578"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4581"/>
         <source>Power</source>
         <translation>Vermogen</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3866"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4587"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3875"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4596"/>
         <source>W&apos;bal</source>
         <translation>W&apos;bal</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3875"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4594"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4598"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3884"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4603"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4607"/>
         <source>Altitude</source>
         <translation>Hoogte</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3879"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4600"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4604"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3888"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4609"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4613"/>
         <source>Alt/Slope</source>
         <translation>Hoogte/Helling</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3896"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4620"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4622"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3905"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4629"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4631"/>
         <source>Headwind</source>
         <translation>Tegenwind</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3904"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4628"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4631"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3913"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4637"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4640"/>
         <source>Temperature</source>
         <translation>Temperatuur</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3912"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4637"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4640"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3921"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4646"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4649"/>
         <source>Anaerobic TISS</source>
         <translation>Anaerobe TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3920"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4646"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4649"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3929"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4655"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4658"/>
         <source>Aerobic TISS</source>
         <translation>Aerobe TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3928"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4655"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4658"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3937"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4664"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4667"/>
         <source>IsoPower</source>
         <translation>IsoPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3936"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4664"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4667"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3945"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4673"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4676"/>
         <source>Vertical Oscillation</source>
         <translation>Verticale Oscillatie</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3944"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4673"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4676"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3953"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4682"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4685"/>
         <source>Run Cadence</source>
         <translation>Hardloopcadans</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3952"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4682"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4685"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3961"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4691"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4694"/>
         <source>GCT</source>
         <translation>GCT</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3960"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4691"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4694"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3969"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4700"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4703"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7068"/>
         <source>Gear Ratio</source>
         <translation>Versnellingsratio</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3976"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4709"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4712"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3985"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4718"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4721"/>
         <source>tHb</source>
         <translation>tHb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3984"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4718"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4721"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3993"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4727"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4730"/>
         <source>O2Hb</source>
         <translation>O2Hb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3992"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4727"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4730"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4001"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4736"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4739"/>
         <source>HHb</source>
         <translation>HHb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4000"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4736"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4739"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4009"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4745"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4748"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4008"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4745"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4748"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4017"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4754"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4757"/>
         <source>Left Pedal Smoothness</source>
         <translation>Linker Pedaal Gelijkmatigheid</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4016"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4754"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4757"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4025"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4763"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4766"/>
         <source>Right Pedal Smoothness</source>
         <translation>Rechter Pedaal Gelijkmatigheid</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4024"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4763"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4766"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4033"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4772"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4775"/>
         <source>Left Torque Efficiency</source>
         <translation>Linker Koppel Efficiëntie</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4032"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4772"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4775"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4041"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4781"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4784"/>
         <source>Right Torque Efficiency</source>
         <translation>Rechter Koppel Efficiëntie</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4043"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4788"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4052"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4797"/>
         <source>Left/Right Pedal Center Offset</source>
         <translation>Links/Rechts Pedaal Middelpunt Offset</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4051"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4795"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4797"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4060"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4804"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4806"/>
         <source>Left Power Phase</source>
         <translation>Linker Vermogensfase</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4059"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4804"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4806"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4068"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4813"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4815"/>
         <source>Right Power Phase</source>
         <translation>Rechter Vermogensfase</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4067"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4813"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4815"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4076"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4822"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4824"/>
         <source>Left Peak Power Phase</source>
         <translation>Linker Piekvermogensfase</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4075"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4822"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4824"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4084"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4831"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4833"/>
         <source>Right Peak Power Phase</source>
         <translation>Rechter Piekvermogensfase</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4085"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4836"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4094"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4845"/>
         <source>L/R Balance</source>
         <translation>L/R Balans</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4093"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4842"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4845"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4102"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4851"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4854"/>
         <source>aPower</source>
         <translation>aPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4484"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4493"/>
         <source>Heart Rate</source>
         <translation>Hartslag</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4580"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4589"/>
         <source>Matches</source>
         <translation>Matches</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4782"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4791"/>
         <source>Left Pedal Center Offset</source>
         <translation>Linker Pedaal Middelpunt Offset</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4785"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4794"/>
         <source>Right Pedal Center Offset</source>
         <translation>Rechter Pedaal Middelpunt Offset</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4830"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4839"/>
         <source>Left Balance</source>
         <translation>Linker Balans</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4832"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4841"/>
         <source>Right Balance</source>
         <translation>Rechter Balans</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
         <source>min/km</source>
         <translation>min/km</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
         <source>min/mile</source>
         <translation>min/mijl</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7045"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7049"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7055"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7059"/>
         <source>
 %1 %2</source>
         <translation>
 %1 %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7048"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
         <source>min/100m</source>
         <translation>min/100m</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7048"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
         <source>min/100yd</source>
         <translation>min/100yd</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7051"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7061"/>
         <source>W&apos;</source>
-        <translation type="unfinished">W&apos;</translation>
+        <translation>W&apos;</translation>
     </message>
 </context>
 <context>
@@ -2183,7 +2172,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="353"/>
         <source>R-R Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>R R Ratio</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="357"/>
@@ -2525,7 +2514,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="329"/>
         <source>Cadence </source>
-        <translation type="unfinished"></translation>
+        <translation>Cadans </translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="368"/>
@@ -2570,7 +2559,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="356"/>
         <source>R-R Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>R R Ratio</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="360"/>
@@ -2646,7 +2635,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="410"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="412"/>
@@ -2666,7 +2655,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="424"/>
         <source>Altitude Power</source>
-        <translation>Altitude Power</translation>
+        <translation>Hoogte Vermogen</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="428"/>
@@ -2768,10 +2757,6 @@ Klik Volgende om verder te gaan
         <translation>Activiteit Splitsen</translation>
     </message>
     <message>
-        <source>Upload Activity to Calendar</source>
-        <translation type="vanished">Activiteit Uploaden naar Kalender</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="408"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="478"/>
         <source>Find Intervals...</source>
@@ -2855,7 +2840,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="571"/>
         <source>Mark as a performance test</source>
-        <translation type="unfinished"></translation>
+        <translation>Markeer als performance test</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="595"/>
@@ -2870,7 +2855,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="617"/>
         <source>Create a performance test</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak een perfromance test</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="625"/>
@@ -2896,18 +2881,18 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="730"/>
         <source>Performance Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance Test</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="809"/>
         <source>Are you sure you want to delete selected interval?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ben je zeker van het verwijderen van dit geselecteerde interval?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="810"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="859"/>
         <source>Remove</source>
-        <translation type="unfinished">Verwijderen</translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="836"/>
@@ -2922,7 +2907,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="858"/>
         <source>Are you sure you want to stop tracking this segment?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ben je zeker van het niet meer volgen van dit segment?</translation>
     </message>
 </context>
 <context>
@@ -2940,7 +2925,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="555"/>
         <source>Cadence/Power duplicated when freewheeling.</source>
-        <translation>Cadans/Vermogen gedupliceerd tijdens freewheeling.</translation>
+        <translation>Cadans/Vermogen gedupliceerd tijdens freewheelen.</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="568"/>
@@ -3120,11 +3105,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Core/Athlete.cpp" line="322"/>
         <source>BikeStress and BikeIntensity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>BikeStress and IF</source>
-        <translation type="vanished">BikeStress en IF</translation>
+        <translation>BikeStress en BikeIntensity</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="323"/>
@@ -3234,17 +3215,17 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="86"/>
         <source>No backup directory selected - backup aborted</source>
-        <translation>Geen backup map geselecteerd - backup </translation>
+        <translation>Geen back-up map geselecteerd - back-up</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="93"/>
         <source>Any unsaved data will not be included into the backup .zip file.</source>
-        <translation>Niet opgeslagen data wordt niet toegevoegd aan het backup .zip bestand.</translation>
+        <translation>Niet opgeslagen data wordt niet toegevoegd aan het back-up .zip bestand.</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="94"/>
         <source>Do you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wil je doorgaan?</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="106"/>
@@ -3255,21 +3236,18 @@ Klik Volgende om verder te gaan
         <location filename="../../FileIO/AthleteBackup.cpp" line="107"/>
         <source>Backup successfully stored in 
 %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Backup successfully stored in %1</source>
-        <translation type="vanished">Backup opslag in %1 was succesvol</translation>
+        <translation>Backup succesvol opgeslagen in 
+%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="132"/>
         <source>No files found for athlete %1 - all athlete sub-directories are empty.</source>
-        <translation>Geen bestanden gevonden voor atleet %1 - alle atleet submappen  zijn leeg.</translation>
+        <translation>Geen bestanden gevonden voor atleet %1 - alle atleet sub-mappen  zijn leeg.</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="142"/>
         <source>Not enough space available on disk: %1 - no backup .zip file created</source>
-        <translation>Niet genoeg ruimte op de disk: %1 - geen backup .zip bestand geschreven</translation>
+        <translation>Niet genoeg ruimte op de disk: %1 - geen back-up .zip bestand geschreven</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="146"/>
@@ -3280,12 +3258,12 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="172"/>
         <source>Backup file %1 cannot be created.</source>
-        <translation>Backup bestand %1 kan niet worden geschreven.</translation>
+        <translation>Back-up bestand %1 kan niet worden geschreven.</translation>
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="178"/>
         <source>Adding files to backup %1 for athlete %2 ...</source>
-        <translation>Bestanden toevoegen aan backup %1 foor atleet %2 ...</translation>
+        <translation>Bestanden toevoegen aan back-up %1 voor atleet %2 ...</translation>
     </message>
 </context>
 <context>
@@ -3293,22 +3271,22 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="654"/>
         <source>Athlete Bones</source>
-        <translation type="unfinished"></translation>
+        <translation>Athlete Skelet</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="656"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="657"/>
         <source>lbs</source>
-        <translation type="unfinished">lbs</translation>
+        <translation>lbs</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="660"/>
         <source>Athlete bones in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Atleet skelet in kg of lbs van lichaamsmetingen</translation>
     </message>
 </context>
 <context>
@@ -3317,10 +3295,6 @@ Klik Volgende om verder te gaan
         <location filename="../../Gui/ConfigDialog.cpp" line="350"/>
         <source>About</source>
         <translation>Over</translation>
-    </message>
-    <message>
-        <source>Measures</source>
-        <translation type="vanished">Metingen</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="345"/>
@@ -3340,27 +3314,27 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="351"/>
         <source>Model</source>
-        <translation type="unfinished">Model</translation>
+        <translation>Model</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="352"/>
         <source>Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Metingen</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="353"/>
         <source>HRV</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="354"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="355"/>
         <source>Accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Accounts</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="356"/>
@@ -3370,7 +3344,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="357"/>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup</translation>
     </message>
 </context>
 <context>
@@ -3393,11 +3367,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="623"/>
         <source>Athlete bodyfat in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bodyfat in kg or lbs from Withings data</source>
-        <translation type="vanished">Lichaamsvet in kg of lbs van Withings data</translation>
+        <translation>Atleet lichaamsvet in kg of lbs van lichaamsmetingen</translation>
     </message>
 </context>
 <context>
@@ -3416,11 +3386,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="767"/>
         <source>Bodyfat in Percent from body measurements</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bodyfat Percent from Withings data</source>
-        <translation type="vanished">Lichaamsvet Percentage van Withings data</translation>
+        <translation>Lichaamsvet in Procenten van lichaamsmetingen</translation>
     </message>
 </context>
 <context>
@@ -3443,11 +3409,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="732"/>
         <source>Lean Weight in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lean Weight in kg or lbs from Withings data</source>
-        <translation type="vanished">Mager Gewicht in kg of lbs van Withings data</translation>
+        <translation>Drooggewicht in kg of lbs van lichaamsmetingen</translation>
     </message>
 </context>
 <context>
@@ -3455,22 +3417,22 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="690"/>
         <source>Athlete Muscles</source>
-        <translation type="unfinished"></translation>
+        <translation>Atleet Spiermassa</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="692"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="693"/>
         <source>lbs</source>
-        <translation type="unfinished">lbs</translation>
+        <translation>lbs</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="696"/>
         <source>Athlete muscles in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Atleet spiermassa in kg of lbs van lichaamsmetingen</translation>
     </message>
 </context>
 <context>
@@ -3493,11 +3455,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="574"/>
         <source>Weight in kg or lbs: first from Athlete body measurements, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation type="vanished">Gewicht in kg of lbs: eerst van Withings data, dan van Activiteit metadata en als laatste van Atleet configuratie met 75kg standaardwaarde</translation>
+        <translation>Gewicht in kg of lbs als eerste van Atleet lichaamsmetingen, daarna van Activiteit metadata en als laatste van Atleet configuratie met 75kg als standaard</translation>
     </message>
 </context>
 <context>
@@ -4025,18 +3983,18 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="520"/>
         <source>Average Stance Time Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Houding Tijdpercentage</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="521"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="522"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="525"/>
         <source>Average Stance Time Percent (%): Ground Contact Time / Step Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Houding Tijdspercentage (%): Grond Contacttijd / Staptijd</translation>
     </message>
 </context>
 <context>
@@ -4063,18 +4021,18 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="460"/>
         <source>Average Vertical Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Verticale Ratio</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="461"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="462"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="465"/>
         <source>Average Vertical Ratio (%): Vertical Oscillation / Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Verticale Ratio (%): Verticale Oscillatie / Staplengte</translation>
     </message>
 </context>
 <context>
@@ -4124,18 +4082,18 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="580"/>
         <source>Average Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Staplengte</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="581"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="582"/>
         <source>mm</source>
-        <translation type="unfinished">mm</translation>
+        <translation>mm</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="585"/>
         <source>Average Step Length: average single step (L to R / R to L) length in mm</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Staplengte: gemiddelde enkele stap (L naar R / R naar L) lengte in mm</translation>
     </message>
 </context>
 <context>
@@ -4204,27 +4162,27 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/Pages.cpp" line="901"/>
         <source>Auto Backup Folder</source>
-        <translation type="unfinished">Auto Backup Map</translation>
+        <translation>Auto Backup Map</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="904"/>
         <source>Browse</source>
-        <translation type="unfinished">Bladeren</translation>
+        <translation>Bladeren</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="910"/>
         <source>Auto Backup execution every</source>
-        <translation type="unfinished">Auto Backup uitvoering ieder</translation>
+        <translation>Auto Backup uitvoering iedere</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="912"/>
         <source>times the athlete is closed - 0 means never</source>
-        <translation type="unfinished">keren dat de atleet is gesloten - 0 betekent nooit</translation>
+        <translation>keren dat de atleet is gesloten - 0 betekent nooit</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="935"/>
         <source>Choose Backup Directory</source>
-        <translation type="unfinished">Kies Backup Map</translation>
+        <translation>Kies Backup Map</translation>
     </message>
 </context>
 <context>
@@ -4394,11 +4352,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="881"/>
         <location filename="../../Metrics/PeakPace.cpp" line="882"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4412,11 +4366,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="786"/>
         <location filename="../../Metrics/PeakPace.cpp" line="787"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4430,11 +4380,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="995"/>
         <location filename="../../Metrics/PeakPace.cpp" line="996"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4448,11 +4394,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="900"/>
         <location filename="../../Metrics/PeakPace.cpp" line="901"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4466,11 +4408,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="1014"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1015"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4484,11 +4422,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="919"/>
         <location filename="../../Metrics/PeakPace.cpp" line="920"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4502,11 +4436,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="805"/>
         <location filename="../../Metrics/PeakPace.cpp" line="806"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4520,11 +4450,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="1033"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1034"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4538,11 +4464,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="938"/>
         <location filename="../../Metrics/PeakPace.cpp" line="939"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4556,11 +4478,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="1071"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1072"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4574,11 +4492,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="957"/>
         <location filename="../../Metrics/PeakPace.cpp" line="958"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4592,11 +4506,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="824"/>
         <location filename="../../Metrics/PeakPace.cpp" line="825"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4610,11 +4520,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="1090"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1091"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4628,11 +4534,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="976"/>
         <location filename="../../Metrics/PeakPace.cpp" line="977"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4646,11 +4548,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="843"/>
         <location filename="../../Metrics/PeakPace.cpp" line="844"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4664,11 +4562,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="767"/>
         <location filename="../../Metrics/PeakPace.cpp" line="768"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4682,11 +4576,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="862"/>
         <location filename="../../Metrics/PeakPace.cpp" line="863"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4700,11 +4590,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="1052"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1053"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4718,11 +4604,7 @@ Klik Volgende om verder te gaan
         <location filename="../../Metrics/PeakPace.cpp" line="1109"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1110"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -4730,12 +4612,12 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Gui/Pages.cpp" line="2751"/>
         <source>Available Metrics</source>
-        <translation>Beschikbare Indicatoren</translation>
+        <translation>Beschikbare Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2756"/>
         <source>Selected Metrics</source>
-        <translation>Beschikbare Indicatoren</translation>
+        <translation>Beschikbare Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2772"/>
@@ -4761,18 +4643,7 @@ Klik Volgende om verder te gaan
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="225"/>
         <source>Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2</source>
-        <translation>Training Stress Score houdt rekening met intensiteit en de tijdsduur van de trainingssessie, het kan worden berekend als 100 * hours * IF^2</translation>
-    </message>
-</context>
-<context>
-    <name>BingMap</name>
-    <message>
-        <source>Route</source>
-        <translation type="vanished">Route</translation>
-    </message>
-    <message>
-        <source>No GPS Data Present</source>
-        <translation type="vanished">Geen GPS Data Aanwezig</translation>
+        <translation>Training Stress Score houdt rekening met intensiteit en de tijdsduur van de trainingssessie, het kan worden berekend als 100 * uren * IF^2</translation>
     </message>
 </context>
 <context>
@@ -4918,7 +4789,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="249"/>
         <source>Find and Import your videos and workouts.</source>
-        <translation>Vinden en toevoegen van videos en trainingen.</translation>
+        <translation>Vinden en toevoegen van video&apos;s en trainingen.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="250"/>
@@ -4941,53 +4812,53 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Weight</source>
-        <translation type="unfinished">Gewicht</translation>
+        <translation>Gewicht</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Fat Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Vetmassa</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Muscle Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiermassa</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Bones Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Skeletmassa</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Lean Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Drooggewicht</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Fat Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>Vetpercentage</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="209"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="209"/>
         <location filename="../../Core/BodyMeasures.cpp" line="210"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="210"/>
         <source>lbs</source>
-        <translation type="unfinished">lbs</translation>
+        <translation>lbs</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.h" line="73"/>
         <source>Body</source>
-        <translation type="unfinished"></translation>
+        <translation>Lichaam</translation>
     </message>
 </context>
 <context>
@@ -4995,97 +4866,97 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="45"/>
         <source>CSV Files (*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV Bestanden (*.csv)</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="45"/>
         <source>Select body measurements file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer lichaamsmetingen bestand om te importeren</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="47"/>
         <source>No file selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen bestand gekozen.</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="52"/>
         <source>Selected file %1 cannot be opened for reading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geselecteerde bestand %1 kan niet geopend worden door leesrechten schending.</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="70"/>
         <source>Column header contains duplicate identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolomheader bevat dubbele kenmerken</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="79"/>
         <source>Unknown column header: </source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekende kolomheader: </translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="80"/>
         <source>SPACE</source>
-        <translation type="unfinished"></translation>
+        <translation>SPATIE</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="88"/>
         <source>Date and Timestamp are missing - Column &apos;ts&apos; for timestamp - Colum &apos;date&apos; for Date/Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum - en tijdstempel ontbreken - Kolom &apos;ts&apos; voor tijdstempel - Kolom &apos;date&apos; voor Datum/Tijd.</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="92"/>
         <source>Both column &apos;ts&apos; - Timestamp and &apos;date&apos; - Date/Time are defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beide kolommen &apos;ts&apos; - Tijdstempel en &apos;date&apos; - Datum/Tijd zijn gedefinieerd.</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="96"/>
         <source>Column &apos;weightkg&apos; - Weight in kg - is missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolom &apos;weightkg&apos; - Gewicht in kg - mist</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="109"/>
         <source>Number of data columns: %1 in line %2 deviates from header columns: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal datakolommen: %1 in regel %2 verschilt van de headerkolommen: %3</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="130"/>
         <source>Invalid &apos;ts&apos; - Timestamp - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige &apos;ts&apos; - Tijdstempel - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="143"/>
         <source>Invalid &apos;date&apos; - Date/Time not ISO 8601 format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige &apos;date&apos; - Datum/Tijd niet ISO 8601 formaat - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="149"/>
         <source>Invalid &apos;weightkg&apos; - Weight in kg - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;weightkg&apos; - Gewicht in kg - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="155"/>
         <source>Invalid &apos;fatkg&apos; - Fat in kg - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;fatkg&apos; - Vet in kg - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="161"/>
         <source>Invalid &apos;boneskg&apos; - Bones in kg - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig  &apos;boneskg&apos; - Skelet in kg - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="167"/>
         <source>Invalid &apos;musclekg&apos; - Muscles in kg - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;musclekg&apos; - Spiermassa in kg - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="173"/>
         <source>Invalid &apos;leankg&apos; - Lean mass in kg - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;leankg&apos; - Drooggewicht in kg - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="179"/>
         <source>Invalid &apos;fatpercent&apos; - Fat in percent - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;fatpercent&apos; - Vet in procenten - in regel %1</translation>
     </message>
 </context>
 <context>
@@ -5093,83 +4964,83 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="33"/>
         <source>Body Measurements download</source>
-        <translation type="unfinished"></translation>
+        <translation>Lichaamsmetingen download</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="39"/>
         <source>Choose the download or import source</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies de download of import bron</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="40"/>
         <source>Withings</source>
-        <translation type="unfinished"></translation>
+        <translation>Withings</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="41"/>
         <source>Today&apos;s Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="42"/>
         <source>Import CSV file</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer CSV bestand</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="50"/>
         <source>Choose date range for download</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies datumbereik om te downloaden</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="51"/>
         <source>From date of first recorded activity to today</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanaf de eerst gemeten activiteit  tot vandaag</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="52"/>
         <source>From date of last downloaded measurement to today</source>
-        <translation type="unfinished"></translation>
+        <translation>Van de laatst gedownloade meeting tot vandaag</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="79"/>
         <source>Discard all existing measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder alle bestaande metingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="233"/>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="316"/>
         <source>Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Lichaamsmetingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="310"/>
         <source>Download completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Download voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="316"/>
         <source>Downloading of body measurements failed with error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloaden van lichaamsmetingen is gestopt met fout: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="53"/>
         <source>Enter manually:</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele invoer:</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="91"/>
         <source>Download</source>
-        <translation type="unfinished">Download</translation>
+        <translation>Download</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="92"/>
         <source>Close</source>
-        <translation type="unfinished">Sluit</translation>
+        <translation>Sluit</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="233"/>
         <source>Invalid date range - please check your input</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig datumbereik - controleer de invoer</translation>
     </message>
 </context>
 <context>
@@ -5261,12 +5132,12 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4393"/>
         <source>Use CP for all metrics</source>
-        <translation>Gebruik CP voor alle indicatoren</translation>
+        <translation>Gebruik CP voor alle metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4394"/>
         <source>Use FTP for Coggan metrics</source>
-        <translation>Gebruik FTP voor Coggan indicatoren</translation>
+        <translation>Gebruik FTP voor Coggan metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4451"/>
@@ -5494,12 +5365,12 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="292"/>
         <source>Altitude Power per kilogram</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoogte Vermogen per kilogram</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="295"/>
         <source>Altitude Power per lb</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoogte Vermogen per lb</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="301"/>
@@ -5520,10 +5391,6 @@ Let&apos;s get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="322"/>
         <source>Power (W)</source>
         <translation>Vermogen (W)</translation>
-    </message>
-    <message>
-        <source>Rank</source>
-        <translation type="vanished">Rang</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="744"/>
@@ -5561,10 +5428,6 @@ Let&apos;s get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="761"/>
         <source>%1 w</source>
         <translation>%1 w</translation>
-    </message>
-    <message>
-        <source>FTP</source>
-        <translation type="vanished">FTP</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="759"/>
@@ -5613,10 +5476,6 @@ Let&apos;s get you setup.</source>
         <translation>CV</translation>
     </message>
     <message>
-        <source>FTV</source>
-        <translation type="vanished">FTV</translation>
-    </message>
-    <message>
         <location filename="../../Charts/CPPlot.cpp" line="836"/>
         <source>Vmax</source>
         <translation>Vmax</translation>
@@ -5630,12 +5489,12 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="379"/>
         <source>Energy/Time </source>
-        <translation type="unfinished"></translation>
+        <translation>Energie/Tijd </translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="415"/>
         <source>No Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen Model</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="672"/>
@@ -5647,7 +5506,7 @@ Let&apos;s get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="741"/>
         <location filename="../../Charts/CPPlot.cpp" line="777"/>
         <source>Percentile</source>
-        <translation type="unfinished"></translation>
+        <translation>Percentiel</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1261"/>
@@ -5667,25 +5526,9 @@ ddd, dd MMM yyyy</source>
 ddd, dd MMM yyyy</translation>
     </message>
     <message>
-        <source>kph %1 mph</source>
-        <translation type="vanished">kph %1 mph</translation>
-    </message>
-    <message>
         <location filename="../../Charts/CPPlot.cpp" line="2131"/>
         <source>Activities</source>
         <translation>Activiteiten</translation>
-    </message>
-    <message>
-        <source>
-%1 m %2 yd</source>
-        <translation type="vanished">
-%1 m %2 yd</translation>
-    </message>
-    <message>
-        <source>
-%1 km %2 mi</source>
-        <translation type="vanished">
-%1 km %2 mi</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2688"/>
@@ -5701,12 +5544,12 @@ ddd, dd MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1947"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermogensindex</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2137"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2147"/>
@@ -5717,36 +5560,40 @@ ddd, dd MMM yyyy</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2152"/>
         <source>%1 Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Procent</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2153"/>
         <source>%1 Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Vermogensindex</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2188"/>
         <source>
 %1 m</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 m</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2189"/>
         <source>
 %1 yd</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 yd</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2193"/>
         <source>
 %1 km</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 km</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2194"/>
         <source>
 %1 mi</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 mi</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="3165"/>
@@ -5824,7 +5671,7 @@ ddd, dd MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5953"/>
         <source>Metric Pace</source>
-        <translation>Indicator Tempo</translation>
+        <translation>Metriek Tempo</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5997"/>
@@ -5932,17 +5779,17 @@ ddd, dd MMM yyyy</translation>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="70"/>
         <source>Google Calendar using CalDAV protocol and authenticate using Google Account</source>
-        <translation type="unfinished"></translation>
+        <translation>Google Calendar met gebruik van CalDAV protocol en authenticatie met gebruik van Google Account</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="71"/>
         <source>Web Calendar using iCal format as a web resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Web Kalender  met gebruik van iCal formaat als web bron</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="73"/>
         <source>Generic CalDAV Calendar such as Apple iCloud calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Generieke CalDAV Kalender zoals Apple iCloud kalender</translation>
     </message>
 </context>
 <context>
@@ -5973,7 +5820,7 @@ ddd, dd MMM yyyy</translation>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="365"/>
         <source>Time In Zone</source>
-        <translation type="unfinished">Tijd in Zone</translation>
+        <translation>Tijd in Zone</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="594"/>
@@ -5981,27 +5828,27 @@ ddd, dd MMM yyyy</translation>
         <location filename="../../Charts/OverviewWindow.cpp" line="675"/>
         <location filename="../../Charts/OverviewWindow.cpp" line="1070"/>
         <source>seconds</source>
-        <translation type="unfinished">seconden</translation>
+        <translation>seconden</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1163"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorm</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1184"/>
         <source>Fitness</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitheid</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1207"/>
         <source>Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermoeidheid</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1230"/>
         <source>Risk</source>
-        <translation type="unfinished"></translation>
+        <translation>Risico</translation>
     </message>
 </context>
 <context>
@@ -6108,7 +5955,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="56"/>
         <source>&lt;center&gt;&lt;b&gt;What is GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;You have requested a function with shares or retrieves GoldenCheetah configuration artifacts like chart definitions, worksouts, custom metrics,... in a cloud based data storage extension which is running on Google App Engine in a data center of variable location as provided by Google and/or choosen by the GoldenCheetah team.&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Privacy Rules for Sharing Artifacts&lt;/b&gt;&lt;br&gt;By sharing an artifact to CloudDB you agree to provide it under &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. When sharing you are asked to enter a &apos;Nickname&apos; and an &apos;Email-Address&apos; which are stored together with a unique identifier (which is automatically created for your athlete) in the CloudDB. This data is only used to support the CloudDB service and will not be disclosed or shared for other purposes (e.g. advertisement).&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Rules for Importing Artifacts&lt;/b&gt;&lt;br&gt;By importing an artifact from CloudDB you accept the license agreement &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Any artifcats are provided as-is without warranty of any kind, either expressed or implied, including, but not limited to, the implied warrenty of fitness for a particular purpose. The entire risk related to the quality of the artifact is with you. There is no liability regarding damages to your data trough the use of any of the artifacts and there will be no quality check/ensurance by the GoldenCheetah team for the provided artifacts.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Availability Disclaimer&lt;/b&gt;&lt;br&gt;The service is provisioned free-of-charge to the users of GoldenCheetah. There is no guarantee nor service level agreement on the 7x24 availabiliy of CloudDB services. The GoldenCheetah team has the right to delete artifacts from the CloudDB at any time and without prior notice to the providing user (e.g. due to quality issues, or due to limitations in storage capacity). The GoldenCheetah team has the right to suspend or stop the complete service or parts of the service at any time and without prior notice to the users.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Rules&lt;/b&gt;&lt;br&gt;The use of the service is exclusively granted to GoldenCheetah users - and the only permitted way to access any of the artifacts is through the GoldenCheetah application. Any attempt to access CloudDB data directly is forbidden and will either be blocked or may even end in suspending or stopping the service in general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Accept or Reject&lt;/b&gt;&lt;br&gt;By pressing &apos;Accept the rules and conditions of CloudDB&apos; you confirm that you have read and fully understood the above text and you agree to follow all of these. This decision is recorded so that you will not asked again when using CloudDB related functions. &lt;br&gt;&lt;br&gt;If you are not sure you can choose &apos;Reject and don&apos;t use CloudDB&apos;. In this case this agreement request will appear again whenever you request to use a CloudDB related function in GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Source Code&lt;/b&gt;&lt;br&gt;The source code of CloudDB is published under &apos;GNU AFFERO GENERAL PUBLIC LICENSE Version 3&apos; here: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</source>
-        <translation>&lt;center&gt;&lt;b&gt;Wat is GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;Je hebt een functie opgevraagd met of deelt of verkrijgt GoldenCheetah configuratie artefacten zoals inzicht definities, trainingen, aangepaste indicatoren,... uit een cloud gebaseerde data opslag uitbreiding welke de Google App Engine gebruikt in een data center met een variabele locatie zoals beschikbaar gesteld door Google en/of gekozen door het GoldenCheetah team.&lt;br&gt;&lt;center&gt;&lt;b&gt;Licentie en Privacy Regels voor het Delen van Artefacten&lt;/b&gt;&lt;br&gt;Door het delen van een artefact met de CloudDB ga je akkoord met het beschikbaar stellen zoals beschreven onder &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Als je deelt wordt je gevraagd om een &apos;Nickname&apos; en een &apos;Email-Address&apos; welke opgeslagen worden samen met de unieke identificatie (welke automatisch is aangemaakt voor jouw atleet) in de CloudDB. Deze data wordt alleen gebruikt om de CloudDB service te ondersteunen en zal niet worden openbaar gemaakt of gedeeld voor andere doeleinden (b.v. reclame).&lt;br&gt;&lt;center&gt;&lt;b&gt;Licenties en Regels voor het Importeren van Artefacten&lt;/b&gt;&lt;br&gt;Door het importeren van artefacten van de CloudDB accepteer je de licentieovereenkomst &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Alee artefacten worden geleverd &quot;as-is&quot; zonder enige garantie, uitgesproken of impliciet, inclusief, maar niet gelimiteerd tot, de impliciete garantie van fitness voor een bepaalde toepassing. Het volledige risico gerelateerd aan de kwaliteit van de artefact ligt bij jou. Er is geen aansprakelijkheid aangaande schade aan jouw data door het gebruik van enig artefact en er is geen kwaliteitscontrole op/verzekering door de GoldenCheetah team geleverde artefacten.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Beschikbaarheid Voorbehoud&lt;/b&gt;&lt;br&gt;De service is gratis beschikbaar gesteld aan de gebruikers van GoldenCheetah. Er is geen garantie of service level overeenkomst over de 7x24 beschikbaarheid van CloudDB services. Het GoldenCheetah team heeft het recht om artefacten te verwijderen van de CloudDB op ieder moment en zonder voorafgaande berichtgeving aan de aanleverende gebruiker (b.v. door kwaliteitsproblemen, of door beperkingen in de opslagcapaciteit ). Het GoldenCheetah team heeft het recht om de complete service of delen of van de service te stoppen of op te schorten op ieder moment en zonder voorafgaande berichtgeving aan de gebruikers.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Regels&lt;/b&gt;&lt;br&gt;Het gebruik van de service is exclusief verleend aan de GoldenCheetah gebruikers - en de enige manier van toegang om artefacten te bereiken is door de GoldenCheetah applicatie. Iedere andere manier om de CloudDB data te benaderen is verboden en wordt of geblokkeerd of zal zelfs leiden tot  opschorten of stoppen van de service in het algemeen.&lt;br&gt;&lt;center&gt;&lt;b&gt;Accepteren of Afwijzen&lt;/b&gt;&lt;br&gt;Door klikken op &apos;Accepteren van de regels en condities van de CloudDB&apos; bevestig je dat je de bovenstaande tekst gelezen en volledig begrepen hebt en dat jij je aan alles beschreven zult houden. Dit besluit is vastgelegd zodat je nogmaals dezelfde vraag krijgt wanneer je de CloudDB gerelateerde functies.gebruikt &lt;br&gt;&lt;br&gt;Als je er niet zeker van bent kan je &apos;Afwijzen en geen gebruik van de CloudDB&apos; kiezen. In dat geval wordt deze overeenkomst tekst opnieuw vertoond wanneer je een nieuw verzoek indient om de CloudDB gerelateerde functies te gebruiken in GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Bron Code&lt;/b&gt;&lt;br&gt;De bron code van CloudDB is gepubliceerd onder &apos;GNU AFFERO GENERAL PUBLIC LICENSE Version 3&apos; hier te vinden: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;Wat is GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;Je hebt een functie opgevraagd met of deelt of verkrijgt GoldenCheetah configuratie artefacten zoals inzicht definities, trainingen, aangepaste metrieken,... uit een cloud gebaseerde data opslag uitbreiding welke de Google App Engine gebruikt in een data center met een variabele locatie zoals beschikbaar gesteld door Google en/of gekozen door het GoldenCheetah team.&lt;br&gt;&lt;center&gt;&lt;b&gt;Licentie en Privacy Regels voor het Delen van Artefacten&lt;/b&gt;&lt;br&gt;Door het delen van een artefact met de CloudDB ga je akkoord met het beschikbaar stellen zoals beschreven onder &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Als je deelt wordt je gevraagd om een &apos;Nickname&apos; en een &apos;Email-Address&apos; welke opgeslagen worden samen met de unieke identificatie (welke automatisch is aangemaakt voor jouw atleet) in de CloudDB. Deze data wordt alleen gebruikt om de CloudDB service te ondersteunen en zal niet worden openbaar gemaakt of gedeeld voor andere doeleinden (b.v. reclame).&lt;br&gt;&lt;center&gt;&lt;b&gt;Licenties en Regels voor het Importeren van Artefacten&lt;/b&gt;&lt;br&gt;Door het importeren van artefacten van de CloudDB accepteer je de licentieovereenkomst &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Alee artefacten worden geleverd &quot;as-is&quot; zonder enige garantie, uitgesproken of impliciet, inclusief, maar niet gelimiteerd tot, de impliciete garantie van fitness voor een bepaalde toepassing. Het volledige risico gerelateerd aan de kwaliteit van de artefact ligt bij jou. Er is geen aansprakelijkheid aangaande schade aan jouw data door het gebruik van enig artefact en er is geen kwaliteitscontrole op/verzekering door de GoldenCheetah team geleverde artefacten.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Beschikbaarheid Voorbehoud&lt;/b&gt;&lt;br&gt;De service is gratis beschikbaar gesteld aan de gebruikers van GoldenCheetah. Er is geen garantie of service level overeenkomst over de 7x24 beschikbaarheid van CloudDB services. Het GoldenCheetah team heeft het recht om artefacten te verwijderen van de CloudDB op ieder moment en zonder voorafgaande berichtgeving aan de aanleverende gebruiker (b.v. door kwaliteitsproblemen, of door beperkingen in de opslagcapaciteit ). Het GoldenCheetah team heeft het recht om de complete service of delen of van de service te stoppen of op te schorten op ieder moment en zonder voorafgaande berichtgeving aan de gebruikers.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Regels&lt;/b&gt;&lt;br&gt;Het gebruik van de service is exclusief verleend aan de GoldenCheetah gebruikers - en de enige manier van toegang om artefacten te bereiken is door de GoldenCheetah applicatie. Iedere andere manier om de CloudDB data te benaderen is verboden en wordt of geblokkeerd of zal zelfs leiden tot  opschorten of stoppen van de service in het algemeen.&lt;br&gt;&lt;center&gt;&lt;b&gt;Accepteren of Afwijzen&lt;/b&gt;&lt;br&gt;Door klikken op &apos;Accepteren van de regels en condities van de CloudDB&apos; bevestig je dat je de bovenstaande tekst gelezen en volledig begrepen hebt en dat jij je aan alles beschreven zult houden. Dit besluit is vastgelegd zodat je nogmaals dezelfde vraag krijgt wanneer je de CloudDB gerelateerde functies.gebruikt &lt;br&gt;&lt;br&gt;Als je er niet zeker van bent kan je &apos;Afwijzen en geen gebruik van de CloudDB&apos; kiezen. In dat geval wordt deze overeenkomst tekst opnieuw vertoond wanneer je een nieuw verzoek indient om de CloudDB gerelateerde functies te gebruiken in GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Bron Code&lt;/b&gt;&lt;br&gt;De bron code van CloudDB is gepubliceerd onder &apos;GNU AFFERO GENERAL PUBLIC LICENSE Version 3&apos; hier te vinden: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="112"/>
@@ -6126,22 +5973,22 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBTelemetry.cpp" line="96"/>
         <source>GoldenCheetah - Storage of User Location</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah - Opslag van Gebruikerslocatie</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBTelemetry.cpp" line="104"/>
         <source>&lt;center&gt;&lt;b&gt;GoldenCheetah User Location Data&lt;/b&gt;&lt;br&gt;We want to start collecting data about where our active users are located and which operating system and GoldenCheetah version they are using. The collection is done via our Cloud DB. We would like to use your IP address to determine your location and count how often you are using GoldenCheetah. Besides the data mentioned we do not store any personal information in our Cloud DB. &lt;br&gt;&lt;br&gt;&lt;b&gt;Can we please record your location, OS and GoldenCheetah version ?</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;b&gt;GoldenCheetah Gebruikerslocatiedata&lt;/b&gt;&lt;br&gt;Wij willen beginnen met het vergaren van data over waar onze actieve gebruikers wonen en welke besturingssystemen en GoldenCheetah versie ze gebruiken. Het vergaren wordt gedaan via onze Cloud DB. We willen graag je IP-adres gebruiken om te bepalen wat je locatie is en hoe vaak je GoldenCheetah gebruikt. Naast de genoemde data bewaren we geen persoonlijke informatie in onze Cloud DB. &lt;br&gt;&lt;br&gt;&lt;b&gt;Mogen we je locatie, Besturingssysteem en GoldenCheetah versie opslaan?</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBTelemetry.cpp" line="117"/>
         <source>No</source>
-        <translation type="unfinished">Nee</translation>
+        <translation>Nee</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBTelemetry.cpp" line="119"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
 </context>
 <context>
@@ -6274,7 +6121,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="719"/>
         <source>All Views</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Overzichten</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="740"/>
@@ -6284,22 +6131,22 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="853"/>
         <source>Chart requires &apos;R&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaart benodigt &apos;R&apos;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="853"/>
         <source>The chart your are downloading requires &apos;R&apos; to be installed                                                                               and activated for GoldenCheetah to show any graphics. Either &apos;R&apos; is not activated                                                                               in the preferences, or not even installed.&lt;br&gt;&lt;br&gt; Please ensure &apos;R&apos;                                                                               is installed and activated to be able to use this chart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het overzicht dat je gedownload hebt benodigd een &apos;R&apos; installatie                                                                               en activatie van &apos;R&apos; voor GoldenCheetah om een beeld te laten zien. Of &apos;R&apos; is niet geactiveerd                                                                               in de voorkeursinstellingen, of is niet geïnstalleerd.&lt;br&gt;&lt;br&gt; Wees er zeker van dat &apos;R&apos; geïnstalleerd is en geactiveerd is voor gebruik om dit overzicht te gebruiken.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="864"/>
         <source>Chart requires &apos;Python&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Overzicht benodigt &apos;Phyton&apos;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="864"/>
         <source>The chart your are downloading requires &apos;Python&apos; to be installed                                                                               and activated for GoldenCheetah to show any graphics. Either &apos;Python&apos; is not activated                                                                               in the preferences, or not even installed.&lt;br&gt;&lt;br&gt; Please ensure &apos;Python&apos;                                                                               is installed and activated to be able to use this chart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het overzicht dat  je gedownload hebt benodigt een &apos;Python&apos; installatie                                                                               en activatie van &apos;Phyton&apos; voor GoldenCheetah om een beeld te laten zien. Of &apos;Python&apos; is niet geactiveerd                                                                               in de voorkeursinstellingen, of is niet geïnstalleerd.&lt;br&gt;&lt;br&gt; Wees er zeker van dat &apos;Python&apos; geïnstalleerd is en geactiveerd is voor gebruik om dit overzicht te gebruiken.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="958"/>
@@ -6450,7 +6297,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="229"/>
         <source>Authorization problem with CloudDB - please try again later.</source>
-        <translation>Authorisatieprobleem met de CloudDB - probeer later nog eens alsjeblieft.</translation>
+        <translation>Authorisatie probleem met de CloudDB - probeer later nog eens alsjeblieft.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="238"/>
@@ -6509,29 +6356,17 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="161"/>
         <source>&lt;b&gt;&lt;big&gt;Ok&lt;/big&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;All Services should be operational - no problems known.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Ok&lt;/big&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;Alle Services zouden moeten werken - geen bekende problemen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="164"/>
         <source>&lt;b&gt;&lt;big&gt;Limited Service&lt;/big&gt;&lt;/b&gt;&lt;br&gt;Sorry - some CloudDB services are not operational.&lt;br&gt;&lt;br&gt;&lt;b&gt;More information:&lt;/b&gt;&lt;br&gt;%1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Beperkte Service&lt;/big&gt;&lt;/b&gt;&lt;br&gt;Sorry - sommige CloudDB services zijn niet operationeel.&lt;br&gt;&lt;br&gt;&lt;b&gt;Meer informatie:&lt;/b&gt;&lt;br&gt;%1</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBStatus.cpp" line="167"/>
         <source>&lt;b&gt;&lt;big&gt;Service outage&lt;/big&gt;&lt;/b&gt;&lt;br&gt;Sorry - CloudDB services are not operational.&lt;br&gt;&lt;br&gt;&lt;b&gt;More information:&lt;/b&gt;&lt;br&gt;%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;&lt;big&gt;Ok&lt;/b&gt;&lt;/big&gt;&lt;br&gt;&lt;br&gt;All Services should be operational - no problems known.</source>
-        <translation type="vanished">&lt;b&gt;&lt;big&gt;Ok&lt;/b&gt;&lt;/big&gt;&lt;br&gt;&lt;br&gt;Alle Services zouden operationeel moeten zijn - geen bekende problemen.</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;&lt;big&gt;Limited Service&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Sorry - some CloudDB services are not operational.&lt;br&gt;&lt;br&gt;&lt;b&gt;More information:&lt;/b&gt;&lt;br&gt;%1</source>
-        <translation type="vanished">&lt;b&gt;&lt;big&gt;Limited Service&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Sorry - sommige CloudDB services zijn niet operationeel.&lt;br&gt;&lt;br&gt;&lt;b&gt;Meer informatie:&lt;/b&gt;&lt;br&gt;%1</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;&lt;big&gt;Service outage&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Sorry - CloudDB services are not operational.&lt;br&gt;&lt;br&gt;&lt;b&gt;More information:&lt;/b&gt;&lt;br&gt;%1</source>
-        <translation type="vanished">&lt;b&gt;&lt;big&gt;Service uitval&lt;/b&gt;&lt;/big&gt;&lt;br&gt;Sorry - CloudDB services zijn niet operationeel.&lt;br&gt;&lt;br&gt;&lt;b&gt;Meer informatie:&lt;/b&gt;&lt;br&gt;%1</translation>
+        <translation>&lt;b&gt;&lt;big&gt;Service storing&lt;/big&gt;&lt;/b&gt;&lt;br&gt;Sorry - CloudDB services zijn niet operationeel.&lt;br&gt;&lt;br&gt;&lt;b&gt;Meer informatie:&lt;/b&gt;&lt;br&gt;%1</translation>
     </message>
 </context>
 <context>
@@ -6539,42 +6374,42 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="147"/>
         <source>GoldenCheetah - Check for new versions</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah - Zoek naar nieuwere versies</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="163"/>
         <source>&lt;b&gt;&lt;big&gt;New versions of GoldenCheetah are available&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Nieuwere versies van GoldenCheetah zijn beschikbaar&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="165"/>
         <source>&lt;b&gt;&lt;big&gt;A new version of GoldenCheetah is available&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Een nieuwere versie van GoldenCheetah is beschikbaar&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="183"/>
         <source>Release: %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>Release: %1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="185"/>
         <source>Release Candidate: %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>Release Candidate: %1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="187"/>
         <source>Development Release: %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>Development Release: %1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="205"/>
         <source>Do not show again</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat dit nooit meer zien</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="207"/>
         <source>Show again in %1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Laat dit weer zien over %1 dagen</translation>
     </message>
 </context>
 <context>
@@ -6582,12 +6417,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="240"/>
         <source>expected compressed activity file.</source>
-        <translation type="unfinished">Verwachtte een gecomprimeerd activiteit bestand.</translation>
+        <translation>Verwachtte een gecomprimeerd activiteitenbestand.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.h" line="92"/>
         <source>None</source>
-        <translation type="unfinished">Geen</translation>
+        <translation>Geen</translation>
     </message>
 </context>
 <context>
@@ -6595,17 +6430,17 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="2007"/>
         <source>Downloading</source>
-        <translation type="unfinished">Downloaden</translation>
+        <translation>Downloaden</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="2008"/>
         <source>Checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Controleren</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="2044"/>
         <source>Last 30 days</source>
-        <translation type="unfinished">Laatste 28 dagen {30 ?}</translation>
+        <translation>Laatste 30 dagen</translation>
     </message>
 </context>
 <context>
@@ -6614,42 +6449,42 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudService.cpp" line="435"/>
         <location filename="../../Cloud/CloudService.cpp" line="637"/>
         <source>Folder</source>
-        <translation type="unfinished">Map</translation>
+        <translation>Map</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="442"/>
         <source>Name</source>
-        <translation type="unfinished">Naam</translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="443"/>
         <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="444"/>
         <source>Modified</source>
-        <translation type="unfinished">Gewijzigd</translation>
+        <translation>Gewijzigd</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="459"/>
         <source>Create Folder</source>
-        <translation type="unfinished">Creëer Map</translation>
+        <translation>Creëer Map</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="460"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="461"/>
         <source>Open</source>
-        <translation type="unfinished">Open</translation>
+        <translation>Open</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="650"/>
         <source>d MMM yyyy</source>
-        <translation type="unfinished">d MMM yyyy</translation>
+        <translation>d MMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -6657,18 +6492,18 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="697"/>
         <source>Synchronise </source>
-        <translation type="unfinished">Synchroniseer</translation>
+        <translation>Synchroniseer </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="705"/>
         <location filename="../../Cloud/CloudService.cpp" line="905"/>
         <source>Sync with </source>
-        <translation type="unfinished">Sync met </translation>
+        <translation>Sync met </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="706"/>
         <source>Unable to connect, check your configuration in preferences.</source>
-        <translation type="unfinished">Onmogelijk om een verbinding te maken, controleer je configuratie in voorkeuren.</translation>
+        <translation>Onmogelijk om een verbinding te maken, controleer je configuratie in voorkeuren.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="725"/>
@@ -6679,7 +6514,7 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudService.cpp" line="1377"/>
         <location filename="../../Cloud/CloudService.cpp" line="1477"/>
         <source>Download</source>
-        <translation type="unfinished">Download</translation>
+        <translation>Download</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="726"/>
@@ -6687,148 +6522,150 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudService.cpp" line="1220"/>
         <location filename="../../Cloud/CloudService.cpp" line="1592"/>
         <source>Upload</source>
-        <translation type="unfinished">Upload</translation>
+        <translation>Upload</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="727"/>
         <location filename="../../Cloud/CloudService.cpp" line="1224"/>
         <location filename="../../Cloud/CloudService.cpp" line="1422"/>
         <source>Synchronize</source>
-        <translation type="unfinished">Synchroniseer</translation>
+        <translation>Synchroniseer</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="742"/>
         <source>From:</source>
-        <translation type="unfinished">Vanaf:</translation>
+        <translation>Vanaf:</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="743"/>
         <source>To:</source>
-        <translation type="unfinished">Tot:</translation>
+        <translation>Tot:</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="753"/>
         <source>Refresh List</source>
-        <translation type="unfinished">Ververs Lijst</translation>
+        <translation>Ververs Lijst</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="754"/>
         <source>Close</source>
-        <translation type="unfinished">Sluit</translation>
+        <translation>Sluit</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="757"/>
         <location filename="../../Cloud/CloudService.cpp" line="784"/>
         <location filename="../../Cloud/CloudService.cpp" line="814"/>
         <source>Select all</source>
-        <translation type="unfinished">Selecteer alles</translation>
+        <translation>Selecteer alles</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="763"/>
         <source>Workout Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Traning naam</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="764"/>
         <location filename="../../Cloud/CloudService.cpp" line="791"/>
         <location filename="../../Cloud/CloudService.cpp" line="830"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="765"/>
         <location filename="../../Cloud/CloudService.cpp" line="792"/>
         <location filename="../../Cloud/CloudService.cpp" line="831"/>
         <source>Time</source>
-        <translation type="unfinished">Tijd</translation>
+        <translation>Tijd</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="766"/>
         <location filename="../../Cloud/CloudService.cpp" line="795"/>
         <source>Exists</source>
-        <translation type="unfinished">Bestaat</translation>
+        <translation>Bestaat</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="767"/>
         <location filename="../../Cloud/CloudService.cpp" line="796"/>
         <location filename="../../Cloud/CloudService.cpp" line="835"/>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="768"/>
         <location filename="../../Cloud/CloudService.cpp" line="836"/>
         <source>Workout Id</source>
-        <translation type="unfinished">Training Id</translation>
+        <translation>Training Id</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="790"/>
         <source>File</source>
-        <translation type="unfinished">Bestand</translation>
+        <translation>Bestand</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="793"/>
         <location filename="../../Cloud/CloudService.cpp" line="832"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdsduur</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="794"/>
         <location filename="../../Cloud/CloudService.cpp" line="833"/>
         <source>Distance</source>
-        <translation type="unfinished">Afstand</translation>
+        <translation>Afstand</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="817"/>
         <source>Keep all do not delete</source>
-        <translation type="unfinished">Behoud alles, niet verwijderen</translation>
+        <translation>Behoud alles, niet verwijderen</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="818"/>
         <source>Keep %1 but delete Local</source>
-        <translation type="unfinished">Behoud %1, maar verwijder Lokaal</translation>
+        <translation>Behoud %1, maar verwijder Lokaal</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="819"/>
         <source>Keep Local but delete %1</source>
-        <translation type="unfinished">Behoud Lokaal, maar verwijder %1</translation>
+        <translation>Behoud Lokaal, maar verwijder %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="829"/>
         <source>Source</source>
-        <translation type="unfinished">Bron</translation>
+        <translation>Bron</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="834"/>
         <source>Action</source>
-        <translation type="unfinished">Actie</translation>
+        <translation>Actie</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="856"/>
         <source>Initial</source>
-        <translation type="unfinished">Initieel</translation>
+        <translation>Initieel</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="858"/>
         <source>Overwrite existing files</source>
-        <translation type="unfinished">Overschrijf bestaande bestanden</translation>
+        <translation>Overschrijf bestaande bestanden</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="907"/>
         <source>One of your activities has unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Een van je activiteiten heeft niet bewaarde wijzigingen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="909"/>
         <source>%1 of your activities have unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van je activiteiten heeft niet bewaarde wijzigingen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="911"/>
         <source>Changes in activities which are not saved, will not be synchronized. 
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzigingen in activiteiten welke niet bewaard zijn, worden niet gesynchroniseerd. 
+
+Dit kan leiden tot inconsistenties tussen je lokale GoldenCheetah activiteiten en de geüploade activiteiten. We adviseren je de wijzigingen op te slaan voordat je verder gaat.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1024"/>
@@ -6836,106 +6673,106 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
         <location filename="../../Cloud/CloudService.cpp" line="1132"/>
         <location filename="../../Cloud/CloudService.cpp" line="1178"/>
         <source>MMM d, yyyy</source>
-        <translation type="unfinished">MMM d, yyyy</translation>
+        <translation>MMM d, yyyy</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1211"/>
         <location filename="../../Cloud/CloudService.cpp" line="1320"/>
         <source>Abort</source>
-        <translation type="unfinished">Afbreken</translation>
+        <translation>Afbreken</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1271"/>
         <location filename="../../Cloud/CloudService.cpp" line="1285"/>
         <location filename="../../Cloud/CloudService.cpp" line="1299"/>
         <source>%1 of %2 selected</source>
-        <translation type="unfinished">%1 van %2 geselecteerd</translation>
+        <translation>%1 van %2 geselecteerd</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1376"/>
         <source>Processed %1 of %2</source>
-        <translation type="unfinished">Verwerkt %1 van %2</translation>
+        <translation>Verwerkt %1 van %2</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1378"/>
         <location filename="../../Cloud/CloudService.cpp" line="1459"/>
         <source>Downloading</source>
-        <translation type="unfinished">Downloaden</translation>
+        <translation>Downloaden</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1386"/>
         <location filename="../../Cloud/CloudService.cpp" line="1560"/>
         <source>Uploading</source>
-        <translation type="unfinished">Uploaden</translation>
+        <translation>Uploaden</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1406"/>
         <location filename="../../Cloud/CloudService.cpp" line="1580"/>
         <source>Parse failure</source>
-        <translation type="unfinished">Parse fout</translation>
+        <translation>Parse fout</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1421"/>
         <source>Sync complete</source>
-        <translation type="unfinished">Sync voltooid</translation>
+        <translation>Sync voltooid</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1433"/>
         <source>Processed %1 of %2 successfully</source>
-        <translation type="unfinished">Verwerkt %1 van %2 succesvol</translation>
+        <translation>Verwerkt %1 van %2 succesvol</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1451"/>
         <location filename="../../Cloud/CloudService.cpp" line="1552"/>
         <location filename="../../Cloud/CloudService.cpp" line="1650"/>
         <source>File exists</source>
-        <translation type="unfinished">Bestand bestaat</translation>
+        <translation>Bestand bestaat</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1461"/>
         <source>Downloaded %1 of %2</source>
-        <translation type="unfinished">Gedownload %1 van %2</translation>
+        <translation>Gedownload %1 van %2</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1476"/>
         <source>Downloads complete</source>
-        <translation type="unfinished">Downloads voltooid</translation>
+        <translation>Downloads voltooid</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1487"/>
         <source>Downloaded %1 of %2 successfully</source>
-        <translation type="unfinished">Succesvol gedownload %1 van %2 </translation>
+        <translation>Downloaden %1 van %2 was succesvol</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1504"/>
         <location filename="../../Cloud/CloudService.cpp" line="1614"/>
         <source>Aborted</source>
-        <translation type="unfinished">Afgebroken</translation>
+        <translation>Afgebroken</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1522"/>
         <source>Saved</source>
-        <translation type="unfinished">Bewaard</translation>
+        <translation>Bewaard</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1562"/>
         <source>Uploaded %1 of %2</source>
-        <translation type="unfinished">Geüpload %1 van %2</translation>
+        <translation>Geüpload %1 van %2</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1591"/>
         <source>Uploads complete</source>
-        <translation type="unfinished">Uploads voltooid</translation>
+        <translation>Uploads voltooid</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1602"/>
         <source>Uploaded %1 of %2 successfully</source>
-        <translation type="unfinished">Succesvol geüpload %1 van %2 </translation>
+        <translation>Upload %1 van %2 was succesvol</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1622"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
 </context>
 <context>
@@ -6943,44 +6780,46 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="315"/>
         <source>Uploading %1 bytes...</source>
-        <translation type="unfinished">Uploaden %1 bytes...</translation>
+        <translation>Uploaden %1 bytes...</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="323"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleren</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="340"/>
         <source>Upload to </source>
-        <translation type="unfinished"></translation>
+        <translation>Upload naar </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="341"/>
         <source>The activity you want to upload has unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>De activiteit die je wilt uploaden heeft niet opgeslagen wijzigingen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="342"/>
         <source>Unsaved changes in activities will be uploaded as well. 
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet bewaarde wijzigingen in activiteiten worden ook geüpload. 
+
+Dit kan lijden to inconsistenties tussen je lokale activiteiten en de geüploade activiteiten als je de activiteit niet opslaat in GoldenCheetah. We adviseren je om de activiteit op te slaan voordat je verder gaat.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="382"/>
         <source>Upload Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload mislukt</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="383"/>
         <source>Unable to upload, check your configuration in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Onmogelijk om te uploaden, check je configuratie in voorkeursinstellingen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="415"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -6993,18 +6832,6 @@ This may lead to inconsistencies between your local activities and the uploaded 
 </context>
 <context>
     <name>ColorsPage</name>
-    <message>
-        <source>Styling</source>
-        <translation type="vanished">Styling</translation>
-    </message>
-    <message>
-        <source>Metallic (Mac)</source>
-        <translation type="vanished">Metallic (Mac)</translation>
-    </message>
-    <message>
-        <source>Flat Color (Windows)</source>
-        <translation type="vanished">Vlakke Kleuren (Windows)</translation>
-    </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2223"/>
         <source>Swatch</source>
@@ -7053,32 +6880,12 @@ This may lead to inconsistencies between your local activities and the uploaded 
     <message>
         <location filename="../../Gui/Pages.cpp" line="2263"/>
         <source>Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Font</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2264"/>
         <source>Font Scaling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="vanished">Standaard</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="vanished">Titel</translation>
-    </message>
-    <message>
-        <source>Chart Markers</source>
-        <translation type="vanished">Inzichtmarkeringen</translation>
-    </message>
-    <message>
-        <source>Chart Labels</source>
-        <translation type="vanished">Inzichtlabels</translation>
-    </message>
-    <message>
-        <source>Calendar Text</source>
-        <translation type="vanished">Kalendertekst</translation>
+        <translation>Font Verkleinen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2327"/>
@@ -7177,10 +6984,6 @@ This may lead to inconsistencies between your local activities and the uploaded 
         <translation>Atleet</translation>
     </message>
     <message>
-        <source>Passwords</source>
-        <translation type="vanished">Wachtwoorden</translation>
-    </message>
-    <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="88"/>
         <source>Appearance</source>
         <translation>Opmaak</translation>
@@ -7193,7 +6996,7 @@ This may lead to inconsistencies between your local activities and the uploaded 
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="96"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="100"/>
@@ -7247,188 +7050,39 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
 <context>
     <name>CredentialsPage</name>
     <message>
-        <source>TrainingPeaks</source>
-        <translation type="vanished">TrainingPeaks</translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation type="vanished">Gebruikersnaam</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation type="vanished">Wachtwoord</translation>
-    </message>
-    <message>
-        <source>Account Type</source>
-        <translation type="vanished">Accounttype</translation>
-    </message>
-    <message>
-        <source>Twitter</source>
-        <translation type="vanished">Twitter</translation>
-    </message>
-    <message>
-        <source>Authorise</source>
-        <translation type="vanished">Toestaan</translation>
-    </message>
-    <message>
-        <source>Dropbox</source>
-        <translation type="vanished">Dropbox</translation>
-    </message>
-    <message>
-        <source>Athlete Folder</source>
-        <translation type="vanished">Atleet Map</translation>
-    </message>
-    <message>
-        <source>Browse</source>
-        <translation type="vanished">Bladeren</translation>
-    </message>
-    <message>
-        <source>Google Drive</source>
-        <translation type="vanished">Google Drive</translation>
-    </message>
-    <message>
-        <source>Shared Local Folder</source>
-        <translation type="vanished">Gedeelde Lokale Map</translation>
-    </message>
-    <message>
-        <source>Shared Local Athlete Folder</source>
-        <translation type="vanished">Gedeelde Lokale Atleet Map</translation>
-    </message>
-    <message>
-        <source>Strava</source>
-        <translation type="vanished">Strava</translation>
-    </message>
-    <message>
-        <source>Cycling Analytics</source>
-        <translation type="vanished">Cycling Analytics</translation>
-    </message>
-    <message>
-        <source>RideWithGPS</source>
-        <translation type="vanished">RideWithGPS</translation>
-    </message>
-    <message>
-        <source>Withings Wifi Scales</source>
-        <translation type="vanished">Withings Wifi Weegschalen</translation>
-    </message>
-    <message>
-        <source>Website</source>
-        <translation type="vanished">Website</translation>
-    </message>
-    <message>
-        <source>User Id</source>
-        <translation type="vanished">Gebruikers Id</translation>
-    </message>
-    <message>
-        <source>Public Key</source>
-        <translation type="vanished">Publieke Sleutel</translation>
-    </message>
-    <message>
-        <source>Web Calendar</source>
-        <translation type="vanished">Web Kalender</translation>
-    </message>
-    <message>
-        <source>Webcal URL</source>
-        <translation type="vanished">Webcal URL</translation>
-    </message>
-    <message>
-        <source>CalDAV Calendar</source>
-        <translation type="vanished">CalDAV Kalender</translation>
-    </message>
-    <message>
-        <source>Generic CalDAV</source>
-        <translation type="vanished">Generieke CalDAV</translation>
-    </message>
-    <message>
-        <source>Google Calendar</source>
-        <translation type="vanished">Google Calendar</translation>
-    </message>
-    <message>
-        <source>CalDAV URL</source>
-        <translation type="vanished">CalDAV URL</translation>
-    </message>
-    <message>
-        <source>CalDAV User Id</source>
-        <translation type="vanished">CalDAV Gebruikers Id</translation>
-    </message>
-    <message>
-        <source>CalDAV Password</source>
-        <translation type="vanished">CalDAV Wachtwoord</translation>
-    </message>
-    <message>
-        <source>Calendar Type</source>
-        <translation type="vanished">Kalender Type</translation>
-    </message>
-    <message>
-        <source>Google CalID</source>
-        <translation type="vanished">Google CalID</translation>
-    </message>
-    <message>
-        <source>Trainingstagebuch</source>
-        <translation type="vanished">Trainingstagebuch</translation>
-    </message>
-    <message>
-        <source>Selfloops</source>
-        <translation type="vanished">Selfloops</translation>
-    </message>
-    <message>
-        <source>Velo Hero</source>
-        <translation type="vanished">Velo Hero</translation>
-    </message>
-    <message>
-        <source>SportPlusHealth</source>
-        <translation type="vanished">SportPlusHealth</translation>
-    </message>
-    <message>
-        <source>Dropbox Connection Failed</source>
-        <translation type="vanished">Dropbox Verbinding Mislukt</translation>
-    </message>
-    <message>
-        <source>Choose Athlete Directory</source>
-        <translation type="vanished">Kies Atleet Map</translation>
-    </message>
-    <message>
-        <source>Google Drive Connection Failed</source>
-        <translation type="vanished">Google Drive Verbinding Mislukt</translation>
-    </message>
-    <message>
-        <source>Choose Shared Local Folder Athlete Directory</source>
-        <translatorcomment>Not sure of the english...</translatorcomment>
-        <translation type="vanished">Kies Gedeelde Lokale Map Atleet Map</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="452"/>
         <source>+</source>
-        <translation type="unfinished">+</translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="453"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="454"/>
         <source>Edit</source>
-        <translation type="unfinished">Bewerken</translation>
+        <translation>Bewerken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="459"/>
         <source>Add</source>
-        <translation type="unfinished">Toevoegen</translation>
+        <translation>Toevoegen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="460"/>
         <source>Delete</source>
-        <translation type="unfinished">Verwijderen</translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="471"/>
         <source>Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Service</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="472"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving</translation>
     </message>
 </context>
 <context>
@@ -7454,7 +7108,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="67"/>
         <source>Show Heat</source>
-        <translation>Toon Warnte</translation>
+        <translation>Toon Warmte</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="69"/>
@@ -7512,7 +7166,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="210"/>
         <source>Show Power Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermogensprofiel tonen</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="215"/>
@@ -7522,7 +7176,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="220"/>
         <source>Show Performance Tests</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance Tests tonen</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="225"/>
@@ -7532,7 +7186,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="230"/>
         <source>Filter Unique Bests</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter Unieke Beste</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="235"/>
@@ -7542,7 +7196,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="240"/>
         <source>Show as Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon als Power Index</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="245"/>
@@ -7567,7 +7221,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="265"/>
         <source>Show time scale linear</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon als lineaire tijdschaal</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="269"/>
@@ -7622,37 +7276,37 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="292"/>
         <source>Envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>Inperking</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="293"/>
         <source>Least Squares (LMA)</source>
-        <translation type="unfinished"></translation>
+        <translation>Levenberg-Marquardt algoritme(LMA)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="294"/>
         <source>Linear Regression (Work)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lineaire Regressie (Work)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="296"/>
         <source>Curve Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Curve Fit</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="299"/>
         <source>MMP bests</source>
-        <translation type="unfinished"></translation>
+        <translation>MMP besten</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="300"/>
         <source>Performance tests</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance Testen</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="302"/>
         <source>Data to fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Data om in te passen</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="304"/>
@@ -7663,7 +7317,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="306"/>
         <source>CP and W&apos; Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>CP en W&apos; Verval</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="311"/>
@@ -7758,10 +7412,6 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="446"/>
         <source>Pmax</source>
         <translation>Pmax</translation>
-    </message>
-    <message>
-        <source>FTP</source>
-        <translation type="vanished">FTP</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="449"/>
@@ -7868,7 +7518,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1567"/>
         <source>aPower per Kilogram</source>
-        <translation type="unfinished"></translation>
+        <translation>aPower per Kilogram</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1568"/>
@@ -7931,7 +7581,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3016"/>
         <source>Are you sure you want to delete this metric?</source>
-        <translation>Ben je zeker van het verwijderen van deze indicator?</translation>
+        <translation>Ben je zeker van het verwijderen van deze metriek?</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3018"/>
@@ -7944,83 +7594,44 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="85"/>
         <source>Account is not configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>Account is niet geconfigureerd.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="109"/>
         <source>You must authorise with Cycling Analytics first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst met Cycling Analytics autoriseren</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="332"/>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="333"/>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="459"/>
         <source>Notes</source>
-        <translation type="unfinished">Aantekeningen</translation>
+        <translation>Aantekeningen</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="434"/>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="536"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="538"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="34"/>
         <source>Cycling Analytics</source>
-        <translation type="unfinished">Cycling Analytics</translation>
+        <translation>Cycling Analytics</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="35"/>
         <source>Sync with the power focused cycling site.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CyclingAnalyticsUploader</name>
-    <message>
-        <source>CyclingAnalytics</source>
-        <translation type="vanished">CyclingAnalytics</translation>
-    </message>
-    <message>
-        <source>no CyclingAnalytics token set. Please authorize in Settings.</source>
-        <translation type="vanished">geen CyclingAnalytics token ingesteld. Stel dit in de Instellingen in alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>CyclingAnalytics support isn&apos;t enabled in this build</source>
-        <translation type="vanished">CyclingAnalytics ondersteuning is niet geactiveerd in deze versie</translation>
-    </message>
-    <message>
-        <source>Error uploading to CyclingAnalytics</source>
-        <translation type="vanished">Fout tijdens het uploaden naar CyclingAnalytics</translation>
-    </message>
-    <message>
-        <source>Successfully uploaded to CyclingAnalytics</source>
-        <translation type="vanished">Succesvol geüpload naar CyclingAnalytics</translation>
-    </message>
-    <message>
-        <source>Upload to CyclingAnalytics...</source>
-        <translation type="vanished">Uploaden naar CyclingAnalytics...</translation>
-    </message>
-    <message>
-        <source>Upload... Sending to CyclingAnalytics</source>
-        <translation type="vanished">Uploaden...Versturen naar CyclingAnalytics</translation>
-    </message>
-    <message>
-        <source>Upload to CyclingAnalytics finished.</source>
-        <translation type="vanished">Uploaden naar CyclingAnalytics voltooid.</translation>
-    </message>
-    <message>
-        <source> Error from CyclingAnalytics: </source>
-        <translation type="vanished">Fout van CyclingAnalytics: </translation>
+        <translation>Sync met de vermogensfocus fietssite.</translation>
     </message>
 </context>
 <context>
@@ -8052,14 +7663,14 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Metrics/DanielsPoints.cpp" line="139"/>
         <source>Daniels Points adapted for cycling using power instead of pace and assuming VO2max-power=1.2*CP, normalized to assign 100 points to 1 hour at CP.</source>
-        <translation>Daniels Points aangepast voor wielersport waarbij Vermogen gebruikt wordt inplaats van tempo en verondersteld VO2max=1.2*CP, genormaliseerd om 100 punten per uur bij CP toe te kennen.</translation>
+        <translation>Daniels Points aangepast voor wielersport waarbij Vermogen gebruikt wordt in plaats van tempo en verondersteld VO2max=1.2*CP, genormaliseerd om 100 punten per uur bij CP toe te kennen.</translation>
     </message>
 </context>
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1608"/>
-        <location filename="../../Core/DataFilter.cpp" line="1647"/>
+        <location filename="../../Core/DataFilter.cpp" line="1617"/>
+        <location filename="../../Core/DataFilter.cpp" line="1656"/>
         <source>malformed expression.</source>
         <translation>misvormde uitdrukking.</translation>
     </message>
@@ -8152,7 +7763,7 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Train/DaumController.cpp" line="59"/>
         <source>Cannot Connect to Daum</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan Geen Verbinding Maken met Daum</translation>
     </message>
 </context>
 <context>
@@ -8307,14 +7918,6 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
-    <message>
-        <source>Auto-connect devices in Train View</source>
-        <translation type="vanished">Apparaten Automatisch Verbinden in Train Weergave</translation>
-    </message>
-    <message>
-        <source>Allow multiple devices in Train View</source>
-        <translation type="vanished">Meerdere Apparaten in Train Weergave toestaan</translation>
-    </message>
 </context>
 <context>
     <name>DeviceTypes</name>
@@ -8351,26 +7954,22 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="64"/>
         <source>Kettler Racer serial device </source>
-        <translation type="unfinished"></translation>
+        <translation>Kettler Racer serieel apparaat </translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="67"/>
         <source>Daum Serial Device </source>
-        <translation type="unfinished"></translation>
+        <translation>Daum Serieel Apparaat </translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="72"/>
         <source>Tacx Fortius bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Fortius fietstrainer met stuur-controller verbonden via een USB poort. Wees er zeker van dat je de firmware van je apparaat bij de hand hebt.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="76"/>
         <source>Tacx iMagic bike trainer with the handlebar controller connected to a USB port.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tacx Fortius/iMagic bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
-        <translation type="vanished">Tacx Fortius/iMagic fietstrainer met de stuurcontroller aangesloten op een USB poort. Wees er zeker van dat je de apparaat firmware bij de hand hebt.</translation>
+        <translation>Tacx iMagic fietstrainer met stuur-controller verbonden via een USB poort.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="82"/>
@@ -8399,50 +7998,6 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
         <translation>Kalender</translation>
     </message>
     <message>
-        <source>Summary</source>
-        <translation type="vanished">Periode</translation>
-    </message>
-    <message>
-        <source>Day Summary</source>
-        <translation type="vanished">Dagoverzicht</translation>
-    </message>
-    <message>
-        <source>Weekly Summary</source>
-        <translation type="vanished">Weekoverzicht</translation>
-    </message>
-    <message>
-        <source>Monthly Summary</source>
-        <translation type="vanished">Maandoverzicht</translation>
-    </message>
-    <message>
-        <source>Totals</source>
-        <translation type="vanished">Totalen</translation>
-    </message>
-    <message>
-        <source>Averages</source>
-        <translation type="vanished">Gemiddelden</translation>
-    </message>
-    <message>
-        <source>Maximums</source>
-        <translation type="vanished">Maximums</translation>
-    </message>
-    <message>
-        <source>Metrics</source>
-        <translation type="vanished">Indicatoren</translation>
-    </message>
-    <message>
-        <source>^(Average|Max) </source>
-        <translation type="vanished">^(Gemiddelde|Max) </translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
-    </message>
-    <message>
-        <source>Day of </source>
-        <translation type="vanished">Dag van </translation>
-    </message>
-    <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="666"/>
         <source>dddd MMMM d</source>
         <translation>dddd MMMM d</translation>
@@ -8451,10 +8006,6 @@ Wil je bevestigen en GoldenCheetah herstarten?</translation>
         <location filename="../../Gui/DiarySidebar.cpp" line="666"/>
         <source>Week Commencing %1</source>
         <translation>Week beginnend met %1</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <translation type="vanished">MMMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -8681,17 +8232,9 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
 <context>
     <name>Dropbox</name>
     <message>
-        <source>invalid root path.</source>
-        <translation type="vanished">ongeldig oorsprong pad.</translation>
-    </message>
-    <message>
-        <source>root is not a directory.</source>
-        <translation type="vanished">root is geen map.</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/Dropbox.cpp" line="68"/>
         <source>Problem accessing Dropbox data</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem met de toegang van Dropbox data</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="130"/>
@@ -8701,7 +8244,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="199"/>
         <source>Parsing Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Parsing Fout: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="287"/>
@@ -8712,21 +8255,17 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="291"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dropbox Cloud Storage</source>
-        <translation type="vanished">Dropbox Cloud Opslag</translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.h" line="37"/>
         <source>Dropbox</source>
-        <translation type="unfinished">Dropbox</translation>
+        <translation>Dropbox</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.h" line="38"/>
         <source>Sync activities via your cloud storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync activiteiten via je cloud opslag.</translation>
     </message>
 </context>
 <context>
@@ -8786,7 +8325,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="207"/>
         <source>Performance Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance Test</translation>
     </message>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="230"/>
@@ -8824,7 +8363,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1610"/>
         <source>Metric</source>
-        <translation>Indicator</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1611"/>
@@ -8837,13 +8376,9 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
         <translation>Schatting</translation>
     </message>
     <message>
-        <source>Stress</source>
-        <translation type="vanished">Stress</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMTool.cpp" line="1613"/>
         <source>PMC</source>
-        <translation type="unfinished">PMC</translation>
+        <translation>PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1614"/>
@@ -8853,17 +8388,17 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1615"/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Meting</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1616"/>
         <source>Performance</source>
-        <translation type="unfinished">Performance</translation>
+        <translation>Performance</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1617"/>
         <source>Banister</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1689"/>
@@ -8933,24 +8468,24 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
 </source>
         <translation># type een formule om te gebruiken
 # bij b.v. BikeStress / Tijdsduur
-# terwijl je typt zullen de beschikbare indicatoren
-# automatisch aangeboden worden 
+# terwijl je typt zullen de beschikbare metrieken
+# automatisch aangeboden worden
 </translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1844"/>
         <source>Weekly Best Performances</source>
-        <translation type="unfinished"></translation>
+        <translation>Wekelijkse Beste Performance</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1845"/>
         <source>Submaximal Weekly Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Sub-maximaal Wekelijkse Best</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1846"/>
         <source>Performance Tests</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance Testen</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1934"/>
@@ -8980,257 +8515,262 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1950"/>
         <source>Negative Training Effect (NTE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Negatief  Trainingseffect (NTE)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1951"/>
         <source>Positive Training Effect (PTE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Positief Trainingseffect (PTE)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1952"/>
         <source>Performance (Power Index)</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance (Power Index)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1953"/>
         <source>Predicted CP (Watts)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorspelde CP (Watts)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1961"/>
+        <location filename="../../Charts/LTMTool.cpp" line="1970"/>
         <source>Curve Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Curve Type</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1991"/>
+        <location filename="../../Charts/LTMTool.cpp" line="1977"/>
+        <source>Perf. Metric</source>
+        <translation>Perf. Metriek</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMTool.cpp" line="2007"/>
         <source>Metadata Field</source>
         <translation>Metadata Veld</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1992"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2008"/>
         <source>PMC metric</source>
-        <translation>PMC indicatoren</translation>
+        <translation>PMC Metrieken</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2017"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2033"/>
         <source>Measure Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Meting Groep</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2025"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2041"/>
         <source>Measure Field</source>
-        <translation type="unfinished"></translation>
+        <translation>Meting Veld</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2045"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2061"/>
         <source>Filter</source>
         <translation>Filter</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2049"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2065"/>
         <source>Name</source>
         <translation>Naam</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2050"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2066"/>
         <source>Axis Label / Units</source>
         <translation>As Label / Eenheden</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2056"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2072"/>
         <source>Style</source>
         <translation>Stijl</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2058"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2074"/>
         <source>Bar</source>
         <translation>Bar</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2059"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2075"/>
         <source>Line</source>
         <translation>Lijn</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2060"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2076"/>
         <source>Sticks</source>
         <translation>Staven</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2061"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2077"/>
         <source>Dots</source>
         <translation>Punten</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2064"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2080"/>
         <source>Stack</source>
         <translation>Stapel</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2069"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2085"/>
         <source>Symbol</source>
         <translation>Symbool</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2071"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2087"/>
         <source>None</source>
         <translation>Geen</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2072"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2088"/>
         <source>Circle</source>
         <translation>Cirkel</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2073"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2089"/>
         <source>Square</source>
         <translation>Vierkant</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2074"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2090"/>
         <source>Diamond</source>
         <translation>Diamant</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2075"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2091"/>
         <source>Triangle</source>
         <translation>Driehoek</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2076"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2092"/>
         <source>Cross</source>
         <translation>Kruis</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2077"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2093"/>
         <source>Hexagon</source>
         <translation>Zeshoek</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2078"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2094"/>
         <source>Star</source>
         <translation>Ster</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2081"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2097"/>
         <source>Color</source>
         <translation>Kleur</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2084"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2100"/>
         <source>Fill curve</source>
         <translation>Vlak opvullen</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2088"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2104"/>
         <source>Data labels</source>
         <translation>Datalabel</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2095"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2111"/>
         <source>Highlight Highest</source>
         <translation>Markeer Hoogste</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2103"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2119"/>
         <source>Highlight Lowest</source>
         <translation>Markeer Laagste</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2111"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2127"/>
         <source>Highlight Outliers</source>
         <translation>Markeer Uitschieters</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2119"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2135"/>
         <source>Baseline</source>
         <translation>Basislijn</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2127"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2143"/>
         <source>Smooth Curve</source>
         <translation>Afvlakken Curve</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2131"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2147"/>
         <source>No trend Line</source>
         <translation>Geen trendlijn</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2132"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2148"/>
         <source>Linear Trend</source>
         <translation>Lineaire Trend</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2133"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2149"/>
         <source>Quadratic Trend</source>
         <translation>Kwadratische Trend</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2134"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2150"/>
         <source>Moving Average</source>
         <translation>Voortschrijdend Gemiddelde</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2135"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2151"/>
         <source>Simple Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Simpel Gemiddelde</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2180"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2196"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2181"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2197"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuleren</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2394"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2410"/>
         <source>Peak %1</source>
         <translation>Piek %1</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2396"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2412"/>
         <source> second </source>
         <translation> seconde </translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2397"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2413"/>
         <source> minute </source>
         <translation> minuut </translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2399"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2415"/>
         <source> hour </source>
         <translation> uur </translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2419"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2435"/>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2433"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2449"/>
         <source>Performances</source>
-        <translation type="unfinished"></translation>
+        <translation>Performances</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2434"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2450"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermogensindex</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2551"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2567"/>
         <source>Performances_%1_%2_%3</source>
-        <translation type="unfinished"></translation>
+        <translation>Performances_%1_%2_%3</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2641"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2660"/>
         <source>Choose Metric Color</source>
-        <translation>Kies Indicatorkleur</translation>
+        <translation>Kies Metriekkleur</translation>
     </message>
 </context>
 <context>
@@ -9428,12 +8968,12 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Core/Season.cpp" line="239"/>
         <source>Priority</source>
-        <translation type="unfinished">Prioriteit</translation>
+        <translation>Prioriteit</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="240"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="271"/>
@@ -9462,8 +9002,8 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
 </source>
         <translation># type een formule om te gebruiken
 # bij b.v. BikeStress / Tijdsduur
-# terwijl je typt zullen de beschikbare indicatoren
-# automatisch aangeboden worden 
+# terwijl je typt zullen de beschikbare metrieken
+# automatisch aangeboden worden
 </translation>
     </message>
     <message>
@@ -9484,7 +9024,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Core/UserData.cpp" line="199"/>
         <source>Zone string</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone string</translation>
     </message>
     <message>
         <location filename="../../Core/UserData.cpp" line="201"/>
@@ -9504,7 +9044,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Core/UserData.cpp" line="247"/>
         <source>Choose Metric Color</source>
-        <translation>Kies Indicatorkleur</translation>
+        <translation>Kies Metriekkleur</translation>
     </message>
 </context>
 <context>
@@ -9512,7 +9052,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="44"/>
         <source>User Defined Metric</source>
-        <translation>Gebruiker Gedefinieerde Indicator</translation>
+        <translation>Gebruiker Gedefinieerde Metriek</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="53"/>
@@ -9602,7 +9142,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="185"/>
         <source>Metric</source>
-        <translation>Metrisch</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="186"/>
@@ -9656,17 +9196,17 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="107"/>
         <source>Elapsed Time</source>
-        <translation type="unfinished">Verstreken Tijd</translation>
+        <translation>Verstreken Tijd</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="108"/>
         <source>secs</source>
-        <translation type="unfinished">secs</translation>
+        <translation>secs</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="110"/>
         <source>Only useful for intervals, time the interval started</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen bruikbaar voor intervallen, startmoment van de interval</translation>
     </message>
 </context>
 <context>
@@ -9869,7 +9409,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
         <location filename="../../Gui/EstimateCPDialog.cpp" line="141"/>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="143"/>
         <source> watts</source>
-        <translation>watts</translation>
+        <translation> watts</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="61"/>
@@ -9899,12 +9439,12 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="85"/>
         <source>Your best short effort (3-5 min):</source>
-        <translation>Jouw beste korte inspannning (3-5 min):</translation>
+        <translation>Jouw beste korte inspanning (3-5 min):</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="89"/>
         <source>Your best long effort (15-60 min):</source>
-        <translation>Jouw beste lange inspannning (15-60 min):</translation>
+        <translation>Jouw beste lange inspanning (15-60 min):</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="96"/>
@@ -10186,243 +9726,11 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     </message>
 </context>
 <context>
-    <name>FileStore</name>
-    <message>
-        <source>expected compressed activity file.</source>
-        <translation type="vanished">Verwachtte een gecomprimeerd activiteit bestand.</translation>
-    </message>
-    <message>
-        <source>Base class</source>
-        <translation type="vanished">Basis class</translation>
-    </message>
-</context>
-<context>
-    <name>FileStoreDialog</name>
-    <message>
-        <source>Folder</source>
-        <translation type="vanished">Map</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="vanished">Naam</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation type="vanished">Type</translation>
-    </message>
-    <message>
-        <source>Modified</source>
-        <translation type="vanished">Gewijzigd</translation>
-    </message>
-    <message>
-        <source>Create Folder</source>
-        <translation type="vanished">Creëer Map</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="vanished">Annuleren</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation type="vanished">Open</translation>
-    </message>
-</context>
-<context>
-    <name>FileStoreSyncDialog</name>
-    <message>
-        <source>Synchronise </source>
-        <translation type="vanished">Synchroniseer</translation>
-    </message>
-    <message>
-        <source>Sync with </source>
-        <translation type="vanished">Sync met </translation>
-    </message>
-    <message>
-        <source>Unable to connect, check your configuration in preferences.</source>
-        <translation type="vanished">Onmogelijk om een verbinding te maken, controleer je configuratie in voorkeuren.</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation type="vanished">Download</translation>
-    </message>
-    <message>
-        <source>Upload</source>
-        <translation type="vanished">Upload</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation type="vanished">Synchroniseer</translation>
-    </message>
-    <message>
-        <source>From:</source>
-        <translation type="vanished">Vanaf:</translation>
-    </message>
-    <message>
-        <source>To:</source>
-        <translation type="vanished">Tot:</translation>
-    </message>
-    <message>
-        <source>Refresh List</source>
-        <translation type="vanished">Ververs Lijst</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="vanished">Sluit</translation>
-    </message>
-    <message>
-        <source>Select all</source>
-        <translation type="vanished">Selecteer alles</translation>
-    </message>
-    <message>
-        <source>Workout Id</source>
-        <translation type="vanished">Training Id</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation type="vanished">Datum</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="vanished">Tijd</translation>
-    </message>
-    <message>
-        <source>Exists</source>
-        <translation type="vanished">Bestaat</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="vanished">Status</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation type="vanished">Bestand</translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation type="vanished">Duur</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="vanished">Afstand</translation>
-    </message>
-    <message>
-        <source>Keep all do not delete</source>
-        <translation type="vanished">Behoud alles, niet verwijderen</translation>
-    </message>
-    <message>
-        <source>Keep %1 but delete Local</source>
-        <translation type="vanished">Behoud %1, maar verwijder Lokaal</translation>
-    </message>
-    <message>
-        <source>Keep Local but delete %1</source>
-        <translation type="vanished">Behoud Lokaal, maar verwijder %1</translation>
-    </message>
-    <message>
-        <source>Source</source>
-        <translation type="vanished">Bron</translation>
-    </message>
-    <message>
-        <source>Action</source>
-        <translation type="vanished">Actie</translation>
-    </message>
-    <message>
-        <source>Initial</source>
-        <translation type="vanished">Initieel</translation>
-    </message>
-    <message>
-        <source>Overwrite existing files</source>
-        <translation type="vanished">Overschrijf bestaande bestanden</translation>
-    </message>
-    <message>
-        <source>%1 of %2 selected</source>
-        <translation type="vanished">%1 van %2 geselecteerd</translation>
-    </message>
-    <message>
-        <source>Processed %1 of %2</source>
-        <translation type="vanished">Verwerkt %1 van %2</translation>
-    </message>
-    <message>
-        <source>Downloading</source>
-        <translation type="vanished">Downloaden</translation>
-    </message>
-    <message>
-        <source>Uploading</source>
-        <translation type="vanished">Uploaden</translation>
-    </message>
-    <message>
-        <source>Parse failure</source>
-        <translation type="vanished">Parse fout</translation>
-    </message>
-    <message>
-        <source>Sync complete</source>
-        <translation type="vanished">Sync voltooid</translation>
-    </message>
-    <message>
-        <source>Processed %1 of %2 successfully</source>
-        <translation type="vanished">Verwerkt %1 van %2 succesvol</translation>
-    </message>
-    <message>
-        <source>File exists</source>
-        <translation type="vanished">Bestand bestaat</translation>
-    </message>
-    <message>
-        <source>Downloaded %1 of %2</source>
-        <translation type="vanished">Gedownload %1 van %2</translation>
-    </message>
-    <message>
-        <source>Downloads complete</source>
-        <translation type="vanished">Downloads voltooid</translation>
-    </message>
-    <message>
-        <source>Downloaded %1 of %2 successfully</source>
-        <translation type="vanished">Succesvol gedownload %1 van %2 </translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="vanished">Afgebroken</translation>
-    </message>
-    <message>
-        <source>Saved</source>
-        <translation type="vanished">Bewaard</translation>
-    </message>
-    <message>
-        <source>Uploaded %1 of %2</source>
-        <translation type="vanished">Geüpload %1 van %2</translation>
-    </message>
-    <message>
-        <source>Uploads complete</source>
-        <translation type="vanished">Uploads voltooid</translation>
-    </message>
-    <message>
-        <source>Uploaded %1 of %2 successfully</source>
-        <translation type="vanished">Succesvol geüpload %1 van %2 </translation>
-    </message>
-    <message>
-        <source>Completed.</source>
-        <translation type="vanished">Voltooid.</translation>
-    </message>
-</context>
-<context>
-    <name>FileStoreUploadDialog</name>
-    <message>
-        <source>Uploading %1 bytes...</source>
-        <translation type="vanished">Uploaden %1 bytes...</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="vanished">Annuleren</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="vanished">OK</translation>
-    </message>
-</context>
-<context>
     <name>FilterHrvOutliers</name>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="244"/>
         <source>Filter R-R Outliers</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter R-R Uitschieters</translation>
     </message>
 </context>
 <context>
@@ -10430,27 +9738,27 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="153"/>
         <source>R-R maximum (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>R-R maximum (msec)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="154"/>
         <source>R-R minimum (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>R-R minimum (msec)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="155"/>
         <source>Filter range</source>
-        <translation type="unfinished"></translation>
+        <translation>Filterbereik</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="156"/>
         <source>Filter window size (#)</source>
-        <translation type="unfinished"></translation>
+        <translation>Filterbereik grootte (#)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="182"/>
         <source>Set Rest Hrv</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust Hrv instellen</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="197"/>
@@ -10460,7 +9768,12 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Filter R-R uitschieters (zie &quot;R-R flag&quot; in HRV Xdata). Niet uitschieters zijn gemarkeerd als &quot;1&quot;.
+  - &quot;R-R min en maximum&quot; observaties negeren (flag -1). Ook genegeerd tijdens het filteren.
+  - &quot;Filterbereik&quot; van het gemiddelde of binnen een bereik(flag 0)
+  - &quot;Filterbereik maat&quot; afstand van beide kanten van de huidige interval
+  - &quot;Set Rust HRV&quot; als aangezet worden de berekende HRV metriek gemarkeerd als Rust HRV Metrieken
+</translation>
     </message>
 </context>
 <context>
@@ -10557,7 +9870,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="103"/>
         <source>Set XData.CdA from HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak XData.CdA van HR</translation>
     </message>
 </context>
 <context>
@@ -10565,7 +9878,7 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="65"/>
         <source>When recording with an iBike AeroPod (in HR mode) the CdA data is sent as HR. This tool will update the activity file to move the values from HR into the XData.CdA series.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wanneer er gemeten wordt met een iBike AeroPod (in HR-mode) wordt de Cda data verstuurd als HR. Dit tool zal het activiteitenbestand updaten en de waardes van HR verplaatsen naar de XData Cda reeks.</translation>
     </message>
 </context>
 <context>
@@ -10573,32 +9886,20 @@ Misschien is het (opnieuw) nodig om de FTDI of PL2303 drivers te installeren voo
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="104"/>
         <source>Estimate Distance Values</source>
-        <translation>Afstandwaarden Schatten</translation>
+        <translation>Afstandswaarden Schatten</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="237"/>
         <source>Derive Distance from GPS on </source>
-        <translation>Afstand Afleiden van GPS aan</translation>
+        <translation>Afstand Afleiden van GPS aan </translation>
     </message>
 </context>
 <context>
     <name>FixDeriveDistanceConfig</name>
     <message>
-        <source>Derive distance based on GPS position
-
-Some unit doesn&apos;t record distance without a speedometer but record position (eg Timex Cycle Trainer)
-
-</source>
-        <translation type="vanished">Leidt afstand af van de GPS positie
-
-Sommige apparaten nemen de afstand op zonder een snelheidsmeter maar leggen wel de positie vast (b.v. Timex Cycle Trainer)
-
-</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="54"/>
         <source>Use Cubic Splines</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik Cubic Splines</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="74"/>
@@ -10607,7 +9908,11 @@ Sommige apparaten nemen de afstand op zonder een snelheidsmeter maar leggen wel 
 This process will populate distance information (and override existing distance information if present.)The cubic splines processing estimates distance across polynomial curve, otherwise this feature will compute geometric arc distance between ride points.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Leidt de afstand af van de GPS locaties
+
+Dit proces vult de afstandsinformatie in (en overschrijft daarmee bestaande afstandsinformatie).De cubic splines functie schat de afstand tussen een aaneenschakeling van polynomen, in plaats van een berekening met geometrische booglengte tussen punten.
+
+</translation>
     </message>
 </context>
 <context>
@@ -10615,12 +9920,12 @@ This process will populate distance information (and override existing distance 
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="83"/>
         <source>Estimate Headwind Values</source>
-        <translation>Tegenwindwaarden Schatten</translation>
+        <translation>Tegenwind Waarden Schatten</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="161"/>
         <source>Derive Headwind from weather on </source>
-        <translation>Leidt Tegenwind af van weer aan</translation>
+        <translation>Leidt Tegenwind af van weer aan </translation>
     </message>
 </context>
 <context>
@@ -10654,22 +9959,17 @@ This process will populate distance information (and override existing distance 
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="68"/>
         <source>CdA</source>
-        <translation type="unfinished">CdA</translation>
+        <translation>CdA</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="69"/>
         <source>Draft mult.</source>
-        <translation type="unfinished">Slipstream Mult.</translation>
+        <translation>Slipstream Mult.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="70"/>
         <source>Wind (kph)</source>
         <translation>Windsnelheid (kph)</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
-        <source>, heading</source>
-        <translation type="unfinished">Windrichting</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="130"/>
@@ -10687,31 +9987,25 @@ wind speed shall be indicated in kph
 wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the ride file already contain wind data
       it will be overridden if wind is entered manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Leidt het geschatte vermogen af van snelheid/hoogte/gewicht enz
+
+Fietsgewicht parameter wordt opgeteld bij de atleetgewicht om het totaalgewicht te berekenen, daarbij horen oof schoenen, kleding enz
+
+CRR parameter is het coëfficiënt van de rolweerstand, het hangt af van de banden en het rijoppervlak
+
+CdA parameter is het effectieve frontale oppervlak in m^2, het hangt af van de positie en apparatuur. als 0 ingesteld wordt wordt het geschat van de anthropometrische data
+
+Draft Mult. parameter is de vermenigvuldigingsfactor om de windschaduw te verrekenen, als 1 ingesteld wordt is er geen windschaduw  en 0.7 is een legitieme waarde voor een groep
+
+windsnelheid wordt aangegeven in kph
+windrichting (origine) eenheid is graden van-179 tot +180 (-90=W, 0=N, 90=O, 180=Z)
+Notitie: als het bestand al wind data bevat
+      wordt dit overschreven als wind handmatig ingegeven wordt</translation>
     </message>
     <message>
+        <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
         <source>, direction</source>
-        <translation type="vanished">Windrichting</translation>
-    </message>
-    <message>
-        <source>Derive estimated power data based on speed/elevation/weight etc
-
-Bike Weight parameter is added to athlete&apos;s weight to compound total mass, it should include apparel, shoes, etc
-
-CRR parameter is the coefficient of rolling resistance, it depends on tires and surface
-wind speed shall be indicated in kph
-wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
-Note: if the ride file already contain wind data
-      it will be overridden if wind is entered manually</source>
-        <translation type="vanished">Leidt geschat vermogen af van snelheid/hoogte/gewicht etc.
-
-De fietsgewicht parameter wordt toegevoegd aan het atleetgewicht; om het totaalgewicht samen te stellen hoort daar ook kleding, schoenen etc. bij
-
-De CRR parameter is het coëfficiënt van de rolweerstand, en hangt af van de banden en het wegoppervlak
-
-Windsnelheid wordt aangegeven in kph
-Windrichting (hoek) wordt aangeven in graden van -179 tot +180 (-90=W, 0=N, 90=E, 180=S)
-Opmerking: als het bestand al winddata bevat wordt dit overschreven als winddata wordt ingevoerd</translation>
+        <translation>Windrichting</translation>
     </message>
 </context>
 <context>
@@ -10740,12 +10034,12 @@ Opmerking: als het bestand al winddata bevat wordt dit overschreven als winddata
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="165"/>
         <source>Fix Elevation Data not possible</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix Hoogte Data niet mogelijk</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="166"/>
         <source>The following problem occured: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit probleem trad op: %1</translation>
     </message>
 </context>
 <context>
@@ -10937,13 +10231,9 @@ Badlengte (in meters) geeft de mogelijkheid om het veld te herdefiniëren als de
 <context>
     <name>FixPowerConfig</name>
     <message>
-        <source>Power Adjustment</source>
-        <translation type="vanished">Vermogen Aanpassen</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/FixPower.cpp" line="50"/>
         <source>Percent Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>Procent Aanpassing</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="52"/>
@@ -10953,12 +10243,12 @@ Badlengte (in meters) geeft de mogelijkheid om het veld te herdefiniëren als de
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="54"/>
         <source>Fix Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix Aanpassing</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="56"/>
         <source>watt</source>
-        <translation type="unfinished"></translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="74"/>
@@ -10969,15 +10259,13 @@ Percent Adjustment - this defines percentage  to modify values by. Negative valu
 Fix Adjustment - this defines an fix amount  to modify values by. Negative values are supported.
 
 If both parameters are given, first the relative adjustment takes place, then the fix value adjustment is applied on the result.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjusting power values allows you to uplift or degrade the power values by a percentage. It takes a single parameter:
+        <translation>Het aanpassen van vermogenswaardes geeft een mogelijk tot opwaarderen en afwaarderen van de vermogenswaardes door een percentage en/of een vaste waarde. Er zijn twee parameters:
 
-Power Adjustment - this defines percentage  to modify values by. Negative values are supported.</source>
-        <translation type="vanished">Het aanpassen van de vermogenswaarde maakte het mogelijk een verhoging of verlaging door te voeren als percentage. Het gebruikt een parameter:
+Procentaanpassing - dit definieert het percentage waarmee de waardes moeten worden veranderd. Negatieve waardes zijn mogelijk.
 
-Vermogen Aanpassen - dit definieert het percentage om waarden te veranderen. Negatieve waarden worden ondersteund.</translation>
+Vaste Aanpassing - dit definieert een vast aantal waarmee de waardes moeten worden veranderd. Negatieve waardes zijn mogelijk.
+
+Als beide parameters gebruikt worden, wordt eerste de relatieve aanpassing gedaan, daarna wordt de vaste waarde verrekend.</translation>
     </message>
 </context>
 <context>
@@ -11025,8 +10313,8 @@ Dit tool converteert dit naar omwentelingen of cycli per minuut</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="65"/>
-        <source>, heading</source>
-        <translation>Windrichting</translation>
+        <source>, direction</source>
+        <translation>, richting</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="108"/>
@@ -11043,7 +10331,7 @@ Note: if the file already contain wind data it will be overridden if wind is ent
 
 Apparatuurgewicht wordt als parameter toegevoegd aan het gewicht van de atleet om een totaalgewicht samen te stellen, dit moet namelijk ook kleding, schoenen, etc. bevatten
 
-De Slipstream Mult. parameter is de vermenigvuldigingsfactor om een aanpassing te doen in geval van slipstreamen, 1 is bij geen slipstream, en 0.7 is toepasselijk bij slipstreamen in een group
+De Slipstream Mult. parameter is de vermenigvuldigingsfactor om een aanpassing te doen in geval van slipstreamen, 1 is bij geen slipstream, en 0.7 is toepasselijk bij slipstreamen in een groep
 
 Windsnelheid wordt aangegeven in kph
 Windrichting (hoek) wordt aangeven in graden van -179 tot +180 (-90=W, 0=N, 90=E, 180=S)
@@ -11055,33 +10343,25 @@ Opmerking: als het bestand al winddata bevat wordt dit overschreven als winddata
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="123"/>
         <source>Fix SmO2 and/or tHb Anomaly</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix SmO2 en/of tHb Afwijking</translation>
     </message>
 </context>
 <context>
     <name>FixSmO2Config</name>
     <message>
-        <source>Occasionally SmO2 (%) will erroneously report high values (0% or &gt;100%).
-
-This function will look for spikes/anomalies in SmO2 data and replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question</source>
-        <translation type="vanished">Soms zal SmO2 (in %) verkeerde hoge waarden aangeven (0% of &gt;100%).
-
-Deze functie zal zoeken naar spikes/onregelmatigheden in de SmO2 data en deze foute data vervangen door deze uit te vlakken/te interpoleren met de aanliggende datapunten in kwestie</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="51"/>
         <source>Fix SmO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix SmO2</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="52"/>
         <source>Fix tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="53"/>
         <source>Max. tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="74"/>
@@ -11093,7 +10373,14 @@ Fix SmO2 - check to fix anomalies in SmO2 data
 Fix tHb - check to fix anomalies in tHb data 
 Max. tHb - any tHb above is considered an outlier 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Soms is/zijn SmO2 (%) en/of tHb (%) weggevallen of hebben erg hoge waardes (SmO2: 0% of &gt;100% / tHb: 0% of &gt; max. tHb parameter). 
+
+ Deze functie gaat op zoek naar deze afwijkingen in SmO2 en tHb data en afhankelijk van de configuratie vervangt dan de foutieve data door middel van afvlakken/interpolatie van de data van de 3 punten in kwestie. Het heeft de volgende parameters:
+
+Fix SmO2 - check of fix onregelmatigheden in SmO2 data 
+Fix tHb - check of fix onregelmatigheden in tHb data 
+Max. tHb - iedere tHb boven deze waarde wordt gezien als een afwijking 
+</translation>
     </message>
 </context>
 <context>
@@ -11124,10 +10411,6 @@ De Voortschrijdend Gemiddelde Seconden parameter maakt het mogelijk om de second
 </context>
 <context>
     <name>FixSpikes</name>
-    <message>
-        <source>Fix SmO2 Anomaly</source>
-        <translation type="vanished">Fix SmO2 onregelmatigheden</translation>
-    </message>
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="131"/>
         <source>Fix Power Spikes</source>
@@ -11725,12 +11008,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Colors.cpp" line="230"/>
         <source>Overview Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Overzicht Achtergrond</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="231"/>
         <source>Overview Card Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Overzicht Kaartachtergrond</translation>
     </message>
 </context>
 <context>
@@ -11738,46 +11021,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="373"/>
         <source>Gravity Ordered Velocity Stress Score, the BikeStress like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation>Gravity Ordered Velocity Stress Score, de BikeStress gelijkende indicator gedefinieerd door Dr. Skiba voor Hardlopen, verantwoordt  variaties in snelheid, helling en relatieve intensiteit and tijdsduur</translation>
-    </message>
-</context>
-<context>
-    <name>GarminUploader</name>
-    <message>
-        <source>Garmin Connect</source>
-        <translation type="vanished">Garmin Connect</translation>
-    </message>
-    <message>
-        <source>Error uploading to Garmin Connect</source>
-        <translation type="vanished">Fout tijdens het uploaden naar Garmin Connect</translation>
-    </message>
-    <message>
-        <source>Successfully uploaded to Garmin Connect</source>
-        <translation type="vanished">Succesvol geupload naar Garmin Connect</translation>
-    </message>
-    <message>
-        <source>Login to Garmin Connect...</source>
-        <translation type="vanished">Login bij Garmin Connect...</translation>
-    </message>
-    <message>
-        <source>Login to Garmin Connect finished.</source>
-        <translation type="vanished">Login bij Garmin Connect voltooid.</translation>
-    </message>
-    <message>
-        <source>Upload to Garmin Connect...</source>
-        <translation type="vanished">Upload naar Garmin Connect...</translation>
-    </message>
-    <message>
-        <source>Upload... Sending to Garmin Connect</source>
-        <translation type="vanished">Upload... Versturen naar Garmin Connect</translation>
-    </message>
-    <message>
-        <source>Upload to Garmin Connect finished.</source>
-        <translation type="vanished">Upload naar Garmin Connect voltooid.</translation>
-    </message>
-    <message>
-        <source> Error from Garmin Connect: </source>
-        <translation type="vanished">Fout van Garmin Connect: </translation>
+        <translation>Gravity Ordered Velocity Stress Score, de BikeStress gelijkende metriek gedefinieerd door Dr. Skiba voor Hardlopen, verantwoordt variaties in snelheid, helling en relatieve intensiteit en tijdsduur</translation>
     </message>
 </context>
 <context>
@@ -11848,23 +11092,23 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="910"/>
         <source>Failed to export chart, please check permissions</source>
-        <translation>Exporteren van Inzicht is mislukt, controleer de toegang permissie alsjeblieft</translation>
+        <translation>Exporteren van Inzicht is mislukt, controleer de toegangspermissie alsjeblieft</translation>
     </message>
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="1094"/>
         <location filename="../../Charts/GoldenCheetah.cpp" line="1101"/>
         <source>Upload not possible</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload niet mogelijk</translation>
     </message>
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="1094"/>
         <source>Standard charts without configuration cannot be uploaded to the GoldenCheetah Cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard inzicht zonder configuratie kan niet geüpload worden naar GoldenCheetah Cloud.</translation>
     </message>
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="1101"/>
         <source>Charts containing user defined metrics cannot be uploaded to the GoldenCheetah Cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inzichten met door gebruiker gedefinieerde metrieken kunnen niet geüpload worden naar GoldenCheetah Cloud.</translation>
     </message>
 </context>
 <context>
@@ -11892,16 +11136,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="256"/>
         <source>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;Metrics: %7&lt;br&gt;OS: %6&lt;br&gt;</source>
-        <translation>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;Metrics: %7&lt;br&gt;OS: %6&lt;br&gt;</translation>
+        <translation>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;Metrieken: %7&lt;br&gt;OS: %6&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="276"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LEVMAR&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="vanished">&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
+        <translation>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LEVMAR&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="493"/>
@@ -11995,7 +11235,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../Core/GcUpgrade.cpp" line="252"/>
         <location filename="../../Core/GcUpgrade.cpp" line="268"/>
         <source>Metric</source>
-        <translation>Indicator</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="254"/>
@@ -12010,38 +11250,34 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Anaerobe TISS</translation>
     </message>
     <message>
-        <source>BikeStress</source>
-        <translation type="vanished">BikeStress</translation>
-    </message>
-    <message>
         <location filename="../../Core/GcUpgrade.cpp" line="285"/>
         <source>TSS</source>
-        <translation type="unfinished"></translation>
+        <translation>TSS</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="411"/>
         <source>Start creating of: Directories... </source>
-        <translation>Start creëren van: Mappen...</translation>
+        <translation>Start creëren van: Mappen... </translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="419"/>
         <source>Error: Creation of subdirectories failed</source>
-        <translation>Fout: Creatie van submappen mislukt</translation>
+        <translation>Fout: Creatie van sub-mappen mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="422"/>
         <source>Creation of subdirectories successful</source>
-        <translation>Creatie van submappen succesvol</translation>
+        <translation>Creatie van sub-mappen succesvol</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="449"/>
         <source>Start copying of: Configuration files... </source>
-        <translation>Start kopiëren van: Configuratiebestanden...</translation>
+        <translation>Start kopiëren van: Configuratiebestanden... </translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="462"/>
         <source>%1 configuration files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 configuratiebestanden verplaatsen naar submap: %2 - %3 mislukt</translation>
+        <translation>%1 configuratiebestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="468"/>
@@ -12051,7 +11287,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="481"/>
         <source>%1 calendar files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 Kalenderbestanden verplaatsen naar submap: %2 - %3 mislukt</translation>
+        <translation>%1 Kalenderbestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="487"/>
@@ -12061,7 +11297,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="500"/>
         <source>%1 log files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 logbestanden verplaatsen naar submap: %2 - %3 mislukt</translation>
+        <translation>%1 logbestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="508"/>
@@ -12071,7 +11307,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="520"/>
         <source>%1 activity (.JSON, .GC) files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 activiteit (.JSON, .GC) bestanden verplaatsen naar submap : %2 - %3 mislukt</translation>
+        <translation>%1 activiteit (.JSON, .GC) bestanden verplaatsen naar sub-map : %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="527"/>
@@ -12081,7 +11317,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="539"/>
         <source>%1 activity backup (.BAK) files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 activiteit-backup (.BAK) bestanden verplaatsen naar submap : %2 - %3 mislukt</translation>
+        <translation>%1 activiteit-backup (.BAK) bestanden verplaatsen naar sub-map : %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="545"/>
@@ -12091,7 +11327,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="560"/>
         <source>%1 media and workout files moved to subdirectory: \%2 - %3 failed</source>
-        <translation>%1 media en training-bestanden verplaatsen naar submap:\ %2 - %3 mislukt</translation>
+        <translation>%1 media en training-bestanden verplaatsen naar sub-map:\ %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="616"/>
@@ -12126,12 +11362,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="707"/>
         <source>%1 activity files converted to .JSON and stored in subdirectory: %2 - %3 failed</source>
-        <translation>%1 activiteit bestanden geconverteerd naar .JSON en opslaan in submap: %2 - %3 mislukt</translation>
+        <translation>%1 activiteit bestanden geconverteerd naar .JSON en opslaan in sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="710"/>
         <source>%1 converted activity source files moved to subdirectory: %2 - %3 failed</source>
-        <translation>%1 geconverteerde activiteit bronbestanden verplaatsen naar submap: %2 - %3 mislukt</translation>
+        <translation>%1 geconverteerde activiteit bronbestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="715"/>
@@ -12141,7 +11377,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="718"/>
         <source>Summary: %1 errors detected - please check log details before proceeding</source>
-        <translation>Samenvatting: %1 fouten opgetreden - controleer de logdetails voordat je verder gaat alsjeblieft</translation>
+        <translation>Samenvatting: %1 fouten opgetreden - controleer de log-details voordat je verder gaat alsjeblieft</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="721"/>
@@ -12179,7 +11415,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="845"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
-        <translation>&lt;center&gt;&lt;b&gt;Maak eerst een Backup van je &apos;Atleet&apos; data!&lt;br&gt;&lt;b&gt;Lees dit aandachtig alsjeblieft!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Met ingang van Versie 3.2 is de &apos;Atleet&apos; map indeling veranderd doordat er een aantal submappen zijn toegevoegd met daarin verschillende GoldenCheetah bestanden.&lt;br&gt;&lt;br&gt;De nieuwe structuur is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuratie bestanden: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download bestanden: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import bestanden: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups van Activiteiten bestanden: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Training gerelateerde bestanden: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache bestanden: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Kalender bestanden: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log bestanden: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp bestanden: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantine bestanden: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;Het upgrade proces zal de nieuwe mappenstructuur creëren en alle bestaande files verplaatsen naar de nieuwe mappen waar nodig. Tijdens de upgrade zullen activiteiten bestanden geconverteerd worden naar GoldenCheetah native formaat JSON en verplaatst worden naar &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; map. De bronbestanden worden verplaatst naar de &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Beginnend met versie 3.2 zullen alle downloads van apparaten of geïmporteerde activiteitenbestanden worden geconverteerd naar GoldenCheetah&apos;s bestandsformaat gedurende het importeren/downloaden. De originele bestanden zullen worden bewaard - afhankelijk van de bron in &lt;samp&gt;/downloads&lt;/samp&gt; of de &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; map.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Wees er alsjeblieft zeker van dat je een backup hebt van je &apos;Atleet&apos; data voor je verder gaat met de upgrade. We kunnen geen verantwoordelijkheid nemen voor ieder verlies van data gedurende dit proces. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;Maak eerst een Backup van je &apos;Atleet&apos; data!&lt;br&gt;&lt;b&gt;Lees dit aandachtig alsjeblieft!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Met ingang van Versie 3.2 is de &apos;Atleet&apos; map indeling veranderd doordat er een aantal sub-mappen zijn toegevoegd met daarin verschillende GoldenCheetah bestanden.&lt;br&gt;&lt;br&gt;De nieuwe structuur is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuratie bestanden: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download bestanden: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import bestanden: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups van Activiteiten bestanden: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Training gerelateerde bestanden: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache bestanden: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Kalender bestanden: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log bestanden: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp bestanden: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantine bestanden: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;Het upgrade proces zal de nieuwe mappenstructuur creëren en alle bestaande files verplaatsen naar de nieuwe mappen waar nodig. Tijdens de upgrade zullen activiteiten bestanden geconverteerd worden naar GoldenCheetah native formaat JSON en verplaatst worden naar &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; map. De bronbestanden worden verplaatst naar de &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Beginnend met versie 3.2 zullen alle downloads van apparaten of geïmporteerde activiteitenbestanden worden geconverteerd naar GoldenCheetah&apos;s bestandsformaat gedurende het importeren/downloaden. De originele bestanden zullen worden bewaard - afhankelijk van de bron in &lt;samp&gt;/downloads&lt;/samp&gt; of de &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; map.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Wees er alsjeblieft zeker van dat je een backup hebt van je &apos;Atleet&apos; data voor je verder gaat met de upgrade. We kunnen geen verantwoordelijkheid nemen voor ieder verlies van data gedurende dit proces. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="884"/>
@@ -12272,7 +11508,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="83"/>
         <source>Metric Trends</source>
-        <translation>Indicator Trends</translation>
+        <translation>Metriek Trends</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="84"/>
@@ -12287,7 +11523,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="89"/>
         <source>Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Overzicht</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="90"/>
@@ -12357,21 +11593,17 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="103"/>
         <source>Python Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Inzicht</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="104"/>
         <source>Python Chart </source>
-        <translation type="unfinished"></translation>
+        <translation>Python Inzicht </translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="106"/>
         <source>2d Plot</source>
         <translation>2de Plot</translation>
-    </message>
-    <message>
-        <source>3d Plot</source>
-        <translation type="vanished">3de Plot</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="107"/>
@@ -12414,10 +11646,6 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Pedaalslag</translation>
     </message>
     <message>
-        <source>StreetView</source>
-        <translation type="vanished">StreetView</translation>
-    </message>
-    <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="117"/>
         <source>Video Player</source>
         <translation>Videospeler</translation>
@@ -12430,7 +11658,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="119"/>
         <source>Web page</source>
-        <translation type="unfinished"></translation>
+        <translation>Web pagina</translation>
     </message>
 </context>
 <context>
@@ -12508,7 +11736,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="86"/>
         <source>Swedish</source>
-        <translation type="unfinished"></translation>
+        <translation>Zweeds</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="110"/>
@@ -12573,12 +11801,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="192"/>
         <source>Enable Python</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Inschakelen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="200"/>
         <source>Share to the OpenData project</source>
-        <translation type="unfinished"></translation>
+        <translation>Delen via het OpenData project</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="212"/>
@@ -12606,7 +11834,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="270"/>
         <source>Python Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Home</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="395"/>
@@ -12616,18 +11844,19 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="406"/>
         <source>Python Installation (PYTHONHOME)</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Installatie (PYTHONHOME)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="415"/>
         <source>Invalid Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige Folder</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="415"/>
         <source>Python does not appear to be installed in that location.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Python is al geïnstalleerd op die lokatie.
+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="429"/>
@@ -12770,33 +11999,14 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Upload mislukt</translation>
     </message>
     <message>
-        <source>Google Drive Cloud Storage</source>
-        <translation type="vanished">Google Drive Cloud Storage</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/GoogleDrive.h" line="44"/>
         <source>Google Drive</source>
-        <translation type="unfinished">Google Drive</translation>
+        <translation>Google Drive</translation>
     </message>
     <message>
         <location filename="../../Cloud/GoogleDrive.h" line="45"/>
         <source>Sync your data via your cloud storage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GoogleMapControl</name>
-    <message>
-        <source>Intervals</source>
-        <translation type="vanished">Intervallen</translation>
-    </message>
-    <message>
-        <source>Route</source>
-        <translation type="vanished">Route</translation>
-    </message>
-    <message>
-        <source>No GPS Data Present</source>
-        <translation type="vanished">Geen GPS Data Aanwezig</translation>
+        <translation>Sync je data via jouw cloud opslag.</translation>
     </message>
 </context>
 <context>
@@ -12820,13 +12030,9 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Training Assistent</translation>
     </message>
     <message>
-        <source>Manually create a workout based on gradient (slope) and distance, maximum grade is 5.</source>
-        <translation type="vanished">Creëer handmatig een training gebaseerd op de gradiënt (helling toe- of afname) en afstand, maximum gradiënt is 5.</translation>
-    </message>
-    <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="551"/>
         <source>Manually create a workout based on gradient (slope) and distance, maximum grade is +-40.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak handmatig een workout met een helling en afstand, maximale hellingshoek is 40.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="557"/>
@@ -13107,12 +12313,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
         <source>Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries</source>
-        <translation>Analyse van een aantal activiteiten(b.v. a tijdsperiode ) zoals PMC, lange termijn indicatoren overzicht, ... en data samenvattingen</translation>
+        <translation>Analyse van een aantal activiteiten(b.v. a tijdsperiode ) zoals PMC, lange termijn metrieken overzicht, ... en data samenvattingen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="73"/>
         <source>Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types</source>
-        <translation>Uitgebreid Kalender overzicht en configureerbare activiteitenlijst, plus lange termijn Inzichten en diagram types</translation>
+        <translation>Uitgebreid Kalender overzicht en configureerbare activiteitenlijst, plus lange termijn metrieken en diagram types</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="75"/>
@@ -13164,7 +12370,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="104"/>
         <source>Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity</source>
-        <translation>Ronde Editor geeft de mogelijkheid om in volgorde werk- rust interval series -gedefinieerd door de repetitie (reps), afstand (dist, untis volgens voorkeursinstellingen in Tempo Zones) en tijdsduur (min en sec)- om de datapunten te genereren voor de activiteit</translation>
+        <translation>Ronde Editor geeft de mogelijkheid om in volgorde werk- rust interval series -gedefinieerd door de repetitie (reps), afstand (afstand, eenheden volgens voorkeursinstellingen in Tempo Zones) en tijdsduur (min en sec)- om de datapunten te genereren voor de activiteit</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="107"/>
@@ -13212,23 +12418,19 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Berekening van VDOT en Threshold Pace volgens Daniels&apos; Running Formule</translation>
     </message>
     <message>
-        <source>Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation type="vanished">Downloaden van Trainingen voor de ERGDB (online training DB) voor Train - Binnen rijden</translation>
-    </message>
-    <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="126"/>
         <source>Downloading of Body Measurements (e.g. weight) from multiple sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloaden van lichaamsmetingen (b.v. gewicht) van verschillende bronnen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="130"/>
         <source>Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloaden van Workouts van de ERGDB (online workout DB) voor Train - Indoor Fietsen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="132"/>
         <source>Downloading of Workouts from your Today&apos;s Plan account for Train - Indoor Riding</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloaden van Workouts van jouw Today&apos;s Plan account voor Train - Indoor Fietsen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="134"/>
@@ -13308,7 +12510,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="166"/>
         <source>Fix Freewheeling from Power and Speed</source>
-        <translation>Fix Freewheeling aan de hand van Vermogen en Snelheid</translation>
+        <translation>Fix Freewheelen aan de hand van Vermogen en Snelheid</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="168"/>
@@ -13318,17 +12520,17 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="171"/>
         <source>Filter R-R outliers</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter R-R afwijkingen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="173"/>
         <source>Fix SmO2/tHb outliers</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix SmO2/tHb afwijkingen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="175"/>
         <source>Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings</source>
-        <translation>Opties voor het onderdelen tonen/verbergen (b.v. Zijbalk) en ook het toevoegen van inzichten en resetten van de inzicht-layout naar de fabrieksstand</translation>
+        <translation>Opties voor het onderdelen tonen/verbergen (b.v. Zijbalk) en ook het toevoegen van inzichten en resetten van de inzicht-layout naar de fabrieksinstellingen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="177"/>
@@ -13338,12 +12540,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="181"/>
         <source>Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates</source>
-        <translation>Volledig configureerbaar diagram type om voortgang en trends te volgen in indicatoren, gebruikers definieerbare beste periodes en model schattingen</translation>
+        <translation>Volledig configureerbaar diagram type om voortgang en trends te volgen in metrieken, gebruikers definieerbare beste periodes en model schattingen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="183"/>
         <source>Date range, data grouping settings which apply to a single chart</source>
-        <translation>Periode, datagroeperingsinstellingen welke van toepassing zijn op een enkele inzicht</translation>
+        <translation>Periode, datagroepering-instellingen welke van toepassing zijn op een enkele inzicht</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="185"/>
@@ -13368,7 +12570,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="194"/>
         <source>Tree map visulation of activity data by two selectable dimensions for a configurable metric</source>
-        <translation>Tree map visualisatie van activiteitsdata met twee selecteerbare dimensies voor een configureerbare indicator</translation>
+        <translation>Tree map visualisatie van activiteitsdata met twee selecteerbare dimensies voor een configureerbare metriek</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="197"/>
@@ -13392,7 +12594,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../Gui/HelpWhatsThis.cpp" line="203"/>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="232"/>
         <source>Distribution of activity data samples or metrics according time spent in a certain segment</source>
-        <translation>Distributie van activiteitendata of indicatoren overeenkomstig met de gespendeerde tijd in een segment</translation>
+        <translation>Distributie van activiteitendata of metrieken overeenkomstig met de gespendeerde tijd in een segment</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="205"/>
@@ -13414,7 +12616,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="211"/>
         <source>Detailed information of a single activity - the metrics shown here are configurable</source>
-        <translation>Gedetailleerde informatie uit een activiteit - de getoonde indicatoren zijn configureerbaar</translation>
+        <translation>Gedetailleerde informatie uit een activiteit - de getoonde metrieken zijn configureerbaar</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="215"/>
@@ -13439,7 +12641,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="234"/>
         <source>Quadrant analysis of pedal velocity vs. effective pedal force</source>
-        <translation>Kwadrant analyse van pedaalsnelheid vs effective pedaalkracht</translation>
+        <translation>Kwadrant analyse van pedaalsnelheid vs effectieve pedaalkracht</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="236"/>
@@ -13484,7 +12686,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="255"/>
         <source>Definition of points in time &apos;Events&apos; which are marked explicitely on time related diagrams</source>
-        <translation>Definitie van punten in de tijd &apos;Gebeurtenissen&apos; welke explicit gemarkeerd zijn op tijd gerelateerde diagrammen</translation>
+        <translation>Definitie van punten in de tijd &apos;Gebeurtenissen&apos; welke expliciet gemarkeerd zijn op tijd gerelateerde diagrammen</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="257"/>
@@ -13592,22 +12794,22 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
         <source>Metrics shown in &apos;Bests&apos;</source>
-        <translation>Indicatoren getoond in &apos;Beste&apos;</translation>
+        <translation>Metrieken getoond in &apos;Beste&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
-        <translation>Indicatoren getoond in &apos;Samenvatting&apos;</translation>
+        <translation>Metrieken getoond in &apos;Samenvatting&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="317"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
-        <translation>Indicatoren getoond in &apos;Intervallen&apos;</translation>
+        <translation>Metrieken getoond in &apos;Intervallen&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="319"/>
@@ -13675,7 +12877,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/HistogramWindow.cpp" line="130"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Charts/HistogramWindow.cpp" line="136"/>
@@ -14100,12 +13302,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="43"/>
         <source>Hr Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Hr Zone</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="47"/>
         <source>Hr Zone fractional number determined from Average Hr.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hr Zone fractie bepaald van Gemiddeld Hr.</translation>
     </message>
 </context>
 <context>
@@ -14527,7 +13729,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="321"/>
         <source>file ended without reading any zones for last range</source>
-        <translation>bestand eindigt zonder dat er zones gelezen konden worden voor de laaste range</translation>
+        <translation>bestand eindigt zonder dat er zones gelezen konden worden voor de laatste range</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrZones.cpp" line="374"/>
@@ -14613,72 +13815,72 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>HR</source>
-        <translation type="unfinished"></translation>
+        <translation>HR</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>AVNN</source>
-        <translation type="unfinished"></translation>
+        <translation>AVNN</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>SDNN</source>
-        <translation type="unfinished"></translation>
+        <translation>SDNN</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>RMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSSD</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>PNN50</source>
-        <translation type="unfinished"></translation>
+        <translation>PNN50</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>LF</source>
-        <translation type="unfinished"></translation>
+        <translation>LF</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>HF</source>
-        <translation type="unfinished"></translation>
+        <translation>HF</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>Recovery Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Herstellingspunten</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>msec^2</source>
-        <translation type="unfinished"></translation>
+        <translation>msec^2</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>Rec.Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Rec.Punten</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.h" line="75"/>
         <source>Hrv</source>
-        <translation type="unfinished"></translation>
+        <translation>Hrv</translation>
     </message>
 </context>
 <context>
@@ -14686,92 +13888,92 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="46"/>
         <source>Select HRV measurements file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteer HRV metingen bestand om te importeren</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="46"/>
         <source>CSV Files (*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV Bestanden (*.csv)</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="48"/>
         <source>No file selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen bestand geselecteerd.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="53"/>
         <source>Selected file %1 cannot be opened for reading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geselecteerd bestand %1  kan niet geopend worden om te lezen.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="75"/>
         <source>Column header contains duplicate identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolom header bevat een dubbele naam</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="85"/>
         <source>Column &apos;timestamp_measurement&apos;/&apos;Datetime&apos;/&apos;date&apos; is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolom &apos;tijdstempelmeeting&apos;/&apos;datumtijd&apos;/&apos;datum&apos; ontbreekt.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="89"/>
         <source>Column &apos;rMSSD&apos;/&apos;rMSSD_lying&apos;/&apos;Rmssd&apos; is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolom &apos;rMSSD&apos;/&apos;rMSSD_lying&apos;/&apos;Rmssd&apos; ontbreekt.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="102"/>
         <source>Number of data columns: %1 in line %2 lower than header columns: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Een aantal data kolommen: %1 in regel %2 is lager dan de header kolommen: %3</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="129"/>
         <source>Invalid &apos;timestamp&apos; - Date/Time not ISO 8601 format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige &apos;tijdstempel&apos; - Datum/Tijd niet ISO 8601 formaat - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="142"/>
         <source>Invalid &apos;date&apos; - Date not yyyy-dd-MM format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige &apos;datum&apos; - Datum niet in jjjj-dd-MM formaat - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="151"/>
         <source>Invalid &apos;rMSSD&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;rMSSD&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="157"/>
         <source>Invalid &apos;HR&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;HR&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="163"/>
         <source>Invalid &apos;AVNN&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;AVNN&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="169"/>
         <source>Invalid &apos;SDNN&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;SDNN&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="175"/>
         <source>Invalid &apos;pNN50&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;pNN50&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="181"/>
         <source>Invalid &apos;LF&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;LF&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="187"/>
         <source>Invalid &apos;HF&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;HF&apos; - in regel %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="193"/>
         <source>Invalid &apos;HRV4T_Recovery_Points&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig &apos;HRV4T_Recovery_Points&apos; - in regel %1</translation>
     </message>
 </context>
 <context>
@@ -14779,77 +13981,77 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="34"/>
         <source>HRV Measurements download</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV Metingen download</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="40"/>
         <source>Choose the download or import source</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies de download of import bron</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="41"/>
         <source>Import CSV file</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer CSV bestand</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="47"/>
         <source>Choose date range for download</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies datumbereik om te downloaden</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="48"/>
         <source>From date of first recorded activity to today</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanaf de eerst vastgelegde activiteit tot vandaag</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="49"/>
         <source>From date of last downloaded measurement to today</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanaf de laatst gedownloade meting tot vandaag</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="50"/>
         <source>Enter manually:</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele invoer:</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="77"/>
         <source>Discard all existing measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder alle bestaande metingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="89"/>
         <source>Download</source>
-        <translation type="unfinished">Download</translation>
+        <translation>Download</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="90"/>
         <source>Close</source>
-        <translation type="unfinished">Sluit</translation>
+        <translation>Sluit</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="165"/>
         <source>Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Lichaamsmetingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="165"/>
         <source>Invalid date range - please check your input</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig datumbereik - controleer de invoer</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="201"/>
         <source>Download completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Download voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="207"/>
         <source>HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV Metingen</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="207"/>
         <source>Downloading of HRV measurements failed with error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloaden van HRV metingen is gestopt met fout: %1</translation>
     </message>
 </context>
 <context>
@@ -14857,64 +14059,64 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="1413"/>
         <source>Time dependent HRV measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdsafhankelijke HRV metingen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1416"/>
         <source>From Date - Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanaf Datum - Tijd</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1486"/>
         <source>Comment</source>
-        <translation type="unfinished">Commentaar</translation>
+        <translation>Commentaar</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1525"/>
         <location filename="../../Gui/Pages.cpp" line="1533"/>
         <source>Update</source>
-        <translation type="unfinished">Update</translation>
+        <translation>Update</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1527"/>
         <source>+</source>
-        <translation type="unfinished">+</translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1528"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1534"/>
         <source>Add</source>
-        <translation type="unfinished">Toevoegen</translation>
+        <translation>Toevoegen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1535"/>
         <source>Delete</source>
-        <translation type="unfinished">Verwijderen</translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1568"/>
         <source>Source</source>
-        <translation type="unfinished">Bron</translation>
+        <translation>Bron</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1570"/>
         <source>Original Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Originele Bron</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1589"/>
         <location filename="../../Gui/Pages.cpp" line="1674"/>
         <source>MMM d, yyyy - hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>MMM d, jjjj - hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1717"/>
         <source>Manual entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele invoer</translation>
     </message>
 </context>
 <context>
@@ -15417,7 +14619,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Train/ImagicController.cpp" line="87"/>
         <source>Cannot Connect to Imagic</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan Geen Verbinding Maken met Imagic</translation>
     </message>
 </context>
 <context>
@@ -15440,12 +14642,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1670"/>
         <source>View</source>
-        <translation type="unfinished">Overzicht</translation>
+        <translation>Overzicht</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1671"/>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1695"/>
@@ -15534,10 +14736,6 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Maximum Graad</translation>
     </message>
     <message>
-        <source>Maximum supported grade is 8</source>
-        <translation type="vanished">Maximum ondersteunde graad is 8</translation>
-    </message>
-    <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="687"/>
         <source>Segment Length</source>
         <translation>Segmentlengte</translation>
@@ -15550,7 +14748,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="672"/>
         <source>Maximum supported grade is +-40</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum ondersteunde hellingshoek is +-40</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="680"/>
@@ -15612,12 +14810,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Pages.cpp" line="2554"/>
         <source>Available Metrics</source>
-        <translation>Beschikbare Indicatoren</translation>
+        <translation>Beschikbare Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2559"/>
         <source>Selected Metrics</source>
-        <translation>Beschikbare Indicatoren</translation>
+        <translation>Geselecteerde Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2575"/>
@@ -15681,7 +14879,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../FileIO/JouleDevice.cpp" line="121"/>
         <location filename="../../FileIO/JouleDevice.cpp" line="406"/>
         <source>ERROR: open failed: </source>
-        <translation>Fout: open mislukt:</translation>
+        <translation>Fout: open mislukt: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="140"/>
@@ -15706,7 +14904,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="190"/>
         <source>Failed to create temporary file </source>
-        <translation>Tijdelijk bestand creëren mislukt</translation>
+        <translation>Tijdelijk bestand creëren mislukt </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="280"/>
@@ -15716,11 +14914,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="299"/>
         <source>Version </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation type="vanished">Versie</translation>
+        <translation>Versie </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="309"/>
@@ -15777,7 +14971,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../FileIO/JouleDevice.cpp" line="619"/>
         <location filename="../../FileIO/JouleDevice.cpp" line="642"/>
         <source>read timeout</source>
-        <translation>lees timeout</translation>
+        <translation>lees time-out</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="564"/>
@@ -15787,12 +14981,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="568"/>
         <source>timeout writing to device</source>
-        <translation>timeout tijdens schrijven naar apparaat</translation>
+        <translation>time-out tijdens schrijven naar apparaat</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="585"/>
         <source>read header error: </source>
-        <translation>leesheader fout:</translation>
+        <translation>leesheader fout: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="592"/>
@@ -15817,7 +15011,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="625"/>
         <source>, read only %1 bytes instead of: %2</source>
-        <translation>, alleen lezen %1 bytes inplaats van: %2</translation>
+        <translation>, alleen lezen %1 bytes in plaats van: %2</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="645"/>
@@ -15830,33 +15024,33 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="319"/>
         <source>You must authorise with KentUniversity first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst autoriseren bij KentUniversity</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="336"/>
         <source>No such directory, try setting a new location in options.</source>
-        <translation type="unfinished">Deze map bestaat niet, probeer een andere instelling in de opties.</translation>
+        <translation>Deze map bestaat niet, probeer een andere instelling in de opties.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="656"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="672"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="660"/>
         <source>Upload failed</source>
-        <translation type="unfinished">Upload mislukt</translation>
+        <translation>Upload mislukt</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="49"/>
         <source>University of Kent</source>
-        <translation type="unfinished"></translation>
+        <translation>University of Kent</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="50"/>
         <source>Participate in academic studies sharing data via google drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem deel aan de academische studies waarbij data gedeeld wordt via Google drive.</translation>
     </message>
 </context>
 <context>
@@ -15864,59 +15058,59 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="827"/>
         <source>Upload to Kent University</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload naar de Kent University</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="838"/>
         <source>Session Perceived Exertion (sRPE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Session Perceived Exertion (sRPE)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="854"/>
         <source>Post Session Fatigue (ROF)</source>
-        <translation type="unfinished"></translation>
+        <translation>Post Session Fatigue (ROF)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="869"/>
         <source>Notes</source>
-        <translation type="unfinished">Aantekeningen</translation>
+        <translation>Aantekeningen</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="877"/>
         <source>Missed workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Overgeslagen workouts</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="882"/>
         <source>Is a self administered test workout</source>
-        <translation type="unfinished"></translation>
+        <translation>Is een zelf opgenomen testworkout</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="885"/>
         <source>Uploading %1 bytes...</source>
-        <translation type="unfinished">Uploaden %1 bytes...</translation>
+        <translation>Uploaden %1 bytes...</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="895"/>
         <source>Upload</source>
-        <translation type="unfinished">Upload</translation>
+        <translation>Upload</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="942"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="970"/>
         <source>Upload Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload mislukt</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="943"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="971"/>
         <source>Unable to upload, check your configuration in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Onmogelijk om te uploaden, check je configuratie in voorkeursinstellingen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="1010"/>
         <source>Done</source>
-        <translation type="unfinished">Voltooid</translation>
+        <translation>Voltooid</translation>
     </message>
 </context>
 <context>
@@ -16191,7 +15385,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="80"/>
         <source>Lactate Iso Power as defined by Dr. Skiba in GOVSS algorithm</source>
-        <translation>Lactaat Genormaliseerde Vermogen zoals gedefineerd door Dr. Skiba in het GOVSS algoritme</translation>
+        <translation>Lactaat Genormaliseerde Vermogen zoals gedefinieerd door Dr. Skiba in het GOVSS algoritme</translation>
     </message>
 </context>
 <context>
@@ -16233,7 +15427,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="822"/>
         <source>%1 average</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 gemiddelde</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="879"/>
@@ -16348,7 +15542,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="4380"/>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>
@@ -16417,7 +15611,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="356"/>
         <source> / non activity-related metrics skipped</source>
-        <translation> / niet aan activiteit gerelateerde indicatoren overgeslagen</translation>
+        <translation> / niet aan activiteit gerelateerde metrieken overgeslagen</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="420"/>
@@ -16437,7 +15631,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="435"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="462"/>
@@ -16488,10 +15682,6 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../Gui/LTMSidebar.cpp" line="214"/>
         <source>Autofilter</source>
         <translation>Autofilter</translation>
-    </message>
-    <message>
-        <source>Summary</source>
-        <translation type="vanished">Samenvatting</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="478"/>
@@ -16617,37 +15807,13 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1288"/>
         <source>The new event could not be uploaded to your remote calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>De nieuwe afspraak kon niet geüpload worden naar je remote kalender.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1417"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="1430"/>
         <source>You can only add phases to user defined seasons. Please select a season you have created before adding a phase.</source>
         <translation>Je kunt alleen aan door gebruikers gedefinieerde seizoen fases toevoegen. Selecteer een seizoen welke je zelf gecreëerd hebt om een fase toe te voegen alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>Totals</source>
-        <translation type="vanished">Totalen</translation>
-    </message>
-    <message>
-        <source>Averages</source>
-        <translation type="vanished">Gemiddelden</translation>
-    </message>
-    <message>
-        <source>Maximums</source>
-        <translation type="vanished">Maximums</translation>
-    </message>
-    <message>
-        <source>Metrics</source>
-        <translation type="vanished">Indicatoren</translation>
-    </message>
-    <message>
-        <source>^(Average|Max) </source>
-        <translation type="vanished">^(Gemiddelde|Max) </translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="vanished">seconden</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1469"/>
@@ -16796,7 +15962,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="115"/>
         <source>Show Banister Helper</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon Banister Helper</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="125"/>
@@ -17229,7 +16395,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1308"/>
         <source>Metric</source>
-        <translation>Indicator</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1310"/>
@@ -17249,17 +16415,17 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1318"/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Meting</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1320"/>
         <source>Performance</source>
-        <translation type="unfinished">Performance</translation>
+        <translation>Performance</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1322"/>
         <source>Banister</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1499"/>
@@ -17301,7 +16467,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="217"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1319"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1344"/>
         <source>All</source>
         <translation>Alles</translation>
     </message>
@@ -17323,103 +16489,108 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="260"/>
         <source>Banister Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="273"/>
-        <source>Impulse Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister Model</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="274"/>
+        <source>Impulse Metric</source>
+        <translation>Impulse Metriek</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="275"/>
+        <source>Perf. Metric</source>
+        <translation>Perf. Metriek</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="276"/>
         <source>Peak</source>
-        <translation type="unfinished">Piek</translation>
-    </message>
-    <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="277"/>
-        <source>Positive decay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="278"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="280"/>
-        <source>days</source>
-        <translation type="unfinished">dagen</translation>
+        <translation>Piek</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="279"/>
-        <source>Negative decay</source>
-        <translation type="unfinished"></translation>
+        <source>Positive decay</source>
+        <translation>Positief verval</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1300"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="280"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="282"/>
+        <source>days</source>
+        <translation>dagen</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="281"/>
+        <source>Negative decay</source>
+        <translation>Negatief verval</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="1325"/>
         <source> grouped by </source>
         <translation> gegroepeerd per </translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1304"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1329"/>
         <source>day</source>
         <translation>dag</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1307"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1332"/>
         <source>week</source>
         <translation>week</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1310"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1335"/>
         <source>month</source>
         <translation>maand</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1313"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1338"/>
         <source>year</source>
         <translation>jaar</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1316"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1341"/>
         <source>time of day</source>
         <translation>tijdstip van de dag</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1402"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1404"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1427"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1429"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1477"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1502"/>
         <source>Coggan Acute Training Load</source>
         <translation>Coggan Acute Training Load</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1478"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1503"/>
         <source>Coggan Chronic Training Load</source>
         <translation>Coggan Chronic Training Load</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1479"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1504"/>
         <source>Coggan Training Stress Balance</source>
         <translation>Coggan Training Stress Balans</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1501"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1551"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1526"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1577"/>
         <source>seconds</source>
         <translation>seconden</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1501"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1526"/>
         <source>hours</source>
         <translation>uren</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1595"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1625"/>
         <source>Export Chart Config</source>
         <translation>Inzicht Configuratie Exporteren</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1608"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1638"/>
         <source>Save Chart Data as CSV</source>
         <translation>Inzicht Data Bewaren als CSV</translation>
     </message>
@@ -17608,7 +16779,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1127"/>
         <source>invalid data series for tiz(): %1</source>
-        <translation>ongeldige datareeks voor tizt(): %1</translation>
+        <translation>ongeldige datareeks voor tiz(): %1</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1134"/>
@@ -17632,119 +16803,115 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1192"/>
-        <source>should be banister(metric, nte|pte|perf|cp)</source>
-        <translation type="unfinished"></translation>
+        <source>should be banister(load_metric, perf_metric, nte|pte|perf|cp)</source>
+        <translation>Zou de banister (load_metric, perf_metric, nte|pte|perf|cp) moeten zijn</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1221"/>
+        <location filename="../../Core/DataFilter.cpp" line="1230"/>
         <source>XDATA needs 3 parameters.</source>
         <translation>XDATA gebruikt 3 parameters.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1228"/>
+        <location filename="../../Core/DataFilter.cpp" line="1237"/>
         <source>XDATA expects a string for first two parameters</source>
         <translation>XDATA verwacht een karakterreeks bij de eerste twee parameters</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1235"/>
+        <location filename="../../Core/DataFilter.cpp" line="1244"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
         <translatorcomment>?</translatorcomment>
         <translation>XDATA verwacht een symbool, eenmalig schaars, herhaal, interpoleren of opnieuw sampelen als derde parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1242"/>
+        <location filename="../../Core/DataFilter.cpp" line="1251"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
         <translation>XDATA verwacht eenmalig schaars, herhaal, interpoleren of opnieuw sampelen als derde parameter. (%1)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1265"/>
+        <location filename="../../Core/DataFilter.cpp" line="1274"/>
         <source>XDATA_UNITS needs 2 parameters.</source>
         <translation>XDATA_UNITS gebruikt 2 parameters.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1272"/>
+        <location filename="../../Core/DataFilter.cpp" line="1281"/>
         <source>XDATA_UNITS expects a string for first two parameters</source>
         <translation>XDATA_UNITS verwacht een karakterreeks als eerste twee parameters</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1287"/>
+        <location filename="../../Core/DataFilter.cpp" line="1296"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
-        <translation>is-aanwezig/aan/uit functie als eerste parameter is een veld/indicator om in te stellen.</translation>
+        <translation>is-aanwezig/aan/uit functie als eerste parameter is een veld/metriek om in te stellen.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1300"/>
+        <location filename="../../Core/DataFilter.cpp" line="1309"/>
         <source>%1 is not supported in isset/set/unset operations</source>
         <translation>%1 is niet ondersteund in is-aanwezig/aan/uit operaties</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1310"/>
+        <location filename="../../Core/DataFilter.cpp" line="1319"/>
         <source>isset has one parameter, a symbol to check.</source>
         <translation>is-aanwezig heeft één parameter, een symbool om te controleren.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1317"/>
+        <location filename="../../Core/DataFilter.cpp" line="1326"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
         <translation>aan-functie heeft drie parameters; symbool waarde en expressie.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1318"/>
+        <location filename="../../Core/DataFilter.cpp" line="1327"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
         <translation>uit-functie heeft twee parameters; symbool en expressie.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1336"/>
+        <location filename="../../Core/DataFilter.cpp" line="1345"/>
         <source>estimate function expects model name as first parameter.</source>
         <translation>schattingsfunctie verwacht modelnaam als eerste parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1342"/>
+        <location filename="../../Core/DataFilter.cpp" line="1351"/>
         <source>estimate function expects model name as first parameter</source>
         <translation>schattingsfunctie verwacht modelnaam als eerste parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1353"/>
+        <location filename="../../Core/DataFilter.cpp" line="1362"/>
         <source>estimate function expects parameter or duration as second parameter</source>
         <translation>schattingsfunctie verwacht parameter of tijdsduur als tweede parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1373"/>
+        <location filename="../../Core/DataFilter.cpp" line="1382"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
         <translation>functie &apos;%1&apos; verwacht %2 parameter(s) niet %3</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1385"/>
+        <location filename="../../Core/DataFilter.cpp" line="1394"/>
         <source>unknown function %1</source>
         <translation>onbekende functie %1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1395"/>
+        <location filename="../../Core/DataFilter.cpp" line="1404"/>
         <source>unary negation on a string!</source>
-        <translation>unary ontkenning in een karakterreeks!</translation>
+        <translation>unare ontkenning in een karakterreeks!</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1415"/>
-        <location filename="../../Core/DataFilter.cpp" line="1432"/>
+        <location filename="../../Core/DataFilter.cpp" line="1424"/>
+        <location filename="../../Core/DataFilter.cpp" line="1441"/>
         <source>variables must be numeric.</source>
         <translation>variabelen moeten numeriek zijn.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1441"/>
+        <location filename="../../Core/DataFilter.cpp" line="1450"/>
         <source>assignment must be to a symbol.</source>
         <translation>toekenning moet aan een symbool gedaan worden.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1454"/>
+        <location filename="../../Core/DataFilter.cpp" line="1463"/>
         <source>comparing strings with numbers</source>
         <translation>vergelijken van karakterreeksen met getallen</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1461"/>
+        <location filename="../../Core/DataFilter.cpp" line="1470"/>
         <source>using a string operations with a number</source>
         <translation>gebruik een karakterreeks met een getal</translation>
-    </message>
-    <message>
-        <source>internal parser error: parms</source>
-        <translation type="vanished">interne parser fout: parms</translation>
     </message>
 </context>
 <context>
@@ -17763,11 +16930,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Metrics/LeftRightBalance.cpp" line="46"/>
         <source>Left/Right Balance shows the proportion of power coming from each pedal for rides and the proportion of Ground Contact Time from each leg for runs.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Left/Right Balance shows the proportion of power coming from each pedal.</source>
-        <translation type="vanished">Links/Rechts Balans toont de verhouding van het vermogen tussen de pedalen.</translation>
+        <translation>Links/Recht Balans laat het proportionele vermogen zien van ieder pedaal voor ritten en de proportie van Grondcontact van ieder been voor hardlopen.</translation>
     </message>
 </context>
 <context>
@@ -17785,7 +16948,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Train/Library.cpp" line="179"/>
         <source>Copy VideoSync Failed</source>
-        <translation>Kopieren VideoSync Mislukt</translation>
+        <translation>Kopiëren VideoSync Mislukt</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="180"/>
@@ -17795,16 +16958,12 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Train/Library.cpp" line="207"/>
         <source>Copy Workout Failed</source>
-        <translation>Kopieren Training Mislukt</translation>
+        <translation>Kopiëren Training Mislukt</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="208"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 already exists in workout library: %2</source>
-        <translation type="vanished">%1 bestaat al in de training bibliotheek: %2</translation>
+        <translation>%1 kan niet worden weggeschreven naar de workout bibliotheek %2 controleer de rechten en beschikbare ruimte</translation>
     </message>
 </context>
 <context>
@@ -17928,18 +17087,14 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>Schrijven naar Map %1 mislukt</translation>
     </message>
     <message>
-        <source>Local Store </source>
-        <translation type="vanished">Lokale Opslag</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/LocalFileStore.h" line="36"/>
         <source>Local Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokale Opslag</translation>
     </message>
     <message>
         <location filename="../../Cloud/LocalFileStore.h" line="37"/>
         <source>Sync with a local folder or thumbdrive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunc. met een lokale map of USB-drive.</translation>
     </message>
 </context>
 <context>
@@ -17999,7 +17154,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../FileIO/MacroDevice.cpp" line="101"/>
         <location filename="../../FileIO/MacroDevice.cpp" line="262"/>
         <source>ERROR: open failed: </source>
-        <translation>FOUT: open mislukt:</translation>
+        <translation>FOUT: open mislukt: </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="105"/>
@@ -18030,7 +17185,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="156"/>
         <source>Failed to create temporary file </source>
-        <translation>Tijdelijk bestand creëren mislukt</translation>
+        <translation>Tijdelijk bestand creëren mislukt </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="188"/>
@@ -18065,7 +17220,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <location filename="../../FileIO/MacroDevice.cpp" line="383"/>
         <location filename="../../FileIO/MacroDevice.cpp" line="401"/>
         <source>read timeout</source>
-        <translation>lees timeout</translation>
+        <translation>lees time-out</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="363"/>
@@ -18075,7 +17230,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="367"/>
         <source>timeout writing to device</source>
-        <translation>timeout tijdens schrijven naar apparaat</translation>
+        <translation>time-out tijdens schrijven naar apparaat</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="383"/>
@@ -18090,7 +17245,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="407"/>
         <source>, read only %1 bytes instead of: %2</source>
-        <translation>, alleen lezen %1 bytes inplaats van: %2</translation>
+        <translation>, alleen lezen %1 bytes in plaats van: %2</translation>
     </message>
 </context>
 <context>
@@ -18103,7 +17258,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="259"/>
         <source>Toggle Compare Pane</source>
-        <translation>Wissel Vergelijkingsspanel</translation>
+        <translation>Wissel Vergelijkingspanel</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="270"/>
@@ -18143,7 +17298,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="398"/>
         <source>Save all modified activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar alle gewijzigde activiteiten</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="400"/>
@@ -18256,54 +17411,6 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation>De&amp;el</translation>
     </message>
     <message>
-        <source>Share Online...</source>
-        <translation type="vanished">Online Delen...</translation>
-    </message>
-    <message>
-        <source>Tweet activity</source>
-        <translation type="vanished">Tweet activiteit</translation>
-    </message>
-    <message>
-        <source>Upload Activity to Calendar</source>
-        <translation type="vanished">Activiteit Uploaden naar Kalender</translation>
-    </message>
-    <message>
-        <source>Refresh Calendar</source>
-        <translation type="vanished">Kalender Verversen</translation>
-    </message>
-    <message>
-        <source>Write to Local Store</source>
-        <translation type="vanished">Naar Locale Opslag Schrijven</translation>
-    </message>
-    <message>
-        <source>Synchronise Local Store...</source>
-        <translation type="vanished">Locale Opslag Synchroniseren...</translation>
-    </message>
-    <message>
-        <source>Upload to &amp;Dropbox</source>
-        <translation type="vanished">Upload naar &amp;Dropbox</translation>
-    </message>
-    <message>
-        <source>Synchronise Dropbox...</source>
-        <translation type="vanished">Dropbox Synchroniseren...</translation>
-    </message>
-    <message>
-        <source>Upload to &amp;GoogleDrive</source>
-        <translation type="vanished">Upload naar &amp;GoogleDrive</translation>
-    </message>
-    <message>
-        <source>Synchronise GoogleDrive...</source>
-        <translation type="vanished">GoogleDrive Synchroniseren...</translation>
-    </message>
-    <message>
-        <source>&amp;Upload to TrainingPeaks</source>
-        <translation type="vanished">&amp;Upload naar TrainingPeaks</translation>
-    </message>
-    <message>
-        <source>Synchronise TrainingPeaks...</source>
-        <translation type="vanished">TrainingPeaks Synchroniseren...</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="459"/>
         <source>&amp;Tools</source>
         <translation>&amp;Tools</translation>
@@ -18329,48 +17436,44 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation>VDOT en T-Pace Calculator...</translation>
     </message>
     <message>
-        <source>Get &amp;Withings Data...</source>
-        <translation type="vanished">&amp;Withings Data Ophalen...</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="431"/>
         <source>Add Cloud Account...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cloud Account Toevoegen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="432"/>
         <source>Ctrl+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+A</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="437"/>
         <source>Upload Activity...</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload Activiteit...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="438"/>
         <source>Synchronise Activities...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchroniseer Activiteiten...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="439"/>
         <source>Get &amp;Body Measurements...</source>
-        <translation type="unfinished"></translation>
+        <translation>Haal &amp;Lichaamsmetingen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="440"/>
         <source>Get &amp;HRV Measurements...</source>
-        <translation type="unfinished"></translation>
+        <translation>Haal &amp;HRV Metingen...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="442"/>
         <source>Check For New Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek Naar Nieuwe Activiteiten</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="443"/>
         <source>Ctrl-C</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl-C</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="466"/>
@@ -18385,7 +17488,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="469"/>
         <source>Download workouts from Today&apos;s Plan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Workouts Downloaden van Today&apos;s Plan...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="471"/>
@@ -18405,7 +17508,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="475"/>
         <source>Export Metrics as CSV...</source>
-        <translation>Metingen Exporteren als CSV...</translation>
+        <translation>Metrieken Exporteren als CSV...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="480"/>
@@ -18575,7 +17678,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1257"/>
         <source>Imported %1 metric charts</source>
-        <translation>%1 indicator inzichten geïmporteerd</translation>
+        <translation>%1 metrieken overzichten geïmporteerd</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1334"/>
@@ -18646,7 +17749,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1514"/>
         <source>Delete Activity</source>
-        <translation>Activiteit &amp;Verwijderen</translation>
+        <translation>Activiteit Verwijderen</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1520"/>
@@ -18678,7 +17781,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1942"/>
         <source>Export Metrics</source>
-        <translation>Exporteer Metingen</translation>
+        <translation>Exporteer Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1942"/>
@@ -18714,7 +17817,7 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="178"/>
         <source>Changes on </source>
-        <translation>Wijzigingen op</translation>
+        <translation>Wijzigingen op </translation>
     </message>
 </context>
 <context>
@@ -18865,7 +17968,7 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="313"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="558"/>
@@ -18893,7 +17996,7 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1326"/>
         <source>Selection #</source>
-        <translation type="unfinished"></translation>
+        <translation>Selectie #</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1400"/>
@@ -18911,7 +18014,7 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="847"/>
         <source>Number of W&apos; balance Matches higher than 2kJ, W&apos; bal tracks the level of W&apos; according to CP model during intermitent exercise.</source>
-        <translation>Aantal W&apos; balans Matches hoger dan 2kJ, W&apos; bal  volgt het nieveau van W&apos; volgens het CP model gedurende een met tussenpozen onderbroken oefening.</translation>
+        <translation>Aantal W&apos; balans Matches hoger dan 2kJ, W&apos; bal  volgt het niveau van W&apos; volgens het CP model gedurende een met tussenpozen onderbroken oefening.</translation>
     </message>
 </context>
 <context>
@@ -19162,27 +18265,27 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
     <message>
         <location filename="../../Core/Measures.cpp" line="41"/>
         <source>Manual entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele invoer</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="43"/>
         <source>Withings</source>
-        <translation type="unfinished"></translation>
+        <translation>Withings</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="45"/>
         <source>Today&apos;s Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="47"/>
         <source>CSV Upload</source>
-        <translation type="unfinished"></translation>
+        <translation>CSV Upload</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="49"/>
         <source>Unknown</source>
-        <translation type="unfinished">Onbekend</translation>
+        <translation>Onbekend</translation>
     </message>
 </context>
 <context>
@@ -19201,13 +18304,9 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
         <translation>Uitlijning Aanpassen</translation>
     </message>
     <message>
-        <source>Adjust merge alignment in time</source>
-        <translation type="vanished">Uitlijning samenvoegen aanpassen in de tijd</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1084"/>
         <source>Adjust merge alignment in time (use cursor and pgDown/pgUp keys for precise alignment)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas het samenvoegen aan in de tijd (gebruik de cursor en pgDown/pgUP toetsen voor exacte uitlijning)</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1129"/>
@@ -19316,7 +18415,7 @@ Als je klikt zal de activiteit worden bewaard, als je niet wilt verder gaan ga d
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="929"/>
         <source>Merge data series from one recording into the current activity where different types of data (e.g. O2 data from a Moxy) have been  recorded by different devices. Taking care to align the data in time.</source>
-        <translation>Datareeksen samenvoegen van een opname met de huidige activiteit waar verschillende datatypes (b.v. O2 data van een Moxy) zijn opgenomen door verschillende apparaten. Met inachtname van het in-lijn houden van de data in de tijd.</translation>
+        <translation>Datareeksen samenvoegen van een opname met de huidige activiteit waar verschillende datatypes (b.v. O2 data van een Moxy) zijn opgenomen door verschillende apparaten. Met inachtneming van het in-lijn houden van de data in de tijd.</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="937"/>
@@ -19344,18 +18443,18 @@ Als je klikt zal de activiteit worden bewaard, als je niet wilt verder gaan ga d
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1249"/>
         <source>Target activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Doel activiteit</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1250"/>
         <source>Source of additional data series</source>
-        <translation type="unfinished"></translation>
+        <translation>Bron van de aditionele dataseries</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1304"/>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1307"/>
         <source>d MMM yy hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>d MMM jj hh:mm:ss</translation>
     </message>
 </context>
 <context>
@@ -19476,12 +18575,12 @@ Als je klikt zal de activiteit worden bewaard, als je niet wilt verder gaan ga d
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1024"/>
         <source>Interpolate location data based upon distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpoleer de locatie gebaseerd op afstand</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1025"/>
         <source>Merge the two activity streams, interpolating location and slope values based upon mutual distance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg twee activiteiten samen, interpoleer de locatie en hellingwaardes gebaseerd op gezamenlijke afstand.</translation>
     </message>
 </context>
 <context>
@@ -19652,380 +18751,6 @@ Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het ha
     </message>
 </context>
 <context>
-    <name>ModelDataProvider</name>
-    <message>
-        <source>Power (watts)</source>
-        <translation type="vanished">Vermogen (Watts)</translation>
-    </message>
-    <message>
-        <source>Cadence (rpm)</source>
-        <translation type="vanished">Cadans (rpm)</translation>
-    </message>
-    <message>
-        <source>Heartrate (bpm)</source>
-        <translation type="vanished">Hartslag (bpm)</translation>
-    </message>
-    <message>
-        <source>Speed (kph)</source>
-        <translation type="vanished">Snelheid (kph)</translation>
-    </message>
-    <message>
-        <source>Speed (mph)</source>
-        <translation type="vanished">Snelheid (mph)</translation>
-    </message>
-    <message>
-        <source>Altitude (meters)</source>
-        <translation type="vanished">Hoogte (meters)</translation>
-    </message>
-    <message>
-        <source>Altitude (feet)</source>
-        <translation type="vanished">Hoogte (voet)</translation>
-    </message>
-    <message>
-        <source>Torque (N)</source>
-        <translation type="vanished">Koppel (N)</translation>
-    </message>
-    <message>
-        <source>Elapsed Time (secs)</source>
-        <translation type="vanished">Verstreken Tijd (secs)</translation>
-    </message>
-    <message>
-        <source>Elapsed Distance (km)</source>
-        <translation type="vanished">Verstreken Afstand (km)</translation>
-    </message>
-    <message>
-        <source>Elapsed Distance (mi)</source>
-        <translation type="vanished">Verstreken Afstand (mi)</translation>
-    </message>
-    <message>
-        <source>Interval Number</source>
-        <translation type="vanished">Interval Nummer</translation>
-    </message>
-    <message>
-        <source>Latitude (degree x 1000)</source>
-        <translation type="vanished">Breedtegraad (graden x 1000)</translation>
-    </message>
-    <message>
-        <source>Longitude (degree x 1000)</source>
-        <translation type="vanished">Lengtegraad (graden x 1000)</translation>
-    </message>
-    <message>
-        <source>Circumferential Pedal Velocity (cm/s)</source>
-        <translation type="vanished">Pedaal Omtreksnelheid (cm/s)</translation>
-    </message>
-    <message>
-        <source>Average Effective Pedal Force (N)</source>
-        <translation type="vanished">Gemiddelde Effectieve Pedaalkracht (N)</translation>
-    </message>
-    <message>
-        <source>Time at X/Y (%)</source>
-        <translation type="vanished">Tijd bij X/Y (%)</translation>
-    </message>
-    <message>
-        <source>Power Zone</source>
-        <translation type="vanished">Vermogenszone</translation>
-    </message>
-    <message>
-        <source>L/R Balance</source>
-        <translation type="vanished">L/R Balans</translation>
-    </message>
-    <message>
-        <source>Running Vertical Oscillation</source>
-        <translation type="vanished">Hardlopen Verticale Oscillatie</translation>
-    </message>
-    <message>
-        <source>Running Ground Contact Time</source>
-        <translation type="vanished">Hardlopen Grondcontacttijd</translation>
-    </message>
-    <message>
-        <source>Running Cadence</source>
-        <translation type="vanished">Hardlopen Cadans</translation>
-    </message>
-    <message>
-        <source>Gear Ratio</source>
-        <translation type="vanished">Versnellingsratio</translation>
-    </message>
-    <message>
-        <source>Muscle Oxygen</source>
-        <translation type="vanished">Spier Zuurstofgehalte</translation>
-    </message>
-    <message>
-        <source>Haemoglobin Mass</source>
-        <translation type="vanished">Hemoglobine Massa</translation>
-    </message>
-    <message>
-        <source>Slope (gradient)</source>
-        <translation type="vanished">Helling</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="vanished">Onbekend</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="vanished">Vermogen</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="vanished">Cadans</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="vanished">Hartslag</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="vanished">Snelheid</translation>
-    </message>
-    <message>
-        <source>Altitude</source>
-        <translation type="vanished">Hoogte</translation>
-    </message>
-    <message>
-        <source>Pedal Force</source>
-        <translation type="vanished">Pedaalkracht</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="vanished">Tijd</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="vanished">Afstand</translation>
-    </message>
-    <message>
-        <source>Interval</source>
-        <translation type="vanished">Interval</translation>
-    </message>
-    <message>
-        <source>Latitude</source>
-        <translation type="vanished">Breedtegraad</translation>
-    </message>
-    <message>
-        <source>Longitude</source>
-        <translation type="vanished">Lengtegraad</translation>
-    </message>
-    <message>
-        <source>Time at X/Y</source>
-        <translation type="vanished">Tijd bij X/Y</translation>
-    </message>
-    <message>
-        <source>Zone</source>
-        <translation type="vanished">Zone</translation>
-    </message>
-    <message>
-        <source>CPV</source>
-        <translation type="vanished">CPV</translation>
-    </message>
-    <message>
-        <source>AEPF</source>
-        <translation type="vanished">AEPF</translation>
-    </message>
-    <message>
-        <source>Balance</source>
-        <translation type="vanished">Balans</translation>
-    </message>
-    <message>
-        <source>RV</source>
-        <translation type="vanished">RV</translation>
-    </message>
-    <message>
-        <source>GCT</source>
-        <translation type="vanished">GCT</translation>
-    </message>
-    <message>
-        <source>Run Cad</source>
-        <translation type="vanished">Hardloop Cad</translation>
-    </message>
-    <message>
-        <source>Gear</source>
-        <translation type="vanished">Uitrusting</translation>
-    </message>
-    <message>
-        <source>SmO2</source>
-        <translation type="vanished">SmO2</translation>
-    </message>
-    <message>
-        <source>tHb</source>
-        <translation type="vanished">tHb</translation>
-    </message>
-    <message>
-        <source>Slope</source>
-        <translation type="vanished">Helling</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="vanished">Geen</translation>
-    </message>
-    <message>
-        <source>No data or bin size too large</source>
-        <translation type="vanished">geen data of bin-breedte te groot</translation>
-    </message>
-</context>
-<context>
-    <name>ModelWindow</name>
-    <message>
-        <source>Power</source>
-        <translation type="vanished">Vermogen</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="vanished">Cadans</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="vanished">Hartslag</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="vanished">Snelheid</translation>
-    </message>
-    <message>
-        <source>Altitude</source>
-        <translation type="vanished">Hoogte</translation>
-    </message>
-    <message>
-        <source>Torque</source>
-        <translation type="vanished">Koppel</translation>
-    </message>
-    <message>
-        <source>AEPF</source>
-        <translation type="vanished">AEPF</translation>
-    </message>
-    <message>
-        <source>CPV</source>
-        <translation type="vanished">CPV</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="vanished">Tijd</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="vanished">Afstand</translation>
-    </message>
-    <message>
-        <source>Slope</source>
-        <translation type="vanished">Helling</translation>
-    </message>
-    <message>
-        <source>Longitude</source>
-        <translation type="vanished">Lengtegraad</translation>
-    </message>
-    <message>
-        <source>L/R Balance</source>
-        <translation type="vanished">L/R Balans</translation>
-    </message>
-    <message>
-        <source>Running Vertical Oscillation</source>
-        <translation type="vanished">Hardlopen Verticale Oscillatie</translation>
-    </message>
-    <message>
-        <source>Running Cadence</source>
-        <translation type="vanished">Hardlopen Cadans</translation>
-    </message>
-    <message>
-        <source>Running GCT</source>
-        <translation type="vanished">Hardlopen GCT</translation>
-    </message>
-    <message>
-        <source>Gear Ratio</source>
-        <translation type="vanished">Versnellingsratio</translation>
-    </message>
-    <message>
-        <source>Muscle Oxygen</source>
-        <translation type="vanished">Spier Zuurstofgehalte</translation>
-    </message>
-    <message>
-        <source>Haemoglobin Mass</source>
-        <translation type="vanished">Hemoglobine Massa</translation>
-    </message>
-    <message>
-        <source>Analyse</source>
-        <translation type="vanished">Analyse</translation>
-    </message>
-    <message>
-        <source>X-Axis:</source>
-        <translation type="vanished">X-As:</translation>
-    </message>
-    <message>
-        <source>Y-Axis:</source>
-        <translation type="vanished">Y-As:</translation>
-    </message>
-    <message>
-        <source>Z-Axis:</source>
-        <translation type="vanished">Z-as:</translation>
-    </message>
-    <message>
-        <source>Time at X&amp;Y</source>
-        <translation type="vanished">Tijd bij X&amp;Y</translation>
-    </message>
-    <message>
-        <source>Color:</source>
-        <translation type="vanished">Kleur:</translation>
-    </message>
-    <message>
-        <source>Power Zone</source>
-        <translation type="vanished">Vermogenszone</translation>
-    </message>
-    <message>
-        <source>Bin Width:</source>
-        <translation type="vanished">Bin Breedte:</translation>
-    </message>
-    <message>
-        <source>Bar</source>
-        <translation type="vanished">Bar</translation>
-    </message>
-    <message>
-        <source>Grid</source>
-        <translation type="vanished">Raster</translation>
-    </message>
-    <message>
-        <source>Surface</source>
-        <translation type="vanished">Opervlak</translation>
-    </message>
-    <message>
-        <source>Dots</source>
-        <translation type="vanished">Punten</translation>
-    </message>
-    <message>
-        <source>Ignore Zero</source>
-        <translation type="vanished">Negeer Nul</translation>
-    </message>
-    <message>
-        <source>Show Grid</source>
-        <translation type="vanished">Toon Raster</translation>
-    </message>
-    <message>
-        <source>Frame Intervals</source>
-        <translation type="vanished">Kader Intervallen</translation>
-    </message>
-    <message>
-        <source>Legend</source>
-        <translation type="vanished">Legenda</translation>
-    </message>
-    <message>
-        <source>User Defined</source>
-        <translation type="vanished">Gebruiker Gedefinieerd</translation>
-    </message>
-    <message>
-        <source>Natural Cadence Selection</source>
-        <translation type="vanished">Natuurlijke Cadans Selectie</translation>
-    </message>
-    <message>
-        <source>Route Visualisation</source>
-        <translation type="vanished">Route Visualisatie</translation>
-    </message>
-    <message>
-        <source>Power Fatigue</source>
-        <translation type="vanished">Vermogen Vermoeidheid</translation>
-    </message>
-    <message>
-        <source>Impact of Altitude</source>
-        <translation type="vanished">Invloed van Hoogte</translation>
-    </message>
-</context>
-<context>
     <name>MonarkController</name>
     <message>
         <location filename="../../Train/MonarkController.cpp" line="90"/>
@@ -20039,13 +18764,14 @@ Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het ha
         <location filename="../../FileIO/MoxyDevice.cpp" line="96"/>
         <source>Connecting ... 
 </source>
-        <translation>Verbinden...</translation>
+        <translation>Verbinden... 
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="99"/>
         <location filename="../../FileIO/MoxyDevice.cpp" line="366"/>
         <source>ERROR: open failed: </source>
-        <translation>FOUT: open mislukt:</translation>
+        <translation>FOUT: open mislukt: </translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="106"/>
@@ -20071,7 +18797,8 @@ Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het ha
         <location filename="../../FileIO/MoxyDevice.cpp" line="199"/>
         <source>Downloading ... 
 </source>
-        <translation>Downloaden...</translation>
+        <translation>Downloaden... 
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="208"/>
@@ -20081,7 +18808,7 @@ Je kunt nu data importeren of downloaden voordat je de data samenvoegt en het ha
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="229"/>
         <source>Parsing ... </source>
-        <translation>Parsen...</translation>
+        <translation>Parsen... </translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="230"/>
@@ -20136,7 +18863,7 @@ Geen ritten gevonden om te importeren.
         <location filename="../../FileIO/MoxyDevice.cpp" line="508"/>
         <location filename="../../FileIO/MoxyDevice.cpp" line="527"/>
         <source>read timeout</source>
-        <translation>lees timeout</translation>
+        <translation>lees time-out</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="485"/>
@@ -20153,7 +18880,7 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="555"/>
         <source>timeout writing &apos;%1&apos; to device</source>
-        <translation>timeout tijdens schrijven  van &apos;%1&apos; naar apparaat</translation>
+        <translation>time-out tijdens schrijven  van &apos;%1&apos; naar apparaat</translation>
     </message>
 </context>
 <context>
@@ -20369,7 +19096,7 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="65"/>
         <source>Metric</source>
-        <translation>Metrische eenheden</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="66"/>
@@ -20406,12 +19133,12 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="341"/>
         <source>Can&apos;t create new directory </source>
-        <translation>Nieuwe map creëren mislukt</translation>
+        <translation>Nieuwe map creëren mislukt </translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="344"/>
         <source>Athlete already exists </source>
-        <translation>Atleet bestaat al</translation>
+        <translation>Atleet bestaat al </translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="347"/>
@@ -20476,17 +19203,9 @@ Geen ritten gevonden om te importeren.
         <translation>Autorisatie Fout</translation>
     </message>
     <message>
-        <source>Error fetching OAuth credentials - Endpoint: /oauth/access_token</source>
-        <translation type="vanished">Fout bij het ophalen van OAuth referenties - Endpoint: /oauth/access_token</translation>
-    </message>
-    <message>
-        <source>Twitter authorization was successful.</source>
-        <translation type="vanished">Twitter autorisatie was succesvol.</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="632"/>
         <source>Withings authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Withings autorisatie was succesvol.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="514"/>
@@ -20503,14 +19222,6 @@ Geen ritten gevonden om te importeren.
         <translation>Informatie</translation>
     </message>
     <message>
-        <source>Error in authorization</source>
-        <translation type="vanished">Fout in de autorisatie</translation>
-    </message>
-    <message>
-        <source>There was an error during authorization. Please check the error description.</source>
-        <translation type="vanished">Er was een fout gedurende de autorisatie. Controleer de foutomschrijving alsjeblieft.</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="501"/>
         <source>Error retrieving authoriation credentials</source>
         <translation>Fout bij het ophalen van de autorisatie referenties</translation>
@@ -20523,12 +19234,12 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="522"/>
         <source>SportTracks authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>SportTracks autorisatie was succesvol.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
         <source>Polar Flow authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Polar Flow autorisatie was succesvol.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
@@ -20548,7 +19259,7 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
         <source>Kent University Google Drive authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kent University Google Drive autorisatie was succesvol.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="601"/>
@@ -20558,17 +19269,17 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="607"/>
         <source>Today&apos;s Plan authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Today&apos;s Plan autorisatie was succesvol.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="641"/>
         <source>Error retrieving access token, %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout tijdens het ophalen van het toegang-token, %1 (%2)</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="642"/>
         <source>SSL Token Refresh Error</source>
-        <translation type="unfinished"></translation>
+        <translation>SSL Token Verversen Fout</translation>
     </message>
 </context>
 <context>
@@ -20576,52 +19287,52 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="118"/>
         <source>Fetching server list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ophalen serverlijst.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="133"/>
         <source>Network Problem reading server list</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk Probleem tijdens het lezen van de serverlijst</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="149"/>
         <source>Invalid server list, please try again later</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige serverlijst, probeer later opnieuw</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="159"/>
         <source>Finding an available server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken naar een beschikbare server.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="202"/>
         <source>No servers available, please try later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen servers beschikbaar, probeer later opnieuw.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="212"/>
         <source>Preparing data to send.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorbereiden van de data om te versturen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="287"/>
         <source>Sending data to server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versturen van de data naar de server.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="330"/>
         <source>Server replied:</source>
-        <translation type="unfinished"></translation>
+        <translation>Server antwoord:</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="339"/>
         <source>Finishing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voltooien.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="348"/>
         <source>Done</source>
-        <translation type="unfinished">Voltooid</translation>
+        <translation>Voltooid</translation>
     </message>
 </context>
 <context>
@@ -20629,27 +19340,27 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="357"/>
         <source>OpenData</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenData</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="373"/>
         <source>&lt;b&gt;&lt;big&gt;OpenData Project&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;OpenData Project&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="383"/>
         <source>We have started a new project to collect user activity data to enable researchers, coaches and others to develop new models and solutions using real world data.&lt;p&gt;All data that is shared is &lt;b&gt;anonymous&lt;/b&gt; and cannot be traced back to the original user, no personal data is shared and the workout data is limited to Power, Heartrate, Altitude, Cadence and Distance data along with metrics and distributions. No personally identifiable information is collected at all.&lt;p&gt;The data will be published to the general public in exactly the same format you have provided it in. And you can choose to remove your data at any time. You can also choose to opt out again in athlete preferences.&lt;p&gt;&lt;center&gt;Your data will only be sent once every year or so.&lt;/center&gt;&lt;br&gt;&lt;b&gt;WE WILL NOT&lt;/b&gt;:&lt;p&gt;- Collect personal information &lt;p&gt;- Collect GPS information &lt;p&gt;- Collect notes or other metadata  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;WE WILL&lt;/b&gt;:&lt;p&gt;- Collect basic athlete info: Gender, Year of Birth and UUID&lt;p&gt;- Collect basic activity samples for HR, Cadence, Power, Distance, Altitude&lt;p&gt;- Collect metrics for every activity stored for this athlete&lt;p&gt;- Collect distribution and mean-max aggregates of activity data&lt;p&gt;&lt;p&gt;&lt;br&gt;We publish the data at the &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; as an &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData project&lt;/a&gt; open to everyone. &lt;p&gt;We have also setup an &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github project&lt;/a&gt; to publish tools for working with the dataset.&lt;p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>We zijn een nieuw project gestart om gebruikersdata te verzamelen met als doel om onderzoekers, coaches en anderen modellen en oplossingen te laten ontwikkelen met gebruikmaking van praktijkdata.&lt;p&gt;Alle data die gedeeld wordt is&lt;b&gt;anoniem&lt;/b&gt; en kan niet herleid worden naar de oorspronkelijke gebruiker, geen persoonlijke data wordt gedeeld en de workout data is gelimiteerd tot Vermogen, Hartslag, Hoogte, Cadans en Afstand samen met metrieken en distributies. Geen enkele persoonlijk identificeerbare informatie wordt verzameld.&lt;p&gt;De data zal openbaar gepubliceerd worden in exact hetzelfde formaat zoals je het aangeboden. En je kunt kiezen om de datum en tijd informatie te verwijderen. Er is ook een opt out mogelijkheid in de atleet voorkeursinstellingen.&lt;p&gt;&lt;center&gt;Jouw data wordt ongeveer eens per jaar verstuurd.&lt;/center&gt;&lt;br&gt;&lt;b&gt;WE ZULLEN NIET&lt;/b&gt;:&lt;p&gt;- Persoonlijke informatie verzamelen&lt;p&gt;- GPS informatie verzamelen &lt;p&gt;- Notities of andere metadata verzamelen &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;WE ZULLEN WEL&lt;/b&gt;:&lt;p&gt;- Basis atleet info verzamelen: Geslacht, Geboortejaar en UUID&lt;p&gt;- Basis activiteiten zoals steekproeven van HR, Cadans, Vermogen, Afstand, Hoogte verzamelen&lt;p&gt;- Metingen voor iedere opgeslagen activiteit van deze atleet verzamelen&lt;p&gt;- Distributie en gemiddelde-max aggregaties van de activiteitendata verzamelen&lt;p&gt;&lt;p&gt;&lt;br&gt;We publiceren de data op&lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; als een &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData project&lt;/a&gt; open voor iedereen. &lt;p&gt;We zullen ook een &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github project&lt;/a&gt; opzetten om tools te delen die werken met de dataset.&lt;p&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="416"/>
         <source>Yes, I want to share</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, ik wil delen</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="419"/>
         <source>No thanks</source>
-        <translation type="unfinished"></translation>
+        <translation>Nee dankjewel</translation>
     </message>
 </context>
 <context>
@@ -20657,117 +19368,117 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="179"/>
         <source>PMC</source>
-        <translation type="unfinished">PMC</translation>
+        <translation>PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="180"/>
         <source>Sport</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="181"/>
         <source>Workout Code</source>
-        <translation type="unfinished">Trainingscode</translation>
+        <translation>Trainingscode</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="182"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdsduur</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="183"/>
         <source>Notes</source>
-        <translation type="unfinished">Aantekeningen</translation>
+        <translation>Aantekeningen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="186"/>
         <source>HRV rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV rMSSD</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="187"/>
         <source>Heartrate</source>
-        <translation type="unfinished">Hartslag</translation>
+        <translation>Hartslag</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="188"/>
         <source>Heartrate Zones</source>
-        <translation type="unfinished">Hartslagzones</translation>
+        <translation>Hartslagzones</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="189"/>
         <source>Climbing</source>
-        <translation type="unfinished"></translation>
+        <translation>Klimmen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="190"/>
         <source>Cadence</source>
-        <translation type="unfinished">Cadans</translation>
+        <translation>Cadans</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="191"/>
         <source>Equivalent Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Equivalent Vermogen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="194"/>
         <source>RPE</source>
-        <translation type="unfinished">RPE</translation>
+        <translation>RPE</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="195"/>
         <source>Stress</source>
-        <translation type="unfinished">Stress</translation>
+        <translation>Stress</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="196"/>
         <source>Fatigue Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermoeidheidzones</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="197"/>
         <source>Intervals</source>
-        <translation type="unfinished">Intervallen</translation>
+        <translation>Intervallen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="200"/>
         <source>Intensity</source>
-        <translation type="unfinished">Intensiteit</translation>
+        <translation>Intensiteit</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="201"/>
         <source>Power</source>
-        <translation type="unfinished">Vermogen</translation>
+        <translation>Vermogen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="202"/>
         <source>Power Zones</source>
-        <translation type="unfinished">Vermogenszones</translation>
+        <translation>Vermogenszones</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="203"/>
         <source>Power Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermogensmodel</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="206"/>
         <source>Distance</source>
-        <translation type="unfinished">Afstand</translation>
+        <translation>Afstand</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="207"/>
         <source>Speed</source>
-        <translation type="unfinished">Snelheid</translation>
+        <translation>Snelheid</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="208"/>
         <source>Pace Zones</source>
-        <translation type="unfinished">Tempozones</translation>
+        <translation>Tempozones</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="209"/>
         <source>Route</source>
-        <translation type="unfinished">Route</translation>
+        <translation>Route</translation>
     </message>
 </context>
 <context>
@@ -20775,22 +19486,22 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Metrics/PDModel.h" line="115"/>
         <source>W&apos;: Formerly known as Anaerobic Work Capacity (AWC). An estimate for the fixed amount of work, expressed in kJ, that you can do above Critical Power.</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;: Vroeger bekend als Anaerobe Werk Capaciteit (AWC). Een schatting voor de vaste hoeveelheid werk, uitgedrukt in kJ, welke je aankunt boven het Kritisch Vermogen.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="116"/>
         <source>Critical Power. An estimate of the power that, theoretically, can be maintained for a long time without fatigue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kritisch Vermogen: Een schatting van het vermogen dat je, theoretisch, aankunt over langere tijdspanne zonder vermoeid te raken.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="117"/>
         <source>Functional Threshold Power. The highest power that a rider can maintain in a quasi-steady state without fatiguing for approximately one hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Functioneel Grens Vermogen. Het hoogste vermogen dat een atleet aan kan in een quasi steady state zonder dat vermoeidheid optreedt over een tijdspanne van 1 uur.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="118"/>
         <source>P-max: An estimate of the maximal power over one full rotation of the cranks.</source>
-        <translation type="unfinished"></translation>
+        <translation>P-Max: Een schatting van het maximale vermogen over 1 volledige rotatie van de crank.</translation>
     </message>
 </context>
 <context>
@@ -20798,22 +19509,22 @@ Geen ritten gevonden om te importeren.
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="627"/>
         <source>CTL/LTS : Chronic Training Load/Long Term Stress. The dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.</source>
-        <translation type="unfinished"></translation>
+        <translation>CTL/LTS : Chronische Training Load/Lange Termijn Stress. De hoeveelheid training die je kunt accumuleren over een langer tijdsbestek, uitgerekend als een exponent van het gewogen gemiddelde van de geselecteerde Chronische Training Load metriek, typisch een periode van 4-8 weken, 42 dagen is de standaard instelling. Dit wordt gezien als gerelateerd zijn aan je fitness.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="632"/>
         <source>ATL/STS : Acute Training Load/Short Term Stress. The dose of training that you accumulated over a short period of time, computed as an exponentially weighted moving average of the selected Training Load metric from 3 to 10 days in general, 7 by default. It is claimed to relate to your fatigue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATL/STS : Acute Training Load/Short Term Stress. De hoeveelheid training die je kunt accumuleren over een korter tijdsbestek, uitgerekend als een exponent van het gewogen voortschrijdend gemiddelde van de geselecteerde Chronische Training Load metriek, typisch een periode van 3-10 dagen, 7 dagen is de standaard instelling. Dit wordt gezien als gerelateerd zijn aan je Vermoeidheid.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="637"/>
         <source>TSB/SB : Training Stress Balance/Stress Balance. It&apos;s the result of subtracting yesterday&apos;s Acute Training Load/Short Term Stress from yesterday&apos;s Chronic Training Load/Long Term Stress. It is claimed to relate to your freshness.</source>
-        <translation type="unfinished"></translation>
+        <translation>TSB/SB : Training Stress Balance/Stress Balance. Is de Acute Training Load/Short Term Stress van gisteren af te trekken van de Chronic Training Load/Long Term Stress. van gisteren. Dit wordt gezien als gerelateerd zijn aan je versheid.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="642"/>
         <source>RR : Ramp Rate. The rate at which CTL/LTS increases over a given time period. Large values up and down indicate a risk of injury and aggressive taper respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>RR : Ramp Rate. Is de ratio waarmee de CTL/LTS vermeerdert over een vastgestelde tijdsperiode. Hoge waarden bewegingen hierin geven een indicatie van het risico tot blessures en daarmee gepaard gaande agressieve tapering.</translation>
     </message>
 </context>
 <context>
@@ -21663,13 +20374,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="245"/>
         <source>10 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>10 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="246"/>
         <location filename="../../Metrics/PeakHr.cpp" line="247"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21677,13 +20388,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="150"/>
         <source>1 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>1 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="151"/>
         <location filename="../../Metrics/PeakHr.cpp" line="152"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21691,13 +20402,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="264"/>
         <source>20 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>20 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="265"/>
         <location filename="../../Metrics/PeakHr.cpp" line="266"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21705,13 +20416,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="169"/>
         <source>2 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>2 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="170"/>
         <location filename="../../Metrics/PeakHr.cpp" line="171"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21719,13 +20430,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="283"/>
         <source>30 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>30 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="284"/>
         <location filename="../../Metrics/PeakHr.cpp" line="285"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21733,13 +20444,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="188"/>
         <source>3 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>3 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="189"/>
         <location filename="../../Metrics/PeakHr.cpp" line="190"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21747,13 +20458,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="207"/>
         <source>5 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>5 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="208"/>
         <location filename="../../Metrics/PeakHr.cpp" line="209"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21761,13 +20472,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="302"/>
         <source>60 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>60 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="303"/>
         <location filename="../../Metrics/PeakHr.cpp" line="304"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21775,13 +20486,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="226"/>
         <source>8 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>8 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="227"/>
         <location filename="../../Metrics/PeakHr.cpp" line="228"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -21789,13 +20500,13 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="321"/>
         <source>90 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>90 min Piek Hr</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="322"/>
         <location filename="../../Metrics/PeakHr.cpp" line="323"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22055,18 +20766,18 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1223"/>
         <source>10 min Peak Pace HR</source>
-        <translation type="unfinished"></translation>
+        <translation>10 min Piek Tempo HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1224"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1225"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1226"/>
         <source>Average Heart Rate for 10 min Peak Pace interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Hartslag voor 10 min Piek Tempo interval</translation>
     </message>
 </context>
 <context>
@@ -22074,18 +20785,18 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1181"/>
         <source>1 min Peak Pace HR</source>
-        <translation type="unfinished"></translation>
+        <translation>1 min Piek Tempo HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1182"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1183"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1184"/>
         <source>Average Heart Rate for 1 min Peak Pace interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Hartslag voor 1 min Piek Tempo interval</translation>
     </message>
 </context>
 <context>
@@ -22093,18 +20804,18 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1244"/>
         <source>20 min Peak Pace HR</source>
-        <translation type="unfinished"></translation>
+        <translation>20 min Piek Tempo HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1245"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1246"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1247"/>
         <source>Average Heart Rate for 20 min Peak Pace interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Hartslag voor 20 min Piek Tempo interval</translation>
     </message>
 </context>
 <context>
@@ -22112,7 +20823,7 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1265"/>
         <source>30 min Peak Pace HR</source>
-        <translation type="unfinished"></translation>
+        <translation>30 min Piek Tempo HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1266"/>
@@ -22120,22 +20831,22 @@ Wil je doorgaan?</translation>
         <location filename="../../Metrics/PeakPace.cpp" line="1287"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1288"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1268"/>
         <source>Average Heart Rate for 30 min Peak Pace interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Hartslag voor 30 min Piek Tempo interval</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1286"/>
         <source>60 min Peak Pace HR</source>
-        <translation type="unfinished"></translation>
+        <translation>60 min Piek Tempo HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1289"/>
         <source>Average Heart Rate for 60 min Peak Pace interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Hartslag voor 60 min Piek Tempo interval</translation>
     </message>
 </context>
 <context>
@@ -22143,18 +20854,18 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1202"/>
         <source>5 min Peak Pace HR</source>
-        <translation type="unfinished"></translation>
+        <translation>5 min Piek Tempo HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1203"/>
         <location filename="../../Metrics/PeakPace.cpp" line="1204"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1205"/>
         <source>Average Heart Rate for 5 min Peak Pace interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde Hartslag voor 5 min Piek Tempo interval</translation>
     </message>
 </context>
 <context>
@@ -22425,7 +21136,7 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="49"/>
         <source>Average Power as Percent of Mean Maximal Power for Duration.</source>
-        <translation>Gemiddelde Vermogen as Percentage van Mean Maximal Power voor de Tijdsduur.</translation>
+        <translation>Gemiddelde Vermogen als Percentage van Mean Maximal Power voor de Tijdsduur.</translation>
     </message>
 </context>
 <context>
@@ -22990,32 +21701,33 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
         <source>Network Problem reading Polar Flow data</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk Probleem tijdens het lezen van de Polar Flow data</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
         <source>problem parsing Polar Flow data</source>
-        <translation type="unfinished"></translation>
+        <translation>probleem gedurende het parsen van de Polar Flow data</translation>
     </message>
     <message>
+        <location filename="../../Cloud/PolarFlow.cpp" line="87"/>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
         <source>You must authorise with Polar Flow first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst autoriseren bij Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.h" line="47"/>
         <source>PolarFlow</source>
-        <translation type="unfinished"></translation>
+        <translation>PolarFlow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.h" line="48"/>
         <source>Download from the popular Polar website.</source>
-        <translation type="unfinished"></translation>
+        <translation>Download van de populaire Polar website.</translation>
     </message>
 </context>
 <context>
@@ -23203,16 +21915,16 @@ Wil je doorgaan?</translation>
 <context>
     <name>PowerIndex</name>
     <message>
-        <location filename="../../Metrics/Banister.cpp" line="598"/>
         <location filename="../../Metrics/Banister.cpp" line="601"/>
+        <location filename="../../Metrics/Banister.cpp" line="604"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermogensindex</translation>
     </message>
     <message>
-        <location filename="../../Metrics/Banister.cpp" line="599"/>
-        <location filename="../../Metrics/Banister.cpp" line="600"/>
+        <location filename="../../Metrics/Banister.cpp" line="602"/>
+        <location filename="../../Metrics/Banister.cpp" line="603"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -23232,7 +21944,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="87"/>
         <source>timeout writing %1 to device</source>
-        <translation>timeout tijdens schrijven van %1 naar apparaat</translation>
+        <translation>time-out tijdens schrijven van %1 naar apparaat</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="95"/>
@@ -23242,7 +21954,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="97"/>
         <source>timeout reading back hardware echo</source>
-        <translation>timeout tijdens teruglezen van de hardware echo</translation>
+        <translation>time-out tijdens teruglezen van de hardware echo</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="113"/>
@@ -23252,7 +21964,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="113"/>
         <source>read timeout</source>
-        <translation>lees timeout</translation>
+        <translation>lees time-out</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="114"/>
@@ -23300,7 +22012,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="189"/>
         <source>ERROR: timeout reading header</source>
-        <translation>FOUT: timeout tijdens header lezen</translation>
+        <translation>FOUT: time-out tijdens header lezen</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="201"/>
@@ -23315,7 +22027,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="217"/>
         <source>ERROR: timeout reading first two</source>
-        <translation>FOUT: timeout tijdens de eerste twee lezen</translation>
+        <translation>FOUT: time-out tijdens de eerste twee lezen</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="230"/>
@@ -23325,7 +22037,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="234"/>
         <source>ERROR: timeout reading block</source>
-        <translation>FOUT: timeout tijdens blok lezen</translation>
+        <translation>FOUT: time-out tijdens blok lezen</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="247"/>
@@ -23340,7 +22052,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="283"/>
         <source>Failed to create temporary file </source>
-        <translation>Tijdelijk bestand creeren mislukt</translation>
+        <translation>Tijdelijk bestand creëren mislukt</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="322"/>
@@ -23391,7 +22103,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3886"/>
         <source>Save</source>
-        <translation type="unfinished">Bewaar</translation>
+        <translation>Bewaar</translation>
     </message>
 </context>
 <context>
@@ -23399,7 +22111,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="287"/>
         <source>Show Console</source>
-        <translation type="unfinished">Toon Console</translation>
+        <translation>Toon Console</translation>
     </message>
 </context>
 <context>
@@ -23407,7 +22119,7 @@ en dat het display, &quot;Host&quot; toont</translation>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="49"/>
         <source>Python Console (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Console (%1)</translation>
     </message>
 </context>
 <context>
@@ -23499,7 +22211,7 @@ yyyy</translation>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="156"/>
         <source>Swedish</source>
-        <translation type="unfinished"></translation>
+        <translation>Zweeds</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="160"/>
@@ -23523,13 +22235,9 @@ yyyy</translation>
         <translation>Probleem tijdens Opslag van Zoekconfiguratie met een naam</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Onbekend</translation>
-    </message>
-    <message>
         <location filename="../../Core/BodyMeasures.cpp" line="56"/>
         <source>Problem Saving Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem Tijdens Opslag van Lichaamsmetingen</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="57"/>
@@ -23545,24 +22253,24 @@ yyyy</translation>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="106"/>
         <source>Problem Reading Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem Tijdens Het Lezen Van Lichaamsmetingen</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="120"/>
         <source>Problem Parsing Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem Tijdens het Parsen Van Lichaamsmetingen</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="107"/>
         <location filename="../../Core/HrvMeasures.cpp" line="111"/>
         <source>File: %1 cannot be opened for &apos;Reading&apos;. Please check file properties.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand %1 kan niet worden geopend om uit te lezen. Controleer de bestandseigenschappen.</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="121"/>
         <location filename="../../Core/HrvMeasures.cpp" line="125"/>
         <source>File: %1 is not a proper JSON file. Parsing error: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand: %1 is niet een correct JSON bestand. Parse fout: %2</translation>
     </message>
     <message>
         <location filename="../../Core/RouteParser.cpp" line="107"/>
@@ -23575,8 +22283,8 @@ yyyy</translation>
         <translation>Probleem bij het Bewaren van Seizoenen</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1506"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2502"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1494"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2518"/>
         <location filename="../../FileIO/TcxParser.cpp" line="410"/>
         <source>Lap %1</source>
         <translation>Ronde %1</translation>
@@ -23694,260 +22402,263 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1256"/>
         <source>Rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1257"/>
         <source>Very, very easy</source>
-        <translation type="unfinished"></translation>
+        <translation>Heel, heel makkelijk</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1258"/>
         <source>Easy</source>
-        <translation type="unfinished"></translation>
+        <translation>Makkelijk</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1259"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddeld</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1260"/>
         <source>Somewhat hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Enigszins moeilijk</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1261"/>
         <source>Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Moeilijk</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1262"/>
         <source>Hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>Moeilijk+</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1263"/>
         <source>Very hard</source>
-        <translation type="unfinished"></translation>
+        <translation>Heel moeilijk</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1264"/>
         <source>Very hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>Heel moeilijk+</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1265"/>
         <source>Very hard++</source>
-        <translation type="unfinished"></translation>
+        <translation>Heel moeilijk++</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1266"/>
         <source>Maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximaal</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1291"/>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Foutieve</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="798"/>
         <source>0 Rest</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Rust</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="799"/>
         <source>1 Very, very easy</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Heel, heel makkelijk</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="800"/>
         <source>2 Easy</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Makkelijk</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="801"/>
         <source>3 Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Gemiddeld</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="802"/>
         <source>4 Somewhat hard</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Enigszins moeilijk</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="803"/>
         <source>5 Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Moeilijk</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="804"/>
         <source>6 Hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Moeilijk+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="805"/>
         <source>7 Very hard</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Heel moeilijk</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="806"/>
         <source>8 Very hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>8 Heel moeilijk+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="807"/>
         <source>9 Very hard++</source>
-        <translation type="unfinished"></translation>
+        <translation>9 Heel moeilijk++</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="808"/>
         <source>10 Maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Maximaal</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="811"/>
         <source>0 Not Fatigued At All</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Totaal Niet Vermoeid</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="812"/>
         <source>1 </source>
-        <translation type="unfinished">1 </translation>
+        <translation>1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="813"/>
         <source>2 A Little Fatigued</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Een Beetje Vermoeid</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="814"/>
         <source>3 </source>
-        <translation type="unfinished">3 </translation>
+        <translation>3 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="815"/>
         <source>4 </source>
-        <translation type="unfinished">4 </translation>
+        <translation>4 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="816"/>
         <source>5 Moderately Fatigued</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Vermoeid</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="817"/>
         <source>6 </source>
-        <translation type="unfinished">6 </translation>
+        <translation>6 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="818"/>
         <source>7 Very fatigued+</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Flink Vermoeid</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="819"/>
         <source>8 </source>
-        <translation type="unfinished">8 </translation>
+        <translation>8 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="820"/>
         <source>9 </source>
-        <translation type="unfinished">9 </translation>
+        <translation>9 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="821"/>
         <source>10 Total Fatigue, Nothing Left</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Uitgegput</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="58"/>
         <source>Problem Saving HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem Tijdens Opslag Van HRV Metingen</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="110"/>
         <source>Problem Reading HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem Tijdens Lezen Van HRV Metingen</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="124"/>
         <source>Problem Parsing HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem Tijdens Parsen Van HRV Metingen</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="286"/>
         <source>Developer limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Ontwikkelaarlimiet overschreden</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="288"/>
         <source>Monthly free plan limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Maandelijkse gratis abonnement limiet overschreden</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="290"/>
         <source>Bad request</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout verzoek</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="292"/>
         <source>Gateway Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Gateway Time-out</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="294"/>
         <source>Connection to remote server timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinding naar server timed out</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="296"/>
         <source>Networkerror: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="398"/>
         <source>Distance %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Afstand %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="401"/>
         <source>Location %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Locatie %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="404"/>
         <source>Time %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="407"/>
         <source>HeartRate %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hartslag %1</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="287"/>
         <source>Python not installed or in path</source>
-        <translation type="unfinished"></translation>
+        <translation>Python niet geïnstalleerd of niet in het zoekpad opgenomen</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="287"/>
         <source>Python v3.%1 is required for Python embedding.
 Python disabled in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Python v3 %1 is nodig voor Python integratie.
+Python is uitgeschakeld in de voorkeursinstellingen.</translation>
     </message>
     <message>
         <location filename="../../R/RTool.cpp" line="222"/>
         <source>The version of R installed is too old. You must have R version 3.4 or higher.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>De versie van de geïnstalleerde R software is te oud. Je moet minimaal R versie 3.4 of hoger hebben.
+</translation>
     </message>
     <message>
         <location filename="../../R/RTool.cpp" line="231"/>
         <source>The version of R installed is too new. You must have R version 3.3 or older.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>De versie van de geïnstalleerde R software is te nieuw. Je moet R versie 3.3 of lager hebben.
+</translation>
     </message>
 </context>
 <context>
@@ -23971,18 +22682,18 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="42"/>
         <source>Fraction of normal RR intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Fractie van normale RR intervallen</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="43"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="44"/>
         <source>pct</source>
-        <translation type="unfinished"></translation>
+        <translation>pct</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="46"/>
         <source>Measure of RR readability</source>
-        <translation type="unfinished"></translation>
+        <translation>Meting van RR leesbaarheid</translation>
     </message>
 </context>
 <context>
@@ -24034,7 +22745,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="484"/>
         <source>Section Time Remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>Resterende Sectietijd</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="487"/>
@@ -24209,32 +22920,32 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="592"/>
         <source>Slope</source>
-        <translation type="unfinished">Helling</translation>
+        <translation>Helling</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="595"/>
         <source>Lap Distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Rondeafstand</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="598"/>
         <source>Lap Distance Remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>Resterende Rondeafstand</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="601"/>
         <source>Latitude</source>
-        <translation type="unfinished">Breedtegraad</translation>
+        <translation>Breedtegraad</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="604"/>
         <source>Longitude</source>
-        <translation type="unfinished">Lengtegraad</translation>
+        <translation>Lengtegraad</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="607"/>
         <source>Altitude</source>
-        <translation type="unfinished">Hoogte</translation>
+        <translation>Hoogte</translation>
     </message>
 </context>
 <context>
@@ -24551,7 +23262,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../FileIO/ManualRideFile.cpp" line="119"/>
         <source>Unknown ride metric &quot;%1&quot;.</source>
-        <translation>Onbekende rit indicator &quot;%1&quot;.</translation>
+        <translation>Onbekende rit metriek &quot;%1&quot;.</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="44"/>
@@ -25177,7 +23888,7 @@ Wil je doorgaan?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="348"/>
         <source>R-R</source>
-        <translation type="unfinished"></translation>
+        <translation>R-R</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="349"/>
@@ -25359,18 +24070,6 @@ Wil je doorgaan?</translation>
         <location filename="../../FileIO/RideFile.cpp" line="468"/>
         <source>ratio</source>
         <translation>ratio</translation>
-    </message>
-    <message>
-        <source>Invalid File Name</source>
-        <translation type="vanished">Ongeldige Bestandsnaam</translation>
-    </message>
-    <message>
-        <source>Invalid date/time in filename:
-%1
-Skipping file...</source>
-        <translation type="vanished">Ongeldige datum/tijd in bestand:
-%1
-Bestand overgeslagen...</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="2345"/>
@@ -25699,7 +24398,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="222"/>
         <source>%1 files for import selected</source>
-        <translation>%1 bestanden voor import geslecteerd</translation>
+        <translation>%1 bestanden voor import geselecteerd</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="224"/>
@@ -25816,11 +24515,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="491"/>
         <source>Error - File does not exist.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error - File does not exit.</source>
-        <translation type="vanished">Fout - bestand bestaat niet.</translation>
+        <translation>Fout - Bestand bestaat niet.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="492"/>
@@ -25835,12 +24530,12 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="494"/>
         <source>Error - Opendata summary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout - Opendata samenvatting.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="506"/>
         <source>undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>ongedefinieerd</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="521"/>
@@ -25910,7 +24605,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="788"/>
         <source>No files for automatic import selected.</source>
-        <translation>Geen bestanden foor auto-import geslecteerd.</translation>
+        <translation>Geen bestanden foor auto-import geselecteerd.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="789"/>
@@ -25957,7 +24652,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1039"/>
         <source>Error - Activity file with same start date/time exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout - Activiteit met dezelfde startdatum/tijd bestaat al</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1056"/>
@@ -25967,7 +24662,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1089"/>
         <source>Processing...</source>
-        <translation type="unfinished">Verwerken...</translation>
+        <translation>Verwerken...</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1093"/>
@@ -26101,7 +24796,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1292"/>
         <source>L%4 %3% EFFORT of %1  (%2 watts)</source>
-        <translation>L%4 %3% INSPANING van %1  (%2 watts)</translation>
+        <translation>L%4 %3% INSPANNING van %1  (%2 watts)</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1313"/>
@@ -26142,10 +24837,6 @@ Bestand overgeslagen...</translation>
         <translation>Google</translation>
     </message>
     <message>
-        <source>Bing</source>
-        <translation type="vanished">Bing</translation>
-    </message>
-    <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="77"/>
         <source>Map</source>
         <translation>Kaart</translation>
@@ -26163,7 +24854,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="80"/>
         <source>Show Intervals Overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon Intervallenvenster</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="83"/>
@@ -26188,39 +24879,27 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="91"/>
         <source>Custom Tile Server A</source>
-        <translation type="unfinished"></translation>
+        <translation>Afwijkende Tegelserver A</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="92"/>
         <source>Custom Tile Server B</source>
-        <translation type="unfinished"></translation>
+        <translation>Afwijkende Tegelserver B</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="93"/>
         <source>Custom Tile Server C</source>
-        <translation type="unfinished"></translation>
+        <translation>Afwijkende Tegelserver C</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="99"/>
         <source>Google API key</source>
-        <translation type="unfinished"></translation>
+        <translation>Google API sleutel</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1154"/>
         <source>Interval</source>
-        <translation type="unfinished">Interval</translation>
-    </message>
-    <message>
-        <source>OpenCycleMap</source>
-        <translation type="vanished">OpenCycleMap</translation>
-    </message>
-    <message>
-        <source>Mapquest</source>
-        <translation type="vanished">Mapquest</translation>
-    </message>
-    <message>
-        <source>Custom</source>
-        <translation type="vanished">Aangepast</translation>
+        <translation>Interval</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="159"/>
@@ -26328,7 +25007,7 @@ Bestand overgeslagen...</translation>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="669"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="674"/>
         <source>&lt;tr&gt;&lt;td&gt;%3&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;tr&gt;&lt;td&gt;%3&lt;/td&gt;&lt;td uitlijning=&quot;right&quot;&gt;&lt;font kleur=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="738"/>
@@ -26336,16 +25015,12 @@ Bestand overgeslagen...</translation>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="742"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="744"/>
         <source>&lt;tr&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;tr&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td uitlijning=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="824"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>&lt;h3&gt;Modeling&lt;br&gt;%1&lt;/h3&gt;</source>
-        <translation type="vanished">&lt;h3&gt;Modelleren&lt;br&gt;%1&lt;/h3&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="308"/>
@@ -26427,7 +25102,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="473"/>
         <source>Metrics</source>
-        <translation>Indicatoren</translation>
+        <translation>Metrieken</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="770"/>
@@ -26608,14 +25283,6 @@ Bestand overgeslagen...</translation>
         <translation>&lt;p&gt;&lt;h2&gt;Fouten bij lezen van bestand:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
     <message>
-        <source>&lt;br&gt;BikeScore and SwimScore are trademarks of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
-        <translation type="vanished">&lt;br&gt;BikeScore en SwimScore zijn handelsmerken van Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
-    </message>
-    <message>
-        <source>&lt;br&gt;FTP, BikeStress, IsoPower and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
-        <translation type="vanished">&lt;br&gt;FTP, BikeStress, IsoPower en IF zijn handelsmerken van Peaksware LLC&lt;/center&gt;</translation>
-    </message>
-    <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1584"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1588"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1593"/>
@@ -26626,7 +25293,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1627"/>
         <source>Metrics*</source>
-        <translation>Indicatoren*</translation>
+        <translation>Metrieken*</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1970"/>
@@ -26634,210 +25301,115 @@ Bestand overgeslagen...</translation>
         <source>&lt;h3&gt;Heartrate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Hartslagzones&lt;/h3&gt;</translation>
     </message>
-    <message>
-        <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
-        <translation type="vanished">&lt;br&gt;BikeScore is een handelsmerk van Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
-    </message>
 </context>
 <context>
     <name>RideWithGPS</name>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="84"/>
         <source>RideWithGPS account not configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>RideWithGPS account niet geconfigureerd.</translation>
     </message>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="219"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="221"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/RideWithGPS.h" line="34"/>
         <source>RideWithGPS</source>
-        <translation type="unfinished">RideWithGPS</translation>
+        <translation>RideWithGPS</translation>
     </message>
     <message>
         <location filename="../../Cloud/RideWithGPS.h" line="35"/>
         <source>Upload rides and analyse them using Google Maps.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RideWithGpsUploader</name>
-    <message>
-        <source>Ride With GPS</source>
-        <translation type="vanished">Ride With GPS</translation>
-    </message>
-    <message>
-        <source>no credentials set for RideWithGps. Please check Settings.</source>
-        <translation type="vanished">geen referenties voor RideWithGps ingesteld. Controleer de Instellingen alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>Error uploading to RideWithGPS</source>
-        <translation type="vanished">Fout tijdens het uploaden naar RideWithGPS</translation>
-    </message>
-    <message>
-        <source>Successfully uploaded to RideWithGPS</source>
-        <translation type="vanished">Succesvol geupload naar RideWithGPS</translation>
-    </message>
-    <message>
-        <source>Upload...</source>
-        <translation type="vanished">Uploaden...</translation>
-    </message>
-    <message>
-        <source>Upload... Sending to RideWithGPS</source>
-        <translation type="vanished">Upload... Versturen naar RideWithGPS</translation>
-    </message>
-    <message>
-        <source>Upload to RideWithGPS finished.</source>
-        <translation type="vanished">Upload naar RideWithGPS voltooid.</translation>
-    </message>
-    <message>
-        <source> Error from RideWithGPS: </source>
-        <translation type="vanished"> Fout tijdens het uploaden vanuit RideWithGPS: </translation>
+        <translation>Upload ritten en analyseeer ze met Google Maps.</translation>
     </message>
 </context>
 <context>
     <name>RiderPhysPage</name>
     <message>
-        <source>Weight (%1)</source>
-        <translation type="vanished">Gewicht (%1)</translation>
-    </message>
-    <message>
-        <source>kg</source>
-        <translation type="vanished">kg</translation>
-    </message>
-    <message>
-        <source>Height (%1)</source>
-        <translation type="vanished">Lengte (%1)</translation>
-    </message>
-    <message>
-        <source>cm</source>
-        <translation type="vanished">cm</translation>
-    </message>
-    <message>
-        <source>lb</source>
-        <translation type="vanished">lb</translation>
-    </message>
-    <message>
-        <source>in</source>
-        <translation type="vanished">in</translation>
-    </message>
-    <message>
-        <source>W&apos;bal tau (s)</source>
-        <translation type="vanished">W&apos;bal tau (s)</translation>
-    </message>
-    <message>
-        <source>STS average (days)</source>
-        <translation type="vanished">STS gemiddelde (dagen)</translation>
-    </message>
-    <message>
-        <source>LTS average (days)</source>
-        <translation type="vanished">LTS gemiddelde (dagen)</translation>
-    </message>
-    <message>
-        <source>PMC Stress Balance Today</source>
-        <translation type="vanished">PMC Stress Balans Vandaag</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="957"/>
         <location filename="../../Gui/Pages.cpp" line="1222"/>
         <source> kg</source>
-        <translation type="unfinished"></translation>
+        <translation> kg</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="957"/>
         <location filename="../../Gui/Pages.cpp" line="1222"/>
         <source> lb</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>From Date</source>
-        <translation type="obsolete">Vanaf Datum</translation>
-    </message>
-    <message>
-        <source>Weight</source>
-        <translation type="obsolete">Gewicht</translation>
+        <translation> lb</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="969"/>
         <source>Default Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard Gewicht</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="992"/>
         <source>Time dependent measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdsafhankelijke metingen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="995"/>
         <source>From Date - Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanaf Datum - Tijd</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1055"/>
         <source>Comment</source>
-        <translation type="unfinished">Commentaar</translation>
+        <translation>Commentaar</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1088"/>
         <location filename="../../Gui/Pages.cpp" line="1096"/>
         <source>Update</source>
-        <translation type="unfinished">Update</translation>
+        <translation>Update</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1090"/>
         <source>+</source>
-        <translation type="unfinished">+</translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1091"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1097"/>
         <source>Add</source>
-        <translation type="unfinished">Toevoegen</translation>
+        <translation>Toevoegen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1098"/>
         <source>Delete</source>
-        <translation type="unfinished">Verwijderen</translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1148"/>
         <location filename="../../Gui/Pages.cpp" line="1280"/>
         <source>MMM d, yyyy - hh:mm:ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">Tijd</translation>
+        <translation>MMM d, jjjj - hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1127"/>
         <source>Source</source>
-        <translation type="unfinished">Bron</translation>
+        <translation>Bron</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1129"/>
         <source>Original Source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MMM d, yyyy</source>
-        <translation type="obsolete">MMM d, yyyy</translation>
+        <translation>Originele Bron</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1319"/>
         <source>Manual entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuele invoer</translation>
     </message>
 </context>
 <context>
@@ -26850,7 +25422,7 @@ Bestand overgeslagen...</translation>
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="1054"/>
         <source>Season</source>
-        <translation type="unfinished">Seizoen</translation>
+        <translation>Seizoen</translation>
     </message>
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="1074"/>
@@ -27072,13 +25644,9 @@ eigen formaat. Zullen we dat doen?
         <translation>Lengtegraad (graden offset)</translation>
     </message>
     <message>
-        <source>Circumferential Pedal Velocity (cm/s)</source>
-        <translation type="vanished">Pedaal Omtreksnelheid (cm/s)</translation>
-    </message>
-    <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="139"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
-        <translation type="unfinished">Pedaal Omtreksnelheid (m/s)</translation>
+        <translation>Pedaal Omtreksnelheid (m/s)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="140"/>
@@ -27666,27 +26234,27 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>A</source>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>C</source>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>D</source>
-        <translation type="unfinished"></translation>
+        <translation>D</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
 </context>
 <context>
@@ -27725,7 +26293,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Core/Season.cpp" line="375"/>
         <source>Last 24 hours</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatste 24 uren</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="382"/>
@@ -27750,7 +26318,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Core/Season.cpp" line="410"/>
         <source>Last 6 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatste 6 weken</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="417"/>
@@ -27839,66 +26407,31 @@ eigen formaat. Zullen we dat doen?
     </message>
 </context>
 <context>
-    <name>SelfLoopsUploader</name>
-    <message>
-        <source>SelfLoops</source>
-        <translation type="vanished">Selfloops</translation>
-    </message>
-    <message>
-        <source>no credentials set for SelfLoops. Please check Settings.</source>
-        <translation type="vanished">geen referenties voor SelfLoops ingesteld. Controleer de Instellingen alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>Error uploading to Selfloops</source>
-        <translation type="vanished">Fout tijdens het uploaden naar Selfloops</translation>
-    </message>
-    <message>
-        <source>Successfully uploaded to Selfloops</source>
-        <translation type="vanished">Succesvol geupload naar Selfloops</translation>
-    </message>
-    <message>
-        <source>Upload to Selfloops...</source>
-        <translation type="vanished">Upload naar Selfloops...</translation>
-    </message>
-    <message>
-        <source>Upload... Sending to Selfloops</source>
-        <translation type="vanished">Upload... Versturen naar Selfloops</translation>
-    </message>
-    <message>
-        <source>Upload to Selfloops finished.</source>
-        <translation type="vanished">Upload naar Selfloops voltooid.</translation>
-    </message>
-    <message>
-        <source> Error from Selfloops: </source>
-        <translation type="vanished"> Fout tijdens het uploaden vanuit Selfloops: </translation>
-    </message>
-</context>
-<context>
     <name>Selfloops</name>
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="84"/>
         <source>Account is not configured,</source>
-        <translation type="unfinished"></translation>
+        <translation>Account is niet geconfigureerd,</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="191"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="193"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.h" line="34"/>
         <source>Selfloops</source>
-        <translation type="unfinished">Selfloops</translation>
+        <translation>Selfloops</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.h" line="35"/>
         <source>Upload and track your training and progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload en volg je training en voortgang.</translation>
     </message>
 </context>
 <context>
@@ -27939,151 +26472,52 @@ eigen formaat. Zullen we dat doen?
     </message>
 </context>
 <context>
-    <name>ShareDialog</name>
-    <message>
-        <source>Share your activity</source>
-        <translation type="vanished">Deel je activiteit</translation>
-    </message>
-    <message>
-        <source>Choose which sites you wish to share on: </source>
-        <translation type="vanished">Kies op welke sites je wilt delen: </translation>
-    </message>
-    <message>
-        <source>Strava</source>
-        <translation type="vanished">Strava</translation>
-    </message>
-    <message>
-        <source>Ride With GPS</source>
-        <translation type="vanished">Ride With GPS</translation>
-    </message>
-    <message>
-        <source>Cycling Analytics</source>
-        <translation type="vanished">Cycling Analytics</translation>
-    </message>
-    <message>
-        <source>Selfloops</source>
-        <translation type="vanished">Selfloops</translation>
-    </message>
-    <message>
-        <source>VeloHero</source>
-        <translation type="vanished">VeloHero</translation>
-    </message>
-    <message>
-        <source>Trainingstagebuch.org</source>
-        <translation type="vanished">Trainingstagebuch.org</translation>
-    </message>
-    <message>
-        <source>SportPlusHealth</source>
-        <translation type="vanished">SportPlusHealth</translation>
-    </message>
-    <message>
-        <source>Choose a name for your activity: </source>
-        <translation type="vanished">Kies een naam voor je activiteit: </translation>
-    </message>
-    <message>
-        <source>Choose which data series you wish to send: </source>
-        <translation type="vanished">Kies welke datareeksen je wilt sturen: </translation>
-    </message>
-    <message>
-        <source>Altitude</source>
-        <translation type="vanished">Hoogte</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="vanished">Vermogen</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="vanished">Cadans</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="vanished">Hartslag</translation>
-    </message>
-    <message>
-        <source>Private</source>
-        <translation type="vanished">Privé</translation>
-    </message>
-    <message>
-        <source>Commute</source>
-        <translation type="vanished">Forens</translation>
-    </message>
-    <message>
-        <source>Trainer</source>
-        <translation type="vanished">Trainer</translation>
-    </message>
-    <message>
-        <source>&amp;Upload Activity</source>
-        <translation type="vanished">&amp;Activiteit Uploaden</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="vanished">&amp;Sluit</translation>
-    </message>
-    <message>
-        <source>No share site selected !</source>
-        <translation type="vanished">Geen deelsite geselecteerd !</translation>
-    </message>
-    <message>
-        <source>This activity is marked as already on %1. Are you sure you want to upload it?</source>
-        <translation type="vanished">Deze activiteit is gemarkeerd als bestaand op %1. Ben je er zeker van dat je deze wilt uploaden?</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="vanished">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="vanished">Annuleren</translation>
-    </message>
-</context>
-<context>
     <name>SixCycle</name>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="124"/>
         <source>Network Problem authenticating with the Sixcycle service</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk Probleem bij de authenticatie met de Sixcycle service</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="157"/>
         <source>invalid root path.</source>
-        <translation type="unfinished">ongeldig oorsprong pad.</translation>
+        <translation>ongeldig oorsprong pad.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="158"/>
         <source>root is not a directory.</source>
-        <translation type="unfinished">root is geen map.</translation>
+        <translation>root is geen map.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="161"/>
         <source>Problem with Sixcycle authentication.</source>
-        <translation type="unfinished"></translation>
+        <translation>Probleem met Sixcycle authenticatie.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="203"/>
         <source>You must authenticate with Sixcycle first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst authenticeren bij Sixcycle</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="452"/>
         <location filename="../../Cloud/SixCycle.cpp" line="480"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="456"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.h" line="38"/>
         <source>Sixcycle</source>
-        <translation type="unfinished"></translation>
+        <translation>Sixcycle</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.h" line="39"/>
         <source>Sync with the innovative training site.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync met de innovatieve trainingsite.</translation>
     </message>
 </context>
 <context>
@@ -28114,7 +26548,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../FileIO/Snippets.cpp" line="78"/>
         <source>Snippet export</source>
-        <translation type="unfinished"></translation>
+        <translation>Knipsel export</translation>
     </message>
 </context>
 <context>
@@ -28122,7 +26556,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../FileIO/Snippets.cpp" line="46"/>
         <source>Dump metrics for the ride to Athlete_Home/Snippets</source>
-        <translation type="unfinished"></translation>
+        <translation>Dump metrieken van deze rit bij Athlete_Home/Snippets</translation>
     </message>
 </context>
 <context>
@@ -28322,7 +26756,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="131"/>
         <source>Metric</source>
-        <translation>Indicator</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="132"/>
@@ -28590,72 +27024,37 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     </message>
 </context>
 <context>
-    <name>SportPlusHealthUploader</name>
-    <message>
-        <source>SportPlusHealth</source>
-        <translation type="vanished">SportPlusHealth</translation>
-    </message>
-    <message>
-        <source>Cannot upload to SportPlusHealth without credentials. Check Settings</source>
-        <translation type="vanished">Kan niet uploaden naar SportPlusHealth zonder referenties. Controleer de instellingen alsjeblieft</translation>
-    </message>
-    <message>
-        <source>sending to SportPlusHealth...</source>
-        <translation type="vanished">versturen naar SportPlusHealth...</translation>
-    </message>
-    <message>
-        <source>error uploading to SportPlusHealth</source>
-        <translation type="vanished">Fout tijdens het uploaden naar SportPlusHealth</translation>
-    </message>
-    <message>
-        <source>request failed: </source>
-        <translation type="vanished">verzoek mislukt: </translation>
-    </message>
-    <message>
-        <source>request failed, Server response: %1 %2</source>
-        <translation type="vanished">verzoek mislukt, Server antwoord: %1 %2</translation>
-    </message>
-    <message>
-        <source>failed to upload file (cod. %1)</source>
-        <translation type="vanished">Uploaden bestand mislukt (cod %1)</translation>
-    </message>
-    <message>
-        <source>successfully uploaded to SportPlusHealth</source>
-        <translation type="vanished">Succesvol geüpload naar SportPlusHealth</translation>
-    </message>
-</context>
-<context>
     <name>SportTracks</name>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="137"/>
         <source>JSON parser error</source>
-        <translation type="unfinished"></translation>
+        <translation>JSON parse fout</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="172"/>
         <source>You must authorise with SportTracks first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst authoriseren bij SportTracks</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="552"/>
         <location filename="../../Cloud/SportTracks.cpp" line="607"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="611"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.h" line="38"/>
         <source>SportTracks.mobi</source>
-        <translation type="unfinished"></translation>
+        <translation>SportTracks.mobi</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.h" line="39"/>
         <source>Sync with the popular multisport website.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync met de populaire multisport website.</translation>
     </message>
 </context>
 <context>
@@ -28663,22 +27062,22 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Cloud/SportsPlusHealth.cpp" line="173"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportsPlusHealth.cpp" line="177"/>
         <source>Upload failed. (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload mislukt. (%1)</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportsPlusHealth.h" line="34"/>
         <source>SportPlusHealth</source>
-        <translation type="unfinished">SportPlusHealth</translation>
+        <translation>SportPlusHealth</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportsPlusHealth.h" line="35"/>
         <source>Upload to the cycling and running site.</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload naar de fiets - en hardloop site.</translation>
     </message>
 </context>
 <context>
@@ -28740,7 +27139,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="212"/>
         <source>failed to initialize Powercontrol communication: %1</source>
-        <translation>Initialisering Powercontrol communicatie mislukt: %1</translation>
+        <translation>Initialiseren Powercontrol communicatie mislukt: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="272"/>
@@ -28855,87 +27254,38 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Cloud/Strava.cpp" line="92"/>
         <source>No authorisation token configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen authoriseringssleutel geconfigureerd.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="116"/>
         <source>You must authorise with Strava first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst authoriseren bij Strava</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="156"/>
         <source>Network Problem reading Strava data</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk Probleem tijdens het lezen van Strava data</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="382"/>
         <source>invalid response or parser exception.</source>
-        <translation type="unfinished">ongeldig antowoord of parser uitzondering.</translation>
+        <translation>ongeldig antwoord of parser uitzondering.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="400"/>
         <location filename="../../Cloud/Strava.cpp" line="424"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.h" line="34"/>
         <source>Strava</source>
-        <translation type="unfinished">Strava</translation>
+        <translation>Strava</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.h" line="35"/>
         <source>Sync with the social network for cyclists and runners.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StravaUploader</name>
-    <message>
-        <source>Strava</source>
-        <translation type="vanished">Strava</translation>
-    </message>
-    <message>
-        <source>no Strava token set. Please authorize in Settings.</source>
-        <translation type="vanished">Geen Strava token ingesteld. In instellingen instellen alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>Strava support isn&apos;t enabled in this build</source>
-        <translation type="vanished">Starva is niet ondersteund in deze versie</translation>
-    </message>
-    <message>
-        <source>Error uploading to Strava</source>
-        <translation type="vanished">Fout tijdens het uploaden naar Strava</translation>
-    </message>
-    <message>
-        <source>Successfully uploaded to Strava
-</source>
-        <translation type="vanished">Succesvol geupload naar Strava
-</translation>
-    </message>
-    <message>
-        <source>Upload activity to Strava...</source>
-        <translation type="vanished">Activiteit Uploaden naar Strava...</translation>
-    </message>
-    <message>
-        <source>Upload... Sending to Strava</source>
-        <translation type="vanished">Upload... Versturen naar Strava</translation>
-    </message>
-    <message>
-        <source>Upload to Strava finished.</source>
-        <translation type="vanished">Upload naar Strava voltooid.</translation>
-    </message>
-    <message>
-        <source>invalid response or parser exception.</source>
-        <translation type="vanished">ongeldig antowoord of parser uitzondering.</translation>
-    </message>
-    <message>
-        <source> Error from Strava: </source>
-        <translation type="vanished"> Fout vanuit Strava: </translation>
-    </message>
-    <message>
-        <source>Processing...</source>
-        <translation type="vanished">Verwerken...</translation>
+        <translation>Sync met het sociale netwerk voor fietsers en hardlopers.</translation>
     </message>
 </context>
 <context>
@@ -28981,12 +27331,12 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Gui/Pages.cpp" line="3139"/>
         <source>Available Metrics</source>
-        <translation>Beschikbare Indicatoren</translation>
+        <translation>Beschikbare Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3144"/>
         <source>Selected Metrics</source>
-        <translation>Beschikbare Indicatoren</translation>
+        <translation>Geselecteerde Metrieken</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3160"/>
@@ -29110,179 +27460,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="314"/>
         <source>SwimScore swimming stress metric as defined by Dr. Skiba</source>
-        <translation>SwimScore zwemstress indicator zoals gedefinieerd door Dr. Skiba</translation>
-    </message>
-</context>
-<context>
-    <name>TPAthlete</name>
-    <message>
-        <source>Error:</source>
-        <translation type="vanished">Fout:</translation>
-    </message>
-</context>
-<context>
-    <name>TPDownloadDialog</name>
-    <message>
-        <source>Synchronise TrainingPeaks.com</source>
-        <translation type="vanished">Synchroniseer TrainingPeaks.com</translation>
-    </message>
-    <message>
-        <source>Download from TrainingPeaks.com</source>
-        <translation type="vanished">Download van TrainingPeaks.com</translation>
-    </message>
-    <message>
-        <source>You must be a premium member to download from TrainingPeaks. Please check your cyclist configurations are correct on the Passwords tab.</source>
-        <translation type="vanished">Je moet een premium member zijn om te kunnen downloaden van TrainingPeaks. Controleer of jouw fietsinstellingen correct zijn op de Wachtwoorden tab alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation type="vanished">Download</translation>
-    </message>
-    <message>
-        <source>Upload</source>
-        <translation type="vanished">Upload</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation type="vanished">Synchroniseer</translation>
-    </message>
-    <message>
-        <source>From:</source>
-        <translation type="vanished">Vanaf:</translation>
-    </message>
-    <message>
-        <source>To:</source>
-        <translation type="vanished">Tot:</translation>
-    </message>
-    <message>
-        <source>Refresh List</source>
-        <translation type="vanished">Ververs Lijst</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="vanished">Sluit</translation>
-    </message>
-    <message>
-        <source>Select all</source>
-        <translation type="vanished">Selecteer alles</translation>
-    </message>
-    <message>
-        <source>Keep all do not delete</source>
-        <translation type="vanished">Behoud alles, niet verwijderen</translation>
-    </message>
-    <message>
-        <source>Keep TP.com but delete Local</source>
-        <translation type="vanished">Behoud TP.com maar verwijder Lokaal</translation>
-    </message>
-    <message>
-        <source>Keep Local but delete TP.com</source>
-        <translation type="vanished">Behoud Lokaal maar verwijder op TP.com</translation>
-    </message>
-    <message>
-        <source>Overwrite existing files</source>
-        <translation type="vanished">Overschrijf bestaande bestanden</translation>
-    </message>
-    <message>
-        <source>Downloading list...</source>
-        <translation type="vanished">Lijst Downloaden...</translation>
-    </message>
-    <message>
-        <source>Processed %1 of %2</source>
-        <translation type="vanished">Verwerkt %1 van %2</translation>
-    </message>
-    <message>
-        <source>Downloading</source>
-        <translation type="vanished">Downloaden</translation>
-    </message>
-    <message>
-        <source>Uploading</source>
-        <translation type="vanished">Uploaden</translation>
-    </message>
-    <message>
-        <source>Sync complete</source>
-        <translation type="vanished">Sync voltooid</translation>
-    </message>
-    <message>
-        <source>Processed %1 of %2 successfully</source>
-        <translation type="vanished">Verwerkt %1 van %2 succesvol</translation>
-    </message>
-    <message>
-        <source>File exists</source>
-        <translation type="vanished">Bestand bestaat</translation>
-    </message>
-    <message>
-        <source>Downloaded %1 of %2</source>
-        <translation type="vanished">Gedownload %1 van %2</translation>
-    </message>
-    <message>
-        <source>Downloads complete</source>
-        <translation type="vanished">Downloads voltooid</translation>
-    </message>
-    <message>
-        <source>Downloaded %1 of %2 successfully</source>
-        <translation type="vanished">Succesvol gedownload %1 van %2 </translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="vanished">Afgebroken</translation>
-    </message>
-    <message>
-        <source>Saved</source>
-        <translation type="vanished">Bewaard</translation>
-    </message>
-    <message>
-        <source>Uploaded %1 of %2</source>
-        <translation type="vanished">Geüpload %1 van %2</translation>
-    </message>
-    <message>
-        <source>Uploads complete</source>
-        <translation type="vanished">Uploads voltooid</translation>
-    </message>
-    <message>
-        <source>Uploaded %1 of %2 successfully</source>
-        <translation type="vanished">Succesvol geüpload %1 van %2 </translation>
-    </message>
-    <message>
-        <source>Upload successful</source>
-        <translation type="vanished">Upload succesvol</translation>
-    </message>
-</context>
-<context>
-    <name>TPUpload</name>
-    <message>
-        <source>Error:</source>
-        <translation type="vanished">Fout:</translation>
-    </message>
-    <message>
-        <source>Upload successful</source>
-        <translation type="vanished">Upload succesvol</translation>
-    </message>
-    <message>
-        <source>Upload failed - file rejected</source>
-        <translation type="vanished">Upload mislukt - bestand afgekeurd</translation>
-    </message>
-</context>
-<context>
-    <name>TPUploadDialog</name>
-    <message>
-        <source>Upload to TrainingPeaks.com</source>
-        <translation type="vanished">Upload naar TrainingPeaks.com</translation>
-    </message>
-    <message>
-        <source>Upload in progress...</source>
-        <translation type="vanished">Bezig met Uploaden...</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="vanished">Afbreken</translation>
-    </message>
-    <message>
-        <source>Uploading (%1 bytes)...</source>
-        <translation type="vanished">Uploaden (%1 bytes)...</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="vanished">Sluit</translation>
+        <translation>SwimScore zwemstress metriek zoals gedefinieerd door Dr. Skiba</translation>
     </message>
 </context>
 <context>
@@ -29305,7 +27483,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Metrics/VDOT.cpp" line="114"/>
         <source>Daniels&apos; TPace, computed as 90%vVDOT from VDOT metric, in min/km or min/mile</source>
-        <translation>Daniels&apos; TPace, berekend als 90%vVDOT van VDOT Indicator, in min/km or min/mijl</translation>
+        <translation>Daniels&apos; TPace, berekend als 90%vVDOT van VDOT metriek, in min/km or min/mijl</translation>
     </message>
 </context>
 <context>
@@ -29318,7 +27496,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Metrics/TRIMPPoints.cpp" line="127"/>
         <source>TRIMP Points normalized to assign 100 points to 1 hour at threshold heart rate.</source>
-        <translation>TRIMP Punten genormaliseerd om 100 points toe te kennen aan 1 uur bij de drempel-hartslag.</translation>
+        <translation>TRIMP Punten genormaliseerd om 100 punten toe te kennen aan 1 uur bij de drempel-hartslag.</translation>
     </message>
 </context>
 <context>
@@ -29331,7 +27509,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Metrics/TRIMPPoints.cpp" line="58"/>
         <source>Training Impulse according to Morton/Banister with Green et al coefficient.</source>
-        <translation>Training Impuls volgens Morton/Banister en Green et al coefficient.</translation>
+        <translation>Training Impuls volgens Morton/Banister en Green et al coëfficiënt.</translation>
     </message>
 </context>
 <context>
@@ -29473,18 +27651,18 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="194"/>
         <source>Time Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdsopname</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="195"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="196"/>
         <source>seconds</source>
-        <translation type="unfinished">seconden</translation>
+        <translation>seconden</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="197"/>
         <source>Time when device was recording, excludes gaps in recording due to pauses or missing samples</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdperiode waarbij het apparaat aan het opnemen was, zonder de tijdgaten in de opname door pauzes of missende observaties</translation>
     </message>
 </context>
 <context>
@@ -29524,48 +27702,48 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="116"/>
         <source>Network Problem reading TodaysPlan data</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk Probleem tijdens het lezen van TodaysPlan data</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="134"/>
         <source>Please re-authorise and select an athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>Graag herauthoriseren en een atleet selecteren</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="147"/>
         <source>It seems you can&apos;t access anymore to this athlete. Please re-authorise.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het lijkt er op dat je geen toegang meer hebt tot deze atleet. Graag herauthoriseren.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="158"/>
         <source>problem parsing TodaysPlan data</source>
-        <translation type="unfinished"></translation>
+        <translation>probleem gedurende het parsen van de TodaysPlan data</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="199"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst autoriseren bij Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="471"/>
         <location filename="../../Cloud/TodaysPlan.cpp" line="503"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="475"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.h" line="38"/>
         <source>Today&apos;s Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.h" line="39"/>
         <source>Sync with the smarter training site.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync met de smarter training site.</translation>
     </message>
 </context>
 <context>
@@ -29573,12 +27751,12 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Cloud/TodaysPlanBodyMeasures.cpp" line="55"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst autoriseren bij Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlanBodyMeasures.cpp" line="165"/>
         <source>Response parsing error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Antwoord parse fout: %1</translation>
     </message>
 </context>
 <context>
@@ -29586,62 +27764,62 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="33"/>
         <source>Download future workouts from Today&apos;s Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Download toekomstige workouts van Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="48"/>
         <source>check/uncheck all</source>
-        <translation type="unfinished">check/uncheck alles</translation>
+        <translation>check/uncheck alles</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="51"/>
         <source>From:</source>
-        <translation type="unfinished">Vanaf:</translation>
+        <translation>Vanaf:</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="52"/>
         <source>To:</source>
-        <translation type="unfinished">Tot:</translation>
+        <translation>Tot:</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="60"/>
         <source>Refresh List</source>
-        <translation type="unfinished">Ververs Lijst</translation>
+        <translation>Ververs Lijst</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="79"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="80"/>
         <source>Name</source>
-        <translation type="unfinished">Naam</translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="81"/>
         <source>T-Score</source>
-        <translation type="unfinished"></translation>
+        <translation>T-Score</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="82"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation>Duur</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="83"/>
         <source>Action</source>
-        <translation type="unfinished">Actie</translation>
+        <translation>Actie</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="100"/>
         <source>Overwrite existing workouts</source>
-        <translation type="unfinished">Overschrijf bestaande trainingen</translation>
+        <translation>Overschrijf bestaande trainingen</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="101"/>
         <source>Close</source>
-        <translation type="unfinished">Sluit</translation>
+        <translation>Sluit</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="102"/>
@@ -29649,90 +27827,90 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="150"/>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="214"/>
         <source>Download</source>
-        <translation type="unfinished">Download</translation>
+        <translation>Download</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="144"/>
         <source>Download...</source>
-        <translation type="unfinished">Download...</translation>
+        <translation>Download...</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="147"/>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="157"/>
         <source>Abort</source>
-        <translation type="unfinished">Afbreken</translation>
+        <translation>Afbreken</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="149"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation type="unfinished">%1 trainingen gedownload, %2 mislukt of overgeslagen.</translation>
+        <translation>%1 trainingen gedownload, %2 mislukt of overgeslagen.</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="183"/>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="187"/>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="193"/>
         <source>Today&apos;s Plan Workout Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Today&apos;s Plan Workout Download</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="183"/>
         <source>You can only download future workouts, &apos;From&apos; will be adjusted to current date</source>
-        <translation type="unfinished"></translation>
+        <translation>Je kan alleen toekomstige workouts  downloaden, &apos;Vanaf&apos; zal worden aagepast aan de datum van vandaag</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="187"/>
         <source>Invalid date range, please check your input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldig datumbereik, controleer de invoer.</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="193"/>
         <source>The following error occured: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit probleem trad op: %1</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="208"/>
         <source>dd MMM yyyy</source>
-        <translation type="unfinished">dd MMM yyyy</translation>
+        <translation>dd MMM jjjj</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="250"/>
         <source>Downloading...</source>
-        <translation type="unfinished">Downloaden...</translation>
+        <translation>Downloaden...</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="256"/>
         <source>Error downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout tijdens downloaden</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="278"/>
         <source>Exists already</source>
-        <translation type="unfinished">Bestaat al</translation>
+        <translation>Bestaat al</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="287"/>
         <source>Removing...</source>
-        <translation type="unfinished">Verwijderen...</translation>
+        <translation>Verwijderen...</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="300"/>
         <source>Saved</source>
-        <translation type="unfinished">Bewaard</translation>
+        <translation>Bewaard</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="306"/>
         <source>Write failed</source>
-        <translation type="unfinished">Schrijven mislukt</translation>
+        <translation>Schrijven mislukt</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="316"/>
         <source>Invalid File</source>
-        <translation type="unfinished">Ongeldig Bestand</translation>
+        <translation>Ongeldig Bestand</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="334"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst autoriseren bij Today&apos;s Plan</translation>
     </message>
 </context>
 <context>
@@ -29750,7 +27928,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="54"/>
         <source>Metric</source>
-        <translation>Indicator</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="57"/>
@@ -29876,13 +28054,6 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     </message>
 </context>
 <context>
-    <name>TrainBottom</name>
-    <message>
-        <source>Auto Hide</source>
-        <translation type="vanished">Auto Verbergen</translation>
-    </message>
-</context>
-<context>
     <name>TrainConfig</name>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="489"/>
@@ -29892,7 +28063,7 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="490"/>
         <source>Preferences</source>
-        <translation type="unfinished">Voorkeuren</translation>
+        <translation>Voorkeuren</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="491"/>
@@ -29922,7 +28093,7 @@ Klik Annuleren om te verlaten.</translation>
         <location filename="../../Train/TrainDB.cpp" line="492"/>
         <location filename="../../Train/TrainDB.cpp" line="513"/>
         <source>Manual Erg Mode</source>
-        <translation>Manuale Erg Modus</translation>
+        <translation>Manuele Erg Modus</translation>
     </message>
     <message>
         <location filename="../../Train/TrainDB.cpp" line="496"/>
@@ -29941,22 +28112,22 @@ Klik Annuleren om te verlaten.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2072"/>
         <source>Auto-connect devices in Train View</source>
-        <translation type="unfinished">Apparaten Automatisch Verbinden in Train Weergave</translation>
+        <translation>Apparaten Automatisch Verbinden in Train Weergave</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2075"/>
         <source>Allow multiple devices in Train View</source>
-        <translation type="unfinished">Meerdere Apparaten in Train Weergave toestaan</translation>
+        <translation>Meerdere Apparaten in Train Weergave toestaan</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2078"/>
         <source>Auto-hide bottom bar in Train View</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch verbergen van de onderste statusbalk</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2084"/>
         <source>Play sound before new lap</source>
-        <translation type="unfinished"></translation>
+        <translation>Geluid afspelen voor iedere nieuwe ronde</translation>
     </message>
 </context>
 <context>
@@ -30007,7 +28178,7 @@ Klik Annuleren om te verlaten.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="426"/>
         <source>Get Workouts from Today&apos;s Plan</source>
-        <translation type="unfinished"></translation>
+        <translation>Haal Workouts van Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="427"/>
@@ -30116,42 +28287,42 @@ Klik Annuleren om te verlaten.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1136"/>
         <source>Resuming..</source>
-        <translation type="unfinished"></translation>
+        <translation>Hervatten..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1163"/>
         <source>Paused..</source>
-        <translation type="unfinished"></translation>
+        <translation>Gepauzeerd..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1264"/>
         <source>Starting..</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestart..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1432"/>
         <source>Stopped..</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestopt..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1505"/>
         <source>Connected..</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbonden..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1523"/>
         <source>Disconnected..</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbroken..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1847"/>
         <source>New lap..</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe ronde..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1864"/>
         <source>Recalibrating steering..</source>
-        <translation type="unfinished"></translation>
+        <translation>Sturen herkalibreren..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1876"/>
@@ -30166,12 +28337,12 @@ Klik Annuleren om te verlaten.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2116"/>
         <source>Exiting calibration..</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie verlaten..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2131"/>
         <source>Calibration not supported for this device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie niet ondersteund van dit apparaat.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2138"/>
@@ -30187,97 +28358,106 @@ Druk F3 op de Controller als het voltooid is.</translation>
         <location filename="../../Train/TrainSidebar.cpp" line="2262"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2266"/>
         <source>Requesting calibration..</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie aanvragen..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2165"/>
         <source>Calibrating...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibreren...</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2169"/>
         <source>Calibrating...
 Current speed %1 kph
 Increase speed to %2 kph</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibreren...
+Huidige snelheid %1 kph
+Breng snelheid op %2 kph</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2173"/>
         <source>Calibrating...
 Stop pedalling until speed drops to 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibreren...
+Stop met trappen totdat de snelheid tot 0 is gekomen</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2178"/>
         <source>Calibration completed successfully!
 Spindown %1 ms
 Zero Offset %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie succesvol voltooid!
+Uitrollen %1 ms
+Nul Offset %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2186"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2237"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2289"/>
         <source>Calibration failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie mislukt!</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2205"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2256"/>
         <source>Unclip or stop pedalling to begin calibration..</source>
-        <translation type="unfinished"></translation>
+        <translation>Klik-uit of stop met trappen om te beginnen met kalibreren..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2224"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Torque %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibreren...
+Klik-uit of stop met trappen totdat het proces is geëindigd..
+Koppel %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2229"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Torque %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie succesvol voltooid!
+Uitrollen %1 ms
+Nul Offset %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2276"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibreren...
+Klik-uit of stop met trappen totdat het proces is geëindigd..
+Nul Offset  %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2281"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibratie succesvol voltooid!
+Uitrollen %1 ms
+Helling %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2322"/>
         <source>Fast forward..</source>
-        <translation type="unfinished"></translation>
+        <translation>Snel vooruit..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2343"/>
         <source>Rewind..</source>
-        <translation type="unfinished"></translation>
+        <translation>Achteruit..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2386"/>
         <source>Increasing intensity..</source>
-        <translation type="unfinished"></translation>
+        <translation>Verhoog intensiteit..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2412"/>
         <source>Decreasing intensity..</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="vanished">Voltooid</translation>
+        <translation>Verlaag intensiteit..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2607"/>
@@ -30298,157 +28478,51 @@ Slope %2</source>
     </message>
 </context>
 <context>
-    <name>TrainingStageBuch</name>
-    <message>
-        <source>failed to parse Settings response: </source>
-        <translation type="obsolete">parsen van instellingen-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to get settings: </source>
-        <translation type="obsolete">instellingen ophalen mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to parse Session response: </source>
-        <translation type="obsolete">parsen van sessie-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to get new session: </source>
-        <translation type="obsolete">verkrijgen nieuwe sessie mislukt: </translation>
-    </message>
-    <message>
-        <source>got empty session</source>
-        <translation type="obsolete">kreeg een lege sessie</translation>
-    </message>
-    <message>
-        <source>Completed.</source>
-        <translation type="obsolete">Voltooid.</translation>
-    </message>
-</context>
-<context>
     <name>TrainingsTageBuch</name>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="125"/>
         <source>failed to parse Settings response: </source>
-        <translation type="unfinished">parsen van instellingen-antwoord mislukt: </translation>
+        <translation>parsen van instellingen-antwoord mislukt: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="130"/>
         <source>failed to get settings: </source>
-        <translation type="unfinished">instellingen ophalen mislukt: </translation>
+        <translation>instellingen ophalen mislukt: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="174"/>
         <source>failed to parse Session response: </source>
-        <translation type="unfinished">parsen van sessie-antwoord mislukt: </translation>
+        <translation>parsen van sessie-antwoord mislukt: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="179"/>
         <source>failed to get new session: </source>
-        <translation type="unfinished">verkrijgen nieuwe sessie mislukt: </translation>
+        <translation>verkrijgen nieuwe sessie mislukt: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="186"/>
         <source>got empty session</source>
-        <translation type="unfinished">kreeg een lege sessie</translation>
+        <translation>kreeg een lege sessie</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="292"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="294"/>
         <source>Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.h" line="46"/>
         <source>Trainingstagebuch</source>
-        <translation type="unfinished">Trainingstagebuch</translation>
+        <translation>Trainingstagebuch</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.h" line="47"/>
         <source>Upload to your online and mobile training log.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TrainingstagebuchUploader</name>
-    <message>
-        <source>Trainingstagebuch.org</source>
-        <translation type="vanished">Trainingstagebuch.org</translation>
-    </message>
-    <message>
-        <source>Cannot upload to Trainingstagebuch without credentials. Check Settings</source>
-        <translation type="vanished">Kan niet uploaden naar Trainingstagebuch zonder referenties. Controleer de instellingen alsjeblieft</translation>
-    </message>
-    <message>
-        <source>Error uploading to Trainingstagebuch.org</source>
-        <translation type="vanished">Fout tijdens het uploaden naar Trainingstagebuch.org</translation>
-    </message>
-    <message>
-        <source>successfully uploaded to Trainingstagebuch.org as %1</source>
-        <translation type="vanished">succesvol geüpload naar Trainingstagebuch.org als %1</translation>
-    </message>
-    <message>
-        <source>getting Settings from Trainingstagebuch.org...</source>
-        <translation type="vanished">instellingen ophalen van Trainingstagebuch.org...</translation>
-    </message>
-    <message>
-        <source>getting new Trainingstagebuch.org Session...</source>
-        <translation type="vanished">nieuwe sessie aanvragen bij Trainingstagebuch.org...</translation>
-    </message>
-    <message>
-        <source>preparing Trainingstagebuch.org data ...</source>
-        <translation type="vanished">Trainingstagebuch.org data voorbereiden...</translation>
-    </message>
-    <message>
-        <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
-        <translation type="vanished">Tijdelijk bestand te groot voor upload:%1 &gt; %1 bytes</translation>
-    </message>
-    <message>
-        <source>sending to Trainingstagebuch.org ...</source>
-        <translation type="vanished">naar Trainingstagebuch.org versturen...</translation>
-    </message>
-    <message>
-        <source>request failed: </source>
-        <translation type="vanished">verzoek mislukt: </translation>
-    </message>
-    <message>
-        <source>request failed, Server response: %1 %2</source>
-        <translation type="vanished">verzoek mislukt, Server antwoord: %1 %2</translation>
-    </message>
-    <message>
-        <source>failed to parse Settings response: </source>
-        <translation type="vanished">parsen van instellingen-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to get settings: </source>
-        <translation type="vanished">instellingen ophalen mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to parse Session response: </source>
-        <translation type="vanished">parsen van sessie-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to get new session: </source>
-        <translation type="vanished">verkrijgen nieuwe sessie mislukt: </translation>
-    </message>
-    <message>
-        <source>got empty session</source>
-        <translation type="vanished">kreeg een lege sessie</translation>
-    </message>
-    <message>
-        <source>failed to parse upload response: </source>
-        <translation type="vanished">parsen upload-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to upload file: </source>
-        <translation type="vanished">bestand uploaden mislukt: </translation>
-    </message>
-    <message>
-        <source>got empty exercise</source>
-        <translation type="vanished">kreeg lege oefening</translation>
+        <translation>Upload naar je online en mobile training log.</translation>
     </message>
 </context>
 <context>
@@ -30478,7 +28552,7 @@ Slope %2</source>
         <location filename="../../Charts/TreeMapWindow.cpp" line="110"/>
         <location filename="../../Charts/TreeMapWindow.cpp" line="137"/>
         <source>Metric</source>
-        <translation>Indicator</translation>
+        <translation>Metriek</translation>
     </message>
     <message>
         <location filename="../../Charts/TreeMapWindow.cpp" line="140"/>
@@ -30507,176 +28581,9 @@ Slope %2</source>
 <context>
     <name>TriScore</name>
     <message>
-        <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming</source>
-        <translation type="vanished">TriScore gecombineerde stress indicator gebaseerd op Dr. Skiba stress indicatoren, gedefinieerd als BikeScore voor fietsen, GOVSS voor hardlopen en SwimScore voor zwemmen</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/SwimScore.cpp" line="390"/>
         <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming. On zero fallback to TRIMP Zonal Points for HR based score.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TwitterDialog</name>
-    <message>
-        <source>Tweet Activity</source>
-        <translation type="vanished">Tweet Activiteit</translation>
-    </message>
-    <message>
-        <source>Choose which metrics you wish to tweet: </source>
-        <translation type="vanished">Kies op welke indicatoren je wilt tweeten: </translation>
-    </message>
-    <message>
-        <source>Workout Time</source>
-        <translation type="vanished">Trainingstijd</translation>
-    </message>
-    <message>
-        <source>Time Moving</source>
-        <translation type="vanished">Bewegingstijd</translation>
-    </message>
-    <message>
-        <source>Total Distance</source>
-        <translation type="vanished">Totale Afstand</translation>
-    </message>
-    <message>
-        <source>Elevation Gain</source>
-        <translation type="vanished">Hoogtewinst</translation>
-    </message>
-    <message>
-        <source>Total Work (kJ)</source>
-        <translation type="vanished">Totale Arbeid (kJ)</translation>
-    </message>
-    <message>
-        <source>Average Speed</source>
-        <translation type="vanished">Gemiddelde Snelheid</translation>
-    </message>
-    <message>
-        <source>Average Power</source>
-        <translation type="vanished">Gemiddelde Vermogen</translation>
-    </message>
-    <message>
-        <source>Average Heart Rate</source>
-        <translation type="vanished">Gemiddelde Hartslag</translation>
-    </message>
-    <message>
-        <source>Average Cadence</source>
-        <translation type="vanished">Gemiddelde Cadans</translation>
-    </message>
-    <message>
-        <source>Max Power</source>
-        <translation type="vanished">Max Vermogen</translation>
-    </message>
-    <message>
-        <source>Max Heart Rate</source>
-        <translation type="vanished">Max Hartslag</translation>
-    </message>
-    <message>
-        <source>Twitter Message:</source>
-        <translation type="vanished">Twitterbericht:</translation>
-    </message>
-    <message>
-        <source>Message Length: </source>
-        <translation type="vanished">Berichtlengte: </translation>
-    </message>
-    <message>
-        <source>&amp;Tweet Activity</source>
-        <translation type="vanished">&amp;Tweet Activiteit</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="vanished">&amp;Annuleren</translation>
-    </message>
-    <message>
-        <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="vanished">Golden Cheetah-&gt;Voorkeuren</translation>
-    </message>
-    <message>
-        <source>Tools-&gt;Options</source>
-        <translation type="vanished">Tools-&gt;Opties</translation>
-    </message>
-    <message>
-        <source>Error fetching OAuth credentials.  Please make sure to complete the twitter authorization procedure found under %1.</source>
-        <translation type="vanished">Fout bij ophalen OAuth referenties. Wees er zeker van dat je de Twitter autorisatieprocedure goed doorloopt die te vinden is onder %1 alsjeblieft.</translation>
-    </message>
-    <message>
-        <source>OAuth Error</source>
-        <translation type="vanished">OAuth Fout</translation>
-    </message>
-    <message>
-        <source>Tweet Length Error</source>
-        <translation type="vanished">Tweet Lengtefout</translation>
-    </message>
-    <message>
-        <source>Tweet must be 140 characters or less.</source>
-        <translation type="vanished">Tweet moet 140 karakters zijn of minder.</translation>
-    </message>
-    <message>
-        <source>Internal error in OAuth request - NULL, invalid Endpoint or invalid request</source>
-        <translation type="vanished">Interne fout in OAuth verzoek - NULL, ongeldig Eindpunt of ongeldig verzoek</translation>
-    </message>
-    <message>
-        <source>Error Posting Tweet</source>
-        <translation type="vanished">Fout tijdens Tweet Posten</translation>
-    </message>
-    <message>
-        <source>There was an error connecting to Twitter.  Check your network connection and try again.</source>
-        <translation type="vanished">Er was een fout tijdens het opzetten van de verbinding met Twitter. Controleer je netwerkconnectie en probeer opnieuw.</translation>
-    </message>
-    <message>
-        <source>Tweet sent</source>
-        <translation type="vanished">Tweet verstuurd</translation>
-    </message>
-    <message>
-        <source>Tweet successfully sent.</source>
-        <translation type="vanished">Tweet versturen succesvol.</translation>
-    </message>
-    <message>
-        <source>Duration: %1 </source>
-        <translation type="vanished">Tijdsduur: %1 </translation>
-    </message>
-    <message>
-        <source>Time Moving: %1 </source>
-        <translation type="vanished">Bewegingstijd: %1 </translation>
-    </message>
-    <message>
-        <source>Distance: %1 </source>
-        <translation type="vanished">Afstand: %1 </translation>
-    </message>
-    <message>
-        <source>Climbing: %1 </source>
-        <translation type="vanished">Klimmen: %1 </translation>
-    </message>
-    <message>
-        <source>Work: %1 </source>
-        <translation type="vanished">Arbeid: %1 </translation>
-    </message>
-    <message>
-        <source>Avg Speed: %1 </source>
-        <translation type="vanished">Gem Snelheid: %1 </translation>
-    </message>
-    <message>
-        <source>Avg Power: %1 </source>
-        <translation type="vanished">Gem Vermogen: %1 </translation>
-    </message>
-    <message>
-        <source>Avg HR: %1 </source>
-        <translation type="vanished">Gem HR: %1 </translation>
-    </message>
-    <message>
-        <source>Avg Cadence: %1 </source>
-        <translation type="vanished">Gem Cadans: %1 </translation>
-    </message>
-    <message>
-        <source>Max Power: %1 </source>
-        <translation type="vanished">Max Vermogen: %1 </translation>
-    </message>
-    <message>
-        <source>Max HR: %1 </source>
-        <translation type="vanished">Max HR: %1 </translation>
-    </message>
-    <message>
-        <source>Message Length: %1</source>
-        <translation type="vanished">Berichtlengte: %1</translation>
+        <translation>TriScore gecombineerde stress metriek gebaseerd op Dr. Skiba stress metriek, gedefinieerd als BikeScore voor fietsen, GOVSS voor hardlopen en SwimScore voor zwemmen. Bij nul terugval naar TRIMP Zonal Points voor Hr gebaseerde score.</translation>
     </message>
 </context>
 <context>
@@ -30684,7 +28591,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/UserMetricParser.cpp" line="107"/>
         <source>Problem Saving User Metric Configuration</source>
-        <translation>Probleem tijdens het Bewaren van Gebruikers Indicatoren Instellingen</translation>
+        <translation>Probleem tijdens het Bewaren van Gebruikersmetriek Instellingen</translation>
     </message>
     <message>
         <location filename="../../Metrics/UserMetricParser.cpp" line="108"/>
@@ -30771,7 +28678,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="150"/>
         <source>Your Training Paces:</source>
-        <translation>Jouw Trainingstempos:</translation>
+        <translation>Jouw Trainingstempo&apos;s:</translation>
     </message>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="156"/>
@@ -30861,108 +28768,41 @@ Slope %2</source>
     </message>
 </context>
 <context>
-    <name>VeloHeroUploader</name>
-    <message>
-        <source>VeloHero</source>
-        <translation type="vanished">VeloHero</translation>
-    </message>
-    <message>
-        <source>Cannot upload to VeloHero without credentials. Check Settings</source>
-        <translation type="vanished">Kan niet uploaden naar VeloHero zonder referenties. Controleer de instellingen alsjeblieft</translation>
-    </message>
-    <message>
-        <source>Error uploading to VeloHero</source>
-        <translation type="vanished">Fout tijdens het uploaden naar VeloHero</translation>
-    </message>
-    <message>
-        <source>successfully uploaded to VeloHero as %1</source>
-        <translation type="vanished">Succesvol geüpload naar VeloHero als %1</translation>
-    </message>
-    <message>
-        <source>getting new VeloHero session...</source>
-        <translation type="vanished">nieuwe sessie aanvragen bij VeloHero...</translation>
-    </message>
-    <message>
-        <source>preparing VeloHero data ...</source>
-        <translation type="vanished">VeloHero data voorbereiden...</translation>
-    </message>
-    <message>
-        <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
-        <translation type="vanished">Tijdelijk bestand te groot voor upload:%1 &gt; %1 bytes</translation>
-    </message>
-    <message>
-        <source>sending to VeloHero...</source>
-        <translation type="vanished">versturen naar VeloHero...</translation>
-    </message>
-    <message>
-        <source>request failed: </source>
-        <translation type="vanished">verzoek mislukt: </translation>
-    </message>
-    <message>
-        <source>request failed, server response: %1 %2</source>
-        <translation type="vanished">verzoek mislukt, Server antwoord: %1 %2</translation>
-    </message>
-    <message>
-        <source>failed to parse session response: </source>
-        <translation type="vanished">parsen van sessie-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to get new session: </source>
-        <translation type="vanished">verkrijgen nieuwe sessie mislukt: </translation>
-    </message>
-    <message>
-        <source>got empty session</source>
-        <translation type="vanished">kreeg een lege sessie</translation>
-    </message>
-    <message>
-        <source>failed to parse upload response: </source>
-        <translation type="vanished">parsen upload-antwoord mislukt: </translation>
-    </message>
-    <message>
-        <source>failed to upload file: </source>
-        <translation type="vanished">bestand uploaden mislukt: </translation>
-    </message>
-    <message>
-        <source>got empty exercise</source>
-        <translation type="vanished">kreeg lege oefening</translation>
-    </message>
-</context>
-<context>
     <name>Velohero</name>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="123"/>
         <source>Failed to parse sessionID response.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij het parsen van het sessionID antwoord.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="128"/>
         <source>failed to get new session: </source>
-        <translation type="unfinished">verkrijgen nieuwe sessie mislukt: </translation>
+        <translation>verkrijgen nieuwe sessie mislukt: </translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="135"/>
         <source>got empty session</source>
-        <translation type="unfinished">kreeg een lege sessie</translation>
+        <translation>kreeg een lege sessie</translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="236"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="238"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.h" line="39"/>
         <source>Velohero</source>
-        <translation type="unfinished"></translation>
+        <translation>Velohero</translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.h" line="40"/>
         <source>Upload your rides to the independent and free cycling training log</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload je ritten naar de onafhankelijke en gratis fietstraining log</translation>
     </message>
 </context>
 <context>
@@ -31061,7 +28901,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1266"/>
         <source>Time expended when Power is above CP and W&apos; bal is below 25% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal onder de 25% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal onder de 25% van W&apos;.</translation>
     </message>
 </context>
 <context>
@@ -31080,7 +28920,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1287"/>
         <source>Time expended when Power is above CP and W&apos; bal is between 25% and 50% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal tussen 25% en 50% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal tussen 25% en 50% van W&apos;.</translation>
     </message>
 </context>
 <context>
@@ -31099,19 +28939,15 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1308"/>
         <source>Time expended when Power is above CP and W&apos; bal is between 50% and 75% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal tussen 50% en 75% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal tussen 50% en 75% van W&apos;.</translation>
     </message>
 </context>
 <context>
     <name>WCPZoneTime4</name>
     <message>
-        <source>W4 W&apos;bal Severe Fatigue</source>
-        <translation type="vanished">W4 Boven CP W&apos;bal Ernstige Vermoeidheid</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/WPrime.cpp" line="1326"/>
         <source>W4 Above CP W&apos;bal Severe Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>W4 Boven CP W&apos;bal Ernstige Vermoeidheid</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1327"/>
@@ -31122,7 +28958,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1329"/>
         <source>Time expended when Power is above CP and W&apos; bal is above 75% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal boven de 75% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin Vermogen boven CP is en W&apos;bal boven de 75% van W&apos;.</translation>
     </message>
 </context>
 <context>
@@ -31250,7 +29086,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1116"/>
         <source>Time expended when W&apos; bal is below 25% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin W&apos;bal onder de 25% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin W&apos;bal onder de 25% van W&apos;.</translation>
     </message>
 </context>
 <context>
@@ -31269,7 +29105,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1137"/>
         <source>Time expended when W&apos; bal is between 25% and 50% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin W&apos;bal tussen de 25% en 50% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin W&apos;bal tussen de 25% en 50% van W&apos;.</translation>
     </message>
 </context>
 <context>
@@ -31288,7 +29124,7 @@ Slope %2</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="1158"/>
         <source>Time expended when W&apos; bal is between 50% and 75% of W&apos;.</source>
-        <translation> Gespendeerde tijd waarin W&apos;bal tussen de 50% en 75% van W&apos;.</translation>
+        <translation>Gespendeerde tijd waarin W&apos;bal tussen de 50% en 75% van W&apos;.</translation>
     </message>
 </context>
 <context>
@@ -31409,18 +29245,11 @@ Slope %2</source>
     </message>
 </context>
 <context>
-    <name>WebBridge</name>
-    <message>
-        <source>Selection #%1 </source>
-        <translation type="vanished">Selectie #%1 </translation>
-    </message>
-</context>
-<context>
     <name>WebPageWindow</name>
     <message>
         <location filename="../../Train/WebPageWindow.cpp" line="125"/>
         <source>URL</source>
-        <translation type="unfinished">URL</translation>
+        <translation>URL</translation>
     </message>
 </context>
 <context>
@@ -31428,12 +29257,12 @@ Slope %2</source>
     <message>
         <location filename="../../Cloud/Withings.h" line="37"/>
         <source>Withings</source>
-        <translation type="unfinished"></translation>
+        <translation>Withings</translation>
     </message>
     <message>
         <location filename="../../Cloud/Withings.h" line="38"/>
         <source>Download weight, body fat etc from the connected health specialists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Download gewicht lichaamsvet enz van de aangesloten gezondheidsspecialisten.</translation>
     </message>
 </context>
 <context>
@@ -31441,50 +29270,38 @@ Slope %2</source>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="71"/>
         <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="unfinished">Golden Cheetah-&gt;Voorkeuren</translation>
+        <translation>Golden Cheetah-&gt;Voorkeuren</translation>
     </message>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="73"/>
         <source>Tools-&gt;Options</source>
-        <translation type="unfinished">Tools-&gt;Opties</translation>
+        <translation>Tools-&gt;Opties</translation>
     </message>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="75"/>
         <source>Error fetching OAuth credentials.  Please make sure to complete the Withings authorization procedure found under %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout bij het ophalen van OAuth verficatiegegevens. Wees er zeker van de volledige authorisatieprocedure te doorlopen zie %1.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="76"/>
         <source>OAuth Error</source>
-        <translation type="unfinished">OAuth Fout</translation>
+        <translation>OAuth Fout</translation>
     </message>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="177"/>
         <source>Error parsing Withings API response. Please check the error description.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Withings Data Download</source>
-        <translation type="vanished">Withings Data Download</translation>
+        <translation>Fout bij het parsen van het Withings API antwoord. Zie verder de foutomschrijving.</translation>
     </message>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="167"/>
         <location filename="../../Cloud/WithingsDownload.cpp" line="176"/>
         <source>Error</source>
-        <translation type="unfinished">Fout</translation>
+        <translation>Fout</translation>
     </message>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="168"/>
         <source>There was an error during fetching. Please check the error description.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No new measurements</source>
-        <translation type="vanished">Geen nieuwe metingen</translation>
-    </message>
-    <message>
-        <source>%1 new measurements received.</source>
-        <translation type="vanished">%1 nieuwe meting ontvangen.</translation>
+        <translation>Er was een fout bij het ophalen. Zie verder foutomschrijving.</translation>
     </message>
 </context>
 <context>
@@ -31581,7 +29398,7 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Train/WorkoutWizard.h" line="210"/>
         <source>Workout Metrics</source>
-        <translation>Trainingsindicatoren</translation>
+        <translation>Trainingsmetrieken</translation>
     </message>
 </context>
 <context>
@@ -31600,11 +29417,7 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="146"/>
         <source>Total Duration including pauses a.k.a. Elapsed Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Total Duration</source>
-        <translation type="vanished">Totale Tijdsduur</translation>
+        <translation>Totale Tijdsduur inclusief pauzes ook bekend als Verstreken Tijd</translation>
     </message>
 </context>
 <context>
@@ -31771,17 +29584,17 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3204"/>
         <source>Cut</source>
-        <translation type="unfinished">Knip</translation>
+        <translation>Knip</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3210"/>
         <source>Copy</source>
-        <translation type="unfinished">Kopieer</translation>
+        <translation>Kopieer</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3216"/>
         <source>Paste</source>
-        <translation type="unfinished">Plak</translation>
+        <translation>Plak</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3226"/>
@@ -31814,27 +29627,27 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
         <location filename="../../Charts/RideEditor.cpp" line="3429"/>
         <location filename="../../Charts/RideEditor.cpp" line="3438"/>
         <source>Paste error</source>
-        <translation type="unfinished">Plakfout</translation>
+        <translation>Plakfout</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3406"/>
         <source>Please select target cell or cells to paste values into.</source>
-        <translation type="unfinished">Selecteer een doelcel of cellen om de waarden in te plakken alsjeblieft.</translation>
+        <translation>Selecteer een doelcel of cellen om de waarden in te plakken alsjeblieft.</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3421"/>
         <source>Copy buffer and selected area are diffferent sizes.</source>
-        <translation type="unfinished">De Kopieerbuffer en het geselecteerde gebied hebben verschillende vormen.</translation>
+        <translation>Kopieerbuffer en het geselecteerde gebied hebben verschillende vormen.</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3430"/>
         <source>Copy buffer has more columns than available.</source>
-        <translation type="unfinished">De Kopieerbuffer heeft meer kolommen dan er beschikbaar zijn.</translation>
+        <translation>Kopieerbuffer heeft meer kolommen dan er beschikbaar zijn.</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="3439"/>
         <source>Copy buffer has more rows than available.</source>
-        <translation type="unfinished">De Kopieerbuffer heeft meer rijen dan er beschikbaar zijn.</translation>
+        <translation>Kopieerbuffer heeft meer rijen dan er beschikbaar zijn.</translation>
     </message>
 </context>
 <context>
@@ -32021,33 +29834,33 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Cloud/Xert.cpp" line="139"/>
         <source>JSON parser error</source>
-        <translation type="unfinished"></translation>
+        <translation>JSON parser fout</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="174"/>
         <source>You must authorise with Xert first</source>
-        <translation type="unfinished"></translation>
+        <translation>Je moet eerst authoriseren bij Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="478"/>
         <location filename="../../Cloud/Xert.cpp" line="569"/>
         <source>Completed.</source>
-        <translation type="unfinished">Voltooid.</translation>
+        <translation>Voltooid.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="571"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="38"/>
         <source>Xert</source>
-        <translation type="unfinished"></translation>
+        <translation>Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="39"/>
         <source>Sync with the innovative site for fitness monitoring, tracking, and planning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sync met de inovatieve site voor fitness monitoren, bijhouden en planning.</translation>
     </message>
 </context>
 <context>
@@ -32571,7 +30384,7 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="215"/>
         <source>Altitude Adjusted Training Stress Score takes into account both the intensity and the duration of the training session plus the altitude effect, it can be computed as 100 * hours * aIF^2</source>
-        <translation>Hoogte Aangepaste Training Stress Score houdt rekening met de intensiteit en de duur van de trainingssessie en het hoogte-effect, het kan worden berekend als 100 * hours * aIF^2</translation>
+        <translation>Hoogte Aangepaste Training Stress Score houdt rekening met de intensiteit en de duur van de trainingssessie en het hoogte-effect, het kan worden berekend als 100 * uren * aIF^2</translation>
     </message>
 </context>
 <context>
@@ -32639,7 +30452,7 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="249"/>
         <source>Aerobic Training Impact Scoring System. It&apos;s a metric to quantify the training strain or response on the aerobic system</source>
-        <translation>Aerobe Training Impact Scoring Systeem, Het is een indicator om de trainingsbelasting te kwantificeren of de respons op het aerobe systeem</translation>
+        <translation>Aerobe Training Impact Scoring Systeem, Het is een metriek om de trainingsbelasting te kwantificeren of de respons op het aerobe systeem</translation>
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="303"/>
@@ -32649,7 +30462,7 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="306"/>
         <source>Anaerobic Training Impact Scoring System. It&apos;s a metric to quantify the training strain or response on the anaerobic system</source>
-        <translation>Anaerobe Training Impact Scoring Systeem, Het is een indicator om de trainingsbelasting te kwantificeren of de respons op het anaerobe systeem</translation>
+        <translation>Anaerobe Training Impact Scoring Systeem, Het is een metriek om de trainingsbelasting te kwantificeren of de respons op het anaerobe systeem</translation>
     </message>
 </context>
 <context>
@@ -32719,13 +30532,13 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
         <location filename="../../Metrics/HrvMetrics.cpp" line="105"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="109"/>
         <source>Average of all NN intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde van alle NN intervallen</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="106"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="107"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
 </context>
 <context>
@@ -32774,12 +30587,12 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="817"/>
         <source>HRV Recovery Points</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV Herstelpunten</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="822"/>
         <source>Natural Log transform of rMSSD, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Natuurlijke logaritme van rMSSD, gemeten tijdens rust</translation>
     </message>
 </context>
 <context>
@@ -32787,18 +30600,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="520"/>
         <source>pNN</source>
-        <translation type="unfinished"></translation>
+        <translation>pNN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="521"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="522"/>
         <source>pct</source>
-        <translation type="unfinished"></translation>
+        <translation>pct</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="524"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than %1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>Percentage van verschillen tussen aangrenzende NN intervallen welke groter zijn dan %1 ms</translation>
     </message>
 </context>
 <context>
@@ -32806,18 +30619,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="593"/>
         <source>Rest AVNN</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust AVNN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="594"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="595"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="597"/>
         <source>Average of all NN intervals measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde van alle NN intervallen gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32825,18 +30638,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="779"/>
         <source>Rest HF</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust HF</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="780"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="781"/>
         <source>msec^2</source>
-        <translation type="unfinished"></translation>
+        <translation>msec^2</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="784"/>
         <source>High Frequency Power HRV, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoog Frequent Vermogen HRV, gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32844,18 +30657,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="557"/>
         <source>Rest HR</source>
-        <translation type="unfinished">Rust HR</translation>
+        <translation>Rust HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="558"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="559"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="561"/>
         <source>Average HR measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde HR gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32863,18 +30676,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="741"/>
         <source>Rest LF</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust LF</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="742"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="743"/>
         <source>msec^2</source>
-        <translation type="unfinished"></translation>
+        <translation>msec^2</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="746"/>
         <source>Low Frequency Power HRV, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Laag Frequent Vermogen HRV, gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32882,18 +30695,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="704"/>
         <source>Rest PNN50</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust PNN50</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="705"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="706"/>
         <source>pct</source>
-        <translation type="unfinished"></translation>
+        <translation>pct</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="708"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than 50 ms, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Percentage van verschillen tussen aangrenzende NN intervallen welke groter zijn dan 50 ms, gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32901,18 +30714,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="667"/>
         <source>Rest rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust rMSSD</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="668"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="669"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="671"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Vierkantswortel van het gemiddelde van de verschillen van vierkanten tussen aangrenzende NN intervallen, gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32920,18 +30733,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="630"/>
         <source>Rest SDNN</source>
-        <translation type="unfinished"></translation>
+        <translation>Rust SDNN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="631"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="632"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="634"/>
         <source>Standard deviation of all NN intervals measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaarddeviatie van alle NN intervallen gemeten in rust</translation>
     </message>
 </context>
 <context>
@@ -32939,18 +30752,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="426"/>
         <source>rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>rMSSD</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="427"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="428"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="430"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Vierkantswortel van het gemiddelde van de verschillen van vierkanten tussen aangrenzende NN intervallen</translation>
     </message>
 </context>
 <context>
@@ -32958,18 +30771,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="250"/>
         <source>SDANN</source>
-        <translation type="unfinished"></translation>
+        <translation>SDANN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="251"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="252"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="254"/>
         <source>Standard deviation of all NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaardeviatie van alle NN intervallen in alle 5-minuten segmenten van een 24-uurs opname</translation>
     </message>
 </context>
 <context>
@@ -32977,18 +30790,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="172"/>
         <source>Standard deviation of NN</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaarddeviatie van NN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="173"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="174"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="176"/>
         <source>Standard deviation of all NN intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaarddeviatie van alle NN intervallen</translation>
     </message>
 </context>
 <context>
@@ -32996,18 +30809,18 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="344"/>
         <source>SDNNIDX</source>
-        <translation type="unfinished"></translation>
+        <translation>SDNNIDX</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="345"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="346"/>
         <source>msec</source>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="348"/>
         <source>Average of the standard deviations of NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemiddelde van alle standaarddeviaties van NN intervallen in alle 5-minuten segmenten van een 24-uurs opname</translation>
     </message>
 </context>
 <context>

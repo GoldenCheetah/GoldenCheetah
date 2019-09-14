@@ -420,6 +420,8 @@ struct FitFileReaderState
                 case 272: return "Powertap C1";
                 case 288: return "Powertap P1";
                 case 4096: return "Powertap G3";
+                case 4353: return "Powercal";
+
                 default: return QString("Powertap Device %1").arg(prod);
             }
         } else if (manu == 13 ) {
@@ -500,7 +502,13 @@ struct FitFileReaderState
         } else if (manu == 260) {
             // Zwift
             return "Zwift";
-        } else if (manu == 267) {
+        } else if (manu == 263) {
+            // Favero
+            switch (prod) {
+                case -1: return "Favero";
+                default: return QString("Favero %1").arg(prod);
+            }
+        }else if (manu == 267) {
             // Bryton
             return "Bryton";
         } else if (manu == 282) {
@@ -515,6 +523,13 @@ struct FitFileReaderState
             switch (prod) {
                 case -1: return "Hammerhead";
                 default: return QString("Hammerhead %1").arg(prod);
+            }
+        } else if (manu == 255) {
+            // Development
+            switch (prod) {
+                case -1: return "Development";
+                case 0: return "Development";
+                default: return QString("Development %1").arg(prod);
             }
         } else {
             QString name = "Unknown FIT Device";

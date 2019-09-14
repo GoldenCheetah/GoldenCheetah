@@ -234,7 +234,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
 
     // Power Estimation Constants (mostly constants...)
     double hRider = ride->getHeight(); //Height in m
-    double M = ride->getWeight(); //Weight kg
+    double M = ride->getWeight() + MBik; //Total Mass kg
     double T = 15; //Temp degC in not in ride data
     double W = 0;  // headwind (from records or based on wind parameters entered manually)
     double bearing = 0.0; //cyclist direction used to compute headwind
@@ -291,7 +291,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 double CrDyn = 0.1 * cos(Slope);
 
                 double Ka;
-                double Frg = 9.81 * (MBik + M) * (CrEff * cos(Slope) + sin(Slope));
+                double Frg = 9.81 * M * (CrEff * cos(Slope) + sin(Slope));
 
                 double vw=V+W; // Wind speed against cyclist = cyclist speed + wind speed
 
