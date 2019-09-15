@@ -370,8 +370,8 @@ main(int argc, char *argv[])
     // being 1920 x 1080 rather than the native resolution
     if (desktop->screen()->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
        // we're on a hidpi screen - lets create a multiplier - always use smallest
-       dpiXFactor = screenSize.width() / 1280;
-       dpiYFactor = screenSize.height() / 1024;
+       dpiXFactor = screenSize.width() / 1280.0;
+       dpiYFactor = screenSize.height() / 1024.0;
 
        if (dpiYFactor < dpiXFactor) dpiXFactor = dpiYFactor;
        else if (dpiXFactor < dpiYFactor) dpiYFactor = dpiXFactor;

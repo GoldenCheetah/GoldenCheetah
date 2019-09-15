@@ -200,7 +200,7 @@ class LTMWindow : public GcChartWindow
         // show the banister helper
         void showBanister(bool relevant);    // show banister helper if relevant to plot
         void tuneBanister();                 // when t1/t2 change
-        void refreshBanister(int);           // refresh banister helper
+        void refreshBanister();              // refresh banister helper
 
         void refreshPlot();         // normal mode
         void refreshCompare();      // compare mode
@@ -306,9 +306,10 @@ class LTMWindow : public GcChartWindow
 
         // banister helper
         QComboBox *banCombo;
+        QComboBox *banPerf;
         QDoubleSpinBox *banT1;
         QDoubleSpinBox *banT2;
-        QLabel *ilabel, *plabel, *peaklabel, *t1label1, *t1label2, *t2label1, *t2label2, *RMSElabel;
+        QLabel *ilabel, *plabel, *peaklabel, *t1label1, *t1label2, *t2label1, *t2label2, *RMSElabel, *perflabel;
 
         QTime lastRefresh;
         bool firstshow;

@@ -132,7 +132,7 @@ static struct {
     { "tests", 0 },
 
     // banister function
-    { "banister", 2 }, // banister(metric, nte|pte|perf|cp)
+    { "banister", 3 }, // banister(load_metric, perf_metric, nte|pte|perf|cp)
 
     // add new ones above this line
     { "", -1 }
@@ -179,7 +179,7 @@ DataFilter::builtins()
                     returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
         } else if (i == 44) {
             // banister
-            returning << "banister(metric, nte|pte|perf|cp)";
+            returning << "banister(load_metric, perf_metric, nte|pte|perf|cp)";
         } else {
             QString function;
             function = DataFilterFunctions[i].name + "(";
@@ -1186,25 +1186,34 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 } else if (leaf->function == "banister") {
 
-                    // 2 or more
-                    if (leaf->fparms.count() != 2) {
+                    // 3 parameters
+                    if (leaf->fparms.count() != 3) {
                         leaf->inerror = true;
-                        DataFiltererrors << QString(tr("should be banister(metric, nte|pte|perf|cp)"));
+                        DataFiltererrors << QString(tr("should be banister(load_metric, perf_metric, nte|pte|perf|cp)"));
                     } else {
 
                         Leaf *first=leaf->fparms[0];
                         Leaf *second=leaf->fparms[1];
+                        Leaf *third=leaf->fparms[2];
 
-                        // check metric name is valid
+                        // check load metric name is valid
                         QString metric = first->signature();
                         QString lookup = df->lookupMap.value(metric, "");
                         if (lookup == "") {
                             leaf->inerror = true;
-                            DataFiltererrors << QString("unknown metric '%1'.").arg(metric);
+                            DataFiltererrors << QString("unknown load metric '%1'.").arg(metric);
+                        }
+
+                        // check perf metric name is valid
+                        metric = second->signature();
+                        lookup = df->lookupMap.value(metric, "");
+                        if (lookup == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString("unknown perf metric '%1'.").arg(metric);
                         }
 
                         // check value
-                        QString value = second->signature();
+                        QString value = third->signature();
                         QRegExp banSymbols("^(nte|pte|perf|cp)$", Qt::CaseInsensitive);
                         if (!banSymbols.exactMatch(value)) {
                             leaf->inerror = true;
@@ -1932,12 +1941,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         if (leaf->function == "banister") {
             Leaf *first=leaf->fparms[0];
             Leaf *second=leaf->fparms[1];
+            Leaf *third=leaf->fparms[2];
 
             // check metric name is valid
             QString metric = df->lookupMap.value(first->signature(), "");
-            QString value = second->signature();
+            QString perf_metric = df->lookupMap.value(second->signature(), "");
+            QString value = third->signature();
             QDate when = m->dateTime.date();
-            Banister *banister = m->context->athlete->getBanisterFor(metric, 0,0);
+            Banister *banister = m->context->athlete->getBanisterFor(metric, perf_metric, 0,0);
             int type = BANISTER_PERFORMANCE;
 
             if (value == "nte") type = BANISTER_NTE;

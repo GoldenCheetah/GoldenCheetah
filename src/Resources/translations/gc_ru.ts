@@ -21013,8 +21013,8 @@ No rides found to import.
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
-        <source>PolarFlow authorization was successful.</source>
-        <translation type="unfinished">Авторизация в PolarFlow прошла успешно.</translation>
+        <source>Polar Flow authorization was successful.</source>
+        <translation type="unfinished">Авторизация в Polar Flow прошла успешно.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
@@ -23532,18 +23532,18 @@ Do you want to continue?</source>
     <name>PolarFlow</name>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
-        <source>Network Problem reading PolarFlow data</source>
-        <translation type="unfinished">Проблемы с сетью при чтении данных PolarFlow</translation>
+        <source>Network Problem reading Polar Flow data</source>
+        <translation type="unfinished">Проблемы с сетью при чтении данных Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
-        <source>problem parsing PolarFlow data</source>
-        <translation type="unfinished">проблема с разбором данных от PolarFlow</translation>
+        <source>problem parsing Polar Flow data</source>
+        <translation type="unfinished">проблема с разбором данных от Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
-        <source>You must authorise with Today&apos;s Plan first</source>
-        <translation type="unfinished">Вы должны вначале авторизоваться на Today&apos;s Plan</translation>
+        <source>You must authorise with Polar Flow first</source>
+        <translation type="unfinished">Вы должны вначале авторизоваться на Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>

@@ -3568,7 +3568,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     // banister model
-    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, 50,11);
+    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, metricDetail.perfSymbol, 50,11);
 
     // should never happen...
     if (banister==NULL) {

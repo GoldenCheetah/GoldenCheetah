@@ -525,19 +525,19 @@ Athlete::getHeight(RideFile *ride)
 
 // working with Banister data series
 Banister *
-Athlete::getBanisterFor(QString metricName, int t1 , int t2)
+Athlete::getBanisterFor(QString metricName, QString perfMetricName, int t1 , int t2)
 {
     Banister *returning = NULL;
 
     // if we don't already have one, create it
-    returning = banisterData.value(metricName, NULL); // we do
+    returning = banisterData.value(metricName+perfMetricName, NULL); // we do
     if (!returning) {
 
         // specification is blank and passes for all
-        returning = new Banister(context, metricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
+        returning = new Banister(context, metricName, perfMetricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
 
         // add to our collection
-        banisterData.insert(metricName, returning);
+        banisterData.insert(metricName+perfMetricName, returning);
     }
 
     return returning;

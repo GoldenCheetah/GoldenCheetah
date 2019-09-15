@@ -76,15 +76,16 @@ class Banister : public QObject {
 
 public:
 
-    Banister(Context *context, QString symbol, double t1, double t2, double k1=0, double k2=0);
+    Banister(Context *context, QString symbol, QString perf_symbol, double t1, double t2, double k1=0, double k2=0);
     double value(QDate date, int type);
 
     // utility
-    QDate getPeakCP(QDate from, QDate to, int &CP);
+    QDate getPeakPerf(QDate from, QDate to, double &perf, int &CP);
     double RMSE(QDate from, QDate to, int &n); // only look at it for a date range
 
     // model parameters - initial 'priors' to use
     QString symbol;         // load metric
+    QString perf_symbol;    // performance metric
     double k1, k2;          // nte/pte coefficients
     double t1, t2;          // nte/pte decay constants
 

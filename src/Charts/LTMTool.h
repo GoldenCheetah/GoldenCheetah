@@ -215,6 +215,7 @@ class EditMetricDetailDialog : public QDialog
 
         // banister
         QComboBox *banisterTypeSelect; // PTE, NTE, Performance
+        QComboBox *banisterPerfMetric; // default Power Index
 
         // formula
         DataFilterEdit *formulaEdit; // edit your formula

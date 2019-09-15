@@ -1991,7 +1991,7 @@ class MinSmO2 : public RideMetric {
         setName(tr("Min SmO2"));
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setDescription(tr("Minimum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen."));
     }
 
@@ -2139,7 +2139,7 @@ class MinHr : public RideMetric {
         setName(tr("Min Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setDescription(tr("Minimum Heart Rate."));
     }
 
@@ -2402,7 +2402,7 @@ class MinTemp : public RideMetric {
         setName(tr("Min Temp"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("F"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setPrecision(1);
         setConversion(FAHRENHEIT_PER_CENTIGRADE);
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);

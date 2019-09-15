@@ -151,6 +151,11 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
+    // Preserve HR data
+    QVector<double> hrdata(ride->dataPoints().count());
+    for (int i=0; i<ride->dataPoints().count(); i++)
+        hrdata[i] = ride->dataPoints()[i]->hr;
+
     // delete current lap markers
     ride->clearIntervals();
     // ok, lets start a transaction and drop existing samples
@@ -195,8 +200,9 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
            kph = 3600.0 * length_distance / length_duration;
            if (length_distance == 0.0) interval++; // pauses mark laps
            for (int i = 0; i < length_duration; i++) {
+               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
                newRows << RideFilePoint(
-                   last_time + i, cad, 0.0,
+                   last_time + i, cad, hr,
                    last_distance + (length_distance * i/length_duration),
                    kph, 0.0, 0.0, 0.0, 0.0, 0.0,
                    0.0, 0.0,

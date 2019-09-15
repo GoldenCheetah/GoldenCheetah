@@ -113,7 +113,7 @@ class Athlete : public QObject
         QMap<QString, PMCData*> pmcData; // all the different PMC series
 
         // Banister Data
-        Banister *getBanisterFor(QString metricName, int t1, int t2); // t1/t2 not used yet
+        Banister *getBanisterFor(QString metricName, QString perfMetricName, int t1, int t2); // t1/t2 not used yet
         QMap<QString, Banister*> banisterData;
 
         // athlete measures
