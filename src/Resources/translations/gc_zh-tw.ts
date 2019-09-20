@@ -1152,7 +1152,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="665"/>
         <source>Match %1 (%2kJ)</source>
-        <translation>匹配 %1 (%2kJ)</translation>
+        <translation>點火 %1 (%2kJ)</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="831"/>
@@ -1847,12 +1847,12 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3275"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 match &gt;2kJ (%5 kJ) %6</source>
-        <translation>Tau=%1, CP=%2, W&apos;=%3, %4 匹配 &gt;2kJ (%5 kJ) %6</translation>
+        <translation>Tau=%1, CP=%2, W&apos;=%3, %4 點火 &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3278"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 matches &gt;2kJ (%5 kJ) %6</source>
-        <translation>Tau=%1, CP=%2, W&apos;=%3, %4 匹配 &gt;2kJ (%5 kJ) %6</translation>
+        <translation>Tau=%1, CP=%2, W&apos;=%3, %4 點火 &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3781"/>
@@ -2032,7 +2032,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4589"/>
         <source>Matches</source>
-        <translation>匹配項目</translation>
+        <translation>點火次數</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="4791"/>
@@ -2091,7 +2091,7 @@ Press Next to Continue
         <location filename="../../Charts/AllPlot.cpp" line="2603"/>
         <location filename="../../Charts/AllPlot.cpp" line="2609"/>
         <source>Match</source>
-        <translation>匹配</translation>
+        <translation>點火</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2733"/>
@@ -2387,7 +2387,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="468"/>
         <source>Matches</source>
-        <translation>匹配項目</translation>
+        <translation>點火次數</translation>
     </message>
 </context>
 <context>
@@ -2702,7 +2702,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="402"/>
         <source>1.0km|mi - 10min</source>
-        <translation>1.0公里|英里 - 10分</translation>
+        <translation>1.0公里|英哩 - 10分</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="403"/>
@@ -13382,7 +13382,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="829"/>
         <source>Isopower</source>
-        <translation>Isopower</translation>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="830"/>
@@ -20057,12 +20057,12 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="844"/>
         <source>W&apos;bal Matches</source>
-        <translation>W&apos;Bal 匹配</translation>
+        <translation>W&apos;Bal 點火</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="847"/>
         <source>Number of W&apos; balance Matches higher than 2kJ, W&apos; bal tracks the level of W&apos; according to CP model during intermitent exercise.</source>
-        <translation>大於2kJ之W&apos;Bal 匹配次數，W&apos;Bal按CP模型追縱在間歇訓練時W&apos;之剩餘狀況。</translation>
+        <translation>大於2kJ之W&apos;Bal 點火次數，W&apos;Bal按CP模型追縱在間歇訓練時W&apos;之剩餘狀況。</translation>
     </message>
 </context>
 <context>
@@ -20127,7 +20127,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="812"/>
         <source>Maximum W&apos;bal Match</source>
-        <translation>最大匹配之W&apos;Bal</translation>
+        <translation>最大W&apos;Bal點火</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="814"/>
@@ -20138,7 +20138,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="817"/>
         <source>Maximum W&apos; bal Match, W&apos; bal tracks the level of W&apos; according to CP model during intermitent exercise.</source>
-        <translation>最大匹配之W&apos;Bal：W&apos;Bal按CP模型追縱在間歇訓練時W&apos;之剩餘狀況。</translation>
+        <translation>最大W&apos;Bal點火：W&apos;Bal按CP模型追縱在間歇訓練時W&apos;之剩餘狀況。</translation>
     </message>
 </context>
 <context>
@@ -24199,7 +24199,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="145"/>
         <source>Watts:</source>
-        <translation>輸出功率 (Watts):</translation>
+        <translation>輸出功率 (w):</translation>
     </message>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="150"/>
@@ -24295,7 +24295,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2325"/>
         <source>Power (watts)</source>
-        <translation>輸出功率(Watts)</translation>
+        <translation>輸出功率(w)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2324"/>
@@ -26856,7 +26856,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="564"/>
         <source>Sustained efforts and matches using power</source>
-        <translation>功率持續間隔或匹配區段</translation>
+        <translation>功率持續間隔或點火區段</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="3172"/>
@@ -26871,7 +26871,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="3179"/>
         <source>Match</source>
-        <translation>匹配</translation>
+        <translation>點火</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="3185"/>
@@ -27595,12 +27595,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1498"/>
         <source>TE MATCH</source>
-        <translation>TE 匹配</translation>
+        <translation>點火至力竭 TE</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1498"/>
         <source>MATCH</source>
-        <translation>匹配</translation>
+        <translation>點火</translation>
     </message>
 </context>
 <context>
@@ -31337,7 +31337,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="458"/>
         <source>Total Distance in km or miles</source>
-        <translation>以公尺或英里計算之總距離</translation>
+        <translation>以公尺或英哩計算之總距離</translation>
     </message>
 </context>
 <context>
