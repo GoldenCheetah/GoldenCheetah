@@ -379,6 +379,7 @@ struct FitFileReaderState
                 case 3111: return "Garmin Fenix 5x +";
                 case 3112: return "Garmin Edge 520 +";
                 case 3113: return "Garmin FR945";
+                case 3291: return "Garmin Fenix 6x";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -1619,6 +1620,7 @@ struct FitFileReaderState
                             lngi = value;
                             break;
                     case 2: // ALTITUDE
+                    case 78:// ENHANCED ALTITUDE
                             if (!native_profile && field.deve_idx>-1)
                                 alt = deve_value;
                             else
@@ -1638,6 +1640,7 @@ struct FitFileReaderState
                             km = value / 100000.0;
                             break;
                     case 6: // SPEED
+                    case 73:// ENHANCED SPEED
                             kph = value * 3.6 / 1000.0;
                             break;
                     case 7: // POWER
