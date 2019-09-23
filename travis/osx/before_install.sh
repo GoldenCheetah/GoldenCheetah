@@ -5,7 +5,7 @@ date
 brew update
 brew install qt5
 brew install libical
-brew install libusb libusb-compat
+brew install libusb-compat
 brew install srmio
 brew install libsamplerate
 rm -rf '/usr/local/include/c++'
