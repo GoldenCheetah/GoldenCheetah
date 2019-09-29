@@ -20,7 +20,8 @@ sed -i "s|#\(ICAL_INSTALL =.*\)|\1 /usr|" src/gcconfig.pri
 # LIBUSB
 #sed -i "s|#\(LIBUSB_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
 sed -i "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
-sed -i "s|#\(LIBUSB_LIBS    =.*\)|\1 /usr/local/lib/libusb.a -lusb-1.0 -ldl -ludev|" src/gcconfig.pri
+sed -i "s|#\(LIBUSB_LIBS    =.*\)|\1 -lusb-1.0 -ldl -ludev|" src/gcconfig.pri
+sed -i "s|#\(LIBUSB_USE_V_1 = true.*\)|\1|" src/gcconfig.pri
 # VLC & VIDEO
 sed -i "s|#\(VLC_INSTALL =.*\)|\1 /usr|" src/gcconfig.pri
 sed -i "s|#\(VLC_LIBS    =.*\)|\1 -lvlc|" src/gcconfig.pri
