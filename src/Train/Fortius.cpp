@@ -79,6 +79,7 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
 
 Fortius::~Fortius()
 {
+    delete usb2;
 }
 
 /* ----------------------------------------------------------------------
