@@ -6,13 +6,13 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1212"/>
         <source>Average aPower</source>
-        <translation>Medel aPower</translation>
+        <translation>Medelvärde aPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1213"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1214"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1216"/>
@@ -29,7 +29,7 @@
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="73"/>
         <source>Found Garmin Express service</source>
-        <translation type="unfinished"></translation>
+        <translation>Hittade Garmin Express service</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="74"/>
@@ -37,18 +37,22 @@
 This can block GoldenCheetah from accessing your ANT+ stick.
 
 Do you want to temporarily disable the service?</source>
-        <translation type="unfinished"></translation>
+        <translation>Garmin Express service kör på din dator.
+Detta kan förhindra Golden Cheetah att använda ANT+ stickan
+
+Vill du stoppa Garmin Express service tillfälligt?</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="84"/>
         <source>Failed stopping Garmin Express service</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades stoppa Garmin Express service</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="85"/>
         <source>GoldenCheetah failed to stop the Garmin Express service.
 It might be necessary to manually disable it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Golden Cheetah misslyckades med att stoppa Garmin Express service.
+Det kan behövas göras manuellt.</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="164"/>
@@ -61,7 +65,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1624"/>
         <source>Power Percent of Max</source>
-        <translation>Effekt Procent av Max</translation>
+        <translation>Effekt - Procent av Max</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1629"/>
@@ -132,7 +136,8 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>keep as is</translatorcomment>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -253,7 +258,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="292"/>
         <source>Time (minutes)</source>
-        <translation>Tid (Minuter)</translation>
+        <translation>Tid (minuter)</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="367"/>
@@ -276,7 +281,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3816"/>
         <source>A checksum for the activity, can be used to trigger cache refresh in R scripts.</source>
-        <translation>Aktivitetens kontrollsumma kan användas tör att starta en cache förnyelse av R skripten.</translation>
+        <translation>Aktivitetens kontrollsumma kan användas för att starta en cache förnyelse av R skripten.</translation>
     </message>
 </context>
 <context>
@@ -284,7 +289,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="440"/>
         <source>Coached Athletes</source>
-        <translation>Träningsadepter</translation>
+        <translation>Ledda Idrottare</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="441"/>
@@ -339,7 +344,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="289"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Meddelande</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="368"/>
@@ -372,17 +377,17 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Mätdata</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Sync measurements such as weight, body fat, HRV and sleep.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synkronisera mätdata så som vikt, kroppsfett, HRV och sömn.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synkronisera planerade motionspass medWebDAV och CalDAV kalendrar så som Google Calendar.</translation>
     </message>
     <message>
         <source>Measures</source>
@@ -420,17 +425,17 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="216"/>
         <source>Terms of Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Servicevillkor</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="217"/>
         <source>Your consent is needed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ditt medgivande behövs</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="227"/>
         <source>Accept</source>
-        <translation type="unfinished"></translation>
+        <translation>Accepterar</translation>
     </message>
 </context>
 <context>
@@ -438,7 +443,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="55"/>
         <source>Add Device Wizard</source>
-        <translation>Enhetsanslutnings-Guiden</translation>
+        <translation>Enhetsanslutningsguiden</translation>
     </message>
 </context>
 <context>
@@ -976,22 +981,22 @@ Genom att välja &quot;Skapa lokal kopia&quot; kommer filen att kopieras in i Go
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="586"/>
         <source>Select Device driver</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj Device driver</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="587"/>
         <source>Select Driver for Tacx Imagic</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj Tacx Inagic driver</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="590"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Bläddra</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="591"/>
         <source>Copy to Library</source>
-        <translation type="unfinished">Skapa lokal kopia</translation>
+        <translation>Skapa lokal kopia</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="597"/>
@@ -1005,22 +1010,33 @@ On later TTS cds it is in support\drivers_usb_interface\32
 Place a copy of this file somewhere on this PC and reference it above.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it in place. </source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Imagic trainer behöver en firmwarefil från Tacx BV. Denna fil är Copyrightskyddad och kan inte levereras med GoldenCheetah.
+
+På Windows hittas filen normalt i C:\Windows\system32.
+
+Alternativt kan filen hämtas från Tacx  software distributions CDn.
+För äldre Fortius CD finns filen i katalogen  FortiusInstall\Support\driver_imagic.
+För senare TTS CD finns filen i katalogen  support\drivers_usb_interface\32
+
+Lägg en kopia i valfri katalog på din dator och ange platsen ovan.
+Vi rekomenderar att den senaste versionen av denna fil används.
+
+Genom att välja &quot;Skapa lokal kopia&quot; kommer filen att kopieras in i GoldenCheetah installationen, annars används en länk till den angivna platsen för filen. </translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="611"/>
         <source>File:</source>
-        <translation type="unfinished">Fil:</translation>
+        <translation>Fil:</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="667"/>
         <source>Open File</source>
-        <translation type="unfinished">Öppna Fil</translation>
+        <translation>Öppna Fil</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="667"/>
         <source>Tacx Device driver (*.sys)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Device driver (*.sys)</translation>
     </message>
 </context>
 <context>
@@ -1048,7 +1064,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="104"/>
         <source>Custom</source>
-        <translation>Skräddarsy</translation>
+        <translation>Skräddarsydd</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="40"/>
@@ -1204,12 +1220,12 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="674"/>
         <source>Pair Devices</source>
-        <translation>Koppla till ANT+ Enheter</translation>
+        <translation>Koppla ihop ANT+ Enheter</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="675"/>
         <source>Search for and pair ANT+ devices</source>
-        <translation>Sök efter ANT+-enheter och koppla till</translation>
+        <translation>Sök efter ANT+-enheter och koppla ihop</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="766"/>
@@ -1240,7 +1256,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="815"/>
         <source>Un-Paired</source>
-        <translation>Inte tillkopplad</translation>
+        <translation>Inte ihopkopplad</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="852"/>
@@ -1260,7 +1276,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="872"/>
         <source>Paired</source>
-        <translation>Tillkopplad</translation>
+        <translation>Ihopkopplad</translation>
     </message>
 </context>
 <context>
@@ -1544,7 +1560,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="777"/>
         <source>No ride selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen cykeltur vald</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="882"/>
@@ -2045,7 +2061,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="7051"/>
         <source>W&apos;</source>
-        <translation type="unfinished">W&apos;</translation>
+        <translation>W&apos;</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2595"/>
@@ -2076,47 +2092,47 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2878"/>
         <source>Watts</source>
-        <translation>Effekt [W]</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2897"/>
         <source>BPM</source>
-        <translation>HF [slag/min]</translation>
+        <translation>slag/min</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="2918"/>
         <source>RPM</source>
-        <translation>KF [v/min]</translation>
+        <translation>varv/min</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3015"/>
         <source>KPH</source>
-        <translation>Fart [km/h]</translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3015"/>
         <source>MPH</source>
-        <translation>Fart [mile/h]</translation>
+        <translation>mile/h</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3044"/>
         <source>Nm</source>
-        <translation>Vridmoment [Nm]</translation>
+        <translation>Nm</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3044"/>
         <source>ftLb</source>
-        <translation>Vridmoment [ftLb]</translation>
+        <translation>ftLb</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3093"/>
         <source>Meters</source>
-        <translation>m ö.h.</translation>
+        <translation>meter</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3093"/>
         <source>Feet</source>
-        <translation>Fot</translation>
+        <translation>fot</translation>
     </message>
 </context>
 <context>
@@ -2494,7 +2510,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="329"/>
         <source>Cadence </source>
-        <translation type="unfinished"></translation>
+        <translation>Kadens </translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="335"/>
@@ -2682,7 +2698,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="424"/>
         <source>Altitude Power</source>
-        <translation>Höjdkorrigerad Effekt (Watt)</translation>
+        <translation>Höjdkorrigerad Effekt (watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="428"/>
@@ -2825,7 +2841,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="571"/>
         <source>Mark as a performance test</source>
-        <translation type="unfinished"></translation>
+        <translation>Markera som prestationstest</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="595"/>
@@ -2840,7 +2856,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="617"/>
         <source>Create a performance test</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa en prestationstest</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="625"/>
@@ -2860,18 +2876,18 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="730"/>
         <source>Performance Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestationstest</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="809"/>
         <source>Are you sure you want to delete selected interval?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill radera det markerade intervallet?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="810"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="859"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="836"/>
@@ -2886,7 +2902,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="858"/>
         <source>Are you sure you want to stop tracking this segment?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill sluta följa detta segment?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="408"/>
@@ -3142,7 +3158,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Core/Athlete.cpp" line="322"/>
         <source>BikeStress and BikeIntensity</source>
-        <translation type="unfinished"></translation>
+        <translation>BikeStress och BikeIntensity</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="323"/>
@@ -3312,22 +3328,22 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="654"/>
         <source>Athlete Bones</source>
-        <translation type="unfinished"></translation>
+        <translation>Idrottare Ben</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="656"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="657"/>
         <source>lbs</source>
-        <translation type="unfinished">lbs</translation>
+        <translation>lbs</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="660"/>
         <source>Athlete bones in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Idrottare ben i kg eller lbs från kroppsmätning</translation>
     </message>
 </context>
 <context>
@@ -3364,12 +3380,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="352"/>
         <source>Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Mätdata</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="353"/>
         <source>HRV</source>
-        <translation type="unfinished">HRV</translation>
+        <translation>HRV</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="354"/>
@@ -3412,7 +3428,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="623"/>
         <source>Athlete bodyfat in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Idrottares kroppsfett i kg eller lbm från kroppsmätningar</translation>
     </message>
     <message>
         <source>Bodyfat in kg or lbs from downloaded Body Measure data</source>
@@ -3439,7 +3455,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="767"/>
         <source>Bodyfat in Percent from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Kroppsfett i procent från kroppsmätningar</translation>
     </message>
     <message>
         <source>Bodyfat Percent from downloaded Body Measure data</source>
@@ -3470,7 +3486,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="732"/>
         <source>Lean Weight in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Fettfri vikt i kg eller lbs från kroppsmätningar</translation>
     </message>
     <message>
         <source>Lean Weight in kg or lbs from downloaded Body Measure data</source>
@@ -3486,22 +3502,22 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="690"/>
         <source>Athlete Muscles</source>
-        <translation type="unfinished"></translation>
+        <translation>Idrottare Muskler</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="692"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="693"/>
         <source>lbs</source>
-        <translation type="unfinished">lbs</translation>
+        <translation>lbs</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="696"/>
         <source>Athlete muscles in kg or lbs from body measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Idrottare muskler i kg eller lbs från kroppsmätningar</translation>
     </message>
 </context>
 <context>
@@ -3509,7 +3525,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="568"/>
         <source>Athlete Weight</source>
-        <translation>Idrottare Vikt</translation>
+        <translation>Idrottares Vikt</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="570"/>
@@ -3524,7 +3540,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="574"/>
         <source>Weight in kg or lbs: first from Athlete body measurements, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation type="unfinished"></translation>
+        <translation>Vikt i kg eller lbs: primärt från kroppsmätning, sekundärt från träningspassmetadata och sist från Idrottarinställningarna med 75kg förinställt</translation>
     </message>
     <message>
         <source>Weight in kg or lbs: first from downloaded Body Measure data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
@@ -3844,7 +3860,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1045"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1046"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1048"/>
@@ -4060,18 +4076,18 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="520"/>
         <source>Average Stance Time Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde Stance Time i procent</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="521"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="522"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="525"/>
         <source>Average Stance Time Percent (%): Ground Contact Time / Step Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde Stance Time i procent (%): Ground Contact Time / Step Time</translation>
     </message>
 </context>
 <context>
@@ -4098,18 +4114,18 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="460"/>
         <source>Average Vertical Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde Vertical Ratio</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="461"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="462"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="465"/>
         <source>Average Vertical Ratio (%): Vertical Oscillation / Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde Vertical Ratio (%): Vertical Oscillation / Step Length</translation>
     </message>
 </context>
 <context>
@@ -4159,18 +4175,18 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="580"/>
         <source>Average Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde Step Length</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="581"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="582"/>
         <source>mm</source>
-        <translation type="unfinished">mm</translation>
+        <translation>mm</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="585"/>
         <source>Average Step Length: average single step (L to R / R to L) length in mm</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde Step Length: medelvärde (Vä-Hö / Hö-Vä) längd i mm</translation>
     </message>
 </context>
 <context>
@@ -4978,53 +4994,53 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Vikt</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Fat Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Fettvikt</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Muscle Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Muskelvikt</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Bones Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Benvikt</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Lean Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Fettfri vikt</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Fat Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>Fettprocent</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="209"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="209"/>
         <location filename="../../Core/BodyMeasures.cpp" line="210"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="210"/>
         <source>lbs</source>
-        <translation type="unfinished">lbs</translation>
+        <translation>lbs</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.h" line="73"/>
         <source>Body</source>
-        <translation type="unfinished"></translation>
+        <translation>Kropp</translation>
     </message>
 </context>
 <context>
@@ -5041,7 +5057,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="45"/>
         <source>Select body measurements file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj kroppsmätningsfil att importera</translation>
     </message>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="47"/>
@@ -5086,7 +5102,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../FileIO/BodyMeasuresCsvImport.cpp" line="109"/>
         <source>Number of data columns: %1 in line %2 deviates from header columns: %3</source>
-        <translation type="unfinished">Antalet datakolumner: %1 på rad %3 överensstämmer inte med antalet rubrikkolumner: %3 {1 ?} {2 ?}</translation>
+        <translation>Antalet datakolumner: %1 på rad %2 överensstämmer inte med antalet rubrikkolumner: %3</translation>
     </message>
     <message>
         <source>Number of data columns: %1 in line %2 deviates from header columns: %2</source>
@@ -5142,7 +5158,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="33"/>
         <source>Body Measurements download</source>
-        <translation type="unfinished"></translation>
+        <translation>Nedladdning av kroppsmätningar</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="39"/>
@@ -5177,28 +5193,28 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="52"/>
         <source>From date of last downloaded measurement to today</source>
-        <translation type="unfinished"></translation>
+        <translation>Från senaste mätningsnedladdningens datum tills idag</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="79"/>
         <source>Discard all existing measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera alla mätdata</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="233"/>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="316"/>
         <source>Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Kropp Mätdata</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="310"/>
         <source>Download completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nerladdningen klar.</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="316"/>
         <source>Downloading of body measurements failed with error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nerladdningen av kroppsmätdatal misslyckades med felet: %1</translation>
     </message>
     <message>
         <source>From date of last downloaded measure to today</source>
@@ -5393,7 +5409,7 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="93"/>
         <source>Average Power (watts)</source>
-        <translation>Medeleffekt (Watt)</translation>
+        <translation>Medeleffekt (watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="103"/>
@@ -5424,7 +5440,7 @@ Går till inställningar.</translation>
         <location filename="../../Charts/CPPlot.cpp" line="277"/>
         <location filename="../../Charts/CPPlot.cpp" line="308"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="204"/>
@@ -5460,12 +5476,12 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="226"/>
         <source>Watts delta</source>
-        <translation>Watt Δ</translation>
+        <translation>watt Δ</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="227"/>
         <source>watts/s</source>
-        <translation>Watt/s</translation>
+        <translation>watt/s</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="231"/>
@@ -5669,36 +5685,40 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2152"/>
         <source>%1 Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Procent</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2153"/>
         <source>%1 Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Power Index</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2188"/>
         <source>
 %1 m</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 m</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2189"/>
         <source>
 %1 yd</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 yd</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2193"/>
         <source>
 %1 km</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 km</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2194"/>
         <source>
 %1 mi</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 mi</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="3165"/>
@@ -5722,18 +5742,18 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="379"/>
         <source>Energy/Time </source>
-        <translation type="unfinished"></translation>
+        <translation>Energi/Tid </translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="415"/>
         <source>No Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen Modell</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="741"/>
         <location filename="../../Charts/CPPlot.cpp" line="777"/>
         <source>Percentile</source>
-        <translation type="unfinished"></translation>
+        <translation>Percentil</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="823"/>
@@ -5753,12 +5773,12 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1947"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Power Index</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2137"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2146"/>
@@ -6000,17 +6020,17 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="70"/>
         <source>Google Calendar using CalDAV protocol and authenticate using Google Account</source>
-        <translation type="unfinished"></translation>
+        <translation>Google Calendar via CalDAV protokollet och autenticering genom Google Account</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="71"/>
         <source>Web Calendar using iCal format as a web resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Web Calendar via iCal formatet som en web resurs</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="73"/>
         <source>Generic CalDAV Calendar such as Apple iCloud calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Generisk CalDAV Calendar som tex Apple iCloud kalender</translation>
     </message>
 </context>
 <context>
@@ -6315,12 +6335,13 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="864"/>
         <source>Chart requires &apos;Python&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagrammet kräver &apos;Python&apos;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="864"/>
         <source>The chart your are downloading requires &apos;Python&apos; to be installed                                                                               and activated for GoldenCheetah to show any graphics. Either &apos;Python&apos; is not activated                                                                               in the preferences, or not even installed.&lt;br&gt;&lt;br&gt; Please ensure &apos;Python&apos;                                                                               is installed and activated to be able to use this chart.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>.... ??</translatorcomment>
+        <translation>Diagrammet som laddas ner kräver att &apos;Python&apos; är installerat                                                                               och aktiverat i GoldenCheetah för att synas. Antingen är &apos;Python&apos; inte aktiverat                                                                               i inställningarna eller inte ens installerat.&lt;br&gt;&lt;br&gt; Vänligen se till att &apos;Python&apos;                                                                               är installerat och aktiverat.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="958"/>
@@ -6619,12 +6640,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="163"/>
         <source>&lt;b&gt;&lt;big&gt;New versions of GoldenCheetah are available&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;Ny verision av GoldenCheetah finns&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="165"/>
         <source>&lt;b&gt;&lt;big&gt;A new version of GoldenCheetah is available&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;En ny verision av GoldenCheetah finns&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="183"/>
@@ -6644,12 +6665,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="205"/>
         <source>Do not show again</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa inte igen</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBVersion.cpp" line="207"/>
         <source>Show again in %1 days</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa igen om %1 dagar</translation>
     </message>
     <message>
         <source>Do not show these versions again</source>
@@ -6670,7 +6691,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.h" line="92"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen</translation>
     </message>
 </context>
 <context>
@@ -6678,17 +6699,17 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="2007"/>
         <source>Downloading</source>
-        <translation type="unfinished">Laddar ner</translation>
+        <translation>Laddar ner</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="2008"/>
         <source>Checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollerar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="2044"/>
         <source>Last 30 days</source>
-        <translation type="unfinished">Senaste 28 dagarna {30 ?}</translation>
+        <translation>Senaste 30 dagarna</translation>
     </message>
 </context>
 <context>
@@ -6899,19 +6920,21 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="907"/>
         <source>One of your activities has unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ett av dina motionspass har ändringar som  inte är sparade.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="909"/>
         <source>%1 of your activities have unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 av dina motionspass har ändringar som  inte är sparade.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="911"/>
         <source>Changes in activities which are not saved, will not be synchronized. 
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Motionspassändringar som  inte är sparade blir inte synkroniserade.
+
+Detta kan leda till skillnader mellan den lokala Golden Cheetah databasen och de uppladdade motionspassen. Det är rekomenderat att spara motionspassen innan synkronisering.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1024"/>
@@ -7036,19 +7059,21 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="340"/>
         <source>Upload to </source>
-        <translation type="unfinished"></translation>
+        <translation>Ladda upp till </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="341"/>
         <source>The activity you want to upload has unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Motionspasset som du vill ladda upp har ej sparade ändringar.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="342"/>
         <source>Unsaved changes in activities will be uploaded as well. 
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Icke sparade ändringar i träningspassen kommer att laddas upp med.
+
+Detta kan leda till skillnader mellan lokalt sparade träningspass och de som laddas upp om det inte sparas i Golden Cheetah. Vi rekomenderar att ändringarna sparas innan du går vidare.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="382"/>
@@ -7319,7 +7344,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
         <location filename="../../Gui/ConfigDialog.cpp" line="49"/>
         <location filename="../../Gui/ConfigDialog.cpp" line="185"/>
         <source>Options</source>
-        <translation>Optioner</translation>
+        <translation>Inställningar</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="84"/>
@@ -7523,7 +7548,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="212"/>
         <source>Critical Power (CP) configured in Power Zones.</source>
-        <translation>Critical Power (CP) sätts i Effektzoner.</translation>
+        <translation>Critical Power (CP) konfigureras i Verktyg/Inställningar/Idrottare/Zoner.</translation>
     </message>
 </context>
 <context>
@@ -7631,7 +7656,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="210"/>
         <source>Show Power Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa Effektprofil</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="215"/>
@@ -7641,7 +7666,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="220"/>
         <source>Show Performance Tests</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa Prestationstest</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="225"/>
@@ -7651,12 +7676,12 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="230"/>
         <source>Filter Unique Bests</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrera Unika Personbästa</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="240"/>
         <source>Show as Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa som Power Index</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="245"/>
@@ -7681,7 +7706,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="265"/>
         <source>Show time scale linear</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd linjär tidsaxel</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="280"/>
@@ -7711,37 +7736,37 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="292"/>
         <source>Envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>Envelopp</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="293"/>
         <source>Least Squares (LMA)</source>
-        <translation type="unfinished"></translation>
+        <translation>Minstakvadratmetoden</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="294"/>
         <source>Linear Regression (Work)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linjär regression</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="296"/>
         <source>Curve Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurvanpassning</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="299"/>
         <source>MMP bests</source>
-        <translation type="unfinished"></translation>
+        <translation>MMP Bästa</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="300"/>
         <source>Performance tests</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestationstest</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="302"/>
         <source>Data to fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Data att anpassa till</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="304"/>
@@ -7752,7 +7777,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="306"/>
         <source>CP and W&apos; Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>CP och W&apos; avklingning</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="311"/>
@@ -7841,7 +7866,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="444"/>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="447"/>
         <source>0 w</source>
-        <translation>0 Watt</translation>
+        <translation>0 watt</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="446"/>
@@ -7870,7 +7895,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1553"/>
         <source>Watts per Kilogram</source>
-        <translation>Specifik Effekt (Watt/kg)</translation>
+        <translation>Specifik Effekt (watt/kg)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="1554"/>
@@ -8031,18 +8056,18 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="109"/>
         <source>You must authorise with Cycling Analytics first</source>
-        <translation type="unfinished"></translation>
+        <translation>Du måste auktorisera med Cycling Analytics innan</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="332"/>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="333"/>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="459"/>
         <source>Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Anteckningar</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="434"/>
@@ -8063,7 +8088,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="35"/>
         <source>Sync with the power focused cycling site.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synka med den effektfokuserade tjänsten.</translation>
     </message>
     <message>
         <source>Upload to the power focused cycling site.</source>
@@ -8120,7 +8145,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
         <location filename="../../Metrics/DanielsPoints.cpp" line="275"/>
         <location filename="../../Metrics/DanielsPoints.cpp" line="276"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/DanielsPoints.cpp" line="278"/>
@@ -8238,7 +8263,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Train/DaumController.cpp" line="59"/>
         <source>Cannot Connect to Daum</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyckas inte koppla upp mot Daum</translation>
     </message>
 </context>
 <context>
@@ -8437,22 +8462,22 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="64"/>
         <source>Kettler Racer serial device </source>
-        <translation type="unfinished"></translation>
+        <translation>Kettler Racer serial device </translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="67"/>
         <source>Daum Serial Device </source>
-        <translation type="unfinished"></translation>
+        <translation>Daum Serial Device </translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="72"/>
         <source>Tacx Fortius bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Fortius bike trainer med styrenheten kopplad till en USB port. Se till att du har enhetens firmware fil tillgänglig.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="76"/>
         <source>Tacx iMagic bike trainer with the handlebar controller connected to a USB port.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx iMagic bike trainer med styrenheten kopplad till en USB port.</translation>
     </message>
     <message>
         <source>Tacx Fortius/iMagic bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
@@ -8785,7 +8810,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="68"/>
         <source>Problem accessing Dropbox data</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommer inte åt Dropbox data</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="130"/>
@@ -8795,7 +8820,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="199"/>
         <source>Parsing Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandlingsfel: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="287"/>
@@ -8880,7 +8905,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="207"/>
         <source>Performance Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestationstest</translation>
     </message>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="230"/>
@@ -8947,7 +8972,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1613"/>
         <source>PMC</source>
-        <translation type="unfinished">PMC</translation>
+        <translation>PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1614"/>
@@ -8957,17 +8982,17 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1615"/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Mått</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1616"/>
         <source>Performance</source>
-        <translation type="unfinished">Prestation</translation>
+        <translation>Prestation</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1617"/>
         <source>Banister</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1689"/>
@@ -9045,17 +9070,17 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1844"/>
         <source>Weekly Best Performances</source>
-        <translation type="unfinished"></translation>
+        <translation>Personbästa per vecka</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1845"/>
         <source>Submaximal Weekly Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Submaximala Personbästa per vecka</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1846"/>
         <source>Performance Tests</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestationstest</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1934"/>
@@ -9085,27 +9110,27 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1950"/>
         <source>Negative Training Effect (NTE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Negative Training Effect (NTE)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1951"/>
         <source>Positive Training Effect (PTE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Positive Training Effect (PTE)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1952"/>
         <source>Performance (Power Index)</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestation (Power Index)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1953"/>
         <source>Predicted CP (Watts)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppskattad CP (W)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1961"/>
         <source>Curve Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurvtyp</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1991"/>
@@ -9120,12 +9145,12 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2017"/>
         <source>Measure Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Måttgrupp</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2025"/>
         <source>Measure Field</source>
-        <translation type="unfinished"></translation>
+        <translation>Måttfält</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2045"/>
@@ -9243,7 +9268,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
         <location filename="../../Charts/LTMTool.cpp" line="2119"/>
         <source>Baseline</source>
         <translatorcomment>???</translatorcomment>
-        <translation>Baslinje</translation>
+        <translation>Referens</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2127"/>
@@ -9308,22 +9333,22 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2419"/>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2433"/>
         <source>Performances</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestationer</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2434"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Power Index</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2551"/>
         <source>Performances_%1_%2_%3</source>
-        <translation type="unfinished"></translation>
+        <translation>Prestationer_%1_%2_%3</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2641"/>
@@ -9526,12 +9551,12 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/Season.cpp" line="239"/>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritet</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="240"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivning</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="271"/>
@@ -9583,7 +9608,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/UserData.cpp" line="199"/>
         <source>Zone string</source>
-        <translation type="unfinished"></translation>
+        <translation>Zonsträng</translation>
     </message>
     <message>
         <location filename="../../Core/UserData.cpp" line="201"/>
@@ -9969,7 +9994,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="141"/>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="143"/>
         <source> watts</source>
-        <translation> Watt</translation>
+        <translation> watt</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="61"/>
@@ -10010,7 +10035,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="96"/>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="144"/>
         <source>Your critical power:</source>
-        <translation>Din CP:</translation>
+        <translation>Din critical power:</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="107"/>
@@ -10063,7 +10088,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="191"/>
         <source>%1 watts</source>
-        <translation>%1 Watt</translation>
+        <translation>%1 watt</translation>
     </message>
     <message>
         <location filename="../../Gui/EstimateCPDialog.cpp" line="195"/>
@@ -10116,7 +10141,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="368"/>
         <source>estimated Watts Per Kilogram (DrF.)</source>
-        <translation>uppskattade Watt per Kilogramm (DrF.)</translation>
+        <translation>uppskattade watt per kilogramm (DrF.)</translation>
     </message>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="370"/>
@@ -10550,7 +10575,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="182"/>
         <source>Set Rest Hrv</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange Vilo HRV</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="197"/>
@@ -10560,7 +10585,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Filter R-R outliers (see &quot;R-R flag&quot; in HRV Xdata). Non outliers are marked &quot;1&quot;.
@@ -10669,7 +10694,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="103"/>
         <source>Set XData.CdA from HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange XData.CdA från HR</translation>
     </message>
 </context>
 <context>
@@ -10677,7 +10702,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="65"/>
         <source>When recording with an iBike AeroPod (in HR mode) the CdA data is sent as HR. This tool will update the activity file to move the values from HR into the XData.CdA series.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vid användning av iBike AeroPod (i HR mode) sparas CdA värdena så som om de vore HR data. Detta verktyg flyttar värdena från HR till XData.CdA.</translation>
     </message>
 </context>
 <context>
@@ -10710,7 +10735,7 @@ Vissa GPS-er beräknar inte distans utan fartmätare, men sparar positioner (tex
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="54"/>
         <source>Use Cubic Splines</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd Kubiska Splines</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="74"/>
@@ -10719,7 +10744,11 @@ Vissa GPS-er beräknar inte distans utan fartmätare, men sparar positioner (tex
 This process will populate distance information (and override existing distance information if present.)The cubic splines processing estimates distance across polynomial curve, otherwise this feature will compute geometric arc distance between ride points.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Uppskatta tillryggalagd sträcka utifrån GPS data
+
+Beräknade distansvärden skapas (och skriver över de värden som ev redan finns.)
+
+</translation>
     </message>
 </context>
 <context>
@@ -10766,12 +10795,12 @@ This process will populate distance information (and override existing distance 
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="68"/>
         <source>CdA</source>
-        <translation type="unfinished">CdA</translation>
+        <translation>CdA</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="69"/>
         <source>Draft mult.</source>
-        <translation type="unfinished">Ta Rygg (faktor).</translation>
+        <translation>Ligga på rulle (faktor).</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="70"/>
@@ -10781,7 +10810,7 @@ This process will populate distance information (and override existing distance 
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
         <source>, heading</source>
-        <translation type="unfinished">, vindriktning</translation>
+        <translation>, vindriktning</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="130"/>
@@ -10799,7 +10828,19 @@ wind speed shall be indicated in kph
 wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the ride file already contain wind data
       it will be overridden if wind is entered manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Beräkna effekt värden utifrån fart/höjdförändring/vikt etc
+
+Cykelns vikt adderas till idrottarens vikt för att få total vikt,inklusive kläder, skor, etc
+
+CRR är rullmotståndskonstanten, den beror på däck och vägyta
+
+CdA är produkten av luftmotståndskoefficienten och den effektiva projicerade ytan i m^2, den beror på sittposition och utrustning. Om satt till 0 görs en uppskattning från kroppsmått
+
+På-rulle faktorn används för att beskriva vinsten av att ligga på rulle (drafting), välj 1 för solokörning och 0.7 för klunga
+
+ange vindhastighet i km/h
+vindriktning (varifrån vinden kommer) anges i grader från -179 till +180 (-90=V, 0=N, 90=Ö, 180=S)
+Obs:ev vind värden kommer att skrivas över om vindhastighet anges</translation>
     </message>
     <message>
         <source>, direction</source>
@@ -10847,17 +10888,17 @@ Notera: om träningpassfilen redan innehåller vind information
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="96"/>
         <source>Fix Elevation errors</source>
-        <translation>Korrigera höjd fel</translation>
+        <translation>Korrigera höjdfel</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="165"/>
         <source>Fix Elevation Data not possible</source>
-        <translation type="unfinished"></translation>
+        <translation>Inte möjligt att korrigera höjdfel</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="166"/>
         <source>The following problem occured: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Följande fel inträffande: %1</translation>
     </message>
 </context>
 <context>
@@ -11051,7 +11092,7 @@ Poollängd (i Meter) omräkning sker då värdet sätts till ett tal större än
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="50"/>
         <source>Percent Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>Procent förändring</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="52"/>
@@ -11061,12 +11102,12 @@ Poollängd (i Meter) omräkning sker då värdet sätts till ett tal större än
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="54"/>
         <source>Fix Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>Konstant förändring</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="56"/>
         <source>watt</source>
-        <translation type="unfinished"></translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="74"/>
@@ -11077,7 +11118,13 @@ Percent Adjustment - this defines percentage  to modify values by. Negative valu
 Fix Adjustment - this defines an fix amount  to modify values by. Negative values are supported.
 
 If both parameters are given, first the relative adjustment takes place, then the fix value adjustment is applied on the result.</source>
-        <translation type="unfinished"></translation>
+        <translation>Korrigering av effektvärden kan ske med en föändring i procent eller med en konstant. Finns två parametrar:
+
+Procent Förändring - ändrar med angivet procenttal. Negativa värden minskar.
+
+Konstant Förändring - lägger till angiven siffra. Negativa värden minskar.
+
+Om båda två används, sker procentuell föändring först och sedan läggs konstanta värdet till.</translation>
     </message>
     <message>
         <source>Adjusting power values allows you to uplift or degrade the power values by a percentage. It takes a single parameter:
@@ -11164,7 +11211,7 @@ Notera: om aktivitetsfilen redan har vind information kommer detta att skrivas �
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="123"/>
         <source>Fix SmO2 and/or tHb Anomaly</source>
-        <translation type="unfinished"></translation>
+        <translation>Korrigera SmO2 och/eller tHb fel</translation>
     </message>
 </context>
 <context>
@@ -11180,17 +11227,17 @@ Denna funktion identifierar outliers/fel i SmO2 datat och byter ut dem mot uppsk
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="51"/>
         <source>Fix SmO2</source>
-        <translation type="unfinished"></translation>
+        <translation>Korrigera SmO2</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="52"/>
         <source>Fix tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>Korrigera tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="53"/>
         <source>Max. tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>Max tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="74"/>
@@ -11202,7 +11249,14 @@ Fix SmO2 - check to fix anomalies in SmO2 data
 Fix tHb - check to fix anomalies in tHb data 
 Max. tHb - any tHb above is considered an outlier 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Felaktiga värden förekommer ibland för SmO2 (%) och/eller tHb (%) (SmO2: 0% eller &gt;100% / tHb: 0% eller &gt; max. tHb parameter). 
+
+ Denna funktion identifierar felaktiga SmO2 och tHb data och beroende på konfigurering ersätts felaktiga data med interpolerade data. Följande möjligheter finns:
+
+Korrigera SmO2
+Korrigera tHb
+Max. tHb - alla tHb värden större än angiven tröskel ersätts
+</translation>
     </message>
 </context>
 <context>
@@ -11450,7 +11504,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="147"/>
         <source>Altitude Power</source>
-        <translation>Höjdkorrigerad Effekt (Watt)</translation>
+        <translation>Höjdkorrigerad Effekt (watt)</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="148"/>
@@ -12010,7 +12064,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="276"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LEVMAR&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LEVMAR&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
@@ -12169,7 +12223,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="285"/>
         <source>TSS</source>
-        <translation type="unfinished"></translation>
+        <translation>TSS</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="468"/>
@@ -12432,7 +12486,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
         <location filename="../../Gui/GcWindowRegistry.cpp" line="95"/>
         <source>Critical Mean Maximals</source>
         <translatorcomment>???</translatorcomment>
-        <translation>Maximal Critical Power</translation>
+        <translation>Kritiska Maximala  Medelvärden</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="96"/>
@@ -12457,12 +12511,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="103"/>
         <source>Python Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Diagram</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="104"/>
         <source>Python Chart </source>
-        <translation type="unfinished"></translation>
+        <translation>Python Diagram </translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="106"/>
@@ -12664,12 +12718,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Pages.cpp" line="192"/>
         <source>Enable Python</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable Python</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="200"/>
         <source>Share to the OpenData project</source>
-        <translation type="unfinished"></translation>
+        <translation>Dela med OpenData projektet</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="212"/>
@@ -12689,7 +12743,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Pages.cpp" line="270"/>
         <source>Python Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Home</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="395"/>
@@ -12719,18 +12773,19 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Pages.cpp" line="406"/>
         <source>Python Installation (PYTHONHOME)</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Installation (PYTHONHOME)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="415"/>
         <source>Invalid Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Felaktig katalog</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="415"/>
         <source>Python does not appear to be installed in that location.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Python verkar inte vara installerat där.
+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="440"/>
@@ -12942,7 +12997,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="551"/>
         <source>Manually create a workout based on gradient (slope) and distance, maximum grade is +-40.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa träningspass utifrån lutning (gradient) och distans, tillåten lutning är inom+/-40.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="557"/>
@@ -13285,7 +13340,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
         <source>Estimation of critical power using the Monod/Scherrer power model</source>
-        <translation>Uppskattning av &apos;critical power&apos; mha Monod/Scherrer effekt modell</translation>
+        <translation>Uppskattning av &apos;critical power&apos; mha Monod/Scherrer arbets modell</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="124"/>
@@ -13434,7 +13489,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="173"/>
         <source>Fix SmO2/tHb outliers</source>
-        <translation type="unfinished"></translation>
+        <translation>Korrigera SmO2/tHb ytterlighetsvärden</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="175"/>
@@ -13566,7 +13621,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="126"/>
         <source>Downloading of Body Measurements (e.g. weight) from multiple sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Nerladdning av kroppsmätetal (tex vikt) från flera källor</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="185"/>
@@ -14088,7 +14143,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1681"/>
         <source>Iso Power to Average Heart Rate ratio in watts/bpm</source>
-        <translation>Förhållandet mellan normalisierad effekt mot medelhjärtfrekvens i Watt:(slag/min)</translation>
+        <translation>Förhållandet mellan normalisierad effekt mot medelhjärtfrekvens i watt:(slag/min)</translation>
     </message>
 </context>
 <context>
@@ -14101,7 +14156,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1485"/>
         <source>Power to Heart Rate Ratio in watts/bpm</source>
-        <translation>Förhållandet mellan Effekt mot medelhjärtfrekvens i Watt:slag/min</translation>
+        <translation>Förhållandet mellan Effekt mot medelhjärtfrekvens i watt:slag/min</translation>
     </message>
 </context>
 <context>
@@ -14114,7 +14169,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HrPwPlot.cpp" line="470"/>
         <source>Power (Watts)</source>
-        <translation>Effekt (Watt)</translation>
+        <translation>Effekt (watt)</translation>
     </message>
 </context>
 <context>
@@ -14216,12 +14271,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="43"/>
         <source>Hr Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>HR Zone</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="47"/>
         <source>Hr Zone fractional number determined from Average Hr.</source>
-        <translation type="unfinished"></translation>
+        <translation>HR zon bråktal bestämt från Medel HR.</translation>
     </message>
 </context>
 <context>
@@ -14729,72 +14784,72 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>HR</source>
-        <translation type="unfinished"></translation>
+        <translation>HR</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>AVNN</source>
-        <translation type="unfinished"></translation>
+        <translation>AVNN</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>SDNN</source>
-        <translation type="unfinished"></translation>
+        <translation>SDNN</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>RMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSSD</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>PNN50</source>
-        <translation type="unfinished"></translation>
+        <translation>PNN50</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>LF</source>
-        <translation type="unfinished"></translation>
+        <translation>LF</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>HF</source>
-        <translation type="unfinished"></translation>
+        <translation>HF</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>Recovery Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Recovery Points</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>msec</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>msec^2</source>
-        <translation type="unfinished"></translation>
+        <translation>ms^2</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>Rec.Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Rec.Points</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.h" line="75"/>
         <source>Hrv</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV</translation>
     </message>
 </context>
 <context>
@@ -14802,92 +14857,92 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="46"/>
         <source>Select HRV measurements file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj HRV mätningsfil att importera</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="46"/>
         <source>CSV Files (*.csv)</source>
-        <translation type="unfinished">CSV Filer (*.csv)</translation>
+        <translation>CSV Filer (*.csv)</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="48"/>
         <source>No file selected.</source>
-        <translation type="unfinished">Ingen fil vald.</translation>
+        <translation>Ingen fil vald.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="53"/>
         <source>Selected file %1 cannot be opened for reading.</source>
-        <translation type="unfinished">Vald fil %1 kan inte öppnas för läsning.</translation>
+        <translation>Vald fil %1 kan inte öppnas för läsning.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="75"/>
         <source>Column header contains duplicate identifier</source>
-        <translation type="unfinished">Kolumnrubrik upprepas</translation>
+        <translation>Kolumnrubrik upprepas</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="85"/>
         <source>Column &apos;timestamp_measurement&apos;/&apos;Datetime&apos;/&apos;date&apos; is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolumnen  &apos;timestamp_measurement&apos;/&apos;Datetime&apos;/&apos;date&apos; saknas.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="89"/>
         <source>Column &apos;rMSSD&apos;/&apos;rMSSD_lying&apos;/&apos;Rmssd&apos; is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolumnen &apos;rMSSD&apos;/&apos;rMSSD_lying&apos;/&apos;Rmssd&apos; saknas.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="102"/>
         <source>Number of data columns: %1 in line %2 lower than header columns: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Antalet datakolumner: %1 i rad %2 är färre än antalet rubrikkolumner: %3</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="129"/>
         <source>Invalid &apos;timestamp&apos; - Date/Time not ISO 8601 format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig  &apos;timestamp&apos; - Date/Time inte i ISO 8601 format - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="142"/>
         <source>Invalid &apos;date&apos; - Date not yyyy-dd-MM format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltigt &apos;date&apos; - Datum inte i yyyy-dd-MM format - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="151"/>
         <source>Invalid &apos;rMSSD&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltigt &apos;rMSSD&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="157"/>
         <source>Invalid &apos;HR&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;HR&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="163"/>
         <source>Invalid &apos;AVNN&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;AVNN&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="169"/>
         <source>Invalid &apos;SDNN&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;SDNN&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="175"/>
         <source>Invalid &apos;pNN50&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;pNN50&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="181"/>
         <source>Invalid &apos;LF&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;LF&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="187"/>
         <source>Invalid &apos;HF&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;HF&apos; - på rad %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="193"/>
         <source>Invalid &apos;HRV4T_Recovery_Points&apos; - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig &apos;HRV4T_Recovery_Points&apos; - på rad %1</translation>
     </message>
 </context>
 <context>
@@ -14895,77 +14950,77 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="34"/>
         <source>HRV Measurements download</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV-mätningsnedladdning</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="40"/>
         <source>Choose the download or import source</source>
-        <translation type="unfinished">Väl källa för nerladdning eller import</translation>
+        <translation>Väl källa för nerladdning eller import</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="41"/>
         <source>Import CSV file</source>
-        <translation type="unfinished">Impoertera CSV fil</translation>
+        <translation>Importera CSV fil</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="47"/>
         <source>Choose date range for download</source>
-        <translation type="unfinished">Välj tidsperiod för nerladdningen</translation>
+        <translation>Välj tidsperiod för nerladdningen</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="48"/>
         <source>From date of first recorded activity to today</source>
-        <translation type="unfinished">Från första aktivitets datum tills idag</translation>
+        <translation>Från första aktivitets datum tills idag</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="49"/>
         <source>From date of last downloaded measurement to today</source>
-        <translation type="unfinished"></translation>
+        <translation>Från senaste mätningsnedladdningens datum tills idag</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="50"/>
         <source>Enter manually:</source>
-        <translation type="unfinished">Manuell inmatning:</translation>
+        <translation>Manuell inmatning:</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="77"/>
         <source>Discard all existing measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera alla mätdata</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="89"/>
         <source>Download</source>
-        <translation type="unfinished">Ladda ner</translation>
+        <translation>Ladda ner</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="90"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Stäng</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="165"/>
         <source>Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Kropp Mätdata</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="165"/>
         <source>Invalid date range - please check your input</source>
-        <translation type="unfinished">Ogiltig tidsperiod - vänligen kontrollera den</translation>
+        <translation>Ogiltig tidsperiod - vänligen kontrollera den</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="201"/>
         <source>Download completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nerladdningen klar.</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="207"/>
         <source>HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV-mätdata</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="207"/>
         <source>Downloading of HRV measurements failed with error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nerladdningen av HRV-mätdata misslyckades med felet: %1</translation>
     </message>
 </context>
 <context>
@@ -14973,64 +15028,64 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Pages.cpp" line="1413"/>
         <source>Time dependent HRV measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsberoende HRV-mätdata</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1416"/>
         <source>From Date - Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Start Datum - Tid</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1486"/>
         <source>Comment</source>
-        <translation type="unfinished">Kommentar</translation>
+        <translation>Kommentar</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1525"/>
         <location filename="../../Gui/Pages.cpp" line="1533"/>
         <source>Update</source>
-        <translation type="unfinished">Uppdatera</translation>
+        <translation>Uppdatera</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1527"/>
         <source>+</source>
-        <translation type="unfinished">+</translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1528"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1534"/>
         <source>Add</source>
-        <translation type="unfinished">Lägg till</translation>
+        <translation>Lägg till</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1535"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1568"/>
         <source>Source</source>
-        <translation type="unfinished">Källa</translation>
+        <translation>Källa</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1570"/>
         <source>Original Source</source>
-        <translation type="unfinished">Ursprunglig Källa</translation>
+        <translation>Ursprunglig Källa</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1589"/>
         <location filename="../../Gui/Pages.cpp" line="1674"/>
         <source>MMM d, yyyy - hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>MMM d, yyyy - hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1717"/>
         <source>Manual entry</source>
-        <translation type="unfinished">Manuell inmatning</translation>
+        <translation>Manuell inmatning</translation>
     </message>
 </context>
 <context>
@@ -15626,7 +15681,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Train/ImagicController.cpp" line="87"/>
         <source>Cannot Connect to Imagic</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyckas inte koppla upp mot Imagic</translation>
     </message>
 </context>
 <context>
@@ -15649,12 +15704,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1670"/>
         <source>View</source>
-        <translation type="unfinished">Vy</translation>
+        <translation>Vy</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1671"/>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1695"/>
@@ -15759,7 +15814,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="672"/>
         <source>Maximum supported grade is +-40</source>
-        <translation type="unfinished"></translation>
+        <translation>Största lutningar är +/-40</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="680"/>
@@ -15925,7 +15980,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="299"/>
         <source>Version </source>
-        <translation type="unfinished"></translation>
+        <translation>Version </translation>
     </message>
     <message>
         <source>Version</source>
@@ -16039,33 +16094,33 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="319"/>
         <source>You must authorise with KentUniversity first</source>
-        <translation type="unfinished"></translation>
+        <translation>Du behöver först auktorisera med Kent University</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="336"/>
         <source>No such directory, try setting a new location in options.</source>
-        <translation type="unfinished">Verzeichnis nicht vorhanden, versuchen Sie in den Optionen eine neues Verzeichnis einzustellen.</translation>
+        <translation>Ingen sådan katalog, försök ange en ny i inställningarna.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="656"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="672"/>
         <source>Completed.</source>
-        <translation type="unfinished">Klart.</translation>
+        <translation>Klart.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="660"/>
         <source>Upload failed</source>
-        <translation type="unfinished">Upload fehlgeschlagen</translation>
+        <translation>Uppladdningen misslyckades</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="49"/>
         <source>University of Kent</source>
-        <translation type="unfinished"></translation>
+        <translation>University of Kent</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="50"/>
         <source>Participate in academic studies sharing data via google drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Delta i forskningsprojekt genom att dela data genom google drive.</translation>
     </message>
 </context>
 <context>
@@ -16073,59 +16128,59 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="827"/>
         <source>Upload to Kent University</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladda upp till Kent University</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="838"/>
         <source>Session Perceived Exertion (sRPE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Session Perceived Exertion (sRPE)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="854"/>
         <source>Post Session Fatigue (ROF)</source>
-        <translation type="unfinished"></translation>
+        <translation>Post Session Fatigue (ROF)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="869"/>
         <source>Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Anteckningar</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="877"/>
         <source>Missed workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Missade motionspass</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="882"/>
         <source>Is a self administered test workout</source>
-        <translation type="unfinished"></translation>
+        <translation>Är ett egenutfört testpass</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="885"/>
         <source>Uploading %1 bytes...</source>
-        <translation type="unfinished"></translation>
+        <translation>Laddar upp %1 bytes...</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="895"/>
         <source>Upload</source>
-        <translation type="unfinished">Ladda upp</translation>
+        <translation>Ladda upp</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="942"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="970"/>
         <source>Upload Failed</source>
-        <translation type="unfinished">Uppladdning Misslyckades</translation>
+        <translation>Uppladdning Misslyckades</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="943"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="971"/>
         <source>Unable to upload, check your configuration in preferences.</source>
-        <translation type="unfinished">Kan inte ladda upp, kontrollera inställningarna.</translation>
+        <translation>Kan inte ladda upp, kontrollera inställningarna.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="1010"/>
         <source>Done</source>
-        <translation type="unfinished">Klart</translation>
+        <translation>Klart</translation>
     </message>
 </context>
 <context>
@@ -16467,7 +16522,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="1349"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="1360"/>
@@ -16826,7 +16881,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1288"/>
         <source>The new event could not be uploaded to your remote calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nya händelsen gick inte att ladda upp till din externa kalender.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1417"/>
@@ -17001,7 +17056,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="115"/>
         <source>Show Banister Helper</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa Banister Helper</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="125"/>
@@ -17419,17 +17474,17 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1318"/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Mått</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1320"/>
         <source>Performance</source>
-        <translation type="unfinished">Prestation</translation>
+        <translation>Prestation</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1322"/>
         <source>Banister</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1499"/>
@@ -17523,33 +17578,33 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="260"/>
         <source>Banister Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister Model</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="273"/>
         <source>Impulse Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Impulse Metric</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="274"/>
         <source>Peak</source>
-        <translation type="unfinished">Topp</translation>
+        <translation>Peak</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="277"/>
         <source>Positive decay</source>
-        <translation type="unfinished"></translation>
+        <translation>Positive decay</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="278"/>
         <location filename="../../Charts/LTMWindow.cpp" line="280"/>
         <source>days</source>
-        <translation type="unfinished">Dagar</translation>
+        <translation>Dagar</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="279"/>
         <source>Negative decay</source>
-        <translation type="unfinished"></translation>
+        <translation>Negative decay</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1300"/>
@@ -17844,7 +17899,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1192"/>
         <source>should be banister(metric, nte|pte|perf|cp)</source>
-        <translation type="unfinished"></translation>
+        <translation>borde vara Banister(metric, nte|pte|perf|cp)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1221"/>
@@ -17973,7 +18028,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/LeftRightBalance.cpp" line="46"/>
         <source>Left/Right Balance shows the proportion of power coming from each pedal for rides and the proportion of Ground Contact Time from each leg for runs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Left/Right Balance visar fördelningen av effekt från varje pedal vid cykelturer eller fördelningen av Ground Contact Time från varje ben vid löpning.</translation>
     </message>
     <message>
         <source>Left/Right Balance shows the proportion of power coming from each pedal.</source>
@@ -18010,7 +18065,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Train/Library.cpp" line="208"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 gick ej att skriva till träningspasskatalogen %2, kontrollera skrivrättigheteroch ledigt utrymme</translation>
     </message>
     <message>
         <source>%1 already exists in workout library: %2</source>
@@ -18827,32 +18882,32 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="437"/>
         <source>Upload Activity...</source>
-        <translation type="unfinished"></translation>
+        <translation>Laddar upp Aktivitet...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="438"/>
         <source>Synchronise Activities...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synkroniserar Aktiviter...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="439"/>
         <source>Get &amp;Body Measurements...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hämta &amp;Kropp Mätdata...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="440"/>
         <source>Get &amp;HRV Measurements...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hämta &amp;HRV Mätdata...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="442"/>
         <source>Check For New Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollera om det finns nya Aktiviteter</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="443"/>
         <source>Ctrl-C</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl-C</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="466"/>
@@ -19133,7 +19188,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1326"/>
         <source>Selection #</source>
-        <translation type="unfinished"></translation>
+        <translation>Val #</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1400"/>
@@ -19241,7 +19296,7 @@ Vänligen kontrollera inställningarna.</translation>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1851"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1852"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1854"/>
@@ -19402,27 +19457,27 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Core/Measures.cpp" line="41"/>
         <source>Manual entry</source>
-        <translation type="unfinished">Manuell inmatning</translation>
+        <translation>Manuell inmatning</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="43"/>
         <source>Withings</source>
-        <translation type="unfinished">Withings</translation>
+        <translation>Withings</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="45"/>
         <source>Today&apos;s Plan</source>
-        <translation type="unfinished">Today&apos;s Plan</translation>
+        <translation>Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="47"/>
         <source>CSV Upload</source>
-        <translation type="unfinished">CSV uppladdning</translation>
+        <translation>CSV uppladdning</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="49"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänd</translation>
     </message>
 </context>
 <context>
@@ -19447,7 +19502,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1084"/>
         <source>Adjust merge alignment in time (use cursor and pgDown/pgUp keys for precise alignment)</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera sammanslagningens ihopfasning (använd markören och PageDown och PageUp tangenterna för precis ihoppassning)</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1129"/>
@@ -19585,18 +19640,18 @@ Om du inte vill göra detta nu , så kan man antingen backa för att göra ändr
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1249"/>
         <source>Target activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Målaktivitet</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1250"/>
         <source>Source of additional data series</source>
-        <translation type="unfinished"></translation>
+        <translation>Källa för de dataserier som skall läggas till</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1304"/>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1307"/>
         <source>d MMM yy hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>d MMM yy hh:mm:ss</translation>
     </message>
 </context>
 <context>
@@ -19717,12 +19772,12 @@ Om du inte vill göra detta nu , så kan man antingen backa för att göra ändr
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1024"/>
         <source>Interpolate location data based upon distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolera positionsdata från distansvärden</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1025"/>
         <source>Merge the two activity streams, interpolating location and slope values based upon mutual distance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå samman de två aktiviteternas dataserier, interpolerande positions och lutningsvärden utifrån ömsesidig distans.</translation>
     </message>
 </context>
 <context>
@@ -20499,7 +20554,7 @@ Inga Aktiviteter att importera.
         <location filename="../../Gui/NewCyclistDialog.cpp" line="39"/>
         <source>Critical Power (FTP)</source>
         <translatorcomment>CP and FTP is not the same...</translatorcomment>
-        <translation>Critical Power(CP/FTP)</translation>
+        <translation>Critical Power(alt. FTP)</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="40"/>
@@ -20700,7 +20755,7 @@ Inga Aktiviteter att importera.
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1267"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1268"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1270"/>
@@ -20794,7 +20849,7 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
         <source>Kent University Google Drive authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kent University Google Drive auktorisering lyckades.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="601"/>
@@ -20827,52 +20882,52 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="118"/>
         <source>Fetching server list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hämtar serverlista.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="133"/>
         <source>Network Problem reading server list</source>
-        <translation type="unfinished"></translation>
+        <translation>Nätverksproblem vid läsning av serverlista</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="149"/>
         <source>Invalid server list, please try again later</source>
-        <translation type="unfinished"></translation>
+        <translation>Ej giltig serverlista, försök igen senare</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="159"/>
         <source>Finding an available server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Letar efter tillgänglig server.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="202"/>
         <source>No servers available, please try later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hittade ingen tillgänglig server, försök igen senare.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="212"/>
         <source>Preparing data to send.</source>
-        <translation type="unfinished"></translation>
+        <translation>Förbereder data att skicka.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="287"/>
         <source>Sending data to server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skickar data till server.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="330"/>
         <source>Server replied:</source>
-        <translation type="unfinished"></translation>
+        <translation>Serversvar:</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="339"/>
         <source>Finishing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gör klart.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="348"/>
         <source>Done</source>
-        <translation type="unfinished">Klart</translation>
+        <translation>Klart</translation>
     </message>
 </context>
 <context>
@@ -20880,27 +20935,27 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="357"/>
         <source>OpenData</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenData</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="373"/>
         <source>&lt;b&gt;&lt;big&gt;OpenData Project&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;OpenData Project&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="383"/>
         <source>We have started a new project to collect user activity data to enable researchers, coaches and others to develop new models and solutions using real world data.&lt;p&gt;All data that is shared is &lt;b&gt;anonymous&lt;/b&gt; and cannot be traced back to the original user, no personal data is shared and the workout data is limited to Power, Heartrate, Altitude, Cadence and Distance data along with metrics and distributions. No personally identifiable information is collected at all.&lt;p&gt;The data will be published to the general public in exactly the same format you have provided it in. And you can choose to remove your data at any time. You can also choose to opt out again in athlete preferences.&lt;p&gt;&lt;center&gt;Your data will only be sent once every year or so.&lt;/center&gt;&lt;br&gt;&lt;b&gt;WE WILL NOT&lt;/b&gt;:&lt;p&gt;- Collect personal information &lt;p&gt;- Collect GPS information &lt;p&gt;- Collect notes or other metadata  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;WE WILL&lt;/b&gt;:&lt;p&gt;- Collect basic athlete info: Gender, Year of Birth and UUID&lt;p&gt;- Collect basic activity samples for HR, Cadence, Power, Distance, Altitude&lt;p&gt;- Collect metrics for every activity stored for this athlete&lt;p&gt;- Collect distribution and mean-max aggregates of activity data&lt;p&gt;&lt;p&gt;&lt;br&gt;We publish the data at the &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; as an &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData project&lt;/a&gt; open to everyone. &lt;p&gt;We have also setup an &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github project&lt;/a&gt; to publish tools for working with the dataset.&lt;p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>We have started a new project to collect user activity data to enable researchers, coaches and others to develop new models and solutions using real world data.&lt;p&gt;All data that is shared is &lt;b&gt;anonymous&lt;/b&gt; and cannot be traced back to the original user, no personal data is shared and the workout data is limited to Power, Heartrate, Altitude, Cadence and Distance data along with metrics and distributions. No personally identifiable information is collected at all.&lt;p&gt;The data will be published to the general public in exactly the same format you have provided it in. And you can choose to remove your data at any time. You can also choose to opt out again in athlete preferences.&lt;p&gt;&lt;center&gt;Your data will only be sent once every year or so.&lt;/center&gt;&lt;br&gt;&lt;b&gt;WE WILL NOT&lt;/b&gt;:&lt;p&gt;- Collect personal information &lt;p&gt;- Collect GPS information &lt;p&gt;- Collect notes or other metadata  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;WE WILL&lt;/b&gt;:&lt;p&gt;- Collect basic athlete info: Gender, Year of Birth and UUID&lt;p&gt;- Collect basic activity samples for HR, Cadence, Power, Distance, Altitude&lt;p&gt;- Collect metrics for every activity stored for this athlete&lt;p&gt;- Collect distribution and mean-max aggregates of activity data&lt;p&gt;&lt;p&gt;&lt;br&gt;We publish the data at the &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; as an &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData project&lt;/a&gt; open to everyone. &lt;p&gt;We have also setup an &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github project&lt;/a&gt; to publish tools for working with the dataset.&lt;p&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="416"/>
         <source>Yes, I want to share</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, jag vill dela med mig</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="419"/>
         <source>No thanks</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej det vill jag inte</translation>
     </message>
 </context>
 <context>
@@ -20937,7 +20992,7 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="186"/>
         <source>HRV rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV rMSSD</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="187"/>
@@ -21030,22 +21085,22 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Metrics/PDModel.h" line="115"/>
         <source>W&apos;: Formerly known as Anaerobic Work Capacity (AWC). An estimate for the fixed amount of work, expressed in kJ, that you can do above Critical Power.</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;: tidigare känt som Anaerobic Work Capacity (AWC). Ett mått på den del av arbetet man klarar av att utföra i kJ vid en effekt över Critical Power.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="116"/>
         <source>Critical Power. An estimate of the power that, theoretically, can be maintained for a long time without fatigue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Critical Power. Ett mått på den största effekt där, i teorin, idrottaren kan fortsätta hur länge som helst utan att bli trött.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="117"/>
         <source>Functional Threshold Power. The highest power that a rider can maintain in a quasi-steady state without fatiguing for approximately one hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Functional Threshold Power. Högsta effekten en idrottare kan prestera vid en jämn intensitet utan att tröttna under en timme.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="118"/>
         <source>P-max: An estimate of the maximal power over one full rotation of the cranks.</source>
-        <translation type="unfinished"></translation>
+        <translation>P-max: Mått på maximal (medel) effekt under ett helt pedalvarv.</translation>
     </message>
 </context>
 <context>
@@ -21053,22 +21108,22 @@ Inga Aktiviteter att importera.
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="627"/>
         <source>CTL/LTS : Chronic Training Load/Long Term Stress. The dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.</source>
-        <translation type="unfinished"></translation>
+        <translation>CTL/LTS : Chronic Training Load/Long Term Stress. Ackumulerad träningsbelastning under en längre period, beräknat some ett exponentiellt viktat rörligt medelvärde av valt träningsbelastningsmått, typiskt under 4-8 veckor, 42 dagar är default. Det påstås ha samband med din form.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="632"/>
         <source>ATL/STS : Acute Training Load/Short Term Stress. The dose of training that you accumulated over a short period of time, computed as an exponentially weighted moving average of the selected Training Load metric from 3 to 10 days in general, 7 by default. It is claimed to relate to your fatigue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATL/STS : Acute Training Load/Short Term Stress. Ackumulerad träningsbelastning under en kort period, beräknat some ett exponentiellt viktat rörligt medelvärde av valt träningsbelastningsmått, typiskt under 3 to 10 dagar, 7 dagar är default. Det påstås ha samband med utmattning.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="637"/>
         <source>TSB/SB : Training Stress Balance/Stress Balance. It&apos;s the result of subtracting yesterday&apos;s Acute Training Load/Short Term Stress from yesterday&apos;s Chronic Training Load/Long Term Stress. It is claimed to relate to your freshness.</source>
-        <translation type="unfinished"></translation>
+        <translation>TSB/SB : Training Stress Balance/Stress Balance. Differeansen/skillnaden mellan gårdagens Acute Training Load/Short Term Stress och gårdagens Chronic Training Load/Long Term Stress. Det påstås ha samband med pigghet.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="642"/>
         <source>RR : Ramp Rate. The rate at which CTL/LTS increases over a given time period. Large values up and down indicate a risk of injury and aggressive taper respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>RR : Ramp Rate. Förändringstakten som CTL/LTS ökar med. Stora positiva värden indikerar skaderisk och mycket negativa värden indikerar markant träningslättnad.</translation>
     </message>
 </context>
 <context>
@@ -21919,13 +21974,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="245"/>
         <source>10 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>10 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="246"/>
         <location filename="../../Metrics/PeakHr.cpp" line="247"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -21933,13 +21988,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="150"/>
         <source>1 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>1 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="151"/>
         <location filename="../../Metrics/PeakHr.cpp" line="152"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -21947,13 +22002,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="264"/>
         <source>20 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>20 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="265"/>
         <location filename="../../Metrics/PeakHr.cpp" line="266"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -21961,13 +22016,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="169"/>
         <source>2 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>2 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="170"/>
         <location filename="../../Metrics/PeakHr.cpp" line="171"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -21975,13 +22030,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="283"/>
         <source>30 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>30 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="284"/>
         <location filename="../../Metrics/PeakHr.cpp" line="285"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -21989,13 +22044,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="188"/>
         <source>3 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>3 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="189"/>
         <location filename="../../Metrics/PeakHr.cpp" line="190"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -22003,13 +22058,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="207"/>
         <source>5 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>5 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="208"/>
         <location filename="../../Metrics/PeakHr.cpp" line="209"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -22017,13 +22072,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="302"/>
         <source>60 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>60 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="303"/>
         <location filename="../../Metrics/PeakHr.cpp" line="304"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -22031,13 +22086,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="226"/>
         <source>8 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>8 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="227"/>
         <location filename="../../Metrics/PeakHr.cpp" line="228"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -22045,13 +22100,13 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="321"/>
         <source>90 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>90 min Topp HR</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="322"/>
         <location filename="../../Metrics/PeakHr.cpp" line="323"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
 </context>
 <context>
@@ -22695,7 +22750,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="551"/>
         <location filename="../../Metrics/PeakPower.cpp" line="552"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22709,7 +22764,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="380"/>
         <location filename="../../Metrics/PeakPower.cpp" line="381"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22723,7 +22778,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="399"/>
         <location filename="../../Metrics/PeakPower.cpp" line="400"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22737,7 +22792,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="456"/>
         <location filename="../../Metrics/PeakPower.cpp" line="457"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22751,7 +22806,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="342"/>
         <location filename="../../Metrics/PeakPower.cpp" line="343"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22765,7 +22820,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="570"/>
         <location filename="../../Metrics/PeakPower.cpp" line="571"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22779,7 +22834,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="418"/>
         <location filename="../../Metrics/PeakPower.cpp" line="419"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22793,7 +22848,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="475"/>
         <location filename="../../Metrics/PeakPower.cpp" line="476"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22807,7 +22862,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="589"/>
         <location filename="../../Metrics/PeakPower.cpp" line="590"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22821,7 +22876,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="437"/>
         <location filename="../../Metrics/PeakPower.cpp" line="438"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22835,7 +22890,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="494"/>
         <location filename="../../Metrics/PeakPower.cpp" line="495"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22849,7 +22904,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="513"/>
         <location filename="../../Metrics/PeakPower.cpp" line="514"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22863,7 +22918,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="361"/>
         <location filename="../../Metrics/PeakPower.cpp" line="362"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22877,7 +22932,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="323"/>
         <location filename="../../Metrics/PeakPower.cpp" line="324"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22891,7 +22946,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="532"/>
         <location filename="../../Metrics/PeakPower.cpp" line="533"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -22905,7 +22960,7 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/PeakPower.cpp" line="608"/>
         <location filename="../../Metrics/PeakPower.cpp" line="609"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
 </context>
 <context>
@@ -23179,7 +23234,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="64"/>
         <source>%1 rpm, %2 watts</source>
-        <translation>%1 varv/min, %2 Watt</translation>
+        <translation>%1 varv/min, %2 watt</translation>
     </message>
 </context>
 <context>
@@ -23200,7 +23255,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="145"/>
         <source>Watts:</source>
-        <translation>Watt:</translation>
+        <translation>Effekt:</translation>
     </message>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="150"/>
@@ -23291,7 +23346,7 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2325"/>
         <source>Power (watts)</source>
-        <translation>Effekt (Watt)</translation>
+        <translation>Effekt (watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2324"/>
@@ -23351,12 +23406,12 @@ Vill du göra detta?</translation>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2330"/>
         <source>Power (watts/kg)</source>
-        <translation>Specifik Effekt (Watt/kg)</translation>
+        <translation>Specifik Effekt (watt/kg)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2339"/>
         <source>aPower (watts)</source>
-        <translation>aPower (Watt)</translation>
+        <translation>aPower (watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2343"/>
@@ -23463,13 +23518,13 @@ Vill du göra detta?</translation>
         <location filename="../../Metrics/Banister.cpp" line="598"/>
         <location filename="../../Metrics/Banister.cpp" line="601"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Power Index</translation>
     </message>
     <message>
         <location filename="../../Metrics/Banister.cpp" line="599"/>
         <location filename="../../Metrics/Banister.cpp" line="600"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -23657,7 +23712,7 @@ och att dess display visar &quot;Host&quot;</translation>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="287"/>
         <source>Show Console</source>
-        <translation type="unfinished">Visa Konsol</translation>
+        <translation>Visa Konsol</translation>
     </message>
 </context>
 <context>
@@ -23665,7 +23720,7 @@ och att dess display visar &quot;Host&quot;</translation>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="49"/>
         <source>Python Console (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Python Konsol (%1)</translation>
     </message>
 </context>
 <context>
@@ -23813,7 +23868,7 @@ yyyy</translation>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="56"/>
         <source>Problem Saving Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem vid försök att Spara Kroppsmätdata</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="57"/>
@@ -23829,12 +23884,12 @@ yyyy</translation>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="106"/>
         <source>Problem Reading Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem vid försök att Läsa Kroppsmätdata</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="120"/>
         <source>Problem Parsing Body Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem vid försök att Behandla Kroppsmätdata</translation>
     </message>
     <message>
         <source>Problem Reading Body Measures</source>
@@ -24040,200 +24095,203 @@ yyyy</translation>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="798"/>
         <source>0 Rest</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Vila</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="799"/>
         <source>1 Very, very easy</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Mycket lätt</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="800"/>
         <source>2 Easy</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Lätt</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="801"/>
         <source>3 Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Mellan</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="802"/>
         <source>4 Somewhat hard</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Något ansträngande</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="803"/>
         <source>5 Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Ansträngande</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="804"/>
         <source>6 Hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Ansträngande+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="805"/>
         <source>7 Very hard</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Mycket ansträngande</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="806"/>
         <source>8 Very hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>8 Mycket ansträngande+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="807"/>
         <source>9 Very hard++</source>
-        <translation type="unfinished"></translation>
+        <translation>9 Mycket ansträngande++</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="808"/>
         <source>10 Maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Maximalt</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="811"/>
         <source>0 Not Fatigued At All</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Inte Trött Alls</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="812"/>
         <source>1 </source>
-        <translation type="unfinished">1 </translation>
+        <translation>1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="813"/>
         <source>2 A Little Fatigued</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Något Trött</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="814"/>
         <source>3 </source>
-        <translation type="unfinished">3 </translation>
+        <translation>3 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="815"/>
         <source>4 </source>
-        <translation type="unfinished">4 </translation>
+        <translation>4 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="816"/>
         <source>5 Moderately Fatigued</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Mellan Trött</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="817"/>
         <source>6 </source>
-        <translation type="unfinished">6 </translation>
+        <translation>6 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="818"/>
         <source>7 Very fatigued+</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Mycket Trött+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="819"/>
         <source>8 </source>
-        <translation type="unfinished">8 </translation>
+        <translation>8 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="820"/>
         <source>9 </source>
-        <translation type="unfinished">9 </translation>
+        <translation>9 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="821"/>
         <source>10 Total Fatigue, Nothing Left</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Fullständigt Utmattad</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="58"/>
         <source>Problem Saving HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem vid försök att Spara HRV data</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="110"/>
         <source>Problem Reading HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem vid försök att Läsa HRV data</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="124"/>
         <source>Problem Parsing HRV Measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Problem vid försök att Behandla HRV data</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="286"/>
         <source>Developer limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Överskriden gräns för utvecklare</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="288"/>
         <source>Monthly free plan limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Överskriden gräns för gratis månadsabonemang</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="290"/>
         <source>Bad request</source>
-        <translation type="unfinished"></translation>
+        <translation>Felaktig begäran</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="292"/>
         <source>Gateway Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Gateway tog för lång tid</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="294"/>
         <source>Connection to remote server timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>Koppling mot server tog för lång tid</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="296"/>
         <source>Networkerror: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nätverksfel: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="398"/>
         <source>Distance %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Distans %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="401"/>
         <source>Location %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="404"/>
         <source>Time %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tid %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="407"/>
         <source>HeartRate %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hjärtfrekvens %1</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="287"/>
         <source>Python not installed or in path</source>
-        <translation type="unfinished"></translation>
+        <translation>Python inte installerad eller i annan katalog</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="287"/>
         <source>Python v3.%1 is required for Python embedding.
 Python disabled in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Python v3.%1 krävs för Python användning.
+Python stängs av i  inställningarna.</translation>
     </message>
     <message>
         <location filename="../../R/RTool.cpp" line="222"/>
         <source>The version of R installed is too old. You must have R version 3.4 or higher.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Installerad R version är för gammal. R version 3.4 eller senare krävs.
+</translation>
     </message>
     <message>
         <location filename="../../R/RTool.cpp" line="231"/>
         <source>The version of R installed is too new. You must have R version 3.3 or older.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Installerad Rversion är för ny.  R version 3.3 eller äldre krävs.
+</translation>
     </message>
 </context>
 <context>
@@ -24282,7 +24340,7 @@ Python disabled in preferences.</source>
         <location filename="../../Metrics/GOVSS.cpp" line="267"/>
         <location filename="../../Metrics/GOVSS.cpp" line="268"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="270"/>
@@ -24320,7 +24378,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="484"/>
         <source>Section Time Remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>Sektion kvarvarande tid</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="487"/>
@@ -24500,27 +24558,27 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="595"/>
         <source>Lap Distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Varvdistans</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="598"/>
         <source>Lap Distance Remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>Kvarvarande Varvdistans</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="601"/>
         <source>Latitude</source>
-        <translation type="unfinished">Latitud</translation>
+        <translation>Latitud</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="604"/>
         <source>Longitude</source>
-        <translation type="unfinished">Longitud</translation>
+        <translation>Longitud</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="607"/>
         <source>Altitude</source>
-        <translation type="unfinished">Höjd</translation>
+        <translation>Höjd</translation>
     </message>
 </context>
 <context>
@@ -24601,7 +24659,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Charts/ReferenceLineDialog.cpp" line="40"/>
         <source>Watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Charts/ReferenceLineDialog.cpp" line="42"/>
@@ -24665,7 +24723,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="430"/>
         <source>Wattage</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="502"/>
@@ -25368,7 +25426,7 @@ Vill du fortsätta?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="336"/>
         <source>Watts per Kilogram</source>
-        <translation>Specifik Effekt (Watt/kg)</translation>
+        <translation>Specifik Effekt (watt/kg)</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="337"/>
@@ -25504,12 +25562,12 @@ Vill du fortsätta?</translation>
         <location filename="../../FileIO/RideFile.cpp" line="432"/>
         <location filename="../../FileIO/RideFile.cpp" line="435"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="430"/>
         <source>watts/s</source>
-        <translation>Watt/s</translation>
+        <translation>watt/s</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="433"/>
@@ -25649,7 +25707,7 @@ Vill du fortsätta?</translation>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="459"/>
         <source>watts/kg</source>
-        <translation>W/kg</translation>
+        <translation>watt/kg</translation>
     </message>
     <message>
         <source>Invalid File Name</source>
@@ -26200,12 +26258,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="494"/>
         <source>Error - Opendata summary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel - Opendata sammanfattning.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="506"/>
         <source>undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>ej definierad</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="757"/>
@@ -26250,7 +26308,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1089"/>
         <source>Processing...</source>
-        <translation type="unfinished">Bearbetar...</translation>
+        <translation>Bearbetar...</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1093"/>
@@ -26372,7 +26430,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Core/RideItem.cpp" line="966"/>
         <source>%1 (%2 watts)</source>
-        <translation>%1 (%2 Watt)</translation>
+        <translation>%1 (%2 watt)</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1001"/>
@@ -26382,17 +26440,17 @@ Skipping file...</source>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1286"/>
         <source>L%3 TTE of %1  (%2 watts)</source>
-        <translation>L%3 TTE av %1  (%2 Watt)</translation>
+        <translation>L%3 TTE av %1  (%2 watt)</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1292"/>
         <source>L%4 %3% EFFORT of %1  (%2 watts)</source>
-        <translation>L%4 %3% ANSTRÄNGNING av %1  (%2 Watt)</translation>
+        <translation>L%4 %3% ANSTRÄNGNING av %1  (%2 watt)</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1313"/>
         <source>L%3 SPRINT of %1 secs (%2 watts)</source>
-        <translation>L%3 SPRINT av %1 sek (%2 Watt)</translation>
+        <translation>L%3 SPRINT av %1 sek (%2 watt)</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="1422"/>
@@ -26474,27 +26532,27 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="91"/>
         <source>Custom Tile Server A</source>
-        <translation type="unfinished"></translation>
+        <translation>Custom Tile Server A</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="92"/>
         <source>Custom Tile Server B</source>
-        <translation type="unfinished"></translation>
+        <translation>Custom Tile Server B</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="93"/>
         <source>Custom Tile Server C</source>
-        <translation type="unfinished"></translation>
+        <translation>Custom Tile Server C</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="99"/>
         <source>Google API key</source>
-        <translation type="unfinished"></translation>
+        <translation>Google API key</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1154"/>
         <source>Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervall</translation>
     </message>
     <message>
         <source>OpenCycleMap</source>
@@ -26658,7 +26716,7 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="669"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="674"/>
         <source>&lt;tr&gt;&lt;td&gt;%3&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;tr&gt;&lt;td&gt;%3&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="738"/>
@@ -26666,7 +26724,7 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="742"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="744"/>
         <source>&lt;tr&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;tr&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="824"/>
@@ -26763,12 +26821,12 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="840"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="862"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="851"/>
         <source>FTP (watts)</source>
-        <translation>FTP (Watt)</translation>
+        <translation>FTP (watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="854"/>
@@ -27073,17 +27131,17 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="969"/>
         <source>Default Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Förinställd Vikt</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="992"/>
         <source>Time dependent measurements</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsberoende mätningar</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="995"/>
         <source>From Date - Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Startdatum - Tid</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1055"/>
@@ -27120,7 +27178,7 @@ Skipping file...</source>
         <location filename="../../Gui/Pages.cpp" line="1148"/>
         <location filename="../../Gui/Pages.cpp" line="1280"/>
         <source>MMM d, yyyy - hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>MMM d, yyyy - hh:mm:ss</translation>
     </message>
     <message>
         <source>Time</source>
@@ -27156,7 +27214,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="1054"/>
         <source>Season</source>
-        <translation type="unfinished">Säsong</translation>
+        <translation>Säsong</translation>
     </message>
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="1074"/>
@@ -27201,7 +27259,7 @@ Skipping file...</source>
         <location filename="../../Metrics/SwimScore.cpp" line="211"/>
         <location filename="../../Metrics/SwimScore.cpp" line="212"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="214"/>
@@ -27309,7 +27367,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="113"/>
         <source>Power (watts)</source>
-        <translation>Effekt (Watt)</translation>
+        <translation>Effekt (watt)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="114"/>
@@ -27384,7 +27442,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="139"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
-        <translation type="unfinished">Pedalens periferihastighet (m/s)</translation>
+        <translation>Pedalens periferihastighet (m/s)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="140"/>
@@ -27972,27 +28030,27 @@ Skall konvertering ske?
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>A</source>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>C</source>
-        <translation type="unfinished">°C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>D</source>
-        <translation type="unfinished"></translation>
+        <translation>D</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
 </context>
 <context>
@@ -28031,7 +28089,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Core/Season.cpp" line="375"/>
         <source>Last 24 hours</source>
-        <translation type="unfinished"></translation>
+        <translation>Senaste 24 timmarna</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="382"/>
@@ -28056,7 +28114,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Core/Season.cpp" line="410"/>
         <source>Last 6 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>Senaste 6 veckorna</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="417"/>
@@ -28406,7 +28464,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Charts/SmallPlot.cpp" line="190"/>
         <source>Watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Charts/SmallPlot.cpp" line="194"/>
@@ -29197,7 +29255,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Cloud/Strava.h" line="35"/>
         <source>Sync with the social network for cyclists and runners.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synka med det sociala nätverket för cyklister och löpare.</translation>
     </message>
     <message>
         <source>Upload to the social network for cyclists and runners.</source>
@@ -29789,18 +29847,18 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="194"/>
         <source>Time Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelad tid</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="195"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="196"/>
         <source>seconds</source>
-        <translation type="unfinished">sekunder</translation>
+        <translation>sekunder</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="197"/>
         <source>Time when device was recording, excludes gaps in recording due to pauses or missing samples</source>
-        <translation type="unfinished"></translation>
+        <translation>Den tid som enheten registrerade data, tidsperioder då det var paus eller data saknas räknas inte</translation>
     </message>
 </context>
 <context>
@@ -29897,12 +29955,12 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Cloud/TodaysPlanBodyMeasures.cpp" line="55"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation type="unfinished">Du måste först auktorisera med Today&apos;s Plan</translation>
+        <translation>Du måste först auktorisera med Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlanBodyMeasures.cpp" line="165"/>
         <source>Response parsing error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Svarsbehandlingsfel: %1</translation>
     </message>
 </context>
 <context>
@@ -30462,7 +30520,7 @@ Välj Avbryt för att stänga denna dialogruta.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1864"/>
         <source>Recalibrating steering..</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibrerar om styrning..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2154"/>
@@ -30539,14 +30597,18 @@ Vridmoment %2</translation>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nollställningsprocedur(&quot;kallibrering&quot;)...
+Förtsätt låt pedalerna vara fria från fötter tills det är klart..
+Nollkompensation %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2281"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Nollställningsproceduren gick bra!
+Nollkompensation %1
+Lutning %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2322"/>
@@ -30713,47 +30775,47 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="125"/>
         <source>failed to parse Settings response: </source>
-        <translation type="unfinished">kunde inte parsa Inställningssvar: </translation>
+        <translation>kunde inte behandla Inställningssvar: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="130"/>
         <source>failed to get settings: </source>
-        <translation type="unfinished">kunde inte hämta inställningar: </translation>
+        <translation>kunde inte hämta inställningar: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="174"/>
         <source>failed to parse Session response: </source>
-        <translation type="unfinished"></translation>
+        <translation>kunde inte behandla Sessionssvar: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="179"/>
         <source>failed to get new session: </source>
-        <translation type="unfinished"></translation>
+        <translation>kunde inte skapa ny session: </translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="186"/>
         <source>got empty session</source>
-        <translation type="unfinished">fick tom session</translation>
+        <translation>fick tom session</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="292"/>
         <source>Completed.</source>
-        <translation type="unfinished">Klart.</translation>
+        <translation>Klart.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.cpp" line="294"/>
         <source>Error - Upload failed.</source>
-        <translation type="unfinished">Fel - Uppladdning mislyckades.</translation>
+        <translation>Fel - Uppladdning mislyckades.</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.h" line="46"/>
         <source>Trainingstagebuch</source>
-        <translation type="unfinished">Träningsdagbok</translation>
+        <translation>Trainingstagebuch</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.h" line="47"/>
         <source>Upload to your online and mobile training log.</source>
-        <translation type="unfinished">Laddaupp till din träningsdagbok.</translation>
+        <translation>Ladda upp till din träningsdagbok.</translation>
     </message>
 </context>
 <context>
@@ -30897,7 +30959,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="390"/>
         <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming. On zero fallback to TRIMP Zonal Points for HR based score.</source>
-        <translation type="unfinished"></translation>
+        <translation>TriScores kombinerade träningsbelastningsmått baseras på Dr. Skibas träningsbelastningsmått: BikeScorer (cykling), GOVSS (löpning) och SwimScore (simmning). Om noll används TRIMP Zonal Points för HR baserat värde.</translation>
     </message>
 </context>
 <context>
@@ -31417,7 +31479,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="334"/>
         <source>Estimated VO2max from 5 min Peak Power relative to Athlete Weight using new ACSM formula: 10.8 * Watts / KG + 7 (3.5 per leg).</source>
-        <translation>Estimerad VO2max från 5 min Toppeffekt delat med Idrottarevikt mha nya ACSM formeln: 10.8 * ToppEffekt-i-Watt / Vikt-i-kg + 7 (3.5 per leg).</translation>
+        <translation>Estimerad VO2max från 5 min Toppeffekt delat med Idrottarevikt mha nya ACSM formeln: 10.8 * ToppEffekt-i-watt / Vikt-i-kg + 7 (3.5 per ben).</translation>
     </message>
 </context>
 <context>
@@ -31602,7 +31664,7 @@ Tryck F3 när det är klart.</translation>
         <location filename="../../Metrics/WPrime.cpp" line="960"/>
         <location filename="../../Metrics/WPrime.cpp" line="961"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="963"/>
@@ -31785,7 +31847,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1576"/>
         <source>Watts:RPE Ratio</source>
-        <translation>Kvoten Watt/Borgskalan(RPE)</translation>
+        <translation>Kvoten Effekt/Borgskalan(RPE)</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1581"/>
@@ -31846,7 +31908,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="177"/>
         <source>Error parsing Withings API response. Please check the error description.</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandlingfel Withings API respons. Kontrollera felmeddelande.</translation>
     </message>
     <message>
         <source>Withings Data Download</source>
@@ -31985,7 +32047,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="146"/>
         <source>Total Duration including pauses a.k.a. Elapsed Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Totallängd inklusive pauser</translation>
     </message>
     <message>
         <source>Total Duration</source>
@@ -32375,7 +32437,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
         <location filename="../../Metrics/BikeScore.cpp" line="55"/>
         <location filename="../../Metrics/BikeScore.cpp" line="56"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="57"/>
@@ -32394,7 +32456,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
         <location filename="../../Metrics/SwimScore.cpp" line="71"/>
         <location filename="../../Metrics/SwimScore.cpp" line="72"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="73"/>
@@ -32407,33 +32469,33 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Cloud/Xert.cpp" line="139"/>
         <source>JSON parser error</source>
-        <translation type="unfinished">JSON behandlingsfel</translation>
+        <translation>JSON behandlingsfel</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="174"/>
         <source>You must authorise with Xert first</source>
-        <translation type="unfinished"></translation>
+        <translation>Du måste först auktorisera med Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="478"/>
         <location filename="../../Cloud/Xert.cpp" line="569"/>
         <source>Completed.</source>
-        <translation type="unfinished">Klart.</translation>
+        <translation>Klart.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="571"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nätverksfel - Uppladdning misslyckades.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="38"/>
         <source>Xert</source>
-        <translation type="unfinished"></translation>
+        <translation>Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="39"/>
         <source>Sync with the innovative site for fitness monitoring, tracking, and planning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synka med den innovativa tjänsten för prestations övervakning.</translation>
     </message>
 </context>
 <context>
@@ -32896,17 +32958,17 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/Zones.cpp" line="735"/>
         <source>Critical Power (watts): %1</source>
-        <translation>Critical Power (Watt): %1</translation>
+        <translation>Critical Power (watt): %1</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="743"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Nedre (Watt)&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Nedre (watt)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="744"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Övre (Watt)&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Övre (watt)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="746"/>
@@ -33083,7 +33145,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
         <location filename="../../Metrics/aBikeScore.cpp" line="54"/>
         <location filename="../../Metrics/aBikeScore.cpp" line="55"/>
         <source>watts</source>
-        <translation>Watt</translation>
+        <translation>watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="56"/>
@@ -33161,12 +33223,12 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="817"/>
         <source>HRV Recovery Points</source>
-        <translation type="unfinished"></translation>
+        <translation>HRV Recovery Points</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="822"/>
         <source>Natural Log transform of rMSSD, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Naturlig Logaritm av rMSSD, mätt vid vila</translation>
     </message>
 </context>
 <context>
@@ -33193,18 +33255,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="593"/>
         <source>Rest AVNN</source>
-        <translation type="unfinished"></translation>
+        <translation>Rest AVNN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="594"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="595"/>
         <source>msec</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="597"/>
         <source>Average of all NN intervals measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelvärde av alla NN intervaller mätt vid vila</translation>
     </message>
 </context>
 <context>
@@ -33212,18 +33274,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="779"/>
         <source>Rest HF</source>
-        <translation type="unfinished"></translation>
+        <translation>Vila HF</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="780"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="781"/>
         <source>msec^2</source>
-        <translation type="unfinished"></translation>
+        <translation>ms^2</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="784"/>
         <source>High Frequency Power HRV, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>High Frequency Power HRV, mätt i vila</translation>
     </message>
 </context>
 <context>
@@ -33231,18 +33293,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="557"/>
         <source>Rest HR</source>
-        <translation type="unfinished">Vilopuls</translation>
+        <translation>Vilopuls</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="558"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="559"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>slag/min</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="561"/>
         <source>Average HR measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Medelhjärtfrekvens vid vila</translation>
     </message>
 </context>
 <context>
@@ -33250,18 +33312,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="741"/>
         <source>Rest LF</source>
-        <translation type="unfinished"></translation>
+        <translation>Vila LF</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="742"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="743"/>
         <source>msec^2</source>
-        <translation type="unfinished"></translation>
+        <translation>ms^2</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="746"/>
         <source>Low Frequency Power HRV, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Low Frequency Power HRV, mätt i vila</translation>
     </message>
 </context>
 <context>
@@ -33269,18 +33331,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="704"/>
         <source>Rest PNN50</source>
-        <translation type="unfinished"></translation>
+        <translation>Vila PNN50</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="705"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="706"/>
         <source>pct</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="708"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than 50 ms, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Percentage of differences between adjacent NN intervals that are greater than 50 ms, measured at rest</translation>
     </message>
 </context>
 <context>
@@ -33288,18 +33350,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="667"/>
         <source>Rest rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Vila  rMSSD</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="668"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="669"/>
         <source>msec</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="671"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Kvadratroten av medelvärdet av skillnaderna mellan närliggande NN intervall i kvadrat,mätt vid vila</translation>
     </message>
 </context>
 <context>
@@ -33307,18 +33369,18 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="630"/>
         <source>Rest SDNN</source>
-        <translation type="unfinished"></translation>
+        <translation>Vila SDNN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="631"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="632"/>
         <source>msec</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="634"/>
         <source>Standard deviation of all NN intervals measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard deviation of all NN intervals measured at rest</translation>
     </message>
 </context>
 <context>
