@@ -78,6 +78,9 @@ public:
     void processRealtimeData(RealtimeData &rtData);
     void processSetup();
 
+signals:
+    void setNotification(QString text, int timeout);
+
 private:
     DeviceConfiguration *dc;
     DeviceConfiguration devConf;

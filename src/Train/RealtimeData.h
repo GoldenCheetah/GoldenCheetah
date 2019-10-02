@@ -39,6 +39,7 @@ public:
                       XPower, BikeScore, RI, Joules, SkibaVI,
                       IsoPower, BikeStress, IF, VI, Wbal,
                       SmO2, tHb, HHb, O2Hb,
+                      Rf, RMV, VO2, VCO2, RER, TidalVolume, FeO2,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
@@ -99,6 +100,20 @@ public:
     double getHHb() const;
     double getO2Hb() const;
 
+    // VO2 related metrics
+    void setVO2_VCO2(double vo2, double vco2);
+    void setRf(double rf);
+    void setRMV(double rmv);
+    void setTv(double tv);
+    void setFeO2(double feo2);
+    double getVO2() const;
+    double getVCO2() const;
+    double getRf() const;
+    double getRMV() const;
+    double getRER() const;
+    double getTv() const;
+    double getFeO2() const;
+
     double getWatts() const;
     double getAltWatts() const;
     double getAltDistance() const;
@@ -152,6 +167,7 @@ private:
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
     double torque; // raw torque data for calibration display
     double latitude, longitude, altitude;
+    double vo2, vco2, rf, rmv, tv, feo2;
 
     // derived data
     double distance;
@@ -160,6 +176,7 @@ private:
     double virtualSpeed;
     double wbal;
     double hhb, o2hb;
+    double rer;
     long lap;
     long msecs;
     long lapMsecs;

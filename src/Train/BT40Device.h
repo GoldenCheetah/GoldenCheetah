@@ -38,6 +38,7 @@ public:
     void connectDevice();
     void disconnectDevice();
     static QMap<QBluetoothUuid, btle_sensor_type_t> supportedServices;
+    QBluetoothDeviceInfo deviceInfo() const;
 
 private slots:
     void deviceConnected();
@@ -52,6 +53,8 @@ private slots:
 				  const QByteArray &value);
     void serviceError(QLowEnergyService::ServiceError e);
 
+signals:
+    void setNotification(QString msg, int timeout);
 private:
     QObject *parent;
     QBluetoothDeviceInfo m_currentDevice;
