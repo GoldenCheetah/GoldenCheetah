@@ -129,6 +129,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *trainSeries=NULL;
     XDataSeries *rrSeries=NULL;
     XDataSeries *ibikeSeries=NULL;
+    XDataSeries *xdataSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -163,6 +164,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp rowproCSV("Date,Comment,Password,ID,Version,RowfileId,Rowfile_Id", Qt::CaseInsensitive);
     QRegExp wahooMACSV("GroundContactTime,MotionCount,MotionPowerZ,Cadence,MotionPowerX,WorkoutActive,Timestamp,Smoothness,MotionPowerY,_ID,VerticalOscillation,", Qt::CaseInsensitive);
     QRegExp rp3CSV ("\"id\",\"workout_interval_id\",\"ref\",\"stroke_number\",\"power\",\"avg_power\",\"stroke_rate\",\"time\",\"stroke_length\",\"distance\",\"distance_per_stroke\",\"estimated_500m_time\",\"energy_per_stroke\",\"energy_sum\",\"pulse\",\"work_per_pulse\",\"peak_force\",\"peak_force_pos\",\"rel_peak_force_pos\",\"drive_time\",\"recover_time\",\"k\",\"curve_data\",\"stroke_number_in_interval\",\"avg_calculated_power\"", Qt::CaseSensitive);
+    QRegExp xdataCSV ("XDATA: (\\w+)", Qt::CaseSensitive);
 
 
     // X-trainer format
@@ -422,6 +424,19 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                     rideFile->addXData("ROW", rowSeries);
 
+               } else if (xdataCSV.indexIn(line) != -1) {
+
+                   csvType = xdata;
+                   rideFile->setDeviceType("GoldenCheetah XData");
+                   rideFile->setFileFormat("GoldenCheetah XData CSV (csv)");
+                   unitsHeader = -1;
+                   recInterval = 1; // may be variable
+
+                   // add XDATA
+                   xdataSeries = new XDataSeries();
+                   xdataSeries->name = xdataCSV.cap(1);
+                   ++lineno;
+                   continue;
 
                } else if (line == "secs,km,power,hr,cad,alt") {
                     // OpenData CSV
@@ -1136,6 +1151,57 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                         rowSeries->datapoints.append(p);
                     }
+
+               } else if (csvType == xdata) {
+
+                   // GoldenCheetah XDATA format with N series and M rows
+                   // XDATA: Name
+                   // SECS, KM, serie1[:units1], ..., seriesN[:unitsN]
+                   // secs1, km1, value11, ..., value1N
+                   // ...
+                   // secsM, kmM, valueM1, ..., valueMN
+
+                   if (lineno == 2) {
+
+                       QStringList hds = line.split(",");
+                       if (hds.count()>2 && hds[0]=="SECS" && hds[1]=="KM") {
+
+                           QRegExp hd("(\\w+)(?::(\\w+))?");
+                           for (int i=2; i<hds.count() && i<XDATA_MAXVALUES+2; i++) {
+                               if (hd.indexIn(hds[i]) == -1) break;
+                               xdataSeries->valuename << hd.cap(1);
+                               xdataSeries->unitname << hd.cap(2);
+                           }
+                           rideFile->addXData(xdataSeries->name, xdataSeries);
+
+                       } else {
+
+                           delete xdataSeries;
+                           xdataSeries = NULL;
+
+                       }
+                   } else if (xdataSeries != NULL) {
+
+                       QStringList els = line.split(",", QString::KeepEmptyParts);
+                       if (els.count() != xdataSeries->valuename.count()+2) continue;
+                       // add ALL data series to XDATA
+                       XDataPoint *p = new XDataPoint();
+                       p->secs = els[0].toDouble();
+                       p->km = els[1].toDouble();
+                       for(int i=2; i<els.count(); i++) p->number[i-2] = els[i].toDouble();
+                       xdataSeries->datapoints.append(p);
+
+                       // only time and distance as standard series
+                       rideFile->appendPoint(p->secs, // time in seconds
+                                             0, 0,    // cad, hr
+                                             p->km,   // distance (km)
+                                             0, 0, 0, 0, 0, 0, 0, 0,
+                                             -255,    // temp
+                                             0, 0, 0, 0, 0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0,
+                                             0, 0, 0, 0, 0, 0.0, 0);
+                   }
 
                } else if (csvType == opendata) {
 
