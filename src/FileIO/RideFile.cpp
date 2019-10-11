@@ -224,8 +224,9 @@ RideFile::isRun() const
 bool
 RideFile::isSwim() const
 {
-    // for now we just look at Sport
-    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
+    // for now we just look at Sport or presence of length data for lap swims
+    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim")) ||
+           (getTag("Sport","") == "" && xdata_.value("SWIM", NULL) != NULL);
 }
 
 // compatibility means used in e.g. R so no spaces in names,
