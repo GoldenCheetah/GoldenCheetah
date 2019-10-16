@@ -26,26 +26,21 @@
 
 DaumController::DaumController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc) {
     daumDevice_ = new Daum(this, dc != 0 ? dc->portSpec : "", dc != 0 ? dc->deviceProfile : "");
-    active_ = false;
 }
 
 int DaumController::start() {
-    active_ = true;
     return daumDevice_->start();
 }
 
 int DaumController::restart() {
-    active_ = true;
     return daumDevice_->restart();
 }
 
 int DaumController::pause() {
-    active_ = false;
     return daumDevice_->pause();
 }
 
 int DaumController::stop() {
-    active_ = false;
     return daumDevice_->stop();
 }
 
@@ -59,8 +54,6 @@ bool DaumController::discover(QString name) {
  * act accordingly.
  */
 void DaumController::getRealtimeData(RealtimeData &rtData) {
-    if (!active_) return;
-
     if(!daumDevice_->isRunning()) {
         QMessageBox msgBox;
         msgBox.setText(tr("Cannot Connect to Daum"));
