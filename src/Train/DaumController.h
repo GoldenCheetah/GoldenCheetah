@@ -29,7 +29,6 @@
 class DaumController : public RealtimeController
 {
     Q_OBJECT
-    bool active_;
 
 public:
     DaumController (TrainSidebar *, DeviceConfiguration *);
