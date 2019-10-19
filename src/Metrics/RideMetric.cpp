@@ -156,7 +156,11 @@
 // 146 21  Apr 2018 Ale Martinez       TriScore Fallback to TRIMP Zonal Points
 // 147 06  May 2018 Ale Martinez       Added PeakHr metrics and HrZone
 // 148 27  Jul 2018 Ale Martinez       Changed Hrv Measures to retrun 0 when no record for the date
-int DBSchemaVersion = 148;
+// 149 04  Jan 2019 Mark Liversedge    PowerIndex metric to score performance tests/intervals/rides vs typical athlete PD curve
+// 150 28  Mar 2019 Ale Martinez       Additional Running Dynamics metrics
+// 151 14  May 2019 Ale Martinez       Added Time Recording and use it in Time in Zone Percentage
+// 152 20  May 2019 Ale Martinez       Fixed Time in Zone Percentages to aggregate properly
+int DBSchemaVersion = 152;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

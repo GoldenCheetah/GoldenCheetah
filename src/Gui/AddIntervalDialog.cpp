@@ -532,16 +532,16 @@ AddIntervalDialog::createClicked()
             }
 
             if (methodPeakPower->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::watts, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Power","");
+                findPeaks(context, byTime, ride, Specification(), RideFile::watts, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak Power"),"");
             }
             else if (methodPeakSpeed->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Speed","");
+                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak Speed"),"");
             }
             else if (methodPeakPace->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::pace, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Pace", "");
+                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::pace, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak Pace"), "");
             }
             else if (methodHeartRate->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::hr, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak HR", "");
+                findPeaks(context, byTime, ride, Specification(), RideFile::hr, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak HR"), "");
             }
         }
 
@@ -767,7 +767,7 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
     while (!bests.empty() && (results.size() < maxIntervals)) {
         AddedInterval candidate = bests.takeFirst();
 
-        QString name = "#%1 %2%3  (%4w)";
+        QString name = "#%1 %2%3";
         name = name.arg(results.count()+1);
 
         if (typeTime)  {
@@ -816,7 +816,8 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
                 name = name.arg("km");
             }
         }
-        name = name.arg(round(candidate.avg));
+        if (candidate.avg > 0) // add average watts only if present
+            name = name + QString("  (%4w)").arg(round(candidate.avg));
         candidate.name = name;
 
         results.append(candidate);
@@ -958,7 +959,7 @@ AddIntervalDialog::findPeaks(Context *context, bool typeTime, const RideFile *ri
                 }
             }
             name += " (%4)";
-            name = name.arg(ride->formatValueWithUnit(round(candidate.avg), series, conversion, context, ride->isSwim()));
+            name = name.arg(ride->formatValueWithUnit(candidate.avg, series, conversion, context, ride->isSwim()));
 
             candidate.name = name;
             name = "";

@@ -22,7 +22,6 @@
 #include "HelpWhatsThis.h"
 #include "Utils.h"
 
-
 // predefined deltas for each series
 static const double wattsDelta = 1.0;
 static const double wattsKgDelta = 0.01;
@@ -1089,7 +1088,7 @@ HistogramWindow::getDelta()
         const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(distMetric());
 
-        if (m) return 1.00F / pow(10, m->precision());
+        if (m) return 1.00F / pow(10, PowerHist::validatePrecision(m->precision()));
         else return 1;
 
 
@@ -1120,7 +1119,7 @@ HistogramWindow::getDigits()
         const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(distMetric());
 
-        if (m) return m->precision();
+        if (m) return PowerHist::validatePrecision(m->precision());
         else return 0;
 
     } else {

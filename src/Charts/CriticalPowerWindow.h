@@ -53,6 +53,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(bool showTest READ showTest WRITE setShowTest USER true)
     Q_PROPERTY(bool filterBest READ filterBest WRITE setFilterBest USER true)
     Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
+    Q_PROPERTY(bool showPowerIndex READ showPowerIndex WRITE setShowPowerIndex USER true)
     Q_PROPERTY(bool showGrid READ showGrid WRITE setShowGrid USER true)
 
     // for retro compatibility
@@ -62,6 +63,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int fit READ fit WRITE setFit USER true)
     Q_PROPERTY(int fitdata READ fitdata WRITE setFitdata USER true)
     Q_PROPERTY(int variant READ variant WRITE setVariant USER true)
+    Q_PROPERTY(bool modelDecay READ modelDecay WRITE setModelDecay USER true)
     Q_PROPERTY(int ani1 READ anI1 WRITE setAnI1 USER true)
     Q_PROPERTY(int ani2 READ anI2 WRITE setAnI2 USER true)
     Q_PROPERTY(int aei1 READ aeI1 WRITE setAeI1 USER true)
@@ -70,6 +72,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int sani2 READ sanI2 WRITE setSanI2 USER true)
     Q_PROPERTY(int laei1 READ laeI1 WRITE setLaeI1 USER true)
     Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
+    Q_PROPERTY(bool showPP READ showPP WRITE setShowPP USER true)
 
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -106,6 +109,9 @@ class CriticalPowerWindow : public GcChartWindow
 
         int cpModel() const { return modelCombo->currentIndex(); }
         void setCPModel(int x) { modelCombo->setCurrentIndex(x); }
+
+        bool modelDecay() const { return modelDecayCheck->isChecked(); }
+        void setModelDecay(bool x) { modelDecayCheck->setChecked(x); }
 
         int fit() const { return fitCombo->currentIndex(); }
         void setFit(int x) { fitCombo->setCurrentIndex(x); }
@@ -219,8 +225,14 @@ class CriticalPowerWindow : public GcChartWindow
         bool showTest() { return showTestCheck->isChecked(); }
         void setShowTest(bool x) { return showTestCheck->setChecked(x); }
 
+        bool showPowerIndex() { return showPowerIndexCheck->isChecked(); }
+        void setShowPowerIndex(bool x) { return showPowerIndexCheck->setChecked(x); }
+
         bool showPercent() { return showPercentCheck->isChecked(); }
         void setShowPercent(bool x) { return showPercentCheck->setChecked(x); }
+
+        bool showPP() { return showPPCheck->isChecked(); }
+        void setShowPP(bool x) { return showPPCheck->setChecked(x); }
 
     protected slots:
         void forceReplot();
@@ -233,10 +245,12 @@ class CriticalPowerWindow : public GcChartWindow
         void seasonSelected(int season);
         void shadingSelected(int shading);
         void showEffortChanged(int check);
+        void showPPChanged(int check);
         void showHeatChanged(int check);
         void showCSLinearChanged(int state);
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
+        void showPowerIndexChanged(int check);
         void showBestChanged(int check);
         void showTestChanged(int check);
         void filterBestChanged(int check);
@@ -294,6 +308,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpintTodayValue;
         QLabel *cpintAllValue;
         QLabel *cpintCPValue;
+        QLabel *modelDecayLabel;
         QComboBox *seriesCombo;
         QComboBox *modelCombo;
         QComboBox *fitCombo;
@@ -305,15 +320,18 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *shadeCheck;
         QCheckBox *shadeIntervalsCheck;
         QCheckBox *showEffortCheck;
+        QCheckBox *showPPCheck;
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;
+        QCheckBox *showPowerIndexCheck;
         QCheckBox *showBestCheck;
         QCheckBox *showTestCheck;
         QCheckBox *filterBestCheck;
         QCheckBox *showGridCheck;
         QCheckBox *rPercent, *rHeat, *rDelta, *rDeltaPercent;
         QCheckBox *showCSLinearCheck;
+        QCheckBox *modelDecayCheck;
         QLabel *showCSLinearLabel;
         QwtPlotPicker *picker;
         QwtPlotGrid *grid;

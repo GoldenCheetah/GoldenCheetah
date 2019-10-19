@@ -46,9 +46,9 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setAttribute(Qt::WA_DeleteOnClose);
     setMinimumWidth(600 *dpiXFactor);
 #ifdef GC_WANT_ROBOT
-    setMinimumHeight(600 *dpiYFactor);
+    setMinimumHeight(800 *dpiYFactor);
 #else
-    setMinimumHeight(500 *dpiYFactor);
+    setMinimumHeight(700 *dpiYFactor);
 #endif
 
     // title

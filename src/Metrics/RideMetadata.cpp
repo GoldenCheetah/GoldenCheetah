@@ -505,7 +505,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
 
-        completer = field.getCompleter(this);
+        completer = field.getCompleter(this, meta->context->athlete->rideCache);
         widget = new QLineEdit(this);
         dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
 
@@ -1083,21 +1083,7 @@ FormField::metadataChanged()
         switch (definition.type) {
         case FIELD_TEXT : // text
         case FIELD_SHORTTEXT : // shorttext
-            {
-                if (meta->context->athlete->rideCache && completer &&
-                    definition.values.count() == 1 && definition.values.at(0) == "*") {
-
-                    // set completer if needed for wildcard matching
-                    QStringList values = meta->context->athlete->rideCache->getDistinctValues(definition.name);
-
-                    delete completer;
-                    completer = new QCompleter(values, this);
-                    completer->setCaseSensitivity(Qt::CaseInsensitive);
-                    completer->setCompletionMode(QCompleter::InlineCompletion);
-                    dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
-                }
                 ((QLineEdit*)widget)->setText(value);
-            }
             break;
 
         case FIELD_TEXTBOX : // textbox
@@ -1169,14 +1155,14 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
 }
 
 QCompleter *
-FieldDefinition::getCompleter(QObject *parent)
+FieldDefinition::getCompleter(QObject *parent, RideCache* rideCache)
 {
     QCompleter *completer = NULL;
     if (values.count()) {
-        if (values.count() == 1 && values.at(0) == "*") {
+        if (values.count() == 1 && values.at(0) == "*" && rideCache) {
 
-            // get the metdata values from the metric db ....
-            QStringList past_values;
+            // get the metdata values from the ride cache
+            QStringList past_values = rideCache->getDistinctValues(name);
 
             // set values from whatever we have done in the past
             completer = new QCompleter(past_values, parent);

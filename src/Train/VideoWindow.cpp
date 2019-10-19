@@ -359,16 +359,22 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 #ifdef GC_VIDEO_VLC
     if (!m) return;
 
+    QList<ErgFilePoint> *ErgFilePoints = NULL;
+    if (context->currentErgFile()) {
+        if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) {
+            ErgFilePoints = &(context->currentErgFile()->Points);
+        }
+    }
+
     // find the curPosition
     if (context->currentVideoSyncFile())
     {
         // when we selected a videosync file in training mode (rlv...):
 
         QVector<VideoSyncFilePoint> VideoSyncFiledataPoints = context->currentVideoSyncFile()->Points;
-
         if (VideoSyncFiledataPoints.count()<2) return;
 
-        if(curPosition > VideoSyncFiledataPoints.count()-1 || curPosition < 1)
+        if (curPosition > VideoSyncFiledataPoints.count() - 1 || curPosition < 1)
             curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
         double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
@@ -405,7 +411,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             rfp = *dataPoints[curPosition];
 
         }
-    */
+        */
         // set video rate ( theoretical : video rate = training speed / ghost speed)
         float rate;
         float video_time_shift_ms;
@@ -494,7 +500,7 @@ void VideoWindow::mediaSelected(QString filename)
 #else
         // A Windows "c:\xyz\abc def.avi" filename should become file:///c:/xyz/abc%20def.avi
         QString fileURL = "file:///" + filename.replace("\\", "/");
-#endif       
+#endif
         //qDebug()<<"file url="<<fileURL;
         /* open media */
         m = libvlc_media_new_location(inst, filename.endsWith("/DVD") ? "dvd://" : fileURL.toLocal8Bit());

@@ -251,6 +251,7 @@ class TrainSidebar : public GcWindow
         double displaySMO2, displayTHB, displayO2HB, displayHHB;
         double displayDistance, displayWorkoutDistance;
         double displayLapDistance, displayLapDistanceRemaining;
+        double displayLatitude, displayLongitude, displayAltitude; // geolocation
         long load;
         double slope;
         int displayLap;            // user increment for Lap

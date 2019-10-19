@@ -181,7 +181,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
 class PDEstimate
 {
     public:
-        PDEstimate() : WPrime(0), CP(0), FTP(0), PMax(0), EI(0), wpk(false) {}
+        PDEstimate() : WPrime(0), CP(0), FTP(0), PMax(0), EI(0), wpk(false), run(false) {}
 
         QDate from, to;
         QString model;
@@ -192,6 +192,7 @@ class PDEstimate
             EI;
 
         bool wpk;
+        bool run;
 
         QList<double> parameters; // parameters are stored/retrieved from here
                                   // so we can run the model using pre-computed
@@ -250,6 +251,8 @@ class CP3Model : public PDModel
 
     public:
         CP3Model(Context *context);
+
+        bool modelDecay;    // should we apply CP + W' decay constants?
 
         // synthetic data for a curve
         virtual double y(double t) const;

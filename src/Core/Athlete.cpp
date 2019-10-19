@@ -36,6 +36,7 @@
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
 #include "PMCData.h"
+#include "Banister.h"
 #include "ErgDB.h"
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
@@ -398,6 +399,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     athlete_quarantine = "quarantine";
     athlete_planned = "planned";
     athlete_snippets = "snippets";
+    athlete_media = "media";
 
 }
 
@@ -425,6 +427,7 @@ AthleteDirectoryStructure::createAllSubdirs() {
     myhome.mkdir(athlete_quarantine);
     myhome.mkdir(athlete_planned);
     myhome.mkdir(athlete_snippets);
+    myhome.mkdir(athlete_media);
 
 }
 
@@ -445,7 +448,8 @@ AthleteDirectoryStructure::subDirsExist() {
             temp().exists() &&
             quarantine().exists()&&
             planned().exists() &&
-            snippets().exists()
+            snippets().exists() &&
+            media().exists()
             );
 }
 
@@ -519,6 +523,27 @@ Athlete::getHeight(RideFile *ride)
     return height;
 }
 
+// working with Banister data series
+Banister *
+Athlete::getBanisterFor(QString metricName, QString perfMetricName, int t1 , int t2)
+{
+    Banister *returning = NULL;
+
+    // if we don't already have one, create it
+    returning = banisterData.value(metricName+perfMetricName, NULL); // we do
+    if (!returning) {
+
+        // specification is blank and passes for all
+        returning = new Banister(context, metricName, perfMetricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
+
+        // add to our collection
+        banisterData.insert(metricName+perfMetricName, returning);
+    }
+
+    return returning;
+
+}
+
 // working with PMC data series
 PMCData *
 Athlete::getPMCFor(QString metricName, int stsdays, int ltsdays)
@@ -559,11 +584,11 @@ Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 }
 
 PDEstimate
-Athlete::getPDEstimateFor(QDate date, QString model, bool wpk)
+Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, bool run)
 {
     // whats the estimate for this date
     foreach(PDEstimate est, getPDEstimates()) {
-        if (est.model == model && est.wpk == wpk && est.from <= date && est.to >= date)
+        if (est.model == model && est.wpk == wpk && est.run == run && est.from <= date && est.to >= date)
             return est;
     }
     return PDEstimate();

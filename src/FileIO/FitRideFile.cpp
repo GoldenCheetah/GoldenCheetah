@@ -135,7 +135,7 @@ struct FitFileReaderState
     int last_event;
     int last_msg_type;
     double frac_time; // to carry sub-second length time in pool swimming
-    double last_lap_end; // to align laps for drill mode in pool swimming
+    double last_altitude; // to avoid problems when records lacks altitude
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
@@ -152,7 +152,7 @@ struct FitFileReaderState
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
         devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1), frac_time(0.0),
-        last_lap_end(0.0)
+        last_altitude(0.0)
     {}
 
     struct TruncatedRead {};
@@ -321,12 +321,10 @@ struct FitFileReaderState
     QString getManuProd(int manu, int prod) {
         if (manu == 1) {
             // Garmin
-            if (prod == -1)
-                return "Garmin";
-
             // Product IDs can be found in c/fit_example.h in the FIT SDK.
             // Multiple product IDs refer to different regions e.g. China, Japan etc. 
             switch (prod) {
+                case -1: return "Garmin";
                 case 473: case 474: case 475: case 494: return "Garmin FR301";
                 case 717: case 987: return "Garmin FR405";
                 case 782: return "Garmin FR50";
@@ -374,6 +372,14 @@ struct FitFileReaderState
                 case 2604: return "Garmin Fenix 5x";
                 case 2691: return "Garmin FR935";
                 case 2697: return "Garmin Fenix 5";
+                case 2713: return "Garmin Edge 1030";
+                case 2886: case 2888: return "Garmin FR645";
+                case 2900: return "Garmin Fenix 5s +";
+                case 3110: return "Garmin Fenix 5 +";
+                case 3111: return "Garmin Fenix 5x +";
+                case 3112: return "Garmin Edge 520 +";
+                case 3113: return "Garmin FR945";
+                case 3291: return "Garmin Fenix 6x";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -381,11 +387,9 @@ struct FitFileReaderState
             }
         } else if (manu == 6 ) {
             // SRM
-            if (prod == -1)
-                return "SRM";
-
             // powercontrol now uses FIT files from PC8
             switch (prod) {
+                case -1: return "SRM";
                 case 6: return "SRM PC6";
                 case 7: return "SRM PC7";
                 case 8: return "SRM PC8";
@@ -393,22 +397,23 @@ struct FitFileReaderState
             }
         } else if (manu == 7 ) {
             // Quarq
-            if (prod == -1)
-                return "Quarq";
-
             switch (prod) {
+                case -1: return "Quarq";
                 case 1: return "Quarq Cinqo";
-
                 case 9479: return "Quarq DZERO";
-
                 default: return QString("Quarq %1").arg(prod);
+            }
+        } else if (manu == 8 ) {
+            // iBike
+            switch (prod) {
+                case -1: return "iBike";
+                case 2054: return "iBike AeroPod";
+                default: return QString("iBike %1").arg(prod);
             }
         } else if (manu == 9 ) {
             // Powertap
-            if (prod == -1)
-                return "Powertap";
-
             switch (prod) {
+                case -1: return "Powertap";
                 case 14: return "Joule 2.0";
                 case 18: return "Joule";
                 case 19: return "Joule GPS";
@@ -416,32 +421,27 @@ struct FitFileReaderState
                 case 272: return "Powertap C1";
                 case 288: return "Powertap P1";
                 case 4096: return "Powertap G3";
+                case 4353: return "Powercal";
 
                 default: return QString("Powertap Device %1").arg(prod);
             }
         } else if (manu == 13 ) {
             // dynastream_oem
-            if (prod == -1)
-                return "Dynastream";
-
             switch (prod) {
+                case -1: return "Dynastream";
                 default: return QString("Dynastream %1").arg(prod);
             }
         } else if (manu == 29 ) {
             // saxonar
-            if (prod == -1)
-                return "Power2max";
-
             switch (prod) {
+                case -1: return "Power2max";
                 case 1031: return "Power2max S";
                 default: return QString("Power2max %1").arg(prod);
             }
         } else if (manu == 32) {
             // wahoo
-            if (prod == -1)
-                return "Wahoo";
-
             switch (prod) {
+                case -1: return "Wahoo";
                 case 0: return "Wahoo fitness";
                 case 28: return "Wahoo ELEMNT";
                 case 31: return "Wahoo ELEMNT BOLT";
@@ -449,19 +449,15 @@ struct FitFileReaderState
             }
         } else if (manu == 38) {
              // o_synce
-            if (prod == -1)
-                return "o_synce";
-
             switch (prod) {
+                case -1: return "o_synce";
                 case 1: return "o_synce navi2coach";
                 default: return QString("o_synce %1").arg(prod);
             }
         } else if (manu == 48) {
-            if (prod == -1)
-                return "Pioneer";
-
             // Pioneer
             switch (prod) {
+                case -1:  return "Pioneer";
                 case 2: return "Pioneer SGX-CA500";
                 default: return QString("Pioneer %1").arg(prod);
             }
@@ -476,17 +472,44 @@ struct FitFileReaderState
             return "Stryd";
         } else if (manu == 98) {
             // BSX
+            switch(prod) {
+                case -1: return "BSX";
+                case 2: return "BSX Insight 2";
+                default: return QString("BSX %1").arg(prod);
+            }
+        } else if (manu == 107) {
+            // Magene
             if (prod == -1)
-                return "BSX";
+                return "Magene";
 
             switch(prod) {
-                  case 2: return "BSX Insight 2";
-                  default: return QString("BSX %1").arg(prod);
+                  default: return QString("Magene %1").arg(prod);
+            }
+        } else if (manu == 115) {
+            // igpsport
+            switch(prod) {
+                case -1: return "igpsport";
+                default: return QString("igpsport %1").arg(prod);
+            }
+        } else if (manu == 258) {
+            // Lezyne
+            switch (prod) {
+                case -1: return "Lezyne";
+                case 4: return "Lezyne Super GPS";
+                case 6: return "Lezyne Micro-GPS";
+                case 11: return "Lezyne MegaXL";
+                default: return QString("Lezyne %1").arg(prod);
             }
         } else if (manu == 260) {
             // Zwift
             return "Zwift";
-        } else if (manu == 267) {
+        } else if (manu == 263) {
+            // Favero
+            switch (prod) {
+                case -1: return "Favero";
+                default: return QString("Favero %1").arg(prod);
+            }
+        }else if (manu == 267) {
             // Bryton
             return "Bryton";
         } else if (manu == 282) {
@@ -495,6 +518,20 @@ struct FitFileReaderState
         } else if (manu == 284) {
             // Rouvy
             return "Rouvy";
+        } else if (manu == 289) {
+            // Hammerhead
+            // currently not setting product ids
+            switch (prod) {
+                case -1: return "Hammerhead";
+                default: return QString("Hammerhead %1").arg(prod);
+            }
+        } else if (manu == 255) {
+            // Development
+            switch (prod) {
+                case -1: return "Development";
+                case 0: return "Development";
+                default: return QString("Development %1").arg(prod);
+            }
         } else {
             QString name = "Unknown FIT Device";
             return name + QString(" %1:%2").arg(manu).arg(prod);
@@ -565,11 +602,29 @@ struct FitFileReaderState
     QString getNameForExtraNative(int native_num) {
         switch (native_num) {
 
+            case 40: // STANCE_TIME_PERCENT
+                    return "STANCETIMEPERCENT"; // Stance Time Percent
+
+            case 42: // ACTIVITY_TYPE
+                    return "ACTIVITYTYPE"; // Activity Type
+
             case 47: // COMBINED_PEDAL_SMOOTHNES
                     return "COMBINEDSMOOTHNESS"; //Combined Pedal Smoothness
 
             case 81: // BATTERY_SOC
                     return "BATTERYSOC";
+
+            case 83: // VERTICAL_RATIO
+                    return "VERTICALRATIO"; // Vertical Ratio
+
+            case 85: // STEP_LENGTH
+                    return "STEPLENGTH"; // Step Length
+
+            case 90: // PERFORMANCE_CONDITION
+                    return "PERFORMANCECONDITION"; // Performance Contition
+
+            case 108: // to confirm : RESPIRATIONRATE
+                return "RESPIRATIONRATE"; // Performance Contition
 
             default:
                     return QString("FIELD_%1").arg(native_num);
@@ -579,9 +634,19 @@ struct FitFileReaderState
     float getScaleForExtraNative(int native_num) {
         switch (native_num) {
 
+            case 40: // STANCE_TIME_PERCENT
+            case 83: // VERTICAL_RATIO
+                    return 100.0;
+
+            case 85: // STEP_LENGTH
+                    return 10.0;
+
             case 47: // COMBINED_PEDAL_SMOOTHNES
             case 81: // BATTERY_SOC
                     return 2.0;
+
+            case 108: // RESPIRATIONRATE
+                return 100.0;
 
             default:
                     return 1.0;
@@ -668,6 +733,62 @@ struct FitFileReaderState
             }
         }
         rideFile->setDeviceType(getManuProd(manu, prod));
+    }
+
+
+    void decodePhysiologicalMetrics(const FitDefinition &def, int,
+                                    const std::vector<FitValue>& values) {
+        int i = 0;
+
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 7:   // METmax: 1 METmax = VO2max * 3.5, scale 65536
+                    rideFile->setTag("VO2max detected", QString::number(round(value / 65536.0 * 3.5 * 10.0) / 10.0));
+                    break;
+
+                case 4:   // Aerobic Training Effect, scale 10
+                    rideFile->setTag("Aerobic Training Effect", QString::number(value/10.0));
+                    break;
+
+                case 20:   // Anaerobic Training Effect, scale 10
+                    rideFile->setTag("Anaerobic Training Effect", QString::number(value/10.0));
+                    break;
+
+                case 9:   // Recovery Time, minutes
+                    rideFile->setTag("Recovery Time", QString::number(round(value/60.0)));
+                    break;
+
+                case 17:   // Performance Condition
+                    rideFile->setTag("Performance Condition", QString::number(value));
+                    break;
+
+                case 14:   // If watch detected Running Lactate Threshold Heart Rate, bpm
+                    if(rideFile->isRun() && value > 0){
+                        rideFile->setTag("LTHR detected", QString::number(value));
+                    }
+                    break;
+
+                case 15:   // If watch detected Running Lactate Threshold Speed, m/s
+                    if(rideFile->isRun() && value > 0){
+                        rideFile->setTag("LTS detected", QString::number(value/100.0));
+                    }
+                    break;
+
+
+                default: ; // do nothing
+            }
+
+
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
+                printf("decodePhysiologicalMetrics  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
+            }
+        }
     }
 
     void decodeSession(const FitDefinition &def, int,
@@ -1266,14 +1387,17 @@ struct FitFileReaderState
 
     void decodeLap(const FitDefinition &def, int time_offset,
                    const std::vector<FitValue>& values) {
-        time_t time = 0;
+        time_t iniTime;
         if (time_offset > 0)
-            time = last_time + time_offset;
+            iniTime = last_time + time_offset;
         else
-            time = last_time;
+            iniTime = last_time;
+
+        time_t time = 0;
         int i = 0;
         time_t this_start_time = 0;
         double total_distance = 0.0;
+        double total_elapsed_time = 0.0;
 
         QString lap_name;
 
@@ -1306,8 +1430,12 @@ struct FitFileReaderState
                 case 9:
                     total_distance = value.v / 100000.0;
                     break;
+                case 7:
+                    total_elapsed_time = value.v / 1000.0;
+                    break;
                 case 24:
                     //lap_trigger = value.v;
+
 
                 // other data (ignored at present):
                 case 254: // lap nbr
@@ -1315,7 +1443,7 @@ struct FitFileReaderState
                 case 4: // start_position_lon
                 case 5: // end_position_lat
                 case 6: // end_position_lon
-                case 7: // total_elapsed_time = value.v / 1000.0;
+
                 case 8: // total_timer_time
                 case 10: // total_cycles
                 case 11: // total calories
@@ -1336,6 +1464,11 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
+
+        if (time == 0 && total_elapsed_time > 0) {
+            time = iniTime + total_elapsed_time - 1;
+        }
+
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -1344,7 +1477,8 @@ struct FitFileReaderState
                 errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
                 return;
             }
-        }
+        } 
+
         if (isLapSwim) {
             // Fill empty laps due to false starts or pauses in some devices
             // s.t. Garmin 910xt - cap to avoid crashes on bad data
@@ -1392,7 +1526,7 @@ struct FitFileReaderState
         if (time_offset > -1)
             time = last_reference_time + time_offset; // was last_time + time_offset
 
-        double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = RideFile::NA;
+        double alt = last_altitude, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = RideFile::NA;
         double kph = 0, temperature = RideFile::NA, watts = 0, slope = 0, headwind = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
 
@@ -1486,6 +1620,7 @@ struct FitFileReaderState
                             lngi = value;
                             break;
                     case 2: // ALTITUDE
+                    case 78:// ENHANCED ALTITUDE
                             if (!native_profile && field.deve_idx>-1)
                                 alt = deve_value;
                             else
@@ -1505,6 +1640,7 @@ struct FitFileReaderState
                             km = value / 100000.0;
                             break;
                     case 6: // SPEED
+                    case 73:// ENHANCED SPEED
                             kph = value * 3.6 / 1000.0;
                             break;
                     case 7: // POWER
@@ -1537,8 +1673,9 @@ struct FitFileReaderState
                                 rvert = value / 100.0f;
                              break;
 
-                    //case 40: // GROUND CONTACT TIME PERCENT
-                             //break;
+                    case 40: // GROUND CONTACT TIME PERCENT
+                             native_num = -1;
+                             break;
 
                     case 41: // GROUND CONTACT TIME
                              if (!native_profile && field.deve_idx>-1)
@@ -1547,10 +1684,9 @@ struct FitFileReaderState
                                 rcontact = value / 10.0f;
                              break;
 
-                    //case 42: // ACTIVITY_TYPE
-                    //         // TODO We should know/test value for run
-                    //         run = true;
-                    //         break;
+                    case 42: // ACTIVITY_TYPE
+                             native_num = -1;
+                             break;
 
                     case 43: // LEFT_TORQUE_EFFECTIVENESS
                              leftTorqueEff = value / 2.0;
@@ -1602,26 +1738,63 @@ struct FitFileReaderState
                     case 69: // ? Left Power Phase ?
                              leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopDeathCenter>360) {
+                                 leftTopDeathCenter = 0;
+                             }
+                             if (leftBottomDeathCenter>360) {
+                                 leftBottomDeathCenter = 0;
+                             }
                              break;
                     case 70: // ? Left Peak Phase  ?
                              leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopPeakPowerPhase>360) {
+                                 leftTopPeakPowerPhase = 0;
+                             }
+                             if (leftBottomPeakPowerPhase>360) {
+                                 leftBottomPeakPowerPhase = 0;
+                             }
                              break;
                     case 71: // ? Right Power Phase ?
                              rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopDeathCenter>360) {
+                                 rightTopDeathCenter = 0;
+                             }
+                             if (rightBottomDeathCenter>360) {
+                                 rightBottomDeathCenter = 0;
+                             }
                              break;
                     case 72: // ? Right Peak Phase  ?
                              rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopPeakPowerPhase>360) {
+                                 rightTopPeakPowerPhase = 0;
+                             }
+                             if (rightBottomPeakPowerPhase>360) {
+                                 rightBottomPeakPowerPhase = 0;
+                             }
+                             break;
+                    case 83: // VERTICAL_RATIO
+                             native_num = -1;
                              break;
                     case 84: // Left right balance
                              lrbalance = value/100.0;
+                             break;
+                    case 85: // STEP_LENGTH
+                             native_num = -1;
                              break;
 
                     case 87: // ???
                              break;
 
+                    case 90: // PERFORMANCE_CONDITION
+                             native_num = -1;
+                             break;
 
                     default:
                             unknown_record_fields.insert(native_num);
@@ -1862,6 +2035,7 @@ struct FitFileReaderState
 
         last_time = time;
         last_distance = km;
+        last_altitude = alt;
 
         if (p_deve != NULL) {
             p_deve->secs = secs;
@@ -2705,6 +2879,11 @@ struct FitFileReaderState
                         RideFile::SeriesType series = getSeriesForNative(field.num);
                         nativeName = rideFile->symbolForSeries(series);
                     }
+                    if (field.deve_idx>-1) {
+                        QString key = QString("%1.%2").arg(field.deve_idx).arg(field.num);
+                        FitDeveField deveField = local_deve_fields[key];
+                        nativeName = deveField.name.c_str();
+                    }
                     printf( " field: type=%d num=%d %s size=%d(%d) ",
                         field.type, field.num, nativeName.toStdString().c_str(), field.size, size);
                     if (value.type == SingleValue) {
@@ -2715,6 +2894,8 @@ struct FitFileReaderState
                     }
                     else if (value.type == StringValue)
                         printf( "value=%s\n", value.s.c_str() );
+                    else if (value.type == FloatValue)
+                        printf( "value=%f\n", value.f );
                     else if (value.type == ListValue) {
                         printf( "values=");
                         for (int i=0;i<value.list.count();i++) {
@@ -2768,6 +2949,9 @@ struct FitFileReaderState
                     decodeDeveloperFieldDescription(def, time_offset, values);
                     break;
 
+                case 140: /* undocumented Garmin/Firstbeat specific metrics */
+                    decodePhysiologicalMetrics(def, time_offset, values);
+                    break;
 
                 case 1: /* capabilities, device settings and timezone */ break;
                 case 2: decodeDeviceSettings(def, time_offset, values); break;
@@ -2817,7 +3001,6 @@ struct FitFileReaderState
                 case 125: /* unknown */
                 case 131: /* cadence zone */
 
-                case 140: /* unknown */
                 case 141: /* unknown */
                 case 145: /* memo glob */
                 case 147: /* equipment (undocumented) = sensors presets (sensor name, wheel circumference, etc.)  ; see details below: */
@@ -3231,7 +3414,10 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     write_int32(array, value, true);
 
     // 6. sport
-    write_int8(array, 2);
+    // Export as bike, run or swim, default sport is bike. 
+    // todo: support all sports based on tag "Sport"
+    int sport = ride->isRun() ? 1 : ride->isSwim() ? 5 : 2;
+    write_int8(array, sport);
 
     // 7. sub sport
     write_int8(array, 0);
@@ -3427,7 +3613,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         num_fields ++;
         write_field_definition(fields, 3, 1, 2); // heart_rate (3)
     }
-    if ( withCad && ride->areDataPresent()->cad ) {
+    if ( withCad && (ride->areDataPresent()->cad || (ride->isRun() && ride->areDataPresent()->rcad)) ) {
         num_fields ++;
         write_field_definition(fields, 4, 1, 2); // cadence (4)
     }
@@ -3448,7 +3634,7 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         num_fields ++;
         write_field_definition(fields, 13, 1, 2); // temperature (13)
     }
-    if ( (type&2)==1 ) {
+    if ( (type&2)==2 ) {
         num_fields ++;
         write_field_definition(fields, 30, 1, 2); // left_right_balance (30)
     }
@@ -3500,6 +3686,10 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( withCad && ride->areDataPresent()->cad ) {
             write_int8(ridePoint, point->cad);
         }
+        // In runs, cadence is saved in 'rcad' instead of 'cad'
+        else if (withCad && ride->isRun() && ride->areDataPresent()->rcad){
+            write_int8(ridePoint, point->rcad);
+        }
         if ( ride->areDataPresent()->km ) {
             write_int32(ridePoint, point->km * 100000, true);
         }
@@ -3514,7 +3704,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( (type&1)==1) {
             write_int8(ridePoint, point->temp);
         }
-        if ( (type&2)==1 ) {
+        if ( (type&2)==2 ) {
             write_int8(ridePoint, point->lrbalance);
         }
 

@@ -222,6 +222,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.estimateDuration;
         out<<metric.estimateDuration_units;
         out<<metric.wpk;
+        out<<metric.run;
         out<<metric.stressType;
         out<<metric.units;
         out<<metric.formula;
@@ -229,6 +230,10 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.datafilter;
         out<<metric.measureGroup;
         out<<metric.measureField;
+        out<<metric.tests;
+        out<<metric.perfs;
+        out<<metric.submax;
+        out<<metric.perfSymbol;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -338,6 +343,9 @@ while(counter-- && !in.atEnd()) {
         if (version >= 11) {
             in >> m.wpk;
         }
+        if (version >= 20) {
+            in >> m.run;
+        }
         if (version >= 12) {
             in >> m.stressType;
         }
@@ -358,6 +366,13 @@ while(counter-- && !in.atEnd()) {
             in >> m.measureGroup;
             in >> m.measureField;
         }
+        if (version >= 18) {
+            in >> m.tests;
+            in >> m.perfs;
+        }
+        if (version >= 19) in >> m.submax;
+        if (version >= 21) in >> m.perfSymbol;
+
         bool keep=true;
         // check for deprecated things and set keep=false if
         // we don't support this any more !

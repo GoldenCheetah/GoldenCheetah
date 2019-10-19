@@ -224,8 +224,9 @@ RideFile::isRun() const
 bool
 RideFile::isSwim() const
 {
-    // for now we just look at Sport
-    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
+    // for now we just look at Sport or presence of length data for lap swims
+    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim")) ||
+           (getTag("Sport","") == "" && xdata_.value("SWIM", NULL) != NULL);
 }
 
 // compatibility means used in e.g. R so no spaces in names,
@@ -479,7 +480,8 @@ RideFile::formatValueWithUnit(double value, SeriesType series, Conversion conver
     if (series == RideFile::kph && conversion == RideFile::pace)
         return kphToPace(value, useMetricUnits, isSwim);
     else
-        return QString("%1%2").arg(value).arg(unitName(series, context));
+        return QString("%1%2").arg(round(value)).arg(unitName(series, context));
+        //TODO: make the rounding series dependent
 }
 
 void
@@ -678,6 +680,7 @@ QStringList RideFileFactory::suffixes() const
 {
     QStringList returning = readFuncs_.keys();
     returning += "zip";
+    returning += "gz";
     return returning;
 }
 
@@ -2762,7 +2765,7 @@ RideFile::recalculateDerivedSeries(bool force)
 
         for(int i=0; i<hrArray.count(); i++) {
             double x_pred = a1 * x;
-            double v_pred = (a1  * a1 ) * (v+gamma);
+            double v_pred = (a1  * a1 ) * v + gamma;
 
             double z = hrArray[i];
             double c_vc = 2.0f *  b2 * x_pred + b1;

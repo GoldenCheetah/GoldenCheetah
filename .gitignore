@@ -50,4 +50,6 @@ qwt/src/Makefile.Debug
 qwt/textengines/mathml/debug/
 qwt/textengines/mathml/release/
 build.pro.user
+build.pro.user.*
 doc/contrib/WASP Packet Protocol.pdf
+

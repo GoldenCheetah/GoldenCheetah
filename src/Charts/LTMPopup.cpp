@@ -103,6 +103,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     mainLayout->addWidget(notes);
 
     connect(rides, SIGNAL(itemSelectionChanged()), this, SLOT(rideSelected()));
+    connect(rides, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(rideOpen()));
 
 }
 
@@ -367,6 +368,7 @@ LTMPopup::setSummaryHTML(RideItem *item)
     // main totals
     const QStringList totalColumn = QStringList()
         << "workout_time"
+        << "time_recording"
         << "time_riding"
         << (item->isSwim ? "distance_swim" : "total_distance")
         << "total_work"
@@ -511,10 +513,34 @@ LTMPopup::rideSelected()
             metrics->setText(setSummaryHTML(have));
 
             notes->setText(""); //! stop crash (?)
-            notes->setText(have->getText("Notes", ""));
+            // Use calendar text for more information and to allow customization
+            notes->setText(have->getText("Calendar Text", ""));
         }
     }
     resizeEvent(NULL);
+}
+
+void
+LTMPopup::rideOpen()
+{
+    // which ride is selected
+    int index = 0;
+    if (rides->selectedItems().count())
+        index = rides->selectedItems().first()->row();
+
+    // do we have any rides and is the index within bounds
+    if (selected.count() > index) {
+
+        RideItem *have = context->athlete->rideCache->getRide(selected[index]);
+
+        if (have) {
+
+            // Select Activity in Activities view
+            context->notifyRideSelected(have);
+            // Select Activities view
+            context->mainWindow->selectAnalysis();
+        }
+    }
 }
 
 void

@@ -406,8 +406,9 @@ class BikeScore : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        // no zones
-        if (item->context->athlete->zones(item->isRun)==NULL || item->zoneRange < 0) {
+        // run, swim or no zones
+        if (item->isSwim || item->isRun ||
+           !item->context->athlete->zones(item->isRun) || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;

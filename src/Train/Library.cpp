@@ -91,7 +91,7 @@ Library::initialise(QDir home)
 }
 
 void
-Library::importFiles(Context *context, QStringList files)
+Library::importFiles(Context *context, QStringList files, bool forcedialog)
 {
     QStringList videos, workouts, videosyncs;
     MediaHelper helper;
@@ -133,7 +133,7 @@ Library::importFiles(Context *context, QStringList files)
 
     // with only 1 of each max, lets import without any
     // fuss and select the items imported
-    if (videos.count()<=1 && workouts.count() <= 1 && videosyncs.count() <= 1) {
+    if (!forcedialog && videos.count()<=1 && workouts.count() <= 1 && videosyncs.count() <= 1) {
 
         trainDB->startLUW();
 
@@ -205,7 +205,7 @@ Library::importFiles(Context *context, QStringList files)
             if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
 
                 QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                    QString(tr("%1 already exists in workout library: %2")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+                    QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
             }
 
             // still add it, it may noit have been scanned...

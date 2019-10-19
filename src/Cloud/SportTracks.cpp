@@ -430,6 +430,21 @@ SportTracks::readFileCompleted()
             }
         }
 
+        // Add Laps
+        if (ride["laps"].isArray()) {
+            for(int i=0; i<ride["laps"].toArray().count(); i++) {
+                QJsonObject lap = ride["laps"].toArray().at(i).toObject();
+                QDateTime lap_starttime = QDateTime::fromString(lap["start_time"].toString(), Qt::ISODate);
+                double duration = lap["duration"].toDouble();
+                int number = lap["number"].toInt();
+
+                double start = starttime.secsTo(lap_starttime);
+                double stop = start + duration;
+
+                ret->addInterval(RideFileInterval::DEVICE, start, stop, QString("#%1").arg(number));
+            }
+        }
+
         // we now work through the tracks combining them into samples
         // with a common offset (ie, by row, not column).
         int index=0;
@@ -513,7 +528,6 @@ SportTracks::readFileCompleted()
             // update accumulated time and distance
             rolling_secs = add.secs;
             rolling_km = add.km;
-
 
             // don't add blanks
             if (updated) ret->appendPoint(add);

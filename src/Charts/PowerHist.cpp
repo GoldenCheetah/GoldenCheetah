@@ -1712,7 +1712,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
     metricY = totalMetric;
 
     // how big should the array be?
-    double multiplier = pow(10, m->precision());
+    double multiplier = pow(10, validatePrecision(m->precision()));
     double max = 0, min = 0;
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE BELOW

@@ -188,10 +188,10 @@ ErgDBDownloadDialog::downloadFiles()
 
             // get the id
             int id = current->text(6).toInt();
-            QString content = ergdb.getFile(id, 300);
+            QString content = ergdb.getWorkout(id);
 
-            QString filename = workoutDir + "/" + current->text(1) + ".erg";
-            ErgFile *p = ErgFile::fromContent(content, context);
+            QString filename = workoutDir + "/" + current->text(1) + ".erg2";
+            ErgFile *p = ErgFile::fromContent2(content, context);
 
             // open success?
             if (p->isValid()) {

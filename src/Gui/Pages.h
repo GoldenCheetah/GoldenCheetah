@@ -133,7 +133,6 @@ class GeneralPage : public QWidget
         QLineEdit *rDirectory;
         QLabel *rLabel;
 #endif
-
         QLabel *langLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;

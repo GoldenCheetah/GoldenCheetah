@@ -31,6 +31,21 @@
 #include <QScrollArea>
 #include <QPushButton>
 
+class Performance {
+
+    public:
+        Performance(QDate wc, double power, double duration, double powerIndex) :
+            weekcommencing(wc), power(power), duration(duration), powerIndex(powerIndex), submaximal(false) {}
+
+        QDate when, weekcommencing;
+        double power, duration, powerIndex;
+        bool submaximal; // set by the filter, user can choose to include.
+        bool run; // indicates a Running with power performance
+
+        double x; // different units, but basically when as a julian day
+};
+
+class Banister;
 class Estimator : public QThread {
 
     Q_OBJECT
@@ -49,18 +64,26 @@ class Estimator : public QThread {
         // cancel any pending/running and kick off with 15 sec delay
         void refresh();
 
+        // filter marks performances as submax
+        QList<Performance> filter(QList<Performance>);
+
     public slots:
 
         // setup and run estimators
         void calculate();
 
+        // get a performance for a given day
+        Performance getPerformanceForDate(QDate date, bool wantrun);
+
     protected:
 
         friend class ::Athlete;
+        friend class ::Banister;
 
         Context *context;
         QMutex lock;
         QList<PDEstimate> estimates;
+        QList<Performance> performances;
         QVector<RideItem*> rides; // worklist
         QTimer singleshot;
 

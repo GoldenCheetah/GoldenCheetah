@@ -24,6 +24,8 @@
 #include "RideCacheModel.h"
 #include "Specification.h"
 
+#include "Banister.h"
+
 #ifndef ESTIMATOR_DEBUG
 #define ESTIMATOR_DEBUG false
 #endif
@@ -162,16 +164,21 @@ Estimator::calculate()
 void
 Estimator::run()
 {
-    printd("Estimator starts.\n");
+  for (int i = 0; i < 2; i++) {
+
+    bool isRun = (i > 0); // two times: one for rides and other for runs
+
+    printd("%s Estimates start.\n", isRun ? "Run" : "Bike");
 
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
-    // bests data from the previous 12 weeks
-    RollingBests bests(12);
-    RollingBests bestsWPK(12);
+    // bests data from the previous 6 weeks
+    RollingBests bests(6);
+    RollingBests bestsWPK(6);
 
     // clear any previous calculations
     QList<PDEstimate> est;
+    QList<Performance> perfs;
 
     // we do this by aggregating power data into bests
     // for each month, and having a rolling set of 3 aggregates
@@ -183,8 +190,8 @@ Estimator::run()
     // what dates have any power data ?
     foreach(RideItem *item, rides) {
 
-        // has power, but not running
-        if (item->present.contains("P") && !item->isRun) {
+        // has power and matches sport
+        if (item->present.contains("P") && item->isRun == isRun) {
 
             // no date set
             if (from == QDate()) from = item->dateTime.date();
@@ -198,27 +205,29 @@ Estimator::run()
         }
     }
 
-    // if we don't have 2 rides or more then skip this but add a blank estimate
+    // if we don't have 2 rides or more then skip this
     if (from == to || to == QDate()) {
-        printd("Estimator ends, less than 2 rides with power data.\n");
-        est << PDEstimate();
-        return;
+        printd("%s Estimator ends, less than 2 rides with power data.\n", isRun ? "Run" : "Bike");
+        continue;
     }
 
     // set up the models we support
     CP2Model p2model(context);
     CP3Model p3model(context);
+    ExtendedModel extmodel(context);
+#if 0 // disable until model fitting errors are fixed (!!!)
     WSModel wsmodel(context);
     MultiModel multimodel(context);
-    ExtendedModel extmodel(context);
+#endif
 
     QList <PDModel *> models;
     models << &p2model;
     models << &p3model;
-    models << &multimodel;
     models << &extmodel;
+#if 0 // disable until model fitting errors are fixed (!!!)
+    models << &multimodel;
     models << &wsmodel;
-
+#endif
 
     // from has first ride with Power data / looking at the next 7 days of data with Power
     // calculate Estimates for all data per week including the week of the last Power recording
@@ -240,8 +249,33 @@ Estimator::run()
         // months is a rolling 3 months sets of bests
         QVector<float> wpk; // for getting the wpk values
 
-        // don't include RUNS ..................................................vvvvv
-        bests.addBests(RideFileCache::meanMaxPowerFor(context, wpk, begin, end, false));
+        // include only rides or runs .............................................................vvvvv
+        QVector<QDate> weekdates;
+        QVector<float> week = RideFileCache::meanMaxPowerFor(context, wpk, begin, end, &weekdates, isRun);
+
+        // lets extract the best performance of the week first.
+        // only care about performances between 3-20 minutes.
+        Performance bestperformance(end,0,0,0);
+        for (int t=240; t<week.length() && t<3600; t++) {
+
+            double p = double(week[t]);
+            if (week[t]<=0) continue;
+
+            double pix = powerIndex(p, t, isRun);
+            if (pix > bestperformance.powerIndex) {
+                bestperformance.duration = t;
+                bestperformance.power = p;
+                bestperformance.powerIndex = pix;
+                bestperformance.when = weekdates[t];
+                bestperformance.run = isRun;
+
+                // for filter, saves having to convert as we go
+                bestperformance.x = bestperformance.when.toJulianDay();
+            }
+        }
+        if (bestperformance.duration > 0) perfs << bestperformance;
+
+        bests.addBests(week);
         bestsWPK.addBests(wpk);
 
         // we now have the data
@@ -253,6 +287,7 @@ Estimator::run()
             model->setData(bests.aggregate());
             model->saveParameters(add.parameters); // save the computed parms
 
+            add.run = isRun;
             add.wpk = false;
             add.from = begin;
             add.to = end;
@@ -302,13 +337,114 @@ Estimator::run()
         date = date.addDays(7);
     }
 
-    // add a dummy entry if we have no estimates to stop constantly trying to refresh
-    if (est.count() == 0)  est << PDEstimate();
+    // filter performances
+    perfs = filter(perfs);
 
     // now update them
     lock.lock();
-    estimates = est;
+    if (i == 0) {
+        estimates = est;
+        performances = perfs;
+    } else {
+        estimates.append(est);
+        performances.append(perfs);
+    }
     lock.unlock();
 
-    printd("Estimates end\n");
+    // debug dump peak performances
+    foreach(Performance p, performances) {
+        printd("%s %f Peak: %f for %f secs on %s\n", p.run ? "Run" : "Bike", p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
+    }
+    printd("%s Estimates end.\n", isRun ? "Run" : "Bike");
+  }
+}
+
+Performance Estimator::getPerformanceForDate(QDate date, bool wantrun)
+{
+    // serial search is ok as low numberish - always takes first as should be no dupes
+    foreach(Performance p, performances) {
+        if (p.when == date && p.run == wantrun) return p;
+    }
+    return Performance(QDate(),0,0,0);
+}
+
+//
+// Filter will mark performances as submaximal but does not remove them
+//
+
+// fast mechanism for vector without needing to calculate angles
+// basic idea stolen from the graham's scan algorithm (it may also predate that)
+// see: https://en.wikipedia.org/wiki/Graham_scan
+// 0 means colinear (straight), +ve means left turn -ve means right turn
+static double crossProduct(const Performance &origin, const Performance &A, const Performance &B)
+{
+    return (A.x - origin.x) * (B.powerIndex - origin.powerIndex) - (A.powerIndex - origin.powerIndex) * (B.x - origin.x);
+}
+
+//
+// Adapted convex hull, but only upper hull using monotone search
+// search ahead is limited too, so we do keep intermediate points in the hull
+//
+QList<Performance>
+Estimator::filter(QList<Performance> perfs)
+{
+    QList<Performance> returning;
+
+    if (perfs.length() < 3) return perfs;
+
+    int index = 2;
+    Performance origin = perfs[0];
+    Performance last = perfs[1];
+    returning << origin;
+    returning << last;
+
+    while (index< perfs.length()) {
+
+        // you get the first 2 regardless, we could tidy up later (todo)
+        if (index < 2) returning << perfs[index];
+        else {
+            // is the next point a left or right turn?
+            double cross = crossProduct(origin, last, perfs[index]);
+
+            // is it higher? no brainer
+            if (perfs[index].powerIndex > perfs[index-1].powerIndex) {  // collinear or better
+                returning << perfs[index];
+                origin=last;
+                last=perfs[index];
+            } else {
+
+                // worse, so lets look at the next 4 points and
+                // pick whichever is best
+                double max=cross;
+                int chosen=0;
+                for (int k=1; k<8 && index+k < perfs.length(); k++) {
+                    cross = crossProduct(origin, last, perfs[index+k]);
+                    // 2% or higher -or- heading in right direction
+                    if (cross >= 0) {
+                        chosen=k;    // use this one and stop looking
+                        break;
+                    } else if (cross > max) {
+                        max = cross;
+                        chosen=k;
+                    }
+                }
+
+                // skip forward to chosen marking submax
+                for(int j=0; j<chosen && (index+j) < perfs.length(); j++) {
+                    perfs[index+j].submaximal = true;
+                    returning << perfs[index+j];
+                }
+
+                // choose this one
+                //origin = last; stick to last one that was higher
+                last = perfs[index+chosen];
+                returning << last;
+                index += chosen;
+            }
+        }
+        // onto "next"
+        index++;
+     }
+
+    return returning;
 }

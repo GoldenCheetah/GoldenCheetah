@@ -32,14 +32,14 @@ HrvMeasure::getFingerprint() const
 {
     quint64 x = 0;
 
-    x += hr;
-    x += avnn;
-    x += sdnn;
-    x += rmssd;
-    x += pnn50;
-    x += lf;
-    x += hf;
-    x += recovery_points;
+    x += 1000.0 * hr;
+    x += 1000.0 * avnn;
+    x += 1000.0 * sdnn;
+    x += 1000.0 * rmssd;
+    x += 1000.0 * pnn50;
+    x += 1000.0 * lf;
+    x += 1000.0 * hf;
+    x += 1000.0 * recovery_points;
 
     QByteArray ba = QByteArray::number(x);
 

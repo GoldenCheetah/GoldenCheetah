@@ -66,11 +66,13 @@ class CPPlot : public QwtPlot
         void setRide(RideItem *rideItem);
         void setDateRange(const QDate &start, const QDate &end, bool stale=false);
         void setShowPercent(bool x);
+        void setShowPowerIndex(bool x);
         void setShowTest(bool x);
         void setShowBest(bool x);
         void setFilterBest(bool x);
         void setShowHeat(bool x);
         void setShowEffort(bool x);
+        void setShowPP(bool x);
         void setShowHeatByDate(bool x);
         void setShowDelta(bool delta, bool percent);
         void setShadeMode(int x);
@@ -83,7 +85,7 @@ class CPPlot : public QwtPlot
         void setPlotType(int index);
         void showXAxisLinear(bool x);
         void setModel(int sanI1, int sanI2, int anI1, int anI2,
-                      int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant, int fit, int fitdata);
+                      int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant, int fit, int fitdata, bool modelDecay);
 
         // getters
         QVector<double> getBests();
@@ -131,6 +133,7 @@ class CPPlot : public QwtPlot
         void plotTests(RideItem *);
         void plotEfforts();
         void plotModel();
+        void plotPowerProfile();
         void plotLinearWorkModel();
         void plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline); // for compare date range models
         void updateModelHelper();   // overlay window with parameter estimates from fit
@@ -150,6 +153,7 @@ class CPPlot : public QwtPlot
         // Models and Extended Models
         int model, modelVariant;
         int fit, fitdata;
+        bool modelDecay;
         double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
 
         // Data and State
@@ -172,9 +176,11 @@ class CPPlot : public QwtPlot
         bool showTest;
         bool showBest;
         bool filterBest;
+        bool showPowerIndex;
         bool showPercent;
         bool showHeat;
         bool showEffort;
+        bool showPP;
         bool showHeatByDate;
         bool showDelta; // only in compare mode
         bool showDeltaPercent; // only in compare mode
@@ -186,6 +192,7 @@ class CPPlot : public QwtPlot
         QList<QwtPlotCurve*> bestsCurves;
         QList<QwtPlotCurve*> centileCurves;
         QList<QwtPlotCurve*> intervalCurves;
+        QList<QwtPlotCurve*> profileCurves;
 
         QList<QwtPlotCurve*> modelCurves;
         QList<QwtPlotIntervalCurve*> modelIntCurves;

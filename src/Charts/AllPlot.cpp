@@ -492,6 +492,38 @@ AllPlotObject::AllPlotObject(AllPlot *plot, QList<UserData*> user) : plot(plot)
 
 }
 
+QVector<QwtZone>
+AllPlotObject::parseZoneString(QString zstring)
+{
+    QVector<QwtZone> returning;
+
+    // we don't worry none about the metric
+    if (zstring.contains(":")) {
+        // split out the metric piece
+        QStringList toks=zstring.split(":");
+        if (toks.count()>=2) zstring=toks[1];
+    }
+
+    // split zstring into ; delimetered tokens
+    foreach(QString entry, zstring.split(";")) {
+
+        // need value, colorname
+        QStringList toks = entry.split(",");
+        if (toks.count()!=2) continue;
+        bool ok;
+        double lim=toks[0].toDouble(&ok);
+        if (!ok) continue;
+        QColor col;
+        col.setNamedColor(toks[1]);
+        if (!col.isValid()) continue;
+
+        // well that worked!
+        returning << QwtZone(lim,col);
+
+    }
+    return returning;
+}
+
 void 
 AllPlotObject::setUserData(QList<UserData*>user)
 {
@@ -525,12 +557,16 @@ AllPlotObject::setUserData(QList<UserData*>user)
         add.color = userdata->color;
         add.color.setAlpha(200);
 
+        // set zones
+        QVector<QwtZone> zones = parseZoneString(userdata->zstring);
+        if (zones.count()>0) add.curve->setZones(zones);
+
         QPen pen;
         pen.setWidth(1.0);
         pen.setColor(userdata->color);
         add.curve->setPen(pen);
 
-        if (plot->fill) {
+        if (plot->fill || zones.count()>0) {
             QColor p = add.color;
             p.setAlpha(64);
             add.curve->setBrush(QBrush(p));
@@ -2367,6 +2403,7 @@ AllPlot::recalc(AllPlotObject *objects)
     for(int k=0; k<objects->U.count(); k++) {
         if (!objects->U[k].array.empty()) {
             objects->U[k].curve->setSamples(xaxis.data() + startingIndex, objects->U[k].smooth.data() + startingIndex, totalPoints);
+            //XXXXHEREXXX
         }
     }
 
@@ -3358,6 +3395,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     int points = stopidx - startidx + 1; // e.g. 10 to 12 is 3 points 10,11,12, so not 12-10 !
     for(int k=0; k<standard->U.count(); k++) standard->U[k].curve->setSamples(xaxis,smoothU[k], points);
+            //XXXXHEREXXX
     standard->hrvCurve->setSamples(plot->standard->smoothHrv_time.data(),
                    plot->standard->smoothHrv.data(),
                    plot->standard->smoothHrv.count());
@@ -5150,6 +5188,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         if (!object->U[k].smooth.empty()) {
 
             standard->U[k].curve->setSamples(xaxis.data(), object->U[k].smooth.data(), totalPoints);
+            //XXXXHEREXXX
             standard->U[k].curve->attach(this);
             standard->U[k].curve->setVisible(true);
         }

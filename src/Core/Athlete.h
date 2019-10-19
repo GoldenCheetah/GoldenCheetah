@@ -62,6 +62,7 @@ class Tab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;
+class Banister;
 
 class Athlete : public QObject
 {
@@ -103,13 +104,17 @@ class Athlete : public QObject
         CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
-        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, bool run);
         QList<PDEstimate> getPDEstimates();
 
         // PMC Data
         PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
         PMCData *getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsDays = -1, int ltsDays = -1); // no Specification used!
         QMap<QString, PMCData*> pmcData; // all the different PMC series
+
+        // Banister Data
+        Banister *getBanisterFor(QString metricName, QString perfMetricName, int t1, int t2); // t1/t2 not used yet
+        QMap<QString, Banister*> banisterData;
 
         // athlete measures
         // note ride can override if passed
@@ -188,6 +193,7 @@ class AthleteDirectoryStructure : public QObject {
             QDir quarantine() { return QDir(myhome.absolutePath()+"/"+athlete_quarantine);}
             QDir planned() { return QDir(myhome.absolutePath()+"/"+athlete_planned);}
             QDir snippets() { return QDir(myhome.absolutePath()+"/"+athlete_snippets);}
+            QDir media() { return QDir(myhome.absolutePath()+"/"+athlete_media);}
             QDir root() { return myhome; }
 
             // supporting functions to work with the subDirs
@@ -214,6 +220,7 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_quarantine;
             QString athlete_planned;
             QString athlete_snippets;
+            QString athlete_media;
 
 };
 

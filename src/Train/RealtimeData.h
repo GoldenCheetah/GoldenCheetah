@@ -44,7 +44,8 @@ public:
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
                       LeftTorqueEffectiveness, RightTorqueEffectiveness,
                       LeftPedalSmoothness, RightPedalSmoothness, Slope, 
-                      LapDistance, LapDistanceRemaining, ErgTimeRemaining };
+                      LapDistance, LapDistanceRemaining, ErgTimeRemaining,
+                      Latitude, Longitude, Altitude };
 
     typedef enum dataseries DataSeries;
 
@@ -85,6 +86,9 @@ public:
     void setLPS(double);
     void setRPS(double);
     void setTorque(double);
+    void setLatitude(double);
+    void setLongitude(double);
+    void setAltitude(double);
 
     const char *getName() const;
 
@@ -119,6 +123,9 @@ public:
     double getLPS() const;
     double getRPS() const;
     double getTorque() const;
+    double getLatitude() const;
+    double getLongitude() const;
+    double getAltitude() const;
 
     void setTrainerStatusAvailable(bool status);
     bool getTrainerStatusAvailable() const;
@@ -144,6 +151,7 @@ private:
     double smo2, thb;
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
     double torque; // raw torque data for calibration display
+    double latitude, longitude, altitude;
 
     // derived data
     double distance;

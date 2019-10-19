@@ -51,10 +51,8 @@ static QString protect(const QString string)
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const QString string)
 {
-    QString string2 = QString::fromLocal8Bit(string.toLatin1().data());
-
     // this is a quoted string
-    QString s = string2.mid(1,string2.length()-2);
+    QString s = string.mid(1,string.length()-2);
 
     // now un-escape the control characters
     s.replace("\\t", "\t");  // tab

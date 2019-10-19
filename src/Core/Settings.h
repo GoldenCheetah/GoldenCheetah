@@ -53,7 +53,7 @@
 
 //Nokia
 #ifndef GC_NOKIA_CLIENT_ID
-#define GC_NOKIA_CLIENT_ID    "Not defined"
+#define GC_NOKIA_CLIENT_ID    "eaa338e1f64bcdb8579d21550df661c84d1d28e2053c5d0ede4600c1ebc8b6cd"
 #endif
 
 // Dropbox id
@@ -133,7 +133,6 @@
 
 // Location of Python Installation - follows PYTHONHOME semantics
 #define GC_PYTHON_HOME                       "<system>pythonhome"
-
 
 // --------------------------------------------------------------------
 // Global Properties - Stored in "root" of the active Athlete Directory

@@ -175,15 +175,16 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     sport = new QLineEdit(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"), this);
     notes = new QTextEdit(this);
+    notes->setAcceptRichText(false);
 
     // Set completer for Sport and Workout Code fields
     RideMetadata *rideMetadata = context->athlete->rideMetadata();
     if (rideMetadata) {
         foreach (FieldDefinition field, rideMetadata->getFields()) {
             if (field.name == "Sport")
-                sport->setCompleter(field.getCompleter(this));
+                sport->setCompleter(field.getCompleter(this, context->athlete->rideCache));
             else if (field.name == "Workout Code")
-                wcode->setCompleter(field.getCompleter(this));
+                wcode->setCompleter(field.getCompleter(this, context->athlete->rideCache));
         }
     }
 
@@ -476,7 +477,7 @@ ManualRideDialog::okClicked()
     // basic metadata
     rideFile->setTag("Sport", sport->text());
     rideFile->setTag("Workout Code", wcode->text());
-    rideFile->setTag("Notes", notes->toPlainText());
+    rideFile->setTag("Notes", notes->document()->toPlainText());
 
     // average metrics
     if (avgBPM->value()) {

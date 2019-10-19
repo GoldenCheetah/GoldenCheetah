@@ -243,7 +243,7 @@ void QwtPlotTextLabel::draw( QPainter *painter,
    \param rect Canvas rectangle with margins subtracted
    \param textSize Size required to draw the text
 
-   \return A rectangle aligned according the the alignment flags of
+   \return A rectangle aligned according the alignment flags of
            the text.
 
    \sa setMargin(), QwtText::renderFlags(), QwtText::textSize()

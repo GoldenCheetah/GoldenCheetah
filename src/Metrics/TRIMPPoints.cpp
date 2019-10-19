@@ -337,11 +337,6 @@ class SessionRPE : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
-        if (!item->context->athlete->hrZones(item->isRun) || item->hrZoneRange < 0) {
-            setValue(RideFile::NIL);
-            return;
-        }
-
         // use RPE value in ride metadata
         double rpe = item->getText("RPE", "0.0").toDouble();
 

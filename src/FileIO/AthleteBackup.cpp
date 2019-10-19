@@ -49,6 +49,7 @@ AthleteBackup::AthleteBackup(QDir athleteHome)
     sourceFolderList.append(athleteDirs->config());
     sourceFolderList.append(athleteDirs->calendar());
     sourceFolderList.append(athleteDirs->workouts());
+    sourceFolderList.append(athleteDirs->media());
 }
 
 AthleteBackup::~AthleteBackup()

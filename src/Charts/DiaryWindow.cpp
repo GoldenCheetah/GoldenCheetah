@@ -42,7 +42,9 @@ DiaryWindow::DiaryWindow(Context *context) :
     QFont bold;
     bold.setPointSize(14);
     bold.setWeight(QFont::Bold);
-    title = new QLabel("", this);
+    title = new QDateEdit(this);
+    title->setDisplayFormat("MMMM yyyy");
+    title->setCurrentSection(QDateTimeEdit::YearSection);
     title->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     title->setFont(bold);
 
@@ -95,6 +97,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(title, SIGNAL(dateChanged(const QDate)), this, SLOT(dateChanged(const QDate)));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
 
@@ -158,8 +161,7 @@ DiaryWindow::rideSelected()
 
     // set the date range to put the current ride in view...
     QDate when = ride->dateTime.date();
-    int month = when.month();
-    int year = when.year();
+    title->setDate(when);
 
     // monthly view updates
     calendarModel->setStale();
@@ -167,10 +169,15 @@ DiaryWindow::rideSelected()
 
     when = when.addDays(Qt::Monday - when.dayOfWeek());
 
-    title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
     repaint();
     next->show();
     prev->show();
+}
+
+void
+DiaryWindow::dateChanged(const QDate &date)
+{
+    calendarModel->setMonth(date.month(), date.year());
 }
 
 void
@@ -180,7 +187,7 @@ DiaryWindow::prevClicked()
     int year = calendarModel->getYear();
     QDate when = QDate(year, month, 1).addDays(-1);
     calendarModel->setMonth(when.month(), when.year());
-    title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
+    title->setDate(when);
 }
 
 void
@@ -190,7 +197,7 @@ DiaryWindow::nextClicked()
     int year = calendarModel->getYear();
     QDate when = QDate(year, month, 1).addMonths(1);
     calendarModel->setMonth(when.month(), when.year());
-    title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
+    title->setDate(when);
 }
 
 bool

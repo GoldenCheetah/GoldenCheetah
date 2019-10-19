@@ -25,6 +25,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "Banister.h"
 #include "RideCache.h"
 #include "RideFileCache.h"
 #include "Settings.h"
@@ -32,6 +33,7 @@
 #include "float.h"
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
+#include "GcOverlayWidget.h"
 
 #ifdef NOWEBKIT
 #include <QWebEngineSettings>
@@ -57,7 +59,7 @@
 #include <qwt_plot_marker.h>
 
 LTMWindow::LTMWindow(Context *context) :
-            GcChartWindow(context), context(context), dirty(true), stackDirty(true), compareDirty(true)
+            GcChartWindow(context), context(context), dirty(true), stackDirty(true), compareDirty(true), firstshow(true)
 {
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
@@ -215,6 +217,7 @@ LTMWindow::LTMWindow(Context *context) :
             << tr("All");
     rGroupBy->setStrings(strings);
     rGroupBy->setValue(0);
+    rGroupBy->setMinimumWidth(100);
 
     revealLayout->addWidget(rGroupBy);
     rData = new QCheckBox(tr("Data Table"), this);
@@ -252,6 +255,49 @@ LTMWindow::LTMWindow(Context *context) :
 
     ltmTool = new LTMTool(context, &settings);
 
+    // the banister overlay
+    QWidget *ban=new QWidget(this);
+    addHelper(tr("Banister Model"), ban);
+
+    QGridLayout *bang= new QGridLayout(ban);
+    bang->setColumnStretch(0, 40);
+    bang->setColumnStretch(1, 30);
+    bang->setColumnStretch(2, 20);
+
+    // interactive elements
+    banCombo = new QComboBox(this);
+    banPerf = new QComboBox(this);
+    banT1 = new QDoubleSpinBox(this);
+    banT2 = new QDoubleSpinBox(this);
+
+    // labels etc
+    ilabel = new QLabel(tr("Impulse Metric"), this);
+    perflabel = new QLabel(tr("Perf. Metric"), this);
+    plabel = new QLabel(tr("Peak"), this);
+    peaklabel = new QLabel(this);
+    peaklabel->setText("296w on 3rd July");
+    t1label1 = new QLabel(tr("Positive decay"), this);
+    t1label2 = new QLabel(tr("days"), this);
+    t2label1 = new QLabel(tr("Negative decay"), this);
+    t2label2 = new QLabel(tr("days"), this);
+    RMSElabel = new QLabel(this);
+    RMSElabel->setText("RMSE 2.9 for 22 tests.");
+
+    // add to layout
+    bang->addWidget(ilabel,0,0);
+    bang->addWidget(banCombo,0,1,1,2,Qt::AlignLeft);
+    bang->addWidget(perflabel,1,0);
+    bang->addWidget(banPerf,1,1,1,2,Qt::AlignLeft);
+    bang->addWidget(plabel, 2,0);
+    bang->addWidget(peaklabel,2,1,1,2,Qt::AlignLeft);
+    bang->addWidget(t1label1,3,0);
+    bang->addWidget(banT1,3,1);
+    bang->addWidget(t1label2,3,2);
+    bang->addWidget(t2label1,4,0);
+    bang->addWidget(banT2,4,1);
+    bang->addWidget(t2label2,4,2);
+    bang->addWidget(RMSElabel,5,0,1,3);
+
     // initialise
     settings.ltmTool = ltmTool;
     settings.groupBy = LTM_DAY;
@@ -274,6 +320,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool->applyButton, SIGNAL(clicked(bool)), this, SLOT(applyClicked(void)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
+    connect(ltmTool->showBanister, SIGNAL(stateChanged(int)), this, SLOT(refresh()));
     connect(rData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
     connect(ltmTool->showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
@@ -309,6 +356,11 @@ LTMWindow::LTMWindow(Context *context) :
     connect(scrollLeft, SIGNAL(clicked()), this, SLOT(moveLeft()));
     connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
 
+    // refresh banister data when combo changes
+    connect(banCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister()));
+    connect(banPerf, SIGNAL(currentIndexChanged(int)), this, SLOT(refreshBanister()));
+    connect(banT1, SIGNAL(valueChanged(double)), this, SLOT(tuneBanister()));
+    connect(banT2, SIGNAL(valueChanged(double)), this, SLOT(tuneBanister()));
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -324,9 +376,194 @@ LTMWindow::hideBasic()
 }
 
 void
+LTMWindow::showBanister(bool relevant)
+{
+    RideMetricFactory &factory = RideMetricFactory::instance();
+
+    if (relevant && banister()) {
+
+        // we reset the combo so lets remember where we were at
+        int remember=0;
+        if (banCombo->count()) remember=banCombo->currentIndex();
+        int rememberPerf=0;
+        if (banPerf->count()) rememberPerf=banPerf->currentIndex();
+
+        QStringList symbols;
+        QStringList perfSymbols;
+
+        // lets setup the widgets
+        banCombo->clear();
+        banPerf->clear();
+        foreach(MetricDetail metricDetail, settings.metrics) {
+            if (metricDetail.type == METRIC_BANISTER) {
+                if (!symbols.contains(metricDetail.symbol)) {
+                    const RideMetric *m = factory.rideMetric(metricDetail.symbol);
+                    if (m) {
+                        symbols << metricDetail.symbol;
+
+                        // bloody TM in bikescore is TEE DEE US
+                        QString name=m->name();
+                        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+                        banCombo->addItem(name, QVariant(metricDetail.symbol));
+                    }
+                }
+                if (!perfSymbols.contains(metricDetail.perfSymbol)) {
+                    const RideMetric *m = factory.rideMetric(metricDetail.perfSymbol);
+                    if (m) {
+                        perfSymbols << metricDetail.perfSymbol;
+                        banPerf->addItem(m->name(), QVariant(metricDetail.perfSymbol));
+                    }
+                }
+            }
+        }
+
+        // go back to remembered value
+        if (remember < banCombo->count()) banCombo->setCurrentIndex(remember);
+        if (rememberPerf < banPerf->count()) banPerf->setCurrentIndex(rememberPerf);
+
+        // now get the metric values etc
+        refreshBanister();
+        overlayWidget->show();
+
+    } else {
+
+        // ignore it
+        overlayWidget->hide();
+    }
+}
+
+bool
+LTMWindow::event(QEvent *event)
+{
+    // nasty nasty nasty hack to move widgets as soon as the widget geometry
+    // is set properly by the layout system, by default the width is 100 and
+    // we wait for it to be set properly then put our helper widget on the RHS
+    if (event->type() == QEvent::Resize && geometry().width() != 100) {
+
+        // put somewhere nice on first show
+        if (firstshow) {
+            firstshow = false;
+            helperWidget()->resize(400*dpiXFactor, 150*dpiYFactor);
+            helperWidget()->move(mainWidget()->geometry().width()-(500*dpiXFactor), 90*dpiYFactor);
+        }
+
+        // if off the screen move on screen
+        if (helperWidget()->geometry().x() > geometry().width()) {
+            helperWidget()->move(mainWidget()->geometry().width()-(500*dpiXFactor), 90*dpiYFactor);
+        }
+    }
+    return QWidget::event(event);
+}
+
+void
+LTMWindow::tuneBanister()
+{
+
+    // if we have a banister...
+    if (banCombo->count() && banPerf->count() && banT1->value() >0 && banT2->value()>0) {
+
+        // lookup and set
+        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(), banPerf->currentData().toString(),0,0);
+
+        // when user adjusts the t1/t2 parameters we need to refit
+        if (banT1->value() < banister->t1 || banT1->value() > banister->t1 ||
+            banT2->value() < banister->t2 || banT2->value() > banister->t2) {
+
+            // lets adjust it them
+            banister->setDecay(banT1->value(), banT2->value());
+        }
+
+        // replot
+        refreshPlot();
+    }
+}
+void
+LTMWindow::refreshBanister()
+{
+    int index = banCombo->currentIndex();
+    int perfIndex = banPerf->currentIndex();
+
+    if (index >= 0 && perfIndex >= 0) {
+
+        // lookup and set
+        Banister *banister = context->athlete->getBanisterFor(banCombo->currentData().toString(), banPerf->currentData().toString(),0,0);
+        banT1->setValue(banister->t1);
+        banT2->setValue(banister->t2);
+
+        double perf=0.0;
+        int CP=0;
+        QDate when = banister->getPeakPerf(settings.start.date(), settings.end.date(), perf, CP);
+
+        // set peak label
+        if (CP >0 && when != QDate()) peaklabel ->setText(QString("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
+        else if (perf >0.0 && when != QDate()) peaklabel ->setText(QString("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
+        else peaklabel->setText("");
+
+        // set RMSE for current view
+        int count;
+        double RMSE = banister->RMSE(settings.start.date(), settings.end.date(), count);
+        if (count && RMSE >0) RMSElabel->setText(QString("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
+        else RMSElabel->setText("");
+
+    } else {
+        // clear
+        peaklabel->setText("");
+        RMSElabel->setText("");
+    }
+}
+
+void
 LTMWindow::configChanged(qint32)
 {
+    // tinted palette for headings etc
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+
+    // inverted palette for data etc
+    QPalette whitepalette;
+    whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+
+    QFont font;
+    font.setPointSize(12); // reasonably big
+    ilabel->setFont(font);
+    perflabel->setFont(font);
+    plabel->setFont(font);
+    t1label1->setFont(font);
+    t1label2->setFont(font);
+    plabel->setFont(font);
+    peaklabel->setFont(font);
+    t2label1->setFont(font);
+    t2label2->setFont(font);
+    RMSElabel->setFont(font);
+    banT1->setFont(font);
+    banT2->setFont(font);
+    banCombo->setFont(font);
+    banPerf->setFont(font);
+
+    ilabel->setPalette(palette);
+    perflabel->setPalette(palette);
+    plabel->setPalette(palette);
+    t1label1->setPalette(palette);
+    t1label2->setPalette(palette);
+    plabel->setPalette(palette);
+    peaklabel->setPalette(whitepalette);
+    t2label1->setPalette(palette);
+    t2label2->setPalette(palette);
+    RMSElabel->setPalette(whitepalette);
+
 #ifndef Q_OS_MAC
+    banT1->setStyleSheet(TabView::ourStyleSheet());
+    banT2->setStyleSheet(TabView::ourStyleSheet());
+    banCombo->setStyleSheet(TabView::ourStyleSheet());
     plotArea->setStyleSheet(TabView::ourStyleSheet());
     compareplotArea->setStyleSheet(TabView::ourStyleSheet());
 #endif
@@ -477,12 +714,14 @@ LTMWindow::refreshPlot()
         if (isCompare()) {
 
             // COMPARE PLOTS
+            showBanister(false); // never
             stackWidget->setCurrentIndex(3);
             refreshCompare();
 
         } else if (ltmTool->showData->isChecked()) {
 
             //  DATA TABLE
+            showBanister(false); // never
             stackWidget->setCurrentIndex(1);
             refreshDataTable();
 
@@ -1329,6 +1568,7 @@ LTMWindow::dataTable(bool html)
                 else summary += ", %1";
 
                 // now format the actual value....
+                QString valueString;
                 const RideMetric *m = settings.metrics[j].metric;
                 if (m != NULL) {
 
@@ -1337,13 +1577,17 @@ LTMWindow::dataTable(bool html)
                     if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision=1;
 
                     // we have a metric so lets be precise ...
-                    QString v = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
+                    valueString = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
 
-                    summary = summary.arg(v);
                 } else {
                     // no precision
-                    summary = summary.arg(QString("%1").arg(columns[j].y[row], 0, 'f', 0));
+                    valueString = QString("%1").arg(columns[j].y[row], 0, 'f', 1);
                 }
+                // Format minutes in sexagesimal format
+                if (LTMPlot::isMinutes(settings.metrics[j].uunits))
+                    valueString = time_to_string(columns[j].y[row]*60, true);
+
+                summary = summary.arg(valueString);
 
                 //
                 if (hdatas.at(j).contains(row)) {

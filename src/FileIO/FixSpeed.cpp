@@ -51,7 +51,7 @@ class FixSpeedConfig : public DataProcessorConfig
             maLabel = new QLabel(tr("Moving Average Seconds"));
 
             ma = new QSpinBox();
-            ma->setMaximum(60);
+            ma->setMaximum(600);
             ma->setMinimum(0);
             ma->setSingleStep(1);
             layout->addWidget(maLabel);

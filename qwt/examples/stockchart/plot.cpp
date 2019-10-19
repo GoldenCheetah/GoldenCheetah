@@ -71,7 +71,7 @@ public:
     ZoneItem( const QString &title )
     {
         setTitle( title );
-        setZ( 11 ); // on top the the grid
+        setZ( 11 ); // on top the grid
         setOrientation( Qt::Vertical );
         setItemAttribute( QwtPlotItem::Legend, true );
     }

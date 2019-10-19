@@ -83,6 +83,7 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QCheckBox *showData;
         QCheckBox *showEvents;
+        QCheckBox *showBanister;
         QCheckBox *showStack;
         QSlider *stackSlider;
 
@@ -170,6 +171,8 @@ class EditMetricDetailDialog : public QDialog
         void stressName();
         void estimateName();
         void measureName();
+        void performanceName();
+        void banisterName();
 
         void modelChanged();
         void estimateChanged();
@@ -181,9 +184,9 @@ class EditMetricDetailDialog : public QDialog
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress, *chooseFormula, *chooseMeasure, *choosePerformance, *chooseBanister;
         QButtonGroup *group;
-        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget, *formulaWidget, *measureWidget, *performanceWidget, *banisterWidget;
         QStackedWidget *typeStack;
 
         // filter
@@ -210,6 +213,10 @@ class EditMetricDetailDialog : public QDialog
         // stress
         QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
 
+        // banister
+        QComboBox *banisterTypeSelect; // PTE, NTE, Performance
+        QComboBox *banisterPerfMetric; // default Power Index
+
         // formula
         DataFilterEdit *formulaEdit; // edit your formula
         QComboBox *formulaType;      // Average etc
@@ -217,6 +224,11 @@ class EditMetricDetailDialog : public QDialog
         // measure
         QComboBox *measureGroupSelect; // Body, Hrv
         QComboBox *measureFieldSelect; // Weight, RMSSD, etc.
+
+        // performances
+        QCheckBox *weeklyPerfCheck;
+        QCheckBox *performanceTestCheck;
+        QCheckBox *submaxWeeklyPerfCheck;
 
         QComboBox *curveStyle,
                   *curveSymbol;

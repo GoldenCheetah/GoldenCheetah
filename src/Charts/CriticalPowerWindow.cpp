@@ -39,6 +39,7 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_curve.h>
 #include <qwt_series_data.h>
+#include <qwt_scale_div.h>
 #include <qwt_compat.h>
 #include <QFile>
 #include "Season.h"
@@ -121,7 +122,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     mainLayout->addLayout(cpediting);
     connect(CPEdit, SIGNAL(textChanged(QString)), this, SLOT(setSliderFromEdit()));
     connect(CPSlider, SIGNAL(valueChanged(int)), this, SLOT(setEditFromSlider()));
-    
+
     //
     // Chart settings
     //
@@ -204,6 +205,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     shadeCheck->setChecked(true);
     cl->addRow(shading, shadeCheck);
 
+    showPPCheck = new QCheckBox(this);
+    showPPCheck->setChecked(false); // default off
+    QLabel *pp = new QLabel(tr("Show Power Profile"));
+    cl->addRow(pp, showPPCheck);
+
     showGridCheck = new QCheckBox(this);
     showGridCheck->setChecked(true); // default on
     QLabel *gridify = new QLabel(tr("Show grid"));
@@ -228,6 +234,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     showEffortCheck->setChecked(false); // default off
     QLabel *heaties = new QLabel(tr("Show Sustained Efforts"));
     cl->addRow(heaties, showEffortCheck);
+
+    showPowerIndexCheck = new QCheckBox(this);
+    showPowerIndexCheck->setChecked(false); // default off
+    QLabel *indexify = new QLabel(tr("Show as Power Index"));
+    cl->addRow(indexify, showPowerIndexCheck);
 
     showPercentCheck = new QCheckBox(this);
     showPercentCheck->setChecked(false); // default off
@@ -291,6 +302,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     mcl->addRow(new QLabel(tr("Data to fit")), fitdataCombo);
 
     mcl->addRow(new QLabel(tr(" ")));
+
+    modelDecayLabel = new QLabel(tr("CP and W' Decay"));
+    modelDecayCheck = new QCheckBox(this);
+    mcl->addRow(modelDecayLabel, modelDecayCheck);
+    mcl->addRow(new QLabel(tr(" ")));
+
     intervalLabel = new QLabel(tr("Search Interval"));
     secondsLabel = new QLabel(tr("(seconds)"));
     mcl->addRow(intervalLabel, secondsLabel);
@@ -402,6 +419,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     grid->enableX(false); // not needed
     grid->enableY(true);
     grid->setZ(-20);
+    QwtValueList ytick[QwtScaleDiv::NTickTypes];
+    for (double i=0.0; i<=2500; i+= 100) ytick[QwtScaleDiv::MajorTick]<<i;
+    cpPlot->setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,2500.0,ytick));
     grid->attach(cpPlot);
 
     // the model helper -- showing model parameters etc
@@ -495,8 +515,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
         // when working on a ride we can select intervals!
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
-        connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));  
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+        connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
 
         // Compare
         connect(context, SIGNAL(compareIntervalsStateChanged(bool)), SLOT(forceReplot()));
@@ -522,6 +542,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(sanI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(modelDecayCheck, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
     connect(velo1, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
     connect(velo2, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
     connect(velo3, SIGNAL(toggled(bool)), this, SLOT(modelParametersChanged()));
@@ -537,6 +558,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(shadeCheck, SIGNAL(stateChanged(int)), this, SLOT(shadingSelected(int)));
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showEffortCheck, SIGNAL(stateChanged(int)), this, SLOT(showEffortChanged(int)));
+    connect(showPPCheck, SIGNAL(stateChanged(int)), this, SLOT(showPPChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(showCSLinearCheck, SIGNAL(stateChanged(int)), this, SLOT(showCSLinearChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
@@ -544,6 +566,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showPowerIndexCheck, SIGNAL(stateChanged(int)), this, SLOT(showPowerIndexChanged(int)));
     connect(showTestCheck, SIGNAL(stateChanged(int)), this, SLOT(showTestChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
     connect(filterBestCheck, SIGNAL(stateChanged(int)), this, SLOT(filterBestChanged(int)));
@@ -567,14 +590,14 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 }
 
 // veloclinic stuff
-void 
+void
 CriticalPowerWindow::setSliderFromEdit()
 {
     int value = CPEdit->text().toInt();
     CPSlider->setValue(value);
 }
 
-void 
+void
 CriticalPowerWindow::setEditFromSlider()
 {
     CPEdit->setText(QString("%1").arg(CPSlider->value()));
@@ -758,16 +781,20 @@ CriticalPowerWindow::modelChanged()
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // No default values !
             break;
 
-    case 4 : // Veloclinic Model uses 2 parameter classic but 
+    case 4 : // Veloclinic Model uses 2 parameter classic but
              // also lets you select a variation ..
             vlabel->show();
             velo1->show();
             velo2->show();
             velo3->show();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // intentional fallthrough
             // and drop through into case 1 below ...
@@ -789,6 +816,8 @@ CriticalPowerWindow::modelChanged()
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // Default values: class 2-3mins 10-20 model
             anI1SpinBox->setValue(120);
@@ -815,6 +844,8 @@ CriticalPowerWindow::modelChanged()
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
+            modelDecayLabel->show();
+            modelDecayCheck->show();
 
             // Default values
             anI1SpinBox->setValue(180);
@@ -839,7 +870,9 @@ CriticalPowerWindow::modelChanged()
             aeI2SpinBox->show();
             laeLabel->show();
             laeI1SpinBox->show();
-            laeI2SpinBox->show();         
+            laeI2SpinBox->show();
+            modelDecayCheck->hide();
+            modelDecayLabel->hide();
 
             // Default values
             sanI1SpinBox->setValue(20);
@@ -859,9 +892,9 @@ CriticalPowerWindow::modelChanged()
     modelParametersChanged();
 }
 
-// kind of tedious but return index into a radio button group 
+// kind of tedious but return index into a radio button group
 // for the button that is actually checked.
-int 
+int
 CriticalPowerWindow::variant() const
 {
     if (velo1->isChecked()) return 0;
@@ -903,7 +936,8 @@ CriticalPowerWindow::modelParametersChanged()
                         modelCombo->currentIndex(),
                         variant(),
                         fitCombo->currentIndex(),
-                        fitdataCombo->currentIndex());
+                        fitdataCombo->currentIndex(),
+                        modelDecay());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {
@@ -964,7 +998,7 @@ CriticalPowerWindow::forceReplot()
     if (rangemode) {
 
         // force replot...
-        dateRangeChanged(myDateRange); 
+        dateRangeChanged(myDateRange);
 
     } else {
 
@@ -1147,8 +1181,8 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
 
     // make a ridefile
     RideFile f(myRideItem->ride());
-   
-    foreach(RideFilePoint *p, myRideItem->ride()->dataPoints()) { 
+
+    foreach(RideFilePoint *p, myRideItem->ride()->dataPoints()) {
        if ((p->secs+f.recIntSecs()) >= current->start && p->secs <= (current->stop+f.recIntSecs())) {
            f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                        p->watts, p->alt, p->lon, p->lat, p->headwind,
@@ -1305,7 +1339,7 @@ bool
 CriticalPowerWindow::event(QEvent *event)
 {
     // nasty nasty nasty hack to move widgets as soon as the widget geometry
-    // is set properly by the layout system, by default the width is 100 and 
+    // is set properly by the layout system, by default the width is 100 and
     // we wait for it to be set properly then put our helper widget on the RHS
     if (event->type() == QEvent::Resize && geometry().width() != 100) {
 
@@ -1690,7 +1724,7 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 
     } else dateRange = myDateRange;
 
-    // only change date range if its actually changed! 
+    // only change date range if its actually changed!
     if (series() == veloclinicplot || dateRange.from != cfrom || dateRange.to != cto || stale) {
 
         cfrom = dateRange.from;
@@ -1812,6 +1846,7 @@ CriticalPowerWindow::showBestChanged(int state)
 void
 CriticalPowerWindow::showPercentChanged(int state)
 {
+    if (state) showPowerIndexCheck->setChecked(false);
     cpPlot->setShowPercent(state);
     rPercent->setChecked(state);
 
@@ -1820,7 +1855,18 @@ CriticalPowerWindow::showPercentChanged(int state)
     else cpPlot->setRide(currentRide);
 }
 
-void 
+void
+CriticalPowerWindow::showPowerIndexChanged(int state)
+{
+    if (state) showPercentCheck->setChecked(false);
+    cpPlot->setShowPowerIndex(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
+}
+
+void
 CriticalPowerWindow::rPercentChanged(int check)
 {
     showPercentCheck->setChecked(check);
@@ -1830,6 +1876,16 @@ void
 CriticalPowerWindow::showEffortChanged(int state)
 {
     cpPlot->setShowEffort(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::showPPChanged(int state)
+{
+    cpPlot->setShowPP(state);
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
@@ -1856,7 +1912,7 @@ CriticalPowerWindow::showCSLinearChanged(int state)
     if (rangemode) dateRangeChanged(DateRange());
 }
 
-void 
+void
 CriticalPowerWindow::rHeatChanged(int check)
 {
     showHeatCheck->setChecked(check);

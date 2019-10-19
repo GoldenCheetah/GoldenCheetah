@@ -65,7 +65,7 @@ class FieldDefinition
         QStringList values; // autocomplete 'defaults'
 
         static unsigned long fingerprint(QList<FieldDefinition>);
-        QCompleter *getCompleter(QObject *parent);
+        QCompleter *getCompleter(QObject *parent, RideCache *rideCache);
         QString calendarText(QString value);
 
         FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}

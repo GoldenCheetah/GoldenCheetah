@@ -132,7 +132,7 @@ public:
 
       F.e. the raster paint engine is a pure software renderer
       where in cache mode a draw operation usually ends in 
-      raster operation with the the backing store, that are usually
+      raster operation with the backing store, that are usually
       faster, than the algorithms for rendering polygons.
       But the opposite can be expected for graphic pipelines
       that can make use of hardware acceleration.

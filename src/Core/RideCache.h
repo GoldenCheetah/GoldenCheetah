@@ -37,11 +37,13 @@
 #endif
 
 class Context;
+class LTMPlot;
 class RideCacheBackgroundRefresh;
 class Specification;
 class AthleteBest;
 class RideCacheModel;
 class Estimator;
+class Banister;
 
 class RideCache : public QObject
 {
@@ -134,6 +136,8 @@ class RideCache : public QObject
         friend class ::Athlete;
         friend class ::MainWindow; // save dialog
         friend class ::RideCacheBackgroundRefresh;
+        friend class ::LTMPlot; // get weekly performances
+        friend class ::Banister; // get weekly performances
 
         Context *context;
         QDir directory, plannedDirectory;

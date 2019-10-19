@@ -1422,7 +1422,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     foreach(WWPoint *point, points_) delete point;
     points_.clear();
 
-    // we suport ERG but not MRC/CRS currently
+    // we suport ERG but not MRC/CRS/CRS_LOC currently
     if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
 
         this->ergFile = ergFile;

@@ -38,7 +38,11 @@ void QwtPlotGappedCurve::drawSeries(QPainter *painter, const QwtScaleMap &xMap,
         // First non-missed point will be the start of curve section.
         double x = sample(i).x();
         double y = sample(i).y();
-        if ((y < (naValue_ + -0.001) || y > (naValue_ + 0.001)) && x - last <= gapValue_) {
+        double yprev = 0;
+        if (i>0) yprev = sample(i-1).y();
+
+        if ((y < (naValue_ + -0.001) || y > (naValue_ + 0.001)) && (x - last <= gapValue_) &&
+            (yprev < (naValue_ + -0.001) || yprev > (naValue_ + 0.001))) {
 
             int start = i-1;
             int end = i;

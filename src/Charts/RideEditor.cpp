@@ -1331,6 +1331,8 @@ QWidget *XDataCellDelegate::createEditor(QWidget *parent, const QStyleOptionView
     default:
     {
         QDoubleSpinBox *valueEdit = new QDoubleSpinBox(parent);
+        valueEdit->setMaximum(std::numeric_limits<double>::max());
+        valueEdit->setMinimum(-std::numeric_limits<double>::max());
         connect(valueEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
         return valueEdit;
     }

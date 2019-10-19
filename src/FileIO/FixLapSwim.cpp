@@ -136,7 +136,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     XDataSeries *series = ride->xdata("SWIM");
     if (!series || series->datapoints.isEmpty()) return false;
 
-    int typeIdx = -1, durationIdx = -1, strokesIdx = -1;
+    int typeIdx = -1, durationIdx = -1, strokesIdx = -1, restIdx = -1;
     for (int a=0; a<series->valuename.count(); a++) {
         if (series->valuename.at(a) == "TYPE")
             typeIdx = a;
@@ -144,14 +144,19 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
             durationIdx = a;
         else if (series->valuename.at(a) == "STROKES")
             strokesIdx = a;
+        else if (series->valuename.at(a) == "REST")
+            restIdx = a;
     }
     // Stroke Type or Duration are mandatory, Strokes only to compute cadence
     if (typeIdx == -1 || durationIdx == -1) return false;
 
-    // get the Smart Recording parameters
-    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
+
+    // Preserve HR data
+    QVector<double> hrdata(ride->dataPoints().count());
+    for (int i=0; i<ride->dataPoints().count(); i++)
+        hrdata[i] = ride->dataPoints()[i]->hr;
 
     // delete current lap markers
     ride->clearIntervals();
@@ -192,13 +197,14 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
        // only fill 100x the maximal smart recording gap defined
        // in preferences - we don't want to crash / stall on bad
        // or corrupt files
-       if ((isGarminSmartRecording.toInt() != 0) && length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
+       if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
            QVector<struct RideFilePoint> newRows;
            kph = 3600.0 * length_distance / length_duration;
            if (length_distance == 0.0) interval++; // pauses mark laps
            for (int i = 0; i < length_duration; i++) {
+               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
                newRows << RideFilePoint(
-                   last_time + i, cad, 0.0,
+                   last_time + i, cad, hr,
                    last_distance + (length_distance * i/length_duration),
                    kph, 0.0, 0.0, 0.0, 0.0, 0.0,
                    0.0, 0.0,
@@ -215,13 +221,38 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
             last_time += length_duration;
             last_distance += length_distance;
             if (length_distance == 0.0) interval++; // pauses mark laps
-        }
+       }
+       // Alternative way to mark pauses: Rest seconds after each length
+       if (restIdx>0 && p->number[restIdx]>0) {
+           QVector<struct RideFilePoint> newRows;
+           interval++; // pauses mark laps
+           for (int i=0; i<p->number[restIdx] && i<100*GarminHWM.toInt(); i++) {
+               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
+               newRows << RideFilePoint(
+                   last_time + i, 0.0, hr,
+                   last_distance,
+                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                   0.0, 0.0,
+                   RideFile::NA,RideFile::NA,
+                   0.0, 0.0,0.0, 0.0,
+                   0.0, 0.0,
+                   0.0, 0.0,0.0, 0.0,
+                   0.0, 0.0,0.0, 0.0,
+                   0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0,
+                   interval);
+           }
+           ride->command->appendPoints(newRows);
+           last_time += p->number[restIdx];
+           interval++; // pauses mark laps
+       }
 
     }
 
     // Update Rec. Interval, Pool Length, set data present and commit
     ride->setRecIntSecs(1.0);
     ride->setTag("Pool Length", QString("%1").arg(pl));
+    ride->setDataPresent(ride->km, true);
     ride->setDataPresent(ride->kph, true);
     ride->setDataPresent(ride->cad, strokesIdx>0);
     ride->command->endLUW();

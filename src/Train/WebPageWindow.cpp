@@ -33,6 +33,8 @@
 #include "Units.h"
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
+#include "Library.h"
+#include "ErgFile.h"
 
 #ifdef NOWEBKIT
 #include <QtWebChannel>
@@ -312,8 +314,19 @@ WebPageWindow::downloadFinished()
 {
     // now try and import it (if download failed file won't exist)
     // dialog is self deleting
-    RideImportWizard *dialog = new RideImportWizard(filenames, context);
-    dialog->process(); // do it!
+    QStringList rides, workouts;
+    foreach(QString filename, filenames) {
+        if (ErgFile::isWorkout(filename)) workouts << filename;
+        else rides << filename;
+    }
+
+    if (rides.count()) {
+        RideImportWizard *dialog = new RideImportWizard(rides, context);
+        dialog->process(); // do it!
+    }
+    if (workouts.count()) {
+        Library::importFiles(context, filenames, true);
+    }
 }
 
 void

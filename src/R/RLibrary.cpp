@@ -309,10 +309,10 @@ RLibrary::load()
 
     // PLATFORM SPECIFIC PATH AND NAME
 #ifdef Q_OS_LINUX
+    name = "lib/libR.so";
     // look in the standard locations for debian/ubuntu or fedora if not set
     if (home == "") {
         home = "/usr/lib/R";
-        name = "lib/libR.so";
 
         // look in the usual place for debian/ubuntu, if not try fedora
         QString path = QString("%1/%2").arg(home).arg(name);

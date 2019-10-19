@@ -2361,10 +2361,6 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
             // get multiple responses
             QList<SEXP> f;
 
-            // names
-            SEXP names;
-            PROTECT(names=Rf_allocVector(STRSXP, activities.count()));
-
             // create a data.frame for each and add to list
             int index=0;
             foreach(RideItem *item, activities) {
@@ -2374,9 +2370,6 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
                 // if a cancel was requested we honour it
                 QApplication::processEvents();
                 if (rtool->cancelled) break;
-
-                // give it a name
-                SET_STRING_ELT(names, index, Rf_mkChar(QString("%1").arg(index+1).toLatin1().constData()));
 
                 // we open, if it wasn't open we also close
                 // to make sure we don't exhause memory
@@ -2394,7 +2387,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
             // we have to give a name to each row
             SEXP rownames;
             PROTECT(rownames = Rf_allocVector(STRSXP, f.count()));
-            for(int i=0; i<activities.count(); i++) {
+            for(int i=0; i<f.count(); i++) {
                 QString rownumber=QString("%1").arg(i+1);
                 SET_STRING_ELT(rownames, i, Rf_mkChar(rownumber.toLatin1().constData()));
             }
@@ -2403,7 +2396,7 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
             //XXX Do not create a dataframe of dataframes, R doesn't like these
             //XXX Rf_setAttrib(list, R_ClassSymbol, Rf_mkString("data.frame"));
             Rf_setAttrib(list, R_RowNamesSymbol, rownames);
-            Rf_namesgets(list, names);
+            Rf_namesgets(list, rownames);
 
             UNPROTECT(3); // list and names and rownames
 

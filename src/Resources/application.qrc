@@ -42,6 +42,8 @@
         <file>images/maps/loop.png</file>
         <file>images/maps/cycling.png</file>
         <file>images/maps/cycling_sprint.png</file>
+        <file>images/maps/running.png</file>
+        <file>images/maps/running_feed.png</file>
         <file>images/maps/finish.png</file>
         <file>images/IconAltitude.png</file>
         <file>images/IconBike.png</file>
@@ -179,5 +181,7 @@
         <file>images/services/sporttracks.png</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
+        <file>data/powerprofile.csv</file>
+        <file>data/powerprofilewpk.csv</file>
     </qresource>
 </RCC>

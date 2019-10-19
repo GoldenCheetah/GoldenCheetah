@@ -27,11 +27,15 @@
 #include "RideMetric.h"
 #include "RideCache.h"
 #include "RideFileCache.h"
+#include "Banister.h"
+#include "Estimator.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "IndendPlotMarker.h"
 #include "DataFilter.h" // formulas
 #include "Utils.h"
+
+#include "IntervalItem.h"
 
 #include "PMCData.h" // for LTS/STS calculation
 #include "Zones.h"
@@ -226,6 +230,8 @@ LTMPlot::setData(LTMSettings *set)
     isolation = false;
     int user=0;
 
+    bool haveBanister=false; // do we want to show the banister helper?
+
     //qDebug()<<"Starting.."<<timer.elapsed();
 
     settings = set;
@@ -375,6 +381,9 @@ LTMPlot::setData(LTMSettings *set)
 
     foreach (MetricDetail metricDetail, settings->metrics) {
 
+        // if we have at least one banister curve visible then helper is relevant
+        if (metricDetail.hidden == false && metricDetail.type == METRIC_BANISTER) haveBanister=true;
+
         if (metricDetail.stack == true) {
 
             // register this data
@@ -440,14 +449,15 @@ LTMPlot::setData(LTMSettings *set)
         if (count <= 0) continue;
 
         // Create a curve
-        QwtPlotCurve *current = metricDetail.type == METRIC_ESTIMATE
+        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE)
                 ? new QwtPlotGappedCurve(metricDetail.uname, 1)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
-        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
+        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_BANISTER) {
+            //fprintf(stderr, "insert curve %s, %s\n", metricDetail.uname.toStdString().c_str(), metricDetail.bestSymbol.toStdString().c_str()); fflush(stderr);
             curves.insert(metricDetail.bestSymbol, current);
-        else
+        } else
             curves.insert(metricDetail.symbol, current);
         stacks.insert(current, stackcounter+1);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
@@ -594,14 +604,15 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
-        QwtPlotCurve *current = metricDetail.type == METRIC_ESTIMATE
+        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE)
                 ? new QwtPlotGappedCurve(metricDetail.uname, 1)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
-        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS)
+        if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_BANISTER) {
+            //fprintf(stderr, "insert curve %s, %s\n", metricDetail.uname.toStdString().c_str(), metricDetail.bestSymbol.toStdString().c_str()); fflush(stderr);
             curves.insert(metricDetail.bestSymbol, current);
-        else
+        } else
             curves.insert(metricDetail.symbol, current);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -650,7 +661,7 @@ LTMPlot::setData(LTMSettings *set)
 
                 QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                 QString trendSymbol = QString("%1_trend")
-                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                        metricDetail.bestSymbol : metricDetail.symbol);
 
                 QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -688,7 +699,7 @@ LTMPlot::setData(LTMSettings *set)
             if (metricDetail.trendtype == 2 && count > 3) {
                 QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                 QString trendSymbol = QString("%1_trend")
-                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                        metricDetail.bestSymbol : metricDetail.symbol);
 
                 QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -730,7 +741,7 @@ LTMPlot::setData(LTMSettings *set)
             if (metricDetail.trendtype == 3 && count > 5) {
                 QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                 QString trendSymbol = QString("%1_trend")
-                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                       .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                        metricDetail.bestSymbol : metricDetail.symbol);
 
                 QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -963,7 +974,7 @@ LTMPlot::setData(LTMSettings *set)
                 topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
             QString topSymbol = QString("%1_%2")
-                                .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                     metricDetail.bestSymbol : metricDetail.symbol).arg(topName);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
             top->setItemAttribute(QwtPlotItem::Legend, false);
@@ -1141,7 +1152,8 @@ LTMPlot::setData(LTMSettings *set)
 
             if (metricDetail.symbolStyle != QwtSymbol::NoSymbol) {
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setSize(6*dpiXFactor);
+                double testfactor = metricDetail.type == METRIC_PERFORMANCE ? 2 : 1;
+                sym->setSize(6*dpiXFactor*testfactor);
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setPen(QPen(metricDetail.penColor));
                 sym->setBrush(QBrush(metricDetail.penColor));
@@ -1367,6 +1379,9 @@ LTMPlot::setData(LTMSettings *set)
 
     // update colours etc for plot chrome will also save state
     configChanged(CONFIG_APPEARANCE);
+
+    // we have banister?
+    parent->showBanister(haveBanister);
 
     // plot
     replot();
@@ -1818,7 +1833,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                     QString trendName = QString(tr("%1 %2 trend")).arg(cd.name).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
-                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -1854,7 +1869,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 if (metricDetail.trendtype == 2 && count > 3) {
                     QString trendName = QString(tr("%1 %2 trend")).arg(cd.name).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
-                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                        .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -1895,7 +1910,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 if (metricDetail.trendtype == 3 && count > 5) {
                     QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
-                                           .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                           .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                            metricDetail.bestSymbol : metricDetail.symbol);
 
                     QwtPlotCurve *trend = new QwtPlotCurve(trendName);
@@ -2076,7 +2091,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 // lets setup a curve with this data then!
                 QString topName = QString(tr("%1 %2 Best")).arg(cd.name).arg(metricDetail.uname);
                 QString topSymbol = QString("%1_%2")
-                                    .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ? 
+                                    .arg((metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS) ?
                                         metricDetail.bestSymbol : metricDetail.symbol).arg(topName);
                 QwtPlotCurve *top = new QwtPlotCurve(topName);
                 top->setItemAttribute(QwtPlotItem::Legend, false);
@@ -2602,6 +2617,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         createMetricData(context, settings, metricDetail, x,y,n, forceZero);
         return;
+    } else if (metricDetail.type == METRIC_BANISTER) {
+        createBanisterData(context, settings, metricDetail, x,y,n, forceZero);
+        return;
     } else if (metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_PM) {
         createPMCData(context, settings, metricDetail, x,y,n, forceZero);
         return;
@@ -2616,6 +2634,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
         return;
     } else if (metricDetail.type == METRIC_D_MEASURE) {
         createMeasureData(context, settings, metricDetail, x,y,n, forceZero);
+        return;
+    } else if (metricDetail.type == METRIC_PERFORMANCE) {
+        createPerformanceData(context, settings, metricDetail, x,y,n, forceZero);
         return;
     }
 
@@ -3028,6 +3049,14 @@ void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
+    // curve specific filter, used to figure out if all activities are runs
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+    int nActivities, nRides, nRuns, nSwims;
+    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims);
+    metricDetail.run = (nRuns > 0 && nActivities == nRuns);
+
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
                     - groupForDate(settings->start.date(), settings->groupBy);
@@ -3051,6 +3080,9 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
     // loop through all the estimate data
     foreach(PDEstimate est, context->athlete->getPDEstimates()) {
+
+        // skip if not the requested sport
+        if (est.run != metricDetail.run) continue;
 
         // wpk skip for now
         if (est.wpk != metricDetail.wpk) continue;
@@ -3532,6 +3564,105 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 }
 
 void
+LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
+                                              QVector<double>&x,QVector<double>&y,int&n, bool)
+{
+    // banister model
+    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, metricDetail.perfSymbol, 50,11);
+
+    // should never happen...
+    if (banister==NULL) {
+        n=0;
+        return;
+    }
+
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    // skip for negative or empty time periods.
+    if (maxdays <=0) return;
+
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // iterate over it and create curve...
+    n=-1;
+    int lastDay=0;
+    unsigned long secondsPerGroupBy=0;
+    bool wantZero = true;
+
+
+    for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
+        bool plotData = true;
+        // past ?
+        bool past = date.daysTo(QDate::currentDate())>0;
+
+        // day we are on
+        int currentDay = groupForDate(date, settings->groupBy);
+
+        // value for day
+        double value = banister->value(date, metricDetail.stressType);
+
+        if (plotData && (value || wantZero)) {
+            unsigned long seconds = 1;
+            if (currentDay > lastDay) {
+                if (lastDay && wantZero) {
+                    while (lastDay<currentDay) {
+                        lastDay++;
+                        n++;
+                        x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
+                        y[n]=0;
+                    }
+                } else {
+                    n++;
+                }
+
+                y[n] = value;
+                x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
+
+                // only increment counter if nonzero or we aggregate zeroes
+                secondsPerGroupBy = seconds;
+
+            } else {
+                // sum totals, average averages and choose best for Peaks
+                int type = RideMetric::Average;
+
+                if (metricDetail.uunits == "Ramp" ||
+                    metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
+
+                // first time thru
+                if (n<0) n++;
+
+                switch (type) {
+                case RideMetric::Total:
+                    y[n] += value;
+                    break;
+                case RideMetric::Average:
+                    {
+                    // average should be calculated taking into account
+                    // the duration of the ride, otherwise high value but
+                    // short rides will skew the overall average
+                    y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    break;
+                    }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
+                case RideMetric::Peak:
+                    if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
+                    break;
+                }
+                secondsPerGroupBy += seconds; // increment for same group
+            }
+            lastDay = currentDay;
+        }
+    }
+}
+
+void
 LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
@@ -3556,6 +3687,142 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
 
         // value for day
         double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, context->athlete->useMetricUnits);
+
+        if (value || wantZero) {
+            unsigned long seconds = 1;
+            if (currentDay > lastDay) {
+                if (lastDay && wantZero) {
+                    while (lastDay<currentDay) {
+                        lastDay++;
+                        n++;
+                        x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
+                        y[n]=0;
+                    }
+                } else {
+                    n++;
+                }
+
+                y[n] = value;
+                x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
+
+                // only increment counter if nonzero or we aggregate zeroes
+                secondsPerGroupBy = seconds;
+
+            } else {
+                // sum totals, average averages and choose best for Peaks
+                int type = RideMetric::Average;
+
+                // first time thru
+                if (n<0) n++;
+
+                switch (type) {
+                case RideMetric::Total:
+                    y[n] += value;
+                    break;
+                case RideMetric::Average:
+                    {
+                    // average should be calculated taking into account
+                    // the duration of the ride, otherwise high value but
+                    // short rides will skew the overall average
+                    y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    break;
+                    }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
+                case RideMetric::Peak:
+                    if (value > y[n]) y[n] = value;
+                    break;
+                case RideMetric::MeanSquareRoot:
+                    if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
+                    break;
+                }
+                secondsPerGroupBy += seconds; // increment for same group
+            }
+            lastDay = currentDay;
+        }
+    }
+}
+
+void
+LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
+{
+    // curve specific filter, used to figure out if all activities are runs
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+    int nActivities, nRides, nRuns, nSwims;
+    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims);
+    metricDetail.run = (nRuns > 0 && nActivities == nRuns);
+
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    // skip for negative or empty time periods.
+    if (maxdays <=0) return;
+
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // iterate over it and create curve...
+    n=-1;
+    int lastDay=0;
+    unsigned long secondsPerGroupBy=0;
+    bool wantZero = false;
+
+    // scan for performance tests and create a map so we can lookup quickly
+    QHash<QDate, Performance> tests;
+    foreach (RideItem *item, context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue; // skip filtered out activities
+
+        if (item->dateTime.date() >= settings->start.date() && item->dateTime.date() <= settings->end.date()) {
+            foreach(IntervalItem *i, item->intervals()) {
+                if (i->istest()) {
+                    Performance p(item->dateTime.date(), 0,0,0);
+                    p=tests.value(item->dateTime.date(), p);
+
+                    // work out interval duration and power
+                    double secs=i->getForSymbol("workout_time");
+                    double power=i->getForSymbol("average_power");
+                    double pix=i->getForSymbol("power_index");
+
+                    if (pix > p.powerIndex) {
+                        // we have a better one
+                        p.when = item->dateTime.date();
+                        p.weekcommencing = item->dateTime.date(); //XXX
+                        p.powerIndex = pix;
+                        p.power = power;
+                        p.duration = secs;
+
+                        tests.insert(item->dateTime.date(), p);
+                    }
+                }
+            }
+        }
+    }
+
+
+    for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
+        // day we are on
+        int currentDay = groupForDate(date, settings->groupBy);
+        double value=0;
+
+        // is there a performance test today?
+        if (metricDetail.tests) {
+            Performance t = tests.value(date, Performance(QDate(), 0,0,0));
+            value = t.powerIndex;
+        }
+        if (metricDetail.perfs && value <= 0) {
+            // is there a weekly performance today?
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, metricDetail.run);
+            if (!p.submaximal) value = p.powerIndex;
+        }
+        if (metricDetail.submax && value <= 0) {
+            // is there a submax weekly performance today?
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, metricDetail.run);
+            if (p.submaximal) value = p.powerIndex;
+        }
 
         if (value || wantZero) {
             unsigned long seconds = 1;

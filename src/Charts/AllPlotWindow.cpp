@@ -1062,6 +1062,7 @@ AllPlotWindow::editUserData()
     UserData edit(userDataSeries[index]->name,
                   userDataSeries[index]->units,
                   userDataSeries[index]->formula,
+                  userDataSeries[index]->zstring,
                   userDataSeries[index]->color);
 
     EditUserDataDialog dialog(context, &edit);
@@ -1070,6 +1071,7 @@ AllPlotWindow::editUserData()
 
         // apply!
         userDataSeries[index]->formula = edit.formula;
+        userDataSeries[index]->zstring = edit.zstring;
         userDataSeries[index]->name = edit.name;
         userDataSeries[index]->units = edit.units;
         userDataSeries[index]->color = edit.color;
@@ -1093,6 +1095,7 @@ AllPlotWindow::doubleClicked( int row, int )
     UserData edit(userDataSeries[row]->name,
                   userDataSeries[row]->units,
                   userDataSeries[row]->formula,
+                  userDataSeries[row]->zstring,
                   userDataSeries[row]->color);
 
     EditUserDataDialog dialog(context, &edit);
@@ -1101,6 +1104,7 @@ AllPlotWindow::doubleClicked( int row, int )
 
         // apply!
         userDataSeries[row]->formula = edit.formula;
+        userDataSeries[row]->zstring = edit.zstring;
         userDataSeries[row]->name = edit.name;
         userDataSeries[row]->units = edit.units;
         userDataSeries[row]->color = edit.color;
@@ -1149,7 +1153,7 @@ AllPlotWindow::addUserData()
 
     if (dialog.exec()) {
         // apply
-        userDataSeries.append(new UserData(add.name, add.units, add.formula, add.color));
+        userDataSeries.append(new UserData(add.name, add.units, add.formula, add.zstring, add.color));
 
         // refresh
         refreshCustomTable();
@@ -1263,7 +1267,7 @@ AllPlotWindow::compareChanged()
         foreach(CompareInterval ci, context->compareIntervals) {
             QList<UserData*> list;
             foreach(UserData *u, userDataSeries) {
-                UserData *p = new UserData(u->name, u->units, u->formula, ci.color); // use context for interval
+                UserData *p = new UserData(u->name, u->units, u->formula, u->zstring, ci.color); // use context for interval
                 p->setRideItem(ci.rideItem);
                 list << p;
             }

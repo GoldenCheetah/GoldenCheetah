@@ -143,7 +143,7 @@ class WorkoutTime : public RideMetric {
         setName(tr("Duration"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
-        setDescription(tr("Total Duration"));
+        setDescription(tr("Total Duration including pauses a.k.a. Elapsed Time"));
     }
 
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
@@ -173,6 +173,54 @@ class WorkoutTime : public RideMetric {
 
 static bool workoutTimeAdded =
     RideMetricFactory::instance().addMetric(WorkoutTime());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class TimeRecording : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TimeRecording)
+    double secsRecording;
+
+    public:
+
+    TimeRecording() : secsRecording(0.0)
+    {
+        setSymbol("time_recording");
+        setInternalName("Time Recording");
+    }
+
+    bool isTime() const { return true; }
+
+    void initialize() {
+        setName(tr("Time Recording"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time when device was recording, excludes gaps in recording due to pauses or missing samples"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride())) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        secsRecording = 0;
+
+        // loop through and count
+        for (RideFileIterator it(item->ride(), spec); it.hasNext(); it.next())
+            secsRecording += item->ride()->recIntSecs();
+        setValue(secsRecording);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new TimeRecording(*this); }
+};
+
+static bool timeRecordingAdded =
+    RideMetricFactory::instance().addMetric(TimeRecording());
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -1943,7 +1991,7 @@ class MinSmO2 : public RideMetric {
         setName(tr("Min SmO2"));
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setDescription(tr("Minimum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen."));
     }
 
@@ -2091,7 +2139,7 @@ class MinHr : public RideMetric {
         setName(tr("Min Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setDescription(tr("Minimum Heart Rate."));
     }
 
@@ -2354,7 +2402,7 @@ class MinTemp : public RideMetric {
         setName(tr("Min Temp"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("F"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setPrecision(1);
         setConversion(FAHRENHEIT_PER_CENTIGRADE);
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
@@ -2739,7 +2787,7 @@ class AvgLTE : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lte) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->lte) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2752,7 +2800,7 @@ class AvgLTE : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->lte) {
+            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
                 samples ++;
                 total += point->lte;
             }
@@ -2794,7 +2842,7 @@ class AvgRTE : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rte) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->rte) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2806,7 +2854,7 @@ class AvgRTE : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rte) {
+            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
                 samples ++;
                 total += point->rte;
             }
@@ -2848,7 +2896,7 @@ class AvgLPS : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->lps) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->lps) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2860,7 +2908,7 @@ class AvgLPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->lps) {
+            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
                 samples ++;
                 total += point->lps;
             }
@@ -2902,7 +2950,7 @@ class AvgRPS : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->rps) {
+        if (spec.isEmpty(item->ride()) || !item->ride()->areDataPresent()->watts || !item->ride()->areDataPresent()->rps) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -2914,7 +2962,7 @@ class AvgRPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rps) {
+            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
                 samples ++;
                 total += point->rps;
             }
