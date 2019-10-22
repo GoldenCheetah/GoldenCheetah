@@ -7058,7 +7058,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
                 QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
                 paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
             }
-        } else if (curve->title() == tr("W'")) {
+        } else if (curve->title().text().startsWith(tr("W'"))) {
             // need to scale for W' bal
             yvalue /= 1000.0f;
         } else if (curve->title() == tr("Hb")) {
@@ -7068,7 +7068,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         } else if (curve->title() == tr("Gear Ratio")) {
             precision = 2;
         }
-        
+
         // output the tooltip
         QString text = QString("%1\n%2 %3%4\n%5 %6")
                         .arg(this->axisTitle(curve->yAxis()).text())
