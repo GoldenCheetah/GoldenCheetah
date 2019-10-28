@@ -156,6 +156,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     presetLayout->addWidget(charts, 0,0);
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
+    applyButton->setDefault(true);
     newButton = new QPushButton(tr("Add Current"));
     connect(newButton, SIGNAL(clicked()), this, SLOT(addCurrent()));
 
@@ -2194,6 +2195,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     applyButton = new QPushButton(tr("&OK"), this);
+    applyButton->setDefault(true);
     cancelButton = new QPushButton(tr("&Cancel"), this);
     buttonLayout->addWidget(cancelButton);
     buttonLayout->addWidget(applyButton);
