@@ -584,6 +584,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 66: // ELITE CRONO FLUID ELASTOGEL
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(2.4508084253648112 * v - 0.0005622440886940634 * pow(v, 2) + 0.0031006831781331848 * pow(v, 3));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }
