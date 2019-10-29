@@ -591,6 +591,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 67: // ELITE TURBO MUIN 2015
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(3.01523235942763813175 * V - 0.12045521113635432750 * pow(V,2) + 0.01739165560254292102 * pow(V,3));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }
