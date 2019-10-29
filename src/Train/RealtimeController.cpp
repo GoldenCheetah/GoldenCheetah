@@ -598,6 +598,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 68: // CycleOps JetFluid Pro
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(0.94874757375670469046 * V + 0.11615123681031937322 * pow(V,2) + 0.00400691905019748630 * pow(V,3));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }

@@ -1275,6 +1275,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Tacx Sirius (10)"));                                  // 65
     virtualPower->addItem(tr("Power - Elite Crono Fluid ElastoGel"));                       // 66
     virtualPower->addItem(tr("Power - Elite Turbo Muin (2015)"));                           // 67
+    virtualPower->addItem(tr("Power - CycleOps JetFluid Pro"));                             // 68
 
     //
     // Wheel size
