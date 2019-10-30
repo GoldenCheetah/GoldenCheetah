@@ -605,6 +605,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 69: // Elite Crono Mag elastogel
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(7.34759700400455518172 * V - 0.00278841177590215417 * pow(V,2) + 0.00052233430180969281 * pow(V,3));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }
