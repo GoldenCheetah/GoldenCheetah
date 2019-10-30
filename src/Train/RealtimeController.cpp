@@ -612,6 +612,20 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 70: // Tacx Magnetic T1820 (4/7)
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(6.77999074563685972005 * V - 0.00148787143661883094 * pow(V,2) + 0.00085058630585658189 * pow(V,3));
+        }
+        break;
+
+    case 71: // Tacx Magnetic T1820 (7/7)
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(9.80556623734881995572 * V - 0.00668894865103764724 * pow(V,2) + 0.00125560535410925628 * pow(V,3));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }
