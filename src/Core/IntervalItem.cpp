@@ -228,6 +228,7 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     applyButton = new QPushButton(tr("&OK"), this);
+    applyButton->setDefault(true);
     cancelButton = new QPushButton(tr("&Cancel"), this);
     buttonLayout->addWidget(cancelButton);
     buttonLayout->addWidget(applyButton);

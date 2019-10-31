@@ -232,7 +232,11 @@ QString GcCrashDialog::versionHTML()
     // -- LIBUSB ----
     QString libusb = "none";
     #ifdef GC_HAVE_LIBUSB
+    #ifdef LIBUSB_V_1
+    libusb = "yes (1.0)";
+    #else
     libusb = "yes";
+    #endif
     #endif
 
     // -- VLC ----

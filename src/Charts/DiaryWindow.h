@@ -60,13 +60,14 @@ class DiaryWindow : public GcChartWindow
         void configChanged(qint32);
         void nextClicked();
         void prevClicked();
+        void dateChanged(const QDate &date);
         void setDefaultView(int);
         bool eventFilter(QObject *object, QEvent *e); // traps monthly view
 
     protected:
         Context *context;
 
-        QLabel *title;
+        QDateEdit *title;
         QPushButton *prev, *next;
 
         QComboBox *viewMode;

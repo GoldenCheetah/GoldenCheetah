@@ -584,6 +584,48 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 66: // ELITE CRONO FLUID ELASTOGEL
+        {
+        double v = rtData.getSpeed();
+        rtData.setWatts(2.4508084253648112 * v - 0.0005622440886940634 * pow(v, 2) + 0.0031006831781331848 * pow(v, 3));
+        }
+        break;
+
+    case 67: // ELITE TURBO MUIN 2015
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(3.01523235942763813175 * V - 0.12045521113635432750 * pow(V,2) + 0.01739165560254292102 * pow(V,3));
+        }
+        break;
+
+    case 68: // CycleOps JetFluid Pro
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(0.94874757375670469046 * V + 0.11615123681031937322 * pow(V,2) + 0.00400691905019748630 * pow(V,3));
+        }
+        break;
+
+    case 69: // Elite Crono Mag elastogel
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(7.34759700400455518172 * V - 0.00278841177590215417 * pow(V,2) + 0.00052233430180969281 * pow(V,3));
+        }
+        break;
+
+    case 70: // Tacx Magnetic T1820 (4/7)
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(6.77999074563685972005 * V - 0.00148787143661883094 * pow(V,2) + 0.00085058630585658189 * pow(V,3));
+        }
+        break;
+
+    case 71: // Tacx Magnetic T1820 (7/7)
+        {
+        double V = rtData.getSpeed();
+        rtData.setWatts(9.80556623734881995572 * V - 0.00668894865103764724 * pow(V,2) + 0.00125560535410925628 * pow(V,3));
+        }
+        break;
+
     default : // unknown - do nothing
         break;
     }

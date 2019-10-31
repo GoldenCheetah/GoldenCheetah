@@ -162,6 +162,7 @@
 #LIBUSB_INSTALL = /usr/local
 #LIBUSB_INCLUDE = 
 #LIBUSB_LIBS    = 
+#LIBUSB_USE_V_1 = true # don't use on Windows
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from

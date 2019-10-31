@@ -2141,6 +2141,11 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                                 .arg(tr("J")); // Joule
 
+        } else if (criticalSeries == CriticalPowerWindow::work) {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', 1)
+                                .arg(tr("kJ")); // kJoule
+
         } else if (criticalSeries == CriticalPowerWindow::kph) {
 
             if (metricPace)  units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));

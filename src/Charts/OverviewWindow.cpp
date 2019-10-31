@@ -48,7 +48,7 @@ OverviewWindow::OverviewWindow(Context *context) :
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
-    setProperty("nomenu", true);
+    //setProperty("nomenu", true);
     setShowTitle(false);
     setControls(NULL);
 

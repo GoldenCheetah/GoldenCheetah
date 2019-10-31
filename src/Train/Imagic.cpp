@@ -47,6 +47,7 @@ Imagic::Imagic(QObject *parent) : QThread(parent)
 
 Imagic::~Imagic()
 {
+    delete usb2;
 }
 
 /* ----------------------------------------------------------------------

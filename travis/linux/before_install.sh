@@ -37,15 +37,7 @@ sudo make install
 cd ${TRAVIS_BUILD_DIR}
 
 # LIBUSB
-#sudo apt-get install -qq libusb-dev libudev-dev
 sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
-wget https://sourceforge.net/projects/libusb/files/libusb-compat-0.1/libusb-compat-0.1.5/libusb-compat-0.1.5.tar.bz2/download -O libusb-compat-0.1.5.tar.bz2
-tar xf libusb-compat-0.1.5.tar.bz2
-cd libusb-compat-0.1.5
-./configure --disable-shared --enable-static
-make --silent -j3
-sudo make install
-cd ${TRAVIS_BUILD_DIR}
 
 # Add Python 3.6 and SIP
 sudo add-apt-repository -y ppa:jonathonf/python-3.6
