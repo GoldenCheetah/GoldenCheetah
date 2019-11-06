@@ -336,6 +336,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lap_elapsed_msec = 0;
 
     rrFile = recordFile = NULL;
+    lastRecordSecs = 0;
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
     mode = ERG;
@@ -1247,6 +1248,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
             if (recordFile) delete recordFile;
             recordFile = new QFile(fulltarget);
+            lastRecordSecs = 0;
             if (!recordFile->open(QFile::WriteOnly | QFile::Truncate)) {
                 clearStatusFlags(RT_RECORDING);
             } else {
@@ -1909,8 +1911,10 @@ void TrainSidebar::diskUpdate()
 
     // convert from milliseconds to secondes
     total_msecs = session_elapsed_msec + session_time.elapsed();
-    secs = total_msecs;
-    secs /= 1000.0;
+    secs = round(total_msecs / 1000.0);
+
+    if (secs <= lastRecordSecs) return; // Avoid duplicates
+    lastRecordSecs = secs;
 
     // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
 
