@@ -26328,7 +26328,7 @@ eigen formaat. Zullen we dat doen?
     <message>
         <location filename="../../Core/Season.cpp" line="424"/>
         <source>Last 3 months</source>
-        <translation>Laatste 32 maanden</translation>
+        <translation>Laatste 3 maanden</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="431"/>
