@@ -466,6 +466,15 @@ struct FitFileReaderState
                 case 2: return "Pioneer SGX-CA500";
                 default: return QString("Pioneer %1").arg(prod);
             }
+        } else if (manu == 69) {
+            // Stages Cycling
+            switch (prod) {
+                case -1:  return "Stages Cycling";
+                case 1: return "Stages Power Gen 1";
+                case 2: return "Stages Power Gen 2";
+                case 3: return "Stages Power Gen 3";
+                default: return QString("Stages Cycling %1").arg(prod);
+            }
         } else if (manu == 70) {
             // does not set product at this point
            return "Sigmasport ROX";
