@@ -20,10 +20,11 @@
 #include <QDebug>
 #include "BT40Controller.h"
 
-QList<QBluetoothUuid> BT40Device::supportedServiceUuids = QList<QBluetoothUuid>()
-    << QBluetoothUuid(QBluetoothUuid::HeartRate)
-    << QBluetoothUuid(QBluetoothUuid::CyclingPower)
-    << QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence);
+QMap<QBluetoothUuid, btle_sensor_type_t> BT40Device::supportedServices = {
+    { QBluetoothUuid(QBluetoothUuid::HeartRate), { "Heartrate", ":images/IconHR.png" }},
+    { QBluetoothUuid(QBluetoothUuid::CyclingPower), { "Power", ":images/IconPower.png" }},
+    { QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence), { "Speed + Cadence", ":images/IconCadence.png" }},
+};
 
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
 {
@@ -105,7 +106,7 @@ void
 BT40Device::serviceDiscovered(QBluetoothUuid uuid)
 {
 
-    if (supportedServiceUuids.contains(uuid)) {
+    if (supportedServices.contains(uuid)) {
         QLowEnergyService *service = m_control->createServiceObject(uuid, this);
         m_services.append(service);
     }
