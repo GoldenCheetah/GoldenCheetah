@@ -214,22 +214,9 @@ class AddPairBTLE : public QWizardPage
         bool validatePage();
         void cleanupPage();
 
-    public slots:
-
-        void getChannelValues();
-        // we found a device on a channel
-        void channelInfo(int channel, int device_number, int device_id);
-        // we failed to find a device on the channel
-        void searchTimeout(int channel);
-
-        // user interactions
-        void sensorChanged(int channel); // sensor selection changed
     private:
         AddDeviceWizard *wizard;
         QTreeWidget *channelWidget;
-        QSignalMapper *signalMapper;
-        QTimer updateValues;
-        QString cyclist;
 
 };
 
