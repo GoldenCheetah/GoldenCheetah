@@ -316,6 +316,31 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Value =  rtd.getHr();
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
         }
+        else if (p_meterWidget->Source() == QString("Load"))
+        {
+            p_meterWidget->Value = rtd.getLoad();
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("Time"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::Time)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("LapTime"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::LapTime)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("LapTimeRemaining"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::LapTimeRemaining)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("ErgTimeRemaining"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::ErgTimeRemaining)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
         else if (p_meterWidget->Source() == QString("TrainerStatus"))
         {
             if (!rtd.getTrainerStatusAvailable())
