@@ -97,6 +97,7 @@
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
         <file>xml/train-layout.xml</file>
+        <file>xml/video-layout.xml</file>
         <file>xml/diary-layout.xml</file>
         <file>xml/analysis-layout.xml</file>
         <file>xml/home-layout.xml</file>

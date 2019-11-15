@@ -103,13 +103,19 @@ VideoWindow::VideoWindow(Context *context)  :
         layout->addWidget(container);
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
 
+        // Video Overlays Initialization: if video config file is not present
+        // copy a default one to be used as a model by the user.
+        // An empty video-layout.xml file disables video overlays
         QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
-        QFileInfo finfo(filename);
-
-        if (finfo.exists())
+        QFile file(filename);
+        if (!file.exists())
         {
-            QFile file(filename);
-
+            file.setFileName(":/xml/video-layout.xml");
+            file.copy(filename);
+            QFile::setPermissions(filename, QFileDevice::ReadUser|QFileDevice::WriteUser);
+        }
+        if (file.exists())
+        {
             // clean previous layout
             foreach(MeterWidget* p_meterWidget, m_metersWidget)
             {
