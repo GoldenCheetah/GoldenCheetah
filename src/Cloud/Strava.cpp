@@ -65,6 +65,8 @@ Strava::Strava(Context *context) : CloudService(context), context(context), root
 
     // config
     settings.insert(OAuthToken, GC_STRAVA_TOKEN);
+    settings.insert(Local1, GC_STRAVA_REFRESH_TOKEN);
+    settings.insert(Local2, GC_STRAVA_LAST_REFRESH);
     settings.insert(Metadata1, QString("%1::Activity Name").arg(GC_STRAVA_ACTIVITY_NAME));
 }
 
@@ -87,11 +89,67 @@ bool
 Strava::open(QStringList &errors)
 {
     printd("Strava::open\n");
-    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
+    QString token = getSetting(GC_STRAVA_REFRESH_TOKEN, "").toString();
     if (token == "") {
         errors << tr("No authorisation token configured.");
         return false;
     }
+
+    printd("Get access token for this session.\n");
+
+    // refresh endpoint
+    QNetworkRequest request(QUrl("https://www.strava.com/oauth/token?"));
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // set params
+    QString data;
+    data += "client_id=" GC_STRAVA_CLIENT_ID;
+    data += "&client_secret=" GC_STRAVA_CLIENT_SECRET;
+    data += "&refresh_token=" + getSetting(GC_STRAVA_REFRESH_TOKEN).toString();
+    data += "&grant_type=refresh_token";
+
+    // make request
+    QNetworkReply* reply = nam->post(request, data.toLatin1());
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    printd("HTTP response code: %d\n", statusCode);
+
+    // oops, no dice
+    if (reply->error() != 0) {
+        printd("Got error %s\n", reply->errorString().toStdString().c_str());
+        errors << reply->errorString();
+        return false;
+    }
+
+    // lets extract the access token, and possibly a new refresh token
+    QByteArray r = reply->readAll();
+    printd("Got response: %s\n", r.data());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // failed to parse result !?
+    if (parseError.error != QJsonParseError::NoError) {
+        printd("Parse error!\n");
+        errors << tr("JSON parser error") << parseError.errorString();
+        return false;
+    }
+
+    QString access_token = document.object()["access_token"].toString();
+    QString refresh_token = document.object()["refresh_token"].toString();
+
+    // update our settings
+    if (access_token != "") setSetting(GC_STRAVA_TOKEN, access_token);
+    if (refresh_token != "") setSetting(GC_STRAVA_REFRESH_TOKEN, refresh_token);
+    setSetting(GC_STRAVA_LAST_REFRESH, QDateTime::currentDateTime());
+
+    // get the factory to save our settings permanently
+    CloudServiceFactory::instance().saveSettings(this, context);
     return true;
 }
 

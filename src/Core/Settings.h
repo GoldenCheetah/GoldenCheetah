@@ -354,6 +354,8 @@
 #define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
 //Strava
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
+#define GC_STRAVA_REFRESH_TOKEN         "<athlete-private>strava_refresh_token"
+#define GC_STRAVA_LAST_REFRESH          "<athlete-private>strava_last_refresh"
 #define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"

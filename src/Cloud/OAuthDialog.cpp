@@ -563,6 +563,8 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         } else if (site == STRAVA) {
 
             service->setSetting(GC_STRAVA_TOKEN, access_token);
+            service->setSetting(GC_STRAVA_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_STRAVA_LAST_REFRESH, QDateTime::currentDateTime());
             QString info = QString(tr("Strava authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
