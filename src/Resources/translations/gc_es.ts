@@ -781,32 +781,32 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1124"/>
         <source>Power - Elite Crono Fluid ElastoGel</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia - Elite Crono Fluid ElastoGel</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1125"/>
         <source>Power - Elite Turbo Muin (2015)</source>
-        <translation type="unfinished">Potencia - Elite Turbo Muin (2013) {2015)?}</translation>
+        <translation>Potencia - Elite Turbo Muin (2015)</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1126"/>
         <source>Power - CycleOps JetFluid Pro</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia - CycleOps JetFluid Pro</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1127"/>
         <source>Power - Elite Crono Mag Elastogel (3/5)</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia - Elite Crono Mag Elastogel (3/5)</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1128"/>
         <source>Power - Tacx Magnetic T1820 (4/7)</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia - Tacx Magnetic T1820 (4/7)</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1129"/>
         <source>Power - Tacx Magnetic T1820 (7/7)</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia - Tacx Magnetic T1820 (7/7)</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1166"/>
@@ -1286,7 +1286,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1008"/>
         <source>Auto detect on device StartUp</source>
-        <translation type="unfinished"></translation>
+        <translation>Detección automática al Inicio</translation>
     </message>
     <message>
         <source>BLE Id</source>
