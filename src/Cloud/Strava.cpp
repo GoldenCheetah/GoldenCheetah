@@ -21,6 +21,7 @@
 #include "JsonRideFile.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "Secrets.h"
 #include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
