@@ -19,7 +19,7 @@ hdiutil mount $FINAL_NAME
 cd /Volumes/GoldenCheetah
 GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
 echo "Uploading for user tests"
-curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --upload-file $TRAVIS_BUILD_DIR/src/$FINAL_NAME https://transfer.sh/$FINAL_NAME
 echo "Make sure we are back in the Travis build directory"
 cd $TRAVIS_BUILD_DIR
 exit
