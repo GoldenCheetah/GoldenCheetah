@@ -782,32 +782,32 @@ Sie müssen diesen möglicherweise manuell de-aktivieren.</translation>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1124"/>
         <source>Power - Elite Crono Fluid ElastoGel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1125"/>
         <source>Power - Elite Turbo Muin (2015)</source>
-        <translation type="unfinished">Leistung - Elite Turbo Muin (2013) {2015)?}</translation>
+        <translation>Leistung - Elite Turbo Muin (2013) {2015)?}</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1126"/>
         <source>Power - CycleOps JetFluid Pro</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1127"/>
         <source>Power - Elite Crono Mag Elastogel (3/5)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1128"/>
         <source>Power - Tacx Magnetic T1820 (4/7)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1129"/>
         <source>Power - Tacx Magnetic T1820 (7/7)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1166"/>
@@ -1155,7 +1155,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="544"/>
         <source>Peak HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Spitzen HF</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="630"/>
@@ -1278,40 +1278,12 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1008"/>
         <source>Auto detect on device StartUp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>BLE Id</source>
-        <translation type="vanished">BLE Id</translation>
-    </message>
-    <message>
-        <source>Value</source>
-        <translation type="vanished">Wert</translation>
+        <translation>Automatische Erkennung beim Gerätestart</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="977"/>
         <source>Status</source>
         <translation>Status</translation>
-    </message>
-    <message>
-        <source>none</source>
-        <translation type="vanished">kein</translation>
-    </message>
-    <message>
-        <source>Un-Paired</source>
-        <translation type="vanished">Nicht gekoppelt</translation>
-    </message>
-    <message>
-        <source>Unused</source>
-        <translation type="vanished">Nicht verwendet</translation>
-    </message>
-    <message>
-        <source>Searching...</source>
-        <translation type="vanished">Suche...</translation>
-    </message>
-    <message>
-        <source>Paired</source>
-        <translation type="vanished">Gekoppelt</translation>
     </message>
 </context>
 <context>
@@ -5054,10 +5026,6 @@ Setup durchführen.</translation>
         <translation>Manuelle Eingabe:</translation>
     </message>
     <message>
-        <source>Nokia Health (Withings)</source>
-        <translation type="vanished">Nokia Health (Withings)</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="91"/>
         <source>Download</source>
         <translation>Download</translation>
@@ -5439,10 +5407,6 @@ Setup durchführen.</translation>
         <location filename="../../Charts/CPPlot.cpp" line="777"/>
         <source>Percentile</source>
         <translation>Perzentil</translation>
-    </message>
-    <message>
-        <source>Rank</source>
-        <translation type="vanished">Rang</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="744"/>
@@ -5896,7 +5860,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Charts/ChartBar.cpp" line="125"/>
         <source>Import Chart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagramm importieren...</translation>
     </message>
     <message>
         <location filename="../../Charts/ChartBar.cpp" line="128"/>
@@ -8428,10 +8392,6 @@ an den Computer anschließen und
         <translation>Schätzung</translation>
     </message>
     <message>
-        <source>Stress</source>
-        <translation type="vanished">Belastung</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMTool.cpp" line="1613"/>
         <source>PMC</source>
         <translation>PMC</translation>
@@ -9951,18 +9911,6 @@ an den Computer anschließen und
 <context>
     <name>FixDeriveDistanceConfig</name>
     <message>
-        <source>Derive distance based on GPS position
-
-Some unit doesn&apos;t record distance without a speedometer but record position (eg Timex Cycle Trainer)
-
-</source>
-        <translation type="vanished">Leite Distanz aus der GPS Position ab
-
-Einige Geräte zeichnen ohne Geschwindigkeitsmesser keine Distanz, aber die Position (z.B. Timex Cycle Trainer) auf
-
-</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="54"/>
         <source>Use Cubic Splines</source>
         <translation>Verwende Kubischen Spline</translation>
@@ -10041,10 +9989,6 @@ Dieser Prozessor ermittelt die Distan (und überschreibt eine bereits vorhandene
         <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
         <source>, direction</source>
         <translation>, Richtung</translation>
-    </message>
-    <message>
-        <source>, heading</source>
-        <translation type="vanished">, Richtung</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="130"/>
@@ -10381,10 +10325,6 @@ Dieses Tool halbiert die vorhandenen Werte.</translation>
         <location filename="../../FileIO/FixRunningPower.cpp" line="65"/>
         <source>, direction</source>
         <translation>, Richtung</translation>
-    </message>
-    <message>
-        <source>, heading</source>
-        <translation type="vanished">, Richtung</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="108"/>
@@ -12104,10 +12044,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Train/WorkoutWizard.cpp" line="549"/>
         <source>Workout Wizard</source>
         <translation>Workout Assistent</translation>
-    </message>
-    <message>
-        <source>Manually create a workout based on gradient (slope) and distance, maximum grade is 5.</source>
-        <translation type="vanished">Workout manuell auf der Grundlage von Steigung und Strecke erstellen - maximale Steigung ist 5.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="551"/>
@@ -14907,10 +14843,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>Maximale Steigung</translation>
     </message>
     <message>
-        <source>Maximum supported grade is 8</source>
-        <translation type="vanished">Größter unterstützter Wert ist 8</translation>
-    </message>
-    <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="687"/>
         <source>Segment Length</source>
         <translation>Abschnittslänge</translation>
@@ -17106,10 +17038,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <source>Left/Right Balance shows the proportion of power coming from each pedal for rides and the proportion of Ground Contact Time from each leg for runs.</source>
         <translation>Links/Rechts Verteilung zeigt den Leistungsanteil der vom jeweiligen Pedal kommt und den Anteil der Bodenkontaktzeit jedes Beins bei Läufen.</translation>
     </message>
-    <message>
-        <source>Left/Right Balance shows the proportion of power coming from each pedal.</source>
-        <translation type="vanished">Links/Rechts Verteilung zeigt den Leistungsanteil der vom jeweiligen Pedal kommt.</translation>
-    </message>
 </context>
 <context>
     <name>Library</name>
@@ -17142,10 +17070,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Train/Library.cpp" line="208"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
         <translation>%1 kann nicht in die Workout Bibliothek %2 gespeichert werden. Prüfe die Zugriffsrechte und den freien Platz.</translation>
-    </message>
-    <message>
-        <source>%1 already exists in workout library: %2</source>
-        <translation type="vanished">%1 ist bereits in der Workout Bibliothek: %2 vorhanden</translation>
     </message>
 </context>
 <context>
@@ -17803,7 +17727,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="557"/>
         <source>Import Chart...</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagramm importieren...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="564"/>
@@ -17823,22 +17747,22 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="827"/>
         <source>Select Chart file to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagramm zum Importieren auswählen</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="827"/>
         <source>GoldenCheetah Chart Files (*.gchart)</source>
-        <translation type="unfinished"></translation>
+        <translation>GoldenCheetah Diagrammdateien (*.gchart)</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="830"/>
         <source>Import Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagramm importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="830"/>
         <source>No chart file selected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Diagramm ausgewählt!</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="959"/>
@@ -18475,10 +18399,6 @@ Please check your preference settings.</source>
         <translation>Manuelle Eingabe</translation>
     </message>
     <message>
-        <source>Nokia Health (Withings)</source>
-        <translation type="vanished">Nokia Health (Withings)</translation>
-    </message>
-    <message>
         <location filename="../../Core/Measures.cpp" line="43"/>
         <source>Withings</source>
         <translation>Withings</translation>
@@ -18513,10 +18433,6 @@ Please check your preference settings.</source>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1104"/>
         <source>Adjust Alignment</source>
         <translation>Ausrichtung anpassen</translation>
-    </message>
-    <message>
-        <source>Adjust merge alignment in time</source>
-        <translation type="vanished">Zeitliche Ausrichtung für Zusammenführung anpassen</translation>
     </message>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1105"/>
@@ -19419,13 +19335,13 @@ Keine Aktivitäten zum Importieren gefunden.
         <location filename="../../Cloud/OAuthDialog.cpp" line="514"/>
         <location filename="../../Cloud/OAuthDialog.cpp" line="523"/>
         <location filename="../../Cloud/OAuthDialog.cpp" line="560"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="567"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="574"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="584"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="593"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="602"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="608"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="633"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="569"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="576"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="586"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="595"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="604"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="610"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="635"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -19445,51 +19361,47 @@ Keine Aktivitäten zum Importieren gefunden.
         <translation>Polar Flow Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="568"/>
         <source>Strava authorization was successful.</source>
         <translation>Strava Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="573"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="575"/>
         <source>Cycling Analytics authorization was successful.</source>
         <translation>Cycling Analytics Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="582"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="584"/>
         <source>Google Calendar authorization was successful.</source>
         <translation>Google Kalender Autorisierung ware erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="594"/>
         <source>Kent University Google Drive authorization was successful.</source>
         <translation>Kent University Google Drive Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="601"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="603"/>
         <source>Google Drive authorization was successful.</source>
         <translation>Google Drive Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="607"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="609"/>
         <source>Today&apos;s Plan authorization was successful.</source>
         <translation>Today&apos;s Plan Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="632"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="634"/>
         <source>Withings authorization was successful.</source>
         <translation>Withings Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <source>Withings/Nokia authorization was successful.</source>
-        <translation type="vanished">Withings/Nokia Health Autorisierung war erfolgreich.</translation>
-    </message>
-    <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="641"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="643"/>
         <source>Error retrieving access token, %1 (%2)</source>
         <translation>Fehler beim Holen des Access Token, %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="642"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="644"/>
         <source>SSL Token Refresh Error</source>
         <translation>SSL Token Aktualisierungsfehler</translation>
     </message>
@@ -27465,28 +27377,33 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits existierenden zus
 <context>
     <name>Strava</name>
     <message>
-        <location filename="../../Cloud/Strava.cpp" line="92"/>
+        <location filename="../../Cloud/Strava.cpp" line="95"/>
         <source>No authorisation token configured.</source>
         <translation>Kein Autorisierungstoken konfiguriert.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Strava.cpp" line="116"/>
+        <location filename="../../Cloud/Strava.cpp" line="140"/>
+        <source>JSON parser error</source>
+        <translation>JSON Parser Fehler</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Strava.cpp" line="175"/>
         <source>You must authorise with Strava first</source>
         <translation>Sie müssen Strava zuerst autorisieren</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Strava.cpp" line="156"/>
+        <location filename="../../Cloud/Strava.cpp" line="215"/>
         <source>Network Problem reading Strava data</source>
         <translation>Netzwerkproblem beim Lesen der Strava Daten</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Strava.cpp" line="382"/>
+        <location filename="../../Cloud/Strava.cpp" line="441"/>
         <source>invalid response or parser exception.</source>
         <translation>Ungültige Antwort oder ParserS- Fehler.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Strava.cpp" line="400"/>
-        <location filename="../../Cloud/Strava.cpp" line="424"/>
+        <location filename="../../Cloud/Strava.cpp" line="459"/>
+        <location filename="../../Cloud/Strava.cpp" line="483"/>
         <source>Completed.</source>
         <translation>Abgeschlossen.</translation>
     </message>
@@ -29021,32 +28938,32 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>VideoWindow</name>
     <message>
-        <location filename="../../Train/VideoWindow.cpp" line="302"/>
+        <location filename="../../Train/VideoWindow.cpp" line="308"/>
         <source> kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../../Train/VideoWindow.cpp" line="317"/>
+        <location filename="../../Train/VideoWindow.cpp" line="323"/>
         <source> bpm</source>
         <translation>1/min</translation>
     </message>
     <message>
-        <location filename="../../Train/VideoWindow.cpp" line="328"/>
+        <location filename="../../Train/VideoWindow.cpp" line="359"/>
         <source>Calibration required</source>
         <translation>Kalibrierung notwendig</translation>
     </message>
     <message>
-        <location filename="../../Train/VideoWindow.cpp" line="333"/>
+        <location filename="../../Train/VideoWindow.cpp" line="364"/>
         <source>Configuration required</source>
         <translation>Konfiguration notwendig</translation>
     </message>
     <message>
-        <location filename="../../Train/VideoWindow.cpp" line="338"/>
+        <location filename="../../Train/VideoWindow.cpp" line="369"/>
         <source>brake fault</source>
         <translation>Bremsenfehler</translation>
     </message>
     <message>
-        <location filename="../../Train/VideoWindow.cpp" line="343"/>
+        <location filename="../../Train/VideoWindow.cpp" line="374"/>
         <source>Ready</source>
         <translation>Fertig</translation>
     </message>
@@ -29468,10 +29385,6 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>Withings</name>
     <message>
-        <source>Nokia Health (Withings)</source>
-        <translation type="vanished">Nokia Health (Withings)</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/Withings.h" line="37"/>
         <source>Withings</source>
         <translation></translation>
@@ -29635,10 +29548,6 @@ Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu l
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="146"/>
         <source>Total Duration including pauses a.k.a. Elapsed Time</source>
         <translation>Gesamtzeit inklusive Pausen. </translation>
-    </message>
-    <message>
-        <source>Total Duration</source>
-        <translation type="vanished">Gesamtdauer</translation>
     </message>
 </context>
 <context>
