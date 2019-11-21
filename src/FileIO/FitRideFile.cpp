@@ -2302,7 +2302,8 @@ struct FitFileReaderState
 
                 case 9:   // event_timestamp
                           last_event_timestamp = value.v;
-                          start_timestamp = time-last_event_timestamp/1024.0;
+                          // update start_timestamp only if Timestamp (253) included for resyncs
+                          if (time > 0) start_timestamp = time-last_event_timestamp/1024.0;
                           timestamps.append(last_event_timestamp/1024.0);
                           break;
                 case 10:  // event_timestamp_12
