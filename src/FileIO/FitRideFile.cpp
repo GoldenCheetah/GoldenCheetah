@@ -794,7 +794,7 @@ struct FitFileReaderState
     void decodeSession(const FitDefinition &def, int,
                        const std::vector<FitValue>& values) {
         int i = 0;
-	QString WorkOutCode = NULL;
+        QString prevSport = rideFile->getTag("Sport", "");
 
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -1071,7 +1071,10 @@ struct FitFileReaderState
                 printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
         }
-	rideFile->setTag("Workout Code",WorkOutCode);
+        // If the Sport changed tag as a Multisport activity
+        QString newSport = rideFile->getTag("Sport", "");
+        if (prevSport != "" && newSport != "" && newSport != prevSport)
+            rideFile->setTag("Sport", "Multisport");
     }
 
     void decodeDeviceInfo(const FitDefinition &def, int,
