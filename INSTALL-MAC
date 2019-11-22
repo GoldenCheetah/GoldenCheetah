@@ -208,6 +208,11 @@ $ cd .. #this should put you in the top level dir containing this file
 $ qmake -recursive
 $ make
 
+When build first time you get number of error messages on .qm files missing:
+    "RCC: Error in 'Resources/application.qrc': Cannot find file 'translations/gc_fr.qm'"
+You can ignore these messages for your build. The .qm files will be created during the
+build at a later point in time via the "lrelease" command you configured in gcconfig.pri)
+
 If make fails to find a Makefile then qmake is configured, by default, to create
 an xcode project file. You will need to change the qmake command above to tell it
 to create a makefile with the following:

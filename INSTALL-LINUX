@@ -91,6 +91,11 @@ $ make clean
 $ qmake
 $ make
 
+When build first time you get number of error messages on .qm files missing:
+    "RCC: Error in 'Resources/application.qrc': Cannot find file 'translations/gc_fr.qm'"
+You can ignore these messages for your build. The .qm files will be created during the
+build at a later point in time via the "lrelease" command you configured in gcconfig.pri)
+
 You will now have a release3 binary but with none of the release3 dependencies compiled in.
 Get latest GOLDEN CHEETAH source files
 --------------------------------------
