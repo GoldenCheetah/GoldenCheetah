@@ -303,7 +303,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 add->label = QFileInfo(each["name"].toString()).fileName();
                 add->id = QString("%1").arg(each["fileId"].toInt());
                 add->isDir = false;
-                add->distance = each["distance"].toInt()/1000.0;
+                add->distance = each["distance"].toDouble()/1000.0;
                 add->duration = each["training"].toInt();
                 add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
 
