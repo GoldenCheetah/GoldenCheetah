@@ -1539,6 +1539,8 @@ LTMWindow::dataTable(bool html)
 
         for(int row=0; row<=rows; row++) {
 
+            QString rowSummary;
+
             // in day mode we don't list all the zeroes .. its too many!
             bool nonzero = false;
             if (settings.groupBy == LTM_DAY) {
@@ -1553,53 +1555,56 @@ LTMWindow::dataTable(bool html)
 
             // alternating colors on html output
             if (html) {
-                if (row%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
-                else summary += "<tr>";
+                if (row%2) rowSummary += "<tr bgcolor='" + altColor.name() + "'>";
+                else rowSummary += "<tr>";
             }
 
             // First column, date / month year etc
-            if (html) summary += "<td align=\"center\" valign=\"top\">%1</td>";
-            else summary += "%1";
-            summary = summary.arg(lsd.label(columns[0].x[row]+0.5).text().replace("\n", " "));
+            if (html) rowSummary += "<td align=\"center\" valign=\"top\">%1</td>";
+            else rowSummary += "%1";
+            rowSummary = rowSummary.arg(lsd.label(columns[0].x[row]+0.5).text().replace("\n", " "));
 
             // Remaining columns - each metric value
             for(int j=0; j<columns.count(); j++) {
-                if (html) summary += "<td align=\"center\" style=\"%2\" valign=\"top\">%1</td>";
-                else summary += ", %1";
+                if (html) rowSummary += "<td align=\"center\" style=\"%2\" valign=\"top\">%1</td>";
+                else rowSummary += ", %1";
 
                 // now format the actual value....
                 QString valueString;
-                const RideMetric *m = settings.metrics[j].metric;
-                if (m != NULL) {
+                double value = columns[j].y[row];
 
-                    // handle precision of 1 for seconds converted to hours
-                    int precision = m->precision();
-                    if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision=1;
-
-                    // we have a metric so lets be precise ...
-                    valueString = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
-
-                } else {
-                    // no precision
-                    valueString = QString("%1").arg(columns[j].y[row], 0, 'f', 1);
-                }
                 // Format minutes in sexagesimal format
-                if (LTMPlot::isMinutes(settings.metrics[j].uunits))
-                    valueString = time_to_string(columns[j].y[row]*60, true);
+                if (LTMPlot::isMinutes(settings.metrics[j].uunits)) {
+                    valueString = time_to_string(value * 60, true);
+                } else {
+                    int precision = 1;
+                    const RideMetric *m = settings.metrics[j].metric;
+                    if (m != NULL) {
 
-                summary = summary.arg(valueString);
+                        // we have a metric so lets be precise ...
+                        precision = m->precision();
+
+                        // handle precision of 1 for seconds converted to hours
+                        if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision = 1;
+                    }
+                    valueString.setNum(value, 'f', precision);
+                }
+
+                rowSummary = rowSummary.arg(valueString);
 
                 //
                 if (hdatas.at(j).contains(row)) {
                     QString c = QString("background-color:%1;color:%2").arg(settings.metrics[j].penColor.name()).arg(fontcolors.at(j));
-                    summary = summary.arg(c);
+                    rowSummary = rowSummary.arg(c);
                 } else
-                    summary = summary.arg("");
+                    rowSummary = rowSummary.arg("");
             }
 
             // ok, this row is done
-            if (html) summary += "</tr>";
-            else summary += "\n"; // csv newline
+            if (html) rowSummary += "</tr>";
+            else rowSummary += "\n"; // csv newline
+
+            summary += rowSummary;
         }
 
         // close table on html page
