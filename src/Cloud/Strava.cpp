@@ -343,11 +343,20 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
 
     // use metadata config if the user selected it
-    QString fieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+    QString activityNameFieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
     QString activityName = "";
-    if (fieldname != "") activityName = ride->getTag(fieldname, "");
+    if (activityNameFieldname != "")
+        activityName = ride->getTag(activityNameFieldname, "");
     activityNamePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain;charset=utf-8"));
     activityNamePart.setBody(activityName.toUtf8());
+
+    QHttpPart activityDescriptionPart;
+    activityDescriptionPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"description\""));
+    QString activityDescription = "";
+    if (activityNameFieldname != "Notes")
+        activityDescription = ride->getTag("Notes", "");
+    activityDescriptionPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain;charset=utf-8"));
+    activityDescriptionPart.setBody(activityDescription.toUtf8());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
@@ -380,6 +389,9 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     multiPart->append(activityTypePart);
     if (activityName != "") {
         multiPart->append(activityNamePart);
+    }
+    if (activityDescription != "") {
+        multiPart->append(activityDescriptionPart);
     }
     multiPart->append(dataTypePart);
     multiPart->append(externalIdPart);
