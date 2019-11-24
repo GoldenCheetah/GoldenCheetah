@@ -10,7 +10,8 @@ sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dyli
 
 # Python SIP
 python3 --version
-wget https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
+python3-config --prefix
+curl -O https://www.riverbankcomputing.com/static/Downloads/sip/4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
 python3 configure.py
