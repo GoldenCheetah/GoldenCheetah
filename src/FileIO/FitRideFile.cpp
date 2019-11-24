@@ -467,6 +467,12 @@ struct FitFileReaderState
         } else if (manu == 76) {
             // Moxy
             return "Moxy Monitor";
+        } else if (manu == 89) {
+            // Tacx
+            switch (prod) {
+                case 2800: return "Tacx Neo";
+                default: return QString("Tacx %1").arg(prod);
+            }
         } else if (manu == 95) {
             // Stryd
             return "Stryd";
@@ -542,6 +548,7 @@ struct FitFileReaderState
         switch (device_type) {
             case 4: return "Headunit"; // bike_power
             case 11: return "Powermeter"; // bike_power
+            case 17: return "Biketrainer"; // fitness equipment
             case 120: return "HR"; // heart_rate
             case 121: return "Speed-Cadence"; // bike_speed_cadence
             case 122: return "Cadence"; // bike_speed
