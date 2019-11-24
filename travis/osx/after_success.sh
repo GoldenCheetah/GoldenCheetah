@@ -7,7 +7,10 @@ echo "About to create dmg file and fix up"
 # This is a hack to include libicudata.64.dylib, not handled by macdployqt[fix]
 mkdir GoldenCheetah.app/Contents/Frameworks
 cp /usr/local/opt/icu4c/lib/libicudata.64.dylib GoldenCheetah.app/Contents/Frameworks
+# Copy python framework and change the path in binary
 cp -R /usr/local/opt/python/Frameworks/Python.framework GoldenCheetah.app/Contents/Frameworks
+install_name_tool -change `otool -L GoldenCheetah.app/Contents/MacOS/GoldenCheetah | awk '/python/ {print $1; gsub("/usr/local/opt/python", "@executable_path/..", $1); print $1}'` GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+# Deploy and generate dmg
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/qt5
 echo "Cleaning up installed QT libraries from qt5"
