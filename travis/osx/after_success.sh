@@ -10,6 +10,17 @@ cp /usr/local/opt/icu4c/lib/libicudata.64.dylib GoldenCheetah.app/Contents/Frame
 # Copy python framework and change the path in binary
 cp -R /usr/local/opt/python/Frameworks/Python.framework GoldenCheetah.app/Contents/Frameworks
 install_name_tool -change `otool -L GoldenCheetah.app/Contents/MacOS/GoldenCheetah | awk '/python/ {print $1; gsub("/usr/local/opt/python", "@executable_path/..", $1); print $1}'` GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+# Fix QtWebEngineProcess due to bug in macdployqt from homebrew
+/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+pushd GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS
+for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtQml QtNetwork QtPositioning
+do
+    OLD_PATH=`otool -L QtWebEngineProcess | grep ${LIB} | cut -f 1 -d ' '`
+    NEW_PATH="@loader_path/../../../../../../../${LIB}.framework/${LIB}"
+    echo ${OLD_PATH} ${NEW_PATH}
+    install_name_tool -change ${OLD_PATH} ${NEW_PATH} QtWebEngineProcess
+done
+popd
 # Deploy and generate dmg
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/qt5
