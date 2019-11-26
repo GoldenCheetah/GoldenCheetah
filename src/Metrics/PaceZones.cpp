@@ -1028,10 +1028,10 @@ PaceZones::paceSetting() const
 bool
 PaceZones::isPaceUnit(QString units)
 {
-    static const QHash<QString, bool> PaceUnitHash = { {"min/km",    true}, {tr("min/km"),    true},
-                                                       {"min/mile",  true}, {tr("min/mile"),  true},
-                                                       {"min/100m",  true}, {tr("min/100m"),  true},
-                                                       {"min/100yd", true}, {tr("min/100yd"), true} };
+    static const QSet<QString> PaceUnitHash = { "min/km",    tr("min/km"),
+                                                "min/mile",  tr("min/mile"),
+                                                "min/100m",  tr("min/100m"),
+                                                "min/100yd", tr("min/100yd") };
 
     return PaceUnitHash.contains(units);
 }

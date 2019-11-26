@@ -4377,7 +4377,7 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
 
 bool LTMPlot::isMinutes(QString units)
 {
-    static const QHash<QString, bool> MinutesHash = { {"minutes", true}, {tr("minutes"), true} };
+    static const QSet<QString> MinutesHash = { "minutes", tr("minutes") };
 
     return MinutesHash.contains(units) || PaceZones::isPaceUnit(units);
 }
