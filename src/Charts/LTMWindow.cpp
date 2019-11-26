@@ -1397,13 +1397,22 @@ LTMWindow::dataTable(bool html)
     if (!firstXvalue && lowestFirstXvalue != highestFirstXvalue) {
         for (int i = 0; i< columns.count(); i++) {
             if (columns[i].n > 0) {
+                // Prepend on vector is prohibitively expensive since requires
+                // full vector copy for each prepend. Much faster to convert
+                // to Qlist, do our business, then convert back.
+                QList<double> tx = columns[i].x.toList();
+                QList<double> ty = columns[i].y.toList();
+
                 double xValue = columns[i].x[0];
-                while (columns[i].x[0] > lowestFirstXvalue) {
+                while (xValue > lowestFirstXvalue) {
                     xValue--;
-                    columns[i].x.prepend(xValue);
-                    columns[i].y.prepend(0.0);
-                    columns[i].n++;
+                    tx.prepend(xValue);
+                    ty.prepend(0.0);
                 }
+
+                columns[i].x = tx.toVector();
+                columns[i].y = ty.toVector();
+                columns[i].n += tx.size();
             }
         }
         // adjust number of visible rows in table
@@ -1423,8 +1432,10 @@ LTMWindow::dataTable(bool html)
 
         if (html) {
             // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
-            summary += "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>%2</b></td>";
-            summary = summary.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(tr("Date"));
+            QString tableStart = "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>%2</b></td>";
+            tableStart = tableStart.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(tr("Date"));
+
+            summary += tableStart;
         } else {
             summary += tr("Date");
         }
@@ -1493,21 +1504,26 @@ LTMWindow::dataTable(bool html)
         // metric name
         for (int i=0; i < settings.metrics.count(); i++) {
 
-            if (html) summary += "<td align=\"center\" style=\"font-weight:bold;background-color:%2;color:%3\" valign=\"top\">%1</td>";
-            else summary += ", %1";
+            QString metricSummary;
+
+            if (html) metricSummary = "<td align=\"center\" style=\"font-weight:bold;background-color:%2;color:%3\" valign=\"top\">%1</td>";
+            else metricSummary = ", %1";
 
             QString name = settings.metrics[i].uname;
-            QString bcolor = settings.metrics[i].penColor.lighter(80).name();
 
             if (name == "Coggan Acute Training Load" || name == tr("Coggan Acute Training Load")) name = "ATL";
             if (name == "Coggan Chronic Training Load" || name == tr("Coggan Chronic Training Load")) name = "CTL";
             if (name == "Coggan Training Stress Balance" || name == tr("Coggan Training Stress Balance")) name = "TSB";
 
-            summary = summary.arg(name);
+            metricSummary = metricSummary.arg(name);
+
             if (html) {
-                summary = summary.arg(bcolor);
-                summary = summary.arg(fontcolors.at(i));
+                QString bcolor = settings.metrics[i].penColor.lighter(80).name();
+                metricSummary = metricSummary.arg(bcolor);
+                metricSummary = metricSummary.arg(fontcolors.at(i));
             }
+
+            summary += metricSummary;
         }
 
         if (html) {
@@ -1517,7 +1533,7 @@ LTMWindow::dataTable(bool html)
 
             // units
             for (int i=0; i < settings.metrics.count(); i++) {
-                summary += "<td align=\"center\" style=\"font-weight:bold;background-color:%2;color:%3\" valign=\"top\">"
+                QString metricSummary = "<td align=\"center\" style=\"font-weight:bold;background-color:%2;color:%3\" valign=\"top\">"
                         "%1</td>";
                 QString units = settings.metrics[i].uunits;
                 QString bcolor = settings.metrics[i].penColor.lighter(80).name();
@@ -1525,9 +1541,11 @@ LTMWindow::dataTable(bool html)
 
                 if (units == "seconds" || units == tr("seconds")) units = tr("hours");
                 if (units == settings.metrics[i].uname) units = "";
-                summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
-                summary = summary.arg(bcolor);
-                summary = summary.arg(fontcolors.at(i));
+                metricSummary = metricSummary.arg(units != "" ? QString("(%1)").arg(units) : "");
+                metricSummary = metricSummary.arg(bcolor);
+                metricSummary = metricSummary.arg(fontcolors.at(i));
+
+                summary += metricSummary;
             }
             summary += "</tr>";
 
@@ -1566,8 +1584,11 @@ LTMWindow::dataTable(bool html)
 
             // Remaining columns - each metric value
             for(int j=0; j<columns.count(); j++) {
-                if (html) rowSummary += "<td align=\"center\" style=\"%2\" valign=\"top\">%1</td>";
-                else rowSummary += ", %1";
+
+                QString metricSummary;
+
+                if (html) metricSummary += "<td align=\"center\" style=\"%2\" valign=\"top\">%1</td>";
+                else metricSummary += ", %1";
 
                 // now format the actual value....
                 QString valueString;
@@ -1590,14 +1611,16 @@ LTMWindow::dataTable(bool html)
                     valueString.setNum(value, 'f', precision);
                 }
 
-                rowSummary = rowSummary.arg(valueString);
+                metricSummary = metricSummary.arg(valueString);
 
                 //
                 if (hdatas.at(j).contains(row)) {
                     QString c = QString("background-color:%1;color:%2").arg(settings.metrics[j].penColor.name()).arg(fontcolors.at(j));
-                    rowSummary = rowSummary.arg(c);
+                    metricSummary = metricSummary.arg(c);
                 } else
-                    rowSummary = rowSummary.arg("");
+                    metricSummary = metricSummary.arg("");
+
+                rowSummary += metricSummary;
             }
 
             // ok, this row is done
