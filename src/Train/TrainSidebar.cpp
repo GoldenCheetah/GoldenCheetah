@@ -1429,6 +1429,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     displayWorkoutDistance = displayDistance = 0;
     displayLapDistance = 0;
     displayLapDistanceRemaining = -1;
+    displayAltitude = 0;
     guiUpdate();
 
     emit setNotification(tr("Stopped.."), 2);
