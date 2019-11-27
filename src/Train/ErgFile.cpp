@@ -1233,7 +1233,7 @@ bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
     if (meters < 0 || meters > Duration) return false;
 
     // No location unless... format contains location...
-    if (format != CRS_LOC)  return 1;
+    if (format != CRS_LOC)  return false;
 
     if (Laps.count() > 0) {
         int lap = 0;

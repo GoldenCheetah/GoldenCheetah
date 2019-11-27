@@ -1535,8 +1535,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
     rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
     rtData.mode = mode;
 
-
-
     // get latest telemetry from devices
     if ((status&RT_RUNNING) || (status&RT_CONNECTED)) {
 
@@ -1687,7 +1685,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
-                // Update location data
+                // For classic rlv with no location data:
+                // Estimate vertical change based upon time passed and slope.
+                // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
+                double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
+
+                displayAltitude += altitudeDeltaMeters;
+
+                // Trust ergFile for location data, if available.
                 if (ergFile) {
                     geolocation geoloc;
                     if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc))
@@ -1698,9 +1703,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                         rtData.setLatitude(displayLatitude);
                         rtData.setLongitude(displayLongitude);
-                        rtData.setAltitude(displayAltitude);
                     }
                 }
+
+                rtData.setAltitude(displayAltitude);
 
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
