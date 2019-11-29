@@ -1303,6 +1303,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
                                 !symbol.compare("Current", Qt::CaseInsensitive) ||
                                 !symbol.compare("RECINTSECS", Qt::CaseInsensitive) ||
+                                !symbol.compare("Device", Qt::CaseInsensitive) ||
                                 !symbol.compare("NA", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
                                 symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
@@ -2658,6 +2659,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             lhsdouble = 1; // if in doubt
             if (m->ride(false)) lhsdouble = m->ride(false)->recIntSecs();
             lhsisNumber = true;
+
+        } else if (!symbol.compare("Device", Qt::CaseInsensitive)) {
+
+            if (m->ride(false)) lhsstring = m->ride(false)->deviceType();
 
         } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
 
