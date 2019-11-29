@@ -42,7 +42,7 @@ login and open a terminal to get a shell prompt
 Download MANDATORY DEPENDENCIES (browser)
 -----------------------------------------
 Download and install the Qt SDK from http://qt-project.org/
-Once that is completed test qmake is ok with: qmake --version (should report 4.7.0 or higher)
+Once that is completed test qmake is ok with: qmake --version (should report 4.9.8 or higher)
 
 
 DEBIAN-BASED DISTRIBUTION INSTRUCTIONS
@@ -91,10 +91,19 @@ $ make clean
 $ qmake
 $ make
 
+To compile translation you need QT tool - lrelease
+If it is not found using he defaults in src/src.pro then set the full path and filename in gcconfig.pri
+QMAKE_LRELEASE = /usr/bin/lrelease
+
 When build first time you get number of error messages on .qm files missing:
     "RCC: Error in 'Resources/application.qrc': Cannot find file 'translations/gc_fr.qm'"
 You can ignore these messages for your build. The .qm files will be created during the
 build at a later point in time via the "lrelease" command you configured in gcconfig.pri)
+
+If your QT build includes its own local compress libs then you should comment the line below in gcconfig.pri,
+otherwise you will need to have the compress libraries installed separately. 
+#LIBZ_INCLUDE =
+#LIBZ_LIBS    = -lz
 
 You will now have a release3 binary but with none of the release3 dependencies compiled in.
 Get latest GOLDEN CHEETAH source files
