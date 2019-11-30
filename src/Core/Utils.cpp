@@ -22,9 +22,122 @@
 #include <QStringList>
 #include <QDebug>
 #include <QDir>
+#include <QRegularExpression>
 
 namespace Utils
 {
+
+// Class for performing multiple string substitutions in a single
+// pass over string. This implementation is only valid when substitutions
+// will not inject additional substitution opportunities.
+class StringSubstitutionizer
+{
+    QVector<QString> v;
+    QMap<QString, QString> qm;
+    QRegularExpression qr;
+
+    QString GetSubstitute(QString s) const
+    {
+        if (!qm.contains(s)) return QString();
+        return qm.value(s);
+    }
+
+    void BuildFindAnyRegex()
+    {
+        QString qRegexString;
+
+        for (int i = 0; i < v.size(); i++)
+        {
+            if (i > 0) qRegexString.append("|");
+
+            qRegexString.append(v[i]);
+        }
+
+        qr = QRegularExpression(qRegexString);
+    }
+
+protected:
+
+    void PushSubstitution(QString regexstring, QString matchstring, QString substitute)
+    {
+        if (!qm.contains(matchstring))
+        {
+            v.push_back(regexstring);
+            qm[matchstring] = substitute;
+        }
+    }
+
+    void FinalizeInit()
+    {
+        BuildFindAnyRegex();
+    }
+
+    QRegularExpression GetFindAnyRegex() const
+    {
+        return qr;
+    }
+
+public:
+
+    QString BuildSubstitutedString(QStringRef s) const
+    {
+        QRegularExpression qr = GetFindAnyRegex();
+
+        QRegularExpressionMatchIterator i = qr.globalMatch(s);
+
+        if (!i.hasNext())
+            return s.toString();
+
+        QString newstring;
+
+        unsigned iCopyIdx = 0;
+        do
+        {
+            QRegularExpressionMatch match = i.next();
+            int copysize = match.capturedStart() - iCopyIdx;
+
+            if (copysize > 0)
+                newstring.append(s.mid(iCopyIdx, copysize));
+
+            newstring.append(GetSubstitute(match.captured()));
+
+            iCopyIdx = (match.capturedStart() + match.captured().size());
+        } while (i.hasNext());
+
+        int copysize = s.size() - iCopyIdx;
+        if (copysize > 0)
+            newstring.append(s.mid(iCopyIdx, copysize));
+
+        return newstring;
+    }
+};
+
+struct RidefileUnEscaper : public StringSubstitutionizer
+{
+    RidefileUnEscaper()
+    {
+        //                regex       match   replacement
+        PushSubstitution("\\\\t",    "\\t",  "\t");       // tab
+        PushSubstitution("\\\\n",    "\\n",  "\n");       // newline
+        PushSubstitution("\\\\r",    "\\r",  "\r");       // carriage-return
+        PushSubstitution("\\\\b",    "\\b",  "\b");       // backspace
+        PushSubstitution("\\\\f",    "\\f",  "\f");       // formfeed
+        PushSubstitution("\\\\/",    "\\/",  "/");        // solidus
+        PushSubstitution("\\\\\"",   "\\\"", "\"");       // quote
+        PushSubstitution("\\\\\\\\", "\\\\", "\\");       // backslash
+
+        FinalizeInit();
+    }
+};
+
+QString RidefileUnEscape(const QStringRef s)
+{
+    // Static const object constructs it's search regex at load time.
+    static const RidefileUnEscaper s_RidefileUnescaper;
+
+    return s_RidefileUnescaper.BuildSubstitutedString(s);
+}
+
 // when writing xml...
 QString xmlprotect(const QString &string)
 {
@@ -43,7 +156,7 @@ QString xmlprotect(const QString &string)
     return s;
 }
 
-// BEWARE: this function is tide closely to RideFile parsing
+// BEWARE: this function is tied closely to RideFile parsing
 //           DO NOT CHANGE IT UNLESS YOU KNOW WHAT YOU ARE DOING
 QString unprotect(const QString &buffer)
 {
