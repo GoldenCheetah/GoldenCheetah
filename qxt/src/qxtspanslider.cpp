@@ -200,6 +200,7 @@ void QxtSpanSliderPrivate::triggerAction(QAbstractSlider::SliderAction action, b
     case QAbstractSlider::SliderMove:
         if ((main && mainControl == QxtSpanSlider::UpperHandle) || (!main && altControl == QxtSpanSlider::UpperHandle))
             up = true;
+        break;
     case QAbstractSlider::SliderNoAction:
         no = true;
         break;

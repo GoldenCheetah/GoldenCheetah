@@ -573,6 +573,8 @@ void DialWindow::seriesChanged()
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
     case RealtimeData::Slope:
+    case RealtimeData::Latitude:
+    case RealtimeData::Longitude:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
             break;

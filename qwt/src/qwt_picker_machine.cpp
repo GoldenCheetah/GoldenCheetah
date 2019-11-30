@@ -218,7 +218,7 @@ QList<QwtPickerMachine::Command> QwtPickerClickRectMachine::transition(
     {
         case QEvent::MouseButtonPress:
         {
-            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1, 
+            if ( eventPattern.mouseMatch( QwtEventPattern::MouseSelect1,
                 static_cast<const QMouseEvent *>( event ) ) )
             {
                 switch ( state() )
@@ -242,6 +242,7 @@ QList<QwtPickerMachine::Command> QwtPickerClickRectMachine::transition(
                     }
                 }
             }
+            break;
         }
         case QEvent::MouseMove:
         case QEvent::Wheel:

@@ -121,6 +121,7 @@ public:
                     name = "QwtPlotAxisXBottom";
                     break;
                 case QwtAxis::xTop:
+                default:
                     align = QwtScaleDraw::TopScale;
                     name = "QwtPlotAxisXTop";
                     break;

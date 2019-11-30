@@ -788,12 +788,12 @@ register LM_REAL sum0=0.0, sum1=0.0, sum2=0.0, sum3=0.0;
        */ 
 
       switch(n - i){ 
-        case 7 : e[i]=-y[i]; sum0+=e[i]*e[i]; ++i;
-        case 6 : e[i]=-y[i]; sum1+=e[i]*e[i]; ++i;
-        case 5 : e[i]=-y[i]; sum2+=e[i]*e[i]; ++i;
-        case 4 : e[i]=-y[i]; sum3+=e[i]*e[i]; ++i;
-        case 3 : e[i]=-y[i]; sum0+=e[i]*e[i]; ++i;
-        case 2 : e[i]=-y[i]; sum1+=e[i]*e[i]; ++i;
+        case 7 : e[i]=-y[i]; sum0+=e[i]*e[i]; ++i; // intentional fallthrough
+        case 6 : e[i]=-y[i]; sum1+=e[i]*e[i]; ++i; // intentional fallthrough
+        case 5 : e[i]=-y[i]; sum2+=e[i]*e[i]; ++i; // intentional fallthrough
+        case 4 : e[i]=-y[i]; sum3+=e[i]*e[i]; ++i; // intentional fallthrough
+        case 3 : e[i]=-y[i]; sum0+=e[i]*e[i]; ++i; // intentional fallthrough
+        case 2 : e[i]=-y[i]; sum1+=e[i]*e[i]; ++i; // intentional fallthrough
         case 1 : e[i]=-y[i]; sum2+=e[i]*e[i]; //++i;
       }
     }
