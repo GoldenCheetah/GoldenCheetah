@@ -49,6 +49,9 @@ static QString unprotect(char *string)
     // does it end with a space (to avoid token conflict) ?
     if (s.endsWith(" ")) s = s.mid(0, s.length()-1);
 
+#if 1
+    s = Utils::RidefileUnEscape(QStringRef(&s));
+#else
     // now un-escape the control characters
     s.replace("\\t", "\t");  // tab
     s.replace("\\n", "\n");  // newline
@@ -58,6 +61,7 @@ static QString unprotect(char *string)
     s.replace("\\/", "/");   // solidus
     s.replace("\\\"", "\""); // quote
     s.replace("\\\\", "\\"); // backslash
+#endif
 
     return s;
 }
