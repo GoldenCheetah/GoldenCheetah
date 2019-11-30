@@ -334,7 +334,6 @@ int fvec_sz=n, fjac_sz=n*m, pp_sz=m, fvecp_sz=n;
 static int LEVMAR_PSEUDOINVERSE(LM_REAL *A, LM_REAL *B, int m)
 {
 LM_REAL *buf=NULL;
-int buf_sz=0;
 static LM_REAL eps=LM_CNST(-1.0);
 
 register int i, j;
@@ -352,8 +351,7 @@ int info, rank, worksz, *iwork, iworksz;
 
   tot_sz=(a_sz + u_sz + s_sz + vt_sz + worksz)*sizeof(LM_REAL) + iworksz*sizeof(int); /* should be arranged in that order for proper doubles alignment */
 
-    buf_sz=tot_sz;
-    buf=(LM_REAL *)malloc(buf_sz);
+    buf=(LM_REAL *)malloc(tot_sz);
     if(!buf){
       fprintf(stderr, RCAT("memory allocation in ", LEVMAR_PSEUDOINVERSE) "() failed!\n");
       return 0; /* error */
@@ -426,7 +424,6 @@ int info, rank, worksz, *iwork, iworksz;
 static int LEVMAR_LUINVERSE(LM_REAL *A, LM_REAL *B, int m)
 {
 void *buf=NULL;
-int buf_sz=0;
 
 register int i, j, k, l;
 int *idx, maxi=-1, idx_sz, a_sz, x_sz, work_sz, tot_sz;
@@ -439,7 +436,6 @@ LM_REAL *a, *x, *work, max, sum, tmp;
   work_sz=m;
   tot_sz=(a_sz + x_sz + work_sz)*sizeof(LM_REAL) + idx_sz*sizeof(int); /* should be arranged in that order for proper doubles alignment */
 
-  buf_sz=tot_sz;
   buf=(void *)malloc(tot_sz);
   if(!buf){
     fprintf(stderr, RCAT("memory allocation in ", LEVMAR_LUINVERSE) "() failed!\n");

@@ -89,8 +89,6 @@ private:
             bool  operator() (unsigned long row, unsigned long col) const;
             /** Destructor */
             ~Matrix();
-            /** Copy Constructor */
-            Matrix(const Matrix& m);
             /** C++11 Move constructor */
             /* Matrix(Matrix&&); */
             /**Copy assignment operator */

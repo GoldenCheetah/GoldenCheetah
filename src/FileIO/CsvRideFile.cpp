@@ -194,7 +194,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
 
-    int xTrainVersion  = 0;
+    //UNUSED int xTrainVersion;
 
     //UNUSED int timestampIndex=-1;
     int secsIndex=-1;
@@ -272,7 +272,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setDeviceType("xtrainCSV");
                     rideFile->setFileFormat("xtrainCSV");
                     unitsHeader = 2;
-                    xTrainVersion = line.section( ',', 1, 1 ).toInt();
+                    //UNUSED xTrainVersion = line.section( ',', 1, 1 ).toInt();
 
                     ++lineno;
                     continue;

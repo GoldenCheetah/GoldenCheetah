@@ -30,19 +30,6 @@ inline QwtIndPlotMarker::Matrix::~Matrix()
     reset();
 }
 
-QwtIndPlotMarker::Matrix::Matrix(const Matrix& m) {
-
-    if((m_rows!=m.rows())||(m_cols!=m.cols())) {
-        resize(m.rows(),m.cols());
-    }
-
-    for(unsigned long i=0;i<m.rows();i++){
-        for (unsigned long j = 0; j < m.cols(); j++) {
-        m_data[i*m_cols+j]=m(i,j);
-        }
-    }
-}
-
 /* UNUSED
 QwtIndPlotMarker::Matrix& QwtIndPlotMarker::Matrix::operator=(const Matrix& m){
     if((m_rows!=m.rows())||(m_cols!=m.cols())) {
