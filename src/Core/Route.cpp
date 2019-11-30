@@ -340,7 +340,7 @@ Routes::readRoutes()
 
     QXmlInputSource source( &routeFile );
     QXmlSimpleReader xmlReader;
-    RouteParser( handler );
+    RouteParser handler;
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
     xmlReader.parse( source );

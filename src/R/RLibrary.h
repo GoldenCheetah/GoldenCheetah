@@ -75,16 +75,16 @@ extern int GC_R_registerRoutines(DllInfo *info, const R_CMethodDef * const crout
                           const R_FortranMethodDef * const fortranRoutines,
                           const R_ExternalMethodDef * const externalRoutines);
 #ifndef WIN32
-extern void (*(*ptr_GC_ptr_R_Suicide))(const char *);
-extern void (*(*ptr_GC_ptr_R_ShowMessage))(const char *);
-extern int  (*(*ptr_GC_ptr_R_ReadConsole))(const char *, unsigned char *, int, int);
-extern void (*(*ptr_GC_ptr_R_WriteConsole))(const char *, int);
-extern void (*(*ptr_GC_ptr_R_WriteConsoleEx))(const char *, int, int);
-extern void (*(*ptr_GC_ptr_R_ResetConsole))(void);
-extern void (*(*ptr_GC_ptr_R_FlushConsole))(void);
-extern void (*(*ptr_GC_ptr_R_ClearerrConsole))(void);
-extern void (*(*ptr_GC_ptr_R_ProcessEvents))(void);
-extern void (*(*ptr_GC_ptr_R_Busy))(int);
+extern void (**ptr_GC_ptr_R_Suicide)(const char *);
+extern void (**ptr_GC_ptr_R_ShowMessage)(const char *);
+extern int  (**ptr_GC_ptr_R_ReadConsole)(const char *, unsigned char *, int, int);
+extern void (**ptr_GC_ptr_R_WriteConsole)(const char *, int);
+extern void (**ptr_GC_ptr_R_WriteConsoleEx)(const char *, int, int);
+extern void (**ptr_GC_ptr_R_ResetConsole)(void);
+extern void (**ptr_GC_ptr_R_FlushConsole)(void);
+extern void (**ptr_GC_ptr_R_ClearerrConsole)(void);
+extern void (**ptr_GC_ptr_R_ProcessEvents)(void);
+extern void (**ptr_GC_ptr_R_Busy)(int);
 extern int *pGC_R_interrupts_pending;
 #else
 typedef char *(*Prot_GC_getDLLVersion)(void);
