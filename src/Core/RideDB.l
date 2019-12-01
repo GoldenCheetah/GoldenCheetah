@@ -49,19 +49,7 @@ static QString unprotect(char *string)
     // does it end with a space (to avoid token conflict) ?
     if (r.endsWith(" ")) r = r.mid(0, r.length()-1);
 
-#if 1
     QString s = Utils::RidefileUnEscape(r);
-#else
-    // now un-escape the control characters
-    s.replace("\\t", "\t");  // tab
-    s.replace("\\n", "\n");  // newline
-    s.replace("\\r", "\r");  // carriage-return
-    s.replace("\\b", "\b");  // backspace
-    s.replace("\\f", "\f");  // formfeed
-    s.replace("\\/", "/");   // solidus
-    s.replace("\\\"", "\""); // quote
-    s.replace("\\\\", "\\"); // backslash
-#endif
 
     return s;
 }
