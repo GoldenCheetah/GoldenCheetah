@@ -44,20 +44,12 @@ static QString unprotect(char *string)
 
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
-    QString s = string2.mid(1,string2.length()-2);
+    QStringRef r = string2.midRef(1,string2.length()-2);
 
     // does it end with a space (to avoid token conflict) ?
-    if (s.endsWith(" ")) s = s.mid(0, s.length()-1);
+    if (r.endsWith(" ")) r = r.mid(0, r.length()-1);
 
-    // now un-escape the control characters
-    s.replace("\\t", "\t");  // tab
-    s.replace("\\n", "\n");  // newline
-    s.replace("\\r", "\r");  // carriage-return
-    s.replace("\\b", "\b");  // backspace
-    s.replace("\\f", "\f");  // formfeed
-    s.replace("\\/", "/");   // solidus
-    s.replace("\\\"", "\""); // quote
-    s.replace("\\\\", "\\"); // backslash
+    QString s = Utils::RidefileUnEscape(r);
 
     return s;
 }
