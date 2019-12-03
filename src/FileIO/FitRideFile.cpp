@@ -2875,7 +2875,7 @@ struct FitFileReaderState
                                    field.size);
 
                         }
-                        read_unknown( field.size, &count );
+                        if (field.size > 0) read_unknown( field.size, &count );
                         value.type = SingleValue;
                         value.v = NA_VALUE;
                         unknown_base_type.insert(field.type);
