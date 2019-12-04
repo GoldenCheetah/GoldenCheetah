@@ -135,6 +135,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Dean Junk");
     contributors.append("Dmitry Monakhov");
     contributors.append("Eric Brandt");
+    contributors.append("Eric Christoffersen");
     contributors.append("Eric Murray");
     contributors.append("Erik Boto");
     contributors.append("Frank Zschockelt");
