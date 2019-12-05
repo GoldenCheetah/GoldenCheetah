@@ -375,6 +375,7 @@ struct FitFileReaderState
                 case 2713: return "Garmin Edge 1030";
                 case 2886: case 2888: return "Garmin FR645";
                 case 2900: return "Garmin Fenix 5s +";
+                case 3028: return "Garmin GPSMap 66";
                 case 3110: return "Garmin Fenix 5 +";
                 case 3111: return "Garmin Fenix 5x +";
                 case 3112: return "Garmin Edge 520 +";
