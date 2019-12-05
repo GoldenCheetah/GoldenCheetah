@@ -2583,10 +2583,10 @@ MultiDeviceDialog::MultiDeviceDialog(Context *, TrainSidebar *traintool) : train
     buttons->addStretch();
     main->addLayout(buttons);
 
-    cancelButton = new QPushButton("Cancel", this);
+    cancelButton = new QPushButton(tr("Cancel"), this);
     buttons->addWidget(cancelButton);
 
-    applyButton = new QPushButton("Apply", this);
+    applyButton = new QPushButton(tr("Apply"), this);
     buttons->addWidget(applyButton);
 
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
