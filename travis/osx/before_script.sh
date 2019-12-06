@@ -21,7 +21,8 @@ cd ..
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
-/usr/local/opt/qt5/bin/lupdate src/src.pro
+# Define GC version string, only for tagged builds
+echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri
 echo DEFINES += NOWEBKIT >> src/gcconfig.pri
 sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
 sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/qt5/bin/lrelease|" src/gcconfig.pri

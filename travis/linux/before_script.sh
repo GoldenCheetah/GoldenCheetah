@@ -4,6 +4,8 @@ export PATH=/opt/qt59/bin:$PATH
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
+# Define GC version string, only for tagged builds
+echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri
 # user WEBENGINE
 echo DEFINES += NOWEBKIT >> src/gcconfig.pri
 # Trusty needs C99 mode to enable declarations in for loops
