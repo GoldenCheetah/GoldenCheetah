@@ -36,6 +36,7 @@ class FixSpikesConfig : public DataProcessorConfig
         QLabel *maxLabel, *varianceLabel;
         QDoubleSpinBox *max,
                        *variance;
+        QCheckBox *kphCheck, *gearCheck, *slopeCheck, *cadenceCheck;
 
     public:
         FixSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -59,12 +60,26 @@ class FixSpikesConfig : public DataProcessorConfig
             variance = new QDoubleSpinBox();
             variance->setMaximum(9999);
             variance->setMinimum(0);
-            variance->setSingleStep(50);
+            variance->setSingleStep(10);
+
+            kphCheck = new QCheckBox(tr("Speed"));
+            kphCheck->setChecked(false);
+            gearCheck = new QCheckBox(tr("Gear"));
+            gearCheck->setChecked(false);
+            slopeCheck = new QCheckBox(tr("Slope"));
+            slopeCheck->setChecked(false);
+            cadenceCheck = new QCheckBox(tr("Cadence"));
+            cadenceCheck->setChecked(false);
 
             layout->addWidget(maxLabel);
             layout->addWidget(max);
             layout->addWidget(varianceLabel);
             layout->addWidget(variance);
+            layout->addWidget(kphCheck);
+            layout->addWidget(gearCheck);
+            layout->addWidget(slopeCheck);
+            layout->addWidget(cadenceCheck);
+
             layout->addStretch();
         }
 
@@ -72,8 +87,8 @@ class FixSpikesConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         QString explain() {
-            return(QString(tr("Occasionally power meters will erroneously "
-                           "report high values for power. For crank based "
+            return(QString(tr("Power meters will occasionally report erroneously "
+                           " high values for power. For crank based "
                            "power meters such as SRM and Quarq this is "
                            "caused by an erroneous cadence reading "
                            "as a result of triggering a reed switch "
@@ -90,12 +105,13 @@ class FixSpikesConfig : public DataProcessorConfig
                            "Variance (%) - this will smooth any values which "
                            "are higher than this percentage of the rolling "
                            "average wattage for the 30 seconds leading up "
-                           "to the spike.")));
+                           "to the spike.\n\nEnable check boxes to permit this function\n"
+                           "to interpolate other data on same anomolous point.\n")));
         }
 
         void readConfig() {
-            double tol = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
-            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
+            double tol = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
+            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "20").toDouble();
             max->setValue(tol);
             variance->setValue(stop);
         }
@@ -145,8 +161,8 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     // get settings
     double variance, max;
     if (config == NULL) { // being called automatically
-        max = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
-        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
+        max = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
+        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "20").toDouble();
     } else { // being called manually
         max = ((FixSpikesConfig*)(config))->max->value();
         variance = ((FixSpikesConfig*)(config))->variance->value();
@@ -160,7 +176,6 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     if (windowsize > ride->dataPoints().count()) return false;
 
     // Find the power outliers
-
     int spikes = 0;
     double spiketime = 0.0;
 
@@ -177,12 +192,11 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     ride->command->startLUW("Fix Spikes in Recording");
     for (int i=0; i<secs.count(); i++) {
 
-        // is this over variance threshold?
-        if (outliers->getDeviationForRank(i) < variance) break;
-
-        // ok, so its highly variant but is it over
-        // the max value we are willing to accept?
-        if (outliers->getYForRank(i) < max) continue;
+        // An entry is a fixup candidate if it is outside variance OR it is above reasonable power.
+        double y = outliers->getYForRank(i);
+        if (   outliers->getDeviationForRank(i) < variance
+            || y < max)
+            continue;
 
         // Houston, we have a spike
         spikes++;
@@ -190,12 +204,38 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
 
         // which one is it
         int pos = outliers->getIndexForRank(i);
-        double left=0.0, right=0.0;
 
-        if (pos > 0) left = ride->dataPoints()[pos-1]->watts;
-        if (pos < (ride->dataPoints().count()-1)) right = ride->dataPoints()[pos+1]->watts;
+        bool doAdjustKph     = ((FixSpikesConfig*)(config))->kphCheck->isChecked();
+        bool doAdjustGear    = ((FixSpikesConfig*)(config))->gearCheck->isChecked();
+        bool doAdjustSlope   = ((FixSpikesConfig*)(config))->slopeCheck->isChecked();
+        bool doAdjustCadence = ((FixSpikesConfig*)(config))->cadenceCheck->isChecked();
 
-        ride->command->setPointValue(pos, RideFile::watts, (left+right)/2.0);
+        static const RideFile::seriestype fixarray[] = { RideFile::watts, RideFile::kph, RideFile::gear, RideFile::slope, RideFile::cad};
+        bool                              doAdjust[] = { true,            doAdjustKph,   doAdjustGear,   doAdjustSlope,   doAdjustCadence};
+        const RideFilePoint* leftPoint = NULL;
+        const RideFilePoint* rightPoint = NULL;
+
+        if (pos > 0) {
+            leftPoint = (ride->dataPoints()[pos - 1]);
+        }
+        if (pos < (ride->dataPoints().count() - 1))
+        {
+            rightPoint = (ride->dataPoints()[pos + 1]);
+        }
+
+        for (int t = 0; t < (sizeof(fixarray) / sizeof(fixarray[0])); t++)
+        {
+            RideFile::seriestype series = fixarray[t];
+            if (!ride->isDataPresent(series))
+                continue;
+
+            if (!doAdjust[t])
+                continue;
+
+            double left = leftPoint ? leftPoint->value(series) : 0.0;
+            double right = rightPoint ? rightPoint->value(series) : 0.0;
+            ride->command->setPointValue(pos, series, (left + right) / 2.0);
+        }
     }
     ride->command->endLUW();
 
