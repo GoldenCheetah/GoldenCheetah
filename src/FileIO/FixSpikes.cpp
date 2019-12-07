@@ -36,7 +36,6 @@ class FixSpikesConfig : public DataProcessorConfig
         QLabel *maxLabel, *varianceLabel;
         QDoubleSpinBox *max,
                        *variance;
-        QCheckBox *kphCheck, *slopeCheck, *cadenceCheck;
 
     public:
         FixSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -62,20 +61,10 @@ class FixSpikesConfig : public DataProcessorConfig
             variance->setMinimum(0);
             variance->setSingleStep(10);
 
-            kphCheck = new QCheckBox(tr("Speed"));
-            kphCheck->setChecked(false);
-            slopeCheck = new QCheckBox(tr("Slope"));
-            slopeCheck->setChecked(false);
-            cadenceCheck = new QCheckBox(tr("Cadence"));
-            cadenceCheck->setChecked(false);
-
             layout->addWidget(maxLabel);
             layout->addWidget(max);
             layout->addWidget(varianceLabel);
             layout->addWidget(variance);
-            layout->addWidget(kphCheck);
-            layout->addWidget(slopeCheck);
-            layout->addWidget(cadenceCheck);
 
             layout->addStretch();
         }
@@ -102,8 +91,7 @@ class FixSpikesConfig : public DataProcessorConfig
                            "Variance (%) - this will smooth any values which "
                            "are higher than this percentage of the rolling "
                            "average wattage for the 30 seconds leading up "
-                           "to the spike.\n\nEnable check boxes to permit this function\n"
-                           "to interpolate other data on same anomolous point.\n")));
+                           "to the spike.\n\n")));
         }
 
         void readConfig() {
@@ -199,13 +187,6 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
         spikes++;
         spiketime += ride->recIntSecs();
 
-        bool doAdjustKph     = ((FixSpikesConfig*)(config))->kphCheck->isChecked()     && ride->isDataPresent(RideFile::kph);
-        bool doAdjustSlope   = ((FixSpikesConfig*)(config))->slopeCheck->isChecked()   && ride->isDataPresent(RideFile::slope);
-        bool doAdjustCadence = ((FixSpikesConfig*)(config))->cadenceCheck->isChecked() && ride->isDataPresent(RideFile::cad);
-
-        static const RideFile::seriestype fixarray[] = { RideFile::watts, RideFile::kph, RideFile::slope, RideFile::cad};
-        bool                              doAdjust[] = { true,            doAdjustKph,   doAdjustSlope,   doAdjustCadence};
-
         const RideFilePoint* leftPoint = NULL;
         const RideFilePoint* rightPoint = NULL;
 
@@ -219,14 +200,9 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
             rightPoint = (ride->dataPoints()[pos + 1]);
         }
 
-        int arraysize = sizeof(fixarray) / sizeof(fixarray[0]);
-        for (int t = 0; t < arraysize && doAdjust[t]; t++) {
-            RideFile::seriestype series = fixarray[t];
-
-            double left = leftPoint ? leftPoint->value(series) : 0.0;
-            double right = rightPoint ? rightPoint->value(series) : 0.0;
-            ride->command->setPointValue(pos, series, (left + right) / 2.0);
-        }
+        double left = leftPoint ? leftPoint->value(RideFile::watts) : 0.0;
+        double right = rightPoint ? rightPoint->value(RideFile::watts) : 0.0;
+        ride->command->setPointValue(pos, RideFile::watts, (left + right) / 2.0);
     }
     ride->command->endLUW();
 
