@@ -196,7 +196,7 @@ public:
     virtual bool isCompare() const { return false;}
 
     // for sorting... we look at x
-    bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
+    bool operator< (const GcWindow &right) const { return geometry().x() < right.geometry().x(); }
 
     // we paint a heading if there is space in the top margin
     void paintEvent (QPaintEvent * event);

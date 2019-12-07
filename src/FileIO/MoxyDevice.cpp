@@ -77,7 +77,7 @@ class MoxyData {
     QDateTime timestamp;
     QString line;
 
-    bool operator<(MoxyData right) const { return timestamp < right.timestamp; }
+    bool operator<(const MoxyData &right) const { return timestamp < right.timestamp; }
 };
 
 bool

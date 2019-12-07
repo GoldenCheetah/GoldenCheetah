@@ -46,7 +46,7 @@ struct HrZoneInfo {
         name(n), desc(d), lo(l), hi(h), trimp(t) {}
 
     // used by qSort()
-    bool operator< (HrZoneInfo right) const {
+    bool operator< (const HrZoneInfo &right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
 };
@@ -71,7 +71,7 @@ struct HrZoneRange {
         begin(b), end(e), lt(_lt), restHr(_restHr), maxHr(_maxHr), hrZonesSetFromLT(false) {}
 
     // used by qSort()
-    bool operator< (HrZoneRange right) const {
+    bool operator< (const HrZoneRange &right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
                 ((begin == right.begin) && (! end.isNull()) &&

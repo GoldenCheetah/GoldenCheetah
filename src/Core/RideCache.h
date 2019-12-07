@@ -162,7 +162,7 @@ class AthleteBest
     QDate date;
 
     // for qsort
-    bool operator< (AthleteBest right) const { return (nvalue < right.nvalue); }
+    bool operator< (const AthleteBest &right) const { return (nvalue < right.nvalue); }
 };
 
 #endif // _GC_RideCache_h

@@ -57,7 +57,7 @@ public:
             sizemeter;      // height ?
 
     // used by qSort()
-    bool operator< (WithingsReading right) const {
+    bool operator< (const WithingsReading &right) const {
         return (when < right.when);
     }
 };

@@ -49,7 +49,7 @@ struct PaceZoneInfo {
         name(n), desc(d), lo(l), hi(h) {}
 
     // used by qSort()
-    bool operator< (PaceZoneInfo right) const {
+    bool operator< (const PaceZoneInfo &right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
 };
@@ -71,7 +71,7 @@ struct PaceZoneRange {
         begin(b), end(e), cv(_cv), zonesSetFromCV(false) {}
 
     // used by qSort()
-    bool operator< (PaceZoneRange right) const {
+    bool operator< (const PaceZoneRange &right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
                 ((begin == right.begin) && (! end.isNull()) &&

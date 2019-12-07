@@ -214,8 +214,8 @@ class RideItem : public QObject
         void setStartTime(QDateTime);
 
         // sorting
-        bool operator<(RideItem right) const { return dateTime < right.dateTime; }
-        bool operator>(RideItem right) const { return dateTime < right.dateTime; }
+        bool operator<(const RideItem &right) const { return dateTime < right.dateTime; }
+        bool operator>(const RideItem &right) const { return dateTime < right.dateTime; }
 
     private:
         void updateIntervals();

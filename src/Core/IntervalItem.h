@@ -89,7 +89,7 @@ class IntervalItem
         RideFileInterval *rideInterval;
 
         // used by qSort()
-        bool operator< (IntervalItem right) const {
+        bool operator< (const IntervalItem &right) const {
             return (start < right.start);
         }
 };

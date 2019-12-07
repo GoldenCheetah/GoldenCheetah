@@ -4301,7 +4301,7 @@ struct schemeitem {
     QString name, desc;
     int lo;
     double trimp;
-    bool operator<(schemeitem right) const { return lo < right.lo; }
+    bool operator<(const schemeitem &right) const { return lo < right.lo; }
 };
 
 ZoneScheme
@@ -5859,7 +5859,7 @@ struct paceschemeitem {
     QString name, desc;
     int lo;
     double trimp;
-    bool operator<(paceschemeitem right) const { return lo < right.lo; }
+    bool operator<(const paceschemeitem &right) const { return lo < right.lo; }
 };
 
 PaceZoneScheme

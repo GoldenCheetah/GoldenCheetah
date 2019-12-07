@@ -31,7 +31,7 @@ class LTMOutliers
         int pos;
         double deviation;
 
-        bool operator< (xdev right) const {
+        bool operator< (const xdev &right) const {
             return (deviation > right.deviation);  // sort ascending! (.gt not .lt)
         }
     };

@@ -99,7 +99,7 @@ PyObject* Bindings::athlete() const
 class gcZoneConfig {
     public:
     gcZoneConfig(QString sport) : sport(sport), date(QDate(01,01,01)), cp(0), wprime(0), pmax(0), ftp(0),lthr(0),rhr(0),hrmax(0),cv(0) {}
-    bool operator<(gcZoneConfig rhs) const { return date < rhs.date; }
+    bool operator<(const gcZoneConfig &rhs) const { return date < rhs.date; }
     QString sport;
     QDate date;
     QList<int> zoneslow;

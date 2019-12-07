@@ -203,7 +203,7 @@ operator-=(struct timeval &left, const struct timeval &right)
 }
 
 static bool
-operator<(struct timeval &left, const struct timeval &right)
+operator<(const struct timeval &left, const struct timeval &right)
 {
     if (left.tv_sec < right.tv_sec)
         return true;

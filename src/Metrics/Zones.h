@@ -45,7 +45,7 @@ struct ZoneInfo {
         name(n), desc(d), lo(l), hi(h) {}
 
     // used by qSort()
-    bool operator< (ZoneInfo right) const {
+    bool operator< (const ZoneInfo &right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
 };
@@ -70,7 +70,7 @@ struct ZoneRange {
         begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
 
     // used by qSort()
-    bool operator< (ZoneRange right) const {
+    bool operator< (const ZoneRange &right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
                 ((begin == right.begin) && (! end.isNull()) &&

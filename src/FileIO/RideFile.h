@@ -126,12 +126,21 @@ class RideFileInterval
         type(type), start(start), stop(stop), name(name), test(test), color(color) {}
 
 
-        // order bu start time (and stop+name for QMap)
-        bool operator< (RideFileInterval right) const { return start < right.start ||
-                                                        (start == right.start && stop < right.stop) ||
-                                                        (start == right.start && stop == right.stop && name < right.name); }
-        bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop && name == right.name; }
-        bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
+        // order by start time (and stop+name for QMap)
+        bool operator< (const RideFileInterval &right) const
+        {
+            return start < right.start ||
+              (start == right.start && stop < right.stop) ||
+              (start == right.start && stop == right.stop && name < right.name);
+        }
+        bool operator== (const RideFileInterval &right) const
+        {
+            return start == right.start && stop == right.stop && name == right.name;
+        }
+        bool operator!= (const RideFileInterval &right) const
+        {
+            return start != right.start || stop != right.stop;
+        }
 
         bool isPeak() const;
         bool isMatch() const;
@@ -149,8 +158,11 @@ struct RideFileCalibration
     RideFileCalibration(double start, int value, QString name) :
         start(start), value(value), name(name) {}
 
-    // order bu start time
-    bool operator< (RideFileCalibration right) const { return start < right.start; }
+    // order by start time
+    bool operator< (const RideFileCalibration &right) const
+    {
+        return start < right.start;
+    }
 };
 
 class RideFile : public QObject // QObject to emit signals

@@ -54,7 +54,7 @@ private:
         double row;
         double value;
 
-        bool operator< (rankx right) const {
+        bool operator< (const rankx &right) const {
             return (value > right.value);  // sort ascending! (.gt not .lt)
         }
         static bool sortByRow(const rankx &left, const rankx &right) {

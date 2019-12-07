@@ -124,7 +124,7 @@ class MetricDetail {
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false), curve(NULL) {}
 
-    bool operator< (MetricDetail right) const { return name < right.name; }
+    bool operator< (const MetricDetail &right) const { return name < right.name; }
 
     int type;
     bool stack; // should this be stacked?

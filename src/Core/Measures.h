@@ -43,7 +43,7 @@ public:
     QString originalSource; // if delivered from the cloud service
 
     // used by qSort()
-    bool operator< (Measure right) const {
+    bool operator< (const Measure &right) const {
         return (when < right.when);
     }
     // calculate a CRC for the Measure data - used to see if

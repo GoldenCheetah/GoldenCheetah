@@ -45,7 +45,7 @@ class UserMetricSettings {
 
     public:
 
-        bool operator!= (UserMetricSettings right) const {
+        bool operator!= (const UserMetricSettings &right) const {
 
             // mostly used to see if it changed when editing
             if (this->symbol != right.symbol ||
