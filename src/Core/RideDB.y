@@ -590,11 +590,11 @@ void RideCache::save(bool opendata, QString filename)
                                                                    << QString("%1").arg(item->stdvariances().value(index, 0.0f), 0, 'f', 5) <<"\"]";
                     } else if (item->counts()[index] == 0) {
                         // if count is 0 don't write it
-						stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                            QString("\":\""), item->metrics()[index], QString("\""));
+                        stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
                     } else {
-					    stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                            QString("\":[\""), item->metrics()[index], QString("\",\""), item->counts()[index], QString("\"]"));
+                        // count is not 1, so lets write it
+                        stream << "\t\t\t\"" << name << "\":[\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\",\""
+                                                                   << QString("%1").arg(item->counts()[index], 0, 'f', 5) <<"\"]";
                     }
                 }
             }
@@ -823,11 +823,11 @@ void RideCache::save(bool opendata, QString filename)
 
                                 // if count is 0 don't write it
                                 } else if (interval->counts()[index] == 0) {
-                                    stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                                        QString("\":\""), item->metrics()[index], QString("\""));
+									stream << "\t\t\t\t\"" << name << "\":\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\"";
                                 } else {
-                                    stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                                        QString("\":[\""), item->metrics()[index], QString("\",\""), item->counts()[index], QString("\"]"));
+                                    // count is not 1, so lets write it
+                                    stream << "\t\t\t\t\"" << name << "\":[\"" << QString("%1").arg(interval->metrics()[index], 0, 'f', 5) <<"\",\""
+                                                                               << QString("%1").arg(interval->counts()[index], 0, 'f', 5) <<"\"]";
                                 }
                             }
                         }
