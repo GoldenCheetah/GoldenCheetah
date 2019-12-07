@@ -824,10 +824,10 @@ void RideCache::save(bool opendata, QString filename)
                                 // if count is 0 don't write it
                                 } else if (interval->counts()[index] == 0) {
                                     stream << ConstructNameNumberString(QString("\t\t\t\""), name,
-                                        QString("\":\""), item->metrics()[index], QString("\""));
+                                        QString("\":\""), interval->metrics()[index], QString("\""));
                                 } else {
                                     stream << ConstructNameNumberNumberString(QString("\t\t\t\""), name,
-                                        QString("\":[\""), item->metrics()[index], QString("\",\""), item->counts()[index], QString("\"]"));
+                                        QString("\":[\""), interval->metrics()[index], QString("\",\""), interval->counts()[index], QString("\"]"));
                                 }
                             }
                         }
