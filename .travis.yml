@@ -1,5 +1,7 @@
 branches:
-- master
+  only:
+  - master
+  - /^[vV]\d+\.\d+(\.\d+)?(-\S*)?$/
 os:
 - osx
 - linux
