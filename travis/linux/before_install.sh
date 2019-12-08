@@ -10,9 +10,7 @@ sudo apt-get install -qq libglu1-mesa-dev libgstreamer0.10-0 libgstreamer-plugin
 sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
 sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
 
-# Add VLC 2.2.8
-sudo add-apt-repository -y ppa:jonathonf/vlc
-sudo apt-get update -qq
+# Add VLC 2.2.2
 sudo apt-get install -qq vlc libvlc-dev libvlccore-dev
 
 # R 3.6
