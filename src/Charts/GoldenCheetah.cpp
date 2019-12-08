@@ -41,6 +41,7 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QGraphicsDropShadowEffect>
+#include <QSvgGenerator>
 
 Q_DECLARE_METATYPE(QWidget*)
 
@@ -874,9 +875,9 @@ GcChartWindow::addHelper(QString name, QWidget *widget)
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  QString(), title()+".png (*.png)");
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  QString(), title()+".png (*.png)"+";;"+title()+".svg (*.svg)");
 
-    if (!fileName.isEmpty()) {
+    if (!fileName.isEmpty() && fileName.endsWith(".png")) {
 
         QPixmap picture;
         menuButton->hide();
@@ -886,6 +887,14 @@ void GcChartWindow:: saveImage()
         picture = QPixmap::grabWidget (this);
 #endif
         picture.save(fileName);
+    } else if (!fileName.isEmpty() && fileName.endsWith(".svg")) {
+
+        QSvgGenerator generator;
+        generator.setFileName(fileName);
+        generator.setSize(size());
+        generator.setViewBox(rect());
+        generator.setTitle(title());
+        render(&generator);
     }
 }
 
