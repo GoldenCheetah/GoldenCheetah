@@ -22,7 +22,9 @@ cd ..
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Define GC version string, only for tagged builds
-if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+#if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+# Temporary hack to get version string without a new tag
+echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri;
 echo DEFINES += NOWEBKIT >> src/gcconfig.pri
 sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
 sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/qt5/bin/lrelease|" src/gcconfig.pri
@@ -76,4 +78,6 @@ sed -i "" "s/__GC_SPORTTRACKS_CLIENT_SECRET__/"$GC_SPORTTRACKS_CLIENT_SECRET"/" 
 sed -i "" "s/OPENDATA_DISABLE/OPENDATA_ENABLE/" src/Core/Secrets.h
 sed -i "" "s/__GC_CLOUD_OPENDATA_SECRET__/"$GC_CLOUD_OPENDATA_SECRET"/" src/Core/Secrets.h
 cat src/gcconfig.pri
+# update translations
+/usr/local/opt/qt5/bin/lupdate src/src.pro
 exit

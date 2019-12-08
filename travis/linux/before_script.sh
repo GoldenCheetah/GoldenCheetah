@@ -5,7 +5,9 @@ export PATH=/opt/qt59/bin:$PATH
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Define GC version string, only for tagged builds
-if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+#if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
+# Temporary hack to get version string without a new tag
+echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri;
 # user WEBENGINE
 echo DEFINES += NOWEBKIT >> src/gcconfig.pri
 # Trusty needs C99 mode to enable declarations in for loops
