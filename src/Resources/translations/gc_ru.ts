@@ -6,7 +6,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1212"/>
         <source>Average aPower</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя мощность aPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1213"/>
@@ -17,7 +17,7 @@
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1216"/>
         <source>Average altitude power. Recorded power adjusted to take into account the effect of altitude on vo2max and thus power output.</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя мощность с учётом высоты. Записанная мощность корректируется с учётом влияния высоты на VO₂ макс и как следствие мощности.</translation>
     </message>
 </context>
 <context>
@@ -101,7 +101,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="814"/>
         <source>W&apos;bal tau (s)</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;bal tau (с)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="825"/>
@@ -301,54 +301,54 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="255"/>
         <source>Service Credentials </source>
-        <translation type="unfinished">Учётные данные Сервиса </translation>
+        <translation>Учётные данные Сервиса </translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="256"/>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="345"/>
         <source>Credentials and authorisation</source>
-        <translation type="unfinished">Учётные данные и авторизация</translation>
+        <translation>Учётные данные и авторизация</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="274"/>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="287"/>
         <source>Authorise</source>
-        <translation type="unfinished">Авторизоваться</translation>
+        <translation>Авторизоваться</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="283"/>
         <source>URL</source>
-        <translation type="unfinished">URL</translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="284"/>
         <source>Key (optional)</source>
-        <translation type="unfinished">Ключ (опционально)</translation>
+        <translation>Ключ (опционально)</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="285"/>
         <source>Username</source>
-        <translation type="unfinished">Имя пользователя</translation>
+        <translation>Имя пользователя</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="286"/>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="288"/>
         <source>Token</source>
-        <translation type="unfinished">Токен</translation>
+        <translation>Токен</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="289"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщение</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="368"/>
         <source>%1 Credentials and authorisation</source>
-        <translation type="unfinished">%1: Учётные данные и авторизация</translation>
+        <translation>%1: Учётные данные и авторизация</translation>
     </message>
 </context>
 <context>
@@ -356,37 +356,37 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="88"/>
         <source>Service Type</source>
-        <translation type="unfinished">Тип Сервиса</translation>
+        <translation>Тип Сервиса</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="89"/>
         <source>What type of Service are you adding an account for ?</source>
-        <translation type="unfinished">Для какого сервиса вы добавляете учетную запись?</translation>
+        <translation>Для какого сервиса вы добавляете учетную запись?</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="99"/>
         <source>Activities</source>
-        <translation type="unfinished">Тренировки</translation>
+        <translation>Тренировки</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="99"/>
         <source>Sync activities with services like Today&apos;s Plan, Strava, Dropbox and Google Drive</source>
-        <translation type="unfinished">Синхронизировать тренировки с сервисами типа Today&apos;s Plan, Strava, Dropbox, Google Drive</translation>
+        <translation>Синхронизировать тренировки с сервисами типа Today&apos;s Plan, Strava, Dropbox, Google Drive</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Measurements</source>
-        <translation type="unfinished">Измерения</translation>
+        <translation>Измерения</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Sync measurements such as weight, body fat, HRV and sleep.</source>
-        <translation type="unfinished">Синхронизировать данные измерений, такие как вес, телесный жир, сон и HRV.</translation>
+        <translation>Синхронизировать данные измерений, такие как вес, телесный жир, сон и HRV.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation type="unfinished">Синхронизировать план тренировок в календарь WebDAV и CalDAV (Google Calendar).</translation>
+        <translation>Синхронизировать план тренировок в календарь WebDAV и CalDAV (Google Calendar).</translation>
     </message>
     <message>
         <source>Measures</source>
@@ -399,7 +399,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Calendar</source>
-        <translation type="unfinished">Календарь</translation>
+        <translation>Календарь</translation>
     </message>
     <message>
         <source>Sync planned workouts to WebDAV and CalDAV calendars.</source>
@@ -424,17 +424,17 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="216"/>
         <source>Terms of Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Условия предоставления сервиса</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="217"/>
         <source>Your consent is needed</source>
-        <translation type="unfinished"></translation>
+        <translation>Требуется ваше согласие</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="227"/>
         <source>Accept</source>
-        <translation type="unfinished"></translation>
+        <translation>Принять</translation>
     </message>
 </context>
 <context>
@@ -987,7 +987,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
 
 Пожалуйста, соблюдайте осторожность и убедитесь, что файл является последней версией прошивки для тренажёра.
 
-Если вы выберите «Скопировать в библиотеку», то файл будет скопирован в библиотеку GoldenCheetah, в противном случае GoldenCheetah будет использовать файл из того места, где вы укажете.</translation>
+Если вы выберите «Скопировать в библиотеку», то файл будет скопирован в библиотеку GoldenCheetah, в противном случае GoldenCheetah будет использовать файл из того места, где вы укажете. </translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="522"/>
@@ -1039,7 +1039,16 @@ On later TTS cds it is in support\drivers_usb_interface\32
 Place a copy of this file somewhere on this PC and reference it above.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it in place. </source>
-        <translation type="unfinished"></translation>
+        <translation>Тренажёр Tacx Imagic требует файл прошивки I-magic.sys, поставляемый компанией Tacx BV. Этот файл защищён авторским правом и не может распространяться вместе с GoldenCheetah.
+В ОС Windows этот файл обычно устанавливается в «C:\Windows\system32».
+
+Так же вы можете извлечь этот файл с CD диска Tacx software
+В старых версиях CD Fortius он находится в директории FortiusInstall\Support\driver_imagic.
+В поздних версиях дисков Tacx Trainers software он находится в директории support\drivers_usb_interface\32
+
+Сохраните копию этого файла прошивки где нибудь на компьютере и укажите полный путь до него ниже.
+
+Если вы выберите «Скопировать в библиотеку», то файл будет скопирован в библиотеку GoldenCheetah, в противном случае GoldenCheetah будет использовать файл из того места, где вы укажете. </translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="611"/>
@@ -3799,7 +3808,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3533"/>
         <source>It is the left pedal stroke region length where you produce positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это протяжённость дуги движения левой педали (в градусах), при котором вы производите положительную мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3817,7 +3826,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3108"/>
         <source>It is the left pedal stroke angle where you start producing positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения левой педали, начиная с которого вы начинаете производить положительную мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3835,7 +3844,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3214"/>
         <source>It is the left pedal stroke angle where you end producing positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения левой педали, при котором вы заканчиваете производить положительную мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3853,7 +3862,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3623"/>
         <source>It is the left pedal stroke region length where you produce peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это протяжённость дуги движения левой педали (в градусах), при котором вы производите пиковую мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3871,7 +3880,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3319"/>
         <source>It is the left pedal stroke angle where you start producing peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения левой педали, начиная с которого вы начинаете производить пиковую мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3889,7 +3898,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3426"/>
         <source>It is the left pedal stroke angle where you end producing peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения левой педали, при котором вы заканчиваете производить пиковую мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3908,7 +3917,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2893"/>
         <source>It measures how smoothly power is delivered to the left pedal throughout the revolution, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Показатель того, насколько плавно мощность передаётся на левую педаль в течение всего оборота, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3927,7 +3936,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2784"/>
         <source>It measures how much of the power delivered to the left pedal is pushing it forward, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Показатель того, какое количество энергии передаваемое на левую педаль уходит на вращение её в прямом направлении, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -3987,7 +3996,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3579"/>
         <source>It is the right pedal stroke region length where you produce positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это протяжённость дуги движения правой педали (в градусах), при котором вы производите положительную мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4005,7 +4014,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3266"/>
         <source>It is the right pedal stroke angle where you end producing positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения правой педали, при котором вы заканчиваете производить положительную мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4023,7 +4032,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3669"/>
         <source>It is the right pedal stroke region length where you produce peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это протяжённость дуги движения правой педали (в градусах), при котором вы производите пиковую мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4041,7 +4050,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3372"/>
         <source>It is the right pedal stroke angle where you start producing peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения правой педали, начиная с которого вы начинаете производить пиковую мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4059,7 +4068,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3478"/>
         <source>It is the right pedal stroke angle where you end producing peak power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения правой педали, при котором вы заканчиваете производить пиковую мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4078,7 +4087,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2947"/>
         <source>It measures how smoothly power is delivered to the right pedal throughout the revolution, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Показатель того, насколько плавно мощность передаётся на правую педаль в течение всего оборота, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4097,7 +4106,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2839"/>
         <source>It measures how much of the power delivered to the right pedal is pushing it forward, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Показатель того, какое количество энергии передаваемое на правую педаль уходит на вращение её в прямом направлении, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4115,7 +4124,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3160"/>
         <source>It is the right pedal stroke angle where you start producing positive power, on average.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это угол положения правой педали, начиная с которого вы начинаете производить положительную мощность, усреднённо.</translation>
     </message>
 </context>
 <context>
@@ -4195,7 +4204,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="460"/>
         <source>Average Vertical Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Среднее Вертикальное Отношение</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="461"/>
@@ -4206,7 +4215,7 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="465"/>
         <source>Average Vertical Ratio (%): Vertical Oscillation / Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Среднее Вертикальное Отношение ( % ): Вертикальное Колебание / Длина Шага</translation>
     </message>
 </context>
 <context>
@@ -4256,18 +4265,18 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="580"/>
         <source>Average Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя длинна шага (одного)</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="581"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="582"/>
         <source>mm</source>
-        <translation type="unfinished">мм</translation>
+        <translation>мм</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="585"/>
         <source>Average Step Length: average single step (L to R / R to L) length in mm</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя длинна шага в мм одного шага (левый - правый или правый - левый)</translation>
     </message>
 </context>
 <context>
@@ -4276,7 +4285,7 @@ Press Next to Continue
         <location filename="../../Metrics/RunMetrics.cpp" line="401"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="407"/>
         <source>Average Stride Length</source>
-        <translation>Средняя длинна шага</translation>
+        <translation>Средняя длинна шага (лев + прав)</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="402"/>
@@ -5657,7 +5666,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="271"/>
         <source>Altitude Power</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Мощность с учётом высоты</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="276"/>
@@ -5689,12 +5698,12 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="292"/>
         <source>Altitude Power per kilogram</source>
-        <translation type="unfinished"></translation>
+        <translation>Мощность с учётом высоты на килограмм</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="295"/>
         <source>Altitude Power per lb</source>
-        <translation type="unfinished"></translation>
+        <translation>Мощность с учётом высоты на фунт</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="301"/>
@@ -6080,23 +6089,23 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Cloud/CalDAV.cpp" line="482"/>
         <location filename="../../Cloud/CalDAV.cpp" line="604"/>
         <source>Missing Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Настройки не указаны или ошибочные</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="79"/>
         <location filename="../../Cloud/CalDAV.cpp" line="482"/>
         <source>CalID or CalDAV Url is missing in preferences</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CalID или CalDAV URL в настройках ошибочные или не указаны</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="130"/>
         <source>CalDAV REPORT url error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CalDAV REPORT ошибка URL</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="536"/>
         <source>CalDAV Calendar API reply error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка в ответе CalDAV Calendar API</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="587"/>
@@ -6111,7 +6120,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="604"/>
         <source>Authorization for Google CalDAV is missing in preferences</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Авторизация для Google CalDAV в настройках ошибочная или не указана</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="667"/>
@@ -6121,12 +6130,12 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="667"/>
         <source>Error requesting access token</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка запрашиваемого токена доступа</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAV.cpp" line="520"/>
         <source>CalDAV Calendar url error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка URL CalDAV Calendar</translation>
     </message>
 </context>
 <context>
@@ -6134,17 +6143,17 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="70"/>
         <source>Google Calendar using CalDAV protocol and authenticate using Google Account</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Календарь Google использует протокол CalDAV и авторизацию аккаунта Google</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="71"/>
         <source>Web Calendar using iCal format as a web resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Web Calendar использует формат iCal как веб-ресурс</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="73"/>
         <source>Generic CalDAV Calendar such as Apple iCloud calendar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Простой календарь CalDAV, такой как Календарь Apple iCloud</translation>
     </message>
 </context>
 <context>
@@ -6152,12 +6161,12 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Cloud/CalendarDownload.cpp" line="47"/>
         <source>Calendar Data Download</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка данных календаря</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalendarDownload.cpp" line="69"/>
         <source>Problem Saving Calendar Download</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проблема сохранения данных календаря</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalendarDownload.cpp" line="70"/>
@@ -6167,7 +6176,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Cloud/CalendarDownload.cpp" line="82"/>
         <source>Remote Calendar not available, reverting to cached workouts.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалённый календарь недоступен, возврат к мохранённым тренировкам.</translation>
     </message>
 </context>
 <context>
@@ -6175,7 +6184,7 @@ ddd, dd MMM yyyy</source>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="365"/>
         <source>Time In Zone</source>
-        <translation type="unfinished">Время в зоне</translation>
+        <translation>Время в зоне</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="594"/>
@@ -6183,27 +6192,27 @@ ddd, dd MMM yyyy</source>
         <location filename="../../Charts/OverviewWindow.cpp" line="675"/>
         <location filename="../../Charts/OverviewWindow.cpp" line="1070"/>
         <source>seconds</source>
-        <translation type="unfinished">секунд</translation>
+        <translation>секунд</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1163"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1184"/>
         <source>Fitness</source>
-        <translation type="unfinished">Тренированность (объём работы)</translation>
+        <translation>Тренированность (объём работы)</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1207"/>
         <source>Fatigue</source>
-        <translation type="unfinished">Усталость</translation>
+        <translation>Усталость</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="1230"/>
         <source>Risk</source>
-        <translation type="unfinished">Риск</translation>
+        <translation>Риск</translation>
     </message>
 </context>
 <context>
@@ -6383,12 +6392,12 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="476"/>
         <source>Curated Only</source>
-        <translation type="unfinished"></translation>
+        <translation>только курируемые</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="477"/>
         <source>Uncurated Only</source>
-        <translation type="unfinished"></translation>
+        <translation>только не курируемые</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="485"/>
@@ -6414,7 +6423,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="709"/>
         <source>unknown</source>
-        <translation type="unfinished">неизвеcтно</translation>
+        <translation>неизвеcтно</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="712"/>
@@ -6439,7 +6448,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="719"/>
         <source>All Views</source>
-        <translation type="unfinished">Все виды</translation>
+        <translation>Все виды</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="853"/>
@@ -6470,7 +6479,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="958"/>
         <source>Chart Maintenance</source>
-        <translation type="unfinished"></translation>
+        <translation>Обслуживание графика</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="958"/>
@@ -6499,7 +6508,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="449"/>
         <source>Showing %1 to %2 of %3 charts for %4 / Total uploaded %5</source>
-        <translation type="unfinished">Показаны графики с %1 по %2 из %3 для «%4», всего выгружено %5</translation>
+        <translation>Показаны графики с %1 по %2 из %3 для «%4», всего выгружено %5</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="534"/>
@@ -6509,7 +6518,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="565"/>
         <source>Set selected chart &apos;Curated&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Сделать выбранный график курируемым</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="627"/>
@@ -6519,7 +6528,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="633"/>
         <source>Curator chart maintenance - Curate, Edit or Delete Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>Обслуживание графиков куратором: курирование редактирование или удаление графиков</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="740"/>
@@ -7148,7 +7157,7 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="315"/>
         <source>Uploading %1 bytes...</source>
-        <translation type="unfinished">Выгружается %1 байт...</translation>
+        <translation>Выгружается %1 байт...</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="323"/>
@@ -7158,12 +7167,12 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="340"/>
         <source>Upload to </source>
-        <translation type="unfinished">Выгрузить в </translation>
+        <translation>Выгрузить в </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="341"/>
         <source>The activity you want to upload has unsaved changes.</source>
-        <translation type="unfinished">Тренировка, котрую вы хотите выгрузить имеет не сохранённые изменений.</translation>
+        <translation>Тренировка, котрую вы хотите выгрузить имеет не сохранённые изменений.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="342"/>
@@ -7177,12 +7186,12 @@ This may lead to inconsistencies between your local activities and the uploaded 
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="382"/>
         <source>Upload Failed</source>
-        <translation type="unfinished">Выгрузка не удалась</translation>
+        <translation>Выгрузка не удалась</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="383"/>
         <source>Unable to upload, check your configuration in preferences.</source>
-        <translation type="unfinished">Невозможно выгрузить, проверьте настройки.</translation>
+        <translation>Невозможно выгрузить, проверьте настройки.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="415"/>
@@ -7729,17 +7738,17 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="269"/>
         <source>Activity Mean Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Средний максимум тренировки</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="270"/>
         <source>Activity Centile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Перцентиль тренировки</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="271"/>
         <source>No Activity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">не отображать тренировку</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="274"/>
@@ -8166,39 +8175,39 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="85"/>
         <source>Account is not configured.</source>
-        <translation type="unfinished">Аккаунт не сконфигурирован.</translation>
+        <translation>Аккаунт не сконфигурирован.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="109"/>
         <source>You must authorise with Cycling Analytics first</source>
-        <translation type="unfinished">Вы должны вначале авторизоваться на Cycling Analytics</translation>
+        <translation>Вы должны вначале авторизоваться на Cycling Analytics</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="332"/>
         <source>Title</source>
-        <translation type="unfinished">Название</translation>
+        <translation>Название</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="333"/>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="459"/>
         <source>Notes</source>
-        <translation type="unfinished">Заметки</translation>
+        <translation>Заметки</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="434"/>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="536"/>
         <source>Completed.</source>
-        <translation type="unfinished">Завершено.</translation>
+        <translation>Завершено.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="538"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished">Ошибка сети — выгрузка файла не удалась.</translation>
+        <translation>Ошибка сети — выгрузка не удалась.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="34"/>
         <source>Cycling Analytics</source>
-        <translation type="unfinished">Cycling Analytics</translation>
+        <translation>Cycling Analytics</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="35"/>
@@ -9912,7 +9921,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="108"/>
         <source>secs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">сек</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="110"/>
@@ -10267,7 +10276,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="368"/>
         <source>estimated Watts Per Kilogram (DrF.)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">оценочные Ватт на килограмм (DrF.)</translation>
     </message>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="370"/>
@@ -10286,17 +10295,18 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/ExhaustionDialog.cpp" line="30"/>
         <source>Exhaustion / Failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Изнурение / Неспособность</translation>
     </message>
     <message>
         <location filename="../../Charts/ExhaustionDialog.cpp" line="37"/>
         <source>Exhausted:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Истощение, изнурение, изнемождение</translatorcomment>
+        <translation type="unfinished">Изнурение:</translation>
     </message>
     <message>
         <location filename="../../Charts/ExhaustionDialog.cpp" line="40"/>
         <source>secs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">сек</translation>
     </message>
     <message>
         <location filename="../../Charts/ExhaustionDialog.cpp" line="46"/>
@@ -10325,7 +10335,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="192"/>
         <source>Fatigue Index is power decay from Max Power to Min Power as a percent of Max Power.</source>
-        <translation type="unfinished">Показатель усталости - это снижение мощности от максимальной до минимальной в процентах от максимальной.</translation>
+        <translation>Показатель усталости - это снижение мощности от максимальной до минимальной в процентах от максимальной.</translation>
     </message>
 </context>
 <context>
@@ -10353,27 +10363,27 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/Pages.cpp" line="3391"/>
         <source>Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Текст</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3392"/>
         <source>Textbox</source>
-        <translation type="unfinished"></translation>
+        <translation>Многострочный текст</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3393"/>
         <source>ShortText</source>
-        <translation type="unfinished"></translation>
+        <translation>Короткий текст</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3394"/>
         <source>Integer</source>
-        <translation type="unfinished"></translation>
+        <translation>Целое</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3395"/>
         <source>Double</source>
-        <translation type="unfinished"></translation>
+        <translation>С плавающей запятой</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3396"/>
@@ -10388,7 +10398,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/Pages.cpp" line="3398"/>
         <source>Checkbox</source>
-        <translation type="unfinished"></translation>
+        <translation>Флажок</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3639"/>
@@ -10599,7 +10609,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="244"/>
         <source>Filter R-R Outliers</source>
-        <translation type="unfinished">Фильтр всплесков R-R</translation>
+        <translation>Фильтр всплесков R-R</translation>
     </message>
 </context>
 <context>
@@ -10682,7 +10692,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2100"/>
         <source>Less Than</source>
-        <translation>Меньше</translation>
+        <translation>Меньше чем</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2101"/>
@@ -10707,17 +10717,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2130"/>
         <source>Time</source>
-        <translation type="unfinished">Время</translation>
+        <translation>Время</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2130"/>
         <source>Column</source>
-        <translation type="unfinished"></translation>
+        <translation>Столбец</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2130"/>
         <source>Value</source>
-        <translation type="unfinished">Значение</translation>
+        <translation>Значение</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2138"/>
@@ -12055,7 +12065,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcChartWindow</name>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="746"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="747"/>
         <source>No data available</source>
         <translation>Данные недоступны</translation>
     </message>
@@ -12064,63 +12074,63 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">Все параметры графика</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="810"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="811"/>
         <source>Chart Settings...</source>
         <translation>Параметры графика...</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="824"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="825"/>
         <source>Export Chart ...</source>
         <translation>Экспорт графика...</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="825"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="826"/>
         <source>Export Chart Image...</source>
         <translation>Экспортировать как изображение...</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="827"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="828"/>
         <source>Upload Chart...</source>
         <translation>Выгрузить график в облачное хранилище...</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="829"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="830"/>
         <source>Remove Chart</source>
         <translation>Удалить график</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="877"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="878"/>
         <source>Save Chart Image</source>
         <translation>Сохранить график как изображение</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="901"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="910"/>
         <source>Export Chart</source>
         <translation>Экспортировать график</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="909"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="918"/>
         <source>Export Failed</source>
         <translation>Не удалось выполнить экспорт</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="910"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="919"/>
         <source>Failed to export chart, please check permissions</source>
         <translation>Ошибка при экспорте графика, проверьте права доступа</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1095"/>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1102"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1104"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1111"/>
         <source>Upload not possible</source>
         <translation>Выгрузка невозможна</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1095"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1104"/>
         <source>Standard charts without configuration cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation>Стандартный график без изменений не может быть загружен в облачное хранилище GoldenCheetah.</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1102"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1111"/>
         <source>Charts containing user defined metrics cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation>График содержащий метрики определяемые пользователем не может быть загружен в облачное хранилище GoldenCheetah.</translation>
     </message>
@@ -12491,18 +12501,18 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">Все параметры графиков</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="58"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="59"/>
         <source>Chart Settings...</source>
         <translation>Параметры графика...</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="72"/>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="218"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="73"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="219"/>
         <source>Remove Chart</source>
         <translation>Удалить график</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="212"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="213"/>
         <source>More...</source>
         <translation>Больше...</translation>
     </message>
@@ -16122,22 +16132,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/JouleDevice.cpp" line="121"/>
         <location filename="../../FileIO/JouleDevice.cpp" line="406"/>
         <source>ERROR: open failed: </source>
-        <translation type="unfinished">Ошибка: не удалось открыть: </translation>
+        <translation>Ошибка: не удалось открыть: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="140"/>
         <source>Joule %1 identified</source>
-        <translation type="unfinished"></translation>
+        <translation>Joule %1 идентифицирован</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="149"/>
         <source>Read detail for activity %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтение подробностей тренировки %1 из %2</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="163"/>
         <source>download cancelled</source>
-        <translation type="unfinished">скачивание отменено</translation>
+        <translation>скачивание отменено</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="172"/>
@@ -16152,12 +16162,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="280"/>
         <source>Get Unit Software Version...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить версию программного обеспечения устройства...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="299"/>
         <source>Version </source>
-        <translation type="unfinished"></translation>
+        <translation>Версия </translation>
     </message>
     <message>
         <source>Version</source>
@@ -16166,32 +16176,32 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="309"/>
         <source>Get System info...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить системную информацию...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="333"/>
         <source>Get Unit Free Space...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить информацию о совбодном месте на устройстве...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="362"/>
         <source>Read summary...</source>
-        <translation type="unfinished"></translation>
+        <translation>Прочитать сводку...</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="394"/>
         <source>%1 detailed activities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 детализированных тренировок</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="420"/>
         <source>Delete detail for activity %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаление подробностей тренировки %1 из %2</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="402"/>
         <source>Erase all records on computer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Очистить все записи на компьютере</translation>
     </message>
 </context>
 <context>
@@ -16199,7 +16209,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="48"/>
         <source>Make sure the Joule (1.0, GPS or GPS+) unit is turned ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь что ваше устройство Joule (1.0, GPS или GPS+) включено</translation>
     </message>
 </context>
 <context>
@@ -16208,7 +16218,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/JouleDevice.cpp" line="506"/>
         <location filename="../../FileIO/JouleDevice.cpp" line="642"/>
         <source>read checksum error: </source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка чтения контрольной суммы: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="506"/>
@@ -16218,52 +16228,52 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/JouleDevice.cpp" line="619"/>
         <location filename="../../FileIO/JouleDevice.cpp" line="642"/>
         <source>read timeout</source>
-        <translation type="unfinished">таймаут чтения</translation>
+        <translation>время ожидания чтения</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="564"/>
         <source>failed to write to device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка записи в устройство: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="568"/>
         <source>timeout writing to device</source>
-        <translation type="unfinished"></translation>
+        <translation>превышено время ожидания записи в устройство</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="585"/>
         <source>read header error: </source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка чтения заголовка: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="592"/>
         <source>read command error: </source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка чтения команды: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="595"/>
         <source>wrong response</source>
-        <translation type="unfinished"></translation>
+        <translation>некорректный ответ</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="603"/>
         <source>read length error: </source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка чтения размера: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="619"/>
         <source>read error: </source>
-        <translation type="unfinished">ошибка чтения: </translation>
+        <translation>ошибка чтения: </translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="625"/>
         <source>, read only %1 bytes instead of: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>, считано только %1 байт из %2</translation>
     </message>
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="645"/>
         <source>wrong _checksum</source>
-        <translation type="unfinished"></translation>
+        <translation>неверная контрольная сумма</translation>
     </message>
 </context>
 <context>
@@ -16271,28 +16281,28 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="319"/>
         <source>You must authorise with KentUniversity first</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы должны вначале авторизоваться на KentUniversity</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="336"/>
         <source>No such directory, try setting a new location in options.</source>
-        <translation type="unfinished">Директории не существует, укажите новое размещение в настройках.</translation>
+        <translation>Директории не существует, укажите новое размещение в настройках.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="656"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="672"/>
         <source>Completed.</source>
-        <translation type="unfinished">Завершено.</translation>
+        <translation>Завершено.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="660"/>
         <source>Upload failed</source>
-        <translation type="unfinished">Выгрузка на сервис не удалась</translation>
+        <translation>Выгрузка на сервис не удалась</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="49"/>
         <source>University of Kent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">University of Kent</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="50"/>
@@ -16305,7 +16315,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="827"/>
         <source>Upload to Kent University</source>
-        <translation type="unfinished"></translation>
+        <translation>Выгрузить в Kent University</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="838"/>
@@ -16365,7 +16375,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/KettlerController.cpp" line="84"/>
         <source>Cannot Connect to Kettler</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удаётся соединиться с Kettler</translation>
     </message>
 </context>
 <context>
@@ -16408,7 +16418,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="3451"/>
         <source>Related Notes Words</source>
-        <translation type="unfinished"></translation>
+        <translation>Связанные записи</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3580"/>
@@ -16676,32 +16686,32 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPlot.cpp" line="742"/>
         <location filename="../../Charts/LTMPlot.cpp" line="1911"/>
         <source>%1 trend</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 - динамика</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="822"/>
         <source>%1 average</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 - среднее</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="879"/>
         <source>%1 Top %2 Outliers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 - Отклонение %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="883"/>
         <source>%1 Outlier</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 - Отклонение</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="971"/>
         <source>%1 Best</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 - Максимальное</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="974"/>
         <source>Best %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Максимальное - %1</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="1349"/>
@@ -16744,17 +16754,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPlot.cpp" line="1834"/>
         <location filename="../../Charts/LTMPlot.cpp" line="1870"/>
         <source>%1 %2 trend</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 %2 - динамика</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="2004"/>
         <source>%1 %2 Outliers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 %2 - Отклонение</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="2092"/>
         <source>%1 %2 Best</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 %2 - Максимальный</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="4334"/>
@@ -16811,18 +16821,18 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPopup.cpp" line="146"/>
         <location filename="../../Charts/LTMPopup.cpp" line="291"/>
         <source>ddd, dd MMM yy hh:mm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMM yyyy, ddd - hh:mm</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="50"/>
         <source>No activity Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Тренировка не выбрана</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="181"/>
         <location filename="../../Charts/LTMPopup.cpp" line="346"/>
         <source>No activity selected</source>
-        <translation type="unfinished">Тренировка не выбрана</translation>
+        <translation>Тренировка не выбрана</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="201"/>
@@ -16838,7 +16848,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPopup.cpp" line="210"/>
         <location filename="../../Charts/LTMPopup.cpp" line="216"/>
         <source>%1 to %2</source>
-        <translation type="unfinished"></translation>
+        <translation>с %1 по %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="211"/>
@@ -16850,7 +16860,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPopup.cpp" line="217"/>
         <location filename="../../Charts/LTMPopup.cpp" line="218"/>
         <source>dd MMMM yy</source>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="225"/>
@@ -16865,7 +16875,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="356"/>
         <source> / non activity-related metrics skipped</source>
-        <translation type="unfinished"></translation>
+        <translation> / метрики не связанные с тренировками не указаны</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="420"/>
@@ -17065,7 +17075,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1288"/>
         <source>The new event could not be uploaded to your remote calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>Новое событие не может быть выгружено в ваш удалённый календарь.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1417"/>
@@ -18303,7 +18313,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="253"/>
         <source>Search for Workouts, Syncs and Media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сканировать и искать тренировки, видеоролики и VideoSync</translation>
     </message>
     <message>
         <source>Workout files (.erg, .mrc etc)</source>
@@ -18312,7 +18322,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="260"/>
         <source>Workout files (.erg, .mrc, .zwo etc)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">файлы тренировок (.erg, .mrc, .zwo etc)</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="262"/>
@@ -18322,7 +18332,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="264"/>
         <source>VideoSync files (.rlv)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">файлы VideoSync (.rlv)</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="282"/>
@@ -18494,12 +18504,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/MacroDevice.cpp" line="101"/>
         <location filename="../../FileIO/MacroDevice.cpp" line="262"/>
         <source>ERROR: open failed: </source>
-        <translation type="unfinished">Ошибка: не удалось открыть: </translation>
+        <translation>Ошибка: не удалось открыть: </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="105"/>
         <source>Request number of training...</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос количества тренировок...</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="115"/>
@@ -18508,34 +18518,34 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/MacroDevice.cpp" line="203"/>
         <location filename="../../FileIO/MacroDevice.cpp" line="229"/>
         <source>download cancelled</source>
-        <translation type="unfinished">скачивание отменено</translation>
+        <translation>скачивание отменено</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="124"/>
         <location filename="../../FileIO/MacroDevice.cpp" line="132"/>
         <source>no data</source>
-        <translation type="unfinished">нет данных</translation>
+        <translation>нет данных</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="140"/>
         <location filename="../../FileIO/MacroDevice.cpp" line="214"/>
         <source>data error</source>
-        <translation type="unfinished"></translation>
+        <translation>ошибка данных</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="156"/>
         <source>Failed to create temporary file </source>
-        <translation type="unfinished">Не удалось создать временный файл </translation>
+        <translation>Не удалось создать временный файл </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="188"/>
         <source>Request datas of training %1 / %2...</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос данных тренировки %1 из %2...</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="223"/>
         <source>training %1/%2... (%3 Bytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>тренировка %1 из %2... (%3 байт)</translation>
     </message>
 </context>
 <context>
@@ -18552,7 +18562,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="322"/>
         <source>read checksum error: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ошибка чтения контрольной суммы: </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="322"/>
@@ -18564,17 +18574,17 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="363"/>
         <source>failed to write to device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ошибка записи в устройство: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="367"/>
         <source>timeout writing to device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">превышено время ожидания записи в устройство</translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="383"/>
         <source>read command error: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ошибка чтения команды: </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="401"/>
@@ -18584,7 +18594,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="407"/>
         <source>, read only %1 bytes instead of: %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">, считано только %1 байт из %2</translation>
     </message>
 </context>
 <context>
@@ -18773,7 +18783,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="487"/>
         <source>Curate charts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Курируемые графики</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="959"/>
@@ -18792,22 +18802,22 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Chart Import</source>
-        <translation type="unfinished">Импорт графика</translation>
+        <translation>Импорт графика</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1414"/>
         <source>Failed to export activity, please check permissions</source>
-        <translation type="unfinished">Не удалось экспортировать тренировку, пожалуйста проверьте разрешения</translation>
+        <translation>Не удалось экспортировать тренировку, пожалуйста проверьте разрешения</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1450"/>
         <source>No Activity To Save</source>
-        <translation type="unfinished">Нет тренировки для сохранения</translation>
+        <translation>Нет тренировки для сохранения</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1451"/>
         <source>There is no currently selected activity to save.</source>
-        <translation type="unfinished">Не выбрана тренировка для сохранения.</translation>
+        <translation>Не выбрана тренировка для сохранения.</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1503"/>
@@ -18844,7 +18854,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
-        <translation type="unfinished">Директория для тренировки не указана в конфигурации или выбранная диреткория не доступна.
+        <translation>Директория для тренировки не указана в конфигурации или выбранная диреткория не доступна.
 
 Пожалуйста, проверьте настройки.</translation>
     </message>
@@ -18856,7 +18866,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
-        <translation type="unfinished">Текущий спортсмен не зарегистрирован как куратор, свяжитесь в GoldenCheetah team</translation>
+        <translation>Текущий спортсмен не зарегистрирован как куратор, свяжитесь с командой GoldenCheetah</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="474"/>
@@ -20750,6 +20760,16 @@ No rides found to import.
         <location filename="../../Train/TrainSidebar.cpp" line="2531"/>
         <source>Multiple Device Configuration</source>
         <translation>Настройка нескольких устройств</translation>
+    </message>
+    <message>
+        <location filename="../../Train/TrainSidebar.cpp" line="2586"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location filename="../../Train/TrainSidebar.cpp" line="2589"/>
+        <source>Apply</source>
+        <translation>Применить</translation>
     </message>
 </context>
 <context>
@@ -23622,33 +23642,33 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="110"/>
         <source>Network Problem reading Polar Flow data</source>
-        <translation type="unfinished">Проблемы с сетью при чтении данных Polar Flow</translation>
+        <translation>Проблемы с сетью при чтении данных Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="132"/>
         <source>problem parsing Polar Flow data</source>
-        <translation type="unfinished">проблема с разбором данных от Polar Flow</translation>
+        <translation>проблема с разбором данных от Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="87"/>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
         <source>You must authorise with Polar Flow first</source>
-        <translation type="unfinished">Вы должны вначале авторизоваться на Polar Flow</translation>
+        <translation>Вы должны вначале авторизоваться на Polar Flow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.cpp" line="219"/>
         <source>Completed.</source>
-        <translation type="unfinished">Завершено.</translation>
+        <translation>Завершено.</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.h" line="47"/>
         <source>PolarFlow</source>
-        <translation type="unfinished">PolarFlow</translation>
+        <translation>PolarFlow</translation>
     </message>
     <message>
         <location filename="../../Cloud/PolarFlow.h" line="48"/>
         <source>Download from the popular Polar website.</source>
-        <translation type="unfinished">Скачать с популярного сайта Polar.</translation>
+        <translation>Скачать с популярного сайта Polar.</translation>
     </message>
 </context>
 <context>
@@ -23839,13 +23859,13 @@ Do you want to continue?</source>
         <location filename="../../Metrics/Banister.cpp" line="601"/>
         <location filename="../../Metrics/Banister.cpp" line="604"/>
         <source>Power Index</source>
-        <translation type="unfinished">Индекс мощности</translation>
+        <translation>Индекс мощности</translation>
     </message>
     <message>
         <location filename="../../Metrics/Banister.cpp" line="602"/>
         <location filename="../../Metrics/Banister.cpp" line="603"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -24023,7 +24043,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3886"/>
         <source>Save</source>
-        <translation type="unfinished">Сохранить</translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -24070,8 +24090,8 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>Велогонка</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1520"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2547"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1521"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2548"/>
         <location filename="../../FileIO/TcxParser.cpp" line="410"/>
         <source>Lap %1</source>
         <translation>Круг %1</translation>
@@ -24731,7 +24751,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="484"/>
         <source>Section Time Remaining</source>
-        <translation type="unfinished">Оставшееся время отрезка</translation>
+        <translation>Оставшееся время отрезка</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="487"/>
@@ -24906,32 +24926,32 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="592"/>
         <source>Slope</source>
-        <translation type="unfinished">Наклон</translation>
+        <translation>Наклон</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="595"/>
         <source>Lap Distance</source>
-        <translation type="unfinished">Дистанция круга</translation>
+        <translation>Дистанция круга</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="598"/>
         <source>Lap Distance Remaining</source>
-        <translation type="unfinished">Оставшаяся дистанция круга</translation>
+        <translation>Оставшаяся дистанция круга</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="601"/>
         <source>Latitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Широта</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="604"/>
         <source>Longitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="607"/>
         <source>Altitude</source>
-        <translation type="unfinished">Высота</translation>
+        <translation>Высота</translation>
     </message>
 </context>
 <context>
@@ -25873,12 +25893,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="348"/>
         <source>Sample Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Индекс записи</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="349"/>
         <source>R-R</source>
-        <translation type="unfinished">R-R</translation>
+        <translation>R-R</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="350"/>
@@ -26479,7 +26499,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="491"/>
         <source>Error - File does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка - Файл не существует.</translation>
     </message>
     <message>
         <source>Error - File does not exit.</source>
@@ -26503,7 +26523,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="506"/>
         <source>undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>неопределено</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="521"/>
@@ -26704,12 +26724,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1039"/>
         <source>Error - Activity file with same start date/time exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: файл тренировки точно с таким де временем и датой начала уже существует</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1089"/>
         <source>Processing...</source>
-        <translation type="unfinished">Выполняется обработка...</translation>
+        <translation>Выполняется обработка...</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1093"/>
@@ -28452,27 +28472,27 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>A</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">B</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>C</source>
-        <translation type="unfinished">°C</translation>
+        <translation type="unfinished">C</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">D</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E</translation>
     </message>
 </context>
 <context>
@@ -28511,7 +28531,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="375"/>
         <source>Last 24 hours</source>
-        <translation type="unfinished"></translation>
+        <translation>Последние 24 часа</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="382"/>
@@ -28536,7 +28556,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="410"/>
         <source>Last 6 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>Последние 6 недель</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="417"/>
@@ -28629,17 +28649,17 @@ native format. Should we do so?
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="84"/>
         <source>Account is not configured,</source>
-        <translation type="unfinished">Аккаунт не сконфигурирован,</translation>
+        <translation>Аккаунт не сконфигурирован,</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="191"/>
         <source>Completed.</source>
-        <translation type="unfinished">Завершено.</translation>
+        <translation>Завершено.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.cpp" line="193"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished">Ошибка сети — выгрузка файла не удалась.</translation>
+        <translation>Ошибка сети — выгрузка файла не удалась.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.h" line="34"/>
@@ -28649,7 +28669,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Cloud/Selfloops.h" line="35"/>
         <source>Upload and track your training and progress.</source>
-        <translation type="unfinished">Загружать и отслеживать ваши тренировки и прогресс.</translation>
+        <translation>Выгрузить и отслеживать ваши тренировки и прогресс.</translation>
     </message>
 </context>
 <context>
@@ -29023,7 +29043,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
         <source>Workout Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Заголовок тренировки</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
@@ -29033,12 +29053,12 @@ native format. Should we do so?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="39"/>
         <source>RPE</source>
-        <translation type="unfinished">Воспринимаемый уровень нагрузки (RPE)</translation>
+        <translation>Воспринимаемый уровень нагрузки (RPE)</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="42"/>
         <source>Equipment</source>
-        <translation type="unfinished"></translation>
+        <translation>Экипировка</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
@@ -29053,7 +29073,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
         <source>Pool Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Длина бассейна</translation>
     </message>
     <message>
         <source>Spikes</source>
@@ -29355,7 +29375,9 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
 
 Вы можете определить минимальную продолжительсть по времени промежутка, который может быть отмечен как конец одного сегмента и начало другого.
 
-Вы так же можете указать минимальный размер сегмента. Все сегменты короче этого значения будут проигнорированы.</translation>
+Вы так же можете указать минимальный размер сегмента. Все сегменты короче этого значения будут проигнорированы.
+
+</translation>
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="534"/>
@@ -29427,9 +29449,7 @@ If the newly created activity clashes with an existing activity (same date and t
 
 Инструмент автоматически определяет сегменты на непрерывной тренировке и позволяет выбрать какие из них необходимо сохранить как новую тренировку. Вы так же можете выбрать любой текущий выбранный интервал.
 
-Если вновь создаваемые тренировки будут конфликтовать с существующими (например тоже самое время и дата), то инструмент позволит скорректировать время на одну или несколько секунд, что бы избежать потери или перезаписи существующих данных.
-
-</translation>
+Если вновь создаваемые тренировки будут конфликтовать с существующими (например тоже самое время и дата), то инструмент позволит скорректировать время на одну или несколько секунд, что бы избежать потери или перезаписи существующих данных.</translation>
     </message>
 </context>
 <context>
@@ -29444,12 +29464,12 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="137"/>
         <source>JSON parser error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка разбора JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="172"/>
         <source>You must authorise with SportTracks first</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вы должны вначале авторизоваться на SportTracks</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="552"/>
@@ -29675,7 +29695,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Cloud/Strava.cpp" line="140"/>
         <source>JSON parser error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка разбора JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="175"/>
@@ -29904,7 +29924,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="196"/>
         <source>Average Swim Pace, computed only when Cadence &gt; 0 to avoid kick/drill lengths</source>
-        <translation type="unfinished">Средний темп плавания, когда каденс больше нуля</translation>
+        <translation>Средний темп плавания, когда каденс больше нуля</translation>
     </message>
 </context>
 <context>
@@ -30895,13 +30915,13 @@ Click Cancel to exit.</source>
         <location filename="../../Train/TrainDB.cpp" line="492"/>
         <location filename="../../Train/TrainDB.cpp" line="513"/>
         <source>Manual Erg Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ручной режим управления мощностью</translation>
     </message>
     <message>
         <location filename="../../Train/TrainDB.cpp" line="496"/>
         <location filename="../../Train/TrainDB.cpp" line="517"/>
         <source>Manual Slope Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ручной режим наклона</translation>
     </message>
 </context>
 <context>
@@ -31067,7 +31087,7 @@ Click Cancel to exit.</source>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1137"/>
         <source>Resuming..</source>
-        <translation type="unfinished">Продолжение..</translation>
+        <translation>Продолжение..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1164"/>
@@ -31123,20 +31143,25 @@ Click Cancel to exit.</source>
         <source>Calibrating...
 Current speed %1 kph
 Increase speed to %2 kph</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка...
+Текущая скорость %1 км/ч
+Увеличьте скорость до %2 км/ч</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2184"/>
         <source>Calibrating...
 Stop pedalling until speed drops to 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка...
+Прекратите крутить педали, пока скорость не упадёт до нуля</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2189"/>
         <source>Calibration completed successfully!
 Spindown %1 ms
 Zero Offset %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка завершена!
+Время замедления вращения %1 мс
+Смещение нуля: %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2197"/>
@@ -31149,35 +31174,43 @@ Zero Offset %2</source>
         <location filename="../../Train/TrainSidebar.cpp" line="2216"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2267"/>
         <source>Unclip or stop pedalling to begin calibration..</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановите вращение педалей и отстегните педали для калибровки..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2235"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Torque %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка...
+Не вращайте педали и не встёгивайтесь в них пока процесс не закончится..
+Крутящий момент: %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2240"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Torque %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка завершена!
+Смещение нуля: %1
+Крутящий момент: %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2287"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка...
+Не вращайте педали и не встёгивайтесь в них пока процесс не закончится..
+Смещение нуля: %1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2292"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка завершена!
+Смещение нуля: %1
+Наклон: %2</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2333"/>
@@ -31244,7 +31277,7 @@ Slope %2</source>
         <location filename="../../Train/TrainSidebar.cpp" line="2149"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
-        <translation type="unfinished">Выполняется калибровка...
+        <translation>Выполняется калибровка...
 После завершения нажмите F3 на контроллере.</translation>
     </message>
     <message>
@@ -32935,7 +32968,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Cloud/Xert.cpp" line="139"/>
         <source>JSON parser error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка разбора JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="174"/>
