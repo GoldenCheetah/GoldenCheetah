@@ -59,12 +59,13 @@ class FixSpikesConfig : public DataProcessorConfig
             variance = new QDoubleSpinBox();
             variance->setMaximum(9999);
             variance->setMinimum(0);
-            variance->setSingleStep(50);
+            variance->setSingleStep(10);
 
             layout->addWidget(maxLabel);
             layout->addWidget(max);
             layout->addWidget(varianceLabel);
             layout->addWidget(variance);
+
             layout->addStretch();
         }
 
@@ -72,8 +73,8 @@ class FixSpikesConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         QString explain() {
-            return(QString(tr("Occasionally power meters will erroneously "
-                           "report high values for power. For crank based "
+            return(QString(tr("Power meters will occasionally report erroneously "
+                           " high values for power. For crank based "
                            "power meters such as SRM and Quarq this is "
                            "caused by an erroneous cadence reading "
                            "as a result of triggering a reed switch "
@@ -90,12 +91,12 @@ class FixSpikesConfig : public DataProcessorConfig
                            "Variance (%) - this will smooth any values which "
                            "are higher than this percentage of the rolling "
                            "average wattage for the 30 seconds leading up "
-                           "to the spike.")));
+                           "to the spike.\n\n")));
         }
 
         void readConfig() {
-            double tol = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
-            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
+            double tol = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
+            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "20").toDouble();
             max->setValue(tol);
             variance->setValue(stop);
         }
@@ -145,8 +146,8 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     // get settings
     double variance, max;
     if (config == NULL) { // being called automatically
-        max = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
-        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
+        max = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
+        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "20").toDouble();
     } else { // being called manually
         max = ((FixSpikesConfig*)(config))->max->value();
         variance = ((FixSpikesConfig*)(config))->variance->value();
@@ -160,7 +161,6 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     if (windowsize > ride->dataPoints().count()) return false;
 
     // Find the power outliers
-
     int spikes = 0;
     double spiketime = 0.0;
 
@@ -177,12 +177,11 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     ride->command->startLUW("Fix Spikes in Recording");
     for (int i=0; i<secs.count(); i++) {
 
-        // is this over variance threshold?
-        if (outliers->getDeviationForRank(i) < variance) break;
-
-        // ok, so its highly variant but is it over
-        // the max value we are willing to accept?
-        if (outliers->getYForRank(i) < max) continue;
+        // An entry is a fixup candidate only if its variance is high AND it is above a concerning power level.
+        double y = outliers->getYForRank(i);
+        if (   outliers->getDeviationForRank(i) < variance
+            || y < max)
+            continue;
 
         // Houston, we have a spike
         spikes++;

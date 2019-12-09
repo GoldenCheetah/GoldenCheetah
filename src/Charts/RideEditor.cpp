@@ -600,8 +600,8 @@ AnomalyDialog::check()
     if (column >= 0 && rideEditor->ride->ride()->dataPoints().count() >= 30) {
 
         // get spike config
-        double max = appsettings->value(this, GC_DPFS_MAX, "1500").toDouble();
-        double variance = appsettings->value(this, GC_DPFS_VARIANCE, "1000").toDouble();
+        double max = appsettings->value(this, GC_DPFS_MAX, "200").toDouble();
+        double variance = appsettings->value(this, GC_DPFS_VARIANCE, "20").toDouble();
 
         LTMOutliers outliers(secs.data(), power.data(), power.count(), 30, false);
 
@@ -609,7 +609,7 @@ AnomalyDialog::check()
         for (int i=0; i<secs.count(); i++) {
 
             // is this over variance threshold?
-            if (outliers.getDeviationForRank(i) < variance) break;
+            if (outliers.getDeviationForRank(i) < variance) continue;
 
             // ok, so its highly variant but is it over
             // the max value we are willing to accept?
