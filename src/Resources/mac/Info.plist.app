@@ -8,8 +8,6 @@
 	<string>@ICON@</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleGetInfoString</key>
-	<string>3.5.0</string>
 	<key>CFBundleShortVersionString</key>
 	<string>3.5.0</string>
 	<key>CFBundleVersion</key>
