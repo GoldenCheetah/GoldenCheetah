@@ -2154,7 +2154,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         } else {
 
             // eg: "### watts"
-            if (showPercent) units2 = tr("%1 Percent").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            if (showPercent && curve == rideCurve) units2 = tr("%1 Percent").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
             else if (showPowerIndex) units2 = tr("%1 Power Index").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
             else units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                                 .arg(RideFile::unitName(rideSeries, context));
