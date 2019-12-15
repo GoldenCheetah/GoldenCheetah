@@ -7,6 +7,7 @@ sudo apt-get install -qq qt5-default qt59base qt59tools qt59serialport qt59svg\
  qt59multimedia qt59connectivity qt59webengine qt59charts-no-lgpl qt59networkauth-no-lgpl qt59translations
 
 sudo apt-get install -qq libglu1-mesa-dev libgstreamer0.10-0 libgstreamer-plugins-base0.10-0
+sudo apt-get install -y --allow-downgrades libpulse0=1:8.0-0ubuntu3
 sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
 sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
 
@@ -38,7 +39,7 @@ cd ${TRAVIS_BUILD_DIR}
 sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
 
 # Add Python 3.6 and SIP
-sudo add-apt-repository -y ppa:jonathonf/python-3.6
+sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
 sudo apt-get install -qq python3.6-dev
 python3.6 --version
