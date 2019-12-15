@@ -307,7 +307,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("Speed"))
         {
             p_meterWidget->Value = rtd.getSpeed() * (metric ? 1.0 : MILES_PER_KM);
-            p_meterWidget->Text = QString::number((int) rtd.getSpeed());
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
             p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph"));
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
@@ -329,6 +329,12 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         {
             p_meterWidget->Value = rtd.getLoad();
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("Distance"))
+        {
+            p_meterWidget->Value = rtd.getDistance() * (metric ? 1.0 : MILES_PER_KM);
+            p_meterWidget->Text = QString::number((int) p_meterWidget->Value);
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" km") : tr(" mi"));
         }
         else if (p_meterWidget->Source() == QString("Time"))
         {
