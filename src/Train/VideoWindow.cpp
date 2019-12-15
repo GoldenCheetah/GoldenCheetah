@@ -20,6 +20,7 @@
 #include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
+#include "Athlete.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "MeterWidget.h"
@@ -295,6 +296,8 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
+    bool metric = context->athlete->useMetricUnits;
+
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
         if (p_meterWidget->Source() == QString("None"))
@@ -303,9 +306,9 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         else if (p_meterWidget->Source() == QString("Speed"))
         {
-            p_meterWidget->Value = rtd.getSpeed();
+            p_meterWidget->Value = rtd.getSpeed() * (metric ? 1.0 : MILES_PER_KM);
             p_meterWidget->Text = QString::number((int) rtd.getSpeed());
-            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + tr(" kph");
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph"));
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
