@@ -879,6 +879,12 @@ Strava::prepareResponse(QByteArray* data)
             if (meta != "") ride->setTag(meta, each["name"].toString());
         }
 
+        // description saved to Notes, if Notes is not already used for name
+        if (!each["description"].isNull()) {
+            QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+            if (meta != "Notes") ride->setTag("Notes", each["description"].toString());
+        }
+
         if (each["manual"].toBool()) {
             if (each["distance"].toDouble()>0) {
                 QMap<QString,QString> map;
