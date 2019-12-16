@@ -1673,8 +1673,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
-            if (useSimulatedSpeed && status&RT_MODE_SLOPE)
-            {
+            // Compute speed from watts if in slope mode and simulation enabled
+            if (useSimulatedSpeed && status&RT_MODE_SLOPE) {
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
@@ -1682,20 +1682,16 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 displaySpeed = ret.v;
                 distanceTick = ret.d;
+            } else {
+                distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
             }
 
             // only update time & distance if actively running (not just connected, and not running but paused)
             if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
 
-                if (distanceTick == 0.0)
-                {
-                    distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
-                }
-
                 displayDistance += distanceTick;
                 displayLapDistance += distanceTick;
                 displayLapDistanceRemaining -= distanceTick;
-
 
                 if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile())) {
                     displayWorkoutDistance = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
