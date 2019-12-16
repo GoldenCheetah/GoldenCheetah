@@ -452,6 +452,7 @@ class TrainOptionsPage : public QWidget
 
     private:
         Context     *context;
+        QCheckBox   *useSimulatedSpeed;
         QCheckBox   *multiCheck;
         QCheckBox   *autoConnect;
         QCheckBox   *autoHide;

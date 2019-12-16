@@ -78,15 +78,16 @@
 
 #include "TrainDB.h"
 #include "Library.h"
-#include "PhysicsUtility.h"
 
-TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context)
+TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
+    bicycle(context->athlete->getWeight(QDate::currentDate()))
 {
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
     autoConnect = false;
+    useSimulatedSpeed = false;
 
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
@@ -600,6 +601,8 @@ TrainSidebar::configChanged(qint32)
 
     // lap sounds are off by default
     lapAudioEnabled = appsettings->value(this, TRAIN_LAPALERT, false).toBool();
+
+    useSimulatedSpeed = appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool();
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
@@ -1118,6 +1121,10 @@ void TrainSidebar::Start()       // when start button is pressed
         session_time.start();
         lap_time.start();
         clearStatusFlags(RT_PAUSED);
+
+        // Reset speed simulation timer.
+        bicycle.reset();
+
         //foreach(int dev, activeDevices) Devices[dev].controller->restart();
         //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -1186,6 +1193,9 @@ void TrainSidebar::Start()       // when start button is pressed
         // START!
         load = 100;
         slope = 0.0;
+
+        // Reset Speed Simulation
+        bicycle.clear();
 
         if (mode == ERG || mode == MRC) {
             setStatusFlags(RT_MODE_ERGO);
@@ -1606,6 +1616,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             rtData.setSlope(slope); // always set load..
             rtData.setAltitude(displayAltitude); // always set display altitude
 
+            double distanceTick = 0;
+            bool fReceivedKphTelemetry = false;
+
             // fetch the right data from each device...
             foreach(int dev, activeDevices) {
 
@@ -1638,6 +1651,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setDistance(local.getDistance());
                     rtData.setLapDistance(local.getLapDistance());
                     rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
+                    fReceivedKphTelemetry = true;
                 }
                 if (dev == wattsTelemetry) {
                     rtData.setWatts(local.getWatts());
@@ -1659,10 +1673,25 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
+            if (useSimulatedSpeed && status&RT_MODE_SLOPE)
+            {
+                BicycleSimState newState(rtData);
+                SpeedDistance ret = bicycle.SampleSpeed(newState);
+
+                rtData.setSpeed(ret.v);
+
+                displaySpeed = ret.v;
+                distanceTick = ret.d;
+            }
+
             // only update time & distance if actively running (not just connected, and not running but paused)
             if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
-                // Distance assumes current speed for the last second. from km/h to km/sec
-                double distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+
+                if (distanceTick == 0.0)
+                {
+                    distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
+                }
+
                 displayDistance += distanceTick;
                 displayLapDistance += distanceTick;
                 displayLapDistanceRemaining -= distanceTick;
