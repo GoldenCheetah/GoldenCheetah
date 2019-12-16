@@ -33,6 +33,8 @@ static const double s_Rspecific = 287.058; // Specific gas constant for dry air 
 
 double AirPressure(double altitudeInMeters); // returns pressure in pascals
 double AirDensity(double altitudeInMeters, double temperatureInKelvin); // returns density in kg/(m^3)
+double KmhToMs(double);
+double MsToKmh(double);
 
 double computeInstantSpeed(double weightKG,
                            double slope,

@@ -2074,6 +2074,9 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    useSimulatedSpeed = new QCheckBox(tr("Use simulated Speed in slope mode"), this);
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+
     autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
     autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
 
@@ -2090,6 +2093,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
     QVBoxLayout *all = new QVBoxLayout(this);
+    all->addWidget(useSimulatedSpeed);
     all->addWidget(multiCheck);
     all->addWidget(autoConnect);
     all->addWidget(autoHide);
@@ -2102,6 +2106,7 @@ qint32
 TrainOptionsPage::saveClicked()
 {
     // Save the train view settings...
+    appsettings->setValue(TRAIN_USESIMULATEDSPEED, useSimulatedSpeed->isChecked());
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
     appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());

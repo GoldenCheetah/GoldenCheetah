@@ -20,6 +20,8 @@
 #include "PhysicsUtility.h"
 #include "BlinnSolver.h"
 
+#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+
 // These Zone 0 Pressure/Density Constants and equations are from wikipedia
 double AirPressure(double altitudeInMeters)
 {
@@ -34,6 +36,17 @@ double AirDensity(double altitudeInMeters, double temperatureInKelvin)
 
     return Rho; // kg/(m^3)
 }
+
+double KmhToMs(double kmh)
+{
+    return kmh * (1000.0 / (60.0 * 60.0));
+}
+
+double MsToKmh(double ms)
+{
+    return ms * ((60.0 * 60.0) / 1000.0);
+}
+
 
 // Function to compute the sustainable speed in KM/H from input params and a
 // bunch of real world constants.

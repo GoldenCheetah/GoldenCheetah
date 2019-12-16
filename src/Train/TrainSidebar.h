@@ -31,6 +31,7 @@
 #include "GcSideBarItem.h"
 #include "RemoteControl.h"
 #include "Tab.h"
+#include "PhysicsUtility.h"
 
 // standard stuff
 #include <QDir>
@@ -46,6 +47,10 @@
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
+
+#include "PhysicsUtility.h"
+#include "BicycleSim.h"
+
 
 // Status settings
 #define RT_MODE_ERGO        0x0001        // load generation modes
@@ -258,6 +263,7 @@ class TrainSidebar : public GcWindow
         int displayWorkoutLap;     // which Lap in the workout are we at?
         bool lapAudioEnabled;
         bool lapAudioThisLap;
+        bool useSimulatedSpeed;
 
         void updateMetricLapDistance();
         void updateMetricLapDistanceRemaining();
@@ -294,6 +300,8 @@ class TrainSidebar : public GcWindow
 
         bool autoConnect;
         bool pendingConfigChange;
+
+        Bicycle bicycle;
 
     public:
         int mode;
