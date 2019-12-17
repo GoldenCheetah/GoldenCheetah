@@ -17,6 +17,8 @@
 */
 
 #include "BicycleSim.h"
+#include "Settings.h"
+#include "Pages.h"
 
 BicycleWheel::BicycleWheel(double outerR,         // outer radius in meters (for circumference)
                            double innerR,         // inner rim radius
@@ -50,7 +52,7 @@ void Bicycle::Init(BicycleConstants constants, double riderMassKG, double bicycl
     // Precompute effective mass for KE calc here since it never changes.
     m_KEMass = (MassKG() + EquivalentMassKG());
 
-    if (m_KEMass < 0)
+    if (m_KEMass < 0) // Should be impossible but bad if it happens.
     {
         m_KEMass = 100;
     }
@@ -59,52 +61,62 @@ void Bicycle::Init(BicycleConstants constants, double riderMassKG, double bicycl
     this->clear();
 }
 
-Bicycle::Bicycle(BicycleConstants constants, double riderMassKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel)
+Bicycle::Bicycle(Context *context, BicycleConstants constants, double riderMassKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel)
 {
+    context;
     Init(constants, riderMassKG, bicycleMassWithoutWheelsKG, frontWheel, rearWheel);
 }
 
-Bicycle::Bicycle(double riderMassKG)
+Bicycle::Bicycle(Context* context)
 {
-    // Some nice modern race bike.
-    double bicycleMassWithoutWheelsKG = 4.0;
+    // Tolerate NULL context since used by NullTrainer for testing.
 
-    // I'm not bothering with drive train rotational inertia.
+    double riderMassKG = (context != NULL)
+        ? context->athlete->getWeight(QDate::currentDate())
+        : 80;
 
-    // Wheel info - I sort of modelled a shimano c40 disc clincher setup tubeless with conti grand prix 5000 tire.
-    static const double bareFrontWheelKG = 739 / 1000.;
-    static const double frontSpokeCount = 24;
-    static const double frontRimKG = 330 / 1000.;
+    double simBikeValues[SimBicyclePage::BicycleParts::LastPart];
+    for (int i = 0; i < SimBicyclePage::BicycleParts::LastPart; i++)
+    {
+        simBikeValues[i] = SimBicyclePage::GetBicyclePartValue(context, i);
+    }
 
-    static const double bareRearWheelKG = 883 / 1000.;
-    static const double rearSpokeCount = 24;
-    static const double rearRimKG = 330 / 1000.;
+    const double bicycleMassWithoutWheelsG = simBikeValues[SimBicyclePage::BicycleWithoutWheelsG];
+    const double bareFrontWheelG           = simBikeValues[SimBicyclePage::FrontWheelG          ];
+    const double frontSpokeCount           = simBikeValues[SimBicyclePage::FrontSpokeCount      ];
+    const double frontSpokeNippleG         = simBikeValues[SimBicyclePage::FrontSpokeNippleG    ];
+    const double frontWheelOuterRadiusM    = simBikeValues[SimBicyclePage::FrontOuterRadiusM    ];
+    const double frontRimInnerRadiusM      = simBikeValues[SimBicyclePage::FrontRimInnerRadiusM ];
+    const double frontRimG                 = simBikeValues[SimBicyclePage::FrontRimG            ];
+    const double frontRotorG               = simBikeValues[SimBicyclePage::FrontRotorG          ];
+    const double frontSkewerG              = simBikeValues[SimBicyclePage::FrontSkewerG         ];
+    const double frontTireG                = simBikeValues[SimBicyclePage::FrontTireG           ];
+    const double frontTubeOrSealantG       = simBikeValues[SimBicyclePage::FrontTubeSealantG    ];
+    const double bareRearWheelG            = simBikeValues[SimBicyclePage::RearWheelG           ];
+    const double rearSpokeCount            = simBikeValues[SimBicyclePage::RearSpokeCount       ];
+    const double rearSpokeNippleG          = simBikeValues[SimBicyclePage::RearSpokeNippleG     ];
+    const double rearWheelOuterRadiusM     = simBikeValues[SimBicyclePage::RearOuterRadiusM     ];
+    const double rearRimInnerRadiusM       = simBikeValues[SimBicyclePage::RearRimInnerRadiusM  ];
+    const double rearRimG                  = simBikeValues[SimBicyclePage::RearRimG             ];
+    const double rearRotorG                = simBikeValues[SimBicyclePage::RearRotorG           ];
+    const double rearSkewerG               = simBikeValues[SimBicyclePage::RearSkewerG          ];
+    const double rearTireG                 = simBikeValues[SimBicyclePage::RearTireG            ];
+    const double rearTubeOrSealantG        = simBikeValues[SimBicyclePage::RearTubeSealantG     ];
+    const double cassetteG                 = simBikeValues[SimBicyclePage::CassetteG            ];
 
-    static const double spokeNippleKG = 5.6 / 1000.;
+    const double frontWheelG = bareFrontWheelG + frontRotorG + frontSkewerG + frontTireG + frontTubeOrSealantG;
+    const double frontWheelRotatingG = frontRimG + frontTireG + frontTubeOrSealantG + (frontSpokeCount * frontSpokeNippleG);
+    const double frontWheelCenterG = frontWheelG - frontWheelRotatingG;
 
-    static const double cassetteKG = 190 / 1000.;
-    static const double rotorKG = 120 / 1000.;
-    static const double skewerKG = 40 / 1000.;
-    static const double tireKG = 220 / 1000.;
-    static const double tubeOrSealantKG = 50 / 1000.;
+    BicycleWheel frontWheel(frontWheelOuterRadiusM, frontRimInnerRadiusM, frontWheelG / 1000, frontWheelCenterG /1000, frontSpokeCount, frontSpokeNippleG/1000);
 
-    static const double frontWheelOuterRadiusM = 0.35;
-    static const double frontRimInnerRadiusM = 0.3;
-    static const double frontWheelKG = bareFrontWheelKG + skewerKG + tireKG + tubeOrSealantKG;
-    static const double frontWheelRotatingKG = frontRimKG + tireKG + tubeOrSealantKG + (frontSpokeCount * spokeNippleKG);
-    static const double frontWheelCenterKG = frontWheelKG - frontWheelRotatingKG;
+    const double rearWheelG = bareRearWheelG + cassetteG + rearRotorG + rearSkewerG + rearTireG + rearTubeOrSealantG;
+    const double rearWheelRotatingG = rearRimG + rearTireG + rearTubeOrSealantG + (rearSpokeCount * rearSpokeNippleG);
+    const double rearWheelCenterG = rearWheelG - rearWheelRotatingG;
 
-    BicycleWheel frontWheel(frontWheelOuterRadiusM, frontRimInnerRadiusM, frontWheelKG, frontWheelCenterKG, frontSpokeCount, spokeNippleKG);
+    BicycleWheel rearWheel (rearWheelOuterRadiusM,  rearRimInnerRadiusM,  rearWheelG / 1000,  rearWheelCenterG / 1000,  rearSpokeCount,  rearSpokeNippleG/1000);
 
-    static const double rearWheelOuterRadiusM = 0.35;
-    static const double rearRimInnerRadiusM = 0.3;
-    static const double rearWheelKG = bareRearWheelKG + cassetteKG + rotorKG + skewerKG + tireKG + tubeOrSealantKG;
-    static const double rearWheelRotatingKG = rearRimKG + tireKG + tubeOrSealantKG + (rearSpokeCount * spokeNippleKG);
-    static const double rearWheelCenterKG = rearWheelKG - rearWheelRotatingKG;
-
-    BicycleWheel rearWheel (rearWheelOuterRadiusM,  rearRimInnerRadiusM,  rearWheelKG,  rearWheelCenterKG,  rearSpokeCount,  spokeNippleKG);
-
-    Init(BicycleConstants(), riderMassKG, bicycleMassWithoutWheelsKG, frontWheel, rearWheel);
+    Init(BicycleConstants(), riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
 }
 
 double Bicycle::MassKG() const

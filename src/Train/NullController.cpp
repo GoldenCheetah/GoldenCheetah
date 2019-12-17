@@ -27,7 +27,7 @@
 NullController::NullController(TrainSidebar *parent,
                                DeviceConfiguration *dc)
   : RealtimeController(parent, dc), parent(parent), load(100),
-    bicycle(0)
+    bicycle(NULL)
 {
 }
 

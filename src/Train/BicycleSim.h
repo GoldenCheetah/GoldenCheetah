@@ -146,8 +146,8 @@ class Bicycle
 
 public:
 
-    Bicycle(BicycleConstants constants, double riderWeightKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel);
-    Bicycle(double riderMassKG);
+    Bicycle(Context* context, BicycleConstants constants, double riderWeightKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel);
+    Bicycle(Context* context);
     SpeedDistance SampleSpeed(BicycleSimState &newState);
 
     // Reset timer. This forces next sample to use 0.1s as its dt.

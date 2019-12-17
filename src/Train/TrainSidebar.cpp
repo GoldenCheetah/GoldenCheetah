@@ -80,7 +80,7 @@
 #include "Library.h"
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
-    bicycle(context->athlete->getWeight(QDate::currentDate()))
+    bicycle(context)
 {
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful

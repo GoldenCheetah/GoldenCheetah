@@ -2220,6 +2220,133 @@ RemotePage::saveClicked()
     return 0;
 }
 
+const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
+{
+    // Bike mass values approximate a good current bike. Wheels are shimano c40 with conti tubeless tires.
+
+    static const SimBicyclePartEntry arr[] = {
+          // SpinBox Title                          Path to athlete value                Default Value      Decimal      Enum
+        { "Bicycle Mass Without Wheels (g)"       , GC_SIM_BICYCLE_MASSWITHOUTWHEELSG,   4000,              0 },      // BicycleWithoutWheelsG
+        { "Front Wheel Mass (g)"                  , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0 },      // FrontWheelG
+        { "Front Spoke Count"                     , GC_SIM_BICYCLE_FRONTSPOKECOUNT,      24,                0 },      // FrontSpokeCount
+        { "Front Spoke & Nipple Mass - Each (g)"  , GC_SIM_BICYCLE_FRONTSPOKENIPPLEG,    5.6,               1 },      // FrontSpokeNippleG
+        { "Front Rim Mass (g)"                    , GC_SIM_BICYCLE_FRONTRIMG,            330,               0 },      // FrontRimG
+        { "Front Rotor Mass (g)"                  , GC_SIM_BICYCLE_FRONTROTORG,          120,               0 },      // FrontRotorG
+        { "Front Skewer Mass (g)"                 , GC_SIM_BICYCLE_FRONTSKEWERG,         40,                0 },      // FrontSkewerG
+        { "Front Tire Mass (g)"                   , GC_SIM_BICYCLE_FRONTTIREG,           220,               0 },      // FrontTireG
+        { "Front Tube or Sealant Mass (g)"        , GC_SIM_BICYCLE_FRONTTUBESEALANTG,    26,                0 },      // FrontTubeSealantG
+        { "Front Rim Outer Radius (m)"            , GC_SIM_BICYCLE_FRONTOUTERRADIUSM,    .35,               3 },      // FrontOuterRadiusM
+        { "Front Rim Inner Radius (m)"            , GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM, .3,                3 },      // FrontRimInnerRadiusM
+        { "Rear Wheel Mass (g)"                   , GC_SIM_BICYCLE_REARWHEELG,           739,               0 },      // RearWheelG
+        { "Rear Spoke Count"                      , GC_SIM_BICYCLE_REARSPOKECOUNT,       24,                0 },      // RearSpokeCount
+        { "Rear Spoke & Nipple Mass - Each (g)"   , GC_SIM_BICYCLE_REARSPOKENIPPLEG,     5.6,               1 },      // RearSpokeNippleG
+        { "Rear Rim Mass (g)"                     , GC_SIM_BICYCLE_REARRIMG,             330,               0 },      // RearRimG
+        { "Rear Rotor Mass (g)"                   , GC_SIM_BICYCLE_REARROTORG,           120,               0 },      // RearRotorG
+        { "Rear Skewer Mass (g)"                  , GC_SIM_BICYCLE_REARSKEWERG,           40,               0 },      // RearSkewerG
+        { "Rear Tire Mass (g)"                    , GC_SIM_BICYCLE_REARTIREG,            220,               0 },      // RearTireG
+        { "Rear Tube or Sealant Mass (g)"         , GC_SIM_BICYCLE_REARTUBESEALANTG,      26,               0 },      // RearTubeSealantG
+        { "Rear Rim Outer Radius (m)"             , GC_SIM_BICYCLE_REAROUTERRADIUSM,     .35,               3 },      // RearOuterRadiusM
+        { "Rear Rim Inner Radius (m)"             , GC_SIM_BICYCLE_REARRIMINNERRADIUSM,  .3,                3 },      // RearRimInnerRadiusM
+        { "Rear Cassette Mass(g)"                 , GC_SIM_BICYCLE_CASSETTEG,            190,               0 }       // CassetteG
+    };
+
+    if (e < 0 || e >= LastPart) e = 0;
+
+    return arr[e];
+}
+
+double
+SimBicyclePage::GetBicyclePartValue(Context* context, int e)
+{
+    const SimBicyclePartEntry &r = GetSimBicyclePartEntry(e);
+
+    if (!context) return r.m_defaultValue;
+
+    return appsettings->cvalue(
+        context->athlete->cyclist,
+        r.m_path,
+        r.m_defaultValue).toDouble();
+}
+
+void
+SimBicyclePage::AddSpecBox(int ePart)
+{
+    const SimBicyclePartEntry & entry = GetSimBicyclePartEntry(ePart);
+
+    m_LabelArr[ePart] = new QLabel(entry.m_path);
+
+    QDoubleSpinBox * pSpinBox = new QDoubleSpinBox(this);
+
+    pSpinBox->setMaximum(99999);
+    pSpinBox->setMinimum(0.0);
+    pSpinBox->setDecimals(entry.m_decimalPlaces);
+    pSpinBox->setValue(GetBicyclePartValue(context, ePart));
+
+    m_SpinBoxArr[ePart] = pSpinBox;
+}
+
+SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+
+#ifdef Q_OS_MAX
+    setContentsMargins(10, 10, 10, 10);
+    grid->setSpacing(5 * dpiXFactor);
+    all->setSpacing(5 * dpiXFactor);
+#endif
+
+    // Populate m_LabelArr and m_SpinBoxArr
+    for (int e = 0; e < LastPart; e++)
+    {
+        AddSpecBox(e);
+    }
+
+    Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter;
+
+    // Column 0
+    int column = 0;
+    int row = 0;
+    for (int i = BicycleWithoutWheelsG; i < BicycleParts::LastPart; i++) {
+        grid->addWidget(m_LabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    // Column 1
+    column = 1;
+    row = 0;
+    for (int i = 0; i < BicycleParts::LastPart; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
+        row++;
+    }
+
+    // Column 2
+    column = 2;
+    row = 0;
+    grid->addWidget(new QLabel("These values are used to compute correct inertia\n"
+                               "for simulated speed in trainer mode.These values\n"
+                               "only have effect when the 'Use simulated speed in\n"
+                               "slope mode' option is set on the training preferences\n"
+                               " tab."), row, column, alignment);
+
+    all->addLayout(grid);
+    all->addStretch();
+}
+
+qint32
+SimBicyclePage::saveClicked()
+{
+    for (int e = 0; e < BicycleParts::LastPart; e++) {
+        const SimBicyclePartEntry& entry = GetSimBicyclePartEntry(e);
+        appsettings->setCValue(context->athlete->cyclist, entry.m_path, m_SpinBoxArr[e]->value());
+    }
+
+    qint32 state = CONFIG_ATHLETE;
+
+    return state;
+}
+
+
 static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
 
 //
