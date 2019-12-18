@@ -325,6 +325,11 @@
 #define GC_SIM_BICYCLE_REAROUTERRADIUSM       "<athlete-preferences>sim_bicycle/RearOuterRadiusM"
 #define GC_SIM_BICYCLE_REARRIMINNERRADIUSM    "<athlete-preferences>sim_bicycle/RearRimInnerRadiusM"
 #define GC_SIM_BICYCLE_CASSETTEG              "<athlete-preferences>sim_bicycle/CassetteG"
+#define GC_SIM_BICYCLE_CRR                    "<athlete-preferences>sim_bicycle/CRR"
+#define GC_SIM_BICYCLE_Cm                     "<athlete-preferences>sim_bicycle/Cm"
+#define GC_SIM_BICYCLE_Cd                     "<athlete-preferences>sim_bicycle/Cd"
+#define GC_SIM_BICYCLE_Am2                    "<athlete-preferences>sim_bicycle/Am2"
+#define GC_SIM_BICYCLE_Tk                     "<athlete-preferences>sim_bicycle/Tk"
 
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"

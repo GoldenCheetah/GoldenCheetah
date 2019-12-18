@@ -116,7 +116,14 @@ Bicycle::Bicycle(Context* context)
 
     BicycleWheel rearWheel (rearWheelOuterRadiusM,  rearRimInnerRadiusM,  rearWheelG / 1000,  rearWheelCenterG / 1000,  rearSpokeCount,  rearSpokeNippleG/1000);
 
-    Init(BicycleConstants(), riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
+    BicycleConstants constants(
+        simBikeValues[SimBicyclePage::CRR],
+        simBikeValues[SimBicyclePage::Cm],
+        simBikeValues[SimBicyclePage::Cd],
+        simBikeValues[SimBicyclePage::Am2],
+        simBikeValues[SimBicyclePage::Tk]);
+
+    Init(constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
 }
 
 double Bicycle::MassKG() const

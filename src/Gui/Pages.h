@@ -481,6 +481,7 @@ struct SimBicyclePartEntry
     const char* m_path;
     double      m_defaultValue;
     double      m_decimalPlaces;
+    const char* m_tooltip;
 };
 
 class SimBicyclePage : public QWidget
@@ -497,7 +498,7 @@ public:
         BicycleWithoutWheelsG = 0,
         FrontWheelG, FrontSpokeCount, FrontSpokeNippleG, FrontRimG, FrontRotorG, FrontSkewerG, FrontTireG, FrontTubeSealantG, FrontOuterRadiusM, FrontRimInnerRadiusM,
         RearWheelG, RearSpokeCount, RearSpokeNippleG, RearRimG, RearRotorG, RearSkewerG, RearTireG, RearTubeSealantG, RearOuterRadiusM, RearRimInnerRadiusM,
-        CassetteG,
+        CassetteG, CRR, Cm, Cd, Am2, Tk,
         LastPart
     };
 
