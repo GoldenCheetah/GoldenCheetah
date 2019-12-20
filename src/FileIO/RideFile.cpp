@@ -289,7 +289,6 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::rcontact: return QString("gct");
         case RideFile::gear: return QString("gearratio");
         case RideFile::index: return QString("index");
-        case RideFile::hrv: return QString("R_R");
         default: return QString("unknown");
         }
     } else {
@@ -346,7 +345,6 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::gear: return QString(tr("Gear Ratio"));
         case RideFile::wbal: return QString(tr("W' Consumed"));
         case RideFile::index: return QString(tr("Sample Index"));
-        case RideFile::hrv: return QString(tr("R-R"));
         default: return QString(tr("Unknown"));
         }
     }
@@ -406,7 +404,6 @@ RideFile::colorFor(SeriesType series)
     case RideFile::vam:
     case RideFile::lon:
     case RideFile::lat:
-    case RideFile::hrv: return GColor(CHEARTRATE);
     default: return GColor(CPLOTMARKER);
     }
 }
@@ -467,7 +464,6 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::rvert: return QString(tr("cm"));
     case RideFile::rcontact: return QString(tr("ms"));
     case RideFile::gear: return QString(tr("ratio"));
-    case RideFile::hrv: return QString(tr("seconds"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -919,19 +915,14 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         // Update presens and filter HRV
         XDataSeries *series = result->xdata("HRV");
 
-        if (series)
-            {
-                result->setDataPresent(result->hrv, series->datapoints.count() > 0);
-                if (result->areDataPresent()->hrv)
-                    {
-                        double rrMax = appsettings->value(NULL, GC_RR_MAX, "2000.0").toDouble();
-                        double rrMin = appsettings->value(NULL, GC_RR_MIN, "270.0").toDouble();
-                        double rrFilt = appsettings->value(NULL, GC_RR_FILT, "0.2").toDouble();
-                        int rrWindow = appsettings->value(NULL, GC_RR_WINDOW, "20").toInt();
+        if (series && series->datapoints.count() > 0) {
+            double rrMax = appsettings->value(NULL, GC_RR_MAX, "2000.0").toDouble();
+            double rrMin = appsettings->value(NULL, GC_RR_MIN, "270.0").toDouble();
+            double rrFilt = appsettings->value(NULL, GC_RR_FILT, "0.2").toDouble();
+            int rrWindow = appsettings->value(NULL, GC_RR_WINDOW, "20").toInt();
 
-                        FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
-                    }
-            }
+            FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
+        }
 
         // calculate derived data series -- after data fixers applied above
         if (context) result->recalculateDerivedSeries();
@@ -1669,7 +1660,6 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case wprime : dataPresent.wprime = value; break;
         case tcore : dataPresent.tcore = value; break;
         case wbal : break; // not present
-        case hrv : dataPresent.hrv = value; break;
         default:
         case none : break;
     }
@@ -1726,7 +1716,6 @@ RideFile::isDataPresent(SeriesType series)
         case gear : return dataPresent.gear; break;
         case interval : return dataPresent.interval; break;
         case tcore : return dataPresent.tcore; break;
-        case hrv : return dataPresent.hrv; break;
         default:
         case none : return false; break;
     }
@@ -1986,7 +1975,6 @@ RideFile::decimalsFor(SeriesType series)
         case wprime : return 0; break;
         case wbal : return 0; break;
         case tcore : return 2; break;
-        case hrv : return 0; break;
         default:
         case none : break;
     }

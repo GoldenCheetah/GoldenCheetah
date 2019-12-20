@@ -252,8 +252,8 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
 {
     Q_UNUSED(op)
 
-    if (ride->areDataPresent()->hrv) {
-        XDataSeries *series = ride->xdata("HRV");
+    XDataSeries *series = ride->xdata("HRV");
+    if (series && series->datapoints.count() > 0) {
 
         // Read settings
         double rrMax;
