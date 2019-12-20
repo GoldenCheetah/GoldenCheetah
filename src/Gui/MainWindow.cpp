@@ -81,6 +81,9 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 // GUI Widgets
 #include "Tab.h"
@@ -502,7 +505,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors();
+    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
 
     if (processors.count()) {
 
@@ -520,6 +523,13 @@ MainWindow::MainWindow(const QDir &home)
             toolMapper->setMapping(action, i.key());
         }
     }
+
+#ifdef GC_WANT_PYTHON
+    // add custom python fix entry to edit menu
+    pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
+    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
+#endif
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -1078,6 +1088,26 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
     if (rideitem) {
+
+#ifdef GC_WANT_PYTHON
+        if (name.startsWith("_fix_py_")) {
+            name = name.remove(0, 8);
+
+            FixPyScript *script = fixPySettings->getScript(name);
+            if (script == nullptr) {
+                return;
+            }
+
+            QString errText;
+            FixPyRunner pyRunner(currentTab->context);
+            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
+                QMessageBox::critical(this, "GoldenCheetah", errText);
+            }
+
+            return;
+        }
+#endif
+
         ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
@@ -2184,6 +2214,41 @@ MainWindow::ridesAutoImport() {
     currentTab->context->athlete->importFilesWhenOpeningAthlete();
 
 }
+
+#ifdef GC_WANT_PYTHON
+void MainWindow::onEditMenuAboutToShow()
+{
+    bool embedPython = appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool();
+    pyFixesMenu->menuAction()->setVisible(embedPython);
+}
+
+void MainWindow::buildPyFixesMenu()
+{
+    pyFixesMenu->clear();
+
+    QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
+    foreach (FixPyScript *fixPyScript, fixPyScripts) {
+        QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
+        pyFixesMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+        toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
+    }
+
+    pyFixesMenu->addSeparator();
+    pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
+    pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
+}
+
+void MainWindow::showManageFixPyScriptsDlg() {
+    ManageFixPyScriptsDialog dlg(currentTab->context);
+    dlg.exec();
+}
+
+void MainWindow::showCreateFixPyScriptDlg() {
+    EditFixPyScriptDialog dlg(currentTab->context, nullptr, this);
+    dlg.exec();
+}
+#endif
 
 // grow/shrink searchbox if there is space...
 void

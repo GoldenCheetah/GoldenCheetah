@@ -47,6 +47,7 @@
 #include "Utils.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
+#include "FixPySettings.h"
 #endif
 extern ConfigDialog *configdialog_ptr;
 
@@ -277,6 +278,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(pythonBrowseButton, 8 + offset,2);
     offset++;
 
+    bool embedPython = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
+    embedPythonchanged(embedPython);
+
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
 #endif
 
@@ -362,6 +366,7 @@ GeneralPage::saveClicked()
 #endif
 #ifdef GC_WANT_PYTHON
     appsettings->setValue(GC_EMBED_PYTHON, embedPython->isChecked());
+    if (!embedPython->isChecked()) fixPySettings->disableFixPy();
 #endif
 
 

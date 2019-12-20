@@ -260,7 +260,7 @@ private:
 
 };
 
-class AnomalyDialog : public QWidget
+class AnomalyDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT
@@ -283,7 +283,7 @@ class AnomalyDialog : public QWidget
 //
 // Dialog for finding values across the ride
 //
-class FindDialog : public QWidget
+class FindDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT

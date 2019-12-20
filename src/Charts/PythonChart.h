@@ -40,6 +40,12 @@
 
 class PythonChart;
 
+class PythonHost {
+public:
+    virtual PythonChart *chart() = 0;
+    virtual bool readOnly() = 0;
+};
+
 // a console widget to type commands and display response
 class PythonConsole : public QTextEdit {
 
@@ -53,7 +59,7 @@ public slots:
     void rMessage(QString);
 
 public:
-    explicit PythonConsole(Context *context, PythonChart *parent = 0);
+    explicit PythonConsole(Context *context, PythonHost *pythonHost, QWidget *parent = 0);
 
     void putData(QString data);
     void putData(QColor color, QString data);
@@ -76,12 +82,12 @@ protected:
 private:
     Context *context;
     bool localEchoEnabled;
-    PythonChart *parent;
+    PythonHost *pythonHost;
     int promptStartIndex = 4;
 };
 
 // the chart
-class PythonChart : public GcChartWindow {
+class PythonChart : public GcChartWindow, public PythonHost {
 
     Q_OBJECT
 
@@ -111,6 +117,9 @@ class PythonChart : public GcChartWindow {
 
         QString getState() const;
         void setState(QString);
+
+        PythonChart *chart() { return this; }
+        bool readOnly() { return true; }
 
     signals:
         void setUrl(QUrl);

@@ -281,8 +281,16 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
             ## SIP type conversion
             SOURCES += Python/SIP/sipgoldencheetahQString.cpp
-            SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp
+            SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp \
+                       Python/SIP/sipgoldencheetahPythonXDataSeries.cpp
             DEFINES += GC_HAVE_PYTHON
+
+            ## Python data processors
+            HEADERS += FileIO/FixPyScriptsDialog.h FileIO/FixPySettings.h FileIO/FixPyRunner.h \
+                       FileIO/FixPyScript.h FileIO/FixPyDataProcessor.h
+
+            SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
+                       FileIO/FixPyDataProcessor.cpp
 
          } else {
             # QT5 but not 5.5 or higher

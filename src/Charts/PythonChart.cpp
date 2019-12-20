@@ -22,6 +22,7 @@
 
 #include "Colors.h"
 #include "TabView.h"
+#include "RideFileCommand.h"
 
 #include <QtConcurrent>
 
@@ -38,9 +39,9 @@
 // unique identifier for each chart
 static int id=0;
 
-PythonConsole::PythonConsole(Context *context, PythonChart *parent)
+PythonConsole::PythonConsole(Context *context, PythonHost *pythonHost, QWidget *parent)
     : QTextEdit(parent)
-    , context(context), localEchoEnabled(true), parent(parent)
+    , context(context), localEchoEnabled(true), pythonHost(pythonHost)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
@@ -188,16 +189,25 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             //qDebug()<<"RUN:" << line;
 
             // set the context for the call
-            python->canvas = parent->canvas;
-            python->chart = parent;
+            if (pythonHost->chart()) {
+                python->canvas = pythonHost->chart()->canvas;
+                python->chart = pythonHost->chart();
+            }
 
             try {
 
                 // replace $$ with chart identifier (to avoid shared data)
                 line = line.replace("$$", chartid);
 
+                bool readOnly = pythonHost->readOnly();
+                QList<RideFile *> editedRideFiles;
                 python->cancelled = false;
-                python->runline(ScriptContext(context, nullptr, nullptr, Specification(), true), line);
+                python->runline(ScriptContext(context, nullptr, true, readOnly, &editedRideFiles), line);
+
+                // finish up commands on edited rides
+                foreach (RideFile *f, editedRideFiles) {
+                    f->command->endLUW();
+                }
 
                 // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));
@@ -314,7 +324,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         setScript("##\n## Python program will run on selection.\n##\n");
 
         leftsplitter->addWidget(script);
-        console = new PythonConsole(context, this);
+        console = new PythonConsole(context, this, this);
         console->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         leftsplitter->addWidget(console);
 
