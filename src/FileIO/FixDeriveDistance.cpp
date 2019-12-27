@@ -26,6 +26,8 @@
 #include <QVector>
 #include "LocationInterpolation.h"
 
+#pragma optimize("", off)
+
 // Config widget used by the Preferences/Options config panes
 class FixDeriveDistance;
 class FixDeriveDistanceConfig : public DataProcessorConfig
