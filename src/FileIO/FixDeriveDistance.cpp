@@ -122,7 +122,7 @@ FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
 
     GeoPointInterpolator gpi;
     int ii = 0;      // interpolator index
-    int goodii = -1; // last reasonable geolocation
+    int goodii = 0;  // last reasonable geolocation
     double cubicDistanceKM = 0.0;
 
     double distanceFromSpeedTime = 0.0;
