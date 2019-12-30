@@ -457,12 +457,33 @@ MergeActivityWizard::combine()
         // and XData from second ride, append if series already present
         foreach (XDataSeries *xdata, ride2->xdata()) {
             if (combined->xdata().contains(xdata->name)) {
+
+                // Reorder to match the series present in the first activity
+                QStringList names = combined->xdata()[xdata->name]->valuename;
+                QVector<int> indexMap;
+                for (int i=0; i<names.count() && i<XDATA_MAXVALUES; i++)
+                    if (xdata->valuename.contains(names[i]))
+                        indexMap << xdata->valuename.indexOf(names[i]);
+
+                // Add the remaining ones to the end only if there is space
+                for (int i=0; i<xdata->valuename.count(); i++)
+                    if (!names.contains(xdata->valuename[i]) && combined->xdata().count()<XDATA_MAXVALUES) {
+                        combined->xdata()[xdata->name]->valuename << xdata->valuename[i];
+                        indexMap << i;
+                    }
+
+                // finally copy the data
                 foreach (XDataPoint *point, xdata->datapoints) {
-                    XDataPoint *pt = new XDataPoint(*point);
+                    XDataPoint *pt = new XDataPoint();
                     pt->secs = point->secs + timeOffset;
                     pt->km = point->km + distanceOffset;
+                    for (int i=0; i<indexMap.count(); i++) {
+                        pt->number[i] = point->number[indexMap[i]];
+                        pt->string[i] = point->string[indexMap[i]];
+                    }
                     combined->xdata(xdata->name)->datapoints.append(pt);
                 }
+
             } else {
                 XDataSeries *xd = new XDataSeries(*xdata);
                 xd->datapoints.clear();

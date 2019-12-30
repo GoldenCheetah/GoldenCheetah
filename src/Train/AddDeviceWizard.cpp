@@ -1273,6 +1273,12 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Tacx Sirius (8)"));                                   // 63
     virtualPower->addItem(tr("Power - Tacx Sirius (9)"));                                   // 64
     virtualPower->addItem(tr("Power - Tacx Sirius (10)"));                                  // 65
+    virtualPower->addItem(tr("Power - Elite Crono Fluid ElastoGel"));                       // 66
+    virtualPower->addItem(tr("Power - Elite Turbo Muin (2015)"));                           // 67
+    virtualPower->addItem(tr("Power - CycleOps JetFluid Pro"));                             // 68
+    virtualPower->addItem(tr("Power - Elite Crono Mag Elastogel (3/5)"));                   // 69
+    virtualPower->addItem(tr("Power - Tacx Magnetic T1820 (4/7)"));                         // 70
+    virtualPower->addItem(tr("Power - Tacx Magnetic T1820 (7/7)"));                         // 71
 
     //
     // Wheel size

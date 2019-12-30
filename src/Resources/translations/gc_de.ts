@@ -4071,7 +4071,7 @@ gespeichert</translation>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="580"/>
         <source>Average Step Length</source>
-        <translation>ø Schrittlänge</translation>
+        <translation>ø Trittlänge</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="581"/>
@@ -4082,7 +4082,7 @@ gespeichert</translation>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="585"/>
         <source>Average Step Length: average single step (L to R / R to L) length in mm</source>
-        <translation>ø Schrittlänge: durchschnittlicher Einzelschritt (L nach R / R nach Links) in mm</translation>
+        <translation>ø Trittlänge: durchschnittlicher Einzelschritt (L nach R / R nach Links) in mm</translation>
     </message>
 </context>
 <context>

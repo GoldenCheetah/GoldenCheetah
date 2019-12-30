@@ -2096,6 +2096,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     QLabel *color = new QLabel(tr("Color"));
     curveColor = new QPushButton(this);
+    curveColor->setAutoDefault(false);
 
     QLabel *fill = new QLabel(tr("Fill curve"));
     fillCurve = new QCheckBox("", this);
@@ -2194,7 +2195,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     applyButton = new QPushButton(tr("&OK"), this);
+    applyButton->setAutoDefault(false);
     cancelButton = new QPushButton(tr("&Cancel"), this);
+    cancelButton->setAutoDefault(false);
     buttonLayout->addWidget(cancelButton);
     buttonLayout->addWidget(applyButton);
     mainLayout->addLayout(buttonLayout);

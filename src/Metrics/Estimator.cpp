@@ -300,8 +300,8 @@ Estimator::run()
             if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
 
             // so long as the important model derived values are sensible ...
-            if (add.WPrime > 1000 && add.CP > 100) {
-                printd("Estimates for %s - %s\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str());
+            if (add.WPrime > 1000 && add.CP > 100 && add.CP < 1000) {
+                printd("Estimates for %s - %s: CP=%.f W'=%.f\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
             }
 
@@ -323,10 +323,10 @@ Estimator::run()
 
             // so long as the model derived values are sensible ...
             if ((!model->hasWPrime() || add.WPrime > 10.0f) &&
-                (!model->hasCP() || add.CP > 1.0f) &&
+                (!model->hasCP() || (add.CP > 1.0f && add.CP < 10.0)) &&
                 (!model->hasPMax() || add.PMax > 1.0f) &&
                 (!model->hasFTP() || add.FTP > 1.0f)) {
-                printd("WPK Estimates for %s - %s\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str());
+                printd("WPK Estimates for %s - %s: CP=%.1f W'=%.1f\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
             }
 
