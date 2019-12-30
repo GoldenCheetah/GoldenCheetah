@@ -611,7 +611,8 @@ CriticalPowerWindow::setEditFromSlider()
         // force replot...
         if (rangemode) {
 
-            // Refresh aggregated curve (ride added/filter changed)
+            // Refresh aggregated curve
+            stale = true;
             dateRangeChanged(myDateRange);
 
         } else {
