@@ -81,6 +81,6 @@
        <RelativeSize Width="10.0" Height="4.0" />
        <RelativePosition X="88.0" Y="95.0" />
        <MainColor R="255" G="0" B="0" A="180" />
-       <Text>target</Text>
+       <Text>load</Text>
    </meter>
 </layout>
