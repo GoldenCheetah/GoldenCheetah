@@ -323,7 +323,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("HRM"))
         {
             p_meterWidget->Value =  rtd.getHr();
-            p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
         }
         else if (p_meterWidget->Source() == QString("Load"))
         {

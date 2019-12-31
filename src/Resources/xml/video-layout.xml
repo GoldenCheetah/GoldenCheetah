@@ -29,7 +29,7 @@
        <RelativeSize Width="50.0" Height="20.0" />
        <RelativePosition X="50.0" Y="85.0" />
        <MainColor R="255" G="100" B="100" A="180" />
-       <Text>Watts</Text>
+       <Text>watts</Text>
    </meter>
    <meter name="Cadencemeter" container="Video" source="Cadence" type="CircularBargraph">
        <RelativeSize Width="15.0" Height="15.0" />
@@ -55,6 +55,12 @@
        <RelativePosition X="50.0" Y="90.0" />
        <MainColor R="255" G="0" B="0" A="180" />
    </meter>
+   <meter name="HRM-unit" container="Video" source="None" type="Text">
+       <RelativeSize Width="15.0" Height="4.0" />
+       <RelativePosition X="50.0" Y="95.0" />
+       <MainColor R="255" G="0" B="0" A="180"/>
+       <Text>bpm</Text>
+   </meter>
    <meter name="status" container="Video" source="TrainerStatus" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
        <RelativePosition X="10.0" Y="10.0" />
@@ -70,5 +76,11 @@
    <meter name="load" container="Video" source="Load" type="Text">
        <RelativeSize Width="10.0" Height="5.0" />
        <RelativePosition X="88.0" Y="90.0" />
+   </meter>
+   <meter name="load-text" container="Video" source="None" type="Text">
+       <RelativeSize Width="10.0" Height="4.0" />
+       <RelativePosition X="88.0" Y="95.0" />
+       <MainColor R="255" G="0" B="0" A="180" />
+       <Text>target</Text>
    </meter>
 </layout>
