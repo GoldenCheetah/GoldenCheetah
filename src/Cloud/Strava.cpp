@@ -862,10 +862,12 @@ Strava::prepareResponse(QByteArray* data)
         // what sport?
         if (!each["type"].isNull()) {
             QString stype = each["type"].toString();
-            if (stype == "Ride") ride->setTag("Sport", "Bike");
-            else if (stype == "Run") ride->setTag("Sport", "Run");
-            else if (stype == "Swim") ride->setTag("Sport", "Swim");
+            if (stype.endsWith("Ride")) ride->setTag("Sport", "Bike");
+            else if (stype.endsWith("Run")) ride->setTag("Sport", "Run");
+            else if (stype.endsWith("Swim")) ride->setTag("Sport", "Swim");
             else ride->setTag("Sport", stype);
+            // Set SubSport to preserve the original when Sport was mapped
+            if (stype != ride->getTag("Sport", "")) ride->setTag("SubSport", stype);
         }
 
         if (each["device_name"].toString().length()>0)
