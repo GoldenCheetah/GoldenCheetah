@@ -24,8 +24,6 @@ popd
 # Deploy and generate dmg
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/qt5
-echo "Cleaning up installed QT libraries from qt5"
-brew remove qt5
 echo "Renaming dmg file to branch and build number ready for deploy"
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
