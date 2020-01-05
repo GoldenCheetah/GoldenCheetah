@@ -170,8 +170,9 @@ macx {
 
     } else {
 
-        contains(DEFINES, "GC_VIDEO_NONE") {
+        contains(DEFINES, "GC_VIDEO_NONE")|contains(DEFINES, "GC_VIDEO_QT5") {
 
+            # GC_VIDEO_QT5 will enable Qt5 video support, otherwise
             # we have a blank videowindow, it will do nothing
             HEADERS += Train/VideoWindow.h
             SOURCES += Train/VideoWindow.cpp
