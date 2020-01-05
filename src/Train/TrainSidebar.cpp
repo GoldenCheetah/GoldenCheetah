@@ -1704,7 +1704,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // Trust ergFile for location data, if available.
                 if (ergFile) {
                     geolocation geoloc;
-                    if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc))
+                    if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope))
                     {
                         displayLatitude = geoloc.Lat();
                         displayLongitude = geoloc.Long();
@@ -1712,6 +1712,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                         rtData.setLatitude(displayLatitude);
                         rtData.setLongitude(displayLongitude);
+                        rtData.setSlope(slope);
                     }
                 }
 
@@ -2003,14 +2004,14 @@ void TrainSidebar::loadUpdate()
             context->notifySetNow(load_msecs);
         }
     } else {
-        slope = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
-
         geolocation geoloc;
-        if (ergFile->locationAt(displayWorkoutDistance * 1000, curLap, geoloc))
+        if (ergFile->locationAt(displayWorkoutDistance * 1000, curLap, geoloc, slope))
         {
             displayLatitude = geoloc.Lat();
             displayLongitude = geoloc.Long();
             displayAltitude = geoloc.Alt();
+        } else {
+            slope = ergFile->gradientAt(displayWorkoutDistance * 1000, curLap);
         }
 
         if(displayWorkoutLap != curLap)

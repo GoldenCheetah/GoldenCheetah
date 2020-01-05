@@ -1001,7 +1001,7 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
                 }
             }
 
-            geolocation interpLoc = gpi.Interpolate(km);
+            geolocation interpLoc = gpi.Location(km);
 
             ride->command->setPointValue(i, RideFile::lat, interpLoc.Lat());
             ride->command->setPointValue(i, RideFile::lon, interpLoc.Long());

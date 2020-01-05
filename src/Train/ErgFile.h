@@ -119,10 +119,10 @@ class ErgFile
 
         bool isValid();         // is the file valid or not?
         double Cp;
-        int format;             // ERG, CRS, MRC and CRS_LOC currently supported
-        int wattsAt(long, int&);      // return the watts value for the passed msec
-        double gradientAt(long, int&);      // return the gradient value for the passed meter
-        bool locationAt(long x, int& lapnum, geolocation &geoLoc); // location at meter
+        int format;                      // ERG, CRS, MRC and CRS_LOC currently supported
+        double wattsAt   (double, int&); // return the watts value for the passed msec
+        double gradientAt(double, int&); // return the gradient value for the passed meter
+        bool locationAt  (double x, int& lapnum, geolocation &geoLoc, double &slope100); // location at meter
 
         int nextLap(long);      // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         int currentLap(long);   // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
