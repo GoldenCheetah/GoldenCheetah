@@ -1197,6 +1197,9 @@ CloudDBChartListDialog::encodeHTML ( const QString& encodeMe )
         case '>':
             temp += "&gt;"; break;
 
+        case '\n':
+            temp += "<br>"; break;
+
         default:
             temp += character;
             break;
