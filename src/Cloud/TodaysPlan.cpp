@@ -229,6 +229,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         QNetworkRequest request(url);
         QNetworkReply *reply;
         request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+        request.setRawHeader("tp-nodecorate", "true"); // without fields description
         if (offset == 0) {
 
             // Prepare the Search Payload for First Call to Search
@@ -240,8 +241,10 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
             jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
             jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
-            jsonString += "\"isNotNull\": [\"fileId\"]}, ";
-            jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\",\"rpe\",\"tqr\",\"pain\"], "; //\"avgWatts\"
+            jsonString += "\"isNotNull\": [\"fileId\"], ";
+            jsonString += "\"sports\": [\"ride\",\"swim\",\"run\"] ";
+            jsonString += "}, "; // end of "criteria"
+            jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\", \"type\", \"rpe\",\"tqr\",\"pain\"], ";
             jsonString += "\"opts\": 1 "; // without fields description
             jsonString += "}";
 
