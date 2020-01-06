@@ -323,7 +323,7 @@ LTMPlot::setData(LTMSettings *set)
 
     // how many ?
     maxX = groupForDate(settings->end.date(), settings->groupBy) -
-           groupForDate(settings->start.date(), settings->groupBy);
+           groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // no data to display so that all folks
     if (context->athlete->rideCache->rides().count() == 0 || maxX <= 0) {
@@ -2609,7 +2609,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     if (maxdays <= 0) return;
 
@@ -2649,7 +2649,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -2806,7 +2806,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -2929,7 +2929,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -3059,7 +3059,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     n = 0;
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -3425,7 +3425,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     PMCData *pmcData = localPMC ? localPMC : athletePMC;
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3577,7 +3577,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
     }
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3666,7 +3666,7 @@ void
 LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3756,7 +3756,7 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
     metricDetail.run = (nRuns > 0 && nActivities == nRuns);
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
