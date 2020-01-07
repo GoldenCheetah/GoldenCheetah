@@ -615,12 +615,12 @@ void GradientPage::SaveWorkout()
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
-    double currentX = 0;
     stream << "[COURSE DATA]" << endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
-        currentX += p.first.toDouble();
+        // header indicates metric units, so convert accordingly
+        double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
         stream << currentX << " " << p.second << " 0" << endl;
     }
     stream << "[END COURSE DATA]" << endl;
@@ -768,8 +768,10 @@ void ImportPage::SaveWorkout()
     double prevDistance = 0;
     foreach (p,rideProfile)
     {
-        stream << p.first - prevDistance << " " << p.second <<" 0" << endl;
-        prevDistance = p.first;
+        // header indicates metric units, so convert accordingly
+        double curDistance = p.first * (metricUnits ? 1.0 : KM_PER_MILE);
+        stream << curDistance - prevDistance << " " << p.second <<" 0" << endl;
+        prevDistance = curDistance;
     }
     stream << "[END COURSE DATA]" << endl;
     f.close();
