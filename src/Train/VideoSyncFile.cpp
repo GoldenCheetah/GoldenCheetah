@@ -72,6 +72,7 @@ void VideoSyncFile::parseRLV()
 
     // running totals
     double rdist = 0; // running total for distance
+    double rend = 0;  // Length of entire course
 
     // open the file for binary reading and open a datastream
     QFile RLVFile(filename);
@@ -164,6 +165,8 @@ void VideoSyncFile::parseRLV()
                 {
                     // read in the mapping records
                     uint32_t PreviousFrameNbr=0;
+                    double PreviousDistance=0;
+
                     for (unsigned int record=0; record < info.records; record++) {
                         // get the next record
                         if (sizeof(framemapping) != input.readRawData((char*)&framemapping, sizeof(framemapping))) {
@@ -171,11 +174,16 @@ void VideoSyncFile::parseRLV()
                             break;
                         }
 
+                        if (record == 0) PreviousDistance = framemapping.distance;
                         VideoSyncFilePoint add;
 
                         if (format == RLV) {
-                            double distance = framemapping.distance; // in meters per frame
-                            rdist += distance * (double) (framemapping.frameNbr - PreviousFrameNbr);
+                            // Calculate average distance per video frame between this sync point and the last
+                            // using the formula (2a+b)/3 where a is the point of lower speed and b is the higher.
+                            double distance = framemapping.distance;
+                            double avgDistance = (qMin(distance, PreviousDistance)*2 + qMax(distance, PreviousDistance)) / 3;
+
+                            rdist += avgDistance * (double) (framemapping.frameNbr - PreviousFrameNbr);
                             add.km = rdist / 1000.0;
 
                             // time
@@ -186,6 +194,7 @@ void VideoSyncFile::parseRLV()
 
                             // FIXME : do we have to consider video offset and weight ?
                             PreviousFrameNbr = framemapping.frameNbr;
+                            PreviousDistance = distance;
                         }
 
                         Points.append(add);
@@ -220,6 +229,7 @@ void VideoSyncFile::parseRLV()
                             happy = false;
                             break;
                         }
+                        if (courseInfo.end > rend) rend = courseInfo.end;
                     }
                     // FIXME : add those data to training messages
                 }
@@ -234,6 +244,17 @@ void VideoSyncFile::parseRLV()
             block++;
 
         } else happy = false;
+    }
+
+    // Make sure we have a sync point to represent the end of the course
+    // Some earlier rlvs don't supply an end point frame reference,
+    // so we need to assume the speed from the last ref point continues to the end
+    if ((!Points.isEmpty()) && (rend > Points.last().km * 1000) && Points.last().kph > 0) {
+        VideoSyncFilePoint add;
+        add.km = rend / 1000;
+        add.kph = Points.last().kph;
+        add.secs = Points.last().secs + ((add.km - Points.last().km) * 3600) / add.kph;
+        Points.append(add);
     }
 
     // done

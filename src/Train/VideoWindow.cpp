@@ -206,8 +206,10 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    if (context->currentVideoSyncFile())
+    if (context->currentVideoSyncFile()) {
         context->currentVideoSyncFile()->manualOffset = 0.0;
+        context->currentVideoSyncFile()->km = 0.0;
+    }
 
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
@@ -218,8 +220,12 @@ void VideoWindow::startPlayback()
     /* set the media to playback */
     libvlc_media_player_set_media (mp, m);
 
-    /* set the playback rate to the media default - since there may be a different one set from RLV */
-    libvlc_media_player_set_rate(mp, libvlc_media_player_get_fps(mp));
+    /* Reset playback rate */
+    /* If video speed will be controlled by a sync file, set almost stationary
+       until first telemetry update. Otherwise (re)set to normal rate */
+    if (context->currentVideoSyncFile() && context->currentVideoSyncFile()->Points.count() > 1)
+        libvlc_media_player_set_rate(mp, 0.1f);
+    else libvlc_media_player_set_rate(mp, 1.0f);
 
     /* play the media_player */
     libvlc_media_player_play (mp);
@@ -402,7 +408,8 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 #endif
 
 #ifdef GC_VIDEO_VLC
-    if (!m) return;
+    if (!m || !context->isRunning || context->isPaused)
+        return;
 
     QList<ErgFilePoint> *ErgFilePoints = NULL;
     if (context->currentErgFile()) {
@@ -431,11 +438,44 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         while ((VideoSyncFiledataPoints[curPosition].km <= CurrentDistance) && (curPosition < VideoSyncFiledataPoints.count()-1))
             curPosition++;
 
-        // update the rfp
-        float weighted_average = (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km != 0.0)?(CurrentDistance-VideoSyncFiledataPoints[curPosition-1].km) / (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km):0.0;
+        /* Create an RFP to represent where we are */
+        VideoSyncFilePoint syncPrevious = VideoSyncFiledataPoints[curPosition-1];
+        VideoSyncFilePoint syncNext = VideoSyncFiledataPoints[curPosition];
+        double syncKmDelta = syncNext.km - syncPrevious.km;
+        double syncKphDelta = syncNext.kph - syncPrevious.kph;
+        double syncTimeDelta = syncNext.secs - syncPrevious.secs;
+        double distanceFactor, speedFactor, timeFactor, timeExtra;
+
+        // Calculate how far we are between points in terms of distance
+        if (syncKmDelta == 0) distanceFactor = 0.0;
+        else distanceFactor = (CurrentDistance - syncPrevious.km) / syncKmDelta;
+
+        // Now create the appropriate factors and interpolate the
+        // video speed and time for the point we have reached.
+        // If there has been no acceleration we can just use use the distance factor
+        if (syncKphDelta == 0) {
+            // Constant filming speed
+            rfp.kph = syncPrevious.kph;
+            rfp.secs = syncPrevious.secs + syncTimeDelta * distanceFactor;
+        }
+        else {
+            // Calculate time difference because of change in speed
+            timeExtra = syncTimeDelta - ((syncKmDelta / syncPrevious.kph) * 3600);
+            if (syncKphDelta > 0) {
+                // The filming speed increased
+                speedFactor = qPow(distanceFactor, 0.66667);
+                timeFactor = qPow(distanceFactor, 0.33333);
+                rfp.kph = syncPrevious.kph + speedFactor * syncKphDelta;
+            }
+            else {
+                // The filming speed decreased
+                speedFactor = 1 - qPow(distanceFactor, 1.5);
+                timeFactor = qPow(distanceFactor, 3.0);
+                rfp.kph = syncNext.kph - speedFactor * syncKphDelta;
+            }
+            rfp.secs = syncPrevious.secs + (distanceFactor * (syncTimeDelta - timeExtra)) + (timeFactor * timeExtra);
+        }
         rfp.km = CurrentDistance;
-        rfp.secs = VideoSyncFiledataPoints[curPosition-1].secs + weighted_average * (VideoSyncFiledataPoints[curPosition].secs - VideoSyncFiledataPoints[curPosition-1].secs);
-        rfp.kph = VideoSyncFiledataPoints[curPosition-1].kph + weighted_average * (VideoSyncFiledataPoints[curPosition].kph - VideoSyncFiledataPoints[curPosition-1].kph);
 
         /*
         //TODO : GPX file format
