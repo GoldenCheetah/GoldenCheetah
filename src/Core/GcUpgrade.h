@@ -97,6 +97,7 @@
 // 3980 - V3.5 RC1
 // 3981 - V3.5 RC2
 // 3982 - V3.5 RC2X
+// 3990 - V3.5 RELEASE (January 2020)
 
 
 #define VERSION3_BUILD    3010 // released
@@ -107,14 +108,14 @@
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
-#define VERSION35_BUILD   3982 // rc2x
+#define VERSION35_BUILD   3990 // released
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3982
-#define VERSION_STRING "V3.5 RC2X"
+#define VERSION_LATEST 3990
+#define VERSION_STRING "V3.5"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
