@@ -558,6 +558,8 @@ static const QStringList timeInZonesWBAL = QStringList()
 void
 Card::setData(RideItem *item)
 {
+    if (item == NULL || item->ride() == NULL) return;
+
     // use ride colors in painting?
     ridecolor = item->color;
 
