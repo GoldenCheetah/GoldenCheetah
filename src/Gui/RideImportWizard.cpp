@@ -957,7 +957,8 @@ RideImportWizard::abortClicked()
     // NOTE: abort button morphs into save and finish button later - so all 3 variants are processed here
 
     // if done when labelled abort we kill off this dialog
-    QString label = abortButton->text();
+    // & removed to avoid issues with kde AutoCheckAccelerators
+    QString label = QString(abortButton->text()).replace("&", "");
 
     // Process "ABORT"
     if (label == tr("Abort")) {
