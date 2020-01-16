@@ -820,9 +820,11 @@ MainWindow::setChartMenu(QMenu *menu)
 void
 MainWindow::addChart(QAction*action)
 {
+    // & removed to avoid issues with kde AutoCheckAccelerators
+    QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
     for (int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].name == action->text()) {
+        if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
         }
@@ -2099,8 +2101,10 @@ MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
+        // & removed to avoid issues with kde AutoCheckAccelerators
+        QString actionText = QString(action->text()).replace("&", "");
 
-        if (action->text() == "University of Kent") {
+        if (actionText == "University of Kent") {
 #if QT_VERSION > 0x50000
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
             KentUniversityUploadDialog uploader(this, db, currentTab->context->ride);

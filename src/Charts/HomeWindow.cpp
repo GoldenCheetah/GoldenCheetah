@@ -188,9 +188,11 @@ HomeWindow::rightClick(const QPoint & /*pos*/)
 void
 HomeWindow::addChartFromMenu(QAction*action)
 {
+    // & removed to avoid issues with kde AutoCheckAccelerators
+    QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
     for (int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].name == action->text()) {
+        if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
         }
