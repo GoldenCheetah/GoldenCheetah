@@ -242,6 +242,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
                                      "        self.value = ''\n"
                                      "    def write(self, txt):\n"
                                      "        self.value += txt\n"
+                                     "    def flush(self):\n"
+                                     "        pass\n"
                                      "catchOutErr = CatchOutErr()\n"
                                      "sys.stdout = catchOutErr\n"
                                      "sys.stderr = catchOutErr\n"
