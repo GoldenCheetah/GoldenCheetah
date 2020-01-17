@@ -859,6 +859,9 @@ Strava::prepareResponse(QByteArray* data)
         // 1s samples with start time
         RideFile *ride = new RideFile(starttime.toUTC(), 1.0f);
 
+        // set strava id in metadata (to show where we got it from - to add View on Strava link in Summary view
+        if (!each["id"].isNull()) ride->setTag("StravaID",  QString("%1").arg(each["id"].toVariant().toULongLong()));
+
         // what sport?
         if (!each["type"].isNull()) {
             QString stype = each["type"].toString();
