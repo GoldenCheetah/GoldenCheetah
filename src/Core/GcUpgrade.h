@@ -98,6 +98,7 @@
 // 3981 - V3.5 RC2
 // 3982 - V3.5 RC2X
 // 3990 - V3.5 RELEASE (January 2020)
+// 3991 - V3.5 RELEASE RE-ISSUE STRAVA RATE LIMIT (January 2020)
 
 
 #define VERSION3_BUILD    3010 // released
@@ -114,7 +115,7 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3990
+#define VERSION_LATEST 3991
 #define VERSION_STRING "V3.5"
 
 // default config for this release cycle
