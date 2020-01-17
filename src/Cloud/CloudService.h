@@ -95,6 +95,9 @@ class CloudService : public QObject {
         // need a logo, we may resize but will keep aspect ratio
         virtual QImage logo() const = 0;
 
+        // an icon to put on the authorize button (mandated by strava guidelines)
+        virtual QString authiconpath() const { return QString(""); }
+
         // register with capabilities of the service - emerging standard
         // is a service that allows oauth, query and upload as well as download
         enum { OAuth=0x01, UserPass=0x02, Upload=0x04, Download=0x08, Query=0x10} capa_;
