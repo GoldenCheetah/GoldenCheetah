@@ -75,6 +75,7 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<br>The core body temperature module was developed by the <br>"
                 "<a href=\"http://www.usariem.army.mil/\">U.S. Army Research Institute of Environmental Medicine</a>"
                 "<br> and is patent pending<br>"
+                "<br><img src=\":images/services/strava_compatible.png\"/><br>"
                 "</center>"
                 )
                 .arg(QString(QUrl::fromLocalFile(context->athlete->home->root().absolutePath()).toEncoded()))
