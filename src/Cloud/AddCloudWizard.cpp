@@ -27,6 +27,7 @@
 #include "OAuthDialog.h"
 
 #include <QMessageBox>
+#include <QPixmap>
 #include <QRegExp>
 
 // WIZARD FLOW
@@ -271,12 +272,14 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     pass = new QLineEdit(this);
     pass->setEchoMode(QLineEdit::Password);
     pass->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    auth = new QPushButton(tr("Authorise"), this);
-    auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     token = new QLabel(this);
     token->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     message = new QLabel(this);
     message->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    // is there an icon for the authorise button?
+    auth = new QPushButton(tr("Authorise"), this);
+    auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     // labels
     comboLabel = new QLabel("");
@@ -366,6 +369,24 @@ AddAuth::initializePage()
 
     // clone to do next few steps!
     setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->uiName()));
+
+    // icon on the authorize button
+    if (wizard->cloudService && wizard->cloudService->authiconpath() != "") {
+
+        // scaling icon hack (193x48 is strava icon size)
+        QPixmap pix(wizard->cloudService->authiconpath());
+        QIcon authicon(pix.scaled(193*dpiXFactor, 48*dpiXFactor));
+        auth->setIconSize(QSize(193*dpiXFactor, 48*dpiYFactor));
+
+        // set the pushbutton
+        auth->setText("");
+        auth->setIcon(authicon);
+    } else {
+
+        // standard pushbutton (reset after used by strava)
+        auth->setText(tr("Authorise"));
+        auth->setIcon(QIcon());
+    }
 
     // show  all the widgets relevant for this service and update the value from the
     // settings we have collected (which will have been defaulted).
