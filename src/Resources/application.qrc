@@ -166,6 +166,7 @@
         <file>images/configure.png</file>
         <file>web/googlemap/dark.css</file>
         <file>images/toolbar/cloud.png</file>
+        <file>images/services/strava_compatible.png</file>
         <file>images/services/cyclinganalytics.png</file>
         <file>images/services/dropbox.png</file>
         <file>images/services/googledrive.png</file>
