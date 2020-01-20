@@ -2097,6 +2097,14 @@ MainWindow::checkCloud()
 }
 
 void
+MainWindow::importCloud()
+{
+    // lets get a new cloud service account
+    AddCloudWizard *p = new AddCloudWizard(currentTab->context, "", true);
+    p->show();
+}
+
+void
 MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
