@@ -172,6 +172,7 @@ class MainWindow : public QMainWindow
         void setUploadMenu();
         void setSyncMenu();
         void checkCloud();
+        void importCloud(); // used to setup and sync in one on first run (see BlankState.cpp)
 
         void showOptions();
 

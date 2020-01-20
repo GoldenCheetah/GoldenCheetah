@@ -42,7 +42,7 @@
 //
 
 // Main wizard - if passed a service name we are in edit mode, not add mode.
-AddCloudWizard::AddCloudWizard(Context *context, QString sname) : QWizard(context->mainWindow), context(context), service(sname)
+AddCloudWizard::AddCloudWizard(Context *context, QString sname, bool sync) : QWizard(context->mainWindow), context(context), service(sname), fsync(sync)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
@@ -721,7 +721,15 @@ AddFinish::validatePage()
     // in the athlete preferences
     appsettings->setCValue(wizard->context->athlete->cyclist, wizard->cloudService->activeSettingName(), "true");
 
+    // start a sync straight away
+    if (wizard->fsync) {
+        CloudService *db = CloudServiceFactory::instance().newService(wizard->cloudService->id(), wizard->context);
+        CloudServiceSyncDialog *syncnow = new CloudServiceSyncDialog(wizard->context, db);
+        syncnow->open();
+    }
+
     // delete the instance
     delete wizard->cloudService;
+
     return true;
 }

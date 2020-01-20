@@ -148,6 +148,14 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
     img->setIcon(QPixmap(":images/analysis.png"));
     img->setIconSize(QSize(800,330));
 
+    ShortCut scCloud;
+    scCloud.label = tr("Connect to cloud service and download");
+    scCloud.buttonLabel = tr("Cloud Download");
+    scCloud.buttonIconPath = ":images/mac/download.png";
+    QPushButton *cloudButton = addToShortCuts(scCloud);
+    connect(cloudButton, SIGNAL(clicked()), context->mainWindow, SLOT(importCloud()));
+
+
     ShortCut scImport;
     scImport.label = tr("Import files from your disk or usb device");
     scImport.buttonLabel = tr("Import data");
