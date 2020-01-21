@@ -7190,8 +7190,8 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-     // mouse wheel zoom logic
-    if (event->type() == QEvent::Wheel && isPlotCanvas(obj)) {
+     // mouse wheel zoom logic (only in normal mode for now)
+    if (event->type() == QEvent::Wheel && isPlotCanvas(obj) && !window->showStack->isChecked()) {
         static ulong lastEvent = 0;
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
         const bool increasingZoom = wheelEvent->delta() > 0;
