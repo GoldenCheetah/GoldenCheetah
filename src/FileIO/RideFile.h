@@ -188,6 +188,7 @@ class RideFile : public QObject // QObject to emit signals
         // fix tools
         friend class FixLapSwim;
         friend class Snippets;
+        friend struct FitFileReaderState;
 
         // utility
         static unsigned int computeFileCRC(QString); 
