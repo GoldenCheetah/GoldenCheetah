@@ -144,8 +144,15 @@ struct FitFileReaderState
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
     XDataSeries *hrvXdata;
-    QMap<int, QString> deviceInfos;
-    QList<QString> dataInfos;
+    QMap<int, QString> deviceInfos, session_device_info_;
+    QList<QString> dataInfos, session_data_info_;
+
+    // cache tags for each session
+    using SessionTagMap = QMap<QString, QVariant>;
+    SessionTagMap active_session_;
+    QList<SessionTagMap> session_tags_;
+    QList<QMap<int, QString>> session_device_info_list_;
+    QList<QList<QString>> session_data_info_list_;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
@@ -307,14 +314,14 @@ struct FitFileReaderState
         printf("type: %d %llx %s\n", v.type, v.v, v.s.c_str());
     }
 
-    void convert2Run() {
-        if (rideFile->areDataPresent()->cad) {
-            foreach(RideFilePoint *pt, rideFile->dataPoints()) {
+    void convert2Run( RideFile *rf) {
+        if (rf->areDataPresent()->cad) {
+            foreach(RideFilePoint *pt, rf->dataPoints()) {
                 pt->rcad = pt->cad;
                 pt->cad = 0;
             }
-            rideFile->setDataPresent(RideFile::rcad, true);
-            rideFile->setDataPresent(RideFile::cad, false);
+            rf->setDataPresent(RideFile::rcad, true);
+            rf->setDataPresent(RideFile::cad, false);
         }
     }
 
@@ -709,13 +716,19 @@ struct FitFileReaderState
                 name = nativeName;
             }
 
-
-            if (xdata && dataInfos.contains(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName))) {
+            const QString contain_info = QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName);
+            if (xdata && dataInfos.contains(contain_info)) {
                 int secs = last_time-start_time;
-                int idx = dataInfos.indexOf(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName));
-                dataInfos.replace(idx, QString("CIQ '%1' -> %2 %3 (STANDARD until %4 secs)").arg(deveField.name.c_str()).arg(typeName).arg(name).arg(secs));
-            } else
-                dataInfos.append(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name));
+                int idx = dataInfos.indexOf(contain_info);
+                const QString info_replacement = QString("CIQ '%1' -> %2 %3 (STANDARD until %4 secs)").arg(deveField.name.c_str()).arg(typeName).arg(name).arg(secs);
+                dataInfos.replace(idx, info_replacement);
+                if (session_data_info_.contains(contain_info))
+                    session_data_info_.replace(session_data_info_.indexOf(contain_info), info_replacement);
+            } else {
+                const QString the_info = QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name);
+                dataInfos.append(the_info);
+                session_data_info_.append(the_info);
+            }
         }
 
         if (xdata) {
@@ -753,6 +766,7 @@ struct FitFileReaderState
                 default: ; // do nothing
             }
         }
+        active_session_["_devicetype"] = getManuProd(manu, prod);
         rideFile->setDeviceType(getManuProd(manu, prod));
     }
 
@@ -770,39 +784,44 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 7:   // METmax: 1 METmax = VO2max * 3.5, scale 65536
+                    active_session_["VO2max detected"] = QString::number(round(value / 65536.0 * 3.5 * 10.0) / 10.0);
                     rideFile->setTag("VO2max detected", QString::number(round(value / 65536.0 * 3.5 * 10.0) / 10.0));
                     break;
 
                 case 4:   // Aerobic Training Effect, scale 10
+                    active_session_["Aerobic Training Effect"] = QString::number(value/10.0);
                     rideFile->setTag("Aerobic Training Effect", QString::number(value/10.0));
                     break;
 
                 case 20:   // Anaerobic Training Effect, scale 10
+                    active_session_["Anaerobic Training Effect"] = QString::number(value/10.0);
                     rideFile->setTag("Anaerobic Training Effect", QString::number(value/10.0));
                     break;
 
                 case 9:   // Recovery Time, minutes
+                    active_session_["Recovery Time"] = QString::number(round(value/60.0));
                     rideFile->setTag("Recovery Time", QString::number(round(value/60.0)));
                     break;
 
                 case 17:   // Performance Condition
+                    active_session_["Performance Condition"] = QString::number(value);
                     rideFile->setTag("Performance Condition", QString::number(value));
                     break;
 
                 case 14:   // If watch detected Running Lactate Threshold Heart Rate, bpm
                     if(rideFile->isRun() && value > 0){
+                        active_session_["LTHR detected"] = QString::number(value);
                         rideFile->setTag("LTHR detected", QString::number(value));
                     }
                     break;
 
                 case 15:   // If watch detected Running Lactate Threshold Speed, m/s
                     if(rideFile->isRun() && value > 0){
+                        active_session_["LTS detected"] = QString::number(value/100.0);
                         rideFile->setTag("LTS detected", QString::number(value/100.0));
                     }
                     break;
-
-
-                default: ; // do nothing
+                default: break; // do nothing
             }
 
 
@@ -812,10 +831,20 @@ struct FitFileReaderState
         }
     }
 
-    void decodeSession(const FitDefinition &def, int,
+    void decodeSession(const FitDefinition &def, int time_offset,
                        const std::vector<FitValue>& values) {
+        time_t iniTime;
+        if (time_offset > 0)
+            iniTime = last_time + time_offset;
+        else
+            iniTime = last_time;
+
         int i = 0;
+        time_t this_timestamp = 0, this_start_time = 0, this_elapsed_time = 0;
+        QString sport, subsport;
+        bool sport_found = false, subsport_found = false;
         QString prevSport = rideFile->getTag("Sport", "");
+
 
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -825,223 +854,232 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 5: // sport field
+                sport_found = true;
                     switch (value) {
                         case 0: // Generic
-			    rideFile->setTag("Sport","");
-			    break;
+                          sport = "";
+                          break;
                         case 1: // running:
-                            rideFile->setTag("Sport","Run");
-                            if (rideFile->dataPoints().count()>0)
-                                convert2Run();
-                            break;
+                          sport = "Run";
+                          break;
                         case 2: // cycling
-                            rideFile->setTag("Sport","Bike");
-                            break;
+                          sport = "Bike";
+                          break;
                         case 3: // transition:
-                            rideFile->setTag("Sport","Transition");
-                            break;
+                          sport = "Transition";
+                          break;
                         case 4: // running:
-                            rideFile->setTag("Sport","Fitness equipment");
+                            sport = "Fitness equipment";
                             break;
                         case 5: // swimming
-                            rideFile->setTag("Sport","Swim");
+                            sport = "Swim";
                             break;
                         case 6: // Basketball:
-                            rideFile->setTag("Sport","Basketball");
+                            sport = "Basketball";
                             break;
                         case 7: //
-                            rideFile->setTag("Sport","Soccer");
+                            sport = "Soccer";
                             break;
                         case 8: // running:
-                            rideFile->setTag("Sport","Tennis");
+                            sport = "Tennis";
                             break;
                         case 9: // running:
-                            rideFile->setTag("Sport","American fotball");
+                            sport = "American fotball";
                             break;
                         case 10: // running:
-                            rideFile->setTag("Sport","Training");
+                            sport = "Training";
                             break;
                         case 11: // running:
-                            rideFile->setTag("Sport","Walking");
+                            sport = "Walking";
                             break;
                         case 12: // running:
-                            rideFile->setTag("Sport","Cross country skiing");
+                            sport = "Cross country skiing";
                             break;
                         case 13: // running:
-                            rideFile->setTag("Sport","Alpine skiing");
+                            sport = "Alpine skiing";
                             break;
                         case 14: // running:
-                            rideFile->setTag("Sport","Snowboarding");
+                            sport = "Snowboarding";
                             break;
                         case 15: // running:
-                            rideFile->setTag("Sport","Rowing");
+                            sport = "Rowing";
                             break;
                         case 16: // running:
-                            rideFile->setTag("Sport","Mountaineering");
+                            sport = "Mountaineering";
                             break;
                         case 17: // running:
-                            rideFile->setTag("Sport","Hiking");
+                            sport = "Hiking";
                             break;
                         case 18: // running:
-                            rideFile->setTag("Sport","Multisport");
+                            sport = "Multisport";
                             break;
                         case 19: // running:
-                            rideFile->setTag("Sport","Paddling");
+                            sport = "Paddling";
                             break;
-                        default: // if we can't work it out, assume bike
-                            // but only if not already set to another sport,
-                            // Garmin Swim send 2 tags for example
-                            if (rideFile->getTag("Sport", "Bike") != "Bike") break;
+                        default: // if we can't work it out, treat as Generic
+                            sport = ""; break;
                     }
                     break;
                 case 6: // sub sport (ignored at present)
+                    subsport_found = true;
                     switch (value) {
                         case 0:    // generic
-			  rideFile->setTag("SubSport","");
-			  break;
+                            subsport = "";
+                            break;
                         case 1:    // treadmill
-			  rideFile->setTag("SubSport","treadmill");
-			  break;
+                            subsport = "treadmill";
+                            break;
                         case 2:    // street
-			  rideFile->setTag("SubSport","street");
-			  break;
+                            subsport = "street";
+                            break;
                         case 3:    // trail
-			  rideFile->setTag("SubSport","trail");
-			  break;
+                            subsport = "trail";
+                            break;
                         case 4:    // track
-			  rideFile->setTag("SubSport","track");
-			  break;
+                            subsport = "track";
+                            break;
                         case 5:    // spin
-			  rideFile->setTag("SubSport","spinning");
-			  break;
+                            subsport = "spinning";
+                            break;
                         case 6:    // home trainer
-			  rideFile->setTag("SubSport","home trainer");
-			  break;
+                            subsport = "home trainer";
+                            break;
                         case 7:    // route
-			  rideFile->setTag("SubSport","route");
-			  break;
+                            subsport = "route";
+                            break;
                         case 8:    // mountain
-			  rideFile->setTag("SubSport","mountain");
-			  break;
+                            subsport = "mountain";
+                            break;
                         case 9:    // downhill
-			  rideFile->setTag("SubSport","downhill");
-			  break;
+                            subsport = "downhill";
+                            break;
                         case 10:    // recumbent
-			  rideFile->setTag("SubSport","recumbent");
-			  break;
+                            subsport = "recumbent";
+                            break;
                         case 11:    // cyclocross
-			  rideFile->setTag("SubSport","cyclocross");
-			  break;
+                            subsport = "cyclocross";
+                            break;
                         case 12:    // hand_cycling
-			  rideFile->setTag("SubSport","hand cycling");
-			  break;
+                            subsport = "hand cycling";
+                            break;
                         case 13:    // piste
-			  rideFile->setTag("SubSport","piste");
-			  break;
+                            subsport = "piste";
+                            break;
                         case 14:    // indoor_rowing
-			  rideFile->setTag("SubSport","indoor rowing");
-			  break;
+                        subsport = "indoor rowing";
+                        break;
                         case 15:    // elliptical
-			  rideFile->setTag("SubSport","elliptical");
-			  break;
-		        case 16: // stair climbing
-			  rideFile->setTag("SubSport","stair climbing");
-			  break;
-		        case 17: // lap swimming
-			  rideFile->setTag("SubSport","lap swimming");
-			  break;
-		        case 18: // open water
-			  rideFile->setTag("SubSport","open water");
-			  break;
-		        case 19: // flexibility training
-			  rideFile->setTag("SubSport","flexibility training");
-			  break;
-   		        case 20: // strength_training
-			  rideFile->setTag("SubSport","strength_training");
-			  break;
-		        case 21: // warm_up
-			  rideFile->setTag("SubSport","warm_up");
-			  break;
-		        case 22: // match
-			  rideFile->setTag("SubSport","match");
-			  break;
-		        case 23: // exercise
-			  rideFile->setTag("SubSport","exercise");
-			  break;
-		        case 24: // challenge
-			  rideFile->setTag("SubSport","challenge");
-			  break;
-		        case 25: // indoor_skiing
-			  rideFile->setTag("SubSport","indoor_skiing");
-			  break;
-		        case 26: // cardio_training
-			  rideFile->setTag("SubSport","cardio_training");
-			  break;
-		        case 27: // indoor_walking
-			  rideFile->setTag("SubSport","indoor_walking");
-			  break;
-		        case 28: // e_bike_fitness
-			  rideFile->setTag("SubSport","e_bike_fitness");
-			  break;
-		        case 29: // bmx
-			  rideFile->setTag("SubSport","bmx");
-			  break;
-		        case 30: // casual_walking
-			  rideFile->setTag("SubSport","casual_walking");
-			  break;
-		        case 31: // speed_walking
-			  rideFile->setTag("SubSport","speed_walking");
-			  break;
-		        case 32: // bike_to_run_transition
-			  rideFile->setTag("SubSport","bike_to_run_transition");
-			  break;
-		        case 33: // run_to_bike_transition
-			  rideFile->setTag("SubSport","run_to_bike_transition");
-			  break;
-		        case 34: // swim_to_bike_transition
-			  rideFile->setTag("SubSport","swim_to_bike_transition");
-			  break;
-		        case 35: // atv
-			  rideFile->setTag("SubSport","atv");
-			  break;
-		        case 36: // motocross
-			  rideFile->setTag("SubSport","motocross");
-			  break;
-		        case 37: // backcountry
-			  rideFile->setTag("SubSport","backcountry");
-			  break;
-		        case 38: // resort
-			  rideFile->setTag("SubSport","resort");
-			  break;
-		        case 39: // rc_drone
-			  rideFile->setTag("SubSport","rc_drone");
-			  break;
-		        case 40: // wingsuit
-			  rideFile->setTag("SubSport","wingsuit");
-			  break;
-		        case 41: // whitewater
-			  rideFile->setTag("SubSport","whitewater");
-			  break;
-  		        case 254: // all
-		        default:
-			  break;
+                        subsport = "elliptical";
+                        break;
+                      case 16: // stair climbing
+                        subsport = "stair climbing";
+                        break;
+                      case 17: // lap swimming
+                        subsport = "lap swimming";
+                        break;
+                      case 18: // open water
+                        subsport = "open water";
+                        break;
+                      case 19: // flexibility training
+                        subsport = "flexibility training";
+                        break;
+                      case 20: // strength_training
+                        subsport = "strength_training";
+                        break;
+                      case 21: // warm_up
+                        subsport = "warm_up";
+                        break;
+                      case 22: // match
+                        subsport = "match";
+                        break;
+                      case 23: // exercise
+                        subsport = "exercise";
+                        break;
+                      case 24: // challenge
+                        subsport = "challenge";
+                        break;
+                      case 25: // indoor_skiing
+                        subsport = "indoor_skiing";
+                        break;
+                      case 26: // cardio_training
+                        subsport = "cardio_training";
+                        break;
+                      case 27: // indoor_walking
+                        subsport = "indoor_walking";
+                        break;
+                      case 28: // e_bike_fitness
+                        subsport = "e_bike_fitness";
+                        break;
+                      case 29: // bmx
+                        subsport = "bmx";
+                        break;
+                      case 30: // casual_walking
+                        subsport = "casual_walking";
+                        break;
+                      case 31: // speed_walking
+                        subsport = "speed_walking";
+                        break;
+                      case 32: // bike_to_run_transition
+                        subsport = "bike_to_run_transition";
+                        break;
+                      case 33: // run_to_bike_transition
+                        subsport = "run_to_bike_transition";
+                        break;
+                      case 34: // swim_to_bike_transition
+                        subsport = "swim_to_bike_transition";
+                        break;
+                      case 35: // atv
+                        subsport = "atv";
+                        break;
+                      case 36: // motocross
+                        subsport = "motocross";
+                        break;
+                      case 37: // backcountry
+                        subsport = "backcountry";
+                        break;
+                      case 38: // resort
+                        subsport = "resort";
+                        break;
+                      case 39: // rc_drone
+                        subsport = "rc_drone";
+                        break;
+                      case 40: // wingsuit
+                        subsport = "wingsuit";
+                        break;
+                      case 41: // whitewater
+                        subsport = "whitewater";
+                        break;
+                      case 254: // all
+                      default:    // default, treat as Generic
+                        subsport = "";
+                        break;
                     }
                     break;
                 case 44: // pool_length
                     pool_length = value / 100000.0;
+                    active_session_["Pool Length"] = QString("%1").arg(pool_length*1000.0);
                     rideFile->setTag("Pool Length", // in meters
                                       QString("%1").arg(pool_length*1000.0));
                     break;
 
                 // other fields are ignored at present
                 case 253: //timestamp
+                    this_timestamp = value + qbase_time.toTime_t();
+                    active_session_["_timestamp"] = static_cast<quint32>(this_timestamp);
+                    break;
                 case 254: //index
                 case 0:   //event
                 case 1:    /* event_type */
                 case 2:    /* start_time */
+                    this_start_time = value + qbase_time.toTime_t();
+                    active_session_["_start_time"] = static_cast<quint32>(this_start_time);
+                    break;
                 case 3:    /* start_position_lat */
                 case 4:    /* start_position_long */
                 case 7:    /* total elapsed time */
+                    this_elapsed_time = value + qbase_time.toTime_t();
+                    active_session_["_total_elapsed_time"] = static_cast<quint32>(this_elapsed_time);
+                    break;
                 case 8:    /* total timer time */
                 case 9:    /* total distance */
                 case 10:    /* total_cycles */
@@ -1085,13 +1123,48 @@ struct FitFileReaderState
                 case 71:    /* min altitude */
                 case 92:    /* fractional avg cadence (rpm) */
                 case 93:    /* fractional max cadence */
-                default: ; // do nothing
+                default: break; // do nothing
             }
 
             if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                 printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
         }
+
+        if (sport_found) {
+            active_session_["Sport"] = sport;
+            rideFile->setTag("Sport", sport);
+        }
+        if (subsport_found) {
+            active_session_["SubSport"] = subsport;
+            rideFile->setTag("SubSport", subsport);
+        }
+
+        // same procedure as for laps, code is c/p until a better solution is found
+        if (this_timestamp == 0 && this_elapsed_time > 0) {
+            this_timestamp = iniTime + this_elapsed_time - 1;
+            active_session_["_timestamp"] = static_cast<quint32>(this_timestamp);
+        }
+
+        if (this_start_time == 0 || this_start_time-start_time < 0) {
+            //errors << QString("lap %1 has invalid start time").arg(interval);
+            this_start_time = start_time; // time was corrected after lap start
+            active_session_["_start_time"] = static_cast<quint32>(this_start_time);
+
+            if (this_timestamp == 0 || this_timestamp-start_time < 0) {
+                active_session_.remove("_timestamp");
+                errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
+                return;
+            }
+        }
+
+        session_tags_.append(active_session_);
+        session_device_info_list_.append(session_device_info_);
+        session_data_info_list_.append(session_data_info_);
+        active_session_.clear();
+        session_device_info_.clear();
+        session_data_info_.clear();
+
         // If the Sport changed tag as a Multisport activity
         QString newSport = rideFile->getTag("Sport", "");
         if (prevSport != "" && newSport != "" && newSport != prevSport)
@@ -1167,9 +1240,10 @@ struct FitFileReaderState
 
         // What is 7 and 0 ?
         // 3 for Moxy ?
-        if (type>-1 && type != 0 && type != 7 && type != 3)
+        if (type>-1 && type != 0 && type != 7 && type != 3) {
             deviceInfos.insert(index, deviceInfo);
-
+            session_device_info_.insert(index, deviceInfo);
+        }
     }
 
     void decodeActivity(const FitDefinition &def, int,
@@ -3205,60 +3279,207 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
-            QStringList uniqueDevices(deviceInfos.values());
-            uniqueDevices.removeDuplicates();
-            QString deviceInfo = uniqueDevices.join("\n");
-            if (! deviceInfo.isEmpty())
-                rideFile->setTag("Device Info", deviceInfo);
-
-            QString dataInfo;
-            foreach(QString info, dataInfos) {
-                dataInfo += info + "\n";
-            }
-            if (dataInfo.length()>0)
-                rideFile->setTag("Data Info", dataInfo);
+            setRideFileDeviceInfo(rideFile, deviceInfos);
+            setRideFileDataInfo(rideFile, dataInfos);
 
             file.close();
 
-            if (weatherXdata->datapoints.count()>0)
-                rideFile->addXData("WEATHER", weatherXdata);
-            else
-                delete weatherXdata;
-
-            if (swimXdata->datapoints.count()>0)
-                rideFile->addXData("SWIM", swimXdata);
-            else
-                delete swimXdata;
-
-            if (hrvXdata->datapoints.count()>0)
-                rideFile->addXData("HRV", hrvXdata);
-            else
-                delete hrvXdata;
-
-            if (gearsXdata->datapoints.count()>0)
-                rideFile->addXData("GEARS", gearsXdata);
-            else
-                delete gearsXdata;
-
-            if (deveXdata->datapoints.count()>0)
-                rideFile->addXData("DEVELOPER", deveXdata);
-            else
-                delete deveXdata;
-
-            if (extraXdata->datapoints.count()>0)
-                rideFile->addXData("EXTRA", extraXdata);
-            else
-                delete extraXdata;
+            appendXData(rideFile);
 
             return rideFile;
         }
     }
+
+    void setRideFileDeviceInfo(RideFile *rf, QMap<int, QString> const& device_infos) {
+        QStringList uniqueDevices(device_infos.values());
+        uniqueDevices.removeDuplicates();
+        QString deviceInfo = uniqueDevices.join("\n");
+        if (! deviceInfo.isEmpty()) {
+            rf->setTag("Device Info", deviceInfo);
+        }
+    }
+
+    void setRideFileDataInfo(RideFile *rf, QList<QString> const& data_infos) {
+        QString dataInfo;
+        foreach(QString info, data_infos) {
+            dataInfo += info + "\n";
+        }
+        if (dataInfo.length()>0) {
+            rf->setTag("Data Info", dataInfo);
+        }
+    }
+
+    void appendXData(RideFile *rf) {
+        if (rf == nullptr) { return; }
+
+        if (!weatherXdata->datapoints.empty())
+            rf->addXData("WEATHER", weatherXdata);
+        else
+            delete weatherXdata;
+
+        if (!swimXdata->datapoints.empty())
+            rf->addXData("SWIM", swimXdata);
+        else
+            delete swimXdata;
+
+        if (!hrvXdata->datapoints.empty())
+            rf->addXData("HRV", hrvXdata);
+        else
+            delete hrvXdata;
+
+        if (!gearsXdata->datapoints.empty())
+            rf->addXData("GEARS", gearsXdata);
+        else
+            delete gearsXdata;
+
+        if (!deveXdata->datapoints.empty())
+            rf->addXData("DEVELOPER", deveXdata);
+        else
+            delete deveXdata;
+
+        if (!extraXdata->datapoints.empty())
+            rf->addXData("EXTRA", extraXdata);
+        else
+            delete extraXdata;
+    }
+
+    RideFile *splitSessions(QList<RideFile*> *rides) {
+        // NOTES:
+        // - start altitude of first transition not correct (zero), leads to too high climb figure
+        //   i think this is not really a big deal yet
+
+        if (session_tags_.size() < 2) {
+            // just check if it was a run activity and adjust values, like it was done
+            // in decoding the session before.
+            if (rideFile->isRun()) {
+                convert2Run(rideFile);
+            }
+            return rideFile;
+        }
+
+        // If there is more than one session parsed we
+        // split the ride file just created into multiple
+        // ones, each representing a single session.
+        // BUT, we do not touch the original file.
+
+        quint32 start = 0, start_time = 0;
+        const QString deviceType = rideFile->deviceType();
+        const QString fileFormat = rideFile->fileFormat();
+        const double recIntSecs = rideFile->recIntSecs();
+        // start date of an activity in ISO format is guaranteed to be unique in GC, see discussion in MR.
+        const QString uniqueSessionCookie = rideFile->startTime().toUTC().toString(Qt::ISODate);
+        QString sport_before;
+
+        int session_idx = 0;
+        for(auto s = session_tags_.begin(); s != session_tags_.end(); ++s, ++session_idx) {
+            RideFile *rf = new RideFile;
+            rf->setDeviceType(deviceType);
+            rf->setFileFormat(fileFormat);
+            rf->setRecIntSecs(recIntSecs);
+
+            // each ride gets a unique cookie to allow filtering/grouping all sessions that belong together
+            rf->setTag("Multisport", uniqueSessionCookie);
+
+            // set tags and filter out session meta data
+            quint32 stop = 0;
+            for(auto sle = s->begin(); sle != s->end(); ++sle) {
+                QString const& key = sle.key();
+                // meta data is prefixed w/ '_', otherwise its a ride file tag
+                if (key.startsWith('_')) {
+                    if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
+                        stop = sle->toUInt();
+                    } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
+                        // only do once
+                        start = sle->toUInt();
+                        start_time = start;
+                    }
+                } else {
+                    rf->setTag(key, sle->toString());
+                }
+            }
+
+            // adjust the start time
+            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
+
+            int idx_start = rideFile->timeIndex(start - start_time);
+            int idx_stop = rideFile->timeIndex(stop - start_time);
+            // add data points to the new file created.
+            const QVector<RideFilePoint*> points_from_file = rideFile->dataPoints().mid(idx_start, idx_stop - idx_start);
+            foreach(RideFilePoint *p, points_from_file) {
+                rf->appendPoint(*p);
+            }
+
+            // fix subsport tag of transitions
+            if (0 == QString::compare(rf->getTag("Sport", ""), "Transition", Qt::CaseInsensitive)) {
+                QString sport_after;
+                auto s_cpy = s + 1;
+                if (s_cpy != session_tags_.end() && s_cpy->contains("Sport") && s_cpy->value("SubSport").toString().isEmpty()) {
+                    sport_after = s_cpy->value("Sport").toString();
+                }
+                if (!sport_before.isEmpty() && !sport_after.isEmpty()) {
+                     rf->setTag("SubSport", (QString("%1_to_%2_transition").arg(sport_before.toLower(), sport_after.toLower())));
+                }
+            }
+
+            // add intervals
+            //   Only intervals that fit in the range of the file we are recently creating
+            //   are transferred.
+            auto ride_intervals = rideFile->intervals();
+            int int_ctr = 1;
+            foreach (RideFileInterval *rfi, ride_intervals) {
+                // is the recent interval in the range of our new file?
+                if (rfi->start >= idx_start && rfi->start <= idx_stop && rfi->stop <= idx_stop) {   // is it possible that the a start is beyond stop and stop fits?
+                    rf->addInterval(rfi->type, rfi->start, rfi->stop, QString("Lap %1").arg(int_ctr));
+                    int_ctr++;
+                }
+            }
+
+            // add XData
+            const auto file_xdata = rideFile->xdata();
+            for (auto it = file_xdata.begin(); it != file_xdata.end(); ++it) {
+                XDataSeries *s = new XDataSeries(*(it.value()));
+                s->datapoints.erase(std::remove_if(s->datapoints.begin(), s->datapoints.end(), [start_time, start, stop](XDataPoint *xdp){
+                    return xdp && (xdp->secs >= (stop - start_time) || xdp->secs < (start - start_time));
+                }), s->datapoints.end());
+                // adjust their timing
+                if (!s->datapoints.empty()) {
+                    auto first_time = s->datapoints.first()->secs;
+                    foreach (XDataPoint *p, s->datapoints) {
+                        p->secs -= first_time;
+                    }
+                    // and append
+                    rf->addXData(it.key(), s);
+                }
+            }
+
+            // convert if necessary (run and transition)
+            if (rf->isRun() || 0 == QString::compare(rf->getTag("Sport", ""), "Transition", Qt::CaseInsensitive)) {
+                convert2Run(rf);
+            }
+
+            setRideFileDataInfo(rf, session_data_info_list_.at(session_idx));
+            setRideFileDeviceInfo(rf, session_device_info_list_.at(session_idx));
+
+            rides->append(rf);
+
+            // remember sport tag
+            sport_before = rf->getTag("Sport", "");
+
+            // adjust timing and go on
+            start = stop;
+        }
+
+        // return original file
+        return rideFile;
+    }
 };
 
-RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
+RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*> *rides) const
 {
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
-    return state->run();
+    auto ret = state->run();
+    ret = state->splitSessions(rides);
+    return ret;
 }
 
 
