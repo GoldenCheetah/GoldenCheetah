@@ -35,13 +35,7 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
     friend class ::FixDeriveDistance;
     protected:
         QHBoxLayout *layout;
-
         QCheckBox *useCubicSplines;
-
-        QLabel *bikeWeightLabel;
-        QDoubleSpinBox *bikeWeight;
-        QLabel *crrLabel;
-        QDoubleSpinBox *crr;
 
     public:
         FixDeriveDistanceConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -52,7 +46,7 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
             layout = new QHBoxLayout(this);
 
             useCubicSplines = new QCheckBox(tr("Use Cubic Splines"), this);
-            useCubicSplines->setCheckState(Qt::Checked);
+            useCubicSplines->setCheckState(Qt::Unchecked);
             layout->addWidget(useCubicSplines);
 
             layout->setContentsMargins(0,0,0,0);
@@ -65,9 +59,11 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         void readConfig() {
+            useCubicSplines->setCheckState(appsettings->value(NULL, GC_DPDD_UCS, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
         }
 
         void saveConfig() {
+            appsettings->setValue(GC_DPDD_UCS, useCubicSplines->checkState());
         }
 
         QString explain() {
@@ -114,11 +110,16 @@ double _deg2rad(double deg) {
 bool
 FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
 
-    bool fUseCubicSplines = ((FixDeriveDistanceConfig*)(config))->useCubicSplines->isChecked();
+    bool fUseCubicSplines = false;
     bool fUseSpeedAndTime = false;
+
+    if (config == NULL) { // being called automatically
+        fUseCubicSplines = appsettings->value(NULL, GC_DPDD_UCS, Qt::Unchecked).toBool();
+    } else { // being called manually
+        fUseCubicSplines = ((FixDeriveDistanceConfig*)(config))->useCubicSplines->isChecked();
+    }
 
     GeoPointInterpolator gpi;
     int ii = 0;      // interpolator index
