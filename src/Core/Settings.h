@@ -183,6 +183,7 @@
 #define GC_DPPA                         "<global-general>dataprocess/poweradjust/adjustment"
 #define GC_DPPA_ABS                     "<global-general>dataprocess/poweradjust/adjustment_abs"
 #define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
+#define GC_DPDD_UCS                     "<global-general>dataprocess/fixderivedistance/usecubicsplines"
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
 #define GC_DPDP_CDA                     "<global-general>dataprocess/fixderivepower/cda"
