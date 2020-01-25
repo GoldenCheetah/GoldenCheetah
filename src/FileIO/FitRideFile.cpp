@@ -3263,81 +3263,172 @@ struct FitFileReaderState
 
             file.close();
 
-            if (weatherXdata->datapoints.count()>0)
-                rideFile->addXData("WEATHER", weatherXdata);
-            else
-                delete weatherXdata;
-
-            if (swimXdata->datapoints.count()>0)
-                rideFile->addXData("SWIM", swimXdata);
-            else
-                delete swimXdata;
-
-            if (hrvXdata->datapoints.count()>0)
-                rideFile->addXData("HRV", hrvXdata);
-            else
-                delete hrvXdata;
-
-            if (gearsXdata->datapoints.count()>0)
-                rideFile->addXData("GEARS", gearsXdata);
-            else
-                delete gearsXdata;
-
-            if (deveXdata->datapoints.count()>0)
-                rideFile->addXData("DEVELOPER", deveXdata);
-            else
-                delete deveXdata;
-
-            if (extraXdata->datapoints.count()>0)
-                rideFile->addXData("EXTRA", extraXdata);
-            else
-                delete extraXdata;
+            appendXData(rideFile);
 
             return rideFile;
         }
     }
 
+    void appendXData(RideFile *rf) {
+        if (rf == nullptr) { return; }
+
+        if (!weatherXdata->datapoints.empty())
+            rf->addXData("WEATHER", weatherXdata);
+        else
+            delete weatherXdata;
+
+        if (!swimXdata->datapoints.empty())
+            rf->addXData("SWIM", swimXdata);
+        else
+            delete swimXdata;
+
+        if (!hrvXdata->datapoints.empty())
+            rf->addXData("HRV", hrvXdata);
+        else
+            delete hrvXdata;
+
+        if (!gearsXdata->datapoints.empty())
+            rf->addXData("GEARS", gearsXdata);
+        else
+            delete gearsXdata;
+
+        if (!deveXdata->datapoints.empty())
+            rf->addXData("DEVELOPER", deveXdata);
+        else
+            delete deveXdata;
+
+        if (!extraXdata->datapoints.empty())
+            rf->addXData("EXTRA", extraXdata);
+        else
+            delete extraXdata;
+    }
+
     RideFile *splitSessions(QList<RideFile*> *rides) {
         // do we have more than one session inside the file
         if (ride_file_tags_.size() < 2) {
+            // just check if it was a run activity and adjust values, like it was done
+            // in decoding the session before. But now we are sure to convert all values.
+            if (rideFile->isRun()) {
+                convert2Run(rideFile);
+            }
             return rideFile;
         }
 
-        (void)rides;    // mute compiler, recently unused
+        // If there is more than one session parsed we
+        // split the ride file just created into multiple
+        // ones, each representing a single session.
+        // BUT, we do not touch the original file.
+        // Even if we know about the individual session tags
+        // there is other information like XData and so forth,
+        // what should we do with that info?
+        // For now we append the XData to all ride files created.
 
         QString notes;
         QTextStream ss(&notes);
         quint32 start = 0, start_time = 0;
+        const QString deviceType = rideFile->deviceType();
+        const QString fileFormat = rideFile->fileFormat();
+        const double recIntSecs = rideFile->recIntSecs();
 
         ss << "=== Session Info ===" << endl;
 
         for(auto s = ride_file_tags_.begin(); s != ride_file_tags_.end(); ++s) {
+            QString file_note;
+            QTextStream fss(&file_note);
+
+            // create a new ride file for each session
             RideFile *rf = new RideFile;
+            rf->setDeviceType(deviceType);
+            rf->setFileFormat(fileFormat);
+            rf->setRecIntSecs(recIntSecs);
+
+            // add base file name of which the session was extracted
+            QFileInfo fileInfo(file.fileName());
+            QString basefilename(fileInfo.fileName());
+            fss << QString("Multisport autosplit from file: %1").arg(basefilename) << endl << endl;
+
+            // set tags and filter out session data
+            fss << "Session data:\ntags:\n";
             quint32 stop = 0;
-            // set tags and filter out sessin data
-            for(auto sle = s->begin(); sle != s->end(); ++sle) {
+            for(auto sle = s->begin(); sle != s->end(); ++sle) {    // check _session _list _entries
                 QString const& key = sle.key();
-                // log
+
                 ss << "  " << key << ": " << sle.value().toString() << endl;
-                if (key.startsWith('_')) {
+                fss << "  |- " << key << " = " << sle.value().toString() << endl;
+
+                if (key.startsWith('_')) {  // meta-keys holding additional info needed are prefixed w/ '_'
                     if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
                         stop = sle->toUInt();
                     } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
+                        // only do once
                         start = sle->toUInt();
                         start_time = start;
                     }
                 } else {
-
+                    rf->setTag(key, sle->toString());
                 }
             }
 
+            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
+            fss << "\nindices:\n";
+
+            // calculate the data point indices
             int idx_start = rideFile->timeIndex(start - start_time);
             int idx_stop = rideFile->timeIndex(stop - start_time);
+
+            fss << "  |- start = " << idx_start << endl
+                << "  |-  stop = " << idx_stop << endl;
+
+            // add data points to the new file created.
+            const QVector<RideFilePoint*> points_from_file = rideFile->dataPoints().mid(idx_start, idx_stop - idx_start);
+            foreach(RideFilePoint *p, points_from_file) {
+                rf->appendPoint(*p);
+            }
+            fss << "  |- points appended = " << rf->dataPoints().size() << endl;// << rf->dataPoints().size() << endl;
+
+            /* These are the names that might be used inside the fit file, we can work out which transission is added, too.
+                case 32: // bike_to_run_transition
+                    subsport = "bike_to_run_transition";
+                    break;
+                case 33: // run_to_bike_transition
+                    subsport = "run_to_bike_transition";
+                    break;
+                case 34: // swim_to_bike_transition
+                    subsport = "swim_to_bike_transition";
+                    break;
+            */
+
+            // add intervals
+            //   Only intervals that fit in the range of the file we are recently creating
+            //   are transferred.
+            auto ride_intervals = rideFile->intervals();
+            int int_ctr = 1;
+            fss << "\nintervals:\n";
+            foreach (RideFileInterval *rfi, ride_intervals) {
+                // is the recent interval in the range of our new file?
+                if (rfi->start >= start && rfi->stop <= stop) {
+                    rf->addInterval(rfi->type, rfi->start, rfi->stop, QString("Lap %1").arg(int_ctr));
+                    fss << "  |- " << rfi->start << " <--> " << rfi->stop << " - " << QString("Lap %1").arg(int_ctr) << " (" << rfi->name << ")\n";
+
+                    int_ctr++;
+                }
+            }
+
+            // convert if necessary
+            if (rf->isRun()) {
+                convert2Run(rf);
+            }
+
+            fss.flush();    // just to be sure everthg is written
+            rf->setTag("Notes", file_note);
+
+            rides->append(rf);
 
             ss << " ~~ " << start << " -- " << stop << " ~~" << endl
                << " ~~~ " << idx_start << " --> " << idx_stop << endl;
             ss << "  start_time: " << rideFile->startTime().toString() << endl;
 
+            // adjust timing and go on
             start = stop;
         }
 
@@ -3357,10 +3448,6 @@ struct FitFileReaderState
         ss << "====================" << endl;
 
         rideFile->setTag("Notes", notes);
-
-        if (rideFile->isRun()) {
-            convert2Run(rideFile);
-        }
 
         return rideFile;
     }
