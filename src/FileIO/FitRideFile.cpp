@@ -312,14 +312,14 @@ struct FitFileReaderState
         printf("type: %d %llx %s\n", v.type, v.v, v.s.c_str());
     }
 
-    void convert2Run() {
-        if (rideFile->areDataPresent()->cad) {
-            foreach(RideFilePoint *pt, rideFile->dataPoints()) {
+    void convert2Run( RideFile *rf) {
+        if (rf->areDataPresent()->cad) {
+            foreach(RideFilePoint *pt, rf->dataPoints()) {
                 pt->rcad = pt->cad;
                 pt->cad = 0;
             }
-            rideFile->setDataPresent(RideFile::rcad, true);
-            rideFile->setDataPresent(RideFile::cad, false);
+            rf->setDataPresent(RideFile::rcad, true);
+            rf->setDataPresent(RideFile::cad, false);
         }
     }
 
@@ -821,7 +821,7 @@ struct FitFileReaderState
         int i = 0;
         time_t this_timestamp = 0, this_start_time = 0, this_elapsed_time = 0;
         QString sport, subsport;
-        bool sport_found = true, subsport_found = true;
+        bool sport_found = false, subsport_found = false;
         QString prevSport = rideFile->getTag("Sport", "");
 
 
@@ -1110,8 +1110,14 @@ struct FitFileReaderState
             }
         }
 
-        if (sport_found) { active_session_["Sport"] = sport; }
-        if (subsport_found) { active_session_["SubSport"] = subsport; }
+        if (sport_found) {
+            active_session_["Sport"] = sport;
+            rideFile->setTag("Sport", sport);
+        }
+        if (subsport_found) {
+            active_session_["SubSport"] = subsport;
+            rideFile->setTag("SubSport", subsport);
+        }
 
         // same procedure as for laps, code is c/p until a better solution is found
         if (this_timestamp == 0 && this_elapsed_time > 0) {
@@ -3292,57 +3298,70 @@ struct FitFileReaderState
     }
 
     RideFile *splitSessions(QList<RideFile*> *rides) {
+        // do we have more than one session inside the file
+        if (ride_file_tags_.size() < 2) {
+            return rideFile;
+        }
+
         (void)rides;    // mute compiler, recently unused
 
-        if(ride_file_tags_.size() > 1) {
-            qDebug() << "found multiple sessions (" << ride_file_tags_.size() << "):";
-            for(auto s = ride_file_tags_.begin(); s != ride_file_tags_.end(); ++s) {
-                for(auto sle = s->begin(); sle != s->end(); ++sle) {
-                    QString const& key = sle.key();
-                    if (key.startsWith('_')) {
-                        qDebug() << "  " << key << ": " << sle.value();
+        QString notes;
+        QTextStream ss(&notes);
+        quint32 start = 0, start_time = 0;
+
+        ss << "=== Session Info ===" << endl;
+
+        for(auto s = ride_file_tags_.begin(); s != ride_file_tags_.end(); ++s) {
+            RideFile *rf = new RideFile;
+            quint32 stop = 0;
+            // set tags and filter out sessin data
+            for(auto sle = s->begin(); sle != s->end(); ++sle) {
+                QString const& key = sle.key();
+                // log
+                ss << "  " << key << ": " << sle.value().toString() << endl;
+                if (key.startsWith('_')) {
+                    if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
+                        stop = sle->toUInt();
+                    } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
+                        start = sle->toUInt();
+                        start_time = start;
                     }
+                } else {
+
                 }
-                qDebug() << "---";
             }
-        }
-#if 0
-        // add data points
-        for (auto data_point_it = ride_file_values_.begin();
-             data_point_it != ride_file_values_.end(); ++data_point_it) {
-            auto const& secs = data_point_it.key();
-            auto const& d = data_point_it.value().first;
-            auto const& it = data_point_it.value().second;
 
-            rideFile->appendPoint(secs,
-                                  d[ 0], d[ 1], d[ 2], d[ 3], d[ 4],
-                    d[ 5], d[ 6], d[ 7], d[ 8], d[ 9],
-                    d[10], d[11], d[12], d[13], d[14],
-                    d[15], d[16], d[17], d[18], d[19],
-                    d[20], d[21], d[22], d[23], d[24],
-                    d[25], d[26], d[27], d[28], d[29],
-                    d[30], d[31], d[32], it);
-        }
-        ride_file_values_.clear();
+            int idx_start = rideFile->timeIndex(start - start_time);
+            int idx_stop = rideFile->timeIndex(stop - start_time);
 
-        // add Laps
-        for (auto it_t = ride_file_intervals_.begin();
-             it_t != ride_file_intervals_.end(); ++it_t) {
-            auto const& it_type = it_t.key();
-            auto const& type_laps = it_t.value();
-            for (auto it_v = type_laps.begin(); it_v != type_laps.end(); ++it_v) {
-                auto const it_start = it_v->first.first;
-                auto const it_stop = it_v->first.second;
-                auto const it_name = it_v->second;
-                rideFile->addInterval(it_type, it_start, it_stop, it_name);
+            ss << " ~~ " << start << " -- " << stop << " ~~" << endl
+               << " ~~~ " << idx_start << " --> " << idx_stop << endl;
+            ss << "  start_time: " << rideFile->startTime().toString() << endl;
+
+            start = stop;
+        }
+
+        ss << endl << "--------------------" << endl << endl;
+
+        ss << "found sessions (" << ride_file_tags_.size() << "):" << endl;
+        for(auto s = ride_file_tags_.begin(); s != ride_file_tags_.end(); ++s) {
+            for(auto sle = s->begin(); sle != s->end(); ++sle) {
+                QString const& key = sle.key();
+                //if (key.startsWith('_')) {
+                ss << "  " << key << ": " << sle.value().toString() << endl;
+                //}
             }
+            ss << "---" << endl;
         }
 
-        // should we convert to run?
+        ss << "====================" << endl;
+
+        rideFile->setTag("Notes", notes);
+
         if (rideFile->isRun()) {
             convert2Run(rideFile);
         }
-#endif
+
         return rideFile;
     }
 };
