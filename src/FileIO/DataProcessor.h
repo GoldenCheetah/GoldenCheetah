@@ -113,6 +113,8 @@ class ManualDataProcessorDialog : public QDialog
     public:
         ManualDataProcessorDialog(Context *, QString, RideItem *);
 
+        RideItem* Ride() { return ride; }
+
     private slots:
         void cancelClicked();
         void okClicked();
