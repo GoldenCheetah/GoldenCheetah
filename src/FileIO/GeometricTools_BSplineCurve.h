@@ -640,8 +640,9 @@ namespace gte
     template <typename T>
     struct is_arbitrary_precision_internal : std::false_type {};
 
+    // EricChristoffersen 1/26/2020: Replace remove_cv_t with pre-c14 syntax so will compile with xcode.
     template <typename T>
-    struct is_arbitrary_precision : is_arbitrary_precision_internal<std::remove_cv_t<T>>::type {};
+    struct is_arbitrary_precision : is_arbitrary_precision_internal<typename std::remove_cv<T>::type>::type {};
 
     // The trait has_division_operator<T> for type T of float, double or
     // long double generates has_division_operator<T>::value of true.  The
@@ -650,8 +651,9 @@ namespace gte
     template <typename T>
     struct has_division_operator_internal : std::false_type {};
 
+    // EricChristoffersen 1/26/2020: Replace remove_cv_t with pre-c14 syntax so will compile with xcode.
     template <typename T>
-    struct has_division_operator : has_division_operator_internal<std::remove_cv_t<T>>::type {};
+    struct has_division_operator : has_division_operator_internal<typename std::remove_cv<T>::type>::type {};
 
     template <>
     struct has_division_operator_internal<float> : std::true_type {};
