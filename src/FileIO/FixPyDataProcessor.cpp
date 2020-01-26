@@ -27,7 +27,7 @@ bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *se
     return pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
 }
 
-DataProcessorConfig *FixPyDataProcessor::processorConfig(QWidget *parent, const RideFile* ride = NULL)
+DataProcessorConfig *FixPyDataProcessor::processorConfig(QWidget *parent, const RideFile* ride)
 {
     Q_UNUSED(ride);
     return new FixPyDataProcessorConfig(parent);
