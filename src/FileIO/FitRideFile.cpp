@@ -746,6 +746,7 @@ struct FitFileReaderState
                 default: ; // do nothing
             }
         }
+        active_session_["_devicetype"] = getManuProd(manu, prod);
         rideFile->setDeviceType(getManuProd(manu, prod));
     }
 
@@ -3248,7 +3249,6 @@ struct FitFileReaderState
             uniqueDevices.removeDuplicates();
             QString deviceInfo = uniqueDevices.join("\n");
             if (! deviceInfo.isEmpty()) {
-                active_session_["Device Info"] = deviceInfo;
                 rideFile->setTag("Device Info", deviceInfo);
             }
 
@@ -3304,10 +3304,21 @@ struct FitFileReaderState
     }
 
     RideFile *splitSessions(QList<RideFile*> *rides) {
-        // do we have more than one session inside the file
+        // NOTES:
+        // - there are two temperature values (avg/max) - temperature and temp - where temp is correct and
+        //   temperature seems to be the overall (avg/max)
+        // - all XData is transferred instead of session related stuff only
+        // - start altitude of first transission not correct (zero), leads to too high climb figure
+        //   i think this is not really a big deal yet
+        // - some metrics - like Gear Ratio for transissions - maintain a steady state due to auto-fill-up
+        //   treatment. This does not really reflect the real world but imho its ok for now and more of
+        //   a general problem
+        // - it might be a good idea to treat transissions as a run activity
+        // - devices are not added to session files
+
         if (ride_file_tags_.size() < 2) {
             // just check if it was a run activity and adjust values, like it was done
-            // in decoding the session before. But now we are sure to convert all values.
+            // in decoding the session before.
             if (rideFile->isRun()) {
                 convert2Run(rideFile);
             }
@@ -3318,25 +3329,16 @@ struct FitFileReaderState
         // split the ride file just created into multiple
         // ones, each representing a single session.
         // BUT, we do not touch the original file.
-        // Even if we know about the individual session tags
-        // there is other information like XData and so forth,
-        // what should we do with that info?
-        // For now we append the XData to all ride files created.
 
-        QString notes;
-        QTextStream ss(&notes);
         quint32 start = 0, start_time = 0;
         const QString deviceType = rideFile->deviceType();
         const QString fileFormat = rideFile->fileFormat();
         const double recIntSecs = rideFile->recIntSecs();
 
-        ss << "=== Session Info ===" << endl;
-
         for(auto s = ride_file_tags_.begin(); s != ride_file_tags_.end(); ++s) {
             QString file_note;
             QTextStream fss(&file_note);
 
-            // create a new ride file for each session
             RideFile *rf = new RideFile;
             rf->setDeviceType(deviceType);
             rf->setFileFormat(fileFormat);
@@ -3347,16 +3349,16 @@ struct FitFileReaderState
             QString basefilename(fileInfo.fileName());
             fss << QString("Multisport autosplit from file: %1").arg(basefilename) << endl << endl;
 
-            // set tags and filter out session data
+            // set tags and filter out session meta data
             fss << "Session data:\ntags:\n";
             quint32 stop = 0;
-            for(auto sle = s->begin(); sle != s->end(); ++sle) {    // check _session _list _entries
+            for(auto sle = s->begin(); sle != s->end(); ++sle) {
                 QString const& key = sle.key();
 
-                ss << "  " << key << ": " << sle.value().toString() << endl;
                 fss << "  |- " << key << " = " << sle.value().toString() << endl;
 
-                if (key.startsWith('_')) {  // meta-keys holding additional info needed are prefixed w/ '_'
+                // meta data is prefixed w/ '_', otherwise its a ride file tag
+                if (key.startsWith('_')) {
                     if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
                         stop = sle->toUInt();
                     } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
@@ -3369,23 +3371,27 @@ struct FitFileReaderState
                 }
             }
 
+            // adjust the start time
             rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
-            fss << "\nindices:\n";
 
-            // calculate the data point indices
+            fss << "\nindices:\n";
             int idx_start = rideFile->timeIndex(start - start_time);
             int idx_stop = rideFile->timeIndex(stop - start_time);
-
-            fss << "  |- start = " << idx_start << endl
-                << "  |-  stop = " << idx_stop << endl;
+            if (FIT_DEBUG) {
+                fss << "  |- start = " << idx_start << endl
+                    << "  |-  stop = " << idx_stop << endl;
+            }
 
             // add data points to the new file created.
             const QVector<RideFilePoint*> points_from_file = rideFile->dataPoints().mid(idx_start, idx_stop - idx_start);
             foreach(RideFilePoint *p, points_from_file) {
                 rf->appendPoint(*p);
             }
-            fss << "  |- points appended = " << rf->dataPoints().size() << endl;// << rf->dataPoints().size() << endl;
+            if (FIT_DEBUG) {
+                fss << "  |- points appended = " << rf->dataPoints().size() << endl;
+            }
 
+            // TODO: get the subsport right if sessions sport is transission
             /* These are the names that might be used inside the fit file, we can work out which transission is added, too.
                 case 32: // bike_to_run_transition
                     subsport = "bike_to_run_transition";
@@ -3406,49 +3412,49 @@ struct FitFileReaderState
             fss << "\nintervals:\n";
             foreach (RideFileInterval *rfi, ride_intervals) {
                 // is the recent interval in the range of our new file?
-                if (rfi->start >= start && rfi->stop <= stop) {
+                if (rfi->start >= start && rfi->start <= stop && rfi->stop <= stop) {   // is it possible that the a start is beyond stop and stop fits?
                     rf->addInterval(rfi->type, rfi->start, rfi->stop, QString("Lap %1").arg(int_ctr));
                     fss << "  |- " << rfi->start << " <--> " << rfi->stop << " - " << QString("Lap %1").arg(int_ctr) << " (" << rfi->name << ")\n";
-
                     int_ctr++;
                 }
             }
 
-            // convert if necessary
-            if (rf->isRun()) {
+            // add XData
+            const auto file_xdata = rideFile->xdata();
+            for (auto it = file_xdata.begin(); it != file_xdata.end(); ++it) {
+                XDataSeries *s = new XDataSeries(*(it.value()));
+                s->datapoints.erase(std::remove_if(s->datapoints.begin(), s->datapoints.end(), [start_time, start, stop](XDataPoint *xdp){
+                    return xdp && (xdp->secs >= (stop - start_time) || xdp->secs < (start - start_time));
+                }), s->datapoints.end());
+                // adjust their timing
+                if (!s->datapoints.empty()) {
+                    auto first_time = s->datapoints.first()->secs;
+                    foreach (XDataPoint *p, s->datapoints) {
+                        p->secs -= first_time;
+                    }
+                    // and append
+                    rf->addXData(it.key(), s);
+                }
+            }
+
+            // convert if necessary (run and transission
+            if (rf->isRun() || 0 == QString::compare(rf->getTag("Sport", ""), "Transition", Qt::CaseInsensitive)) {
                 convert2Run(rf);
             }
 
             fss.flush();    // just to be sure everthg is written
-            rf->setTag("Notes", file_note);
+            QString notes_tag_content = rideFile->getTag("Notes", "");
+            if (notes_tag_content.size() > 0) notes_tag_content.append("\n\n");
+            notes_tag_content += file_note;
+            rf->setTag("Notes", notes_tag_content);
 
             rides->append(rf);
-
-            ss << " ~~ " << start << " -- " << stop << " ~~" << endl
-               << " ~~~ " << idx_start << " --> " << idx_stop << endl;
-            ss << "  start_time: " << rideFile->startTime().toString() << endl;
 
             // adjust timing and go on
             start = stop;
         }
 
-        ss << endl << "--------------------" << endl << endl;
-
-        ss << "found sessions (" << ride_file_tags_.size() << "):" << endl;
-        for(auto s = ride_file_tags_.begin(); s != ride_file_tags_.end(); ++s) {
-            for(auto sle = s->begin(); sle != s->end(); ++sle) {
-                QString const& key = sle.key();
-                //if (key.startsWith('_')) {
-                ss << "  " << key << ": " << sle.value().toString() << endl;
-                //}
-            }
-            ss << "---" << endl;
-        }
-
-        ss << "====================" << endl;
-
-        rideFile->setTag("Notes", notes);
-
+        // return original file
         return rideFile;
     }
 };
