@@ -29,7 +29,7 @@
 
 using namespace gte;
 
-bool smoothAltitude(RideFile *ride, int degree, double &minSlope, double &maxSlope, bool fDoRewrite);
+bool smoothAltitude(const RideFile *ride, int degree, double &minSlope, double &maxSlope, std::vector<Vector2<double>> & outControls);
 
 void ComputeRideFileStats(const RideFile * ride, double &minSlope, double &maxSlope, double &sampleDistanceVariance)
 {
@@ -75,6 +75,7 @@ class FixGPSConfig : public DataProcessorConfig
     friend class ::FixGPS;
     protected:
         QVBoxLayout *mainLayout;
+        QHBoxLayout *simpleLayout;
         QFormLayout *layout;
         QLabel *degreeLabel;
         QSpinBox *degreeSpinBox;
@@ -83,134 +84,162 @@ class FixGPSConfig : public DataProcessorConfig
         QLabel *minSlopeLabel;
         QLabel *maxSlopeLabel;
         QLabel *varianceLabel;
-        RideFile *ride;
+        const RideFile *ride;
 
     public slots:
         void testClicked()
         {
-            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-            testButton->setEnabled(false);
+            // This function should be unreachable unless ride exists.
+            if (ride)
+            {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                testButton->setEnabled(false);
 
-            int degree = degreeSpinBox->value();
+                int degree = degreeSpinBox->value();
 
-            // Test and report effectiveness of smoothing but do not apply changes to ride file.
-            double minSlope, maxSlope;
-            smoothAltitude(ride, degree, minSlope, maxSlope, false);
+                // Test and report effectiveness of smoothing but do not apply changes to ride file.
+                double minSlope, maxSlope;
+                std::vector<Vector2<double>> outControls;
+                smoothAltitude(ride, degree, minSlope, maxSlope, outControls);
 
-            QString minLabel(tr("Min Slope"));
-            QString maxLabel(tr("Max Slope"));
+                QString minLabel(tr("Min Slope"));
+                QString maxLabel(tr("Max Slope"));
 
-            minLabel.append(QString(": %1").arg(minSlope));
-            maxLabel.append(QString(": %1").arg(maxSlope));
+                minLabel.append(QString(": %1").arg(minSlope));
+                maxLabel.append(QString(": %1").arg(maxSlope));
 
-            minSlopeLabel->setText(minLabel);
-            minSlopeLabel->setToolTip(tr("Min slope computed from current smoothing parameters."));
+                minSlopeLabel->setText(minLabel);
+                minSlopeLabel->setToolTip(tr("Min slope computed from current smoothing parameters."));
 
-            maxSlopeLabel->setText(maxLabel);
-            maxSlopeLabel->setToolTip(tr("Max slope computed from current smoothing parameters."));
+                maxSlopeLabel->setText(maxLabel);
+                maxSlopeLabel->setToolTip(tr("Max slope computed from current smoothing parameters."));
 
-            testButton->setEnabled(true);
-            QApplication::restoreOverrideCursor();
+                testButton->setEnabled(true);
+                QApplication::restoreOverrideCursor();
+            }
         }
 
     public:
-        FixGPSConfig(QWidget *parent) : DataProcessorConfig(parent) {
+        FixGPSConfig(QWidget *parent, const RideFile * rideFile) : DataProcessorConfig(parent) {
+
+            mainLayout = NULL;
+            simpleLayout = NULL;
+            layout = NULL;
+            degreeLabel = NULL;
+            degreeSpinBox = NULL;
+            doSmoothAltitude = NULL;
+            testButton = NULL;
+            minSlopeLabel = NULL;
+            maxSlopeLabel = NULL;
+            varianceLabel = NULL;
+            ride = rideFile;
 
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixGPSErrors));
 
-            // Should we consider passing ride data to all DataProcessorConfigs?
-            //
-            // Steal ride from ManualDataProcessorDialog. This is needed to test
-            // smoothing settings prior to application, so user can see what final
-            // min and max slopes will be.
-            ride = ((ManualDataProcessorDialog*)parent)->Ride()->ride();
-
-            // Determine min and max slope of original ride file.
-            double minSlope = 0;
-            double maxSlope = 0;
-            double sampleDistanceVariance = 0;
-            bool fHasAlt = ride && ride->areDataPresent()->alt;
-            if (fHasAlt) {
-                ComputeRideFileStats(ride, minSlope, maxSlope, sampleDistanceVariance);
-            }
-
-            mainLayout = new QVBoxLayout(this);
-            layout = new QFormLayout();
-            mainLayout->addLayout(layout);
-
-            mainLayout->setContentsMargins(0, 0, 0, 0);
-            setContentsMargins(0, 0, 0, 0);
-
-            // Create widgets
-
             // Degree SpinBox
 
-            degreeLabel = new QLabel(tr("B-Spline Degree:"));
+            degreeLabel = new QLabel(tr("Altitude Smoothing Sample Degree:"));
             degreeSpinBox = new QSpinBox();
             degreeSpinBox->setRange(0, 500);
             degreeSpinBox->setSingleStep(10);
-            degreeSpinBox->setValue(200);
+            degreeSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toInt());
             degreeSpinBox->setToolTip(tr("The 'degree' of a b-spline is the number of samples that are\n"
                                          "used to compute each point. Smoothing becomes more global\n"
                                          "as 'degree' increases. Degree is in terms of samples so exact\n"
                                          "window size in meters depends on the sample separation in\n"
                                          "the ridefile and can vary by sample."));
 
-            // Min/Max Slope and distance variance Labels
-
-            QString minSlopeLabelString(tr("Min Slope"));
-            QString maxSlopeLabelString(tr("Max Slope"));
-            QString varianceLabelString(tr("Distance Variance"));
-
-            minSlopeLabelString.append(QString(": %1").arg(minSlope));
-            maxSlopeLabelString.append(QString(": %1").arg(maxSlope));
-            varianceLabelString.append(QString(": %1").arg(sampleDistanceVariance));
-
-            minSlopeLabel = new QLabel(minSlopeLabelString);
-            minSlopeLabel->setToolTip(tr("Min slope computed from ride file altitude and distance information."));
-            maxSlopeLabel = new QLabel(maxSlopeLabelString);
-            maxSlopeLabel->setToolTip(tr("Max slope computed from ride file altitude and distance information."));
-            varianceLabel = new QLabel(varianceLabelString);
-            varianceLabel->setToolTip(tr("Variance of distance between ride file samples."));
-
             // Apply Smoothing Checkbox
 
             doSmoothAltitude = new QCheckBox(tr("Apply BSpline Altitude Smoothing"));
             doSmoothAltitude->setToolTip(tr("Check this box to apply b-spline based altitude smoothing after running the GPS outlier pass."));
+            doSmoothAltitude->setCheckState(appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
 
-            // Test Smoothing Button
+            // If no ridefile is provided then present simple dialog
+            if (rideFile == NULL)
+            {
+                simpleLayout = new QHBoxLayout(this);
 
-            testButton = new QPushButton(tr("Test Altitude Smoothing"), this);
-            testButton->setToolTip(tr("Click this button to simulate behavior of current smoothing settings and report what min and max slope will be."));
+                simpleLayout->addWidget(doSmoothAltitude);
+                simpleLayout->addWidget(degreeLabel);
+                simpleLayout->addWidget(degreeSpinBox);
 
-            // Create Rows of Widgets
+                simpleLayout->setContentsMargins(0, 0, 0, 0);
+                setContentsMargins(0, 0, 0, 0);
 
-            QHBoxLayout* row0 = new QHBoxLayout();
-            row0->addWidget(degreeLabel);
-            row0->addWidget(degreeSpinBox);
+                simpleLayout->addStretch();
+            }
+            else
+            {
+                // Determine min and max slope of original ride file.
+                double minSlope = 0;
+                double maxSlope = 0;
+                double sampleDistanceVariance = 0;
+                bool fHasAlt = ride && ride->areDataPresent()->alt;
+                if (fHasAlt) {
+                    ComputeRideFileStats(ride, minSlope, maxSlope, sampleDistanceVariance);
+                }
 
-            QHBoxLayout* row1 = new QHBoxLayout();
-            row1->addWidget(doSmoothAltitude);
+                mainLayout = new QVBoxLayout(this);
+                layout = new QFormLayout();
+                mainLayout->addLayout(layout);
 
-            QHBoxLayout* row2 = new QHBoxLayout();
-            row2->addWidget(testButton);
+                mainLayout->setContentsMargins(0, 0, 0, 0);
+                setContentsMargins(0, 0, 0, 0);
 
-            QHBoxLayout* row3 = new QHBoxLayout();
-            row3->addWidget(minSlopeLabel);
-            row3->addWidget(maxSlopeLabel);
-            row3->addWidget(varianceLabel);
+                // Create widgets
 
-            // Insert rows into layout
+                // Min/Max Slope and distance variance Labels
 
-            layout->insertRow(0, row0);
-            layout->insertRow(1, row1);
-            layout->insertRow(2, row2);
-            layout->insertRow(3, row3);
+                QString minSlopeLabelString(tr("Min Slope"));
+                QString maxSlopeLabelString(tr("Max Slope"));
+                QString varianceLabelString(tr("Distance Variance"));
 
-            // Hook up testButton to testClicked method.
+                minSlopeLabelString.append(QString(": %1").arg(minSlope));
+                maxSlopeLabelString.append(QString(": %1").arg(maxSlope));
+                varianceLabelString.append(QString(": %1").arg(sampleDistanceVariance));
 
-            connect(testButton, &QPushButton::clicked, this, &FixGPSConfig::testClicked);
+                minSlopeLabel = new QLabel(minSlopeLabelString);
+                minSlopeLabel->setToolTip(tr("Min slope computed from ride file altitude and distance information."));
+                maxSlopeLabel = new QLabel(maxSlopeLabelString);
+                maxSlopeLabel->setToolTip(tr("Max slope computed from ride file altitude and distance information."));
+                varianceLabel = new QLabel(varianceLabelString);
+                varianceLabel->setToolTip(tr("Variance of distance between ride file samples."));
+
+                // Test Smoothing Button
+
+                testButton = new QPushButton(tr("Test Altitude Smoothing"), this);
+                testButton->setToolTip(tr("Click this button to simulate behavior of current smoothing settings and report what min and max slope will be."));
+
+                // Create Rows of Widgets
+
+                QHBoxLayout* row0 = new QHBoxLayout();
+                row0->addWidget(degreeLabel);
+                row0->addWidget(degreeSpinBox);
+
+                QHBoxLayout* row1 = new QHBoxLayout();
+                row1->addWidget(doSmoothAltitude);
+
+                QHBoxLayout* row2 = new QHBoxLayout();
+                row2->addWidget(testButton);
+
+                QHBoxLayout* row3 = new QHBoxLayout();
+                row3->addWidget(minSlopeLabel);
+                row3->addWidget(maxSlopeLabel);
+                row3->addWidget(varianceLabel);
+
+                // Insert rows into layout
+
+                layout->insertRow(0, row0);
+                layout->insertRow(1, row1);
+                layout->insertRow(2, row2);
+                layout->insertRow(3, row3);
+
+                // Hook up testButton to testClicked method.
+
+                connect(testButton, &QPushButton::clicked, this, &FixGPSConfig::testClicked);
+            }
         }
         
         QString explain() {
@@ -224,8 +253,15 @@ class FixGPSConfig : public DataProcessorConfig
                            "checked with the test button.\n")));
         }
 
-        void readConfig() {}
-        void saveConfig() {}
+        void readConfig() {
+            degreeSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toInt());
+            doSmoothAltitude->setCheckState(appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
+        }
+
+        void saveConfig() {
+            appsettings->setValue(GC_FIXGPS_ALTITUDE_FIX_DEGREE, degreeSpinBox->value());
+            appsettings->setValue(GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, doSmoothAltitude->checkState());
+        }
 };
 
 // RideFile Dataprocessor -- used to handle gaps in recording
@@ -243,8 +279,9 @@ class FixGPS : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="");
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
-            return new FixGPSConfig(parent);
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
+            return new FixGPSConfig(parent, ride);
         }
 
         // Localized Name
@@ -346,9 +383,11 @@ bool InterpolateBSplineCurve(std::vector<Vector2<double>> &inControls, std::vect
     return true;
 }
 
-// Smooth ridefile altitude. Return true if ridefile was modified, otherwise false.
-bool smoothAltitude(RideFile *ride, int degree, double &minSlope, double &maxSlope, bool fDoRewrite)
+// Smooth ridefile altitude. Return true if outControls populated, otherwise false.
+bool smoothAltitude(const RideFile *ride, int degree, double &minSlope, double &maxSlope, std::vector<Vector2<double>> & outControls)
 {
+    outControls.resize(0);
+
     bool fHasAlt = ride && ride->areDataPresent()->alt;
     if (!fHasAlt)
         return false;
@@ -361,10 +400,8 @@ bool smoothAltitude(RideFile *ride, int degree, double &minSlope, double &maxSlo
         return false;
     }
 
-    ride->command->startLUW("Smooth Altitude");
-
     // Gather distance/altitude pairs
-    std::vector<Vector2<double>> inControls, outControls;
+    std::vector<Vector2<double>> inControls;
     for (int i = 0; i < ride->dataPoints().count(); i++) {
         const RideFilePoint * pi = (ride->dataPoints()[i]);
 
@@ -393,15 +430,6 @@ bool smoothAltitude(RideFile *ride, int degree, double &minSlope, double &maxSlo
         if (slope < minSlope) minSlope = slope;
         if (slope > maxSlope) maxSlope = slope;
     }
-
-    // Apply smoothed altitudes to ride file if requested.
-    if (fDoRewrite) {
-        for (int i = 0; i < ride->dataPoints().count(); i++) {
-            ride->command->setPointValue(i, RideFile::alt, outControls[i][1]);
-        }
-    }
-
-    ride->command->endLUW();
 
     return true;
 }
@@ -465,22 +493,32 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
 
     ride->command->endLUW();
 
-    bool smoothed = false;
-    if (((FixGPSConfig*)(config))->doSmoothAltitude->checkState()) {
+    bool smoothingSuccess = false;
+    if (config && ((FixGPSConfig*)(config))->doSmoothAltitude->checkState()) {
         double minSlope = 0;
         double maxSlope = 0;
 
         int degree = ((FixGPSConfig*)(config))->degreeSpinBox->value();
 
-        smoothed = smoothAltitude(ride, degree, minSlope, maxSlope, true);
-        if (smoothed) {
+        ride->command->startLUW("Smooth Altitude");
+
+        std::vector<Vector2<double>> outControls;
+        smoothingSuccess = smoothAltitude(ride, degree, minSlope, maxSlope, outControls);
+        if (smoothingSuccess) {
+            // Apply smoothed altitudes to ride file if requested.
+            for (int i = 0; i < ride->dataPoints().count(); i++) {
+                ride->command->setPointValue(i, RideFile::alt, outControls[i][1]);
+            }
+ 
             ride->recalculateDerivedSeries(true);
         }
+
+        ride->command->endLUW();
     }
 
     if (errors) {
         ride->setTag("GPS errors", QString("%1").arg(errors));
     }
 
-    return errors || smoothed;
+    return errors || smoothingSuccess;
 }

@@ -134,7 +134,7 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     QLabel *explainLabel = new QLabel(tr("Description"), this);
     explainLabel->setFont(font);
 
-    config = processor->processorConfig(this);
+    config = processor->processorConfig(this, ride->ride());
     config->readConfig();
     explain = new QTextEdit(this);
     explain->setText(config->explain());
