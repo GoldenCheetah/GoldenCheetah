@@ -3307,13 +3307,11 @@ struct FitFileReaderState
         // NOTES:
         // - there are two temperature values (avg/max) - temperature and temp - where temp is correct and
         //   temperature seems to be the overall (avg/max)
-        // - all XData is transferred instead of session related stuff only
-        // - start altitude of first transission not correct (zero), leads to too high climb figure
+        // - start altitude of first transition not correct (zero), leads to too high climb figure
         //   i think this is not really a big deal yet
-        // - some metrics - like Gear Ratio for transissions - maintain a steady state due to auto-fill-up
+        // - some metrics - like Gear Ratio for transitions - maintain a steady state due to auto-fill-up
         //   treatment. This does not really reflect the real world but imho its ok for now and more of
         //   a general problem
-        // - it might be a good idea to treat transissions as a run activity
         // - devices are not added to session files
 
         if (ride_file_tags_.size() < 2) {
@@ -3374,7 +3372,7 @@ struct FitFileReaderState
             // adjust the start time
             rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
 
-            fss << "\nindices:\n";
+            fss << endl;
             int idx_start = rideFile->timeIndex(start - start_time);
             int idx_stop = rideFile->timeIndex(stop - start_time);
             if (FIT_DEBUG) {
@@ -3412,7 +3410,10 @@ struct FitFileReaderState
             fss << "\nintervals:\n";
             foreach (RideFileInterval *rfi, ride_intervals) {
                 // is the recent interval in the range of our new file?
-                if (rfi->start >= start && rfi->start <= stop && rfi->stop <= stop) {   // is it possible that the a start is beyond stop and stop fits?
+                if (FIT_DEBUG) {
+                    fss << "  |- not added " << rfi->start << " <--> " << rfi->stop << " - " << QString("Lap %1").arg(int_ctr) << " (" << rfi->name << ")\n";
+                }
+                if (rfi->start >= idx_start && rfi->start <= idx_stop && rfi->stop <= idx_stop) {   // is it possible that the a start is beyond stop and stop fits?
                     rf->addInterval(rfi->type, rfi->start, rfi->stop, QString("Lap %1").arg(int_ctr));
                     fss << "  |- " << rfi->start << " <--> " << rfi->stop << " - " << QString("Lap %1").arg(int_ctr) << " (" << rfi->name << ")\n";
                     int_ctr++;
