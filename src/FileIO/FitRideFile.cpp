@@ -382,6 +382,7 @@ struct FitFileReaderState
                 case 3111: return "Garmin Fenix 5x +";
                 case 3112: return "Garmin Edge 520 +";
                 case 3113: return "Garmin FR945";
+                case 3122: return "Garmin Edge 830";
                 case 3126: return "Garmin Instinct";
                 case 3291: return "Garmin Fenix 6x";
                 case 20119: return "Garmin Training Center";
@@ -464,6 +465,15 @@ struct FitFileReaderState
                 case -1:  return "Pioneer";
                 case 2: return "Pioneer SGX-CA500";
                 default: return QString("Pioneer %1").arg(prod);
+            }
+        } else if (manu == 69) {
+            // Stages Cycling
+            switch (prod) {
+                case -1:  return "Stages Cycling";
+                case 1: return "Stages Power Gen 1";
+                case 2: return "Stages Power Gen 2";
+                case 3: return "Stages Power Gen 3";
+                default: return QString("Stages Cycling %1").arg(prod);
             }
         } else if (manu == 70) {
             // does not set product at this point
