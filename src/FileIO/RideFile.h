@@ -578,7 +578,11 @@ public:
         valuename = other.valuename;
         unitname = other.unitname;
         valuetype = other.valuetype;
-        datapoints = other.datapoints;
+        // we need to create new objects since we are holding pointers to objects
+        // otherwise we would end up w/ multiple frees or dangling ptrs!
+        foreach (XDataPoint *p, other.datapoints) {
+            datapoints.push_back(new XDataPoint(*p));
+        }
     }
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }
