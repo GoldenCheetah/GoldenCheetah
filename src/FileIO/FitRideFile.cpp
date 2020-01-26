@@ -1218,7 +1218,6 @@ struct FitFileReaderState
         // 3 for Moxy ?
         if (type>-1 && type != 0 && type != 7 && type != 3)
             deviceInfos.insert(index, deviceInfo);
-
     }
 
     void decodeActivity(const FitDefinition &def, int,
@@ -3245,27 +3244,33 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
-            QStringList uniqueDevices(deviceInfos.values());
-            uniqueDevices.removeDuplicates();
-            QString deviceInfo = uniqueDevices.join("\n");
-            if (! deviceInfo.isEmpty()) {
-                rideFile->setTag("Device Info", deviceInfo);
-            }
-
-            QString dataInfo;
-            foreach(QString info, dataInfos) {
-                dataInfo += info + "\n";
-            }
-            if (dataInfo.length()>0) {
-                active_session_["Data Info"] = dataInfo;
-                rideFile->setTag("Data Info", dataInfo);
-            }
+            setRideFileDeviceInfo(rideFile);
+            setRideFileDataInfo(rideFile);
 
             file.close();
 
             appendXData(rideFile);
 
             return rideFile;
+        }
+    }
+
+    void setRideFileDeviceInfo(RideFile *rf) {
+        QStringList uniqueDevices(deviceInfos.values());
+        uniqueDevices.removeDuplicates();
+        QString deviceInfo = uniqueDevices.join("\n");
+        if (! deviceInfo.isEmpty()) {
+            rf->setTag("Device Info", deviceInfo);
+        }
+    }
+
+    void setRideFileDataInfo(RideFile *rf) {
+        QString dataInfo;
+        foreach(QString info, dataInfos) {
+            dataInfo += info + "\n";
+        }
+        if (dataInfo.length()>0) {
+            rf->setTag("Data Info", dataInfo);
         }
     }
 
@@ -3345,7 +3350,7 @@ struct FitFileReaderState
             // add base file name of which the session was extracted
             QFileInfo fileInfo(file.fileName());
             QString basefilename(fileInfo.fileName());
-            fss << QString("Multisport autosplit from file: %1").arg(basefilename) << endl << endl;
+            rf->setTag("Notes", QString("Multisport autosplit (%1)\n").arg(basefilename));
 
             // set tags and filter out session meta data
             fss << "Session data:\ntags:\n";
@@ -3376,7 +3381,8 @@ struct FitFileReaderState
             int idx_start = rideFile->timeIndex(start - start_time);
             int idx_stop = rideFile->timeIndex(stop - start_time);
             if (FIT_DEBUG) {
-                fss << "  |- start = " << idx_start << endl
+                fss << "indices:\n"
+                    << "  |- start = " << idx_start << endl
                     << "  |-  stop = " << idx_stop << endl;
             }
 
@@ -3443,11 +3449,17 @@ struct FitFileReaderState
                 convert2Run(rf);
             }
 
-            fss.flush();    // just to be sure everthg is written
-            QString notes_tag_content = rideFile->getTag("Notes", "");
-            if (notes_tag_content.size() > 0) notes_tag_content.append("\n\n");
-            notes_tag_content += file_note;
-            rf->setTag("Notes", notes_tag_content);
+            // set device info and data info
+            setRideFileDeviceInfo(rf);
+            setRideFileDataInfo(rf);
+
+            if (FIT_DEBUG) {
+                fss.flush();    // just to be sure everthg is written
+                QString notes_tag_content = rideFile->getTag("Notes", "");
+                if (notes_tag_content.size() > 0) notes_tag_content.append("\n\n");
+                notes_tag_content += file_note;
+                rf->setTag("Notes", notes_tag_content);
+            }
 
             rides->append(rf);
 
