@@ -204,6 +204,7 @@
 #define GC_MOXY_FIX_THB_MAX             "<global-general>dataprocess/fixmoxydata/fix_thb_max"
 #define GC_FIXGPS_ALTITUDE_FIX_DEGREE   "<global-general>dataprocess/fixgps/altitude_degree"
 #define GC_FIXGPS_ALTITUDE_FIX_DOAPPLY  "<global-general>dataprocess/fixgps/altitude_doapply"
+#define GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT "<global-general>dataprocess/fixgps/altitude_outlier_percent"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where

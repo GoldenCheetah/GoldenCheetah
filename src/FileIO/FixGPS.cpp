@@ -29,7 +29,7 @@
 
 using namespace gte;
 
-bool smoothAltitude(const RideFile *ride, int degree, double &minSlope, double &maxSlope, std::vector<Vector2<double>> & outControls);
+bool smoothAltitude(const RideFile *ride, unsigned degree, double outlierCriteria, double &minSlope, double &maxSlope, unsigned &outlierCount, std::vector<Vector2<double>> & outControls);
 
 void ComputeRideFileStats(const RideFile * ride, double &minSlope, double &maxSlope, double &sampleDistanceVariance)
 {
@@ -80,9 +80,12 @@ class FixGPSConfig : public DataProcessorConfig
         QLabel *degreeLabel;
         QSpinBox *degreeSpinBox;
         QCheckBox *doSmoothAltitude;
+        QLabel *outlierLabel;
+        QSpinBox *outlierSpinBox;
         QPushButton *testButton;
         QLabel *minSlopeLabel;
         QLabel *maxSlopeLabel;
+        QLabel *outlierCountLabel;
         QLabel *varianceLabel;
         const RideFile *ride;
 
@@ -95,24 +98,32 @@ class FixGPSConfig : public DataProcessorConfig
                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 testButton->setEnabled(false);
 
-                int degree = degreeSpinBox->value();
+                unsigned degree = degreeSpinBox->value();
+
+                double outlierCriteria = outlierSpinBox->value() / 100.;
 
                 // Test and report effectiveness of smoothing but do not apply changes to ride file.
                 double minSlope, maxSlope;
+                unsigned outlierCount;
                 std::vector<Vector2<double>> outControls;
-                smoothAltitude(ride, degree, minSlope, maxSlope, outControls);
+                smoothAltitude(ride, degree, outlierCriteria, minSlope, maxSlope, outlierCount, outControls);
 
                 QString minLabel(tr("Min Slope"));
                 QString maxLabel(tr("Max Slope"));
+                QString outlierLabel(tr("OutlierCount"));
 
                 minLabel.append(QString(": %1").arg(minSlope));
                 maxLabel.append(QString(": %1").arg(maxSlope));
+                outlierLabel.append(QString(": %1").arg(outlierCount));
 
                 minSlopeLabel->setText(minLabel);
                 minSlopeLabel->setToolTip(tr("Min slope computed from current smoothing parameters."));
 
                 maxSlopeLabel->setText(maxLabel);
                 maxSlopeLabel->setToolTip(tr("Max slope computed from current smoothing parameters."));
+
+                outlierCountLabel->setText(outlierLabel);
+                outlierCountLabel->setToolTip(tr("Count of outliers found."));
 
                 testButton->setEnabled(true);
                 QApplication::restoreOverrideCursor();
@@ -128,9 +139,12 @@ class FixGPSConfig : public DataProcessorConfig
             degreeLabel = NULL;
             degreeSpinBox = NULL;
             doSmoothAltitude = NULL;
+            outlierLabel = NULL;
+            outlierSpinBox = NULL;
             testButton = NULL;
             minSlopeLabel = NULL;
             maxSlopeLabel = NULL;
+            outlierCountLabel = NULL;
             varianceLabel = NULL;
             ride = rideFile;
 
@@ -150,6 +164,15 @@ class FixGPSConfig : public DataProcessorConfig
                                          "window size in meters depends on the sample separation in\n"
                                          "the ridefile and can vary by sample."));
 
+            outlierLabel = new QLabel(tr("Outlier criteria %:"));
+            outlierSpinBox = new QSpinBox();
+            outlierSpinBox->setRange(1, 5000);
+            outlierSpinBox->setSingleStep(10);
+            outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, 5000).toInt());
+            outlierSpinBox->setToolTip(tr("Outlier percent is used to decide outlier points that will be discarded after\n"
+                                          "initial bspline is constructed. This value is the percent of variance between\n"
+                                          "original and bspline where a value will be considered an outlier.\n"));
+
             // Apply Smoothing Checkbox
 
             doSmoothAltitude = new QCheckBox(tr("Apply BSpline Altitude Smoothing"));
@@ -164,6 +187,8 @@ class FixGPSConfig : public DataProcessorConfig
                 simpleLayout->addWidget(doSmoothAltitude);
                 simpleLayout->addWidget(degreeLabel);
                 simpleLayout->addWidget(degreeSpinBox);
+                simpleLayout->addWidget(outlierLabel);
+                simpleLayout->addWidget(outlierSpinBox);
 
                 simpleLayout->setContentsMargins(0, 0, 0, 0);
                 setContentsMargins(0, 0, 0, 0);
@@ -175,6 +200,7 @@ class FixGPSConfig : public DataProcessorConfig
                 // Determine min and max slope of original ride file.
                 double minSlope = 0;
                 double maxSlope = 0;
+                double outlierCount = 0;
                 double sampleDistanceVariance = 0;
                 bool fHasAlt = ride && ride->areDataPresent()->alt;
                 if (fHasAlt) {
@@ -195,15 +221,19 @@ class FixGPSConfig : public DataProcessorConfig
                 QString minSlopeLabelString(tr("Min Slope"));
                 QString maxSlopeLabelString(tr("Max Slope"));
                 QString varianceLabelString(tr("Distance Variance"));
+                QString outlierLabelString(tr("Outlier Count"));
 
                 minSlopeLabelString.append(QString(": %1").arg(minSlope));
                 maxSlopeLabelString.append(QString(": %1").arg(maxSlope));
                 varianceLabelString.append(QString(": %1").arg(sampleDistanceVariance));
+                outlierLabelString.append(QString(": %1").arg(outlierCount));
 
                 minSlopeLabel = new QLabel(minSlopeLabelString);
                 minSlopeLabel->setToolTip(tr("Min slope computed from ride file altitude and distance information."));
                 maxSlopeLabel = new QLabel(maxSlopeLabelString);
                 maxSlopeLabel->setToolTip(tr("Max slope computed from ride file altitude and distance information."));
+                outlierCountLabel = new QLabel(outlierLabelString);
+                outlierCountLabel->setToolTip(tr("Count of outliers found."));
                 varianceLabel = new QLabel(varianceLabelString);
                 varianceLabel->setToolTip(tr("Variance of distance between ride file samples."));
 
@@ -218,6 +248,9 @@ class FixGPSConfig : public DataProcessorConfig
                 row0->addWidget(degreeLabel);
                 row0->addWidget(degreeSpinBox);
 
+                row0->addWidget(outlierLabel);
+                row0->addWidget(outlierSpinBox);
+
                 QHBoxLayout* row1 = new QHBoxLayout();
                 row1->addWidget(doSmoothAltitude);
 
@@ -227,6 +260,7 @@ class FixGPSConfig : public DataProcessorConfig
                 QHBoxLayout* row3 = new QHBoxLayout();
                 row3->addWidget(minSlopeLabel);
                 row3->addWidget(maxSlopeLabel);
+                row3->addWidget(outlierCountLabel);
                 row3->addWidget(varianceLabel);
 
                 // Insert rows into layout
@@ -256,11 +290,13 @@ class FixGPSConfig : public DataProcessorConfig
         void readConfig() {
             degreeSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toInt());
             doSmoothAltitude->setCheckState(appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
+            outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, 100).toInt());
         }
 
         void saveConfig() {
             appsettings->setValue(GC_FIXGPS_ALTITUDE_FIX_DEGREE, degreeSpinBox->value());
             appsettings->setValue(GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, doSmoothAltitude->checkState());
+            appsettings->setValue(GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, outlierSpinBox->value());
         }
 };
 
@@ -384,7 +420,7 @@ bool InterpolateBSplineCurve(std::vector<Vector2<double>> &inControls, std::vect
 }
 
 // Smooth ridefile altitude. Return true if outControls populated, otherwise false.
-bool smoothAltitude(const RideFile *ride, int degree, double &minSlope, double &maxSlope, std::vector<Vector2<double>> & outControls)
+bool smoothAltitude(const RideFile *ride, unsigned degree, double outlierCriteria, double &minSlope, double &maxSlope, unsigned &outlierCount, std::vector<Vector2<double>> & outControls)
 {
     outControls.resize(0);
 
@@ -409,6 +445,7 @@ bool smoothAltitude(const RideFile *ride, int degree, double &minSlope, double &
     }
 
     // Create b-spline curve of desired degree.
+    if (degree > inControls.size()) degree = (unsigned)inControls.size() - 1;
     BasisFunctionInput<double> inBasis((int)inControls.size(), degree);
     BSplineCurve<2, double> curve(inBasis, inControls.data());
 
@@ -417,6 +454,42 @@ bool smoothAltitude(const RideFile *ride, int degree, double &minSlope, double &
     if (!fSuccess) {
         // Translation failed to converge.
         return false;
+    }
+
+    //determine in out Variance
+    double var = 0;
+    for (int i = 0; i < outControls.size(); i++)
+    {
+        double d = inControls[i][1] - outControls[i][1];
+        var += (d*d);
+    }
+    var /= outControls.size();
+
+    // Push non-outliers to new input vector
+    std::vector <Vector2<double>> inControls2;
+    for (int i = 0; i < outControls.size(); i++) {
+        double d = inControls[i][1] - outControls[i][1];
+        if (outlierCriteria > (d*d)) {
+            inControls2.push_back(inControls[i]);
+        }
+    }
+
+    // If there are outliers then create new bspline from non-outliers
+    // and redo interpolation.
+    outlierCount = (unsigned)(inControls.size() - inControls2.size());
+    if (outlierCount > 0)
+    {
+        // Create b-spline curve of desired degree using non-outliers.
+        if (degree > (unsigned)inControls2.size()) degree = (unsigned)inControls2.size() - 1;
+        BasisFunctionInput<double> inBasis2((int)inControls2.size(), degree);
+        BSplineCurve<2, double> curve2(inBasis2, inControls2.data());
+
+        // Gather new altitudes for all incoming distances.
+        bool fSuccess2 = InterpolateBSplineCurve(inControls, outControls, curve2);
+        if (!fSuccess2) {
+            // Translation failed to converge.
+            return false;
+        }
     }
 
     // Determine min and max slope of smoothed distance/altitude pairs.
@@ -496,23 +569,27 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
     bool smoothingSuccess = false;
 
     bool fDoSmoothAltitude;
-    int degree;
+    unsigned degree;
+    double outlierCriteria;
     if (config) {
         fDoSmoothAltitude = ((FixGPSConfig*)(config))->doSmoothAltitude->checkState();
         degree = ((FixGPSConfig*)(config))->degreeSpinBox->value();
+        outlierCriteria = (((FixGPSConfig*)(config))->outlierSpinBox->value()) / 100.;
     } else {
         fDoSmoothAltitude = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool();
-        degree = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toInt();
+        degree = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toUInt();
+        outlierCriteria = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, 100).toInt();
     }
 
     if (fDoSmoothAltitude) {
         double minSlope = 0;
         double maxSlope = 0;
+        unsigned outlierCount = 0;
 
         ride->command->startLUW("Smooth Altitude");
 
         std::vector<Vector2<double>> outControls;
-        smoothingSuccess = smoothAltitude(ride, degree, minSlope, maxSlope, outControls);
+        smoothingSuccess = smoothAltitude(ride, degree, outlierCriteria, minSlope, maxSlope, outlierCount, outControls);
         if (smoothingSuccess) {
             // Apply smoothed altitudes to ride file if requested.
             for (int i = 0; i < ride->dataPoints().count(); i++) {
