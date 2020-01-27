@@ -494,11 +494,20 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
     ride->command->endLUW();
 
     bool smoothingSuccess = false;
-    if (config && ((FixGPSConfig*)(config))->doSmoothAltitude->checkState()) {
+
+    bool fDoSmoothAltitude;
+    int degree;
+    if (config) {
+        fDoSmoothAltitude = ((FixGPSConfig*)(config))->doSmoothAltitude->checkState();
+        degree = ((FixGPSConfig*)(config))->degreeSpinBox->value();
+    } else {
+        fDoSmoothAltitude = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool();
+        degree = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toInt();
+    }
+
+    if (fDoSmoothAltitude) {
         double minSlope = 0;
         double maxSlope = 0;
-
-        int degree = ((FixGPSConfig*)(config))->degreeSpinBox->value();
 
         ride->command->startLUW("Smooth Altitude");
 
