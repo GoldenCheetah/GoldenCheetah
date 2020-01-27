@@ -2477,7 +2477,7 @@ RideFile::recalculateDerivedSeries(bool force)
             p->antiss = anTISS;
         }
 
-        if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+        if (dataPresent.alt && dataPresent.km) {
             if (lastP) {
                 double deltaDistance = (p->km - lastP->km) * 1000;
                 double deltaAltitude = p->alt - lastP->alt;

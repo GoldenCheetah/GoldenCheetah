@@ -9,7 +9,7 @@ class FixPyDataProcessor : public DataProcessor
 public:
     FixPyDataProcessor(FixPyScript *pyScript);
     bool postProcess(RideFile *rideFile, DataProcessorConfig *settings, QString op);
-    DataProcessorConfig *processorConfig(QWidget *parent);
+    DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL);
     QString name() { return pyScript->name; }
     bool isCoreProcessor() { return false; }
 
