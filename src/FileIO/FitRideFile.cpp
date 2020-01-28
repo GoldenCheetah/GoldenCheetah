@@ -1381,32 +1381,41 @@ struct FitFileReaderState
 
     void decodeHRV(const FitDefinition &def,
                    const std::vector<FitValue>& values) {
-      int rrvalue;
-      int i=0;
-      double hrv_time=0.0;
-      int n=hrvXdata->datapoints.count();
+        int rrvalue;
+        int i=0;
+        double hrv_time=0.0;
+        int n=hrvXdata->datapoints.count();
 
-      if (n>0)
-	hrv_time = hrvXdata->datapoints[n-1]->secs;
+        if (n>0)
+            hrv_time = hrvXdata->datapoints[n-1]->secs;
 
-      foreach(const FitField &field, def.fields) {
-	FitValue value = values[i++];
-	if ( value.type == ListValue && field.num == 0){
-	  for (int j=0; j<value.list.size(); j++)
-	    {
-	      rrvalue = int(value.list.at(j));
-	      hrv_time += rrvalue/1000.0;
+        foreach(const FitField &field, def.fields) {
+            FitValue value = values[i++];
+            if ( value.type == ListValue && field.num == 0){
+                for (int j=0; j<value.list.size(); j++)
+                {
+                    rrvalue = int(value.list.at(j));
+                    hrv_time += rrvalue/1000.0;
 
-	      if (rrvalue == -1){
-		break;
-	      }
-	      XDataPoint *p = new XDataPoint();
-	      p->secs = hrv_time;
-	      p->number[0] = rrvalue;
-	      hrvXdata->datapoints.append(p);
-	    }
-	}
-      }
+                    if (rrvalue == -1){
+                        break;
+                    }
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = hrv_time;
+                    p->number[0] = rrvalue;
+                    hrvXdata->datapoints.append(p);
+                }
+            } else if (value.type == SingleValue)
+            {
+                rrvalue = int(value.v);
+                hrv_time += rrvalue/1000.0;
+
+                XDataPoint *p = new XDataPoint();
+                p->secs = hrv_time;
+                p->number[0] = rrvalue;
+                hrvXdata->datapoints.append(p);
+            }
+        }
     }
 
     void decodeLap(const FitDefinition &def, int time_offset,
