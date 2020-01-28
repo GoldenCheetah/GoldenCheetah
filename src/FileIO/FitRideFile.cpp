@@ -1405,7 +1405,17 @@ struct FitFileReaderState
 	      p->number[0] = rrvalue;
 	      hrvXdata->datapoints.append(p);
 	    }
-	}
+    } else if (value.type == SingleValue)
+    {
+        rrvalue = int(value.v);
+        hrv_time += rrvalue/1000.0;
+
+        XDataPoint *p = new XDataPoint();
+        p->secs = hrv_time;
+        p->number[0] = rrvalue;
+        hrvXdata->datapoints.append(p);
+    }
+
       }
     }
 
