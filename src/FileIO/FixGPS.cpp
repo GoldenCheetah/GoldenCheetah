@@ -143,6 +143,14 @@ class FixGPSConfig : public DataProcessorConfig
         QLabel      *varianceLabel;
         const RideFile *ride;
 
+        // Defaults:
+        static const int s_Default_AltitudeDegree0        = 500;
+        static const int s_Default_AltitudeDegree1        = 200;
+        static const int s_Default_AltitudeOutlierPercent = 10;
+        static const int s_Default_RouteDegree0           = 20;
+        static const int s_Default_RouteDegree1           = 10;
+        static const int s_Default_RouteOutlierPercent    = 10;
+
     public slots:
         void testClicked()
         {
@@ -218,7 +226,7 @@ class FixGPSConfig : public DataProcessorConfig
                             }
                             prevGeo = geo;
                         }
-                        double routeDistance = 1000. * outControls4[outControls4.size() - 1][0];
+                        double routeDistance = 10. * outControls4[outControls4.size() - 1][0];
                         altitudeSmoothingStats.avgSlope = routeDistance ? slopeDistance / routeDistance : altitudeSmoothingStats.avgSlope;
                     }
                 }
@@ -332,7 +340,7 @@ class FixGPSConfig : public DataProcessorConfig
             degree0SpinBox = new QSpinBox();
             degree0SpinBox->setRange(0, 1000);
             degree0SpinBox->setSingleStep(10);
-            degree0SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 500).toInt());
+            degree0SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE, s_Default_AltitudeDegree0).toInt());
             degree0SpinBox->setToolTip(tr("ALTITUDE PASS 1 Smoothing Degree:\n"
                                           "The 'degree' of a b-spline is the number of samples that are\n"
                                           "used to compute each point. Smoothing becomes more global\n"
@@ -347,7 +355,7 @@ class FixGPSConfig : public DataProcessorConfig
             degree1SpinBox = new QSpinBox();
             degree1SpinBox->setRange(0, 1000);
             degree1SpinBox->setSingleStep(10);
-            degree1SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE1, 500).toInt());
+            degree1SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE1, s_Default_AltitudeDegree1).toInt());
             degree1SpinBox->setToolTip(tr("ALTITUDE PASS 2 Smoothing Degree:\n"
                                           "The 'degree' of a b-spline is the number of samples that are\n"
                                           "used to compute each point. Smoothing becomes more global\n"
@@ -362,7 +370,7 @@ class FixGPSConfig : public DataProcessorConfig
             outlierSpinBox = new QSpinBox();
             outlierSpinBox->setRange(1, 10000);
             outlierSpinBox->setSingleStep(10);
-            outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, 100).toInt());
+            outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
             outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA (%)\n"
                                           "Outlier percent is used to decide outlier points that will be discarded after\n"
                                           "initial bspline is constructed. This value is the percent of variance between\n"
@@ -382,7 +390,7 @@ class FixGPSConfig : public DataProcessorConfig
             degree0SpinBoxRoute = new QSpinBox();
             degree0SpinBoxRoute->setRange(0, 1000);
             degree0SpinBoxRoute->setSingleStep(10);
-            degree0SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE, 20).toInt());
+            degree0SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE, s_Default_RouteDegree0).toInt());
             degree0SpinBoxRoute->setToolTip(tr("ROUTE PASS 1 Smoothing Degree:\n"
                                                "The 'degree' of a b-spline is the number of samples that are\n"
                                                "used to compute each point. Smoothing becomes more global\n"
@@ -395,7 +403,7 @@ class FixGPSConfig : public DataProcessorConfig
             degree1SpinBoxRoute = new QSpinBox();
             degree1SpinBoxRoute->setRange(0, 1000);
             degree1SpinBoxRoute->setSingleStep(10);
-            degree1SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE1, 10).toInt());
+            degree1SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE1, s_Default_RouteDegree1).toInt());
             degree1SpinBoxRoute->setToolTip(tr("ROUTE PASS 2 Smoothing Degree:\n"
                                                "The 'degree' of a b-spline is the number of samples that are\n"
                                                "used to compute each point. Smoothing becomes more global\n"
@@ -408,7 +416,7 @@ class FixGPSConfig : public DataProcessorConfig
             outlierSpinBoxRoute = new QSpinBox();
             outlierSpinBoxRoute->setRange(1, 10000);
             outlierSpinBoxRoute->setSingleStep(10);
-            outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, 100).toInt());
+            outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
             outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA (%)"
                                                "Outlier percent is used to decide outlier points that will be discarded after\n"
                                                "initial bspline is constructed. This value is the percent of variance between\n"
@@ -607,14 +615,14 @@ class FixGPSConfig : public DataProcessorConfig
 
         void readConfig() {
             doSmoothAltitude->setCheckState(appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
-            degree0SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toInt());
-            degree1SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE1, 100).toInt());
-            outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, 100).toInt());
+            degree0SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE,        s_Default_AltitudeDegree0).toInt());
+            degree1SpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_FIX_DEGREE1,       s_Default_AltitudeDegree1).toInt());
+            outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT,   s_Default_AltitudeOutlierPercent).toInt());
 
             doSmoothRoute->setCheckState(appsettings->value(NULL,  GC_FIXGPS_ROUTE_FIX_DOAPPLY, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
-            degree0SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE, 20).toInt());
-            degree1SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE1, 10).toInt());
-            outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, 100).toInt());
+            degree0SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE,      s_Default_RouteDegree0).toInt());
+            degree1SpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_FIX_DEGREE1,     s_Default_RouteDegree1).toInt());
+            outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
         }
 
         void saveConfig() {
@@ -832,8 +840,8 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     // Determine min, max, avg slope of smoothed distance/altitude pairs.
     double slopeDistance = 0;
     for (int i = 1; i < outControls.size(); i++) {
-        double run = 10*(outControls[i - 1][0] - outControls[i][0]);
-        double rise = outControls[i - 1][1] - outControls[i][1];
+        double run = 10*(outControls[i][0] - outControls[i-1][0]);
+        double rise = outControls[i][1] - outControls[i-1][1];
         double slope = run ? (rise / run) : 0;
 
         stats.minSlope = std::min(stats.minSlope, slope);
