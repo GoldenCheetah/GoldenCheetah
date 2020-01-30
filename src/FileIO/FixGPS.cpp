@@ -780,13 +780,17 @@ bool GatherForAltitudeSmoothing(const RideFile *ride, std::vector < Vector2<doub
 // Smooth ridefile altitude. Return true if outControls populated, otherwise false.
 bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned degree0, double outlierCriteria, unsigned degree1, std::vector<Vector2<double>> & outControls, AltitudeSmoothingStats &stats)
 {
+    stats.minSlope = 0;
+    stats.maxSlope = 0;
+    stats.outlierCount = 0;
+
     outControls.resize(0);
 
     // Spline undefined if degree is less than 3.
     if (degree0 < 3) return false;
 
     // Degree can't exceed control size - 1.
-    if (degree0 > inControls.size()) degree0 = (unsigned)inControls.size() - 1;
+    degree0 = std::min(degree0, (unsigned)inControls.size() - 1);
 
     BasisFunctionInput<double> inBasis((int)inControls.size(), degree0);
     typedef BSplineCurve<2, double> DistanceAltitudeBSplineCurve;
@@ -800,40 +804,34 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
         return false;
     }
 
-    //determine in out Variance
-    double var = 0;
-    for (int i = 0; i < outControls.size(); i++)
-    {
-        double d = inControls[i][1] - outControls[i][1];
-        var += (d*d);
-    }
-    var /= outControls.size();
-
-    // Push non-outliers to new input vector
-    std::vector <Vector2<double>> inControls2;
-    for (int i = 0; i < outControls.size(); i++) {
-        double d = inControls[i][1] - outControls[i][1];
-        if (outlierCriteria > (d*d)) {
-            inControls2.push_back(inControls[i]);
+    // No second pass if its smoothing degree too small.
+    if (degree1 >= 3) {
+        // Push non-outliers to new input vector
+        std::vector <Vector2<double>> inControls2;
+        for (int i = 0; i < outControls.size(); i++) {
+            double d = inControls[i][1] - outControls[i][1];
+            if (outlierCriteria > (d*d)) {
+                inControls2.push_back(inControls[i]);
+            }
         }
-    }
 
-    // If there are outliers or second pass degree is different than first:
-    // Create new bspline from non-outliers and redo interpolation.
-    stats.outlierCount = (unsigned)(inControls.size() - inControls2.size());
-    if (stats.outlierCount || (degree0 != degree1)) {
-        const std::vector <Vector2<double>> &pass2InControls = (inControls2.size()) ? inControls2 : inControls;
+        // If there are outliers or second pass degree is different than first:
+        // Create new bspline from non-outliers and redo interpolation.
+        stats.outlierCount = (unsigned)(inControls.size() - inControls2.size());
+        if (stats.outlierCount || (degree0 != degree1)) {
+            const std::vector <Vector2<double>> &pass2InControls = (inControls2.size()) ? inControls2 : inControls;
 
-        // Create b-spline curve of desired degree using non-outliers.
-        if (degree1 > (unsigned)pass2InControls.size()) degree1 = (unsigned)pass2InControls.size() - 1;
-        BasisFunctionInput<double> inBasis2((int)pass2InControls.size(), degree1);
-        BSplineCurve<2, double> curve2(inBasis2, pass2InControls.data());
+            // Create b-spline curve of desired degree using non-outliers.
+            degree1 = std::min(degree1, (unsigned)pass2InControls.size() - 1);
+            BasisFunctionInput<double> inBasis2((int)pass2InControls.size(), degree1);
+            BSplineCurve<2, double> curve2(inBasis2, pass2InControls.data());
 
-        // Gather new altitudes for all incoming distances using original inControls sample distances.
-        bool fSuccess2 = InterpolateBSplineCurve<DistanceAltitudeBSplineCurve, Vector2<double>>(inControls, outControls, curve2, evalCount);
-        if (!fSuccess2) {
-            // Translation failed to converge.
-            return false;
+            // Gather new altitudes for all incoming distances using original inControls sample distances.
+            bool fSuccess2 = InterpolateBSplineCurve<DistanceAltitudeBSplineCurve, Vector2<double>>(inControls, outControls, curve2, evalCount);
+            if (!fSuccess2) {
+                // Translation failed to converge.
+                return false;
+            }
         }
     }
 
@@ -898,12 +896,16 @@ bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>>
 // Smooth ridefile location data. Return true if outControls populated, otherwise false.
 bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree0, double outlierCriteria, unsigned degree1, std::vector<Vector4<double>> & outControls, RouteSmoothingStats &routeSmoothingStats)
 {
+    routeSmoothingStats.pass1Variance = 0;
+    routeSmoothingStats.pass2Variance = 0;
+    routeSmoothingStats.outlierCount = 0;
+
     outControls.resize(0);
 
     if (degree0 < 3) return false;
 
     // Create b-spline curve of desired degree.
-    if (degree0 > inControls.size()) degree0 = (unsigned)inControls.size() - 1;
+    degree0 = std::min(degree0, (unsigned)(inControls.size() - 1));
     BasisFunctionInput<double> inBasis((int)inControls.size(), degree0);
     typedef BSplineCurve<4, double> DistanceXYZBSplineCurve;
     DistanceXYZBSplineCurve curve(inBasis, inControls.data());
@@ -918,27 +920,27 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
 
     routeSmoothingStats.pass1Variance = ComputeLocationResultVariance(inControls, outControls);
 
-    // Push non-outliers to new input vector
-    std::vector <Vector4<double>> inControls2;
-    for (int i = 0; i < outControls.size(); i++) {
-        xyz in(inControls[i][1], inControls[i][2], inControls[i][3]);
-        xyz out(outControls[i][1], outControls[i][2], outControls[i][3]);
+    // No second pass if its smoothing degree too small.
+    if (degree1 >= 3) {
+        // Push non-outliers to new input vector
+        std::vector <Vector4<double>> inControls2;
+        for (int i = 0; i < outControls.size(); i++) {
+            xyz in(inControls[i][1], inControls[i][2], inControls[i][3]);
+            xyz out(outControls[i][1], outControls[i][2], outControls[i][3]);
 
-        double d = out.subtract(in).magnitude();
-        if (outlierCriteria > (d*d)) {
-            inControls2.push_back(inControls[i]);
+            double d = out.subtract(in).magnitude();
+            if (outlierCriteria > (d*d)) {
+                inControls2.push_back(inControls[i]);
+            }
         }
-    }
 
-    // Redo interpolation if there are outliers or pass2 degree is different than pass1 degree.
-    routeSmoothingStats.outlierCount = (unsigned)(inControls.size() - inControls2.size());
-    if (routeSmoothingStats.outlierCount || (degree0 != degree1))
-    {
-        const std::vector <Vector4<double>> &pass2InControls = (inControls2.size()) ? inControls2 : inControls;
+        // Redo interpolation if there are outliers or pass2 degree is different than pass1 degree.
+        routeSmoothingStats.outlierCount = (unsigned)(inControls.size() - inControls2.size());
+        if (routeSmoothingStats.outlierCount || (degree0 != degree1)) {
+            const std::vector <Vector4<double>> &pass2InControls = (inControls2.size()) ? inControls2 : inControls;
 
-        // Create b-spline curve of desired degree using non-outliers.
-        if (degree1 > (unsigned)pass2InControls.size()) degree1 = (unsigned)pass2InControls.size() - 1;
-        if (degree1 >= 3) {
+            // Create b-spline curve of desired degree using non-outliers.
+            degree1 = std::min(degree1, (unsigned)pass2InControls.size() - 1);
             BasisFunctionInput<double> inBasis2((int)pass2InControls.size(), degree1);
             DistanceXYZBSplineCurve curve2(inBasis2, pass2InControls.data());
 
