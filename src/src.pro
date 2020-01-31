@@ -641,6 +641,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
     SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
     HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
+    SOURCES += Train/Ergofit.cpp Train/ErgofitController.cpp Train/ErgofitConnection.cpp
+    HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
     SOURCES += Train/DaumController.cpp Train/Daum.cpp
     HEADERS += Train/DaumController.h Train/Daum.h
 

@@ -39,6 +39,7 @@
 #define DEV_MONARK     0x4000   // Monark USB
 #define DEV_KETTLER    0x8000   // Kettler Serial
 #define DEV_KETTLER_RACER    0x8100   // Kettler racer Serial
+#define DEV_ERGOFIT    0x9000   // Ergofit Serial
 #define DEV_DAUM       0x10000   // Daum Serial
 
 #define DEV_QUARQ      0x01     // ants use id:hostname:port
