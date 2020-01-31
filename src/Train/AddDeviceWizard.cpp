@@ -45,11 +45,7 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
     setMinimumWidth(600 *dpiXFactor);
-#ifdef GC_WANT_ROBOT
-    setMinimumHeight(800 *dpiYFactor);
-#else
-    setMinimumHeight(700 *dpiYFactor);
-#endif
+    setMinimumHeight(500 *dpiYFactor);
 
     // title
     setWindowTitle(tr("Add Device Wizard"));
@@ -81,8 +77,17 @@ AddType::AddType(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
     setTitle(tr("Select Device"));
     setSubTitle(tr("What kind of device to add"));
 
+    QWidget *buttons = new QWidget(this);
+
+    QVBoxLayout *mainlayout = new QVBoxLayout(this);
+    setLayout(mainlayout);
+    scrollarea=new QScrollArea(this);
+    scrollarea->setWidgetResizable(true);
+    scrollarea->setWidget(buttons);
+    mainlayout->addWidget(scrollarea);
+
     QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
+    buttons->setLayout(layout);
 
     mapper = new QSignalMapper(this);
     connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));

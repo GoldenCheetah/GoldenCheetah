@@ -49,6 +49,7 @@
 #include <QProgressBar>
 #include <QFileDialog>
 #include <QCommandLinkButton>
+#include <QScrollArea>
 
 class DeviceScanner;
 
@@ -97,6 +98,7 @@ class AddType : public QWizardPage
         void clicked(QString);
 
     private:
+        QScrollArea *scrollarea;
         AddDeviceWizard *wizard;
         QSignalMapper *mapper;
         QLabel *label;
