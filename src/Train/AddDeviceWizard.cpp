@@ -209,6 +209,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     case DEV_MONARK : wizard->controller = new MonarkController(NULL, NULL); break;
     case DEV_KETTLER : wizard->controller = new KettlerController(NULL, NULL); break;
     case DEV_KETTLER_RACER : wizard->controller = new KettlerRacerController (NULL, NULL); break;
+    case DEV_ERGOFIT : wizard->controller = new ErgofitController(NULL, NULL); break;
     case DEV_DAUM : wizard->controller = new DaumController(NULL, NULL); break;
 #endif
 #ifdef GC_HAVE_LIBUSB
@@ -461,6 +462,7 @@ AddSearch::nextId() const
         case DEV_MONARK : return 60; break; // confirm and add
         case DEV_KETTLER : return 60; break; // confirm and add
         case DEV_KETTLER_RACER : return 60; break; // confirm and add
+        case DEV_ERGOFIT : return 60; break; // confirm and add
         case DEV_DAUM : return 60; break; // confirm and add
         case DEV_FORTIUS : return 30; break; // confirm and add
         case DEV_IMAGIC : return 35; break; // confirm and add
