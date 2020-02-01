@@ -19,6 +19,28 @@
 #include "BlinnSolver.h"
 #include "cmath"
 
+// 0 == A*x + B
+Roots LinearSolver(double A, double B)
+{
+    if (A == 0) {
+        if (B == 0) return Roots({ 0,1 });
+        return Roots();
+    }
+
+    return Roots({ -B / A, 1 });
+}
+
+// 0 == A*x^2 + B*x + C
+Roots QuadraticSolver(double A, double B, double C)
+{
+    if (A == 0) return LinearSolver(B, C);
+
+    double det = sqrt(B*B - 4 * A*C);
+    double r0 = (-B + det) / (2 * A);
+    double r1 = (-B - det) / (2 * A);
+    return Roots({ r0, 1 }, { r1, 1 });
+}
+
 // Cubic solver as described by James F. Blinn's EPIC paper:
 // 'How to Solve A Cubic Equation', all 5 parts are awesome
 // but part 5 provides the algorithmic conclusion that I used
@@ -40,6 +62,11 @@
 Roots
 BlinnCubicSolver(double A, double B, double C, double D)
 {
+    if (A == 0)
+    {
+        return QuadraticSolver(B, C, D);
+    }
+
     // Make Monic.
     B = B / A;
     C = C / A;

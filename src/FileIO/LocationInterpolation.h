@@ -171,6 +171,10 @@ struct SphericalTwoPointInterpolator : public TwoPointInterpolator
 
 class UnitCatmullRomInterpolator
 {
+    // Optimization Note: Currently everything is computed from control
+    // parameters in m_p. If someone wished this to run faster the
+    // roots and coefficients could be precomputed whenever init is called.
+
     std::tuple<double, double, double, double> m_p;
 
     static double T(); // rounding coefficient
@@ -182,6 +186,7 @@ public:
     UnitCatmullRomInterpolator(double pm1, double p0, double p1, double p2);
     double Location(double u);
     double Tangent(double u);
+    bool   Inverse(double r, double &u);
 };
 
 class UnitCatmullRomInterpolator3D
@@ -228,13 +233,16 @@ public:
 // 4 element sliding window to hold interpolation points
 template <typename T> class SlidingWindow
 {
-    std::tuple<T, T, T, T> m_Window;
-    MyBitset<4>            m_ElementExists;
-    //std::bitset<4>         m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
+    std::tuple<T, T, T, T>     m_Window;
+    MyBitset<4>                m_ElementExists;
+    //std::bitset<4>             m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
+
+    UnitCatmullRomInterpolator u;
+    bool                       m_InterpolatorNeedsInit;
 
 public:
 
-    SlidingWindow() : m_ElementExists(0) {}
+    SlidingWindow() : m_ElementExists(0), m_InterpolatorNeedsInit(true) {}
 
     void Reset() {
         m_ElementExists.reset();
@@ -242,10 +250,10 @@ public:
 
     unsigned Count() const { return (unsigned)m_ElementExists.count(); }
 
-    T& pm1() { return std::get<0>(m_Window); }
-    T& p0() { return std::get<1>(m_Window); }
-    T& p1() { return std::get<2>(m_Window); }
-    T& p2() { return std::get<3>(m_Window); }
+    T& pm1(){ m_InterpolatorNeedsInit = true; return std::get<0>(m_Window); }
+    T& p0() { m_InterpolatorNeedsInit = true; return std::get<1>(m_Window); }
+    T& p1() { m_InterpolatorNeedsInit = true; return std::get<2>(m_Window); }
+    T& p2() { m_InterpolatorNeedsInit = true; return std::get<3>(m_Window); }
 
     T  pm1()         const { return std::get<0>(m_Window); }
     T  p0()          const { return std::get<1>(m_Window); }
@@ -257,8 +265,20 @@ public:
     bool  hasp1()    const { return m_ElementExists.test(1); }
     bool  hasp2()    const { return m_ElementExists.test(0); }
 
+    bool BracketFromDistance(double distance, double &bracket)
+    {
+        if (m_InterpolatorNeedsInit) {
+            u.Init(pm1(), p0(), p1(), p2());
+            m_InterpolatorNeedsInit = false;
+        }
+
+        return u.Inverse(distance, bracket);
+    }
+
     void Push(const T& t)
     {
+        m_InterpolatorNeedsInit = true;
+
         m_ElementExists <<= 1;
         m_ElementExists.set(0); // set p2 existing
 
@@ -270,6 +290,8 @@ public:
 
     void Advance()
     {
+        m_InterpolatorNeedsInit = true;
+
         m_ElementExists <<= 1;
 
         pm1() = p0();
@@ -492,8 +514,16 @@ template <typename T_TwoPointInterpolator> class DistancePointInterpolator
             }
             break;
         case 3:
-        case 4:
             ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+            break;
+        case 4:
+            {
+                bool fInv = m_DistanceWindow.BracketFromDistance(distance, ratio);
+                if (!fInv)
+                {
+                    ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+                }
+            }
             break;
         }
 

@@ -17,6 +17,7 @@
 */
 
 #include "LocationInterpolation.h"
+#include "blinnsolver.h"
 
 static double radianstodegrees(double r) { return r * (360.0 / (2 * M_PI)); }
 static double degreestoradians(double d) { return d * (2 * M_PI / 360.0); }
@@ -253,6 +254,51 @@ double UnitCatmullRomInterpolator::Tangent(double u)
         + p2 * s_T;
 
     return retval;
+}
+
+// Given interpolated value v, provides u that would yield v.
+// Only successful if spline is invertable (which is true for
+// distance spline.)
+bool UnitCatmullRomInterpolator::Inverse(double r, double &u)
+{
+    const double t = T();
+
+    double p0 = std::get<0>(m_p);
+    double p1 = std::get<1>(m_p);
+    double p2 = std::get<2>(m_p);
+    double p3 = std::get<3>(m_p);
+
+    // Normalized form of equation from Location.
+    double a = (p3*t - p0 * t + p2 * (t - 2) + p1 * (2 - t));
+    double b = (-p3 * t + 2 * p0*t + p1 * (t - 3) + p2 * (3 - 2 * t));
+    double c = (p2*t - p0 * t);
+    double d = p1 - r; // "- r" because root finder expects form that equals zero.
+
+    Roots roots = BlinnCubicSolver(a, b, c, d);
+
+    // There are 0, 1, 2 or 3 roots.
+    if (roots.resultcount() < 1) return false;
+
+    double r0 = roots.result(0).x / roots.result(0).w;
+    double r1 = r0;
+    double r2 = r0;
+
+    if (roots.resultcount() > 1)
+        r1 = roots.result(1).x / roots.result(1).w;
+
+    if (roots.resultcount() > 2)
+        r2 = roots.result(2).x / roots.result(2).w;
+
+    // We have success if there is a root in the range [0..1].
+
+    // TODO: For now we return a single root.
+    // It is certainly possible that there are multiple roots in range... give caller a choice?
+    bool ret = false;
+    if      (r0 >= 0. && r0 <= 1.) { u = r0; ret = true; }
+    else if (r1 >= 0. && r1 <= 1.) { u = r1; ret = true; }
+    else if (r2 >= 0. && r2 <= 1.) { u = r2; ret = true; }
+
+    return ret;
 }
 
 void UnitCatmullRomInterpolator3D::Init(xyz pm1, xyz p0, xyz p1, xyz p2)
