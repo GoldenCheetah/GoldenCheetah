@@ -240,7 +240,7 @@ void
 WorkoutWindow::resizeEvent(QResizeEvent *)
 {
     // show or hide toolbar if big enough
-    if (!recording && height() > MINTOOLHEIGHT) toolbar->show();
+    if (!recording && height() > (MINTOOLHEIGHT*dpiYFactor)) toolbar->show();
     else toolbar->hide();
 }
 

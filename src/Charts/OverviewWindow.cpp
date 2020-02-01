@@ -2749,7 +2749,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // min max width
             if (setcolumn < 800) setcolumn = 800;
-            if (setcolumn > 2400) setcolumn = 2400;
+            if (setcolumn > 4400) setcolumn = 4400;
 
             columns[stateData.xresize.column] = setcolumn;
 
