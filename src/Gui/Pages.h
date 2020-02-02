@@ -72,6 +72,7 @@ class BackupPage;
 class SeasonsPage;
 class DevicePage;
 class RemotePage;
+class SimBicyclePage;
 
 class GeneralPage : public QWidget
 {
@@ -452,6 +453,7 @@ class TrainOptionsPage : public QWidget
 
     private:
         Context     *context;
+        QCheckBox   *useSimulatedSpeed;
         QCheckBox   *multiCheck;
         QCheckBox   *autoConnect;
         QCheckBox   *autoHide;
@@ -471,6 +473,46 @@ class RemotePage : public QWidget
         RemoteControl *remote;
         Context       *context;
         QTreeWidget   *fields;
+};
+
+struct SimBicyclePartEntry
+{
+    const char* m_label;
+    const char* m_path;
+    double      m_defaultValue;
+    double      m_decimalPlaces;
+    const char* m_tooltip;
+};
+
+class SimBicyclePage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    SimBicyclePage(QWidget *parent, Context *context);
+    qint32 saveClicked();
+
+    // Order of this enum must be synced with static array in GetSimBicyclePartEntry.
+    enum BicycleParts {
+        BicycleWithoutWheelsG = 0,
+        FrontWheelG, FrontSpokeCount, FrontSpokeNippleG, FrontRimG, FrontRotorG, FrontSkewerG, FrontTireG, FrontTubeSealantG, FrontOuterRadiusM, FrontRimInnerRadiusM,
+        RearWheelG, RearSpokeCount, RearSpokeNippleG, RearRimG, RearRotorG, RearSkewerG, RearTireG, RearTubeSealantG, RearOuterRadiusM, RearRimInnerRadiusM,
+        CassetteG, CRR, Cm, Cd, Am2, Tk,
+        LastPart
+    };
+
+    static const SimBicyclePartEntry& GetSimBicyclePartEntry(int e);
+
+    static double                     GetBicyclePartValue(Context *context, int e);
+
+private:
+    void AddSpecBox(int ePart);
+
+    Context         *context;
+
+    QLabel          *m_LabelArr  [LastPart];
+    QDoubleSpinBox  *m_SpinBoxArr[LastPart];
 };
 
 class BestsMetricsPage : public QWidget
