@@ -17,6 +17,7 @@
 */
 
 #include "LocationInterpolation.h"
+#include "BlinnSolver.h"
 
 static double radianstodegrees(double r) { return r * (360.0 / (2 * M_PI)); }
 static double degreestoradians(double d) { return d * (2 * M_PI / 360.0); }
@@ -45,7 +46,7 @@ xyz geolocation::toxyz() const
     double lat = degreestoradians(Lat());
     double lon = degreestoradians(Long());
     double alt = Alt();
-    double n = a / sqrt(1 - e2*sin(lat)*sin(lat));
+    double n = a / sqrt(1 - e2 * sin(lat)*sin(lat));
     double dx = ((n + alt)*cos(lat)*cos(lon));           //ECEF x
     double dy = ((n + alt)*cos(lat)*sin(lon));           //ECEF y
     double dz = ((n*(1 - e2) + alt)*sin(lat));           //ECEF z
@@ -82,9 +83,9 @@ geolocation xyz::togeolocation() const
     double y = xyz::y();
     double z = xyz::z();
     double zp = std::abs(z);
-    double w2 = x*x + y*y;
+    double w2 = x * x + y * y;
     double w = sqrt(w2);
-    double r2 = w2 + z*z;
+    double r2 = w2 + z * z;
     double r = sqrt(r2);
 
     double retLong;
@@ -92,33 +93,33 @@ geolocation xyz::togeolocation() const
     double retAlt;
 
     retLong = atan2(y, x);    // Lon (final)
-    double s2 = z*z / r2;
+    double s2 = z * z / r2;
     double c2 = w2 / r2;
     double u = a2 / r;
     double v = a3 - a4 / r;
     double s, ss, c;
     if (c2 > 0.3) {
-        s = (zp / r)*(1.0 + c2*(a1 + u + s2*v) / r);
+        s = (zp / r)*(1.0 + c2 * (a1 + u + s2 * v) / r);
         retLat = asin(s);      //Lat
-        ss = s*s;
+        ss = s * s;
         c = sqrt(1.0 - ss);
     }
     else {
-        c = (w / r)*(1.0 - s2*(a5 - u - c2*v) / r);
+        c = (w / r)*(1.0 - s2 * (a5 - u - c2 * v) / r);
         retLat = acos(c);      //Lat
-        ss = 1.0 - c*c;
+        ss = 1.0 - c * c;
         s = sqrt(ss);
     }
-    double g = 1.0 - e2*ss;
+    double g = 1.0 - e2 * ss;
     double rg = a / sqrt(g);
-    double rf = a6*rg;
-    u = w - rg*c;
-    v = zp - rf*s;
-    double f = c*u + s*v;
-    double m = c*v - s*u;
+    double rf = a6 * rg;
+    u = w - rg * c;
+    v = zp - rf * s;
+    double f = c * u + s * v;
+    double m = c * v - s * u;
     double p = m / (rf / g + f);
     retLat = retLat + p;            //Lat
-    retAlt = f + m*p / 2.0;         //Altitude
+    retAlt = f + m * p / 2.0;         //Altitude
     if (z < 0.0) {
         retLat = retLat * -1.0;     //Lat
     }
@@ -206,9 +207,16 @@ UnitCatmullRomInterpolator::UnitCatmullRomInterpolator(double pm1, double p0, do
     Init(pm1, p0, p1, p2);
 }
 
-double UnitCatmullRomInterpolator::Interpolate(double u)
+double UnitCatmullRomInterpolator::T()
 {
-    // assert u in range 0 <= u <= 1.0
+    static const double s_T = 0.5; // Control curvature: 0 is linear, 1 is pretty loopy, most people like 0.5.
+
+    return s_T;
+}
+
+double UnitCatmullRomInterpolator::Location(double u)
+{
+    static const double s_T = T();
 
     double p0 = std::get<0>(m_p);
     double p1 = std::get<1>(m_p);
@@ -218,11 +226,79 @@ double UnitCatmullRomInterpolator::Interpolate(double u)
     // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
     // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
 
-    static const double t = 0.5; // Control curvature: 0 is linear, 1 is pretty loopy, most people like 0.5.
-    double retval = p0 * u * (u * (2 * t - t * u) - t) +
-        u * (u * (u * (p1 * (-t) + 2 * p1 + p2 * (t - 2) + p3 * t) + p1 * t - 3 * p1 + p2 * (3 - 2 * t) - p3 * t) + p2 * t) + p1;
+    double retval = p0 * u * (u * (2 * s_T - s_T * u) - s_T) +
+        u * (u * (u * (p1 * (-s_T) + 2 * p1 + p2 * (s_T - 2) + p3 * s_T) + p1 * s_T - 3 * p1 + p2 * (3 - 2 * s_T) - p3 * s_T) + p2 * s_T) + p1;
 
     return retval;
+}
+
+double UnitCatmullRomInterpolator::Tangent(double u)
+{
+    static const double s_T = T();
+
+    double p0 = std::get<0>(m_p);
+    double p1 = std::get<1>(m_p);
+    double p2 = std::get<2>(m_p);
+    double p3 = std::get<3>(m_p);
+
+    // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
+    // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
+
+    // dx/du
+
+    // Closed form slope for cubic at point u in 0..1.
+    double retval = p0 * u * (2 * s_T - 2 * s_T * u)
+        + p0 * (u * (2 * s_T - s_T * u) - s_T)
+        + u * (u * (p1 * (-s_T) + 2 * p1 + p2 * (s_T - 2) + p3 * s_T) + p1 * s_T - 3 * p1 + p2 * (3 - 2 * s_T) - p3 * s_T)
+        + u * (2 * u * (p1 * (-s_T) + 2 * p1 + p2 * (s_T - 2) + p3 * s_T) + p1 * s_T - 3 * p1 + p2 * (3 - 2 * s_T) - p3 * s_T)
+        + p2 * s_T;
+
+    return retval;
+}
+
+// Given interpolated value v, provides u that would yield v.
+// Only successful if spline is invertable (which is true for
+// distance spline.)
+bool UnitCatmullRomInterpolator::Inverse(double r, double &u)
+{
+    const double t = T();
+
+    double p0 = std::get<0>(m_p);
+    double p1 = std::get<1>(m_p);
+    double p2 = std::get<2>(m_p);
+    double p3 = std::get<3>(m_p);
+
+    // Normalized form of equation from Location.
+    double a = (p3*t - p0 * t + p2 * (t - 2) + p1 * (2 - t));
+    double b = (-p3 * t + 2 * p0*t + p1 * (t - 3) + p2 * (3 - 2 * t));
+    double c = (p2*t - p0 * t);
+    double d = p1 - r; // "- r" because root finder expects form that equals zero.
+
+    Roots roots = BlinnCubicSolver(a, b, c, d);
+
+    // There are 0, 1, 2 or 3 roots.
+    if (roots.resultcount() < 1) return false;
+
+    double r0 = roots.result(0).x / roots.result(0).w;
+    double r1 = r0;
+    double r2 = r0;
+
+    if (roots.resultcount() > 1)
+        r1 = roots.result(1).x / roots.result(1).w;
+
+    if (roots.resultcount() > 2)
+        r2 = roots.result(2).x / roots.result(2).w;
+
+    // We have success if there is a root in the range [0..1].
+
+    // TODO: For now we return a single root.
+    // It is certainly possible that there are multiple roots in range... give caller a choice?
+    bool ret = false;
+    if      (r0 >= 0. && r0 <= 1.) { u = r0; ret = true; }
+    else if (r1 >= 0. && r1 <= 1.) { u = r1; ret = true; }
+    else if (r2 >= 0. && r2 <= 1.) { u = r2; ret = true; }
+
+    return ret;
 }
 
 void UnitCatmullRomInterpolator3D::Init(xyz pm1, xyz p0, xyz p1, xyz p2)
@@ -237,14 +313,40 @@ UnitCatmullRomInterpolator3D::UnitCatmullRomInterpolator3D(xyz pm1, xyz p0, xyz 
     Init(pm1, p0, p1, p2);
 }
 
-xyz UnitCatmullRomInterpolator3D::Interpolate(double frac)
+xyz UnitCatmullRomInterpolator3D::Location(double frac)
 {
-    return xyz(x.Interpolate(frac), y.Interpolate(frac), z.Interpolate(frac));
+    return xyz(x.Location(frac), y.Location(frac), z.Location(frac));
 }
 
-geolocation GeoPointInterpolator::Interpolate(double distance)
+xyz UnitCatmullRomInterpolator3D::Tangent(double frac)
 {
-    return DistancePointInterpolator<SphericalTwoPointInterpolator>::Interpolate(distance).togeolocation();
+    return xyz(x.Tangent(frac), y.Tangent(frac), z.Tangent(frac));
+}
+
+geolocation GeoPointInterpolator::Location(double distance)
+{
+    xyz l0xyz = DistancePointInterpolator<SphericalTwoPointInterpolator>::Location(distance);
+    geolocation l0 = l0xyz.togeolocation();
+    return l0;
+}
+
+geolocation GeoPointInterpolator::Location(double distance, double &slope)
+{
+    xyz tangentVector;
+    xyz l0xyz = DistancePointInterpolator<SphericalTwoPointInterpolator>::Location(distance, tangentVector);
+
+    // Compute earth gradient from location and tangent.
+    geolocation l1 = xyz(l0xyz.add(tangentVector.normalize())).togeolocation();
+    geolocation l0 = l0xyz.togeolocation();
+
+    double a0 = l0.Alt();
+    double a1 = l1.Alt();
+    double rise = a1 - a0;
+    double run = sqrt(1 - fabs(rise)); // length of adjacent
+
+    slope = run ? rise / run : 0;
+
+    return l0;
 }
 
 void GeoPointInterpolator::Push(double distance, geolocation point)

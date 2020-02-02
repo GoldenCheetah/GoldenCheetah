@@ -39,13 +39,13 @@ public:
     double  y() const { return std::get<1>(m_t); }
     double  z() const { return std::get<2>(m_t); }
 
-    double& x()       { return std::get<0>(m_t); }
-    double& y()       { return std::get<1>(m_t); }
-    double& z()       { return std::get<2>(m_t); }
+    double& x() { return std::get<0>(m_t); }
+    double& y() { return std::get<1>(m_t); }
+    double& z() { return std::get<2>(m_t); }
 
     v3 add(const v3 &a)      const { return v3(x() + a.x(), y() + a.y(), z() + a.z()); }
     v3 subtract(const v3 &a) const { return v3(x() - a.x(), y() - a.y(), z() - a.z()); }
-    v3 scale(double d)       const { return v3(x() * d,     y() * d,     z() * d); }
+    v3 scale(double d)       const { return v3(x() * d, y() * d, z() * d); }
 
     double magnitude()       const { return sqrt(dot(*this)); }
 
@@ -117,10 +117,10 @@ struct geolocation : v3
         return dist;
     }
 
-    bool IsReasonableGeoLocation () const {
-        return  (this->Lat() &&  this->Lat()  >= double(-90)  && this->Lat()  <= double(90) &&
-                 this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
-                 this->Alt() >= -1000 && this->Alt() < 10000);
+    bool IsReasonableGeoLocation() const {
+        return  (this->Lat() && this->Lat() >= double(-90) && this->Lat() <= double(90) &&
+            this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
+            this->Alt() >= -1000 && this->Alt() < 10000);
     }
 
 };
@@ -171,14 +171,22 @@ struct SphericalTwoPointInterpolator : public TwoPointInterpolator
 
 class UnitCatmullRomInterpolator
 {
+    // Optimization Note: Currently everything is computed from control
+    // parameters in m_p. If someone wished this to run faster the
+    // roots and coefficients could be precomputed whenever init is called.
+
     std::tuple<double, double, double, double> m_p;
+
+    static double T(); // rounding coefficient
 
 public:
 
     void Init(double pm1, double p0, double p1, double p2);
     UnitCatmullRomInterpolator();
     UnitCatmullRomInterpolator(double pm1, double p0, double p1, double p2);
-    double Interpolate(double u);
+    double Location(double u);
+    double Tangent(double u);
+    bool   Inverse(double r, double &u);
 };
 
 class UnitCatmullRomInterpolator3D
@@ -190,7 +198,8 @@ public:
     void Init(xyz pm1, xyz p0, xyz p1, xyz p2);
     UnitCatmullRomInterpolator3D() : x(), y(), z() {}
     UnitCatmullRomInterpolator3D(xyz pm1, xyz p0, xyz p1, xyz p2);
-    xyz Interpolate(double frac);
+    xyz Location(double frac);
+    xyz Tangent(double frac);
 };
 
 // Visual studio has an error in how it compiles bitset that prevents
@@ -199,13 +208,13 @@ public:
 template <size_t T_bitsize> class MyBitset
 {
     static_assert(T_bitsize <= 32, "T_bitsize must be <= 32.");
-    static_assert(T_bitsize >= 1,  "T_bitsize must be >= 1.");
+    static_assert(T_bitsize >= 1, "T_bitsize must be >= 1.");
 
     unsigned m_mask;
 
     unsigned popcnt(unsigned x) const {
         x = x - ((x >> 1) & 0x55555555);
-        x = (x & 0x33333333) + ((x >> 2) & 0x33333333);  
+        x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
         return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
@@ -214,23 +223,26 @@ template <size_t T_bitsize> class MyBitset
 public:
 
     MyBitset(unsigned m) : m_mask(m) {}
-    void reset()                           { m_mask = 0; }
-    bool test(unsigned u) const            { return ((m_mask >> u) & 1) != 0; }
-    void set(unsigned u)                   { m_mask |= (1 << u); truncate(); }
-    unsigned count() const                 { return popcnt(m_mask); }
+    void reset() { m_mask = 0; }
+    bool test(unsigned u) const { return ((m_mask >> u) & 1) != 0; }
+    void set(unsigned u) { m_mask |= (1 << u); truncate(); }
+    unsigned count() const { return popcnt(m_mask); }
     MyBitset<T_bitsize>& operator <<=(unsigned u) { m_mask <<= u; truncate(); return (*this); }
 };
 
 // 4 element sliding window to hold interpolation points
 template <typename T> class SlidingWindow
 {
-    std::tuple<T, T, T, T> m_Window;
-    MyBitset<4>            m_ElementExists;
-    //std::bitset<4>         m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
+    std::tuple<T, T, T, T>     m_Window;
+    MyBitset<4>                m_ElementExists;
+    //std::bitset<4>             m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
+
+    UnitCatmullRomInterpolator u;
+    bool                       m_InterpolatorNeedsInit;
 
 public:
 
-    SlidingWindow() : m_ElementExists(0) {}
+    SlidingWindow() : m_ElementExists(0), m_InterpolatorNeedsInit(true) {}
 
     void Reset() {
         m_ElementExists.reset();
@@ -238,10 +250,10 @@ public:
 
     unsigned Count() const { return (unsigned)m_ElementExists.count(); }
 
-    T& pm1()               { return std::get<0>(m_Window); }
-    T& p0()                { return std::get<1>(m_Window); }
-    T& p1()                { return std::get<2>(m_Window); }
-    T& p2()                { return std::get<3>(m_Window); }
+    T& pm1(){ m_InterpolatorNeedsInit = true; return std::get<0>(m_Window); }
+    T& p0() { m_InterpolatorNeedsInit = true; return std::get<1>(m_Window); }
+    T& p1() { m_InterpolatorNeedsInit = true; return std::get<2>(m_Window); }
+    T& p2() { m_InterpolatorNeedsInit = true; return std::get<3>(m_Window); }
 
     T  pm1()         const { return std::get<0>(m_Window); }
     T  p0()          const { return std::get<1>(m_Window); }
@@ -253,8 +265,20 @@ public:
     bool  hasp1()    const { return m_ElementExists.test(1); }
     bool  hasp2()    const { return m_ElementExists.test(0); }
 
+    bool BracketFromDistance(double distance, double &bracket)
+    {
+        if (m_InterpolatorNeedsInit) {
+            u.Init(pm1(), p0(), p1(), p2());
+            m_InterpolatorNeedsInit = false;
+        }
+
+        return u.Inverse(distance, bracket);
+    }
+
     void Push(const T& t)
     {
+        m_InterpolatorNeedsInit = true;
+
         m_ElementExists <<= 1;
         m_ElementExists.set(0); // set p2 existing
 
@@ -266,6 +290,8 @@ public:
 
     void Advance()
     {
+        m_InterpolatorNeedsInit = true;
+
         m_ElementExists <<= 1;
 
         pm1() = p0();
@@ -418,14 +444,23 @@ public:
     // Interpolate between points[1] and points[2].
     // If points[0] and points[3] dont exist then
     // create them.
-    xyz Interpolate(double frac)
+    xyz Location(double frac)
     {
         // Ensure interpolator has current state - synthesize fake points if needed.
         update();
 
-        // assert frac in range 0-1.
+        return m_Interpolator.Location(frac);
+    }
 
-        return m_Interpolator.Interpolate(frac);
+    // Interpolate between points[1] and points[2].
+    // If points[0] and points[3] dont exist then
+    // create them.
+    xyz Tangent(double frac)
+    {
+        // Ensure interpolator has current state - synthesize fake points if needed.
+        update();
+
+        return m_Interpolator.Tangent(frac);
     }
 };
 
@@ -435,10 +470,64 @@ template <typename T_TwoPointInterpolator> class DistancePointInterpolator
     SlidingWindow<double>                                      m_DistanceWindow;
     bool                                                       m_fInputComplete;
 
-    static double OffsetInRangeToFraction(double distance, double start, double end)
+    static double OffsetInRangeToRatio(double distance, double start, double end)
     {
-        // assert distance >= start && distance <= end
+        if (end == start)
+            return 0;
+
         return (distance - start) / (end - start);
+    }
+
+    // Prepare interpolation window for query at distance, then return
+    // bracket ratio for distance within current bracket.
+    double DistanceToBracketRatio(double distance)
+    {
+        // Continue to advance queue after input is complete.
+        if (m_fInputComplete) {
+            // When input is finished we must continue to advance the point state based on distance
+            while (m_DistanceWindow.hasp1() && distance >= m_DistanceWindow.p1()) {
+                m_DistanceWindow.Advance();
+                m_Interpolator.Advance();
+            }
+        }
+
+        // Determine fraction of range that this distance specifies (frac must be 0-1.)
+        double ratio = 0.0;
+        switch (m_DistanceWindow.Count())
+        {
+        case 0:
+        case 1:
+            break;
+        case 2:
+            if (!m_DistanceWindow.haspm1() && !m_DistanceWindow.hasp0()) {
+                // missing: pm1 && p0
+                // Query distance comes before any known range.
+                ratio = 1.0;
+            }
+            else if (!m_DistanceWindow.haspm1()) {
+                // missing: pm1 && p2
+                ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+            }
+            else {
+                // missing: p1  && p2
+                ratio = 0.0;
+            }
+            break;
+        case 3:
+            ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+            break;
+        case 4:
+            {
+                bool fInv = m_DistanceWindow.BracketFromDistance(distance, ratio);
+                if (!fInv)
+                {
+                    ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+                }
+            }
+            break;
+        }
+
+        return ratio;
     }
 
 public:
@@ -482,6 +571,7 @@ public:
         return r;
     }
 
+    // Return center two points of the four point interpolation window.
     bool GetBracket(double &d0, double &d1)
     {
         if (!m_DistanceWindow.hasp0() || !m_DistanceWindow.hasp1())
@@ -493,44 +583,23 @@ public:
         return true;
     }
 
-    xyz Interpolate(double distance)
+    // Location interpolation when tangent isn't needed.
+    xyz Location(double distance)
     {
-        // Continue to advance queue after input is complete.
-        if (m_fInputComplete) {
-            // When input is finished we must continue to advance the point state based on distance
-            while (m_DistanceWindow.hasp1() && distance >= m_DistanceWindow.p1()) {
-                m_DistanceWindow.Advance();
-                m_Interpolator.Advance();
-            }
-        }
+        double ratio = DistanceToBracketRatio(distance);
+        xyz newXYZLocation = m_Interpolator.Location(ratio);
+        return newXYZLocation;
+    }
 
-        // Determine fraction of range that this distance specifies (frac must be 0-1.)
-        double frac = 0.0;
-        switch (m_DistanceWindow.Count())
-        {
-        case 0:
-        case 1:
-            break;
-        case 2:
-            if (!m_DistanceWindow.haspm1() && !m_DistanceWindow.hasp0()) {
-                // missing: pm1 && p0
-                // Query distance comes before any known range.
-                frac = 1.0;
-            } else if (!m_DistanceWindow.haspm1()) {
-                // missing: pm1 && p2
-                frac = OffsetInRangeToFraction(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
-            } else {
-                // missing: p1  && p2
-                frac = 0.0;
-            }
-            break;
-        case 3:
-        case 4:
-            frac = OffsetInRangeToFraction(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
-            break;
-        }
+    // Location interpolation including tangent vector computation
+    xyz Location(double distance, xyz &tangentVector)
+    {
+        double bracketRatio = DistanceToBracketRatio(distance);
 
-        return m_Interpolator.Interpolate(frac);
+        tangentVector = m_Interpolator.Tangent(bracketRatio);
+        xyz l0xyz = m_Interpolator.Location(bracketRatio);
+
+        return l0xyz;
     }
 
 private:
@@ -638,10 +707,10 @@ public:
             const double inter1 = d0 + thirdspan + thirdspan;
 
             // Step 2
-            const xyz pm1 = this->Interpolate(d0);
-            const xyz  p0 = this->Interpolate(inter0);
-            const xyz  p1 = this->Interpolate(inter1);
-            const xyz  p2 = this->Interpolate(d1);
+            const xyz pm1 = this->Location(d0);
+            const xyz  p0 = this->Location(inter0);
+            const xyz  p1 = this->Location(inter1);
+            const xyz  p2 = this->Location(d1);
 
             // Step 3
             double linearDistance = p2.DistanceFrom(pm1);
@@ -663,7 +732,7 @@ public:
                 finalLength += arcDistance;
             } else {
                 // 5B: otherwise push the 3 new subsegments onto worklist.
-                worklist.Push(CalcSplineLengthBracketPair(d0,     inter0));
+                worklist.Push(CalcSplineLengthBracketPair(d0, inter0));
                 worklist.Push(CalcSplineLengthBracketPair(inter0, inter1));
                 worklist.Push(CalcSplineLengthBracketPair(inter1, d1));
             }
@@ -679,7 +748,8 @@ public:
 
     GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>() {}
 
-    geolocation Interpolate(double distance);
+    geolocation Location(double distance);
+    geolocation Location(double distance, double &slope);
 
     void Push(double distance, geolocation point);
 };

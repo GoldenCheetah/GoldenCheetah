@@ -1140,8 +1140,8 @@ ErgFile::isValid()
     return valid;
 }
 
-int
-ErgFile::wattsAt(long x, int &lapnum)
+double
+ErgFile::wattsAt(double x, int &lapnum)
 {
     // workout what wattage load should be set for any given
     // point in time in msecs.
@@ -1199,7 +1199,7 @@ ErgFile::wattsAt(long x, int &lapnum)
 }
 
 double
-ErgFile::gradientAt(long x, int &lapnum)
+ErgFile::gradientAt(double x, int &lapnum)
 {
     // workout what wattage load should be set for any given
     // point in time in msecs.
@@ -1228,12 +1228,17 @@ ErgFile::gradientAt(long x, int &lapnum)
             rightPoint++;
         }
     }
-    return Points.at(leftPoint).val;
+
+    double gradient = Points.at(leftPoint).val;
+
+    return gradient;
 }
 
 // Returns true if a location is determined, otherwise returns false.
-bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
+bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double &slope100)
 {
+    slope100 = -100;
+
     if (!isValid()) return false; // not a valid ergfile
 
     // is it in bounds?
@@ -1306,7 +1311,9 @@ bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
         }
     }
 
-    geoLoc = gpi.Interpolate(meters);
+    geoLoc = gpi.Location(meters, slope100);
+
+    slope100 *= 100;
 
     return true;
 }
