@@ -17,7 +17,7 @@
 */
 
 #include "LocationInterpolation.h"
-#include "blinnsolver.h"
+#include "BlinnSolver.h"
 
 static double radianstodegrees(double r) { return r * (360.0 / (2 * M_PI)); }
 static double degreestoradians(double d) { return d * (2 * M_PI / 360.0); }
