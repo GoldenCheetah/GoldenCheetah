@@ -38,6 +38,7 @@ public:
 
     BicycleWheel() {}
 
+    double KEMass()           const { return MassKG() + EquivalentMassKG(); }
     double MassKG()           const { return m_massKG; }
     double EquivalentMassKG() const { return m_equivalentMassKG; }
     double I()                const { return m_I; }
@@ -137,10 +138,6 @@ class Bicycle
 
     void Init(BicycleConstants constants, double riderWeightKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel);
 
-    double MassKG() const;                   // Actual mass of bike and rider.
-    double EquivalentMassKG() const;         // Additional mass due to rotational inertia
-    double KEMass() const;                   // Total effective kinetic mass
-
     double SampleDT();                       // Gather sample time stamp and return dt (in seconds)
     double FilterWattIncrease(double watts); // Reduce power spikes by limiting power growth per sample period
 
@@ -149,6 +146,12 @@ public:
     Bicycle(Context* context, BicycleConstants constants, double riderWeightKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel);
     Bicycle(Context* context);
     SpeedDistance SampleSpeed(BicycleSimState &newState);
+
+    double MassKG() const;                   // Actual mass of bike and rider.
+    double EquivalentMassKG() const;         // Additional mass due to rotational inertia
+    double KEMass() const;                   // Total effective kinetic mass
+    const BicycleWheel &FrontWheel() const { return m_frontWheel; }
+    const BicycleWheel &RearWheel() const { return m_rearWheel; }
 
     // Reset timer. This forces next sample to use 0.1s as its dt.
     void reset()
