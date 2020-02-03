@@ -651,6 +651,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         QT += bluetooth
         HEADERS += Train/BT40Controller.h Train/BT40Device.h
         SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
+        HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
+        SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
     }
 
     # qt charts is officially supported from QT5.8 or higher

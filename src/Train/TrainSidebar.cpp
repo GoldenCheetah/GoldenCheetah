@@ -337,7 +337,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lap_time = QTime();
     lap_elapsed_msec = 0;
 
-    rrFile = recordFile = NULL;
+    rrFile = recordFile = vo2File = NULL;
     lastRecordSecs = 0;
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
@@ -675,6 +675,8 @@ TrainSidebar::configChanged(qint32)
 #ifdef QT_BLUETOOTH_LIB
         } else if (Devices.at(i).type == DEV_BT40) {
             Devices[i].controller = new BT40Controller(this, &Devices[i]);
+            connect(Devices[i].controller, SIGNAL(vo2Data(double,double,double,double,double,double)),
+                    this, SLOT(vo2Data(double,double,double,double,double,double)));
 #endif
         }
     }
@@ -1384,6 +1386,14 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             rrFile=NULL;
         }
 
+        // close vo2File
+        if (vo2File) {
+            fprintf(stderr, "Closing vo2 file\n"); fflush(stderr);
+            vo2File->close();
+            delete vo2File;
+            vo2File=NULL;
+        }
+
         if(deviceStatus == DEVICE_ERROR)
         {
             recordFile->remove();
@@ -1514,6 +1524,7 @@ void TrainSidebar::Connect()
     foreach(int dev, activeDevices) {
         Devices[dev].controller->start();
         Devices[dev].controller->resetCalibrationState();
+        connect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
     }
     setStatusFlags(RT_CONNECTED);
     gui_timer->start(REFRESHRATE);
@@ -1531,7 +1542,10 @@ void TrainSidebar::Disconnect()
 
     qDebug() << "disconnecting..";
 
-    foreach(int dev, activeDevices) Devices[dev].controller->stop();
+    foreach(int dev, activeDevices) {
+        disconnect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
+        Devices[dev].controller->stop();
+    }
     clearStatusFlags(RT_CONNECTED);
 
     gui_timer->stop();
@@ -1644,6 +1658,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
+                }
+
+                if (Devices[dev].type == DEV_NULL || Devices[dev].type == DEV_BT40) {
+                    // Only robot and BT40 devices provides VO2 metrics
+                    rtData.setRf(local.getRf());
+                    rtData.setRMV(local.getRMV());
+                    rtData.setVO2_VCO2(local.getVO2(), local.getVCO2());
+                    rtData.setTv(local.getTv());
+                    rtData.setFeO2(local.getFeO2());
                 }
 
                 // what are we getting from this one?
@@ -2825,6 +2848,37 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
         recordFileStream << secs << ", " << bpm << ", " << rrtime << "\n";
     }
     //fprintf(stderr, "R-R: %d ms, HR=%d, count=%d\n", rrtime, bpm, count); fflush(stderr);
+}
+
+// VO2 Measurement data received
+void TrainSidebar::vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2)
+{
+    if (status&RT_RECORDING && vo2File == NULL && recordFile != NULL) {
+        QString vo2filename = recordFile->fileName().replace("csv", "vo2");
+
+        // setup the rr file
+        vo2File = new QFile(vo2filename);
+        if (!vo2File->open(QFile::WriteOnly | QFile::Truncate)) {
+            delete vo2File;
+            vo2File=NULL;
+        } else {
+
+            // CSV File header
+            QTextStream recordFileStream(vo2File);
+            recordFileStream << "secs, rf, rmv, vo2, vco2, tv, feo2\n";
+        }
+    }
+
+    // output a line if recording and file ready
+    if (status&RT_RECORDING && vo2File) {
+        QTextStream recordFileStream(vo2File);
+
+        // convert from milliseconds to secondes
+        double secs = double(session_elapsed_msec + session_time.elapsed()) / 1000.00;
+
+        // output a line
+        recordFileStream << secs << ", " << rf << ", " << rmv << ", " << vo2 << ", " << vco2 << ", " << tv << ", " << feo2 << "\n";
+    }
 }
 
 // connect/disconnect automatically when view changes

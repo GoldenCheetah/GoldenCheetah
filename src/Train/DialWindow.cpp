@@ -508,6 +508,22 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
+    case RealtimeData::VO2:
+    case RealtimeData::VCO2:
+    case RealtimeData::Rf:
+    case RealtimeData::RMV:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 0));
+        break;
+
+    case RealtimeData::TidalVolume:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
+    case RealtimeData::FeO2:
+    case RealtimeData::RER:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -573,6 +589,13 @@ void DialWindow::seriesChanged()
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
     case RealtimeData::Slope:
+    case RealtimeData::Rf:
+    case RealtimeData::RMV:
+    case RealtimeData::VO2:
+    case RealtimeData::VCO2:
+    case RealtimeData::RER:
+    case RealtimeData::TidalVolume:
+    case RealtimeData::FeO2:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
             break;

@@ -210,6 +210,9 @@ class TrainSidebar : public GcWindow
         // HRV R-R data being saved away
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+        // VO2 measurement data to save
+        void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
+
     protected:
 
         friend class ::MultiDeviceDialog;
@@ -276,6 +279,7 @@ class TrainSidebar : public GcWindow
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
         QFile *rrFile;          // r-r records, if any received.
+        QFile *vo2File;         // vo2 records, if any received.
         ErgFile *ergFile;       // workout file
         VideoSyncFile *videosyncFile;       // videosync file
 
