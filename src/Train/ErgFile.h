@@ -47,6 +47,12 @@
 #define CRS_LOC 4
 #define ERG2    5
 
+enum class TimeFormat
+{
+    SECONDS
+    ,MINUTES
+}; // enum class TimeFormat
+
 class ErgFilePoint
 {
     public:
@@ -146,6 +152,7 @@ class ErgFile
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
         int mode;
+        TimeFormat timeFormat;
 
         int leftPoint, rightPoint;     // current points we are between
         int interpolatorReadIndex;     // next point to be fed to interpolator
