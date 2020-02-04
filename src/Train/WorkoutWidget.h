@@ -135,6 +135,9 @@ class WorkoutWidget : public QWidget
         QList<int> hr; // 1s samples [bpm]
         QList<double> speed; // 1s samples [km/h]
         QList<int> cadence; // 1s samples [rpm]
+        QList<int> vo2; // 1s samples [ml/min]
+        QList<int> ventilation; // 1s samples [l/min]
+        QList<double> hrAvg, pwrAvg, cadenceAvg, vo2Avg, ventilationAvg, speedAvg; // averages
 
         // interaction state;
         // none - initial state
@@ -294,6 +297,22 @@ class WorkoutWidget : public QWidget
         // hate this function !
         bool setBlockCursor();
 
+        // settings getters
+        bool shouldPlotHr();
+        bool shouldPlotPwr();
+        bool shouldPlotCadence();
+        bool shouldPlotWbal();
+        bool shouldPlotVo2();
+        bool shouldPlotVentilation();
+        bool shouldPlotSpeed();
+
+        int hrPlotAvgLength();
+        int pwrPlotAvgLength();
+        int cadencePlotAvgLength();
+        int vo2PlotAvgLength();
+        int ventilationPlotAvgLength();
+        int speedPlotAvgLength();
+
     protected:
 
         // interacting with points
@@ -384,6 +403,8 @@ class WorkoutWidget : public QWidget
         int cadenceMax;
         int hrMax;
         double speedMax;
+        int vo2Max;
+        int ventilationMax;
 
         // resampling when recording
         double wbalSum;
@@ -391,6 +412,8 @@ class WorkoutWidget : public QWidget
         double cadenceSum;
         double speedSum;
         double hrSum;
+        double vo2Sum;
+        double ventilationSum;
         int count;
 };
 

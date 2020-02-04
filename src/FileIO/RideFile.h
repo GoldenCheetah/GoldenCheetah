@@ -212,7 +212,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal, tcore, clength, aPowerKg, index,
+                          wbal, tcore, clength, aPowerKg, index, vo2, ventilation,
                           none }; // none must ALWAYS be last
         typedef enum seriestype SeriesType;
 

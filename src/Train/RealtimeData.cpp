@@ -639,7 +639,7 @@ QString RealtimeData::seriesName(DataSeries series)
     case Rf: return tr("Respiratory Frequency");
         break;
 
-    case RMV: return tr("Respiratory Minute Volume");
+    case RMV: return tr("Ventilation");
         break;
 
     case VO2: return tr("VO2");
