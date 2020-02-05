@@ -29,6 +29,8 @@
 #include "Units.h"
 #include "Utils.h"
 
+#include "TTSReader.h"
+
 // Supported file types
 static QStringList supported;
 static bool setSupported()
@@ -39,6 +41,7 @@ static bool setSupported()
     ::supported << ".pgmf";
     ::supported << ".zwo";
     ::supported << ".gpx";
+    ::supported << ".tts";
     return true;
 }
 static bool isinit = setSupported();
@@ -110,6 +113,7 @@ void ErgFile::reload()
     else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
     else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
+    else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
 
 }
@@ -807,6 +811,144 @@ void ErgFile::parseGpx()
     calculateMetrics();
 }
 
+// Parse TTS into ergfile
+void ErgFile::parseTTS()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;                   // FTP this file was targetted at
+    MaxWatts = 0;              // maxWatts in this ergfile (scaling)
+    valid = false;             // did it parse ok?
+    rightPoint = leftPoint = 0;
+    interpolatorReadIndex = 0;
+    format = mode = CRS;
+    Points.clear();
+    Laps.clear();
+
+    QFile ttsFile(filename);
+    if (ttsFile.open(QIODevice::ReadOnly) == false) {
+        valid = false;
+       return;
+    }
+    QStringList errors_;
+
+    QDataStream qttsStream(&ttsFile);
+    qttsStream.setByteOrder(QDataStream::LittleEndian);
+
+    NS_TTSReader::TTSReader ttsReader;
+    bool success = ttsReader.parseFile(qttsStream);
+    if (!success) {
+        valid = false;
+        return;
+    }
+
+    const std::vector<NS_TTSReader::Point> &ttsPoints = ttsReader.getPoints();
+    int pointCount = (int)ttsPoints.size();
+    if (pointCount < 2) {
+        valid = false;
+        return;
+    }
+
+    // Enumerate the data types that are available.
+    bool fHasKm    = ttsReader.hasKm();
+    bool fHasLat   = ttsReader.hasLatitude();
+    bool fHasLon   = ttsReader.hasLongitude();
+    bool fHasAlt   = ttsReader.hasElevation();
+    bool fHasSlope = ttsReader.hasGradient();
+
+    if (fHasKm && fHasSlope) {}     // same as crs file
+    else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
+    else {
+        valid = false;
+        return;
+    }
+
+    const NS_TTSReader::Point *prevPoint, *point, *nextPoint;
+
+    prevPoint = NULL;
+    point = NULL;
+    nextPoint = &ttsPoints[1];
+
+    double alt = 0;
+    if (fHasAlt) {
+        // Start with altitude of second point.
+        alt = ttsPoints[1].getElevation();
+    }
+
+    for (int i = 1; i <= pointCount; i++) { // first data point is actually the last...
+        ErgFilePoint add;
+
+        prevPoint = point;
+        point = nextPoint;
+        nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[0] : &ttsPoints[i + 1];
+
+        // Determine slope to next point
+        double slope = 0.0;
+
+        if (fHasAlt) {
+            alt = point->getElevation();
+        }
+
+        if (fHasSlope) {
+            slope = point->getGradient();
+            if (!fHasAlt && prevPoint)
+            {
+                alt += ((slope * (point->getDistanceFromStart() - prevPoint->getDistanceFromStart()))) / 100.0;
+            }
+        } else if (nextPoint && fHasAlt) {
+            double km0 = (i == 0) ? 0 : point->getDistanceFromStart(); // first entry holds total distance
+            double alt0 = point->getElevation();
+        
+            double km1 = nextPoint->getDistanceFromStart();
+            double alt1 = nextPoint->getElevation();
+        
+            double rise = alt1 - alt0;
+            double h = km1 - km0;
+
+            slope = 100 * (rise / (sqrt(h*h - rise * rise)));
+        }
+
+        add.x = point->getDistanceFromStart(); // record distance in meters
+        add.y = alt;
+        add.val = slope;
+
+        if (fHasLat) add.lat = point->getLatitude();
+        if (fHasLon) add.lon = point->getLongitude();
+        if (add.y > MaxWatts) MaxWatts = add.y;
+
+        Points.append(add);
+    }
+
+    // Altitude is interpolated if there is slope. Actually this slope is
+    // smooth so we might consider it usable (even though its wrong.)
+    if (fHasSlope) {
+        fHasAlt = true;
+    }
+
+    if (fHasAlt) {
+        format = mode = CRS_LOC;
+    }
+
+    ttsFile.close();
+
+    valid = true;
+
+    // set ErgFile duration
+    Duration = Points.last().x;      // end point in meters
+
+    leftPoint = 0;                   // setup initial sample bracketing
+    rightPoint = 1;
+    interpolatorReadIndex = 0;
+
+    // calculate climbing etc
+    calculateMetrics();
+}
+
+
 // convert points to set of sections
 QList<ErgFileSection>
 ErgFile::Sections()
@@ -1212,7 +1354,7 @@ ErgFile::gradientAt(double x, int &lapnum)
     if (!isValid()) return -100; // not a valid ergfile
 
     // is it in bounds?
-    if (x < 0 || x > Duration) return -100;   // out of bounds!!! (-10 through +15 are valid return vals)
+    if (x < 0 || x > Duration) return -100;   // out of bounds!!! (-40 through +40 are valid return vals)
 
     // do we need to return the Lap marker?
     if (Laps.count() > 0) {
@@ -1243,15 +1385,13 @@ ErgFile::gradientAt(double x, int &lapnum)
 // Returns true if a location is determined, otherwise returns false.
 bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double &slope100)
 {
-    slope100 = -100;
-
     if (!isValid()) return false; // not a valid ergfile
 
     // is it in bounds?
     if (meters < 0 || meters > Duration) return false;
 
     // No location unless... format contains location...
-    if (format != CRS_LOC)  return false;
+    if (format != CRS && format != CRS_LOC)  return false;
 
     if (Laps.count() > 0) {
         int lap = 0;
@@ -1306,8 +1446,14 @@ bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double
     while (gpi.WantsInput(meters)) {
         if (interpolatorReadIndex < Points.count()) {
             const ErgFilePoint * pii = &(Points.at(interpolatorReadIndex));
-            geolocation geo(pii->lat, pii->lon, pii->y);
-            gpi.Push(pii->x, geo);
+
+            // When there is no geolocation, invent something to support tangent interpolation.
+            if (pii->lat || pii->lon) {
+                geolocation geo(pii->lat, pii->lon, pii->y);
+                gpi.Push(pii->x, geo);
+            } else {
+                gpi.Push(pii->x, pii->y);
+            }
 
             interpolatorReadIndex++;
         }
@@ -1320,7 +1466,7 @@ bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double
     geoLoc = gpi.Location(meters, slope100);
 
     slope100 *= 100;
-
+    
     return true;
 }
 

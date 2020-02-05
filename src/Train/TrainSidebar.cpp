@@ -1743,26 +1743,37 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
-                // For classic rlv with no location data:
-                // Estimate vertical change based upon time passed and slope.
-                // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
-                double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
-
-                displayAltitude += altitudeDeltaMeters;
-
                 // Trust ergFile for location data, if available.
+                bool fAltitudeSet = false;
                 if (ergFile) {
-                    geolocation geoloc;
-                    if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope))
-                    {
-                        displayLatitude = geoloc.Lat();
-                        displayLongitude = geoloc.Long();
-                        displayAltitude = geoloc.Alt();
 
-                        rtData.setLatitude(displayLatitude);
-                        rtData.setLongitude(displayLongitude);
-                        rtData.setSlope(slope);
+                    // Obtain slope recorded in ergfile.
+                    slope = ergFile->gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
+
+                    // Attempt to obtain location and derive slope from altitude in ergfile.
+                    geolocation geoloc;
+                    if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
+                        displayLatitude  = geoloc.Lat();
+                        displayLongitude = geoloc.Long();
+                        displayAltitude  = geoloc.Alt();
+
+                        if (displayLatitude && displayLongitude) {
+                            rtData.setLatitude(displayLatitude);
+                            rtData.setLongitude(displayLongitude);
+                        }
+                        fAltitudeSet = true;
                     }
+
+                    rtData.setSlope(slope);
+                }
+
+                if (!fAltitudeSet) {
+                    // For classic rlv with no location data:
+                    // Estimate vertical change based upon time passed and slope.
+                    // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
+                    double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
+
+                    displayAltitude += altitudeDeltaMeters;
                 }
 
                 rtData.setAltitude(displayAltitude);
@@ -2025,7 +2036,7 @@ void TrainSidebar::diskUpdate()
 
 void TrainSidebar::loadUpdate()
 {
-    int curLap;
+    int curLap = 0;
 
     // we hold our horses whilst calibration is taking place...
     if (calibrating) return;
@@ -2053,15 +2064,6 @@ void TrainSidebar::loadUpdate()
             context->notifySetNow(load_msecs);
         }
     } else {
-        geolocation geoloc;
-        if (ergFile->locationAt(displayWorkoutDistance * 1000, curLap, geoloc, slope))
-        {
-            displayLatitude = geoloc.Lat();
-            displayLongitude = geoloc.Long();
-            displayAltitude = geoloc.Alt();
-        } else {
-            slope = ergFile->gradientAt(displayWorkoutDistance * 1000, curLap);
-        }
 
         if(displayWorkoutLap != curLap)
         {

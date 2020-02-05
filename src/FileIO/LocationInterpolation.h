@@ -184,9 +184,9 @@ public:
     void Init(double pm1, double p0, double p1, double p2);
     UnitCatmullRomInterpolator();
     UnitCatmullRomInterpolator(double pm1, double p0, double p1, double p2);
-    double Location(double u);
-    double Tangent(double u);
-    bool   Inverse(double r, double &u);
+    double Location(double u) const;
+    double Tangent(double u) const;
+    bool   Inverse(double r, double &u) const;
 };
 
 class UnitCatmullRomInterpolator3D
@@ -198,8 +198,8 @@ public:
     void Init(xyz pm1, xyz p0, xyz p1, xyz p2);
     UnitCatmullRomInterpolator3D() : x(), y(), z() {}
     UnitCatmullRomInterpolator3D(xyz pm1, xyz p0, xyz p1, xyz p2);
-    xyz Location(double frac);
-    xyz Tangent(double frac);
+    xyz Location(double frac) const;
+    xyz Tangent(double frac) const;
 };
 
 // Visual studio has an error in how it compiles bitset that prevents
@@ -215,7 +215,7 @@ template <size_t T_bitsize> class MyBitset
     unsigned popcnt(unsigned x) const {
         x = x - ((x >> 1) & 0x55555555);
         x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
-        return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+        return (((x + (x >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
     void truncate() { m_mask &= (((unsigned)(-1 << (32 - T_bitsize))) >> (32 - T_bitsize)); }
@@ -239,6 +239,14 @@ template <typename T> class SlidingWindow
 
     UnitCatmullRomInterpolator u;
     bool                       m_InterpolatorNeedsInit;
+
+    void Maintain()
+    {
+        if (m_InterpolatorNeedsInit) {
+            u.Init(pm1(), p0(), p1(), p2());
+            m_InterpolatorNeedsInit = false;
+        }
+    }
 
 public:
 
@@ -267,12 +275,29 @@ public:
 
     bool BracketFromDistance(double distance, double &bracket)
     {
-        if (m_InterpolatorNeedsInit) {
-            u.Init(pm1(), p0(), p1(), p2());
-            m_InterpolatorNeedsInit = false;
-        }
+        Maintain();
 
         return u.Inverse(distance, bracket);
+    }
+
+    // Returns rate of change of distance spline at bracket [0..1].
+    double FrameSpeed(double frac) const
+    {
+        // Do not call Maintain() here. frac input implies that current
+        // interpolator state should be queried.
+        // If anything assert that interpolator state needs no update.
+
+        double frameSpeed = u.Tangent(frac);
+
+        // Slope can be zero at start (when prior distance window entries are zero.)
+        // Just use average until there are enough datapoints to interpolate.
+
+        // Note frameSpeed should never be negative since that would imply
+        // route distance can decrease.
+
+        frameSpeed = (frameSpeed > 0.) ? frameSpeed : (p1() - p0());
+
+        return frameSpeed;
     }
 
     void Push(const T& t)
@@ -518,9 +543,10 @@ template <typename T_TwoPointInterpolator> class DistancePointInterpolator
             break;
         case 4:
             {
+                if (distance == m_DistanceWindow.p0()) return 0.;
+                if (distance == m_DistanceWindow.p1()) return 1.;
                 bool fInv = m_DistanceWindow.BracketFromDistance(distance, ratio);
-                if (!fInv)
-                {
+                if (!fInv) {
                     ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
                 }
             }
@@ -597,6 +623,22 @@ public:
         double bracketRatio = DistanceToBracketRatio(distance);
 
         tangentVector = m_Interpolator.Tangent(bracketRatio);
+
+        // Frame speed is speed of parametric distance.
+        // Remove frame speed from tangent vector.
+        double frameSpeed = m_DistanceWindow.FrameSpeed(bracketRatio);
+        double tangentSpeed = tangentVector.magnitude();
+        double correctionScale = frameSpeed / (tangentSpeed * tangentSpeed);
+
+        // This rescale converts tangent vector into a unit vector
+        // WRT parametric route velocity.
+        // Tangent vector's remaining non-unit-ness is due to
+        // distortion from mapping route speed to geometric
+        // speed, but that cannot be corrected here since we
+        // are in ECEF and vector's altitude component is not
+        // distorted while orthagonal plane is.
+        tangentVector = tangentVector.scale(correctionScale);
+
         xyz l0xyz = m_Interpolator.Location(bracketRatio);
 
         return l0xyz;
@@ -744,14 +786,20 @@ public:
 
 class GeoPointInterpolator : public DistancePointInterpolator<SphericalTwoPointInterpolator>
 {
+    enum LocationState { Unset, YesLocation, NoLocation};
+    LocationState m_locationState;
+
 public:
 
-    GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>() {}
+    GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>(), m_locationState(Unset) {}
 
     geolocation Location(double distance);
     geolocation Location(double distance, double &slope);
 
+    bool HasLocation() { return m_locationState == YesLocation; }
+
     void Push(double distance, geolocation point);
+    void Push(double distance, double altitude);
 };
 
 #endif

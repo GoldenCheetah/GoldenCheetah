@@ -16,6 +16,7 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <assert.h>
 #include "LocationInterpolation.h"
 #include "BlinnSolver.h"
 
@@ -209,14 +210,18 @@ UnitCatmullRomInterpolator::UnitCatmullRomInterpolator(double pm1, double p0, do
 
 double UnitCatmullRomInterpolator::T()
 {
-    static const double s_T = 0.5; // Control curvature: 0 is linear, 1 is pretty loopy, most people like 0.5.
+    // Control curvature:
+    //   0   is standard (straigtest)
+    //   0.5 is called centripetal
+    //   1   is chordal (loopiest)
+    double t = 0.5;
 
-    return s_T;
+    return t;
 }
 
-double UnitCatmullRomInterpolator::Location(double u)
+double UnitCatmullRomInterpolator::Location(double u) const
 {
-    static const double s_T = T();
+    double t = T();
 
     double p0 = std::get<0>(m_p);
     double p1 = std::get<1>(m_p);
@@ -226,15 +231,15 @@ double UnitCatmullRomInterpolator::Location(double u)
     // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
     // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
 
-    double retval = p0 * u * (u * (2 * s_T - s_T * u) - s_T) +
-        u * (u * (u * (p1 * (-s_T) + 2 * p1 + p2 * (s_T - 2) + p3 * s_T) + p1 * s_T - 3 * p1 + p2 * (3 - 2 * s_T) - p3 * s_T) + p2 * s_T) + p1;
+    double retval = p0 * u * (u * (2 * t - t * u) - t) +
+        u * (u * (u * (p1 * (-t) + 2 * p1 + p2 * (t - 2) + p3 * t) + p1 * t - 3 * p1 + p2 * (3 - 2 * t) - p3 * t) + p2 * t) + p1;
 
     return retval;
 }
 
-double UnitCatmullRomInterpolator::Tangent(double u)
+double UnitCatmullRomInterpolator::Tangent(double u) const
 {
-    static const double s_T = T();
+    double t = T();
 
     double p0 = std::get<0>(m_p);
     double p1 = std::get<1>(m_p);
@@ -244,22 +249,20 @@ double UnitCatmullRomInterpolator::Tangent(double u)
     // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
     // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
 
-    // dx/du
+    // d f(u)/du
 
     // Closed form slope for cubic at point u in 0..1.
-    double retval = p0 * u * (2 * s_T - 2 * s_T * u)
-        + p0 * (u * (2 * s_T - s_T * u) - s_T)
-        + u * (u * (p1 * (-s_T) + 2 * p1 + p2 * (s_T - 2) + p3 * s_T) + p1 * s_T - 3 * p1 + p2 * (3 - 2 * s_T) - p3 * s_T)
-        + u * (2 * u * (p1 * (-s_T) + 2 * p1 + p2 * (s_T - 2) + p3 * s_T) + p1 * s_T - 3 * p1 + p2 * (3 - 2 * s_T) - p3 * s_T)
-        + p2 * s_T;
+    double retval = 3 * (u *u) * ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1) +
+                    2 * (u)    * ((-p3 - 2 * p2 + p1 + 2 * p0)*t + 3 * p2 - 3 * p1) +
+                                 (p2 - p0) * t;
 
     return retval;
 }
 
-// Given interpolated value v, provides u that would yield v.
+// Given interpolated value r, provides u that would yield r.
 // Only successful if spline is invertable (which is true for
-// distance spline.)
-bool UnitCatmullRomInterpolator::Inverse(double r, double &u)
+// the distance spline which is monotonic, etc.)
+bool UnitCatmullRomInterpolator::Inverse(double r, double &u) const
 {
     const double t = T();
 
@@ -269,34 +272,27 @@ bool UnitCatmullRomInterpolator::Inverse(double r, double &u)
     double p3 = std::get<3>(m_p);
 
     // Normalized form of equation from Location.
-    double a = (p3*t - p0 * t + p2 * (t - 2) + p1 * (2 - t));
-    double b = (-p3 * t + 2 * p0*t + p1 * (t - 3) + p2 * (3 - 2 * t));
-    double c = (p2*t - p0 * t);
-    double d = p1 - r; // "- r" because root finder expects form that equals zero.
+    double a = ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1);
+    double b = ((-p3 - 2 * p2 + p1 + 2 * p0)*t + 3 * p2 - 3 * p1);
+    double c = (p2 - p0) * t;
+    double d = p1 - r; // "- r" because root finder expects coefficients for expression that equals zero.
 
     Roots roots = BlinnCubicSolver(a, b, c, d);
 
     // There are 0, 1, 2 or 3 roots.
-    if (roots.resultcount() < 1) return false;
 
-    double r0 = roots.result(0).x / roots.result(0).w;
-    double r1 = r0;
-    double r2 = r0;
-
-    if (roots.resultcount() > 1)
-        r1 = roots.result(1).x / roots.result(1).w;
-
-    if (roots.resultcount() > 2)
-        r2 = roots.result(2).x / roots.result(2).w;
-
-    // We have success if there is a root in the range [0..1].
-
-    // TODO: For now we return a single root.
-    // It is certainly possible that there are multiple roots in range... give caller a choice?
-    bool ret = false;
-    if      (r0 >= 0. && r0 <= 1.) { u = r0; ret = true; }
-    else if (r1 >= 0. && r1 <= 1.) { u = r1; ret = true; }
-    else if (r2 >= 0. && r2 <= 1.) { u = r2; ret = true; }
+    // In general it is possible that there are multiple roots in range... but should never happen
+    // for monotonic distance mapping.
+    bool ret = false;    
+    for (unsigned i = 0; i < roots.resultcount(); i++) {
+        double r = roots.result(i).x / roots.result(i).w;
+        // Take the first root we find in range 0..1.
+        if (r >= 0. && r <= 1.) {
+            u = r;
+            ret = true;
+            break;
+        }
+    }
 
     return ret;
 }
@@ -313,12 +309,12 @@ UnitCatmullRomInterpolator3D::UnitCatmullRomInterpolator3D(xyz pm1, xyz p0, xyz 
     Init(pm1, p0, p1, p2);
 }
 
-xyz UnitCatmullRomInterpolator3D::Location(double frac)
+xyz UnitCatmullRomInterpolator3D::Location(double frac) const
 {
     return xyz(x.Location(frac), y.Location(frac), z.Location(frac));
 }
 
-xyz UnitCatmullRomInterpolator3D::Tangent(double frac)
+xyz UnitCatmullRomInterpolator3D::Tangent(double frac) const
 {
     return xyz(x.Tangent(frac), y.Tangent(frac), z.Tangent(frac));
 }
@@ -335,21 +331,70 @@ geolocation GeoPointInterpolator::Location(double distance, double &slope)
     xyz tangentVector;
     xyz l0xyz = DistancePointInterpolator<SphericalTwoPointInterpolator>::Location(distance, tangentVector);
 
-    // Compute earth gradient from location and tangent.
+    // First step, construct 2 geo locations that are separated by a unit-length tangent veocity vector.
     geolocation l1 = xyz(l0xyz.add(tangentVector.normalize())).togeolocation();
     geolocation l0 = l0xyz.togeolocation();
 
-    double a0 = l0.Alt();
-    double a1 = l1.Alt();
-    double rise = a1 - a0;
-    double run = sqrt(1 - fabs(rise)); // length of adjacent
+    // - Route distance is independent of geometric distance.
+    //   - Route distance is fixed in stone because it must match video
+    //     synchronization files.
+    //   - Geometric distance is also fixed since it is a fact of gps location.
+    //
+    // - Altitude is always in route distance units (so is computable
+    //   using gradient and route distance.)
+    //
+    // - Path length on spline is gps-based so uses geometric units.
+    //
+    // - Catmull-Rom spline is non-uniform, meaning speed of interpolated point can
+    //   vary across bracket which distorts the tangent vector.
 
+    // Vertical velocity of unit tangent vector (altitude is always kept in in route distance units.)
+    double rise = l1.Alt() - l0.Alt();
+
+    // Tangent vector's magnitude is velocity in terms of distance spline.
+    // Will be unit vector when distance spline has constant rate.
+    double hyp = tangentVector.magnitude();
+
+    // Compute adjacent speed.
+    double run = sqrt(fabs((hyp * hyp) - (rise * rise)));
+
+    // Gradient.
     slope = run ? rise / run : 0;
+
+    // No matter what we still don't permit slopes above 40%.
+    slope = std::min(slope,  .4);
+    slope = std::max(slope, -.4);
+
+    // Clear out location if we are an altitude only spline.
+    if (!HasLocation()) {
+        l0.Lat() = 0;
+        l0.Long() = 0;
+    }
 
     return l0;
 }
 
 void GeoPointInterpolator::Push(double distance, geolocation point)
 {
+    if (m_locationState == Unset)
+        m_locationState = YesLocation;
+    else
+        assert(m_locationState == YesLocation);
+
     DistancePointInterpolator<SphericalTwoPointInterpolator>::Push(distance, point.toxyz());
+}
+
+// Special form for case where altitude exists but no location.
+void GeoPointInterpolator::Push(double distance, double altitude)
+{
+    if (m_locationState == Unset)
+        m_locationState = NoLocation;
+    else
+        assert(m_locationState == NoLocation);
+
+    geolocation geo(0, 0, altitude);
+    xyz point = geo.toxyz();
+    point.y() = distance;
+
+    DistancePointInterpolator<SphericalTwoPointInterpolator>::Push(distance, point);
 }
