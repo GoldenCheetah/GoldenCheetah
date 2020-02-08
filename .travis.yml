@@ -6,7 +6,7 @@ os:
 - osx
 - linux
 dist: xenial
-language: c++
+language: cpp
 env:
   global:
   - BRANCH=master
