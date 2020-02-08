@@ -33,6 +33,8 @@ env:
       - os: osx
         osx_image: xcode10.1
         compiler: clang
+      - os: osx
+        osx_image: xcode11.3
       - os: linux
         compiler: gcc
 before_install:
