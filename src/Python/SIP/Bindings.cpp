@@ -57,6 +57,50 @@ Bindings::webpage(QString url) const
     return 0;
 }
 
+bool 
+Bindings::configChart(QString title, int type, bool animate) const
+{
+    python->chart->configChart(title, type, animate);
+    return true;
+}
+
+bool 
+Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl) const
+{
+    QVector<double>xs, ys;
+
+    // xseries type conversion
+    if (!PyList_Check(xseries)) {
+         PyErr_Format(PyExc_TypeError, "The argument 'xseries' must be of list or subtype of list");
+         return false;
+    } else {
+        // convert to QVector TODO convert in SIP
+        for (Py_ssize_t i=0; i <PyList_Size(xseries); i++) {
+            PyObject *it = PyList_GET_ITEM(xseries,i);
+            if (it==NULL) break;
+            xs << PyFloat_AsDouble(it);
+        }
+    }
+
+    // yseries type conversion
+    if (!PyList_Check(yseries)) {
+         PyErr_Format(PyExc_TypeError, "The argument 'yseries' must be of list or subtype of list");
+         return false;
+    } else {
+        // convert to QVector TODO convert in SIP
+        for (Py_ssize_t i=0; i <PyList_Size(yseries); i++) {
+            PyObject *it = PyList_GET_ITEM(yseries,i);
+            if (it==NULL) break;
+            ys << PyFloat_AsDouble(it);
+        }
+    }
+
+    // now just add via the chart
+    python->chart->emitCurve(name, xs, ys, xname, yname, line, symbol, size, color, opacity, opengl);
+    return true;
+}
+
 void
 Bindings::result(double value)
 {

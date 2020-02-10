@@ -180,6 +180,9 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     threadid=-1;
     name = QString("GoldenCheetah");
 
+    // register metatypes used to pass between threads
+    qRegisterMetaType<QVector<double> >();
+
     // config or environment variable
     QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
     if (PYTHONHOME == "") PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");

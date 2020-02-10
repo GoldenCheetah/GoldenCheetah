@@ -112,6 +112,12 @@ class Bindings {
         bool deleteActivitySample(int index = -1, PyObject *activity = NULL) const;
         bool deleteSeries(int type, PyObject *activity = NULL) const;
         bool postProcess(QString processor, PyObject *activity = NULL) const;
+
+        // working with charts
+        bool configChart(QString title, int type, bool animate) const;
+        bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+                      int line, int symbol, int symbolsize, QString color, int opacity, bool opengl) const;
+
     private:
         // find a RideItem by DateTime
         RideItem* fromDateTime(PyObject* activity=NULL) const;

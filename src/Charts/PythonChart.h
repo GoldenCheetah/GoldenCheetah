@@ -32,11 +32,18 @@
 #include <string.h>
 #include <QWebEngineView>
 #include <QUrl>
+#include <QtCharts>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "RCanvas.h"
+
+// keep aligned to library.py
+#define GC_CHART_LINE      1
+#define GC_CHART_SCATTER   2
+#define GC_CHART_BAR       3
+#define GC_CHART_PIE       4
 
 class PythonChart;
 
@@ -94,20 +101,30 @@ class PythonChart : public GcChartWindow, public PythonHost {
     Q_PROPERTY(QString script READ getScript WRITE setScript USER true)
     Q_PROPERTY(QString state READ getState WRITE setState USER true)
     Q_PROPERTY(bool showConsole READ showConsole WRITE setConsole USER true)
+    Q_PROPERTY(bool asWeb READ asWeb WRITE setWeb USER true)
 
     public:
         PythonChart(Context *context, bool ridesummary);
 
         // reveal
         bool hasReveal() { return true; }
-        QCheckBox *showCon;
+        QCheckBox *showCon, *web;
 
         // receives all the events
         QTextEdit *script;
         PythonConsole *console;
+        QWidget *render;
+        QVBoxLayout *renderlayout;
+
+        // rendering via...
         QWebEngineView *canvas; // not yet!!
+        QChartView *chartview;
+        QChart *qchart;
 
         void emitUrl(QUrl x) { emit setUrl(x); }
+
+        bool asWeb() const { return (web ? web->isChecked() : true); }
+        void setWeb(bool);
 
         bool showConsole() const { return (showCon ? showCon->isChecked() : true); }
         void setConsole(bool);
@@ -121,15 +138,41 @@ class PythonChart : public GcChartWindow, public PythonHost {
         PythonChart *chart() { return this; }
         bool readOnly() { return true; }
 
+        // set chart settings
+        bool configChart(QString title, int type, bool animate) {
+
+            if (chartview) {
+                // if we changed the type, all series must go
+                if (charttype != type) qchart->removeAllSeries();
+                charttype=type;
+
+                // title is allowed to be blank
+                qchart->setTitle(title);
+
+                // would avoid animations as they get very tiresome and are not
+                // generally transition animations, so add very little value
+                // by default they are disabled anyway
+                qchart->setAnimationOptions(animate ? QChart::SeriesAnimations : QChart::NoAnimation);
+
+                return true;
+            }
+        }
     signals:
         void setUrl(QUrl);
+        bool emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl);
+
 
     public slots:
         void configChanged(qint32);
         void showConChanged(int state);
+        void showWebChanged(int state);
         void runScript();
         void webpage(QUrl);
         static void execScript(PythonChart *);
+
+        bool setCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl);
 
     protected:
         // enable stopping long running scripts
@@ -142,6 +185,10 @@ class PythonChart : public GcChartWindow, public PythonHost {
         Context *context;
         QString text; // if Rtool not alive
         bool ridesummary;
+        int charttype;
+
+        // curves
+        QMap<QString, QAbstractSeries *>curves;
 };
 
 

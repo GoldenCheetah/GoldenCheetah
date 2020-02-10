@@ -1043,6 +1043,100 @@ static PyObject *meth_Bindings_postProcess(PyObject *sipSelf, PyObject *sipArgs,
 }
 
 
+extern "C" {static PyObject *meth_Bindings_configChart(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_configChart(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+        int a1;
+        bool a2;
+        const  ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_title,
+            sipName_type,
+            sipName_animate,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1ib", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2))
+        {
+            bool sipRes;
+
+            sipRes = sipCpp->configChart(*a0,a1,a2);
+            sipReleaseType(a0,sipType_QString,a0State);
+
+            return PyBool_FromLong(sipRes);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_configChart, NULL);
+
+    return NULL;
+}
+
+
+extern "C" {static PyObject *meth_Bindings_setCurve(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_setCurve(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+        PyObject * a1;
+        PyObject * a2;
+         ::QString* a3;
+        int a3State = 0;
+         ::QString* a4;
+        int a4State = 0;
+        int a5;
+        int a6;
+        int a7;
+         ::QString* a8;
+        int a8State = 0;
+        int a9;
+        bool a10;
+        const  ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_name,
+            sipName_xseries,
+            sipName_yseries,
+            sipName_xname,
+            sipName_yname,
+            sipName_line,
+            sipName_symbol,
+            sipName_symbolsize,
+            sipName_color,
+            sipName_opacity,
+            sipName_opengl,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1P0P0J1J1iiiJ1ib", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, sipType_QString,&a3, &a3State, sipType_QString,&a4, &a4State, &a5, &a6, &a7, sipType_QString,&a8, &a8State, &a9, &a10))
+        {
+            bool sipRes;
+
+            sipRes = sipCpp->setCurve(*a0,a1,a2,*a3,*a4,a5,a6,a7,*a8,a9,a10);
+            sipReleaseType(a0,sipType_QString,a0State);
+            sipReleaseType(a3,sipType_QString,a3State);
+            sipReleaseType(a4,sipType_QString,a4State);
+            sipReleaseType(a8,sipType_QString,a8State);
+
+            return PyBool_FromLong(sipRes);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_setCurve, NULL);
+
+    return NULL;
+}
+
+
 /* Call the instance's destructor. */
 extern "C" {static void release_Bindings(void *, int);}
 static void release_Bindings(void *sipCppV, int)
@@ -1120,6 +1214,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athleteZones), (PyCFunction)meth_Bindings_athleteZones, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_configChart), (PyCFunction)meth_Bindings_configChart, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_createXDataSeries), (PyCFunction)meth_Bindings_createXDataSeries, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_deleteActivitySample), (PyCFunction)meth_Bindings_deleteActivitySample, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_deleteSeries), (PyCFunction)meth_Bindings_deleteSeries, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -1137,6 +1232,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_seriesLast), meth_Bindings_seriesLast, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesName), (PyCFunction)meth_Bindings_seriesName, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_seriesPresent), (PyCFunction)meth_Bindings_seriesPresent, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_setCurve), (PyCFunction)meth_Bindings_setCurve, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_threadid), meth_Bindings_threadid, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_version), meth_Bindings_version, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_webpage), (PyCFunction)meth_Bindings_webpage, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -1159,7 +1255,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        31, methods_Bindings,
+        33, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

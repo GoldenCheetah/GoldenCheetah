@@ -281,7 +281,23 @@ void PythonConsole::contextMenuEvent(QContextMenuEvent *e)
 
 PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
-    setControls(NULL);
+    // controls widget
+    QWidget *c = new QWidget;
+    setControls(c);
+    //HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    //c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
+
+    // settings
+    QVBoxLayout *clv = new QVBoxLayout(c);
+    web = new QCheckBox(tr("Web charting"), this);
+    web->setChecked(true);
+    clv->addWidget(web);
+    clv->addStretch();
+
+    // sert no render widget
+    charttype=0; // not set yet
+    chartview=NULL;
+    canvas=NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -296,6 +312,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         QHBoxLayout *rev = new QHBoxLayout();
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
+
 
         rev->addStretch();
         rev->addWidget(showCon);
@@ -335,34 +352,31 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         splitter->addWidget(leftsplitter);
 
-        canvas = new QWebEngineView(this);
-        canvas->setContentsMargins(0,0,0,0);
-        canvas->page()->view()->setContentsMargins(0,0,0,0);
-        canvas->setZoomFactor(dpiXFactor);
-        canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-#if QT_VERSION >= 0x050800
-        // stop stealing focus!
-        canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
-        splitter->addWidget(canvas);
+        // for Chart or webpage
+        render = new QWidget(this);
+        renderlayout = new QVBoxLayout(render);
+        splitter->addWidget(render);
 
         // make splitter reasonable
         QList<int> sizes;
         sizes << 300 << 500;
         splitter->setSizes(sizes);
 
+        // passing data across python and gui threads
         connect(this, SIGNAL(setUrl(QUrl)), this, SLOT(webpage(QUrl)));
+        connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,int,int,int,QString,int,bool)),
+                this,   SLOT( setCurve(QString,QVector<double>,QVector<double>,QString,QString,int,int,int,QString,int,bool)));
 
         if (ridesummary) {
-            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
 
             // refresh when comparing
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(runScript()));
 
             // refresh when intervals changed / selected
-            connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
-            connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
+            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript())); // not needed since get signal below
+            //connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
+            //connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
 
         } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
@@ -378,6 +392,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         // reveal controls
         connect(showCon, SIGNAL(stateChanged(int)), this, SLOT(showConChanged(int)));
+        connect(web, SIGNAL(stateChanged(int)), this, SLOT(showWebChanged(int)));
 
         // config changes
         connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -399,6 +414,66 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         showCon = NULL;
         leftsplitter = NULL;
     }
+}
+
+
+// switch between rendering to a web page and rendering to a chart page
+void
+PythonChart::setWeb(bool x)
+{
+    // toggle the use of a web chart or a qt chart for rendering the data
+    if (x && canvas==NULL) {
+
+        // delete the chart view if exists
+        if (chartview) {
+            renderlayout->removeWidget(chartview);
+            delete chartview; // deletes associated chart too
+            chartview=NULL;
+            qchart=NULL;
+        }
+
+        // setup the canvas
+        canvas = new QWebEngineView(this);
+        canvas->setContentsMargins(0,0,0,0);
+        canvas->page()->view()->setContentsMargins(0,0,0,0);
+        canvas->setZoomFactor(dpiXFactor);
+        canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+#if QT_VERSION >= 0x050800
+        // stop stealing focus!
+        canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+#endif
+        renderlayout->insertWidget(0, canvas);
+    }
+
+    if (!x && chartview==NULL) {
+
+        // delete the canvas if exists
+        if (canvas) {
+            renderlayout->removeWidget(canvas);
+            delete canvas;
+            canvas = NULL;
+        }
+
+        // setup the chart
+        qchart = new QChart();
+        qchart->setBackgroundVisible(false); // draw on canvas
+        qchart->legend()->setVisible(false); // no legends
+        qchart->setTitle("No title set"); // none wanted
+        qchart->setAnimationOptions(QChart::NoAnimation);
+        qchart->setFont(QFont());
+
+        // set theme, but for now use a std one TODO: map color scheme to chart theme
+        qchart->setTheme(QChart::ChartThemeDark);
+
+        chartview = new QChartView(qchart, this);
+        renderlayout->insertWidget(0, chartview);
+    }
+
+    // set the check state!
+    web->setChecked(x);
+
+    // config changed...
+    configChanged(0);
 }
 
 bool
@@ -435,6 +510,13 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+
+    // chart colors
+    if (chartview) {
+        chartview->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
+        qchart->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
+        qchart->setBackgroundPen(QPen(GColor(CPLOTMARKER)));
+    }
 }
 
 void
@@ -447,6 +529,12 @@ void
 PythonChart::showConChanged(int state)
 {
     if (leftsplitter) leftsplitter->setVisible(state);
+}
+
+void
+PythonChart::showWebChanged(int state)
+{
+    setWeb(state);
 }
 
 QString
@@ -571,8 +659,102 @@ PythonChart::runScript()
     }
 }
 
+// rendering to a web page
 void
 PythonChart::webpage(QUrl url)
 {
-    canvas->setUrl(url);
+    if (canvas) canvas->setUrl(url);
+}
+
+// rendering to qt chart
+bool
+PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl)
+{
+    // if curve already exists, remove it
+    QAbstractSeries *existing = curves.value(name);
+    if (existing) qchart->removeSeries(existing);
+    delete existing;
+
+    switch (charttype) {
+    default:
+
+    case GC_CHART_LINE:
+        {
+            // set up the curves
+            QLineSeries *add = new QLineSeries();
+            add->setName(name);
+
+            // aesthetics
+            QColor col=QColor(color);
+            add->setBrush(Qt::NoBrush);
+            QPen pen(color);
+            pen.setStyle(Qt::SolidLine);
+            pen.setWidth(size);
+            add->setPen(pen);
+            add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
+
+            // data
+            for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+                add->append(xseries.at(i), yseries.at(i));
+
+            // hardware support?
+            chartview->setRenderHint(QPainter::Antialiasing);
+            add->setUseOpenGL(opengl); // for scatter or line only apparently
+
+            // chart
+            qchart->addSeries(add);
+            qchart->legend()->setMarkerShape(QLegend::MarkerShapeFromSeries);
+            qchart->createDefaultAxes();
+            qchart->setDropShadowEnabled(false);
+
+            // add to list of curves
+            curves.insert(name,add);
+        }
+        break;
+
+    case GC_CHART_SCATTER:
+        {
+            // set up the curves
+            QScatterSeries *add = new QScatterSeries();
+            add->setName(name);
+
+            // aesthetics
+            add->setMarkerShape(QScatterSeries::MarkerShapeCircle); //TODO: use 'symbol'
+            add->setMarkerSize(size);
+            QColor col=QColor(color);
+            add->setBrush(QBrush(col));
+            add->setPen(Qt::NoPen);
+            add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
+
+            // data
+            for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+                add->append(xseries.at(i), yseries.at(i));
+
+            // hardware support?
+            chartview->setRenderHint(QPainter::Antialiasing);
+            add->setUseOpenGL(opengl); // for scatter or line only apparently
+
+            // chart
+            qchart->addSeries(add);
+            qchart->legend()->setMarkerShape(QLegend::MarkerShapeFromSeries);
+            qchart->createDefaultAxes();
+            qchart->setDropShadowEnabled(false);
+
+            // add to list of curves
+            curves.insert(name,add);
+        }
+        break;
+    case GC_CHART_BAR:
+        {
+            // set up the curves
+        }
+        break;
+    case GC_CHART_PIE:
+        {
+            // set up the curves
+        }
+        break;
+
+    }
 }
