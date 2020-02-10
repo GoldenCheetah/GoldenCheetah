@@ -182,6 +182,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 
     // register metatypes used to pass between threads
     qRegisterMetaType<QVector<double> >();
+    qRegisterMetaType<QStringList>();
 
     // config or environment variable
     QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();

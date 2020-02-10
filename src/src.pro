@@ -282,6 +282,7 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
             ## SIP type conversion
             SOURCES += Python/SIP/sipgoldencheetahQString.cpp
+            SOURCES += Python/SIP/sipgoldencheetahQStringList.cpp
             SOURCES += Python/SIP/sipgoldencheetahPythonDataSeries.cpp \
                        Python/SIP/sipgoldencheetahPythonXDataSeries.cpp
             DEFINES += GC_HAVE_PYTHON

@@ -123,6 +123,119 @@ public:
 };
 
 //
+// QStringList Conversion
+//
+
+%MappedType QStringList
+        /TypeHintIn="Iterable[QString]", TypeHintOut="List[QString]",
+        TypeHintValue="[]"/
+{
+%TypeHeaderCode
+#include <qstringlist.h>
+%End
+
+%ConvertFromTypeCode
+    PyObject *l = PyList_New(sipCpp->size());
+
+    if (!l)
+        return 0;
+
+    for (int i = 0; i < sipCpp->size(); ++i)
+    {
+        QString *t = new QString(sipCpp->at(i));
+        PyObject *tobj = sipConvertFromNewType(t, sipType_QString,
+                sipTransferObj);
+
+        if (!tobj)
+        {
+            delete t;
+            Py_DECREF(l);
+
+            return 0;
+        }
+
+        PyList_SetItem(l, i, tobj);
+    }
+
+    return l;
+%End
+
+%ConvertToTypeCode
+    PyObject *iter = PyObject_GetIter(sipPy);
+
+    if (!sipIsErr)
+    {
+        PyErr_Clear();
+        Py_XDECREF(iter);
+
+        return (iter
+#if PY_MAJOR_VERSION < 3
+                && !PyString_Check(sipPy)
+#endif
+                && !PyUnicode_Check(sipPy));
+    }
+
+    if (!iter)
+    {
+        *sipIsErr = 1;
+
+        return 0;
+    }
+
+    QStringList *ql = new QStringList;
+ 
+    for (Py_ssize_t i = 0; ; ++i)
+    {
+        PyErr_Clear();
+        PyObject *itm = PyIter_Next(iter);
+
+        if (!itm)
+        {
+            if (PyErr_Occurred())
+            {
+                delete ql;
+                Py_DECREF(iter);
+                *sipIsErr = 1;
+
+                return 0;
+            }
+
+            break;
+        }
+
+        int state;
+        QString *t = reinterpret_cast<QString *>(
+                sipForceConvertToType(itm, sipType_QString, sipTransferObj,
+                        SIP_NOT_NONE, &state, sipIsErr));
+
+        if (*sipIsErr)
+        {
+            PyErr_Format(PyExc_TypeError,
+                    "index %zd has type '%s' but 'str' is expected", i,
+                    sipPyTypeName(Py_TYPE(itm)));
+
+            Py_DECREF(itm);
+            delete ql;
+            Py_DECREF(iter);
+
+            return 0;
+        }
+
+        ql->append(*t);
+
+        sipReleaseType(t, sipType_QString, state);
+        Py_DECREF(itm);
+    }
+ 
+    Py_DECREF(iter);
+
+    *sipCppPtr = ql;
+ 
+    return sipGetState(sipTransferObj);
+%End
+};
+
+//
 // Return an XDataSeries using the Buffer Protocol
 //
 class PythonXDataSeries {
@@ -277,6 +390,7 @@ public:
     // working with qt charts
     bool configChart(QString title, int type, bool animate) const;
     bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+                      QStringList labels, QStringList colors,
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl) const;
 };
 

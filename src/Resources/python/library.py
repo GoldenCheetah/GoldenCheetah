@@ -33,10 +33,10 @@ def __GCsetChart(title="",type=1,animate=False):
     GC.configChart(title,type,animate)
 
 # add a curve
-def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", line=1,symbol=0,size=15,color="cyan",opacity=0,opengl=True):
+def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=0,size=15,color="cyan",opacity=0,opengl=True):
     if (name == ""):
        raise ValueError("curve 'name' must be set and unique.")
-    GC.setCurve(name,list(x),list(y),xaxis,yaxis,line,symbol,size,color,opacity,opengl)
+    GC.setCurve(name,list(x),list(y),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl)
 
 # add to main GC entrypoint
 GC.activity=__GCactivity

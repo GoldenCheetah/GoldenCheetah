@@ -116,6 +116,7 @@ class Bindings {
         // working with charts
         bool configChart(QString title, int type, bool animate) const;
         bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+                      QStringList labels,  QStringList colors,
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl) const;
 
     private:

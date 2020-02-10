@@ -142,6 +142,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
         void setUrl(QUrl);
         bool emitChart(QString title, int type, bool animate);
         bool emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl);
 
 
@@ -153,15 +154,38 @@ class PythonChart : public GcChartWindow, public PythonHost {
         void webpage(QUrl);
         static void execScript(PythonChart *);
 
+        // post processing clean up / add decorations / helpers etc
+        void polishChart();
+
         // set chart settings
         bool configChart(QString title, int type, bool animate) {
 
             if (chartview) {
+
                 // if we changed the type, all series must go
                 if (charttype != type) {
                     qchart->removeAllSeries();
                     curves.clear();
+                    barseries=NULL;
                 }
+
+                // clear ALL axes
+                foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical)) {
+                    qchart->removeAxis(axis);
+                    delete axis;
+                }
+                foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
+                    qchart->removeAxis(axis);
+                    delete axis;
+                }
+                baraxisx=NULL; //leak?
+                baraxisy=NULL; //leak?
+                barsets.clear();
+                maxcategories=0;
+                barmaxy=0;
+                barminy=0;
+
+                // remember type
                 charttype=type;
 
                 // title is allowed to be blank
@@ -176,6 +200,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
             }
         }
         bool setCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl);
 
     protected:
@@ -190,9 +215,18 @@ class PythonChart : public GcChartWindow, public PythonHost {
         QString text; // if Rtool not alive
         bool ridesummary;
         int charttype;
+        int maxcategories;
 
         // curves
         QMap<QString, QAbstractSeries *>curves;
+
+        // barsets
+        QList<QBarSet*> barsets;
+        QStringList categories;
+        QBarSeries *barseries;
+        QBarCategoryAxis *baraxisx;
+        QValueAxis *baraxisy;
+        double barmaxy,barminy;
 };
 
 
