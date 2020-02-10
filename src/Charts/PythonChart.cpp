@@ -364,6 +364,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         // passing data across python and gui threads
         connect(this, SIGNAL(setUrl(QUrl)), this, SLOT(webpage(QUrl)));
+        connect(this, SIGNAL(emitChart(QString,int,bool)), this, SLOT(configChart(QString,int,bool)));
         connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,int,int,int,QString,int,bool)),
                 this,   SLOT( setCurve(QString,QVector<double>,QVector<double>,QString,QString,int,int,int,QString,int,bool)));
 

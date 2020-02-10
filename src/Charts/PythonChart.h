@@ -138,12 +138,30 @@ class PythonChart : public GcChartWindow, public PythonHost {
         PythonChart *chart() { return this; }
         bool readOnly() { return true; }
 
+    signals:
+        void setUrl(QUrl);
+        bool emitChart(QString title, int type, bool animate);
+        bool emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl);
+
+
+    public slots:
+        void configChanged(qint32);
+        void showConChanged(int state);
+        void showWebChanged(int state);
+        void runScript();
+        void webpage(QUrl);
+        static void execScript(PythonChart *);
+
         // set chart settings
         bool configChart(QString title, int type, bool animate) {
 
             if (chartview) {
                 // if we changed the type, all series must go
-                if (charttype != type) qchart->removeAllSeries();
+                if (charttype != type) {
+                    qchart->removeAllSeries();
+                    curves.clear();
+                }
                 charttype=type;
 
                 // title is allowed to be blank
@@ -157,20 +175,6 @@ class PythonChart : public GcChartWindow, public PythonHost {
                 return true;
             }
         }
-    signals:
-        void setUrl(QUrl);
-        bool emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl);
-
-
-    public slots:
-        void configChanged(qint32);
-        void showConChanged(int state);
-        void showWebChanged(int state);
-        void runScript();
-        void webpage(QUrl);
-        static void execScript(PythonChart *);
-
         bool setCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       int line, int symbol, int size, QString color, int opacity, bool opengl);
 
