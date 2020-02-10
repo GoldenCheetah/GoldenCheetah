@@ -1117,6 +1117,15 @@ GcChartWindow::exportChartToCloudDB()
     menuButton->hide();
     picture = grab(geometry());
 
+    // limit size of picture to not go beyong GAE datastore_V3 request call size
+    // these size limits provide images below 1000k which is expected to work for all known cases
+    if ( picture.size().width()> 1024 ) {
+        picture = picture.scaledToWidth(1024, Qt::SmoothTransformation);
+    }
+    if (picture.size().height() > 768) {
+        picture = picture.scaledToHeight(768, Qt::SmoothTransformation);
+    }
+
     QBuffer buffer(&chart.Image);
     buffer.open(QIODevice::WriteOnly);
     picture.save(&buffer, "PNG"); // writes pixmap into bytes in PNG format (a bit larger than JPG - but much better in Quality when importing)
