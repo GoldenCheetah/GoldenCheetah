@@ -102,6 +102,14 @@ Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QString x
     return true;
 }
 
+bool
+Bindings::configAxis(QString name, bool visible, int align, double min, double max,
+                      int type, QString labelcolor, QString color, bool log, QStringList categories)
+{
+    python->chart->emitAxis(name, visible, align, min, max, type, labelcolor, color, log, categories);
+    return false;
+}
+
 void
 Bindings::result(double value)
 {

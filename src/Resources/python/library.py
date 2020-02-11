@@ -38,13 +38,25 @@ def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), c
        raise ValueError("curve 'name' must be set and unique.")
     GC.setCurve(name,list(x),list(y),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl)
 
+# setting the axis
+def __GCconfigAxis(name,visible=True,align=-1,min=-1,max=-1,type=-1,labelcolor="",color="",log=False,categories=list()):
+    if (name == ""):
+        raise ValueError("axis 'name' must be passed.")
+    GC.configAxis(name, visible, align, min, max, type, labelcolor, color, log, categories)
+
+
 # add to main GC entrypoint
 GC.activity=__GCactivity
 GC.activityXdata=__GCactivityXdata
 GC.setChart=__GCsetChart
 GC.addCurve=__GCsetCurve
+GC.setAxis=__GCconfigAxis
 
 # constants
+GC_ALIGN_BOTTOM=0
+GC_ALIGN_LEFT=1
+GC_ALIGN_TOP=2
+GC_ALIGN_RIGHT=3
 
 # 0 reserved for uninitialised
 GC.CHART_LINE=1

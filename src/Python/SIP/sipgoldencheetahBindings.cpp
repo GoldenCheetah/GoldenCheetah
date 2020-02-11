@@ -1148,6 +1148,62 @@ static PyObject *meth_Bindings_setCurve(PyObject *sipSelf, PyObject *sipArgs, Py
 }
 
 
+extern "C" {static PyObject *meth_Bindings_configAxis(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_configAxis(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+        bool a1;
+        int a2;
+        double a3;
+        double a4;
+        int a5;
+         ::QString* a6;
+        int a6State = 0;
+         ::QString* a7;
+        int a7State = 0;
+        bool a8;
+         ::QStringList* a9;
+        int a9State = 0;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_name,
+            sipName_visible,
+            sipName_align,
+            sipName_min,
+            sipName_max,
+            sipName_type,
+            sipName_labelcolor,
+            sipName_color,
+            sipName_log,
+            sipName_categories,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1biddiJ1J1bJ1", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, &a3, &a4, &a5, sipType_QString,&a6, &a6State, sipType_QString,&a7, &a7State, &a8, sipType_QStringList,&a9, &a9State))
+        {
+            bool sipRes;
+
+            sipRes = sipCpp->configAxis(*a0,a1,a2,a3,a4,a5,*a6,*a7,a8,*a9);
+            sipReleaseType(a0,sipType_QString,a0State);
+            sipReleaseType(a6,sipType_QString,a6State);
+            sipReleaseType(a7,sipType_QString,a7State);
+            sipReleaseType(a9,sipType_QStringList,a9State);
+
+            return PyBool_FromLong(sipRes);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_configAxis, NULL);
+
+    return NULL;
+}
+
+
 /* Call the instance's destructor. */
 extern "C" {static void release_Bindings(void *, int);}
 static void release_Bindings(void *sipCppV, int)
@@ -1225,6 +1281,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athleteZones), (PyCFunction)meth_Bindings_athleteZones, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
+    {SIP_MLNAME_CAST(sipName_configAxis), (PyCFunction)meth_Bindings_configAxis, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_configChart), (PyCFunction)meth_Bindings_configChart, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_createXDataSeries), (PyCFunction)meth_Bindings_createXDataSeries, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_deleteActivitySample), (PyCFunction)meth_Bindings_deleteActivitySample, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -1266,7 +1323,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        33, methods_Bindings,
+        34, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

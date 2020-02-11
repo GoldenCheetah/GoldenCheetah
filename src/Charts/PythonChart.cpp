@@ -299,7 +299,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     chartview=NULL;
     canvas=NULL;
     barseries=NULL;
-    baraxisx=NULL;
+    bottom=left=true;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -369,6 +369,8 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         connect(this, SIGNAL(emitChart(QString,int,bool)), this, SLOT(configChart(QString,int,bool)));
         connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)),
                 this,   SLOT( setCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)));
+        connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
+                this,   SLOT(configAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
 
         if (ridesummary) {
 
@@ -644,6 +646,9 @@ PythonChart::runScript()
 
         }
 
+        // polish  the chart if needed
+        if (qchart) polishChart();
+
         // turn off updates for a sec
         setUpdatesEnabled(true);
 
@@ -656,9 +661,6 @@ PythonChart::runScript()
 
         // scale to fit and center on output
         //canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
-
-        // polish  the chart if needed
-        if (qchart) polishChart();
 
         // clear context
         python->canvas = NULL;
@@ -688,6 +690,37 @@ PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yse
         }
     }
 
+    // lets find that axis - even blank ones
+    AxisInfo *xaxis, *yaxis;
+    xaxis=axisinfos.value(xname);
+    yaxis=axisinfos.value(yname);
+    if (xaxis==NULL) {
+        xaxis=new AxisInfo(Qt::Horizontal, xname);
+
+        // default alignment toggles
+        xaxis->align = bottom ? Qt::AlignBottom : Qt::AlignTop;
+        bottom = !bottom;
+
+        // use marker color for x axes
+        xaxis->labelcolor = xaxis->axiscolor = GColor(CPLOTMARKER);
+
+        // add to list
+        axisinfos.insert(xname, xaxis);
+    }
+    if (yaxis==NULL) {
+        yaxis=new AxisInfo(Qt::Vertical, yname);
+
+        // default alignment toggles
+        yaxis->align = left ? Qt::AlignLeft : Qt::AlignRight;
+        left = !left;
+
+        // yaxis color matches, but not done for xaxis above
+        yaxis->labelcolor = yaxis->axiscolor = QColor(color);
+
+        // add to list
+        axisinfos.insert(yname, yaxis);
+    }
+
     switch (charttype) {
     default:
 
@@ -706,8 +739,13 @@ PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yse
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
 
             // data
-            for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+            for (int i=0; i<xseries.size() && i<yseries.size(); i++) {
                 add->append(xseries.at(i), yseries.at(i));
+
+                // tell axis about the data
+                xaxis->point(xseries.at(i), yseries.at(i));
+                yaxis->point(xseries.at(i), yseries.at(i));
+            }
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
@@ -718,6 +756,8 @@ PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // add to list of curves
             curves.insert(name,add);
+            xaxis->series.append(add);
+            yaxis->series.append(add);
         }
         break;
 
@@ -736,8 +776,14 @@ PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yse
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
 
             // data
-            for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+            for (int i=0; i<xseries.size() && i<yseries.size(); i++) {
                 add->append(xseries.at(i), yseries.at(i));
+
+                // tell axis about the data
+                xaxis->point(xseries.at(i), yseries.at(i));
+                yaxis->point(xseries.at(i), yseries.at(i));
+
+            }
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
@@ -750,9 +796,12 @@ PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // add to list of curves
             curves.insert(name,add);
+            xaxis->series.append(add);
+            yaxis->series.append(add);
 
         }
         break;
+
     case GC_CHART_BAR:
         {
             // set up the barsets
@@ -766,17 +815,19 @@ PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yse
             for (int i=0; i<yseries.size(); i++) {
                 double value = yseries.at(i);
                 *add << value;
-                if (value < barminy) barminy=value;
-                if (value > barmaxy) barmaxy=value;
+                yaxis->point(i,value);
+                xaxis->point(i,value);
             }
 
-            // keep track of number of categories
-            if (add->count() > maxcategories) maxcategories=add->count();
+            // we are very particular regarding axis
+            yaxis->type = AxisInfo::CONTINUOUS;
+            xaxis->type = AxisInfo::CATEGORY;
 
             // add to list of barsets
             barsets << add;
         }
         break;
+
     case GC_CHART_PIE:
         {
             // set up the curves
@@ -821,51 +872,130 @@ PythonChart::polishChart()
 {
     if (!qchart) return;
 
-    // must be done when all series are added
-    if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER) {
-        qchart->createDefaultAxes();
-    }
-
-    // more aesthetics
+    // basic aesthetics
     qchart->legend()->setMarkerShape(QLegend::MarkerShapeRectangle);
     qchart->setDropShadowEnabled(false);
+
+    // no more than 1 category axis since barsets are all assigned.
+    bool donecategory=false;
+
+    // Create axes - for everyone except pie charts that don't have any
+    if (charttype != GC_CHART_PIE) {
+        // create desired axis
+        foreach(AxisInfo *axisinfo, axisinfos) {
+//fprintf(stderr, "Axis: %s, orient:%s, type:%d\n",axisinfo->name.toStdString().c_str(),axisinfo->orientation==Qt::Vertical?"vertical":"horizontal",(int)axisinfo->type);
+//fflush(stderr);
+            QAbstractAxis *add=NULL;
+            switch (axisinfo->type) {
+            case AxisInfo::DATERANGE: // TODO
+            case AxisInfo::TIME:      // TODO
+            case AxisInfo::CONTINUOUS:
+                {
+                    QValueAxis *vaxis= new QValueAxis(qchart);
+                    add=vaxis; // gets added later
+
+                    vaxis->setMin(axisinfo->min());
+                    vaxis->setMax(axisinfo->max());
+
+                    // attach to the chart
+                    qchart->addAxis(add, axisinfo->locate());
+                }
+                break;
+            case AxisInfo::CATEGORY:
+                {
+                    if (!donecategory) {
+
+                        donecategory=true;
+
+                        QBarCategoryAxis *caxis = new QBarCategoryAxis(qchart);
+                        add=caxis;
+
+                        // add the bar series
+                        if (!barseries) { barseries = new QBarSeries(); qchart->addSeries(barseries); }
+                        else barseries->clear();
+
+                        // add the new barsets
+                        foreach (QBarSet *bs, barsets)
+                            barseries->append(bs);
+
+                        // attach before addig barseries
+                        qchart->addAxis(add, axisinfo->locate());
+
+                        // attach to category axis
+                        barseries->attachAxis(caxis);
+
+                        // category labels
+                        for(int i=axisinfo->categories.count(); i<=axisinfo->maxx; i++)
+                            axisinfo->categories << QString("%1").arg(i+1);
+                        caxis->setCategories(axisinfo->categories);
+                    }
+                }
+                break;
+            }
+
+            // at this point the basic settngs have been done and the axis
+            // is attached to the chart, so we can go ahead and apply common settings
+            if (add) {
+
+                // once we've done the basics, lets do the aesthetics
+                if (axisinfo->name != "x" && axisinfo->name != "y")  // equivalent to being blank
+                    add->setTitleText(axisinfo->name);
+                add->setLinePenColor(axisinfo->axiscolor);
+                add->setLabelsColor(axisinfo->labelcolor);
+                add->setTitleBrush(QBrush(axisinfo->labelcolor));
+
+                // add the series that are associated with this
+                foreach(QAbstractSeries *series, axisinfo->series)
+                    series->attachAxis(add);
+            }
+        }
+    }
 
     if (charttype ==GC_CHART_PIE) {
         // pie, never want a legend
         qchart->legend()->setVisible(false);
     }
 
-    //barseries
-    if (charttype==GC_CHART_BAR) {
+    // barseries special case
+    if (charttype==GC_CHART_BAR && barseries) {
 
-        // add the bar series
-        if (!barseries) { barseries = new QBarSeries(); qchart->addSeries(barseries); }
-        else barseries->clear();
-
-        // add the new barsets
-        foreach (QBarSet *bs, barsets)
-            barseries->append(bs);
-
-        // create the category axis
-        QStringList categories;
-        for(int i=1; i<=maxcategories; i++) {
-            categories << QString("%1").arg(i);
-        }
-
-        // do we have the  x axis already?
-        if (baraxisx==NULL) {
-            baraxisx = new QBarCategoryAxis();
-            qchart->addAxis(baraxisx, Qt::AlignBottom);
-            barseries->attachAxis(baraxisx);
-        } else baraxisx->clear();
-        baraxisx->append(categories);
-
-        // do we have the y axis already?
-        if (baraxisy==NULL) {
-            baraxisy = new QValueAxis();
-            qchart->addAxis(baraxisy, Qt::AlignLeft);
-            barseries->attachAxis(baraxisy);
-        }
-        baraxisy->setRange(barminy,barmaxy);
+        // need to attach barseries to the value axes
+        foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))
+            barseries->attachAxis(axis);
     }
+}
+
+bool
+PythonChart::configAxis(QString name, bool visible, int align, double min, double max,
+                      int type, QString labelcolor, QString color, bool log, QStringList categories)
+{
+    AxisInfo *axis = axisinfos.value(name);
+    if (axis == NULL) return false;
+
+    // lets update the settings then
+    axis->visible = visible;
+
+    // -1 if not passed
+    if (align == 0) axis->align = Qt::AlignBottom;
+    if (align == 1) axis->align = Qt::AlignLeft;
+    if (align == 2) axis->align = Qt::AlignTop;
+    if (align == 3) axis->align = Qt::AlignRight;
+
+    // -1 if not passed
+    if (min != -1)  axis->minx = axis->miny = min;
+    if (max != -1)  axis->maxx = axis->maxy = max;
+
+    // type
+    if (type != -1) axis->type = static_cast<AxisInfo::AxisInfoType>(type);
+
+    // color
+    if (labelcolor != "") axis->labelcolor=QColor(labelcolor);
+    if (color != "") axis->axiscolor=QColor(color);
+
+    // log .. hmmm
+    axis->log = log;
+
+    // categories
+    if (categories.count()) axis->categories = categories;
+    return true;
 }

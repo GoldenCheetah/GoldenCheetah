@@ -118,6 +118,8 @@ class Bindings {
         bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
                       QStringList labels,  QStringList colors,
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl) const;
+        bool configAxis(QString name, bool visible, int align, double min, double max,
+                      int type, QString labelcolor, QString color, bool log, QStringList categories);
 
     private:
         // find a RideItem by DateTime
