@@ -225,10 +225,16 @@ void ErgFile::parseErg2(QString p)
                 add.val = add.y = int((segment.at(2).toDouble() /100.00) * CP);
                 Points.append(add);
             }
-        }
+            // set ErgFile duration
+            Duration = Points.last().x;      // last is the end point in msecs
 
-        qDebug() << "document" << object["title"];
-        valid = true;
+            leftPoint = 0;                   // setup initial sample bracketing
+            rightPoint = 1;
+            interpolatorReadIndex = 0;
+
+            calculateMetrics();
+            valid = true;
+        }
     }
 }
 
