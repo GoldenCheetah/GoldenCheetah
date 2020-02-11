@@ -320,9 +320,11 @@ class AboutModelPage : public QWidget
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
         QCheckBox *showSBToday;
+        QLabel *modelInputWeekCntLabel;
+        QSpinBox *modelInputWeekCnt;
 
     struct {
-        int lts,sts;
+        int lts,sts,modelInputWeekCnt;
     } b4;
 
 };
