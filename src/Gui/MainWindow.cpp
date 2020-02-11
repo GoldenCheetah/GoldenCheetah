@@ -1282,7 +1282,8 @@ MainWindow::dropEvent(QDropEvent *event)
             xmlReader.parse(source);
             imported += handler.getSettings();
 
-        } else if (ErgFile::isWorkout(filename)) {
+        // Look for Workout files only in Train view
+        } else if (currentTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
             workouts << filename;
         } else {
             filenames.append(filename);
@@ -1312,7 +1313,7 @@ MainWindow::dropEvent(QDropEvent *event)
     if (list.count())  importCharts(list);
 
     // import workouts
-    if (workouts.count()) Library::importFiles(currentTab->context, filenames, true);
+    if (workouts.count()) Library::importFiles(currentTab->context, workouts, true);
 
     // if there is anything left, process based upon view...
     if (filenames.count()) {
