@@ -16,28 +16,99 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <cmath>
+#include <algorithm>
 #include "BlinnSolver.h"
-#include "cmath"
+
+int GetExponent(double a) {
+    int exp;
+    std::frexp(a, &exp);
+    return exp;
+}
+
+template <typename T>
+int MaxExponent(T a) {
+    return GetExponent(a);
+}
+
+template <typename T, typename ... Args>
+int MaxExponent(T a, Args ... args) {
+    return std::max(MaxExponent(args...), GetExponent(a));
+}
+
+// Returns true if value is so small compared to args that it is effectively zero.
+// Very important that near-zero values are detected. Zero is defined relative to how large
+// the use-expression's other operands are.
+// The solver will be subtracting and losing precision. If one term is near zero the result
+// will be noise since result has no effective precision. Much better results if you disregard
+// a term with near zero coefficient and instead use the next lower order solver.
+template <unsigned T_MantissaBitsNeeded, typename ... Args>
+bool RangedZeroTest(double value, Args ... args) {
+    const static int s_ExpLimit = std::numeric_limits<double>::digits - T_MantissaBitsNeeded;
+
+    // Easy yes if value is actually zero.
+    if (value == 0.) return true;
+
+    int vExp = GetExponent(value);
+    int maxExp = MaxExponent(args...);
+    if (maxExp - vExp > s_ExpLimit)
+        return true;
+
+    return false;
+}
+
+// Define zero as 10 or fewer bits of mantissa precision shared between value and operand(s).
+// Less than that we have no precision. Relative size must differs by 2^(53-bits)
+const static int s_MantissaBitsNeeded = 10;
+
+template <typename ... Args>
+bool IsZero(double value, Args...args) {
+    return RangedZeroTest<s_MantissaBitsNeeded>(value, args...);
+}
 
 // 0 == A*x + B
-Roots LinearSolver(double A, double B)
-{
-    if (A == 0) {
-        if (B == 0) return Roots({ 0,1 });
-        return Roots();
+Roots LinearSolver(double A, double B) {
+    if (IsZero(A, B)) {
+        if (B == 0) return Roots({ 0,1 }); // choose 0
+        return Roots(); // no root
     }
 
     return Roots({ -B / A, 1 });
 }
 
 // 0 == A*x^2 + B*x + C
-Roots QuadraticSolver(double A, double B, double C)
-{
-    if (A == 0) return LinearSolver(B, C);
+Roots QuadraticSolver(double A, double B, double C) {
 
-    double det = sqrt(B*B - 4 * A*C);
-    double r0 = (-B + det) / (2 * A);
-    double r1 = (-B - det) / (2 * A);
+    // If A is zero then linear.
+    if (IsZero(A, B, C)) {
+        return LinearSolver(B, C);
+    }
+
+    // Make monic.
+    B /= A;
+    C /= A;
+    A = 1;
+
+    // No C term means a quick and accurate factor.
+    if (IsZero(C, B)) {
+        return Roots({ B, 1 }, { -B, 1 });
+    }
+
+    // Double root case.
+    double det2 = B * B - 4 * C;
+    if (IsZero(det2, B * B, 4 * C)) {
+        return Roots({ -B / 2, 1 });
+    }
+
+    // Negative determinate means no roots.
+    if (det2 < 0) {
+        return Roots();
+    }
+
+    // Otherwise standard double roots.
+    double r0 = (B + std::copysign(std::sqrt(det2), B)) / -2.;
+    double r1 = C / r0;
+
     return Roots({ r0, 1 }, { r1, 1 });
 }
 
@@ -60,10 +131,12 @@ Roots QuadraticSolver(double A, double B, double C)
 // To obtain solution for x with w == 1 simply divide
 // x by w.
 Roots
-BlinnCubicSolver(double A, double B, double C, double D)
-{
-    if (A == 0)
-    {
+BlinnCubicSolver(double A, double B, double C, double D) {
+    // Take care to detect near zero A coefficient since
+    // it can destroy precision and cause solver to produce
+    // the same result over and over. Much better to use 
+    // quadratic solver.
+    if (IsZero(A, B, C, D)) {
         return QuadraticSolver(B, C, D);
     }
 
@@ -100,8 +173,7 @@ BlinnCubicSolver(double A, double B, double C, double D)
             At = A;
             Cbar = d1;
             Dbar = -2 * B * d1 + A * d2;
-        }
-        else {
+        } else {
             // Depress params for algorithm 'D/A'
             At = D;
             Cbar = d3;

@@ -155,7 +155,7 @@ double Bicycle::VFromKE(double ke) const
     bool isNegative = ke < 0;
     ke = fabs(ke);
     double v = sqrt(2 * ke / KEMass());
-    if (isNegative) v = -v;
+    if (isNegative) v = 0;
 
     return v;
 }

@@ -116,8 +116,10 @@ class ErgFile
         void parseZwift();      // its a zwo file (zwift xml)
         void parseGpx();        // its a gpx...
         void parseErg2(QString p = "");       // ergdb
+        void parseTTS();        // its ahh tts
 
         bool isValid();         // is the file valid or not?
+
         double Cp;
         int format;                      // ERG, CRS, MRC and CRS_LOC currently supported
         double wattsAt   (double, int&); // return the watts value for the passed msec
