@@ -450,7 +450,7 @@ PythonChart::setWeb(bool x)
         }
 
         // setup the chart
-        plot = new GenericPlot(this,context);
+        plot = new GenericPlot(NULL,context); //XXX todo: null to avoid crash on close...
         renderlayout->insertWidget(0,plot);
 
         // signals to update it

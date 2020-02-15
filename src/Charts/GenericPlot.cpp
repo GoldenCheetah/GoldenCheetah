@@ -37,7 +37,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     // setup the chart
     qchart = new QChart();
     qchart->setBackgroundVisible(false); // draw on canvas
-    qchart->legend()->setVisible(true); // no legends
+    qchart->legend()->setVisible(false); // no legends --> custom todo
     qchart->setTitle("No title set"); // none wanted
     qchart->setAnimationOptions(QChart::NoAnimation);
     qchart->setFont(QFont());
@@ -53,9 +53,9 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     chartview->setMouseTracking(true);
     chartview->scene()->installEventFilter(this);
 
-    // add watcher
-    watcher = new SelectionTool(this);
-    chartview->scene()->addItem(watcher);
+    // add selector
+    selector = new SelectionTool(this);
+    chartview->scene()->addItem(selector);
 
     // filter ESC so we can stop scripts
     installEventFilter(this);
@@ -67,34 +67,425 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     configChanged(0);
 }
 
-SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host) {}
-void SelectionTool::paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*) {}
-QRectF SelectionTool::boundingRect() const { return QRectF(0,0,0,0); }
-bool SelectionTool::sceneEventFilter(QGraphicsItem *watched, QEvent *event) { return host->sceneEventFilter(watched,event); }
+//
+// Selecting points on the plot
+//
+SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host)
+{
+    // start inactive and rectangle
+    state = INACTIVE;
+    mode = RECTANGLE;
+    setVisible(false);
+    rect = QRectF(0,0,0,0);
+}
+
+// the selection tool is painted only when it is active, but will be
+// a lassoo or rectangle shape
+void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+   if (state == INACTIVE) return; // do not paint when inactive
+   switch (mode) {
+   case CIRCLE:
+        {
+
+        }
+        break;
+   case RECTANGLE:
+        {
+            // paint inside!
+            painter->save();
+            QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
+            QColor color = GColor(CPLOTMARKER);
+            color.setAlphaF(0.2);
+            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+            painter->fillRect(r,QBrush(color));
+            painter->restore();
+        }
+        break;
+
+   case LASSOO:
+        {
+
+        }
+        break;
+   }
+}
+
+// rect is updated during selection etc in the event handler
+QRectF SelectionTool::boundingRect() const { return rect; }
+
+// trap events and redirect to plot event handler
+bool SelectionTool::sceneEventFilter(QGraphicsItem *watched, QEvent *event) { return host->eventHandler(0, watched,event); }
+bool GenericPlot::eventFilter(QObject *obj, QEvent *e) { return eventHandler(1, obj, e); }
 
 bool
-GenericPlot::sceneEventFilter(QGraphicsItem *, QEvent *)
+SelectionTool::reset()
 {
-    // events on items in qt chart
-    //fprintf(stderr,"scene event, obj=%u event=%d\n", (void*)watched, event->type());
-    //fflush(stderr);
+    state = INACTIVE;
+    start=QPointF(0,0);
+    finish=QPointF(0,0);
+    rect = QRectF(0,0,0,0);
+    setVisible(false);
+    resetSelections();
+    update();
+    return true;
+}
+
+// handle mouse events in selector
+bool
+SelectionTool::clicked(QPointF pos)
+{
+    if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
+
+        // are we moving?
+        state = MOVING;
+        setZValue(100);
+        start = pos;
+        startingpos = this->pos();
+        update(rect);
+        return true;
+
+    } else {
+
+        // initial sizing
+        state = SIZING;
+        start = pos;
+        finish = QPointF(0,0);
+        rect = QRectF(-5,-5,5,5);
+        setPos(start);
+        // above when selecting
+        setZValue(100);
+        setVisible(true);
+        update(rect);
+        return true;
+
+    }
     return false;
 }
 
 bool
-GenericPlot::eventFilter(QObject *, QEvent *e)
+SelectionTool::released(QPointF)
 {
-    if (e->type() != QEvent::MouseMove && e->type() != QEvent::GraphicsSceneMouseMove) {
-        //fprintf(stderr,"chart event, obj=%u event=%d\n", (void*)obj, e->type());
-        //fflush(stderr);
-    }
+    // width and heights can be negative if dragged in reverse
+    if (rect.width() < 10 && rect.width() > -10 && rect.height() < 10 && rect.height() > -10) {
 
-    // on resize event scale the display
-    if (e->type() == QEvent::Resize) {
+        // tiny, as in click release - deactivate
+        state = INACTIVE; // reset for any state
+        rect = QRectF(0,0,0,0);
+        setVisible(false);
+        return true;
+
+    } else if (state == SIZING || state == MOVING) {
+
+        // finishing move/resize
+        state = ACTIVE;
+        setZValue(-100); // send to back after done
+        update(rect);
+        return true;
+    }
+    return false;
+}
+
+bool
+SelectionTool::moved(QPointF pos)
+{
+    // only care if we are sizing
+    if (state == SIZING) {
+        finish = pos;
+
+        // reshape - rect might have negative sizes if sized backwards
+        rect = QRectF(QPointF(0,0), finish-start);
+        update(rect);
+        return true;
+
+    } else if (state == MOVING) {
+
+        QPointF delta = pos - start;
+        setPos(this->startingpos + delta);
+        update(rect);
+        return true;
+    }
+    return false;
+}
+
+bool
+SelectionTool::wheel(int delta)
+{
+    if (state == ACTIVE) {
+        if (delta < 0) {
+            rect.setSize(rect.size() * 0.9);
+        } else {
+            rect.setSize(rect.size() * 1.1);
+        }
+        return true;
+    }
+    return false;
+}
+
+double
+SelectionTool::miny(QAbstractSeries*series)
+{
+    return host->qchart->mapToValue(pos()+QPointF(0,rect.height()), series).y();
+}
+
+double
+SelectionTool::maxy(QAbstractSeries*series)
+{
+    return host->qchart->mapToValue(pos(), series).y();
+}
+
+double
+SelectionTool::minx(QAbstractSeries*series)
+{
+    return host->qchart->mapToValue(pos(), series).x();
+}
+
+double
+SelectionTool::maxx(QAbstractSeries*series)
+{
+    return host->qchart->mapToValue(pos()+QPointF(rect.width(),0), series).x();
+}
+
+// source 0=scene, 1=widget
+bool
+GenericPlot::eventHandler(int source, void *obj, QEvent *e)
+{
+    static bool block=false;
+
+    // don't want to get interuppted
+    if (block) return false;
+    else block=true;
+
+    // lets get some basic info first
+    // where is the cursor?
+    QPoint wpos=cursor().pos();
+    QPointF spos=QPointF();
+
+    // so we want to trigger a scene update?
+    bool updatescene = false;
+
+    //
+    // HANDLE EVENTS AND UPDATE STATE
+    //
+    switch(e->type()) {
+
+    // mouse clicked
+    case QEvent::GraphicsSceneMousePress:
+        spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
+    //case QEvent::MouseButtonPress:
+        //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
+        //fprintf(stderr,"%s: mouse PRESSED for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        {
+            updatescene = selector->clicked(spos);
+        }
+    break;
+
+    // mouse released
+    case QEvent::GraphicsSceneMouseRelease:
+        spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
+    //case QEvent::MouseButtonRelease:
+        //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
+        //fprintf(stderr,"%s: mouse RELEASED for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        {
+            updatescene = selector->released(spos);
+        }
+    break;
+
+    // mouse move
+    case QEvent::GraphicsSceneMouseMove:
+        spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
+    //case QEvent::MouseMove:
+        //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
+        //fprintf(stderr,"%s: mouse MOVE for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        {
+            updatescene = selector->moved(spos);
+        }
+    break;
+
+    case QEvent::GraphicsSceneWheel:
+        {
+            QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(e);
+            //fprintf(stderr,"%s: mouse WHEEL [%d] for obj=%u\n", source ? "widget" : "scene", w->delta(),(void*)obj); fflush(stderr);
+            updatescene = selector->wheel(w->delta());
+        }
+        break;
+
+    // resize
+    case QEvent::Resize: {
         //canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
     }
+    break;
 
+    // tooltip, paused for a moment..
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHelp:
+    case QEvent::GraphicsSceneHoverMove: {
+
+        // debug info
+        fprintf(stderr,"%s: HOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+    }
+    break;
+
+    // tooltip, paused for a moment..
+    case QEvent::GraphicsSceneHoverLeave: {
+
+        // debug info
+        fprintf(stderr,"%s: UNHOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+    }
+    break;
+
+    // tooltip, paused for a moment..
+    case QEvent::ToolTip: {
+
+        // debug info
+        //fprintf(stderr,"%s: tooltip for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+    }
+    break;
+
+
+    default:
+        //fprintf(stderr,"%s: some event %d for obj=%u\n", source ? "widget" : "scene", e->type(), (void*)obj); fflush(stderr);
+        break;
+    }
+
+    //
+    // UPDATE SCENE TO REFLECT STATE
+    //
+    if (updatescene) {
+
+        selector->updateScene(); // really only do selection right now.. more to come
+
+        // repaint everything
+        chartview->scene()->update(0,0,chartview->scene()->width(),chartview->scene()->height());
+    }
+
+    // all done.
+    block = false;
     return false;
+}
+
+// selector needs to update the chart for selections
+void
+SelectionTool::updateScene()
+{
+    // is the selection active?
+    if (state != SelectionTool::INACTIVE) {
+
+        // selection tool is active so set curves gray
+        // and create curves for highlighted points etc
+        QList<QAbstractSeries*> originallist=host->qchart->series();
+        foreach(QAbstractSeries *x, originallist) { // because we update it below (!)
+
+            if (ignore.contains(x)) continue;
+
+            switch(x->type()) {
+            case QAbstractSeries::SeriesTypeScatter: {
+
+                QScatterSeries *scatter = static_cast<QScatterSeries*>(x);
+
+                // ignore empty series
+                if (scatter->count() < 1) continue;
+
+                // this will be used to plot selected points on the plot
+                QScatterSeries *selection =NULL;
+
+                // the axes for the current series
+                QAbstractAxis *xaxis=NULL, *yaxis=NULL;
+
+                if ((selection=static_cast<QScatterSeries*>(selections.value(x, NULL))) == NULL) {
+
+                    selection = new QScatterSeries();
+
+                    // all of this curve cloning should be in a new method xxx todo
+                    host->qchart->addSeries(selection); // before adding data and axis
+                    selection->setColor(scatter->color());
+                    selection->setMarkerSize(scatter->markerSize());
+                    selection->setMarkerShape(scatter->markerShape());
+                    selection->setPen(scatter->pen());
+                    selection->setVisible(true);
+                    selections.insert(x, selection);
+                    ignore.append(selection);
+                    static_cast<QScatterSeries*>(x)->setColor(Qt::gray);
+
+                    // Add series to the right axes
+                    foreach (QAbstractAxis *ax, x->attachedAxes()) {
+                        if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
+                        if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
+                    }
+
+                    // only do when creating it.
+                    if (yaxis) selection->attachAxis(yaxis);
+                    if (xaxis) selection->attachAxis(xaxis);
+                }
+
+                // lets work out what range of values we need to be
+                // selecting is, reverse since possible to have a backwards
+                // rectangle in the selection tool
+                // xxx todo this bit through to break; should be a method of selection tool ?
+                double miny=0,maxy=0,minx=0,maxx=0;
+                miny =this->miny(x);
+                maxy =this->maxy(x);
+                if (maxy < miny) { double t=miny; miny=maxy; maxy=t; }
+
+                minx =this->minx(x);
+                maxx =this->maxx(x);
+                if (maxx < minx) { double t=minx; minx=maxx; maxx=t; }
+
+                //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
+
+                // add points to the selection curve
+                QList<QPointF> points;
+                for(int i=0; i<scatter->count(); i++) {
+                    QPointF point = scatter->at(i); // avoid deep copy
+                    if (point.y() >= miny && point.y() <= maxy &&
+                        point.x() >= minx && point.x() <= maxx)
+                        points << point;
+                }
+                //fprintf(stderr, "selected %d points\n", points.count());
+                selection->clear();
+                if (points.count()) selection->append(points);
+            }
+            break;
+            }
+        }
+
+    } else {
+
+        resetSelections();
+    }
+ }
+
+ void
+ SelectionTool::resetSelections()
+ {
+    // selection tool isn't active so reset curves to original
+    if (selections.count()) {
+
+        foreach(QAbstractSeries *x, host->qchart->series()) {
+
+            if (ignore.contains(x)) continue;
+
+            switch(x->type()) {
+
+            case QAbstractSeries::SeriesTypeScatter:
+                QScatterSeries *selection=NULL;
+                if ((selection=static_cast<QScatterSeries*>(selections.value(x,NULL))) != NULL) {
+
+                    // set greyed out original back to its proper color
+                    static_cast<QScatterSeries*>(x)->setColor(static_cast<QScatterSeries*>(selection)->color());
+
+                    // clear points, remove from axis and remove from chart
+                    selection->clear();
+                    foreach(QAbstractAxis *ax, selection->attachedAxes()) selection->detachAxis(ax);
+                    host->qchart->removeSeries(selection);
+                    delete selection;
+                }
+                break;
+            }
+        }
+        selections.clear();
+        ignore.clear();
+    }
 }
 
 void
@@ -112,6 +503,34 @@ GenericPlot::configChanged(qint32)
     chartview->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
     qchart->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
     qchart->setBackgroundPen(QPen(GColor(CPLOTMARKER)));
+}
+
+double
+GenericPlot::min(QAbstractAxis *ax)
+{
+    if (ax == NULL) return 0;
+    else {
+        switch (ax->type()) {
+            case QAbstractAxis::AxisTypeValue:
+                return static_cast<QValueAxis*>(ax)->min();
+                break;
+        }
+        return 0;
+    }
+}
+
+double
+GenericPlot::max(QAbstractAxis *ax)
+{
+    if (ax == NULL) return 0;
+    else {
+        switch (ax->type()) {
+            case QAbstractAxis::AxisTypeValue:
+                return static_cast<QValueAxis*>(ax)->max();
+                break;
+        }
+        return 0;
+    }
 }
 
 bool
@@ -140,6 +559,9 @@ GenericPlot::initialiseChart(QString title, int type, bool animate)
     bottom=true;
     barsets.clear();
 
+    // reset selections etc
+    selector->reset();
+
     // remember type
     charttype=type;
 
@@ -165,7 +587,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         QAbstractSeries *existing = curves.value(name);
         if (existing) {
             qchart->removeSeries(existing);
-            delete existing;
+            delete existing; // XXX is this such a great idea.. causes a lot of flicker...
         }
     }
 
@@ -417,11 +839,24 @@ GenericPlot::finaliseChart()
             if (add) {
 
                 // once we've done the basics, lets do the aesthetics
+                QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+                stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+                stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                add->setTitleFont(stGiles);
+                add->setLabelsFont(stGiles);
+
                 if (axisinfo->name != "x" && axisinfo->name != "y")  // equivalent to being blank
                     add->setTitleText(axisinfo->name);
                 add->setLinePenColor(axisinfo->axiscolor);
+                if (axisinfo->orientation == Qt::Vertical) // we never have y axis lines
+                    add->setLineVisible(false);
                 add->setLabelsColor(axisinfo->labelcolor);
                 add->setTitleBrush(QBrush(axisinfo->labelcolor));
+
+                // grid lines, just color for now xxx todo: ticks (sigh)
+                add->setGridLineColor(GColor(CPLOTGRID));
+                if (charttype != GC_CHART_SCATTER && add->orientation()==Qt::Horizontal) // no x grids unless a scatter
+                    add->setGridLineVisible(false);
 
                 // add the series that are associated with this
                 foreach(QAbstractSeries *series, axisinfo->series)
@@ -443,9 +878,16 @@ GenericPlot::finaliseChart()
             barseries->attachAxis(axis);
     }
 
-    // install event filters on thes scene objects to
-    foreach(QGraphicsItem *item, chartview->scene()->items())
-        item->installSceneEventFilter(watcher); // XXX create sceneitem to help us here!
+    // install event filters on thes scene objects for Pie and Bar
+    // charts only, since for line/scatter we select and interact via
+    // collision detection (and don't want the double number of events).
+    if (charttype == GC_CHART_BAR || charttype == GC_CHART_PIE) {
+
+        // largely we just want the hover events coz they're handy
+        foreach(QGraphicsItem *item, chartview->scene()->items())
+            item->installSceneEventFilter(selector); // XXX create sceneitem to help us here!
+
+    }
 }
 
 bool

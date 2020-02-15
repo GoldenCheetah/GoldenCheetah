@@ -102,8 +102,12 @@ public:
 // for watcing scene events
 class SelectionTool : public QGraphicsItem
 {
+    friend class ::GenericPlot;
+
     public:
         SelectionTool(GenericPlot *);
+        enum { INACTIVE, SIZING, MOVING, ACTIVE } state; // what state are we in?
+        enum { RECTANGLE, LASSOO, CIRCLE } mode; // what mode are we in?
 
         // is invisible and tiny. we are just an observer
         bool sceneEventFilter(QGraphicsItem *watched, QEvent *event);
@@ -112,8 +116,35 @@ class SelectionTool : public QGraphicsItem
         void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
         QRectF boundingRect() const;
 
+        // an interaction happened
+        bool reset();
+        bool clicked(QPointF);
+        bool moved(QPointF);
+        bool released(QPointF);
+        bool wheel(int);
+
+        // value coords
+        double miny(QAbstractSeries*);
+        double maxy(QAbstractSeries*);
+        double minx(QAbstractSeries*);
+        double maxx(QAbstractSeries*);
+
+        // update the scene to reflect current state
+        void updateScene();
+        void resetSelections(); // clear out selections stuff
+
+    protected:
+        QRectF rect;
+        QPainterPath *lassoo; // when lassoing objects
+
     private:
         GenericPlot *host;
+        QPointF start, startingpos, finish; // when calculating distances during transitions
+
+        // selections from original during selection
+        QMap<QAbstractSeries*, QAbstractSeries*> selections;
+        QList<QAbstractSeries*> ignore; // temp series we add during selection to be ignored
+
 };
 
 // the chart
@@ -126,7 +157,7 @@ class GenericPlot : public QWidget {
 
         // rendering via...
         QChartView *chartview;
-        SelectionTool *watcher;
+        SelectionTool *selector;
         QChart *qchart;
 
     public slots:
@@ -147,14 +178,16 @@ class GenericPlot : public QWidget {
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
 
-
-        // watching scene events for interaction
-        bool sceneEventFilter(QGraphicsItem *watched, QEvent *event);
-
+        // watching scene events and managing interaction
+        bool eventHandler(int eventsource, void *obj, QEvent *event);
 
     protected:
-        // enable stopping long running scripts
+        // trap widget events and pass to event handler
         bool eventFilter(QObject *, QEvent *e);
+
+        // working with axes
+        double min(QAbstractAxis*);
+        double max(QAbstractAxis*);
 
     private:
         Context *context;
