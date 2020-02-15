@@ -295,11 +295,8 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     clv->addStretch();
 
     // sert no render widget
-    charttype=0; // not set yet
-    chartview=NULL;
     canvas=NULL;
-    barseries=NULL;
-    bottom=left=true;
+    plot=NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -366,11 +363,6 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         // passing data across python and gui threads
         connect(this, SIGNAL(setUrl(QUrl)), this, SLOT(webpage(QUrl)));
-        connect(this, SIGNAL(emitChart(QString,int,bool)), this, SLOT(configChart(QString,int,bool)));
-        connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)),
-                this,   SLOT( setCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)));
-        connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
-                this,   SLOT(configAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
 
         if (ridesummary) {
 
@@ -430,11 +422,9 @@ PythonChart::setWeb(bool x)
     if (x && canvas==NULL) {
 
         // delete the chart view if exists
-        if (chartview) {
-            renderlayout->removeWidget(chartview);
-            delete chartview; // deletes associated chart too
-            chartview=NULL;
-            qchart=NULL;
+        if (plot) {
+            renderlayout->removeWidget(plot);
+            delete plot; // deletes associated chart too
         }
 
         // setup the canvas
@@ -450,7 +440,7 @@ PythonChart::setWeb(bool x)
         renderlayout->insertWidget(0, canvas);
     }
 
-    if (!x && chartview==NULL) {
+    if (!x && plot==NULL) {
 
         // delete the canvas if exists
         if (canvas) {
@@ -460,19 +450,16 @@ PythonChart::setWeb(bool x)
         }
 
         // setup the chart
-        qchart = new QChart();
-        qchart->setBackgroundVisible(false); // draw on canvas
-        qchart->legend()->setVisible(true); // no legends
-        qchart->setTitle("No title set"); // none wanted
-        qchart->setAnimationOptions(QChart::NoAnimation);
-        qchart->setFont(QFont());
+        plot = new GenericPlot(this,context);
+        renderlayout->insertWidget(0,plot);
 
-        // set theme, but for now use a std one TODO: map color scheme to chart theme
-        qchart->setTheme(QChart::ChartThemeDark);
+        // signals to update it
+        connect(this, SIGNAL(emitChart(QString,int,bool)), plot, SLOT(initialiseChart(QString,int,bool)));
+        connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)),
+                plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)));
+        connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
+                plot,   SLOT(configureAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
 
-        chartview = new QChartView(qchart, this);
-        chartview->setRenderHint(QPainter::Antialiasing);
-        renderlayout->insertWidget(0, chartview);
     }
 
     // set the check state!
@@ -483,23 +470,27 @@ PythonChart::setWeb(bool x)
 }
 
 bool
-PythonChart::eventFilter(QObject *, QEvent *e)
+PythonChart::eventFilter(QObject *obj, QEvent *e)
 {
+    // running script, just watch of escape
+    if (python->chart) {
+
+        // is it an ESC key?
+        if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
+            // stop!
+            python->cancel();
+            return true;
+        }
+
+        // otherwise lets just ignore it while active
+        return false;
+    }
+
     // on resize event scale the display
     if (e->type() == QEvent::Resize) {
         //canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
     }
 
-    // not running a script
-    if (!python) return false;
-
-    // is it an ESC key?
-    if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
-        // stop!
-        python->cancel();
-        return true;
-    }
-    // otherwise do nothing
     return false;
 }
 
@@ -517,12 +508,6 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
 
-    // chart colors
-    if (chartview) {
-        chartview->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
-        qchart->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
-        qchart->setBackgroundPen(QPen(GColor(CPLOTMARKER)));
-    }
 }
 
 void
@@ -647,7 +632,7 @@ PythonChart::runScript()
         }
 
         // polish  the chart if needed
-        if (qchart) polishChart();
+        if (plot) plot->finaliseChart();
 
         // turn off updates for a sec
         setUpdatesEnabled(true);
@@ -673,329 +658,4 @@ void
 PythonChart::webpage(QUrl url)
 {
     if (canvas) canvas->setUrl(url);
-}
-
-// rendering to qt chart
-bool
-PythonChart::setCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
-                      QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl)
-{
-    // if curve already exists, remove it
-    if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
-        QAbstractSeries *existing = curves.value(name);
-        if (existing) {
-            qchart->removeSeries(existing);
-            delete existing;
-        }
-    }
-
-    // lets find that axis - even blank ones
-    AxisInfo *xaxis, *yaxis;
-    xaxis=axisinfos.value(xname);
-    yaxis=axisinfos.value(yname);
-    if (xaxis==NULL) {
-        xaxis=new AxisInfo(Qt::Horizontal, xname);
-
-        // default alignment toggles
-        xaxis->align = bottom ? Qt::AlignBottom : Qt::AlignTop;
-        bottom = !bottom;
-
-        // use marker color for x axes
-        xaxis->labelcolor = xaxis->axiscolor = GColor(CPLOTMARKER);
-
-        // add to list
-        axisinfos.insert(xname, xaxis);
-    }
-    if (yaxis==NULL) {
-        yaxis=new AxisInfo(Qt::Vertical, yname);
-
-        // default alignment toggles
-        yaxis->align = left ? Qt::AlignLeft : Qt::AlignRight;
-        left = !left;
-
-        // yaxis color matches, but not done for xaxis above
-        yaxis->labelcolor = yaxis->axiscolor = QColor(color);
-
-        // add to list
-        axisinfos.insert(yname, yaxis);
-    }
-
-    switch (charttype) {
-    default:
-
-    case GC_CHART_LINE:
-        {
-            // set up the curves
-            QLineSeries *add = new QLineSeries();
-            add->setName(name);
-
-            // aesthetics
-            add->setBrush(Qt::NoBrush);
-            QPen pen(color);
-            pen.setStyle(Qt::SolidLine);
-            pen.setWidth(size);
-            add->setPen(pen);
-            add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
-
-            // data
-            for (int i=0; i<xseries.size() && i<yseries.size(); i++) {
-                add->append(xseries.at(i), yseries.at(i));
-
-                // tell axis about the data
-                xaxis->point(xseries.at(i), yseries.at(i));
-                yaxis->point(xseries.at(i), yseries.at(i));
-            }
-
-            // hardware support?
-            chartview->setRenderHint(QPainter::Antialiasing);
-            add->setUseOpenGL(opengl); // for scatter or line only apparently
-
-            // chart
-            qchart->addSeries(add);
-
-            // add to list of curves
-            curves.insert(name,add);
-            xaxis->series.append(add);
-            yaxis->series.append(add);
-        }
-        break;
-
-    case GC_CHART_SCATTER:
-        {
-            // set up the curves
-            QScatterSeries *add = new QScatterSeries();
-            add->setName(name);
-
-            // aesthetics
-            add->setMarkerShape(QScatterSeries::MarkerShapeCircle); //TODO: use 'symbol'
-            add->setMarkerSize(size);
-            QColor col=QColor(color);
-            add->setBrush(QBrush(col));
-            add->setPen(Qt::NoPen);
-            add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
-
-            // data
-            for (int i=0; i<xseries.size() && i<yseries.size(); i++) {
-                add->append(xseries.at(i), yseries.at(i));
-
-                // tell axis about the data
-                xaxis->point(xseries.at(i), yseries.at(i));
-                yaxis->point(xseries.at(i), yseries.at(i));
-
-            }
-
-            // hardware support?
-            chartview->setRenderHint(QPainter::Antialiasing);
-            add->setUseOpenGL(opengl); // for scatter or line only apparently
-
-            // chart
-            qchart->addSeries(add);
-            qchart->legend()->setMarkerShape(QLegend::MarkerShapeRectangle);
-            qchart->setDropShadowEnabled(false);
-
-            // add to list of curves
-            curves.insert(name,add);
-            xaxis->series.append(add);
-            yaxis->series.append(add);
-
-        }
-        break;
-
-    case GC_CHART_BAR:
-        {
-            // set up the barsets
-            QBarSet *add= new QBarSet(name);
-
-            // aesthetics
-            add->setBrush(QBrush(QColor(color)));
-            add->setPen(Qt::NoPen);
-
-            // data and min/max values
-            for (int i=0; i<yseries.size(); i++) {
-                double value = yseries.at(i);
-                *add << value;
-                yaxis->point(i,value);
-                xaxis->point(i,value);
-            }
-
-            // we are very particular regarding axis
-            yaxis->type = AxisInfo::CONTINUOUS;
-            xaxis->type = AxisInfo::CATEGORY;
-
-            // add to list of barsets
-            barsets << add;
-        }
-        break;
-
-    case GC_CHART_PIE:
-        {
-            // set up the curves
-            QPieSeries *add = new QPieSeries();
-
-            // setup the slices
-            for(int i=0; i<yseries.size(); i++) {
-                // get label?
-                if (i>=labels.size())
-                    add->append(QString("%1").arg(i), yseries.at(i));
-                else
-                    add->append(labels.at(i), yseries.at(i));
-            }
-
-            // now do the colors
-            int i=0;
-            foreach(QPieSlice *slice, add->slices()) {
-
-                slice->setExploded();
-                slice->setLabelVisible();
-                slice->setPen(Qt::NoPen);
-                if (i <colors.size()) slice->setBrush(QColor(colors.at(i)));
-                else slice->setBrush(Qt::red);
-                i++;
-            }
-
-            // set the pie chart
-            qchart->addSeries(add);
-
-            // add to list of curves
-            curves.insert(name,add);
-        }
-        break;
-
-    }
-    return true;
-}
-
-// once python script has run polish the chart, fixup axes/ranges and so on.
-void
-PythonChart::polishChart()
-{
-    if (!qchart) return;
-
-    // basic aesthetics
-    qchart->legend()->setMarkerShape(QLegend::MarkerShapeRectangle);
-    qchart->setDropShadowEnabled(false);
-
-    // no more than 1 category axis since barsets are all assigned.
-    bool donecategory=false;
-
-    // Create axes - for everyone except pie charts that don't have any
-    if (charttype != GC_CHART_PIE) {
-        // create desired axis
-        foreach(AxisInfo *axisinfo, axisinfos) {
-//fprintf(stderr, "Axis: %s, orient:%s, type:%d\n",axisinfo->name.toStdString().c_str(),axisinfo->orientation==Qt::Vertical?"vertical":"horizontal",(int)axisinfo->type);
-//fflush(stderr);
-            QAbstractAxis *add=NULL;
-            switch (axisinfo->type) {
-            case AxisInfo::DATERANGE: // TODO
-            case AxisInfo::TIME:      // TODO
-            case AxisInfo::CONTINUOUS:
-                {
-                    QValueAxis *vaxis= new QValueAxis(qchart);
-                    add=vaxis; // gets added later
-
-                    vaxis->setMin(axisinfo->min());
-                    vaxis->setMax(axisinfo->max());
-
-                    // attach to the chart
-                    qchart->addAxis(add, axisinfo->locate());
-                }
-                break;
-            case AxisInfo::CATEGORY:
-                {
-                    if (!donecategory) {
-
-                        donecategory=true;
-
-                        QBarCategoryAxis *caxis = new QBarCategoryAxis(qchart);
-                        add=caxis;
-
-                        // add the bar series
-                        if (!barseries) { barseries = new QBarSeries(); qchart->addSeries(barseries); }
-                        else barseries->clear();
-
-                        // add the new barsets
-                        foreach (QBarSet *bs, barsets)
-                            barseries->append(bs);
-
-                        // attach before addig barseries
-                        qchart->addAxis(add, axisinfo->locate());
-
-                        // attach to category axis
-                        barseries->attachAxis(caxis);
-
-                        // category labels
-                        for(int i=axisinfo->categories.count(); i<=axisinfo->maxx; i++)
-                            axisinfo->categories << QString("%1").arg(i+1);
-                        caxis->setCategories(axisinfo->categories);
-                    }
-                }
-                break;
-            }
-
-            // at this point the basic settngs have been done and the axis
-            // is attached to the chart, so we can go ahead and apply common settings
-            if (add) {
-
-                // once we've done the basics, lets do the aesthetics
-                if (axisinfo->name != "x" && axisinfo->name != "y")  // equivalent to being blank
-                    add->setTitleText(axisinfo->name);
-                add->setLinePenColor(axisinfo->axiscolor);
-                add->setLabelsColor(axisinfo->labelcolor);
-                add->setTitleBrush(QBrush(axisinfo->labelcolor));
-
-                // add the series that are associated with this
-                foreach(QAbstractSeries *series, axisinfo->series)
-                    series->attachAxis(add);
-            }
-        }
-    }
-
-    if (charttype ==GC_CHART_PIE) {
-        // pie, never want a legend
-        qchart->legend()->setVisible(false);
-    }
-
-    // barseries special case
-    if (charttype==GC_CHART_BAR && barseries) {
-
-        // need to attach barseries to the value axes
-        foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))
-            barseries->attachAxis(axis);
-    }
-}
-
-bool
-PythonChart::configAxis(QString name, bool visible, int align, double min, double max,
-                      int type, QString labelcolor, QString color, bool log, QStringList categories)
-{
-    AxisInfo *axis = axisinfos.value(name);
-    if (axis == NULL) return false;
-
-    // lets update the settings then
-    axis->visible = visible;
-
-    // -1 if not passed
-    if (align == 0) axis->align = Qt::AlignBottom;
-    if (align == 1) axis->align = Qt::AlignLeft;
-    if (align == 2) axis->align = Qt::AlignTop;
-    if (align == 3) axis->align = Qt::AlignRight;
-
-    // -1 if not passed
-    if (min != -1)  axis->minx = axis->miny = min;
-    if (max != -1)  axis->maxx = axis->maxy = max;
-
-    // type
-    if (type != -1) axis->type = static_cast<AxisInfo::AxisInfoType>(type);
-
-    // color
-    if (labelcolor != "") axis->labelcolor=QColor(labelcolor);
-    if (color != "") axis->axiscolor=QColor(color);
-
-    // log .. hmmm
-    axis->log = log;
-
-    // categories
-    if (categories.count()) axis->categories = categories;
-    return true;
 }

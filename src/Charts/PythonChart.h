@@ -33,12 +33,13 @@
 #include <QWebEngineView>
 #include <QUrl>
 #include <QtCharts>
+#include <QGraphicsItem>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Colors.h"
-#include "RCanvas.h"
+#include "GenericPlot.h"
 
 // keep aligned to library.py
 #define GC_CHART_LINE      1
@@ -94,59 +95,6 @@ private:
     int promptStartIndex = 4;
 };
 
-// axis info, might become generic later (i.e. use in other charts)
-class AxisInfo {
-public:
-        enum axisinfoType { CONTINUOUS=0,                 // Continious range
-                            DATERANGE=1,                  // Date
-                            TIME=2,                       // Duration, Time
-                            CATEGORY=3                // labelled with categories
-                          };
-        typedef enum axisinfoType AxisInfoType;
-
-        AxisInfo(Qt::Orientations orientation, QString name) : name(name), orientation(orientation) {
-            miny=maxy=minx=maxx=0;
-            fixed=log=false;
-            visible=minorgrid=majorgrid=true;
-            type=CONTINUOUS;
-            axiscolor=labelcolor=GColor(CPLOTMARKER);
-        }
-
-        void point(double x, double y) {
-            if (fixed) return;
-            if (x>maxx) maxx=x;
-            if (x<minx) minx=x;
-            if (y>maxy) maxy=y;
-            if (y<miny) miny=y;
-        }
-
-        double min() {
-            if (orientation == Qt::Horizontal) return minx;
-            else return miny;
-        }
-        double max() {
-            if (orientation == Qt::Horizontal) return maxx;
-            else return maxy;
-        }
-
-        Qt::AlignmentFlag locate() {
-            return align;
-        }
-
-        // series we are associated with
-        QList<QAbstractSeries*> series;
-
-        // data is all public to avoid tedious get/set
-        QString name;
-        Qt::Orientations orientation;
-        Qt::AlignmentFlag align;
-        double miny, maxy, minx, maxx; // updated as we see points, set the range
-        bool visible,fixed, log, minorgrid, majorgrid; // settings
-        QColor labelcolor, axiscolor; // aesthetics
-        QStringList categories;
-        AxisInfoType type; // what type of axis is this?
-};
-
 // the chart
 class PythonChart : public GcChartWindow, public PythonHost {
 
@@ -170,10 +118,9 @@ class PythonChart : public GcChartWindow, public PythonHost {
         QWidget *render;
         QVBoxLayout *renderlayout;
 
-        // rendering via...
-        QWebEngineView *canvas; // not yet!!
-        QChartView *chartview;
-        QChart *qchart;
+        // rendering via a web page or a generic plot
+        QWebEngineView *canvas;
+        GenericPlot *plot;
 
         void emitUrl(QUrl x) { emit setUrl(x); }
 
@@ -209,58 +156,6 @@ class PythonChart : public GcChartWindow, public PythonHost {
         void webpage(QUrl);
         static void execScript(PythonChart *);
 
-        // post processing clean up / add decorations / helpers etc
-        void polishChart();
-
-        // set chart settings
-        bool configChart(QString title, int type, bool animate) {
-
-            if (chartview) {
-
-                // if we changed the type, all series must go
-                if (charttype != type) {
-                    qchart->removeAllSeries();
-                    curves.clear();
-                    barseries=NULL;
-                }
-
-                // clear ALL axes
-                foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical)) {
-                    qchart->removeAxis(axis);
-                    delete axis;
-                }
-                foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
-                    qchart->removeAxis(axis);
-                    delete axis;
-                }
-                foreach(AxisInfo *axisinfo, axisinfos) delete axisinfo;
-                axisinfos.clear();
-
-                left=true;
-                bottom=true;
-                barsets.clear();
-
-                // remember type
-                charttype=type;
-
-                // title is allowed to be blank
-                qchart->setTitle(title);
-
-                // would avoid animations as they get very tiresome and are not
-                // generally transition animations, so add very little value
-                // by default they are disabled anyway
-                qchart->setAnimationOptions(animate ? QChart::SeriesAnimations : QChart::NoAnimation);
-
-                return true;
-            }
-        }
-        bool setCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
-                      QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl);
-
-        bool configAxis(QString name, bool visible, int align, double min, double max,
-                      int type, QString labelcolor, QString color, bool log, QStringList categories);
-
     protected:
         // enable stopping long running scripts
         bool eventFilter(QObject *, QEvent *e);
@@ -272,21 +167,6 @@ class PythonChart : public GcChartWindow, public PythonHost {
         Context *context;
         QString text; // if Rtool not alive
         bool ridesummary;
-        int charttype;
-
-        // curves
-        QMap<QString, QAbstractSeries *>curves;
-
-        // axes
-        QMap<QString, AxisInfo *>axisinfos;
-
-        // barsets
-        QList<QBarSet*> barsets;
-        QBarSeries *barseries;
-
-        // axis placement (before user interacts)
-        // alternates as axis added
-        bool left, bottom;
 };
 
 

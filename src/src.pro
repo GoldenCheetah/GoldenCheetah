@@ -666,6 +666,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         HEADERS += Charts/OverviewWindow.h
         SOURCES += Charts/OverviewWindow.cpp
 
+        # generic chart
+        DEFINES += GC_HAVE_GENERIC
+        HEADERS += Charts/GenericPlot.h
+        SOURCES += Charts/GenericPlot.cpp
+
     }
 }
 
