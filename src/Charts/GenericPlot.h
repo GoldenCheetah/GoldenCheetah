@@ -32,6 +32,7 @@
 #include <QGraphicsItem>
 
 #include "GoldenCheetah.h"
+#include "Settings.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Colors.h"
