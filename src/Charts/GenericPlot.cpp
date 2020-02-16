@@ -98,6 +98,103 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
             QColor color = GColor(CPLOTMARKER);
             color.setAlphaF(0.2);
             painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+
+            // now paint the statistics
+            foreach(Calculator calc, stats) {
+                // slope and intercept?
+                if (calc.count<2) continue;
+                QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
+                QPen line(calc.color);
+                painter->setPen(line);
+                painter->drawText(QPointF(0,0), lr);
+
+                // slope
+                if (calc.xaxis != NULL) {
+
+                    if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) { //XXX todo for log date etc?
+                        double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
+                        double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
+                        QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b),calc.series));
+                        QPointF stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
+                        QColor col=calc.color;
+                        col.setAlphaF(0.25);
+                        QPen line(col);
+                        line.setStyle(Qt::DashLine);
+                        line.setWidthF(2 * dpiXFactor);
+                        painter->setPen(line);
+                        painter->drawLine(startp, stopp);
+                    }
+
+                    // scene coordinate for min/max (remember we get clipped)
+                    QPointF minxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,0),calc.series));
+                    QPointF minxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,calc.y.min),calc.series));
+
+                    QPointF maxxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,0),calc.series));
+                    QPointF maxxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,calc.y.max),calc.series));
+
+                    QPointF minyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.min),calc.series));
+                    QPointF minypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min, calc.y.min),calc.series));
+
+                    QPointF maxyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.max),calc.series));
+                    QPointF maxypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max, calc.y.max),calc.series));
+
+                    QPointF avgyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.mean),calc.series));
+                    QPointF avgxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, 0),calc.series));
+                    QPointF avgmid = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, calc.y.mean),calc.series));
+
+                    QColor linecol=GColor(CPLOTMARKER);
+                    linecol.setAlphaF(0.25);
+                    QPen gridpen(linecol);
+                    gridpen.setStyle(Qt::DashLine);
+                    gridpen.setWidthF(1 *dpiXFactor);
+                    painter->setPen(gridpen);
+
+                    // min/max guides
+                    painter->drawLine(minxp,minxpinf);
+                    painter->drawLine(maxxp,maxxpinf);
+                    painter->drawLine(minyp,minypinf);
+                    painter->drawLine(maxyp,maxypinf);
+
+                    linecol = QColor(Qt::red);
+                    linecol.setAlphaF(0.25);
+                    gridpen = QColor(linecol);
+                    gridpen.setStyle(Qt::DashLine);
+                    gridpen.setWidthF(1 *dpiXFactor);
+                    painter->setPen(gridpen);
+
+                    // min/max guides
+                    painter->drawLine(avgxp,avgmid);
+                    painter->drawLine(avgyp,avgmid);
+
+                    // min max texts
+                    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+                    stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+                    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                    painter->setFont(stGiles);
+
+                    QPen markerpen(GColor(CPLOTMARKER));
+                    painter->setPen(markerpen);
+                    QString label=QString("%1").arg(calc.x.max);
+                    painter->drawText(maxxp-QPointF(0,4), label);
+                    label=QString("%1").arg(calc.x.min);
+                    painter->drawText(minxp-QPointF(0,4), label);
+
+                    markerpen = QPen(calc.color);
+                    painter->setPen(markerpen);
+                    label=QString("%1").arg(calc.y.max);
+                    painter->drawText(maxyp, label);
+                    label=QString("%1").arg(calc.y.min);
+                    painter->drawText(minyp, label);
+
+                    markerpen = QPen(Qt::red);
+                    painter->setPen(markerpen);
+                    label=QString("%1").arg(calc.y.mean);
+                    painter->drawText(avgyp, label);
+                    label=QString("%1").arg(calc.x.mean);
+                    painter->drawText(avgxp-QPointF(0,4), label);
+                }
+
+            }
             painter->fillRect(r,QBrush(color));
             painter->restore();
         }
@@ -246,6 +343,51 @@ SelectionTool::maxx(QAbstractSeries*series)
     return host->qchart->mapToValue(pos()+QPointF(rect.width(),0), series).x();
 }
 
+void
+Calculator::initialise()
+{
+    count=0;
+    m = b = sumxy = sumx2 =
+    x.max = x.min = x.sum = x.mean =
+    y.max = y.min = y.sum = y.mean = 0;
+
+}
+
+void
+Calculator::addPoint(QPointF point)
+{
+
+    // max min set from values we've seen
+    if (count >0) {
+        if (point.x() < x.min) x.min = point.x();
+        if (point.x() > x.max) x.max = point.x();
+        if (point.y() < y.min) y.min = point.y();
+        if (point.y() > y.max) y.max = point.y();
+    } else {
+        // use only value we've seen
+        x.min = x.max = point.x();
+        y.min = y.max = point.y();
+    }
+
+    count ++;
+    x.sum += point.x();
+    y.sum += point.y();
+    x.mean = x.sum / double(count);
+    y.mean = y.sum / double(count);
+    sumx2 += point.x() * point.x();
+    sumxy += point.x() * point.y();
+}
+
+void
+Calculator::finalise()
+{
+    // add calcs for stuff cannot do on the fly
+    if (count >=2) {
+        m = (count * sumxy - x.sum * y.sum) / (count * sumx2 - (x.sum * x.sum));
+        b = (y.sum - m * x.sum) / count;
+    }
+}
+
 // source 0=scene, 1=widget
 bool
 GenericPlot::eventHandler(int source, void *obj, QEvent *e)
@@ -391,6 +533,10 @@ SelectionTool::updateScene()
 
                 // the axes for the current series
                 QAbstractAxis *xaxis=NULL, *yaxis=NULL;
+                foreach (QAbstractAxis *ax, x->attachedAxes()) {
+                    if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
+                    if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
+                }
 
                 if ((selection=static_cast<QScatterSeries*>(selections.value(x, NULL))) == NULL) {
 
@@ -407,12 +553,6 @@ SelectionTool::updateScene()
                     ignore.append(selection);
                     static_cast<QScatterSeries*>(x)->setColor(Qt::gray);
 
-                    // Add series to the right axes
-                    foreach (QAbstractAxis *ax, x->attachedAxes()) {
-                        if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
-                        if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
-                    }
-
                     // only do when creating it.
                     if (yaxis) selection->attachAxis(yaxis);
                     if (xaxis) selection->attachAxis(xaxis);
@@ -421,7 +561,6 @@ SelectionTool::updateScene()
                 // lets work out what range of values we need to be
                 // selecting is, reverse since possible to have a backwards
                 // rectangle in the selection tool
-                // xxx todo this bit through to break; should be a method of selection tool ?
                 double miny=0,maxy=0,minx=0,maxx=0;
                 miny =this->miny(x);
                 maxy =this->maxy(x);
@@ -433,14 +572,25 @@ SelectionTool::updateScene()
 
                 //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
 
-                // add points to the selection curve
+                // add points to the selection curve and calculate as you go
                 QList<QPointF> points;
+                Calculator calc;
+                calc.initialise();
+                calc.color = selection->color(); // should this go into constructor?! xxx todo
+                calc.xaxis = xaxis;
+                calc.yaxis = yaxis;
+                calc.series = scatter;
                 for(int i=0; i<scatter->count(); i++) {
                     QPointF point = scatter->at(i); // avoid deep copy
                     if (point.y() >= miny && point.y() <= maxy &&
-                        point.x() >= minx && point.x() <= maxx)
+                        point.x() >= minx && point.x() <= maxx) {
                         points << point;
+                        calc.addPoint(point);
+                    }
                 }
+                calc.finalise();
+                stats.insert(scatter, calc);
+
                 //fprintf(stderr, "selected %d points\n", points.count());
                 selection->clear();
                 if (points.count()) selection->append(points);
@@ -484,8 +634,9 @@ SelectionTool::updateScene()
             }
         }
         selections.clear();
-        ignore.clear();
     }
+    ignore.clear();
+    stats.clear();
 }
 
 void

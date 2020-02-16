@@ -99,6 +99,29 @@ public:
         AxisInfoType type; // what type of axis is this?
 };
 
+// for dynamic calculations
+class Calculator
+{
+    public:
+    Calculator() {}
+
+    void initialise();
+    void addPoint(QPointF);
+    void finalise();
+
+    int count;
+    double m,b,r2; // r2 and y=mx +b
+    double sumx2, sumxy; // used to resolve m and b
+    struct {
+        double max, min, sum, mean;
+    } x,y;
+    QColor color; // for paint
+
+    // what were we calculated on? (so paint can transform)
+    QAbstractAxis *xaxis,*yaxis;
+    QAbstractSeries *series;
+};
+
 // for watcing scene events
 class SelectionTool : public QGraphicsItem
 {
@@ -143,6 +166,7 @@ class SelectionTool : public QGraphicsItem
 
         // selections from original during selection
         QMap<QAbstractSeries*, QAbstractSeries*> selections;
+        QMap<QAbstractSeries*, Calculator> stats;
         QList<QAbstractSeries*> ignore; // temp series we add during selection to be ignored
 
 };
