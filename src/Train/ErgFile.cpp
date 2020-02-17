@@ -54,7 +54,7 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), context(context)
+    filename(filename), mode(mode), context(context), StrictGradient(true)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -63,7 +63,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), context(context)
+ErgFile::ErgFile(Context *context) : mode(0), context(context), StrictGradient(true)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -705,6 +705,9 @@ void ErgFile::parseGpx()
     Points.clear();
     Laps.clear();
 
+    // TTS File Gradient Should be smoothly interpolated from Altitude.
+    StrictGradient = false;
+
     static double km = 0;
 
     QFile gpxFile(filename);
@@ -828,6 +831,9 @@ void ErgFile::parseTTS()
     format = mode = CRS;
     Points.clear();
     Laps.clear();
+
+    // TTS File Gradient Should be smoothly interpolated from Altitude.
+    StrictGradient = false;
 
     QFile ttsFile(filename);
     if (ttsFile.open(QIODevice::ReadOnly) == false) {
