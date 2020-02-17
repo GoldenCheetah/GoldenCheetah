@@ -96,8 +96,9 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
             painter->save();
             QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
             QColor color = GColor(CPLOTMARKER);
-            color.setAlphaF(0.2);
+            color.setAlphaF(state == ACTIVE ? 0.05 : 0.2); // almost hidden if not moving/sizing
             painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+            painter->fillRect(r,QBrush(color));
 
             // now paint the statistics
             foreach(Calculator calc, stats) {
@@ -116,13 +117,15 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                         double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
                         QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b),calc.series));
                         QPointF stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
-                        QColor col=calc.color;
-                        col.setAlphaF(0.25);
+                        QColor col=GColor(CPLOTMARKER);
+                        col.setAlphaF(1);
                         QPen line(col);
-                        line.setStyle(Qt::DashLine);
+                        line.setStyle(Qt::SolidLine);
                         line.setWidthF(2 * dpiXFactor);
                         painter->setPen(line);
+                        painter->setClipRect(r);
                         painter->drawLine(startp, stopp);
+                        painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
                     }
 
                     // scene coordinate for min/max (remember we get clipped)
@@ -148,7 +151,7 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                     gridpen.setStyle(Qt::DashLine);
                     gridpen.setWidthF(1 *dpiXFactor);
                     painter->setPen(gridpen);
-
+#if 0 // way too busy on the chart
                     // min/max guides
                     painter->drawLine(minxp,minxpinf);
                     painter->drawLine(maxxp,maxxpinf);
@@ -162,9 +165,10 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                     gridpen.setWidthF(1 *dpiXFactor);
                     painter->setPen(gridpen);
 
-                    // min/max guides
+                    // avg guides
                     painter->drawLine(avgxp,avgmid);
                     painter->drawLine(avgyp,avgmid);
+#endif
 
                     // min max texts
                     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
@@ -178,6 +182,8 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                     painter->drawText(maxxp-QPointF(0,4), label);
                     label=QString("%1").arg(calc.x.min);
                     painter->drawText(minxp-QPointF(0,4), label);
+                    label=QString("%1").arg(calc.x.mean);
+                    painter->drawText(avgxp-QPointF(0,4), label);
 
                     markerpen = QPen(calc.color);
                     painter->setPen(markerpen);
@@ -185,17 +191,11 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                     painter->drawText(maxyp, label);
                     label=QString("%1").arg(calc.y.min);
                     painter->drawText(minyp, label);
-
-                    markerpen = QPen(Qt::red);
-                    painter->setPen(markerpen);
                     label=QString("%1").arg(calc.y.mean);
                     painter->drawText(avgyp, label);
-                    label=QString("%1").arg(calc.x.mean);
-                    painter->drawText(avgxp-QPointF(0,4), label);
                 }
 
             }
-            painter->fillRect(r,QBrush(color));
             painter->restore();
         }
         break;
