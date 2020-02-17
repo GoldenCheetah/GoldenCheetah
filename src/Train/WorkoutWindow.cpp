@@ -440,6 +440,11 @@ WorkoutWindow::saveAs()
         return;
     }
 
+    // filetype defaults to .erg
+    if(!filename.endsWith(".erg") && !filename.endsWith(".zwo")) {
+        filename.append(".erg");
+    }
+
     // New ergfile will be created almost empty
     ErgFile *newergFile = new ErgFile(context);
 
