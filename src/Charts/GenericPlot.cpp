@@ -694,15 +694,6 @@ GenericPlot::initialiseChart(QString title, int type, bool animate)
         barseries=NULL;
     }
 
-    // clear ALL axes
-    foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical)) {
-        qchart->removeAxis(axis);
-        delete axis;
-    }
-    foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
-        qchart->removeAxis(axis);
-        delete axis;
-    }
     foreach(AxisInfo *axisinfo, axisinfos) delete axisinfo;
     axisinfos.clear();
 
@@ -923,6 +914,16 @@ void
 GenericPlot::finaliseChart()
 {
     if (!qchart) return;
+
+    // clear ALL axes
+    foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical)) {
+        qchart->removeAxis(axis);
+        delete axis;
+    }
+    foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
+        qchart->removeAxis(axis);
+        delete axis;
+    }
 
     // basic aesthetics
     qchart->legend()->setMarkerShape(QLegend::MarkerShapeRectangle);
