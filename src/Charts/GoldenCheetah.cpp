@@ -875,9 +875,23 @@ GcChartWindow::addHelper(QString name, QWidget *widget)
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  QString(), title()+".png (*.png)"+";;"+title()+".svg (*.svg)");
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  fileName, title()+".png (*.png)"+";;"+title()+".svg (*.svg)");
 
-    if (!fileName.isEmpty() && fileName.endsWith(".png")) {
+    if (fileName.isEmpty()) return; // no filename selected, abort
+
+    if (!fileName.isEmpty() && fileName.endsWith(".svg")) {
+
+        QSvgGenerator generator;
+        generator.setFileName(fileName);
+        generator.setSize(size());
+        generator.setViewBox(rect());
+        generator.setTitle(title());
+        render(&generator);
+
+    } else {
+
+        // default, export to png adding extension if missing
+        if (!fileName.endsWith(".png")) fileName += ".png";
 
         QPixmap picture;
         menuButton->hide();
@@ -887,14 +901,7 @@ void GcChartWindow:: saveImage()
         picture = QPixmap::grabWidget (this);
 #endif
         picture.save(fileName);
-    } else if (!fileName.isEmpty() && fileName.endsWith(".svg")) {
 
-        QSvgGenerator generator;
-        generator.setFileName(fileName);
-        generator.setSize(size());
-        generator.setViewBox(rect());
-        generator.setTitle(title());
-        render(&generator);
     }
 }
 
