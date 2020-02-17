@@ -1746,22 +1746,24 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // Trust ergFile for location data, if available.
                 bool fAltitudeSet = false;
                 if (ergFile) {
+                    if (!ergFile->StrictGradient) {
+                        // Attempt to obtain location and derived slope from altitude in ergfile.
+                        geolocation geoloc;
+                        if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
+                            displayLatitude = geoloc.Lat();
+                            displayLongitude = geoloc.Long();
+                            displayAltitude = geoloc.Alt();
 
-                    // Obtain slope recorded in ergfile.
-                    slope = ergFile->gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
-
-                    // Attempt to obtain location and derive slope from altitude in ergfile.
-                    geolocation geoloc;
-                    if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
-                        displayLatitude  = geoloc.Lat();
-                        displayLongitude = geoloc.Long();
-                        displayAltitude  = geoloc.Alt();
-
-                        if (displayLatitude && displayLongitude) {
-                            rtData.setLatitude(displayLatitude);
-                            rtData.setLongitude(displayLongitude);
+                            if (displayLatitude && displayLongitude) {
+                                rtData.setLatitude(displayLatitude);
+                                rtData.setLongitude(displayLongitude);
+                            }
+                            fAltitudeSet = true;
                         }
-                        fAltitudeSet = true;
+                    }
+
+                    if (ergFile->StrictGradient || !fAltitudeSet) {
+                        slope = ergFile->gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
                     }
 
                     rtData.setSlope(slope);

@@ -148,6 +148,7 @@ class ErgFile
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
         int mode;
+        bool    StrictGradient; // should gradient be strict or smoothed?
 
         int leftPoint, rightPoint;     // current points we are between
         int interpolatorReadIndex;     // next point to be fed to interpolator
