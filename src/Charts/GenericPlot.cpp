@@ -440,7 +440,26 @@ GenericPlot::eventHandler(int source, void *obj, QEvent *e)
         //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
         //fprintf(stderr,"%s: mouse MOVE for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
         {
+            // see if selection tool cares about new mouse position
             updatescene = selector->moved(spos);
+
+            // XXX look for nearest point for each series
+            // XXX will need to refactor into selection tool  and reuse for id selected items there
+            foreach(QAbstractSeries *series, qchart->series()) {
+                Quadtree *tree= quadtrees.value(series,NULL);
+                if (tree != NULL) {
+                    // lets convert cursor pos to value pos to find nearest
+                    double pixels = 10 * dpiXFactor; // within 10 pixels
+                    QRectF srect(spos-QPointF(pixels,pixels), spos+QPointF(pixels,pixels));
+                    QRectF vrect(qchart->mapToValue(srect.topLeft(),series), qchart->mapToValue(srect.bottomRight(),series));
+                    QPointF vpos = qchart->mapToValue(spos, series);
+
+                    // find a candidate
+                    QList<QPointF> tohere;
+                    tree->candidates(vrect, tohere);
+                    if (tohere.count()) fprintf(stderr, "hover %d candidates\n", tohere.count()); fflush(stderr);
+                }
+            }
         }
     break;
 
@@ -694,6 +713,9 @@ GenericPlot::initialiseChart(QString title, int type, bool animate)
         barseries=NULL;
     }
 
+    foreach(Quadtree *tree, quadtrees) delete tree;
+    quadtrees.clear();
+
     foreach(AxisInfo *axisinfo, axisinfos) delete axisinfo;
     axisinfos.clear();
 
@@ -819,6 +841,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
 
             // data
+            Calculator calc; // watching as we add
             for (int i=0; i<xseries.size() && i<yseries.size(); i++) {
                 add->append(xseries.at(i), yseries.at(i));
 
@@ -826,7 +849,21 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 xaxis->point(xseries.at(i), yseries.at(i));
                 yaxis->point(xseries.at(i), yseries.at(i));
 
+                // calculate stuff
+                calc.addPoint(QPointF(xseries.at(i), yseries.at(i)));
+
             }
+
+            QTime stopwatch;
+            stopwatch.start();
+            // set the quadtree up - now we know the ranges...
+            Quadtree *tree = new Quadtree(QPointF(calc.x.min, calc.y.min), QPointF(calc.x.max, calc.y.max));
+            for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+                if (xseries.at(i) != 0 && yseries.at(i) != 0) // 0,0 is common and lets ignore (usually means no data)
+                    tree->insert(QPointF(xseries.at(i), yseries.at(i)));
+            fprintf(stderr, "quadtree creation took %u ms for %u records\n", stopwatch.elapsed(), calc.count); fflush(stderr);
+            fprintf(stderr, "quadtree created %u nodes\n", tree->nodes.count()); fflush(stderr);
+            if (tree->nodes.count()) quadtrees.insert(add, tree);
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);

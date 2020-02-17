@@ -30,6 +30,7 @@
 #include <string.h>
 #include <QtCharts>
 #include <QGraphicsItem>
+#include "Quadtree.h"
 
 #include "GoldenCheetah.h"
 #include "Settings.h"
@@ -220,6 +221,9 @@ class GenericPlot : public QWidget {
 
         // curves
         QMap<QString, QAbstractSeries *>curves;
+
+        // quadtrees
+        QMap<QAbstractSeries*, Quadtree*> quadtrees;
 
         // axes
         QMap<QString, AxisInfo *>axisinfos;
