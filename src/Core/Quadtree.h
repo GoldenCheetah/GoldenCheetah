@@ -41,7 +41,7 @@ class QuadtreeNode
         // do we overlap with the search space - when looking
         bool intersect(QRectF r) { return r.intersects(QRectF(topleft,bottomright)); }
 
-        // add a node
+        // add a point
         void insert(Quadtree *root, QPointF value);
 
         // get candidates in same quadrant (might be miles away for big quadrant).
@@ -53,7 +53,7 @@ class QuadtreeNode
         void split(Quadtree *root);
 
     private:
-        // AABB - index into nodes on Quadtree class.
+        // AABB children (also in a freelist in Quadtree)
         QuadtreeNode *aabb[4];
 
         // the points in this quadrant
@@ -75,8 +75,8 @@ class Quadtree
         // add a point
         void insert(QPointF x);
 
-        // find points in same quadrant as cursor, of course might be long way away...
-        int candidates(QRectF point, QList<QPointF>&tohere) { return root->candidates(point, tohere); }
+        // find points in boundg rect, of course might be long way away...
+        int candidates(QRectF rect, QList<QPointF>&tohere) { return root->candidates(rect, tohere); }
 
         // manage the entire child tree on a single qvector to delete quickly
         QuadtreeNode *newnode(QPointF topleft, QPointF bottomright);
