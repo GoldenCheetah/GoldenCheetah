@@ -208,9 +208,10 @@ double Bicycle::ExtraWatts(const BicycleSimState &simState, double v) const
     double sl = simState.Slope() / 100; // 10% = 0.1
     const double CrV = 0.1;             // Coefficient for velocity - dependent dynamic rolling resistance, here approximated with 0.1
     double CrVn = CrV * cos(sl);        // Coefficient for the dynamic rolling resistance, normalized to road inclination; CrVn = CrV*cos(slope)
-    double Beta = atan(sl);
-    double cosBeta = cos(Beta);
-    double sinBeta = sin(Beta);
+
+    double cosBeta = 1 / std::sqrt(sl*sl + 1); // cos(atan(sl))
+    double sinBeta = sl * cosBeta;             // sin(atan(sl))
+
     double m = MassKG();
     double Frg = s_g0 * m * (m_constants.m_crr * cosBeta + sinBeta);
 
