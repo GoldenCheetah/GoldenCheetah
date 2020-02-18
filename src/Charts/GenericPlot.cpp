@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2020 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -75,7 +75,9 @@ SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host
     // start inactive and rectangle
     state = INACTIVE;
     mode = RECTANGLE;
-    setVisible(false);
+    setVisible(true); // always visible - paints on axis
+    setZValue(100); // always on top.
+    hoverpoint = QPointF();
     rect = QRectF(0,0,0,0);
 }
 
@@ -83,7 +85,6 @@ SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host
 // a lassoo or rectangle shape
 void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
-   if (state == INACTIVE) return; // do not paint when inactive
    switch (mode) {
    case CIRCLE:
         {
@@ -92,83 +93,10 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
         break;
    case RECTANGLE:
         {
-            // paint inside!
-            painter->save();
-            QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
-            QColor color = GColor(CPLOTMARKER);
-            color.setAlphaF(state == ACTIVE ? 0.05 : 0.2); // almost hidden if not moving/sizing
-            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
-            painter->fillRect(r,QBrush(color));
+            if (state == ACTIVE || state == INACTIVE) {
 
-            // now paint the statistics
-            foreach(Calculator calc, stats) {
-                // slope and intercept?
-                if (calc.count<2) continue;
-                QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
-                QPen line(calc.color);
-                painter->setPen(line);
-                painter->drawText(QPointF(0,0), lr);
+                if (host->charttype == GC_CHART_LINE || host->charttype == GC_CHART_SCATTER) {
 
-                // slope
-                if (calc.xaxis != NULL) {
-
-                    if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) { //XXX todo for log date etc?
-                        double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
-                        double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
-                        QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b),calc.series));
-                        QPointF stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
-                        QColor col=GColor(CPLOTMARKER);
-                        col.setAlphaF(1);
-                        QPen line(col);
-                        line.setStyle(Qt::SolidLine);
-                        line.setWidthF(2 * dpiXFactor);
-                        painter->setPen(line);
-                        painter->setClipRect(r);
-                        painter->drawLine(startp, stopp);
-                        painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
-                    }
-
-                    // scene coordinate for min/max (remember we get clipped)
-                    QPointF minxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,0),calc.series));
-                    QPointF minxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,calc.y.min),calc.series));
-
-                    QPointF maxxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,0),calc.series));
-                    QPointF maxxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,calc.y.max),calc.series));
-
-                    QPointF minyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.min),calc.series));
-                    QPointF minypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min, calc.y.min),calc.series));
-
-                    QPointF maxyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.max),calc.series));
-                    QPointF maxypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max, calc.y.max),calc.series));
-
-                    QPointF avgyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.mean),calc.series));
-                    QPointF avgxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, 0),calc.series));
-                    QPointF avgmid = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, calc.y.mean),calc.series));
-
-                    QColor linecol=GColor(CPLOTMARKER);
-                    linecol.setAlphaF(0.25);
-                    QPen gridpen(linecol);
-                    gridpen.setStyle(Qt::DashLine);
-                    gridpen.setWidthF(1 *dpiXFactor);
-                    painter->setPen(gridpen);
-#if 0 // way too busy on the chart
-                    // min/max guides
-                    painter->drawLine(minxp,minxpinf);
-                    painter->drawLine(maxxp,maxxpinf);
-                    painter->drawLine(minyp,minypinf);
-                    painter->drawLine(maxyp,maxypinf);
-
-                    linecol = QColor(Qt::red);
-                    linecol.setAlphaF(0.25);
-                    gridpen = QColor(linecol);
-                    gridpen.setStyle(Qt::DashLine);
-                    gridpen.setWidthF(1 *dpiXFactor);
-                    painter->setPen(gridpen);
-
-                    // avg guides
-                    painter->drawLine(avgxp,avgmid);
-                    painter->drawLine(avgyp,avgmid);
-#endif
 
                     // min max texts
                     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
@@ -176,27 +104,163 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
                     painter->setFont(stGiles);
 
-                    QPen markerpen(GColor(CPLOTMARKER));
-                    painter->setPen(markerpen);
-                    QString label=QString("%1").arg(calc.x.max);
-                    painter->drawText(maxxp-QPointF(0,4), label);
-                    label=QString("%1").arg(calc.x.min);
-                    painter->drawText(minxp-QPointF(0,4), label);
-                    label=QString("%1").arg(calc.x.mean);
-                    painter->drawText(avgxp-QPointF(0,4), label);
 
-                    markerpen = QPen(calc.color);
-                    painter->setPen(markerpen);
-                    label=QString("%1").arg(calc.y.max);
-                    painter->drawText(maxyp, label);
-                    label=QString("%1").arg(calc.y.min);
-                    painter->drawText(minyp, label);
-                    label=QString("%1").arg(calc.y.mean);
-                    painter->drawText(avgyp, label);
+                    // current position for each series
+                    foreach(QAbstractSeries *series, host->qchart->series()) {
+
+                        // hovering around - draw label for current position in axis
+                        if (hoverpoint != QPointF()) {
+                            // draw a circle using marker color
+                            painter->setBrush(GColor(CPLOTMARKER));
+                            painter->setPen(GColor(CPLOTMARKER));
+                            QRectF circle(0,0,25,25);
+                            circle.moveCenter(hoverpoint);
+                            painter->drawEllipse(circle);
+                            painter->setBrush(Qt::NoBrush);
+
+                        }
+
+                        // convert screen position to value for series
+                        QPointF v = host->qchart->mapToValue(spos,series);
+
+                        QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),0),series));
+                        QPointF posyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, v.y()),series));
+
+                        QPen markerpen(GColor(CPLOTMARKER));
+                        painter->setPen(markerpen);
+                        painter->setBrush(QBrush(GColor(CPLOTBACKGROUND)));
+
+                        QFontMetrics fm(stGiles); // adjust position to align centre
+
+                        // x value
+                        QString label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                        painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
+
+                        if (series->type() == QAbstractSeries::SeriesTypeScatter) {
+                            QPen markerpen(static_cast<QScatterSeries*>(series)->color());
+                            painter->setPen(markerpen);
+                        } else {
+                            QPen markerpen(Qt::gray); // dunno?
+                            painter->setPen(markerpen);
+                        }
+
+                        // y value
+                        label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
+                        painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
+
+                        //fprintf(stderr,"cursor (%f,%f) @(%f,%f) for series %s\n", spos.x(), spos.y(),v.x(),v.y(),series->name().toStdString().c_str()); fflush(stderr);
+                    }
                 }
 
             }
-            painter->restore();
+            if (state != INACTIVE) {
+
+                // there is a rectangle to draw on the screen
+                painter->save();
+                QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
+                QColor color = GColor(CPLOTMARKER);
+                color.setAlphaF(state == ACTIVE ? 0.05 : 0.2); // almost hidden if not moving/sizing
+                painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+                painter->fillRect(r,QBrush(color));
+
+                // now paint the statistics
+                foreach(Calculator calc, stats) {
+                    // slope and intercept?
+                    if (calc.count<2) continue;
+                    QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
+                    QPen line(calc.color);
+                    painter->setPen(line);
+                    painter->drawText(QPointF(0,0), lr);
+
+                    // slope
+                    if (calc.xaxis != NULL) {
+
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) { //XXX todo for log date etc?
+                            double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
+                            double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
+                            QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b),calc.series));
+                            QPointF stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
+                            QColor col=GColor(CPLOTMARKER);
+                            col.setAlphaF(1);
+                            QPen line(col);
+                            line.setStyle(Qt::SolidLine);
+                            line.setWidthF(0.5 * dpiXFactor);
+                            painter->setPen(line);
+                            painter->setClipRect(r);
+                            painter->drawLine(startp, stopp);
+                            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+                        }
+
+                        // scene coordinate for min/max (remember we get clipped)
+                        QPointF minxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,0),calc.series));
+                        QPointF minxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,calc.y.min),calc.series));
+
+                        QPointF maxxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,0),calc.series));
+                        QPointF maxxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,calc.y.max),calc.series));
+
+                        QPointF minyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.min),calc.series));
+                        QPointF minypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min, calc.y.min),calc.series));
+
+                        QPointF maxyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.max),calc.series));
+                        QPointF maxypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max, calc.y.max),calc.series));
+
+                        QPointF avgyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.mean),calc.series));
+                        QPointF avgxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, 0),calc.series));
+                        QPointF avgmid = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, calc.y.mean),calc.series));
+
+                        QColor linecol=GColor(CPLOTMARKER);
+                        linecol.setAlphaF(0.25);
+                        QPen gridpen(linecol);
+                        gridpen.setStyle(Qt::DashLine);
+                        gridpen.setWidthF(1 *dpiXFactor);
+                        painter->setPen(gridpen);
+#if 0 // way too busy on the chart
+                        // min/max guides
+                        painter->drawLine(minxp,minxpinf);
+                        painter->drawLine(maxxp,maxxpinf);
+                        painter->drawLine(minyp,minypinf);
+                        painter->drawLine(maxyp,maxypinf);
+
+                        linecol = QColor(Qt::red);
+                        linecol.setAlphaF(0.25);
+                        gridpen = QColor(linecol);
+                        gridpen.setStyle(Qt::DashLine);
+                        gridpen.setWidthF(1 *dpiXFactor);
+                        painter->setPen(gridpen);
+
+                        // avg guides
+                        painter->drawLine(avgxp,avgmid);
+                        painter->drawLine(avgyp,avgmid);
+#endif
+
+                        // min max texts
+                        QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+                        stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+                        stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                        painter->setFont(stGiles);
+
+                        QPen markerpen(GColor(CPLOTMARKER));
+                        painter->setPen(markerpen);
+                        QString label=QString("%1").arg(calc.x.max);
+                        painter->drawText(maxxp-QPointF(0,4), label);
+                        label=QString("%1").arg(calc.x.min);
+                        painter->drawText(minxp-QPointF(0,4), label);
+                        label=QString("%1").arg(calc.x.mean);
+                        painter->drawText(avgxp-QPointF(0,4), label);
+
+                        markerpen = QPen(calc.color);
+                        painter->setPen(markerpen);
+                        label=QString("%1").arg(calc.y.max);
+                        painter->drawText(maxyp, label);
+                        label=QString("%1").arg(calc.y.min);
+                        painter->drawText(minyp, label);
+                        label=QString("%1").arg(calc.y.mean);
+                        painter->drawText(avgyp, label);
+                    }
+
+                }
+                painter->restore();
+            }
         }
         break;
 
@@ -222,7 +286,6 @@ SelectionTool::reset()
     start=QPointF(0,0);
     finish=QPointF(0,0);
     rect = QRectF(0,0,0,0);
-    setVisible(false);
     resetSelections();
     update();
     return true;
@@ -236,7 +299,6 @@ SelectionTool::clicked(QPointF pos)
 
         // are we moving?
         state = MOVING;
-        setZValue(100);
         start = pos;
         startingpos = this->pos();
         update(rect);
@@ -250,9 +312,6 @@ SelectionTool::clicked(QPointF pos)
         finish = QPointF(0,0);
         rect = QRectF(-5,-5,5,5);
         setPos(start);
-        // above when selecting
-        setZValue(100);
-        setVisible(true);
         update(rect);
         return true;
 
@@ -269,14 +328,12 @@ SelectionTool::released(QPointF)
         // tiny, as in click release - deactivate
         state = INACTIVE; // reset for any state
         rect = QRectF(0,0,0,0);
-        setVisible(false);
         return true;
 
     } else if (state == SIZING || state == MOVING) {
 
         // finishing move/resize
         state = ACTIVE;
-        setZValue(-100); // send to back after done
         update(rect);
         return true;
     }
@@ -301,6 +358,49 @@ SelectionTool::moved(QPointF pos)
         setPos(this->startingpos + delta);
         update(rect);
         return true;
+
+    } else {
+
+        // remember screen pos of cursor for tracking values
+        // when painting on the axis/plot area
+        spos = pos;
+
+        // not moving or sizing so just hovering
+        // look for nearest point for each series
+        // this needs to be super quick as mouse
+        // movements are very fast, so we use a
+        // quadtree to find the nearest points
+        hoverpoint = QPointF(); // screen coordinates
+        foreach(QAbstractSeries *series, host->qchart->series()) {
+
+            Quadtree *tree= host->quadtrees.value(series,NULL);
+            if (tree != NULL) {
+
+                // lets convert cursor pos to value pos to find nearest
+                double pixels = 10 * dpiXFactor; // within 10 pixels
+                QRectF srect(pos-QPointF(pixels,pixels), pos+QPointF(pixels,pixels));
+                QRectF vrect(host->qchart->mapToValue(srect.topLeft(),series), host->qchart->mapToValue(srect.bottomRight(),series));
+                //QPointF vpos = host->qchart->mapToValue(pos, series);
+
+                // find candidates all close by using paint co-ords
+                QList<QPointF> tohere;
+                tree->candidates(vrect, tohere);
+
+                QPointF cursorpos=mapFromScene(pos);
+                foreach(QPointF p, tohere) {
+                    QPointF scpos = mapFromScene(host->qchart->mapToPosition(p, series));
+                    if (hoverpoint == QPointF()) hoverpoint = scpos;
+                    else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength())
+                        hoverpoint=scpos; // not happy with this XXX needs more work
+                }
+
+                //if (tohere.count())  fprintf(stderr, "HOVER %d candidates nearby\n", tohere.count()); fflush(stderr);
+            }
+        }
+
+        // for mouse moves..
+        update(rect);
+        return true;
     }
     return false;
 }
@@ -308,6 +408,7 @@ SelectionTool::moved(QPointF pos)
 bool
 SelectionTool::wheel(int delta)
 {
+    // mouse wheel resizes selection rect if it is active
     if (state == ACTIVE) {
         if (delta < 0) {
             rect.setSize(rect.size() * 0.9);
@@ -442,24 +543,6 @@ GenericPlot::eventHandler(int source, void *obj, QEvent *e)
         {
             // see if selection tool cares about new mouse position
             updatescene = selector->moved(spos);
-
-            // XXX look for nearest point for each series
-            // XXX will need to refactor into selection tool  and reuse for id selected items there
-            foreach(QAbstractSeries *series, qchart->series()) {
-                Quadtree *tree= quadtrees.value(series,NULL);
-                if (tree != NULL) {
-                    // lets convert cursor pos to value pos to find nearest
-                    double pixels = 10 * dpiXFactor; // within 10 pixels
-                    QRectF srect(spos-QPointF(pixels,pixels), spos+QPointF(pixels,pixels));
-                    QRectF vrect(qchart->mapToValue(srect.topLeft(),series), qchart->mapToValue(srect.bottomRight(),series));
-                    QPointF vpos = qchart->mapToValue(spos, series);
-
-                    // find a candidate
-                    QList<QPointF> tohere;
-                    tree->candidates(vrect, tohere);
-                    if (tohere.count()) fprintf(stderr, "hover %d candidates\n", tohere.count()); fflush(stderr);
-                }
-            }
         }
     break;
 
@@ -573,7 +656,6 @@ SelectionTool::updateScene()
                     selection->setMarkerSize(scatter->markerSize());
                     selection->setMarkerShape(scatter->markerShape());
                     selection->setPen(scatter->pen());
-                    selection->setVisible(true);
                     selections.insert(x, selection);
                     ignore.append(selection);
 
@@ -862,15 +944,12 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             }
 
-            QTime stopwatch;
-            stopwatch.start();
             // set the quadtree up - now we know the ranges...
             Quadtree *tree = new Quadtree(QPointF(calc.x.min, calc.y.min), QPointF(calc.x.max, calc.y.max));
             for (int i=0; i<xseries.size() && i<yseries.size(); i++)
                 if (xseries.at(i) != 0 && yseries.at(i) != 0) // 0,0 is common and lets ignore (usually means no data)
                     tree->insert(QPointF(xseries.at(i), yseries.at(i)));
-            fprintf(stderr, "quadtree creation took %u ms for %u records\n", stopwatch.elapsed(), calc.count); fflush(stderr);
-            fprintf(stderr, "quadtree created %u nodes\n", tree->nodes.count()); fflush(stderr);
+
             if (tree->nodes.count()) quadtrees.insert(add, tree);
 
             // hardware support?

@@ -19,6 +19,7 @@
 #ifndef _GC_GenericPlot_h
 #define _GC_GenericPlot_h 1
 
+#include <QWidget>
 #include <QString>
 #include <QDebug>
 #include <QColor>
@@ -30,6 +31,7 @@
 #include <string.h>
 #include <QtCharts>
 #include <QGraphicsItem>
+#include <QFontMetrics>
 #include "Quadtree.h"
 
 #include "GoldenCheetah.h"
@@ -47,6 +49,29 @@
 
 class GenericPlot;
 class SelectionTool;
+class GenericLegend;
+
+class GenericLegendLabel : public QWidget {
+
+    Q_OBJECT
+
+    public:
+        GenericLegendLabel(QWidget *parent, QString name) : QWidget(parent), name(name) {}
+
+    private:
+        QString name;
+};
+
+class GenericLegend : public QWidget {
+    Q_OBJECT
+
+    public:
+        GenericLegend(QWidget *parent) : QWidget(parent) {}
+
+    // a label has a unique name, not directly tide to
+    // a series or axis value, it depends...
+    QMap<QString,GenericLegendLabel*> labels;
+};
 
 // general axis info
 class AxisInfo {
@@ -165,6 +190,8 @@ class SelectionTool : public QGraphicsItem
     private:
         GenericPlot *host;
         QPointF start, startingpos, finish; // when calculating distances during transitions
+        QPointF spos; // last point we saw
+        QPointF hoverpoint;
 
         // selections from original during selection
         QMap<QAbstractSeries*, QAbstractSeries*> selections;
@@ -179,6 +206,9 @@ class GenericPlot : public QWidget {
     Q_OBJECT
 
     public:
+
+        friend class ::SelectionTool;
+
         GenericPlot(QWidget *parent, Context *context);
 
         // rendering via...
@@ -215,15 +245,15 @@ class GenericPlot : public QWidget {
         double min(QAbstractAxis*);
         double max(QAbstractAxis*);
 
+        // quadtrees
+        QMap<QAbstractSeries*, Quadtree*> quadtrees;
+
     private:
         Context *context;
         int charttype;
 
         // curves
         QMap<QString, QAbstractSeries *>curves;
-
-        // quadtrees
-        QMap<QAbstractSeries*, Quadtree*> quadtrees;
 
         // axes
         QMap<QString, AxisInfo *>axisinfos;
