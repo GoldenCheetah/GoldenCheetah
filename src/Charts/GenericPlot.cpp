@@ -563,14 +563,19 @@ SelectionTool::updateScene()
 
                     // all of this curve cloning should be in a new method xxx todo
                     host->qchart->addSeries(selection); // before adding data and axis
-                    selection->setColor(scatter->color());
+                    selection->setUseOpenGL(scatter->useOpenGL());
+                    if (selection->useOpenGL())
+                        selection->setColor(Qt::gray); // use opengl ignores changing colors
+                    else {
+                        selection->setColor(scatter->color());
+                        static_cast<QScatterSeries*>(x)->setColor(Qt::gray);
+                    }
                     selection->setMarkerSize(scatter->markerSize());
                     selection->setMarkerShape(scatter->markerShape());
                     selection->setPen(scatter->pen());
                     selection->setVisible(true);
                     selections.insert(x, selection);
                     ignore.append(selection);
-                    static_cast<QScatterSeries*>(x)->setColor(Qt::gray);
 
                     // only do when creating it.
                     if (yaxis) selection->attachAxis(yaxis);
@@ -610,7 +615,6 @@ SelectionTool::updateScene()
                 calc.finalise();
                 stats.insert(scatter, calc);
 
-                //fprintf(stderr, "selected %d points\n", points.count());
                 selection->clear();
                 if (points.count()) selection->append(points);
             }
@@ -641,7 +645,11 @@ SelectionTool::updateScene()
                 if ((selection=static_cast<QScatterSeries*>(selections.value(x,NULL))) != NULL) {
 
                     // set greyed out original back to its proper color
-                    static_cast<QScatterSeries*>(x)->setColor(static_cast<QScatterSeries*>(selection)->color());
+                    // rememember when opengl is in use setColor is ignored
+                    // so we didn't change it on selection, so no need to
+                    // set it back to original in that case
+                    if (!selection->useOpenGL())
+                        static_cast<QScatterSeries*>(x)->setColor(static_cast<QScatterSeries*>(selection)->color());
 
                     // clear points, remove from axis and remove from chart
                     selection->clear();
