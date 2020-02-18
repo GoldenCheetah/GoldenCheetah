@@ -20,6 +20,7 @@
 #define _GC_Quadtree_h 1
 
 #include <QPointF>
+#include <QRectF>
 #include <QList>
 
 class Quadtree;
