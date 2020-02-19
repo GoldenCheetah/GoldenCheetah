@@ -257,7 +257,7 @@ class WorkoutWidget : public QWidget
         void telemetryUpdate(RealtimeData rtData);
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *);
+        void ergFileSelected(ErgFile *, int format = 0);
 
         // save or save as (when erfile is NULL)
         void save();
@@ -342,6 +342,7 @@ class WorkoutWidget : public QWidget
         bool qwkactive; // we're editing it, not the user
         QStringList codeStrings;
         QList<int> codePoints; // index into points_ for each line
+        int format;
 
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file
@@ -361,6 +362,8 @@ class WorkoutWidget : public QWidget
 
         // for computing W'bal
         WPrime wpBal;
+
+        int ftp;
 
         // sizing
         double IHEIGHT;         // interval gap at bottom (used for TTE warning)
