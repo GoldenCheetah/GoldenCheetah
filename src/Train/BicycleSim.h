@@ -167,7 +167,7 @@ public:
     double KEFromV(double v) const;  // Compute kinetic energy of bike and rider (J) at speed v (in m/s)
     double VFromKE(double ke) const; // Compute velocity (m/s) from kinetic energy of bike and rider (J)
 
-    double ExtraWatts(const BicycleSimState &simState, double v) const;
+    double WattsForV(const BicycleSimState &simState, double v) const;
 
     // Compute new velocity in m/s after simState applied for dt seconds.
     double V(const BicycleSimState &simState,   // current sim state
@@ -175,7 +175,7 @@ public:
              double dt) const;                  // impulse duration
 
     double DV(const BicycleSimState &simState,  // current sim state
-        double v) const;                        // current velocity
+             double v) const;                        // current velocity
 
 };
 

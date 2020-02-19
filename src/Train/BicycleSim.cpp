@@ -202,8 +202,8 @@ struct MotionStatePair
     }
 };
 
-// Returns power surplus (or deficit) of v against current state.
-double Bicycle::ExtraWatts(const BicycleSimState &simState, double v) const
+// Returns power needed to maintain speed v against current simstate.
+double Bicycle::WattsForV(const BicycleSimState &simState, double v) const
 {
     double sl = simState.Slope() / 100; // 10% = 0.1
     const double CrV = 0.1;             // Coefficient for velocity - dependent dynamic rolling resistance, here approximated with 0.1
@@ -221,9 +221,8 @@ double Bicycle::ExtraWatts(const BicycleSimState &simState, double v) const
 
     const double W = 0;                 // Windspeed
     double wattsForV = m_constants.m_Cm * v * (CdARho / 2 * (v + W)*(v + W) + Frg + v * CrVn);
-    double extraWatts = simState.Watts() - wattsForV;
 
-    return extraWatts;
+    return wattsForV;
 }
 
 // Return ms/s from current state, speed and impulse duration.
@@ -237,7 +236,8 @@ double Bicycle::V(const BicycleSimState &simState,     // current sim state
     //Negative means... we're not going there.
     if (dt <= 0.0) return v;
 
-    double extraWatts = ExtraWatts(simState, v);
+    double wattsForV = WattsForV(simState, v);
+    double extraWatts = simState.Watts() - wattsForV;
 
     double j = KEFromV(v);               // state and speed to joules
     double newJ = j + (extraWatts * dt); // joules + (watts * time == more joules)
