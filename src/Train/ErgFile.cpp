@@ -737,11 +737,6 @@ void ErgFile::parseGpx()
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
 
-    if (fHasLat && fHasLon)
-    {
-        format = mode = CRS_LOC;
-    }
-
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
     else {
@@ -935,10 +930,6 @@ void ErgFile::parseTTS()
         fHasAlt = true;
     }
 
-    if (fHasAlt) {
-        format = mode = CRS_LOC;
-    }
-
     ttsFile.close();
 
     valid = true;
@@ -983,7 +974,7 @@ ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS || format == CRS_LOC) {
+    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
@@ -993,7 +984,6 @@ ErgFile::save(QStringList &errors)
     if (format==ERG) typestring = "ERG";
     if (format==MRC) typestring = "MRC";
     if (format==CRS) typestring = "CRS";
-    if (format == CRS_LOC) typestring = "CRS";
     if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
@@ -1397,7 +1387,7 @@ bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double
     if (meters < 0 || meters > Duration) return false;
 
     // No location unless... format contains location...
-    if (format != CRS && format != CRS_LOC)  return false;
+    if (format != CRS)  return false;
 
     if (Laps.count() > 0) {
         int lap = 0;
@@ -1521,7 +1511,7 @@ ErgFile::calculateMetrics()
     // is it valid?
     if (!isValid()) return;
 
-    if (format == CRS || format == CRS_LOC) {
+    if (format == CRS) {
 
         ErgFilePoint last;
         bool first = true;

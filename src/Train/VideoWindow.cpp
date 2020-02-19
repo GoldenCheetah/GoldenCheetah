@@ -413,7 +413,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
     QList<ErgFilePoint> *ErgFilePoints = NULL;
     if (context->currentErgFile()) {
-        if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) {
+        if (context->currentErgFile()->format == CRS) {
             ErgFilePoints = &(context->currentErgFile()->Points);
         }
     }
