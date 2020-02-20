@@ -13,7 +13,7 @@ install_name_tool -change `otool -L GoldenCheetah.app/Contents/MacOS/GoldenCheet
 # Fix QtWebEngineProcess due to bug in macdployqt from homebrew
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 pushd GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS
-for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtQml QtNetwork QtPositioning
+for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtNetwork QtPositioning
 do
     OLD_PATH=`otool -L QtWebEngineProcess | grep ${LIB} | cut -f 1 -d ' '`
     NEW_PATH="@loader_path/../../../../../../../${LIB}.framework/${LIB}"

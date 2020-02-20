@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt59/bin:$PATH
-export LD_LIBRARY_PATH=/opt/qt59/lib/x86_64-linux-gnu:/opt/qt59/lib:$LD_LIBRARY_PATH
+export PATH=/opt/qt514/bin:$PATH
+export LD_LIBRARY_PATH=/opt/qt514/lib/x86_64-linux-gnu:/opt/qt514/lib:$LD_LIBRARY_PATH
 
 ### This script should be run from GoldenCheetah src directory after build
 cd src
@@ -29,10 +29,10 @@ EOF
 # Icon
 cp Resources/images/gc.png appdir/
 
-### Add OpenSSL libs
+### Add OpenSSL 1.1 libs (to make it easier for Xenial users)
 mkdir appdir/lib
-cp /usr/lib/x86_64-linux-gnu/libssl.so appdir/lib
-cp /usr/lib/x86_64-linux-gnu/libcrypto.so appdir/lib
+cp /usr/local/lib/libssl.so.1.1 appdir/lib
+cp /usr/local/lib/libcrypto.so.1.1 appdir/lib
 
 ### Download current version of linuxdeployqt
 wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage

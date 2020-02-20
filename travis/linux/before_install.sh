@@ -1,15 +1,26 @@
 #!/bin/bash
 set -ev
 # Add recent Qt dependency ppa, update on a newer qt version.
-sudo add-apt-repository -y ppa:beineri/opt-qt597-xenial
+sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.1-xenial
 sudo apt-get update -qq
-sudo apt-get install -qq qt5-default qt59base qt59tools qt59serialport qt59svg\
- qt59multimedia qt59connectivity qt59webengine qt59charts-no-lgpl qt59networkauth-no-lgpl qt59translations
+sudo apt-get install -qq qt5-default qt514base qt514tools qt514serialport\
+ qt514svg qt514multimedia qt514connectivity qt514webengine qt514charts-no-lgpl\
+ qt514networkauth-no-lgpl qt514translations
 
 sudo apt-get install -qq libglu1-mesa-dev libgstreamer0.10-0 libgstreamer-plugins-base0.10-0
 sudo apt-get install -y --allow-downgrades libpulse0=1:8.0-0ubuntu3
 sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
 sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
+
+# Add OpenSSL 1.1.1 (required by Qt 5.14.1)
+wget https://www.openssl.org/source/openssl-1.1.1d.tar.gz
+tar xf openssl-1.1.1d.tar.gz
+cd openssl-1.1.1d
+./Configure shared --prefix=/usr --openssldir=/usr/lib/ssl --libdir=lib no-idea no-mdc2 no-rc5 no-zlib no-ssl3 enable-ec_nistp_64_gcc_128 linux-x86_64
+make -j4
+sudo cp libssl.so.1.1 libcrypto.so.1.1 /usr/local/lib/
+sudo ldconfig
+cd ..
 
 # Add VLC 2.2.2
 sudo apt-get install -qq vlc libvlc-dev libvlccore-dev
