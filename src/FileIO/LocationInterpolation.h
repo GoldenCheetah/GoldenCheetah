@@ -793,6 +793,11 @@ public:
 
     GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>(), m_locationState(Unset) {}
 
+    void Reset() {
+        m_locationState = Unset;
+        DistancePointInterpolator<SphericalTwoPointInterpolator>::Reset();
+    }
+
     geolocation Location(double distance);
     geolocation Location(double distance, double &slope);
 

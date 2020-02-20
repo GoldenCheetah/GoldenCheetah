@@ -394,7 +394,6 @@ void GeoPointInterpolator::Push(double distance, double altitude)
 
     geolocation geo(0, 0, altitude);
     xyz point = geo.toxyz();
-    point.y() = distance;
 
     DistancePointInterpolator<SphericalTwoPointInterpolator>::Push(distance, point);
 }

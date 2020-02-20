@@ -75,7 +75,8 @@ class VideoSyncFile
         static bool isVideoSync(QString); // is this a supported videosync?
 
         void reload();          // reload after messed about
-        void parseRLV();         // its a rlv file
+        void parseRLV();        // its a rlv file
+        void parseTTS();        // its a tts file
         bool isValid();         // is the file valid or not?
 
         double VideoFrameRate;

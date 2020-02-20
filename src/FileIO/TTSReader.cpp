@@ -16,7 +16,7 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-// Adapted to C++ from Wattzap Community Edition Java source code.
+// Data reader adapted to C++ from Wattzap Community Edition Java source code.
 
 #include "TTSReader.h"
 #include "LocationInterpolation.h"
@@ -389,100 +389,6 @@ double TTSReader::getMinSlope() const {
     return minSlope;
 }
 
-// The thing about duplicates is... you must treat the entire span of duplicates
-// as bogus, not just the ones after the first. Because often they all have the same
-// altitude and its important to amortize that change across the span of duplicates.
-//
-// The sad truth is that routes with duplicates have low accuracy gps data and we
-// shouldn't even trust the non-duplicates. We should be averaging the 'good' points
-// even before interpolating the bad ones.
-//
-// Function returns next 'non-duplicate' index. At end this function returns points.size().
-unsigned TTSReader::findNextNonDuplicateGeolocation(unsigned u) const
-{
-    geolocation geo(points[u].getLatitude(), points[u].getLongitude(), 0);
-
-    unsigned idx = u + 1;
-    while (idx < points.size()) {
-        geolocation geoIdx(points[idx].getLatitude(), points[idx].getLongitude(), 0);
-
-        double distance = geo.DistanceFrom(geoIdx);
-        if (distance == 0.) {
-            idx++;
-            continue;
-        }
-
-        int distanceExp;
-        std::frexp(distance, &distanceExp);
-
-        // If outside of 2^-12 then they are not the same location.
-        if (distanceExp < -12) {
-            idx++;
-            continue;
-        }
-
-        break;
-    }
-
-    return idx;
-}
-
-unsigned TTSReader::interpolateDuplicateLocations()
-{
-    // Some tts files I see have an altitude crisis around the start: Fixup altitude
-    // of index 1 by linear interpolating from 2 using 1's gradient.
-    double d2d1delta = points[2].getDistanceFromStart() - points[1].getDistanceFromStart();
-    points[1].setElevation(points[2].getElevation() - (0.01 * points[1].getGradient()*d2d1delta));
-
-    GeoPointInterpolator gpi;
-
-    gpi.Push(points[1].getDistanceFromStart(), geolocation(points[1].getLatitude(), points[1].getLongitude(), points[1].getElevation()));
-    unsigned ii = 2;
-
-    unsigned uRewriteCount = 0;
-    unsigned idx = 2;
-    while (idx < points.size()) {
-
-        unsigned duplicateEndIdx = findNextNonDuplicateGeolocation(idx);
-
-        if (duplicateEndIdx != (idx + 1)) {
-
-            while (idx < duplicateEndIdx) {
-
-                Point & reP = points[idx];
-                double reDist = reP.getDistanceFromStart();
-                while (gpi.WantsInput(reDist)) {
-
-                    ii = findNextNonDuplicateGeolocation(ii);
-
-                    // At end, push that final point (stored at index 0) and notify complete.
-                    if (ii >= (points.size() - 1)) {
-                        Point &p = points[0];
-                        gpi.Push(p.getDistanceFromStart(), geolocation(p.getLatitude(), p.getLongitude(), p.getElevation()));
-                        gpi.NotifyInputComplete();
-                    } else {
-                        Point &p = points[ii];
-                        gpi.Push(p.getDistanceFromStart(), geolocation(p.getLatitude(), p.getLongitude(), p.getElevation()));
-                    }
-                }
-
-                geolocation n = gpi.Location(reDist);
-
-                reP.setLatitude(n.Lat());
-                reP.setLongitude(n.Long());
-                reP.setElevation(n.Alt());
-
-                uRewriteCount++;
-                idx++;
-            }
-        }
-
-        idx = duplicateEndIdx;
-    }
-
-    return uRewriteCount;
-}
-
 bool TTSReader::deriveMinMaxSlopes(double &minSlope, double &maxSlope, double &variance) const {
 
     minSlope = 0;
@@ -511,10 +417,16 @@ bool TTSReader::deriveMinMaxSlopes(double &minSlope, double &maxSlope, double &v
 
 void TTSReader::recomputeAltitudeFromGradient() {
 
-    // Wish there was a fix... TTS Files with no altitude will start at elevation 0...
-    double alt = points[1].getElevation();
+    // Some tts files I see have an altitude crisis around the start: Fixup altitude
+    // of index 0 and 1 by linear interpolating.
+    double d2d1delta = points[2].getDistanceFromStart() - points[1].getDistanceFromStart();
+    points[1].setElevation(points[2].getElevation() - (0.01 * points[1].getGradient()*d2d1delta));
+    points[0].setElevation(points[1].getElevation() - (0.01 * points[0].getGradient()*d2d1delta));
 
-    for (unsigned u = 2; u < points.size(); u++) {
+    // Wish there was a fix... TTS Files with no altitude will start at elevation 0...
+    double alt = points[0].getElevation();
+
+    for (unsigned u = 1; u < points.size(); u++) {
 
         const Point &curr = points[u];
         const Point &prev = points[u - 1];
@@ -530,9 +442,6 @@ void TTSReader::recomputeAltitudeFromGradient() {
 
         points[u].setElevation(alt);
     }
-
-    // Rewrite teh first point which is actually last point.
-    points[0].setElevation(alt);
 
     // Even if tts file started without altitude, now that it is generated
     // we will claim to have it.
@@ -599,25 +508,7 @@ bool TTSReader::parseFile(QDataStream &file) {
 
     // Clean up passes.
 
-    // I can't tell if this is the design but it seems to work
-    // well. Move all trip distance values forward by one with points[1]
-    // being given 0. The symptom I'm fixing is that points[0]'s distance
-    // is the final distance, and point[1]'s distance looks like it
-    // should be the second point's distance.
-    double nextDist = 0;
-    for (int i = 1; i < points.size(); i++) {
-        double t = points[i].getDistanceFromStart();
-        points[i].setDistanceFromStart(nextDist);
-        nextDist = t;
-    }
-
-    // First some tts files have lat/lon that were
-    // stored as float32. These have ranges of duplicate location
-    // that should be removed. This pass also fixes up common errors
-    // with the first sample on the ride.
-    interpolateDuplicateLocations();
-
-    // Now recompute all altitude data using the recorded gradient.
+    // Recompute all altitude data using the recorded gradient.
     // This is necessary because generally the altitude data in tts
     // files is far far too noisy to use to compute slope. For example
     // see IT_LOMBARDY08.TTS.
@@ -816,67 +707,186 @@ bool TTSReader::loadHeaders() {
         bytes += (int)data.size();
     }
 
-    // merge program points
+    // At this... point...
+    // - pointList holds framemapping info (if any)
+    // - programList holds slope info
+    // - gpsList holds gps info
+    //
+    // GPS Info is optional.
+    // FrameMapping Info is optional.
+    //
+    // If this is a slope program then slope info is NOT optional.
+    //
+    // So we need to decide what is our base list.
+    //
+    // WattZap implementation based everything on framemapping info,
+    // which doesn't work when framemapping isn't in the tts.
+    //
+    // One stream is chosen to be the basis for the interpolation of
+    // the other streams. Choose whichever has the most data points,
+    // then interpolate the other two onto it.
+    size_t gpsCount = gpsPoints.size();
+    size_t slopeCount = programList.size();
+    size_t frameMapCount = pointList.size();
+
+    enum Basis { NoBasis, FrameMap, GPS, Slope };
+
+    Basis basis = NoBasis;
+
+    // Copy basis stream onto points[].
+    if (frameMapCount > gpsCount && frameMapCount > slopeCount)
+    {
+        // pointList basis. This holds frame mapping.
+        // Is already correct type so just copy.
+        points = pointList;
+        basis = FrameMap;
+    } else if (gpsCount >= slopeCount) {
+        // GpsList basis    
+        for (int i = 0; i < gpsCount; i++) {
+            Point p;
+
+            p.setDistanceFromStart(gpsPoints[i].distance);
+            p.setLatitude(gpsPoints[i].lat);
+            p.setLongitude(gpsPoints[i].lon);
+            p.setElevation(gpsPoints[i].alt);
+
+            points.push_back(p);
+        }
+        basis = GPS;
+    } else {
+        // slope basis
+        for (int i = 0; i < slopeCount; i++) {
+            Point p;
+
+            p.setDistanceFromStart(programList[i].distance);
+            p.setGradient(programList[i].slope);
+
+            points.push_back(p);
+        }
+        basis = Slope;
+    }
+
+    if (basis == NoBasis) {
+        return false;
+    }
+
+    GeoPointInterpolator gpi; // geo interpolation
+
+    // Interpolate non-geo data in xyz.
+    DistancePointInterpolator<LinearTwoPointInterpolator> ti;
+    DistancePointInterpolator<LinearTwoPointInterpolator> si;
+
+    // Interpolate non-basis streams onto points[].
+    int frameMapIdx = 0;
+    int gpsIdx      = 0;
+    int slopeIdx    = 0;
+
+    for (int i = 0; i < points.size(); i++) {
+
+        fHasKM = true;
+
+        Point &p = points[i];
+
+        // Interpolate framemap
+        if (basis != FrameMap && frameMapCount) {
+
+            while (ti.WantsInput(p.getDistanceFromStart())) {
+                if (frameMapIdx >= frameMapCount) {
+                    ti.NotifyInputComplete();
+                    break;
+                }
+                ti.Push(pointList[frameMapIdx].getDistanceFromStart(),
+                        xyz(pointList[frameMapIdx].getTime(), 0, 0));
+                frameMapIdx++;
+            }
+
+            xyz interp = ti.Location(p.getDistanceFromStart());
+            double time = interp.x();
+
+            p.setTime(time);
+
+            fHasFrameMapping = true;
+        }
+
+        // Interpolate gps location
+        if (basis != GPS && gpsCount) {
+            while (gpi.WantsInput(p.getDistanceFromStart())) {
+                if (gpsIdx >= gpsCount) {
+                    gpi.NotifyInputComplete();
+                    break;
+                }
+                gpi.Push(gpsPoints[gpsIdx].distance,
+                         geolocation(gpsPoints[gpsIdx].lat,
+                                     gpsPoints[gpsIdx].lon,
+                                     gpsPoints[gpsIdx].alt));
+                gpsIdx++;
+            }
+
+            geolocation geoloc = gpi.Location(p.getDistanceFromStart());
+
+            p.setLatitude (geoloc.Lat());
+            p.setLongitude(geoloc.Long());
+            p.setElevation(geoloc.Alt());
+
+            fHasGPS = true;
+            fHasAlt = true;
+        }
+
+        // Interpolate gradient
+        if (basis != Slope && slopeCount) {
+
+            while (si.WantsInput(p.getDistanceFromStart())) {
+                if (slopeIdx >= frameMapCount) {
+                    si.NotifyInputComplete();
+                    break;
+                }
+                si.Push(programList[slopeIdx].distance,
+                        xyz(programList[slopeIdx].slope, 0, 0));
+                slopeIdx++;
+            }
+
+            xyz interp = si.Location(p.getDistanceFromStart());
+            double slope = interp.x();
+
+            p.setGradient(slope);
+
+            fHasSlope = true;
+        }
+    }
+
+    // Convet units for distance and time. Compute speed.
+    Point *pPrevPoint = &(points[0]);
+
     unsigned int pointCount = 0;
-    long lastDistance = 0;
-    double lastSlope = 0.0;
+    while (pointCount < points.size()) {
+        Point &p = points[pointCount];
 
-    Point &lastPoint = pointList[0];
-    int programCount = (int)programList.size();
+        // turn into meters
+        p.setDistanceFromStart(p.getDistanceFromStart() / 100);
 
-    for (int i = 0; i < programCount; i++) {
-        ProgramPoint pp = programList[i];
-        while (pointCount < pointList.size()) {
-            Point &p = pointList[pointCount];
-            if (pp.distance > p.getDistanceFromStart() || i == programCount - 1) {
+        // convert to mS
+        p.setTime(p.getTime() * 1000);
 
-                this->fHasSlope = true;
-                this->fHasKM = true;
+        // speed = d/t
+        if (pointCount > 0) {
+            p.setSpeed((3600 * (p.getDistanceFromStart() - pPrevPoint->getDistanceFromStart())) / ((p.getTime() - pPrevPoint->getTime())));
+        }
 
-                // see which point is closest
-                if ((p.getDistanceFromStart() - lastDistance) < (p.getDistanceFromStart() - pp.distance)) {
-                    p.setGradient(pp.slope);
-                }
-                else {
-                    p.setGradient(lastSlope);
-                }
+        pPrevPoint = &(points[pointCount]);
 
-                // turn into meters
-                p.setDistanceFromStart(p.getDistanceFromStart() / 100);
+        // meters / meters
+        p.print();
 
-                // convert to mS
-                p.setTime(p.getTime() * 1000);
+        series.push_back({ p.getDistanceFromStart() / 1000, p.getElevation() });
 
-                // speed = d/t
-                if (pointCount > 0) {
-                    p.setSpeed((3600 * (p.getDistanceFromStart() - lastPoint.getDistanceFromStart())) / ((p.getTime() - lastPoint.getTime())));
-                }
-
-                lastPoint = p;
-
-                // meters / meters
-                p.print();
-
-                series.push_back({ p.getDistanceFromStart() / 1000, p.getElevation() });
-            }
-            else {
-                break;
-            }
-
-            lastDistance = pp.distance;
-            lastSlope = pp.slope;
-
-            pointCount++;
-        }// while
-    }// for
+        pointCount++;
+    }// while
 
     // fill in speed for first point
 
-    pointList[0].setSpeed(pointList[1].getSpeed());
+    points[0].setSpeed(points[1].getSpeed());
 
-    totalDistance = pointList[pointList.size() - 1].getDistanceFromStart();
-
-    points = pointList;
+    totalDistance = points[points.size() - 1].getDistanceFromStart();
 
     return true;
 }
@@ -986,14 +996,7 @@ void TTSReader::GPSData(int version, ByteArray &data) {
 
     DEBUG_LOG << "[" << (data.size() / 16) << " gps points]\n";
 
-    unsigned int pointCount = 0;
-    int lastDistance = 0;
-    double lastLat = 0;
-    double lastLon = 0;
-    double lastAlt = 0;
-
     int gpsCount = (int)data.size() / 16;
-
     for (int i = 0; i < gpsCount; i++) {
 
         int distance = getUInt(data, i * 16);
@@ -1002,60 +1005,41 @@ void TTSReader::GPSData(int version, ByteArray &data) {
         double lon = AsFloat(getUInt(data, i * 16 + 8));
         double altitude = AsFloat(getUInt(data, i * 16 + 12));
 
-        while (pointCount < pointList.size()) {
+        if (lat != 0. || lon != 0.) {
+            fHasGPS = true;
+        }
 
-            Point &p = pointList[pointCount];
+        if (altitude != 0.) {
+            fHasAlt = true;
+        }
 
-            /*
-             * we're straddling two points or we've run out of gps points to
-             * use
-             */
-            if (distance > p.getDistanceFromStart() || i == gpsCount - 1) {
+        bool fIsDuplicate = false;
 
-                fHasLat = true;
-                fHasLon = true;
-                fHasAlt = true;
+        // Some tts files contain duplicate points. Remove these
+        // since they only screw up interpolation during stream
+        // merging.
+        if (gpsPoints.size()) {
+            GPSPoint &prevGPS = gpsPoints[gpsPoints.size() - 1];
 
-                // see which point is closest
-                if ((p.getDistanceFromStart() - lastDistance) < (p.getDistanceFromStart() - distance)) {
+            // Compare geo distance independent of altitude,
+            // altitude noise is a separate problem.
+            geolocation curGPS(lat, lon, 0);
+            geolocation newGPS(prevGPS.lat, prevGPS.lon, 0);
 
-                    DEBUG_LOG_VERBOSE << "[" << pointCount << "]"
-                              << p.getDistanceFromStart() << "/"
-                              << distance << " : " << p.getTime()
-                              << " secs " << lat << "/" << lon << ", "
-                              << altitude << " meters\n";
+            double distance = curGPS.DistanceFrom(newGPS);
 
-                    p.setElevation(altitude);
-                    p.setLatitude(lat);
-                    p.setLongitude(lon);
-                }
-                else {
+            int distanceExp;
+            std::frexp(distance, &distanceExp);
 
-                    DEBUG_LOG_VERBOSE << "[" << pointCount << "]"
-                              << (long) p.getDistanceFromStart() << "/"
-                              << lastDistance << " : " << p.getTime()
-                              << " secs " << lastLat << "/" << lastLon
-                              << ", " << lastAlt << " meters\n";
-
-                    p.setElevation(lastAlt);
-                    p.setLatitude(lastLat);
-                    p.setLongitude(lastLon);
-                }
-
-                pointList[pointCount] = p;
+            // If outside of 2^-12 then they are not the same location.
+            if (distanceExp < -12) {
+                fIsDuplicate = true;
             }
-            else {
-                break;
-            }
+        }
 
-            pointCount++;
-
-        }// while
-
-        lastDistance = distance;
-        lastLat = lat;
-        lastLon = lon;
-        lastAlt = altitude;
+        if (!fIsDuplicate) {
+            gpsPoints.push_back(GPSPoint(distance, lat, lon, altitude));
+        }
     }
 
     return;
@@ -1111,6 +1095,10 @@ void TTSReader::distanceToFrame(int version, ByteArray &data) {
         p.setTime((int)(frame / frameRate));
         pointList.push_back(p);
     }
+
+    // This reader was premised on all tts files having frame mapping, but
+    // some don't...
+    fHasFrameMapping = pointList.size() != 0;
 }
 
 /**
@@ -1134,10 +1122,9 @@ void TTSReader::programData(int version, ByteArray &data) {
 
     DEBUG_LOG << "[" << data.size() / 6 << " program points]";
 
-    long distance = 0;
+    double distance = 0;
     int pointCount = (int)data.size() / 6;
-
-    programList.resize(pointCount);
+    double bias = 0;
 
     for (int i = 0; i < pointCount; i++) {
         int slope = getUShort(data, i * 6);
@@ -1167,7 +1154,15 @@ void TTSReader::programData(int version, ByteArray &data) {
             maxSlope = p.slope;
         }
 
-        p.distance = distance;
+        // If first point isn't zero distance then bias
+        // it and all subseequent points by this distance.
+        // This might be rubbish but appears to help every
+        // tts I've tried.
+        if (i == 0 && distance != 0.) {
+            bias = -distance;
+        }
+
+        p.distance = distance + bias;
 
         programList.push_back(p);
     }
