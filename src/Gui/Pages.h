@@ -570,6 +570,8 @@ class CustomMetricsPage : public QWidget
         void deleteClicked();
         void addClicked();
         void editClicked();
+        void exportClicked();
+        void importClicked();
         void doubleClicked(QTreeWidgetItem *item, int column);
 
     protected:
@@ -577,7 +579,9 @@ class CustomMetricsPage : public QWidget
 
         QPushButton *addButton,
                     *deleteButton,
-                    *editButton;
+                    *editButton,
+                    *exportButton,
+                    *importButton;
         QTreeWidget *table;
         QList<UserMetricSettings> metrics;
 

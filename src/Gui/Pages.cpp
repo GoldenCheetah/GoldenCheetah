@@ -3131,6 +3131,8 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
 
     editButton = new QPushButton(tr("Edit"));
+    exportButton = new QPushButton(tr("Export"));
+    importButton = new QPushButton(tr("Import"));
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
@@ -3141,6 +3143,8 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(exportButton);
+    buttons->addWidget(importButton);
     buttons->addStretch();
     buttons->addWidget(editButton);
     buttons->addStretch();
@@ -3152,6 +3156,8 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+    connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
+    connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
 }
 
 void
@@ -3276,6 +3282,73 @@ CustomMetricsPage::doubleClicked(QTreeWidgetItem *item, int)
 
         // add to the list
         metrics[row+skipcompat] = here;
+        refreshTable();
+
+    }
+}
+
+void
+CustomMetricsPage::exportClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // metric to export
+    UserMetricSettings here = metrics[row+skipcompat];
+
+    // get a filename to export to...
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export Metric"), QDir::homePath() + "/" + here.symbol + ".gmetric", tr("GoldenCheetah Metric File (*.gmetric)"));
+
+    // nothing given
+    if (filename.isEmpty()) return;
+
+    UserMetricParser::serialize(filename, QList<UserMetricSettings>() << here);
+}
+
+void
+CustomMetricsPage::importClicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Metric file to import"), "", tr("GoldenCheetah Metric Files (*.gmetric)"));
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Metric"), tr("No Metric file selected!"));
+        return;
+    }
+
+    QList<UserMetricSettings> imported;
+    QFile metricFile(fileName);
+
+    // setup XML processor
+    QXmlInputSource source( &metricFile );
+    QXmlSimpleReader xmlReader;
+    UserMetricParser handler;
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+
+    // parse and get return values
+    xmlReader.parse(source);
+    imported = handler.getSettings();
+    if (imported.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Metric"), tr("No Metric found in the selected file!"));
+        return;
+    }
+
+    UserMetricSettings here = imported.first();
+
+    EditUserMetricDialog editor(this, context, here);
+    if (editor.exec() == QDialog::Accepted) {
+
+        // add to the list
+        metrics.append(here);
         refreshTable();
 
     }
