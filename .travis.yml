@@ -2,10 +2,6 @@ branches:
   only:
   - master
   - /^[vV]\d+\.\d+(\.\d+)?(-\S*)?$/
-os:
-- osx
-- linux
-dist: xenial
 language: cpp
 env:
   global:
@@ -28,13 +24,14 @@ env:
   - secure: cc0pAJjkmFNw2bO3zVACmtyHTwINAHALrtUxi+nRD+FhOO9KxuxuuwvcKCZKfp9EUOjz5PrYWKV1ZH/zt/jMix8A4Gyue2mWX8WYih7aTmJBcJWsFNTCybnClreKBCh18kHdWWhkmhk8EMINDvlqxzJZGpcNO04gxhL9wuLLrNQ=
   - secure: em0xXIm69rMHsHXYQiizeJB7dEFBkX33PsWDHwBNrX6lFBued23eL96KJC4RVbk6A+AHFtXFATrreZ14D5JH/E/37CXhe3X2R93WqiPUSH0s7NI4fFA1BroKUNAlqO4bMqDBidtNmwMPaLTXjaOnOZyvbAG7z+QV3TKC8tOeZDU=
   - secure: VFaSERlgsjzjiDQhKw8XFvQrjdvFzHHL7V3NQg+RfELHoT6I1pAGFdl/+lRBIVOiVkbQ6XnpBA28nlf0QydPHElRZdqmh0azQV/bkUXD4ffPE8q0iSqeqhAZ+5L05K5K+Gby/y8TZE4FX6e/7trFL7oq+h9x0gq5RQO8rAcTV84=
-  matrix:
-    include:
-      - os: osx
-        osx_image: xcode10.1
-        compiler: clang
-      - os: linux
-        compiler: gcc
+jobs:
+  include:
+  - os: osx
+    osx_image: xcode10.1
+    compiler: clang
+  - os: linux
+    dist: xenial
+    compiler: gcc
 before_install:
 - travis/$TRAVIS_OS_NAME/before_install.sh
 before_script:
@@ -50,10 +47,10 @@ after_success:
 - travis/$TRAVIS_OS_NAME/after_success.sh
 deploy:
   provider: releases
-  api_key:
+  token:
     secure: KlfkRM8oGP02y5LhbdxetnhqUG3YzVylvyhT8BTYjdoJtkJr7YXYpdhj9byZ9aiy1gSWI/g7A1X6/P8/McqRtgt4dEYr4Zg8QO7Y7QdTpgNQEwu8ZrkyyG/7b/rSkfFHDjrOAHslLVXuBNwWgi8YW1aTn0rY2AqDbOri7u6tt9Q=
   file: src/$FINAL_NAME
-  skip_cleanup: true
+  cleanup: false
   on:
     tags: true
     repo: GoldenCheetah/GoldenCheetah
