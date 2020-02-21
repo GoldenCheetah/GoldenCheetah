@@ -47,7 +47,6 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
 
     chartview = new QChartView(qchart, this);
     chartview->setRenderHint(QPainter::Antialiasing);
-    mainLayout->addWidget(chartview);
 
     // watch mouse hover etc on the chartview and scene
     chartview->setMouseTracking(true);
@@ -57,8 +56,15 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     selector = new SelectionTool(this);
     chartview->scene()->addItem(selector);
 
+    // the legend at the top for now
+    legend = new GenericLegend(context, this);
+
     // filter ESC so we can stop scripts
     installEventFilter(this);
+
+    // add all widgets to the view
+    mainLayout->addWidget(legend);
+    mainLayout->addWidget(chartview);
 
     // watch for colors changing
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -68,9 +74,152 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
 }
 
 //
+// legends
+//
+
+GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color) :
+    QWidget(parent), context(context), name(name), color(color)
+{
+
+    value=0;
+    hasvalue=false;
+
+    // set height and width, gets reset when configchanges
+    configChanged(0);
+
+    // watch for changes...
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+}
+
+
+void
+GenericLegendItem::configChanged(qint32)
+{
+    static const double gl_margin = 6 * dpiXFactor;
+    static const double gl_spacer = 5 * dpiXFactor;
+    static const double gl_block = 10 * dpiXFactor;
+    static const double gl_linewidth = 1 * dpiXFactor;
+
+    // we just set geometry for now.
+    QFont f; // based on what just got set in prefs
+    QFontMetricsF fm(f);
+
+    // so now the string we would display
+    QString valuelabel = QString ("%1").arg("9999999.999"); // xxx later we might have scale/dp
+
+    // maximum width of widget = margin + block + space + name + space + value + margin
+    double width = gl_margin + gl_block + gl_spacer + fm.boundingRect(name).width()
+                              + gl_spacer + fm.boundingRect(valuelabel).width() + gl_margin;
+
+    // maximum height of widget = margin + textheight + spacer + line
+    double height = gl_margin + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
+
+    // now set geometry of widget
+    setFixedWidth(width);
+    setFixedHeight(height);
+
+    // calculate all the rects used by the painter now since static
+    blockrect = QRectF(gl_margin, gl_margin, gl_block, height-gl_margin);
+    linerect = QRectF(gl_margin, height-gl_linewidth, width-gl_margin, gl_linewidth);
+    namerect = QRectF(gl_margin + gl_block + gl_spacer, gl_margin, fm.boundingRect(name).width(), fm.boundingRect(name).height());
+    valuerect =QRectF(namerect.x() + namerect.width() + gl_spacer, gl_margin, fm.boundingRect(valuelabel).width(), fm.boundingRect(valuelabel).height());
+
+
+    // redraw
+    update();
+}
+
+void
+GenericLegendItem::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.save();
+
+    // fill background first
+    painter.setBrush(QBrush(GColor(CPLOTBACKGROUND)));
+    painter.setPen(Qt::NoPen);
+    painter.drawRect(0,0,geometry().width()-1, geometry().height()-1);
+
+    // block and line
+    painter.setBrush(QBrush(color));
+    painter.setPen(Qt::NoPen);
+    painter.drawRect(blockrect);
+    painter.drawRect(linerect);
+
+    // just paint the value for now
+    QString string;
+    if (hasvalue) string=QString("%1").arg(value, 0, 'f', 2);
+    else string="   ";
+
+    // set pen to series color for now
+    painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND))); // use invert - usually black or white
+    painter.setFont(QFont());
+
+    // series
+    painter.drawText(namerect, name, Qt::AlignHCenter|Qt::AlignVCenter);
+    painter.drawText(valuerect, string, Qt::AlignHCenter|Qt::AlignVCenter);
+    painter.restore();
+}
+
+GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(context), plot(plot)
+{
+    layout = new QHBoxLayout(this);
+    layout->addStretch();
+
+    // get notifications when values change
+    connect(plot->selector, SIGNAL(hover(QPointF,QString,QAbstractSeries*)), this, SLOT(hover(QPointF,QString,QAbstractSeries*)));
+    connect(plot->selector, SIGNAL(unhover(QString)), this, SLOT(unhover(QString)));
+}
+
+void
+GenericLegend::addSeries(QString name, QAbstractSeries *series)
+{
+    // if it already exists remove it
+    if (items.value(name,NULL) != NULL) removeSeries(name);
+
+    GenericLegendItem *add = new GenericLegendItem(context, this, name, GenericPlot::seriesColor(series));
+    layout->insertWidget(0, add);
+    items.insert(name,add);
+
+    // lets see ya!
+    add->show();
+}
+
+void
+GenericLegend::removeSeries(QString name)
+{
+    GenericLegendItem *remove = items.value(name, NULL);
+    if (remove) {
+        layout->removeWidget(remove);
+        items.remove(name);
+        delete remove;
+    }
+}
+
+void
+GenericLegend::removeAllSeries()
+{
+    foreach (QString name, items.keys())   removeSeries(name);
+}
+
+void
+GenericLegend::hover(QPointF value, QString name, QAbstractSeries*)
+{
+    GenericLegendItem *call = items.value(name, NULL);
+    if (call) call->setValue(value);
+}
+
+void
+GenericLegend::unhover(QString name)
+{
+    items.value(name)->noValue();
+}
+
+//
 // Selecting points on the plot
 //
-SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host)
+SelectionTool::SelectionTool(GenericPlot *host) : QObject(host), QGraphicsItem(NULL), host(host)
 {
     // start inactive and rectangle
     state = INACTIVE;
@@ -78,6 +227,7 @@ SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host
     setVisible(true); // always visible - paints on axis
     setZValue(100); // always on top.
     hoverpoint = QPointF();
+    hoverseries = NULL;
     rect = QRectF(0,0,0,0);
 }
 
@@ -85,6 +235,10 @@ SelectionTool::SelectionTool(GenericPlot *host) : QGraphicsItem(NULL), host(host
 // a lassoo or rectangle shape
 void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
+   // don't paint outside the canvas
+   painter->save();
+   painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+
    switch (mode) {
    case CIRCLE:
         {
@@ -148,6 +302,7 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                         label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
                         painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
 
+                        // tell the legend or whoever else is listening
                         //fprintf(stderr,"cursor (%f,%f) @(%f,%f) for series %s\n", spos.x(), spos.y(),v.x(),v.y(),series->name().toStdString().c_str()); fflush(stderr);
                     }
                 }
@@ -156,11 +311,9 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
             if (state != INACTIVE) {
 
                 // there is a rectangle to draw on the screen
-                painter->save();
                 QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
                 QColor color = GColor(CPLOTMARKER);
                 color.setAlphaF(state == ACTIVE ? 0.05 : 0.2); // almost hidden if not moving/sizing
-                painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
                 painter->fillRect(r,QBrush(color));
 
                 // now paint the statistics
@@ -259,7 +412,6 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                     }
 
                 }
-                painter->restore();
             }
         }
         break;
@@ -270,6 +422,7 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
         }
         break;
    }
+   painter->restore();
 }
 
 // rect is updated during selection etc in the event handler
@@ -286,6 +439,8 @@ SelectionTool::reset()
     start=QPointF(0,0);
     finish=QPointF(0,0);
     rect = QRectF(0,0,0,0);
+    hoverpoint = QPointF();
+    hoverseries = NULL;
     resetSelections();
     update();
     return true;
@@ -370,7 +525,11 @@ SelectionTool::moved(QPointF pos)
         // this needs to be super quick as mouse
         // movements are very fast, so we use a
         // quadtree to find the nearest points
+        QPointF originalhover = hoverpoint;         // screen co-ordinates used by paint later
+        QPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
         hoverpoint = QPointF(); // screen coordinates
+        QAbstractSeries *originalhoverseries = hoverseries;
+        hoverseries = NULL;
         foreach(QAbstractSeries *series, host->qchart->series()) {
 
             Quadtree *tree= host->quadtrees.value(series,NULL);
@@ -389,13 +548,26 @@ SelectionTool::moved(QPointF pos)
                 QPointF cursorpos=mapFromScene(pos);
                 foreach(QPointF p, tohere) {
                     QPointF scpos = mapFromScene(host->qchart->mapToPosition(p, series));
-                    if (hoverpoint == QPointF()) hoverpoint = scpos;
-                    else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength())
+                    if (hoverpoint == QPointF()) {
+                        hoverpoint = scpos;
+                        hoverseries = series;
+                        hoverv = p;
+                    } else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength()) {
                         hoverpoint=scpos; // not happy with this XXX needs more work
+                        hoverseries = series;
+                        hoverv = p;
+                    }
                 }
 
                 //if (tohere.count())  fprintf(stderr, "HOVER %d candidates nearby\n", tohere.count()); fflush(stderr);
             }
+
+        }
+
+        // hoverpoint changed - either a new series selected, a new point, or no point at all
+        if (originalhoverseries != hoverseries || hoverv != QPointF()) {
+            if (hoverseries != originalhoverseries && originalhoverseries != NULL) emit (unhover(originalhoverseries->name())); // old hover changed
+            if (hoverseries != NULL)  emit hover(hoverv, hoverseries->name(), hoverseries); // new hover changed
         }
 
         // for mouse moves..
@@ -1049,6 +1221,9 @@ GenericPlot::finaliseChart()
         delete axis;
     }
 
+    // clear the legend
+    legend->removeAllSeries();
+
     // basic aesthetics
     qchart->legend()->setMarkerShape(QLegend::MarkerShapeRectangle);
     qchart->setDropShadowEnabled(false);
@@ -1137,13 +1312,22 @@ GenericPlot::finaliseChart()
                 // add the series that are associated with this
                 foreach(QAbstractSeries *series, axisinfo->series)
                     series->attachAxis(add);
+
             }
         }
     }
 
-    if (charttype ==GC_CHART_PIE) {
+    if (charttype == GC_CHART_SCATTER || charttype == GC_CHART_LINE) {
+        foreach(QAbstractSeries *series, qchart->series()) {
+            // add to the legend xxx might make some hidden?
+            legend->addSeries(series->name(), series);
+        }
+        legend->show();
+    }
+
+    if (charttype ==GC_CHART_PIE || charttype== GC_CHART_BAR) { //XXX bar chart legend?
         // pie, never want a legend
-        qchart->legend()->setVisible(false);
+        legend->hide();
     }
 
     // barseries special case
@@ -1199,4 +1383,14 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
     // categories
     if (categories.count()) axis->categories = categories;
     return true;
+}
+
+QColor
+GenericPlot::seriesColor(QAbstractSeries* series)
+{
+    switch (series->type()) {
+    case QAbstractSeries::SeriesTypeScatter: return static_cast<QScatterSeries*>(series)->color(); break;
+    case QAbstractSeries::SeriesTypeLine: return static_cast<QLineSeries*>(series)->color(); break;
+    default: return GColor(CPLOTMARKER);
+    }
 }

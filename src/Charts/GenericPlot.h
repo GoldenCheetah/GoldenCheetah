@@ -20,6 +20,7 @@
 #define _GC_GenericPlot_h 1
 
 #include <QWidget>
+#include <QPointF>
 #include <QString>
 #include <QDebug>
 #include <QColor>
@@ -51,26 +52,58 @@ class GenericPlot;
 class SelectionTool;
 class GenericLegend;
 
-class GenericLegendLabel : public QWidget {
+class GenericLegendItem : public QWidget {
 
     Q_OBJECT
 
     public:
-        GenericLegendLabel(QWidget *parent, QString name) : QWidget(parent), name(name) {}
+        GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color);
+
+    public slots:
+
+        void paintEvent(QPaintEvent *event);
+        void setValue(QPointF p) { hasvalue=true; value=p.y(); update(); } // set value to display
+        void noValue() { hasvalue=false; update(); } // no value to display
+        void configChanged(qint32); // context changed
 
     private:
+        Context *context;
         QString name;
+        QColor color;
+
+        bool hasvalue;
+        double value;
+
+        // geometry for painting fast / updated on config changes
+        QRectF blockrect, namerect, valuerect, linerect;
+
 };
 
 class GenericLegend : public QWidget {
+
     Q_OBJECT
 
     public:
-        GenericLegend(QWidget *parent) : QWidget(parent) {}
+        GenericLegend(Context *context, GenericPlot *parent);
 
-    // a label has a unique name, not directly tide to
-    // a series or axis value, it depends...
-    QMap<QString,GenericLegendLabel*> labels;
+        void addSeries(QString name, QAbstractSeries *series);
+        void removeSeries(QString name);
+        void removeAllSeries();
+
+    Q_SIGNALS:
+        void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
+
+    public slots:
+        void hover(QPointF value, QString name, QAbstractSeries*series);
+        void unhover(QString name);
+
+    private:
+        // a label has a unique name, not directly tide to
+        // a series or axis value, it depends...
+        Context *context;
+        GenericPlot *plot;
+        QHBoxLayout *layout;
+        QMap<QString,GenericLegendItem*> items;
 };
 
 // general axis info
@@ -150,8 +183,11 @@ class Calculator
 };
 
 // for watcing scene events
-class SelectionTool : public QGraphicsItem
+class SelectionTool : public QObject, public QGraphicsItem
 {
+
+    Q_OBJECT
+
     friend class ::GenericPlot;
 
     public:
@@ -183,6 +219,10 @@ class SelectionTool : public QGraphicsItem
         void updateScene();
         void resetSelections(); // clear out selections stuff
 
+    Q_SIGNALS:
+        void hover(QPointF value, QString name, QAbstractSeries*series); // mouse cursor is over a point on the chart
+        void unhover(QString name); // mouse cursor is no longer over a point on the chart
+
     protected:
         QRectF rect;
         QPainterPath *lassoo; // when lassoing objects
@@ -192,6 +232,7 @@ class SelectionTool : public QGraphicsItem
         QPointF start, startingpos, finish; // when calculating distances during transitions
         QPointF spos; // last point we saw
         QPointF hoverpoint;
+        QAbstractSeries *hoverseries;
 
         // selections from original during selection
         QMap<QAbstractSeries*, QAbstractSeries*> selections;
@@ -208,13 +249,12 @@ class GenericPlot : public QWidget {
     public:
 
         friend class ::SelectionTool;
+        friend class ::GenericLegend;
 
         GenericPlot(QWidget *parent, Context *context);
 
-        // rendering via...
-        QChartView *chartview;
-        SelectionTool *selector;
-        QChart *qchart;
+        // some helper functions
+        static QColor seriesColor(QAbstractSeries* series);
 
     public slots:
         void configChanged(qint32);
@@ -238,12 +278,21 @@ class GenericPlot : public QWidget {
         bool eventHandler(int eventsource, void *obj, QEvent *event);
 
     protected:
+
+        // legend and selector need acces to these
+        QChartView *chartview;
+        SelectionTool *selector;
+        QChart *qchart;
+
         // trap widget events and pass to event handler
         bool eventFilter(QObject *, QEvent *e);
 
         // working with axes
         double min(QAbstractAxis*);
         double max(QAbstractAxis*);
+
+        // the legend
+        GenericLegend *legend;
 
         // quadtrees
         QMap<QAbstractSeries*, Quadtree*> quadtrees;

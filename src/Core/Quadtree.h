@@ -36,8 +36,8 @@ class QuadtreeNode
               topleft(topleft), bottomright(bottomright), mid((topleft+bottomright)/2.0), leaf(true) {}
 
         // is the point in our space - when inserting
-        bool contains(QPointF p) { return ((p.x() > topleft.x() && p.x() < bottomright.x()) &&
-                                           p.y() > topleft.y() && p.y() < bottomright.y()); }
+        bool contains(QPointF p) { return ((p.x() >= topleft.x() && p.x() <= bottomright.x()) &&
+                                           p.y() >= topleft.y() && p.y() <= bottomright.y()); }
 
         // do we overlap with the search space - when looking
         bool intersect(QRectF r) { return r.intersects(QRectF(topleft,bottomright)); }
