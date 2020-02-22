@@ -19,22 +19,27 @@
 #include "Quadtree.h"
 
 // add a node
-void
+bool
 QuadtreeNode::insert(Quadtree *root, QPointF value)
 {
-    if (!contains(value)) return;
+    if (!contains(value)) return false;
 
     // here will do
     if (leaf && contents.count() < maxentries) {
         if (!contents.contains(value)) contents.append(value); // de dupe
-        return;
+        return true;
     }
 
     // full, so split out
     if (leaf)  split(root);
 
     // find me a home below
-    for(int i=0; i<4; i++) aabb[i]->insert(root, value);
+    for(int i=0; i<4; i++)
+        if (aabb[i]->insert(root, value) == true)
+            return true;
+
+    // should not get here
+    return false;
 }
 
 // get candidates
@@ -83,7 +88,8 @@ QuadtreeNode::split(Quadtree *root)
     // find them homes and clear here
     for(int i=0; i<contents.count(); i++)
         for(int j=0; j<4; j++)
-            aabb[j]->insert(root, contents.at(i));
+            if (aabb[j]->insert(root, contents.at(i)) == true)
+                break;
     contents.clear();
 
 }
@@ -119,7 +125,15 @@ Quadtree::newnode(QPointF topleft, QPointF bottomright)
     return add;
 }
 
-void Quadtree::insert(QPointF point)
+bool Quadtree::insert(QPointF point)
 {
-    root->insert(this, point);
+    bool result= root->insert(this, point);
+    if (result == false) {
+
+        fprintf(stderr, "quadtree: insert failed (%f,%f) in [%f,%f = %f-%f]\n", point.x(), point.y(),
+                                                                               root->topleft.x(), root->topleft.y(),
+                                                                               root->bottomright.x(), root->bottomright.y());
+        fflush(stderr);
+    }
+    return result;
 }

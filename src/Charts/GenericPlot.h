@@ -187,12 +187,13 @@ class SelectionTool : public QObject, public QGraphicsItem
 {
 
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 
     friend class ::GenericPlot;
 
     public:
         SelectionTool(GenericPlot *);
-        enum { INACTIVE, SIZING, MOVING, ACTIVE } state; // what state are we in?
+        enum { INACTIVE, SIZING, MOVING, DRAGGING, ACTIVE } state; // what state are we in?
         enum { RECTANGLE, LASSOO, CIRCLE } mode; // what mode are we in?
 
         // is invisible and tiny. we are just an observer
@@ -219,6 +220,9 @@ class SelectionTool : public QObject, public QGraphicsItem
         void updateScene();
         void resetSelections(); // clear out selections stuff
 
+    public slots:
+        void dragStart();
+
     Q_SIGNALS:
         void hover(QPointF value, QString name, QAbstractSeries*series); // mouse cursor is over a point on the chart
         void unhover(QString name); // mouse cursor is no longer over a point on the chart
@@ -238,6 +242,9 @@ class SelectionTool : public QObject, public QGraphicsItem
         QMap<QAbstractSeries*, QAbstractSeries*> selections;
         QMap<QAbstractSeries*, Calculator> stats;
         QList<QAbstractSeries*> ignore; // temp series we add during selection to be ignored
+
+        // timeout click and hold to drag
+        QTimer drag;
 
 };
 

@@ -29,6 +29,8 @@ class QuadtreeNode
     static const int maxdepth=12;
     static const int maxentries=25;
 
+    friend class ::Quadtree;
+
     public:
 
         // constructor makes an empty leaf
@@ -42,8 +44,8 @@ class QuadtreeNode
         // do we overlap with the search space - when looking
         bool intersect(QRectF r) { return r.intersects(QRectF(topleft,bottomright)); }
 
-        // add a point
-        void insert(Quadtree *root, QPointF value);
+        // add a point - return false if not added
+        bool insert(Quadtree *root, QPointF value);
 
         // get candidates in same quadrant (might be miles away for big quadrant).
         int candidates(QRectF,QList<QPointF>&tohere);
@@ -53,15 +55,15 @@ class QuadtreeNode
         // split leaf into nodes (when to many entries)
         void split(Quadtree *root);
 
+        // geom of quadrant
+        QPointF topleft, bottomright, mid;
+
     private:
         // AABB children (also in a freelist in Quadtree)
         QuadtreeNode *aabb[4];
 
         // the points in this quadrant
         QList<QPointF> contents;
-
-        // geom of quadrant
-        QPointF topleft, mid, bottomright;
 
         // if no children in aabb leaf==true
         bool leaf;
@@ -73,8 +75,8 @@ class Quadtree
         Quadtree (QPointF topleft, QPointF bottomright);
         ~Quadtree();
 
-        // add a point
-        void insert(QPointF x);
+        // add a point - returns false if not in range
+        bool insert(QPointF x);
 
         // find points in boundg rect, of course might be long way away...
         int candidates(QRectF rect, QList<QPointF>&tohere) { return root->candidates(rect, tohere); }

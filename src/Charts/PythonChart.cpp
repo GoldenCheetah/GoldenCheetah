@@ -470,7 +470,7 @@ PythonChart::setWeb(bool x)
 }
 
 bool
-PythonChart::eventFilter(QObject *obj, QEvent *e)
+PythonChart::eventFilter(QObject *, QEvent *e)
 {
     // running script, just watch of escape
     if (python->chart) {

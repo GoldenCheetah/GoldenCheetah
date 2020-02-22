@@ -97,7 +97,7 @@ void
 GenericLegendItem::configChanged(qint32)
 {
     static const double gl_margin = 6 * dpiXFactor;
-    static const double gl_spacer = 5 * dpiXFactor;
+    static const double gl_spacer = 6 * dpiXFactor;
     static const double gl_block = 10 * dpiXFactor;
     static const double gl_linewidth = 1 * dpiXFactor;
 
@@ -200,7 +200,11 @@ GenericLegend::removeSeries(QString name)
 void
 GenericLegend::removeAllSeries()
 {
-    foreach (QString name, items.keys())   removeSeries(name);
+    QMapIterator<QString, GenericLegendItem*> i(items);
+    while (i.hasNext()) {
+        i.next();
+        removeSeries(i.key());
+    }
 }
 
 void
@@ -229,6 +233,7 @@ SelectionTool::SelectionTool(GenericPlot *host) : QObject(host), QGraphicsItem(N
     hoverpoint = QPointF();
     hoverseries = NULL;
     rect = QRectF(0,0,0,0);
+    connect(&drag, SIGNAL(timeout()), this, SLOT(dragStart()));
 }
 
 // the selection tool is painted only when it is active, but will be
@@ -346,20 +351,11 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
 
                         // scene coordinate for min/max (remember we get clipped)
                         QPointF minxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,0),calc.series));
-                        QPointF minxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,calc.y.min),calc.series));
-
                         QPointF maxxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,0),calc.series));
-                        QPointF maxxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,calc.y.max),calc.series));
-
                         QPointF minyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.min),calc.series));
-                        QPointF minypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min, calc.y.min),calc.series));
-
                         QPointF maxyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.max),calc.series));
-                        QPointF maxypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max, calc.y.max),calc.series));
-
                         QPointF avgyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.mean),calc.series));
                         QPointF avgxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, 0),calc.series));
-                        QPointF avgmid = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, calc.y.mean),calc.series));
 
                         QColor linecol=GColor(CPLOTMARKER);
                         linecol.setAlphaF(0.25);
@@ -367,7 +363,14 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                         gridpen.setStyle(Qt::DashLine);
                         gridpen.setWidthF(1 *dpiXFactor);
                         painter->setPen(gridpen);
+
 #if 0 // way too busy on the chart
+                        QPointF minxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,calc.y.min),calc.series));
+                        QPointF maxxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,calc.y.max),calc.series));
+                        QPointF minypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min, calc.y.min),calc.series));
+                        QPointF maxypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max, calc.y.max),calc.series));
+                        QPointF avgmid = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, calc.y.mean),calc.series));
+
                         // min/max guides
                         painter->drawLine(minxp,minxpinf);
                         painter->drawLine(maxxp,maxxpinf);
@@ -461,12 +464,23 @@ SelectionTool::clicked(QPointF pos)
 
     } else {
 
-        // initial sizing
+        // initial sizing - or click hold to drag?
         state = SIZING;
         start = pos;
         finish = QPointF(0,0);
         rect = QRectF(-5,-5,5,5);
         setPos(start);
+
+        // time 400ms to drag - after lots of playing
+        // this seems a reasonable time period that isnt
+        // too long but doesn't conflict with straight
+        // forward click to select.
+        // its probably no coincidence that this is also
+        // the Doherty Threshold for UX
+        drag.setInterval(400);
+        drag.setSingleShot(true);
+        drag.start();
+
         update(rect);
         return true;
 
@@ -478,7 +492,14 @@ bool
 SelectionTool::released(QPointF)
 {
     // width and heights can be negative if dragged in reverse
-    if (rect.width() < 10 && rect.width() > -10 && rect.height() < 10 && rect.height() > -10) {
+    if (state == DRAGGING) {
+
+        host->setCursor(Qt::ArrowCursor);
+        state = INACTIVE;
+        rect = QRectF(0,0,0,0);
+        return true;
+
+    } else if (rect.width() < 10 && rect.width() > -10 && rect.height() < 10 && rect.height() > -10) {
 
         // tiny, as in click release - deactivate
         state = INACTIVE; // reset for any state
@@ -495,11 +516,27 @@ SelectionTool::released(QPointF)
     return false;
 }
 
+void
+SelectionTool::dragStart()
+{
+    // check still right state for it?
+    if (state == SIZING) {
+        fprintf(stderr, "drag mode!\n"); fflush(stderr);
+        host->setCursor(Qt::ClosedHandCursor);
+        state = DRAGGING;
+    }
+}
+
 bool
 SelectionTool::moved(QPointF pos)
 {
     // only care if we are sizing
     if (state == SIZING) {
+
+        // cancel the timer to trigger drag
+        drag.stop();
+
+        // work out where we got to
         finish = pos;
 
         // reshape - rect might have negative sizes if sized backwards
@@ -514,6 +551,12 @@ SelectionTool::moved(QPointF pos)
         update(rect);
         return true;
 
+    } else if (state == DRAGGING) {
+
+        //QPointF delta = pos - start;
+        // move axis to reflect new pos...
+        return true;
+
     } else {
 
         // remember screen pos of cursor for tracking values
@@ -525,7 +568,6 @@ SelectionTool::moved(QPointF pos)
         // this needs to be super quick as mouse
         // movements are very fast, so we use a
         // quadtree to find the nearest points
-        QPointF originalhover = hoverpoint;         // screen co-ordinates used by paint later
         QPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
         hoverpoint = QPointF(); // screen coordinates
         QAbstractSeries *originalhoverseries = hoverseries;
@@ -663,7 +705,7 @@ Calculator::finalise()
 
 // source 0=scene, 1=widget
 bool
-GenericPlot::eventHandler(int source, void *obj, QEvent *e)
+GenericPlot::eventHandler(int, void *, QEvent *e)
 {
     static bool block=false;
 
@@ -673,7 +715,7 @@ GenericPlot::eventHandler(int source, void *obj, QEvent *e)
 
     // lets get some basic info first
     // where is the cursor?
-    QPoint wpos=cursor().pos();
+    //QPoint wpos=cursor().pos();
     QPointF spos=QPointF();
 
     // so we want to trigger a scene update?
@@ -738,7 +780,7 @@ GenericPlot::eventHandler(int source, void *obj, QEvent *e)
     case QEvent::GraphicsSceneHoverMove: {
 
         // debug info
-        fprintf(stderr,"%s: HOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        //fprintf(stderr,"%s: HOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
     }
     break;
 
@@ -746,7 +788,7 @@ GenericPlot::eventHandler(int source, void *obj, QEvent *e)
     case QEvent::GraphicsSceneHoverLeave: {
 
         // debug info
-        fprintf(stderr,"%s: UNHOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        //fprintf(stderr,"%s: UNHOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
     }
     break;
 
@@ -873,6 +915,8 @@ SelectionTool::updateScene()
                 if (points.count()) selection->append(points);
             }
             break;
+            default:
+                break;
             }
         }
 
@@ -895,6 +939,7 @@ SelectionTool::updateScene()
             switch(x->type()) {
 
             case QAbstractSeries::SeriesTypeScatter:
+            {
                 QScatterSeries *selection=NULL;
                 if ((selection=static_cast<QScatterSeries*>(selections.value(x,NULL))) != NULL) {
 
@@ -911,7 +956,9 @@ SelectionTool::updateScene()
                     host->qchart->removeSeries(selection);
                     delete selection;
                 }
-                break;
+            }
+            break;
+            default: break;
             }
         }
         selections.clear();
@@ -946,6 +993,7 @@ GenericPlot::min(QAbstractAxis *ax)
             case QAbstractAxis::AxisTypeValue:
                 return static_cast<QValueAxis*>(ax)->min();
                 break;
+        default: return 0;
         }
         return 0;
     }
@@ -960,6 +1008,7 @@ GenericPlot::max(QAbstractAxis *ax)
             case QAbstractAxis::AxisTypeValue:
                 return static_cast<QValueAxis*>(ax)->max();
                 break;
+            default: break;
         }
         return 0;
     }
