@@ -3172,6 +3172,14 @@ CustomMetricsPage::refreshTable()
             continue;
         }
 
+        // user metrics are silently discarded if the symbol is already in use
+        if (!table->findItems(m.symbol, Qt::MatchExactly, 0).isEmpty())
+            QMessageBox::warning(this, tr("User Metrics"), tr("Duplicate Symbol: %1, one metric will be discarded").arg(m.symbol));
+
+        // duplicate names are allowed, but not recommended
+        if (!table->findItems(m.name, Qt::MatchExactly, 1).isEmpty())
+            QMessageBox::warning(this, tr("User Metrics"), tr("Duplicate Name: %1, one metric will not be acessible in formulas").arg(m.name));
+
         QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
         add->setText(0, m.symbol);
         add->setToolTip(0, m.description);

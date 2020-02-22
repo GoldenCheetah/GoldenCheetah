@@ -97,9 +97,11 @@ class EditUserMetricDialog : public QDialog {
         // the current ride, time to compute all rides)
         void refreshStats();
         void okClicked();
+        void enableOk();
 
     private:
 
+        bool validSettings();
         void setSettings(UserMetricSettings &);
 
         Context *context;

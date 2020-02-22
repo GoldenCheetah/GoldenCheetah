@@ -27,9 +27,11 @@
 #include "DataFilter.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "RideMetric.h"
 
 #include <QFont>
 #include <QFontMetrics>
+#include <QMessageBox>
 
 static bool insensitiveLessThan(const QString &a, const QString &b)
 {
@@ -255,10 +257,35 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
 
     mainLayout->addLayout(head);
 
+    connect(symbol, SIGNAL(textChanged(const QString &)), SLOT(enableOk()));
+    connect(name, SIGNAL(textChanged(const QString &)), SLOT(enableOk()));
+
     connect(test, SIGNAL(clicked()), this, SLOT(refreshStats()));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(refreshStats()));
     connect (cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect (okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+
+    // initialize button state
+    enableOk();
+}
+
+void
+EditUserMetricDialog::enableOk()
+{
+    okButton->setEnabled(!symbol->text().isEmpty() && !name->text().isEmpty());
+}
+
+bool
+EditUserMetricDialog::validSettings()
+{
+    // user metrics are silently discarded if the symbol is already in use
+    const RideMetric* metric = RideMetricFactory::instance().rideMetric(symbol->text());
+    if (metric && !metric->isUser()) {
+        QMessageBox::critical(this, tr("User Metric"), tr("Symbol already in use by a Builtin metric"));
+        return false;
+    }
+
+    return true;
 }
 
 void
@@ -284,6 +311,9 @@ EditUserMetricDialog::setSettings(UserMetricSettings &here)
 void
 EditUserMetricDialog::okClicked()
 {
+    // validate input
+    if (!validSettings()) return;
+
     // fetch current state
     setSettings(settings);
 
