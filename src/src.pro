@@ -668,8 +668,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
         # generic chart
         DEFINES += GC_HAVE_GENERIC
-        HEADERS += Charts/GenericPlot.h
-        SOURCES += Charts/GenericPlot.cpp
+        HEADERS += Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h
+        SOURCES += Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp
 
     }
 }
