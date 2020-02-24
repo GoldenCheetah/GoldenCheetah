@@ -197,7 +197,7 @@ GenericLegend::addSeries(QString name, QAbstractSeries *series)
 }
 
 void
-GenericLegend::addX(QString name, QAbstractSeries *series)
+GenericLegend::addX(QString name)
 {
     // if it already exists remove it
     if (items.value(name,NULL) != NULL) removeSeries(name);
@@ -763,7 +763,7 @@ SelectionTool::moved(QPointF pos)
                 vals.insert(series, QPointF(*i));
 
                 // nearest x?
-                if (nearestx == -9999 || (i->x()-xvalue) < (nearestx-xvalue)) nearestx = i->x();
+                if (i->x() != 0 && (nearestx == -9999 || (i->x()-xvalue) < (nearestx-xvalue))) nearestx = i->x();
             }
 
         }
@@ -922,7 +922,7 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     case QEvent::GraphicsSceneMouseMove:
         spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
     //case QEvent::MouseMove:
-        //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
+        //fprintf(stderr,"POS: %f:%f\n", spos.x(), spos.y());
         //fprintf(stderr,"%s: mouse MOVE for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
         {
             // see if selection tool cares about new mouse position
@@ -1552,7 +1552,7 @@ GenericPlot::finaliseChart()
                 // look for first series with a horizontal axis (we will use this later)
                 foreach(QAbstractAxis *axis, series->attachedAxes()) {
                     if (axis->orientation() == Qt::Horizontal && axis->type()==QAbstractAxis::AxisTypeValue) {
-                        legend->addX(static_cast<QValueAxis*>(axis)->titleText(), series);
+                        legend->addX(static_cast<QValueAxis*>(axis)->titleText());
                         havexaxis=true;
                         break;
                     }

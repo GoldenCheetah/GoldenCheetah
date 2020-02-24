@@ -87,7 +87,7 @@ class GenericLegend : public QWidget {
         GenericLegend(Context *context, GenericPlot *parent);
 
         void addSeries(QString name, QAbstractSeries *series);
-        void addX(QString name, QAbstractSeries *series);
+        void addX(QString name);
         void removeSeries(QString name);
         void removeAllSeries();
 
