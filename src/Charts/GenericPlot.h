@@ -265,6 +265,9 @@ class SelectionTool : public QObject, public QGraphicsItem
         // timeout click and hold to drag
         QTimer drag;
 
+        // did selection change on last event?
+        bool rectchanged;
+
 };
 
 // the chart

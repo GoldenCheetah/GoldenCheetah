@@ -551,6 +551,7 @@ SelectionTool::reset()
     hoverseries = NULL;
     hoverpoints.clear();
     resetSelections();
+    rectchanged=true;
     update();
     return true;
 }
@@ -567,6 +568,7 @@ SelectionTool::clicked(QPointF pos)
             state = MOVING;
             start = pos;
             startingpos = this->pos();
+            rectchanged = true;
             update(rect);
             return true;
 
@@ -584,6 +586,7 @@ SelectionTool::clicked(QPointF pos)
                 rect = QRectF(0,0,5,host->qchart->plotArea().height());
                 setPos(QPointF(start.x(),host->qchart->plotArea().y()));
             }
+            rectchanged = true;
 
             // time 400ms to drag - after lots of playing
             // this seems a reasonable time period that isnt
@@ -614,18 +617,21 @@ SelectionTool::released(QPointF)
             host->setCursor(Qt::ArrowCursor);
             state = INACTIVE;
             rect = QRectF(0,0,0,0);
+            rectchanged = true;
             return true;
 
         } else if (rect.width() < 10 && rect.width() > -10 && (mode == XRANGE || (rect.height() < 10 && rect.height() > -10))) {
 
             // tiny, as in click release - deactivate
             reset();
+            rectchanged = true;
             return true;
 
         } else if (state == SIZING || state == MOVING) {
 
             // finishing move/resize
             state = ACTIVE;
+            rectchanged = true;
             update(rect);
             return true;
         }
@@ -668,6 +674,7 @@ SelectionTool::moved(QPointF pos)
         // reshape - rect might have negative sizes if sized backwards
         if (mode == RECTANGLE) rect = QRectF(QPointF(0,0), finish-start);
         else rect.setWidth (finish.x()-start.x());
+        rectchanged = true;
 
         update(rect);
         return true;
@@ -677,6 +684,7 @@ SelectionTool::moved(QPointF pos)
         QPointF delta = pos - start;
         if (mode == RECTANGLE) setPos(this->startingpos + delta);
         else if (mode == XRANGE) setPos(this->startingpos + QPointF(delta.x(),0));
+        rectchanged = true;
         update(rect);
         return true;
 
@@ -817,6 +825,7 @@ SelectionTool::wheel(int delta)
             } else {
                 rect.setSize(rect.size() * 1.1);
             }
+            rectchanged = true;
             return true;
         }
     }
@@ -1018,6 +1027,8 @@ SelectionTool::updateScene()
     // is the selection active?
     if (state != SelectionTool::INACTIVE) {
 
+        if (rectchanged == false) return;
+
         // selection tool is active so set curves gray
         // and create curves for highlighted points etc
         QList<QAbstractSeries*> originallist=host->qchart->series();
@@ -1190,6 +1201,8 @@ SelectionTool::updateScene()
                 break;
             }
         }
+
+        rectchanged = false;
 
     } else {
 
