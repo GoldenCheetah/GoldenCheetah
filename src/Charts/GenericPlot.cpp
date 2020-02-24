@@ -249,7 +249,8 @@ GenericLegend::hover(QPointF value, QString name, QAbstractSeries*)
 void
 GenericLegend::unhover(QString name)
 {
-    items.value(name)->noValue();
+    GenericLegendItem *xaxis = items.value(name,NULL);
+    if (xaxis) xaxis->noValue();
 }
 
 void
@@ -341,11 +342,12 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                 painter->setBrush(Qt::NoBrush);
             }
         }
-        break;
-
+        //
+        // DROPS THROUGH INTO RECTANGLE FOR SELECTION RECTANGLE
+        //
    case RECTANGLE:
         {
-            if (state == ACTIVE || state == INACTIVE) {
+            if (mode == RECTANGLE && (state == ACTIVE || state == INACTIVE)) {
 
                 if (host->charttype == GC_CHART_LINE || host->charttype == GC_CHART_SCATTER) {
 
@@ -417,10 +419,15 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                 foreach(Calculator calc, stats) {
                     // slope and intercept?
                     if (calc.count<2) continue;
-                    QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
-                    QPen line(calc.color);
-                    painter->setPen(line);
-                    painter->drawText(QPointF(0,0), lr);
+
+                    // slope calcs way over the top for a line chart
+                    // where there are multiple series being plotted
+                    if (host->charttype == GC_CHART_SCATTER) {
+                        QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
+                        QPen line(calc.color);
+                        painter->setPen(line);
+                        painter->drawText(QPointF(0,0), lr);
+                    }
 
                     // slope
                     if (calc.xaxis != NULL) {
@@ -496,14 +503,20 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                         label=QString("%1").arg(calc.x.mean);
                         painter->drawText(avgxp-QPointF(0,4), label);
 
-                        markerpen = QPen(calc.color);
-                        painter->setPen(markerpen);
-                        label=QString("%1").arg(calc.y.max);
-                        painter->drawText(maxyp, label);
-                        label=QString("%1").arg(calc.y.min);
-                        painter->drawText(minyp, label);
-                        label=QString("%1").arg(calc.y.mean);
-                        painter->drawText(avgyp, label);
+                        if (host->charttype == GC_CHART_SCATTER) {
+
+                            // too noisy on a line chart, where there are
+                            // typically multiple data series being plotted
+                            // arguably this is too busy for a scatter chart too...
+                            markerpen = QPen(calc.color);
+                            painter->setPen(markerpen);
+                            label=QString("%1").arg(calc.y.max);
+                            painter->drawText(maxyp, label);
+                            label=QString("%1").arg(calc.y.min);
+                            painter->drawText(minyp, label);
+                            label=QString("%1").arg(calc.y.mean);
+                            painter->drawText(avgyp, label);
+                        }
                     }
 
                 }
@@ -546,7 +559,8 @@ SelectionTool::reset()
 bool
 SelectionTool::clicked(QPointF pos)
 {
-    if (mode == RECTANGLE) {
+    if (mode == XRANGE || mode == RECTANGLE) {
+
         if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
 
             // are we moving?
@@ -562,8 +576,14 @@ SelectionTool::clicked(QPointF pos)
             state = SIZING;
             start = pos;
             finish = QPointF(0,0);
-            rect = QRectF(-5,-5,5,5);
-            setPos(start);
+
+            if (mode == RECTANGLE) {
+                rect = QRectF(-5,-5,5,5);
+                setPos(start);
+            } else if (mode == XRANGE) {
+                rect = QRectF(0,0,5,host->qchart->plotArea().height());
+                setPos(QPointF(start.x(),host->qchart->plotArea().y()));
+            }
 
             // time 400ms to drag - after lots of playing
             // this seems a reasonable time period that isnt
@@ -586,7 +606,7 @@ SelectionTool::clicked(QPointF pos)
 bool
 SelectionTool::released(QPointF)
 {
-    if (mode == RECTANGLE) {
+    if (mode == RECTANGLE || mode == XRANGE) {
 
         // width and heights can be negative if dragged in reverse
         if (state == DRAGGING) {
@@ -596,11 +616,10 @@ SelectionTool::released(QPointF)
             rect = QRectF(0,0,0,0);
             return true;
 
-        } else if (rect.width() < 10 && rect.width() > -10 && rect.height() < 10 && rect.height() > -10) {
+        } else if (rect.width() < 10 && rect.width() > -10 && (mode == XRANGE || (rect.height() < 10 && rect.height() > -10))) {
 
             // tiny, as in click release - deactivate
-            state = INACTIVE; // reset for any state
-            rect = QRectF(0,0,0,0);
+            reset();
             return true;
 
         } else if (state == SIZING || state == MOVING) {
@@ -617,7 +636,7 @@ SelectionTool::released(QPointF)
 void
 SelectionTool::dragStart()
 {
-    if (mode == RECTANGLE) {
+    if (mode == RECTANGLE || mode == XRANGE) {
         // check still right state for it?
         if (state == SIZING) {
             fprintf(stderr, "drag mode!\n"); fflush(stderr);
@@ -637,38 +656,41 @@ struct CompareQPointFX {
 bool
 SelectionTool::moved(QPointF pos)
 {
-    if (mode == RECTANGLE) {
+    // user hovers over points, but can select using a rectangle
+    if (state == SIZING) {
 
-        // user hovers over points, but can select using a rectangle
+        // cancel the timer to trigger drag
+        drag.stop();
 
-        if (state == SIZING) {
+        // work out where we got to
+        finish = pos;
 
-            // cancel the timer to trigger drag
-            drag.stop();
+        // reshape - rect might have negative sizes if sized backwards
+        if (mode == RECTANGLE) rect = QRectF(QPointF(0,0), finish-start);
+        else rect.setWidth (finish.x()-start.x());
 
-            // work out where we got to
-            finish = pos;
+        update(rect);
+        return true;
 
-            // reshape - rect might have negative sizes if sized backwards
-            rect = QRectF(QPointF(0,0), finish-start);
-            update(rect);
-            return true;
+    } else if (state == MOVING) {
 
-        } else if (state == MOVING) {
+        QPointF delta = pos - start;
+        if (mode == RECTANGLE) setPos(this->startingpos + delta);
+        else if (mode == XRANGE) setPos(this->startingpos + QPointF(delta.x(),0));
+        update(rect);
+        return true;
 
-            QPointF delta = pos - start;
-            setPos(this->startingpos + delta);
-            update(rect);
-            return true;
+    } else if (state == DRAGGING) {
 
-        } else if (state == DRAGGING) {
+        //QPointF delta = pos - start;
+        // move axis to reflect new pos...
+        return true;
 
-            //QPointF delta = pos - start;
-            // move axis to reflect new pos...
-            return true;
+    } else {
 
-        } else {
+        // HOVERING around.. the big one...
 
+        if (mode == RECTANGLE) {
             // remember screen pos of cursor for tracking values
             // when painting on the axis/plot area
             spos = pos;
@@ -730,58 +752,55 @@ SelectionTool::moved(QPointF pos)
             // for mouse moves..
             update(rect);
             return true;
-        }
 
-        // END OF RECTANLGE MODE
-    } else if (mode == XRANGE) {
+        } else if (mode == XRANGE) {
 
-        // xxx just hover for now, will do sizing shortly
-        // user hovers with a vertical line, but can select a range on the x axis
-        // lets get x axis value (any old series will do as they should have a common
-        // x axis
-        spos = pos;
-        QMap<QAbstractSeries*,QPointF> vals; // what values were found
-        double nearestx=-9999;
-        foreach(QAbstractSeries *series, host->qchart->series()) {
+            // user hovers with a vertical line, but can select a range on the x axis
+            // lets get x axis value (any old series will do as they should have a common x axis
+            spos = pos;
+            QMap<QAbstractSeries*,QPointF> vals; // what values were found
+            double nearestx=-9999;
+            foreach(QAbstractSeries *series, host->qchart->series()) {
 
-            // get x value to search
-            double xvalue=host->qchart->mapToValue(spos,series).x();
+                // get x value to search
+                double xvalue=host->qchart->mapToValue(spos,series).x();
 
-            // pointsVector
-            if (series->type() == QAbstractSeries::SeriesTypeLine) {
+                // pointsVector
+                if (series->type() == QAbstractSeries::SeriesTypeLine) {
 
-                // we take a copy, would love to avoid this.
-                QVector<QPointF> p = static_cast<QLineSeries*>(series)->pointsVector();
+                    // we take a copy, would love to avoid this.
+                    QVector<QPointF> p = static_cast<QLineSeries*>(series)->pointsVector();
 
-                // value we want
-                QPointF x= QPointF(xvalue,0);
+                    // value we want
+                    QPointF x= QPointF(xvalue,0);
 
-                // lower_bound to value near x
-                QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
+                    // lower_bound to value near x
+                    QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
 
-                // collect them away
-                vals.insert(series, QPointF(*i));
+                    // collect them away
+                    vals.insert(series, QPointF(*i));
 
-                // nearest x?
-                if (i->x() != 0 && (nearestx == -9999 || (i->x()-xvalue) < (nearestx-xvalue))) nearestx = i->x();
+                    // nearest x?
+                    if (i->x() != 0 && (nearestx == -9999 || (i->x()-xvalue) < (nearestx-xvalue))) nearestx = i->x();
+                }
+
             }
 
+            // run over what we found, updating paint points and signal (for legend)
+            hoverpoints.clear();
+            QMapIterator<QAbstractSeries*, QPointF> i(vals);
+            while (i.hasNext()) {
+                i.next();
+                if (i.value().x() == nearestx) {
+                    SeriesPoint add;
+                    add.series = i.key();
+                    add.xy = i.value();
+                    emit hover(i.value(), i.key()->name(), i.key());
+                    if (add.xy.y()) hoverpoints << add; // ignore zeroes
+                } else emit unhover(i.key()->name());
+            }
+            if (vals.count()) return true;
         }
-
-        // run over what we found, updating paint points and signal (for legend)
-        hoverpoints.clear();
-        QMapIterator<QAbstractSeries*, QPointF> i(vals);
-        while (i.hasNext()) {
-            i.next();
-            if (i.value().x() == nearestx) {
-                SeriesPoint add;
-                add.series = i.key();
-                add.xy = i.value();
-                emit hover(i.value(), i.key()->name(), i.key());
-                if (add.xy.y()) hoverpoints << add; // ignore zeroes
-            } else emit unhover(i.key()->name());
-        }
-        if (vals.count()) return true;
     }
     return false;
 }
@@ -900,7 +919,7 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     case QEvent::GraphicsSceneMousePress:
         spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
     //case QEvent::MouseButtonPress:
-        //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
+        //fprintf(stderr,"POS: %g:%g \n", spos.x(), spos.y());
         //fprintf(stderr,"%s: mouse PRESSED for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
         {
             updatescene = selector->clicked(spos);
@@ -1006,7 +1025,89 @@ SelectionTool::updateScene()
 
             if (ignore.contains(x)) continue;
 
+            // Run through all the curves, setting them gray
+            // selecting the points that fall into the selection
+            // and creating selection curves and stats for painting
+            // onto the plot
+            //
+            // We duplicate code by curve type (but not chart type)
+            // so we can e.g. put a scatter curve on a line chart
+            // and vice versa later.
+
             switch(x->type()) {
+            case QAbstractSeries::SeriesTypeLine: {
+                QLineSeries *line = static_cast<QLineSeries*>(x);
+
+                // ignore empty series
+                if (line->count() < 1) continue;
+
+                // this will be used to plot selected points on the plot
+                QLineSeries *selection =NULL;
+
+                // the axes for the current series
+                QAbstractAxis *xaxis=NULL, *yaxis=NULL;
+                foreach (QAbstractAxis *ax, x->attachedAxes()) {
+                    if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
+                    if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
+                }
+
+                if ((selection=static_cast<QLineSeries*>(selections.value(x, NULL))) == NULL) {
+
+                    selection = new QLineSeries();
+
+                    // all of this curve cloning should be in a new method xxx todo
+                    selection->setUseOpenGL(line->useOpenGL());
+                    selection->setPen(line->pen());
+                    if (line->useOpenGL())
+                        selection->setColor(Qt::gray); // use opengl ignores changing colors
+                    else {
+                        selection->setColor(line->color());
+                        static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                    }
+                    selections.insert(x, selection);
+                    ignore.append(selection);
+
+                    // add after done all aesthetic for opengl snafus
+                    host->qchart->addSeries(selection); // before adding data and axis
+
+                    // only do when creating it.
+                    if (yaxis) selection->attachAxis(yaxis);
+                    if (xaxis) selection->attachAxis(xaxis);
+                }
+
+                // lets work out what range of values we need to be
+                // selecting is, reverse since possible to have a backwards
+                // rectangle in the selection tool
+                double minx=0,maxx=0;
+                minx =this->minx(x);
+                maxx =this->maxx(x);
+                if (maxx < minx) { double t=minx; minx=maxx; maxx=t; }
+
+                //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
+
+                // add points to the selection curve and calculate as you go
+                QList<QPointF> points;
+                Calculator calc;
+                calc.initialise();
+                calc.color = selection->color(); // should this go into constructor?! xxx todo
+                calc.xaxis = xaxis;
+                calc.yaxis = yaxis;
+                calc.series = line;
+                for(int i=0; i<line->count(); i++) {
+                    QPointF point = line->at(i); // avoid deep copy
+                    if (point.x() >= minx && point.x() <= maxx) {
+                        if (!points.contains(point)) points << point; // avoid dupes
+                        calc.addPoint(point);
+                    }
+                }
+                calc.finalise();
+                stats.insert(line, calc);
+
+                selection->clear();
+                if (points.count()) selection->append(points);
+
+            }
+            break;
             case QAbstractSeries::SeriesTypeScatter: {
 
                 QScatterSeries *scatter = static_cast<QScatterSeries*>(x);
@@ -1108,6 +1209,26 @@ SelectionTool::updateScene()
 
             switch(x->type()) {
 
+            case QAbstractSeries::SeriesTypeLine:
+            {
+                QLineSeries *selection=NULL;
+                if ((selection=static_cast<QLineSeries*>(selections.value(x,NULL))) != NULL) {
+
+                    // set greyed out original back to its proper color
+                    // rememember when opengl is in use setColor is ignored
+                    // so we didn't change it on selection, so no need to
+                    // set it back to original in that case
+                    if (!selection->useOpenGL())
+                        static_cast<QLineSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+
+                    // clear points, remove from axis and remove from chart
+                    selection->clear();
+                    foreach(QAbstractAxis *ax, selection->attachedAxes()) selection->detachAxis(ax);
+                    host->qchart->removeSeries(selection);
+                    delete selection;
+                }
+            }
+            break;
             case QAbstractSeries::SeriesTypeScatter:
             {
                 QScatterSeries *selection=NULL;
