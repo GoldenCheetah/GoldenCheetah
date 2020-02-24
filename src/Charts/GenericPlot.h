@@ -182,6 +182,12 @@ class Calculator
     QAbstractSeries *series;
 };
 
+// hover points etc
+struct SeriesPoint {
+    QAbstractSeries *series;    // series this is a point for
+    QPointF xy;                 // the actual xy value (not screen position)
+};
+
 // for watcing scene events
 class SelectionTool : public QObject, public QGraphicsItem
 {
@@ -193,8 +199,13 @@ class SelectionTool : public QObject, public QGraphicsItem
 
     public:
         SelectionTool(GenericPlot *);
-        enum { INACTIVE, SIZING, MOVING, DRAGGING, ACTIVE } state; // what state are we in?
-        enum { RECTANGLE, LASSOO, CIRCLE } mode; // what mode are we in?
+        enum stateType { INACTIVE, SIZING, MOVING, DRAGGING, ACTIVE } state; // what state are we in?
+        enum modeType { RECTANGLE, XRANGE, LASSOO, CIRCLE } mode; // what mode are we in?
+        typedef modeType SelectionMode;
+        typedef stateType SelectionState;
+
+        // set mode
+        void setMode(SelectionMode mode) { this->mode=mode;  }
 
         // is invisible and tiny. we are just an observer
         bool sceneEventFilter(QGraphicsItem *watched, QEvent *event);
@@ -235,8 +246,12 @@ class SelectionTool : public QObject, public QGraphicsItem
         GenericPlot *host;
         QPointF start, startingpos, finish; // when calculating distances during transitions
         QPointF spos; // last point we saw
+
+        // scatter does this xxx TODO refactor into hoverpoints
         QPointF hoverpoint;
         QAbstractSeries *hoverseries;
+        // line plot uses this
+        QList<SeriesPoint> hoverpoints;
 
         // selections from original during selection
         QMap<QAbstractSeries*, QAbstractSeries*> selections;

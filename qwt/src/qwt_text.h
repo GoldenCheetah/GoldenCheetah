@@ -139,7 +139,7 @@ public:
     //! Layout attributes
     typedef QFlags<LayoutAttribute> LayoutAttributes;
 
-    QwtText( const QString & = QString::null,
+    QwtText( const QString & = QString(),
              TextFormat textFormat = AutoText );
     QwtText( const QwtText & );
     ~QwtText();

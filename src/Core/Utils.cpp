@@ -253,5 +253,25 @@ searchPath(QString path, QString binary, bool isexec)
     return returning;
 }
 
+QString
+removeDP(QString in)
+{
+    QString out;
+    if (in.contains('.')) {
+
+        int n=in.indexOf('.');
+        out += in.mid(0,n);
+        int i=in.length()-1;
+        for(; in[i] != '.'; i--)
+            if (in[i] != '0')
+                break;
+        if (in[i]=='.') return out;
+        else out += in.mid(n, i-n+1);
+        return out;
+    } else {
+        return in;
+    }
+}
+
 };
 

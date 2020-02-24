@@ -21,6 +21,9 @@
 #include "Colors.h"
 #include "TabView.h"
 #include "RideFileCommand.h"
+#include "Utils.h"
+
+#include <limits>
 
 GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
@@ -96,9 +99,9 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
 void
 GenericLegendItem::configChanged(qint32)
 {
-    static const double gl_margin = 6 * dpiXFactor;
-    static const double gl_spacer = 6 * dpiXFactor;
-    static const double gl_block = 10 * dpiXFactor;
+    static const double gl_margin = 3 * dpiXFactor;
+    static const double gl_spacer = 3 * dpiXFactor;
+    static const double gl_block = 7 * dpiXFactor;
     static const double gl_linewidth = 1 * dpiXFactor;
 
     // we just set geometry for now.
@@ -121,7 +124,7 @@ GenericLegendItem::configChanged(qint32)
 
     // calculate all the rects used by the painter now since static
     blockrect = QRectF(gl_margin, gl_margin, gl_block, height-gl_margin);
-    linerect = QRectF(gl_margin, height-gl_linewidth, width-gl_margin, gl_linewidth);
+    linerect = QRectF(gl_margin+gl_block, height-gl_linewidth, width-gl_margin, gl_linewidth);
     namerect = QRectF(gl_margin + gl_block + gl_spacer, gl_margin, fm.boundingRect(name).width(), fm.boundingRect(name).height());
     valuerect =QRectF(namerect.x() + namerect.width() + gl_spacer, gl_margin, fm.boundingRect(valuelabel).width(), fm.boundingRect(valuelabel).height());
 
@@ -144,13 +147,16 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     // block and line
     painter.setBrush(QBrush(color));
     painter.setPen(Qt::NoPen);
-    painter.drawRect(blockrect);
+    //painter.drawRect(blockrect);
     painter.drawRect(linerect);
 
     // just paint the value for now
     QString string;
     if (hasvalue) string=QString("%1").arg(value, 0, 'f', 2);
     else string="   ";
+
+    // remove redundat dps (e.g. trailing zeroes)
+    string = Utils::removeDP(string);
 
     // set pen to series color for now
     painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND))); // use invert - usually black or white
@@ -160,6 +166,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.drawText(namerect, name, Qt::AlignHCenter|Qt::AlignVCenter);
     painter.drawText(valuerect, string, Qt::AlignHCenter|Qt::AlignVCenter);
     painter.restore();
+
 }
 
 GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(context), plot(plot)
@@ -244,12 +251,64 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
    painter->save();
    painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
+   // min max texts
+   QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+   stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+   stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
    switch (mode) {
    case CIRCLE:
         {
 
         }
         break;
+
+   case XRANGE:
+        {
+
+            // current position for each series - we only do first, coz only interested in x axis anyway
+            foreach(QAbstractSeries *series, host->qchart->series()) {
+
+                // convert screen position to value for series
+                QPointF v = host->qchart->mapToValue(spos,series);
+                double miny=0;
+                foreach (QAbstractAxis *axis, series->attachedAxes()) {
+                    if (axis->orientation() == Qt::Vertical && axis->type()==QAbstractAxis::AxisTypeValue) {
+                        miny=static_cast<QValueAxis*>(axis)->min();
+                        break;
+                    }
+                }
+                QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),miny),series));
+
+                QPen markerpen(GColor(CPLOTMARKER));
+                painter->setPen(markerpen);
+                painter->setBrush(QBrush(GColor(CPLOTBACKGROUND)));
+
+                QFontMetrics fm(stGiles); // adjust position to align centre
+                painter->setFont(stGiles);
+
+                // x value
+                QString label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                label = Utils::removeDP(label); // remove unneccessary decimal places
+                painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
+                break;
+
+            }
+
+            // draw the points we are hovering over
+            foreach(SeriesPoint p, hoverpoints) {
+                QPointF pos = mapFromScene(host->qchart->mapToPosition(p.xy,p.series));
+                QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                painter->setBrush(invert);
+                painter->setPen(invert);
+                QRectF circle(0,0,5*dpiXFactor,5*dpiYFactor);
+                circle.moveCenter(pos);
+                painter->drawEllipse(circle);
+                painter->setBrush(Qt::NoBrush);
+            }
+        }
+        break;
+
    case RECTANGLE:
         {
             if (state == ACTIVE || state == INACTIVE) {
@@ -257,27 +316,24 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
                 if (host->charttype == GC_CHART_LINE || host->charttype == GC_CHART_SCATTER) {
 
 
-                    // min max texts
-                    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
-                    stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-                    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
                     painter->setFont(stGiles);
 
+                    // hovering around - draw label for current position in axis
+                    if (hoverpoint != QPointF()) {
+                        // draw a circle using marker color
+                        QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                        painter->setBrush(invert);
+                        painter->setPen(invert);
+                        QRectF circle(0,0,10*dpiXFactor,10*dpiYFactor);
+                        circle.moveCenter(hoverpoint);
+                        painter->drawEllipse(circle);
+                        painter->setBrush(Qt::NoBrush);
+
+                    }
 
                     // current position for each series
                     foreach(QAbstractSeries *series, host->qchart->series()) {
 
-                        // hovering around - draw label for current position in axis
-                        if (hoverpoint != QPointF()) {
-                            // draw a circle using marker color
-                            painter->setBrush(GColor(CPLOTMARKER));
-                            painter->setPen(GColor(CPLOTMARKER));
-                            QRectF circle(0,0,25,25);
-                            circle.moveCenter(hoverpoint);
-                            painter->drawEllipse(circle);
-                            painter->setBrush(Qt::NoBrush);
-
-                        }
 
                         // convert screen position to value for series
                         QPointF v = host->qchart->mapToValue(spos,series);
@@ -293,6 +349,7 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
 
                         // x value
                         QString label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                        label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
 
                         if (series->type() == QAbstractSeries::SeriesTypeScatter) {
@@ -305,14 +362,15 @@ void SelectionTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QW
 
                         // y value
                         label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
+                        label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
 
                         // tell the legend or whoever else is listening
                         //fprintf(stderr,"cursor (%f,%f) @(%f,%f) for series %s\n", spos.x(), spos.y(),v.x(),v.y(),series->name().toStdString().c_str()); fflush(stderr);
                     }
                 }
-
             }
+
             if (state != INACTIVE) {
 
                 // there is a rectangle to draw on the screen
@@ -444,6 +502,7 @@ SelectionTool::reset()
     rect = QRectF(0,0,0,0);
     hoverpoint = QPointF();
     hoverseries = NULL;
+    hoverpoints.clear();
     resetSelections();
     update();
     return true;
@@ -453,37 +512,39 @@ SelectionTool::reset()
 bool
 SelectionTool::clicked(QPointF pos)
 {
-    if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
+    if (mode == RECTANGLE) {
+        if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
 
-        // are we moving?
-        state = MOVING;
-        start = pos;
-        startingpos = this->pos();
-        update(rect);
-        return true;
+            // are we moving?
+            state = MOVING;
+            start = pos;
+            startingpos = this->pos();
+            update(rect);
+            return true;
 
-    } else {
+        } else {
 
-        // initial sizing - or click hold to drag?
-        state = SIZING;
-        start = pos;
-        finish = QPointF(0,0);
-        rect = QRectF(-5,-5,5,5);
-        setPos(start);
+            // initial sizing - or click hold to drag?
+            state = SIZING;
+            start = pos;
+            finish = QPointF(0,0);
+            rect = QRectF(-5,-5,5,5);
+            setPos(start);
 
-        // time 400ms to drag - after lots of playing
-        // this seems a reasonable time period that isnt
-        // too long but doesn't conflict with straight
-        // forward click to select.
-        // its probably no coincidence that this is also
-        // the Doherty Threshold for UX
-        drag.setInterval(400);
-        drag.setSingleShot(true);
-        drag.start();
+            // time 400ms to drag - after lots of playing
+            // this seems a reasonable time period that isnt
+            // too long but doesn't conflict with straight
+            // forward click to select.
+            // its probably no coincidence that this is also
+            // the Doherty Threshold for UX
+            drag.setInterval(400);
+            drag.setSingleShot(true);
+            drag.start();
 
-        update(rect);
-        return true;
+            update(rect);
+            return true;
 
+        }
     }
     return false;
 }
@@ -491,27 +552,30 @@ SelectionTool::clicked(QPointF pos)
 bool
 SelectionTool::released(QPointF)
 {
-    // width and heights can be negative if dragged in reverse
-    if (state == DRAGGING) {
+    if (mode == RECTANGLE) {
 
-        host->setCursor(Qt::ArrowCursor);
-        state = INACTIVE;
-        rect = QRectF(0,0,0,0);
-        return true;
+        // width and heights can be negative if dragged in reverse
+        if (state == DRAGGING) {
 
-    } else if (rect.width() < 10 && rect.width() > -10 && rect.height() < 10 && rect.height() > -10) {
+            host->setCursor(Qt::ArrowCursor);
+            state = INACTIVE;
+            rect = QRectF(0,0,0,0);
+            return true;
 
-        // tiny, as in click release - deactivate
-        state = INACTIVE; // reset for any state
-        rect = QRectF(0,0,0,0);
-        return true;
+        } else if (rect.width() < 10 && rect.width() > -10 && rect.height() < 10 && rect.height() > -10) {
 
-    } else if (state == SIZING || state == MOVING) {
+            // tiny, as in click release - deactivate
+            state = INACTIVE; // reset for any state
+            rect = QRectF(0,0,0,0);
+            return true;
 
-        // finishing move/resize
-        state = ACTIVE;
-        update(rect);
-        return true;
+        } else if (state == SIZING || state == MOVING) {
+
+            // finishing move/resize
+            state = ACTIVE;
+            update(rect);
+            return true;
+        }
     }
     return false;
 }
@@ -519,102 +583,166 @@ SelectionTool::released(QPointF)
 void
 SelectionTool::dragStart()
 {
-    // check still right state for it?
-    if (state == SIZING) {
-        fprintf(stderr, "drag mode!\n"); fflush(stderr);
-        host->setCursor(Qt::ClosedHandCursor);
-        state = DRAGGING;
+    if (mode == RECTANGLE) {
+        // check still right state for it?
+        if (state == SIZING) {
+            fprintf(stderr, "drag mode!\n"); fflush(stderr);
+            host->setCursor(Qt::ClosedHandCursor);
+            state = DRAGGING;
+        }
     }
 }
+
+// for std::lower_bound search of x QPointF value
+struct CompareQPointFX {
+    bool operator()(const QPointF p1, const QPointF p2) {
+        return p1.x() < p2.x();
+    }
+};
 
 bool
 SelectionTool::moved(QPointF pos)
 {
-    // only care if we are sizing
-    if (state == SIZING) {
+    if (mode == RECTANGLE) {
 
-        // cancel the timer to trigger drag
-        drag.stop();
+        // user hovers over points, but can select using a rectangle
 
-        // work out where we got to
-        finish = pos;
+        if (state == SIZING) {
 
-        // reshape - rect might have negative sizes if sized backwards
-        rect = QRectF(QPointF(0,0), finish-start);
-        update(rect);
-        return true;
+            // cancel the timer to trigger drag
+            drag.stop();
 
-    } else if (state == MOVING) {
+            // work out where we got to
+            finish = pos;
 
-        QPointF delta = pos - start;
-        setPos(this->startingpos + delta);
-        update(rect);
-        return true;
+            // reshape - rect might have negative sizes if sized backwards
+            rect = QRectF(QPointF(0,0), finish-start);
+            update(rect);
+            return true;
 
-    } else if (state == DRAGGING) {
+        } else if (state == MOVING) {
 
-        //QPointF delta = pos - start;
-        // move axis to reflect new pos...
-        return true;
+            QPointF delta = pos - start;
+            setPos(this->startingpos + delta);
+            update(rect);
+            return true;
 
-    } else {
+        } else if (state == DRAGGING) {
 
-        // remember screen pos of cursor for tracking values
-        // when painting on the axis/plot area
-        spos = pos;
+            //QPointF delta = pos - start;
+            // move axis to reflect new pos...
+            return true;
 
-        // not moving or sizing so just hovering
-        // look for nearest point for each series
-        // this needs to be super quick as mouse
-        // movements are very fast, so we use a
-        // quadtree to find the nearest points
-        QPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
-        hoverpoint = QPointF(); // screen coordinates
-        QAbstractSeries *originalhoverseries = hoverseries;
-        hoverseries = NULL;
-        foreach(QAbstractSeries *series, host->qchart->series()) {
+        } else {
 
-            Quadtree *tree= host->quadtrees.value(series,NULL);
-            if (tree != NULL) {
+            // remember screen pos of cursor for tracking values
+            // when painting on the axis/plot area
+            spos = pos;
 
-                // lets convert cursor pos to value pos to find nearest
-                double pixels = 10 * dpiXFactor; // within 10 pixels
-                QRectF srect(pos-QPointF(pixels,pixels), pos+QPointF(pixels,pixels));
-                QRectF vrect(host->qchart->mapToValue(srect.topLeft(),series), host->qchart->mapToValue(srect.bottomRight(),series));
-                //QPointF vpos = host->qchart->mapToValue(pos, series);
+            // not moving or sizing so just hovering
+            // look for nearest point for each series
+            // this needs to be super quick as mouse
+            // movements are very fast, so we use a
+            // quadtree to find the nearest points
+            QPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
+            hoverpoint = QPointF(); // screen coordinates
+            QAbstractSeries *originalhoverseries = hoverseries;
+            hoverseries = NULL;
+            foreach(QAbstractSeries *series, host->qchart->series()) {
 
-                // find candidates all close by using paint co-ords
-                QList<QPointF> tohere;
-                tree->candidates(vrect, tohere);
+                Quadtree *tree= host->quadtrees.value(series,NULL);
+                if (tree != NULL) {
 
-                QPointF cursorpos=mapFromScene(pos);
-                foreach(QPointF p, tohere) {
-                    QPointF scpos = mapFromScene(host->qchart->mapToPosition(p, series));
-                    if (hoverpoint == QPointF()) {
-                        hoverpoint = scpos;
-                        hoverseries = series;
-                        hoverv = p;
-                    } else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength()) {
-                        hoverpoint=scpos; // not happy with this XXX needs more work
-                        hoverseries = series;
-                        hoverv = p;
+                    // lets convert cursor pos to value pos to find nearest
+                    double pixels = 10 * dpiXFactor; // within 10 pixels
+                    QRectF srect(pos-QPointF(pixels,pixels), pos+QPointF(pixels,pixels));
+                    QRectF vrect(host->qchart->mapToValue(srect.topLeft(),series), host->qchart->mapToValue(srect.bottomRight(),series));
+                    //QPointF vpos = host->qchart->mapToValue(pos, series);
+
+                    // find candidates all close by using paint co-ords
+                    QList<QPointF> tohere;
+                    tree->candidates(vrect, tohere);
+
+                    QPointF cursorpos=mapFromScene(pos);
+                    foreach(QPointF p, tohere) {
+                        QPointF scpos = mapFromScene(host->qchart->mapToPosition(p, series));
+                        if (hoverpoint == QPointF()) {
+                            hoverpoint = scpos;
+                            hoverseries = series;
+                            hoverv = p;
+                        } else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength()) {
+                            hoverpoint=scpos; // not happy with this XXX needs more work
+                            hoverseries = series;
+                            hoverv = p;
+                        }
                     }
+
+                    //if (tohere.count())  fprintf(stderr, "HOVER %d candidates nearby\n", tohere.count()); fflush(stderr);
                 }
 
-                //if (tohere.count())  fprintf(stderr, "HOVER %d candidates nearby\n", tohere.count()); fflush(stderr);
+            }
+
+            // hoverpoint changed - either a new series selected, a new point, or no point at all
+            if (originalhoverseries != hoverseries || hoverv != QPointF()) {
+                if (hoverseries != originalhoverseries && originalhoverseries != NULL) emit (unhover(originalhoverseries->name())); // old hover changed
+                if (hoverseries != NULL)  emit hover(hoverv, hoverseries->name(), hoverseries); // new hover changed
+            }
+
+            // for mouse moves..
+            update(rect);
+            return true;
+        }
+
+        // END OF RECTANLGE MODE
+    } else if (mode == XRANGE) {
+
+        // xxx just hover for now, will do sizing shortly
+        // user hovers with a vertical line, but can select a range on the x axis
+        // lets get x axis value (any old series will do as they should have a common
+        // x axis
+        spos = pos;
+        QMap<QAbstractSeries*,QPointF> vals; // what values were found
+        double nearestx=-9999;
+        foreach(QAbstractSeries *series, host->qchart->series()) {
+
+            // get x value to search
+            double xvalue=host->qchart->mapToValue(spos,series).x();
+
+            // pointsVector
+            if (series->type() == QAbstractSeries::SeriesTypeLine) {
+
+                // we take a copy, would love to avoid this.
+                QVector<QPointF> p = static_cast<QLineSeries*>(series)->pointsVector();
+
+                // value we want
+                QPointF x= QPointF(xvalue,0);
+
+                // lower_bound to value near x
+                QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
+
+                // collect them away
+                vals.insert(series, QPointF(*i));
+
+                // nearest x?
+                if (nearestx == -9999 || (i->x()-xvalue) < (nearestx-xvalue)) nearestx = i->x();
             }
 
         }
 
-        // hoverpoint changed - either a new series selected, a new point, or no point at all
-        if (originalhoverseries != hoverseries || hoverv != QPointF()) {
-            if (hoverseries != originalhoverseries && originalhoverseries != NULL) emit (unhover(originalhoverseries->name())); // old hover changed
-            if (hoverseries != NULL)  emit hover(hoverv, hoverseries->name(), hoverseries); // new hover changed
+        // run over what we found, updating paint points and signal (for legend)
+        hoverpoints.clear();
+        QMapIterator<QAbstractSeries*, QPointF> i(vals);
+        while (i.hasNext()) {
+            i.next();
+            if (i.value().x() == nearestx) {
+                SeriesPoint add;
+                add.series = i.key();
+                add.xy = i.value();
+                emit hover(i.value(), i.key()->name(), i.key());
+                if (add.xy.y()) hoverpoints << add; // ignore zeroes
+            } else emit unhover(i.key()->name());
         }
-
-        // for mouse moves..
-        update(rect);
-        return true;
+        if (vals.count()) return true;
     }
     return false;
 }
@@ -622,14 +750,17 @@ SelectionTool::moved(QPointF pos)
 bool
 SelectionTool::wheel(int delta)
 {
-    // mouse wheel resizes selection rect if it is active
-    if (state == ACTIVE) {
-        if (delta < 0) {
-            rect.setSize(rect.size() * 0.9);
-        } else {
-            rect.setSize(rect.size() * 1.1);
+
+    if (mode == RECTANGLE) {
+        // mouse wheel resizes selection rect if it is active
+        if (state == ACTIVE) {
+            if (delta < 0) {
+                rect.setSize(rect.size() * 0.9);
+            } else {
+                rect.setSize(rect.size() * 1.1);
+            }
+            return true;
         }
-        return true;
     }
     return false;
 }
@@ -904,7 +1035,7 @@ SelectionTool::updateScene()
                     QPointF point = scatter->at(i); // avoid deep copy
                     if (point.y() >= miny && point.y() <= maxy &&
                         point.x() >= minx && point.x() <= maxx) {
-                        points << point;
+                        if (!points.contains(point)) points << point; // avoid dupes
                         calc.addPoint(point);
                     }
                 }
@@ -1047,6 +1178,10 @@ GenericPlot::initialiseChart(QString title, int type, bool animate)
     // generally transition animations, so add very little value
     // by default they are disabled anyway
     qchart->setAnimationOptions(animate ? QChart::SeriesAnimations : QChart::NoAnimation);
+
+    // what kind of selector do we use?
+    if (charttype==GC_CHART_LINE) selector->setMode(SelectionTool::XRANGE);
+    else selector->setMode(SelectionTool::RECTANGLE);
 
     return true;
 }

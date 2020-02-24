@@ -36,6 +36,7 @@ namespace Utils
     QString jsonprotect(const QString &buffer);
     QString jsonunprotect(const QString &buffer);
     QStringList searchPath(QString path, QString binary, bool isexec=true);
+    QString removeDP(QString);
 };
 
 
