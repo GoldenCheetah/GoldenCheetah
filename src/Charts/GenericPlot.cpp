@@ -174,9 +174,12 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     layout = new QHBoxLayout(this);
     layout->addStretch();
 
+    xname="";
+
     // get notifications when values change
     connect(plot->selector, SIGNAL(hover(QPointF,QString,QAbstractSeries*)), this, SLOT(hover(QPointF,QString,QAbstractSeries*)));
     connect(plot->selector, SIGNAL(unhover(QString)), this, SLOT(unhover(QString)));
+    connect(plot->selector, SIGNAL(unhoverx()), this, SLOT(unhoverx()));
 }
 
 void
@@ -194,6 +197,23 @@ GenericLegend::addSeries(QString name, QAbstractSeries *series)
 }
 
 void
+GenericLegend::addX(QString name, QAbstractSeries *series)
+{
+    // if it already exists remove it
+    if (items.value(name,NULL) != NULL) removeSeries(name);
+
+    GenericLegendItem *add = new GenericLegendItem(context, this, name, GColor(CPLOTMARKER));
+    layout->insertWidget(0, add);
+    items.insert(name,add);
+
+    // lets see ya!
+    add->show();
+
+    // remember the x axis
+    xname = name;
+}
+
+void
 GenericLegend::removeSeries(QString name)
 {
     GenericLegendItem *remove = items.value(name, NULL);
@@ -207,6 +227,7 @@ GenericLegend::removeSeries(QString name)
 void
 GenericLegend::removeAllSeries()
 {
+    xname = "";
     QMapIterator<QString, GenericLegendItem*> i(items);
     while (i.hasNext()) {
         i.next();
@@ -218,13 +239,26 @@ void
 GenericLegend::hover(QPointF value, QString name, QAbstractSeries*)
 {
     GenericLegendItem *call = items.value(name, NULL);
-    if (call) call->setValue(value);
+    if (call) call->setValue(value.y());
+
+    // xaxis
+    GenericLegendItem *xaxis = items.value(xname, NULL);
+    if (xaxis) xaxis->setValue(value.x());
 }
 
 void
 GenericLegend::unhover(QString name)
 {
     items.value(name)->noValue();
+}
+
+void
+GenericLegend::unhoverx()
+{
+    if (xname != "") {
+        GenericLegendItem *xaxis = items.value(xname, NULL);
+        if (xaxis) xaxis->noValue();
+    }
 }
 
 //
@@ -686,6 +720,11 @@ SelectionTool::moved(QPointF pos)
             if (originalhoverseries != hoverseries || hoverv != QPointF()) {
                 if (hoverseries != originalhoverseries && originalhoverseries != NULL) emit (unhover(originalhoverseries->name())); // old hover changed
                 if (hoverseries != NULL)  emit hover(hoverv, hoverseries->name(), hoverseries); // new hover changed
+            }
+
+            // we need to clear x-axis if we aren't hovering on anything at all
+            if (hoverv == QPointF()) {
+                emit unhoverx();
             }
 
             // for mouse moves..
@@ -1502,10 +1541,29 @@ GenericPlot::finaliseChart()
     }
 
     if (charttype == GC_CHART_SCATTER || charttype == GC_CHART_LINE) {
+
+        bool havexaxis=false;
         foreach(QAbstractSeries *series, qchart->series()) {
+            // manufactured series to show X axis values
+            // pick the first X-axis we find and add it
+            // using the axis units
+            if (havexaxis == false) {
+
+                // look for first series with a horizontal axis (we will use this later)
+                foreach(QAbstractAxis *axis, series->attachedAxes()) {
+                    if (axis->orientation() == Qt::Horizontal && axis->type()==QAbstractAxis::AxisTypeValue) {
+                        legend->addX(static_cast<QValueAxis*>(axis)->titleText(), series);
+                        havexaxis=true;
+                        break;
+                    }
+                }
+            }
+
             // add to the legend xxx might make some hidden?
             legend->addSeries(series->name(), series);
+
         }
+
         legend->show();
     }
 

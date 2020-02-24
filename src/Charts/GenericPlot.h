@@ -62,7 +62,7 @@ class GenericLegendItem : public QWidget {
     public slots:
 
         void paintEvent(QPaintEvent *event);
-        void setValue(QPointF p) { hasvalue=true; value=p.y(); update(); } // set value to display
+        void setValue(double p) { hasvalue=true; value=p; update(); } // set value to display
         void noValue() { hasvalue=false; update(); } // no value to display
         void configChanged(qint32); // context changed
 
@@ -87,6 +87,7 @@ class GenericLegend : public QWidget {
         GenericLegend(Context *context, GenericPlot *parent);
 
         void addSeries(QString name, QAbstractSeries *series);
+        void addX(QString name, QAbstractSeries *series);
         void removeSeries(QString name);
         void removeAllSeries();
 
@@ -96,6 +97,7 @@ class GenericLegend : public QWidget {
     public slots:
         void hover(QPointF value, QString name, QAbstractSeries*series);
         void unhover(QString name);
+        void unhoverx();
 
     private:
         // a label has a unique name, not directly tide to
@@ -104,6 +106,7 @@ class GenericLegend : public QWidget {
         GenericPlot *plot;
         QHBoxLayout *layout;
         QMap<QString,GenericLegendItem*> items;
+        QString xname;
 };
 
 // general axis info
@@ -237,6 +240,7 @@ class SelectionTool : public QObject, public QGraphicsItem
     Q_SIGNALS:
         void hover(QPointF value, QString name, QAbstractSeries*series); // mouse cursor is over a point on the chart
         void unhover(QString name); // mouse cursor is no longer over a point on the chart
+        void unhoverx(); // when we aren't hovering on anything at all
 
     protected:
         QRectF rect;
