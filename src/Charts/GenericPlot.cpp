@@ -544,6 +544,7 @@ bool
 SelectionTool::reset()
 {
     state = INACTIVE;
+    host->setCursor(Qt::ArrowCursor);
     start=QPointF(0,0);
     finish=QPointF(0,0);
     rect = QRectF(0,0,0,0);
@@ -560,7 +561,12 @@ SelectionTool::reset()
 bool
 SelectionTool::clicked(QPointF pos)
 {
+    bool updatescene = false;
+
     if (mode == XRANGE || mode == RECTANGLE) {
+
+        hoverpoints.clear();
+        hoverpoint=QPointF();
 
         if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
 
@@ -570,7 +576,7 @@ SelectionTool::clicked(QPointF pos)
             startingpos = this->pos();
             rectchanged = true;
             update(rect);
-            return true;
+            updatescene = true;
 
         } else {
 
@@ -586,24 +592,24 @@ SelectionTool::clicked(QPointF pos)
                 rect = QRectF(0,0,5,host->qchart->plotArea().height());
                 setPos(QPointF(start.x(),host->qchart->plotArea().y()));
             }
+
             rectchanged = true;
-
-            // time 400ms to drag - after lots of playing
-            // this seems a reasonable time period that isnt
-            // too long but doesn't conflict with straight
-            // forward click to select.
-            // its probably no coincidence that this is also
-            // the Doherty Threshold for UX
-            drag.setInterval(400);
-            drag.setSingleShot(true);
-            drag.start();
-
+            updatescene = true;
             update(rect);
-            return true;
-
         }
     }
-    return false;
+
+    // time 400ms to drag - after lots of playing
+    // this seems a reasonable time period that isnt
+    // too long but doesn't conflict with straight
+    // forward click to select.
+    // its probably no coincidence that this is also
+    // the Doherty Threshold for UX
+    drag.setInterval(400);
+    drag.setSingleShot(true);
+    drag.start();
+
+    return updatescene;
 }
 
 bool
@@ -612,17 +618,9 @@ SelectionTool::released(QPointF)
     if (mode == RECTANGLE || mode == XRANGE) {
 
         // width and heights can be negative if dragged in reverse
-        if (state == DRAGGING) {
+        if (state == DRAGGING ||
+           (rect.width() < 10 && rect.width() > -10 && (mode == XRANGE || (rect.height() < 10 && rect.height() > -10)))) {
 
-            host->setCursor(Qt::ArrowCursor);
-            state = INACTIVE;
-            rect = QRectF(0,0,0,0);
-            rectchanged = true;
-            return true;
-
-        } else if (rect.width() < 10 && rect.width() > -10 && (mode == XRANGE || (rect.height() < 10 && rect.height() > -10))) {
-
-            // tiny, as in click release - deactivate
             reset();
             rectchanged = true;
             return true;
@@ -631,6 +629,8 @@ SelectionTool::released(QPointF)
 
             // finishing move/resize
             state = ACTIVE;
+            hoverpoint=QPointF();
+            hoverpoints.clear();
             rectchanged = true;
             update(rect);
             return true;
@@ -644,10 +644,15 @@ SelectionTool::dragStart()
 {
     if (mode == RECTANGLE || mode == XRANGE) {
         // check still right state for it?
-        if (state == SIZING) {
-            fprintf(stderr, "drag mode!\n"); fflush(stderr);
+        if (state == SIZING || state == MOVING) {
+
+            reset(); // reset the selection, it would be active from the initial click
+
+            start = spos;
             host->setCursor(Qt::ClosedHandCursor);
             state = DRAGGING;
+
+            updateScene(); // force as we are a timeout not scene event
         }
     }
 }
@@ -680,6 +685,9 @@ SelectionTool::moved(QPointF pos)
         return true;
 
     } else if (state == MOVING) {
+
+        // cancel the timer to trigger drag
+        drag.stop();
 
         QPointF delta = pos - start;
         if (mode == RECTANGLE) setPos(this->startingpos + delta);
@@ -769,6 +777,8 @@ SelectionTool::moved(QPointF pos)
             QMap<QAbstractSeries*,QPointF> vals; // what values were found
             double nearestx=-9999;
             foreach(QAbstractSeries *series, host->qchart->series()) {
+
+                if (ignore.contains(series)) continue;
 
                 // get x value to search
                 double xvalue=host->qchart->mapToValue(spos,series).x();
@@ -1007,13 +1017,7 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     //
     // UPDATE SCENE TO REFLECT STATE
     //
-    if (updatescene) {
-
-        selector->updateScene(); // really only do selection right now.. more to come
-
-        // repaint everything
-        chartview->scene()->update(0,0,chartview->scene()->width(),chartview->scene()->height());
-    }
+    if (updatescene)   selector->updateScene(); // really only do selection right now.. more to come
 
     // all done.
     block = false;
@@ -1025,9 +1029,8 @@ void
 SelectionTool::updateScene()
 {
     // is the selection active?
-    if (state != SelectionTool::INACTIVE) {
-
-        if (rectchanged == false) return;
+    if (rectchanged) {
+    if (state != SelectionTool::INACTIVE && state != DRAGGING) {
 
         // selection tool is active so set curves gray
         // and create curves for highlighted points etc
@@ -1208,6 +1211,10 @@ SelectionTool::updateScene()
 
         resetSelections();
     }
+    }
+
+    // repaint everything
+    host->chartview->scene()->update(0,0,host->chartview->scene()->width(),host->chartview->scene()->height());
  }
 
  void
