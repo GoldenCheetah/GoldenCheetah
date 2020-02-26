@@ -672,52 +672,168 @@ bool IsReasonableGeoLocation(geolocation *ploc) {
              ploc->Alt() >= -1000 && ploc->Alt() < 10000);
 }
 
+class SaveState
+{
+    double m_t;
+    double m_step;
+    double m_achieved;
+    bool   m_fGoingUp;
+
+public:
+
+    SaveState() : m_t(0.), m_step(0.), m_achieved(1000000.), m_fGoingUp(true) {};
+
+    void Save(double t, double step, double achieved, bool fGoingUp) {
+        m_t = t;
+        m_step = step;
+        m_achieved = achieved;
+        m_fGoingUp = fGoingUp;
+    }
+
+    void Restore(double& t, double& step, double &achieved, bool& fGoingUp) {
+        t = m_t;
+        step = m_step;
+        fGoingUp = m_fGoingUp;
+        achieved = m_achieved;
+    }
+};
+
+class GradientPrecisionHistory
+{
+    static const size_t s_HistSize = 4;
+    double    precisionHistory[s_HistSize];
+    SaveState saveHistory[s_HistSize];
+
+public:
+
+    GradientPrecisionHistory() {
+        for (int i = 0; i < s_HistSize; i++) precisionHistory[i] = 1000000.;
+    }
+
+    void GetBestState(SaveState& state) {
+        int lowestIdx = 0;
+        double lowestValue = precisionHistory[lowestIdx];
+		for (int i = 1; i < s_HistSize; i++) {
+            double val = precisionHistory[i];
+            if (val < lowestValue)
+            {
+                lowestIdx = i;
+                lowestValue = precisionHistory[i];
+            }
+        }
+
+        state = saveHistory[lowestIdx];
+    }
+
+    bool Push(double newDelta, SaveState state) {
+        int highestIdx = 0;
+        double highestValue = precisionHistory[highestIdx];
+
+        for (int i = 1; i < s_HistSize; i++) {
+            double val = precisionHistory[i];
+            if (val > highestValue) {
+                highestValue = val;
+                highestIdx = i;
+            }
+        }
+
+        // Only dealing in magnitudes here.
+        newDelta = fabs(newDelta);
+
+		// Making progress if new value is less than the biggest value in history.
+		if (newDelta < highestValue) {
+			precisionHistory[highestIdx] = newDelta;
+			saveHistory[highestIdx] = state;
+			return true;;
+		}
+
+        return false;
+    }
+};
+
 // Gradient descent requires 2x the compute per evaluation but usually seens 7x fewer evalutaions,
 // so > 3x speedup.
+// Returns delta from epsilon, 0. if perfect resolution.
 template <typename T_Curve, typename T_Pos, bool T_GradientDescent>
-bool EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilon, unsigned sampleCount, double &prevT, T_Pos &pos, unsigned &evalCount)
+double EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilon, unsigned sampleCount, double &prevT, T_Pos &pos, unsigned &evalCount)
 {
     static const int s_iGradientDegree = T_GradientDescent ? 1 : 0;
 
     double t = prevT;
-    double step = 1 / (double)sampleCount; // default step size if gradient descent isn't used.
+    double step = std::max(0.1, 1 / (double)sampleCount); // default step size if gradient descent isn't used.
     bool fGoingUp = true;
+    bool fGradientPossible = true;
+    double achievedPrecision = 1000000.;
+    GradientPrecisionHistory gph;
+    SaveState gss;
+
+    gss.Save(t, step, achievedPrecision,fGoingUp);
 
     while (true) {
         evalCount++;
 
         // Fail if no convegence after 100 tries.
         if (evalCount > 100)
-            return false;
+            return achievedPrecision;
 
         T_Pos evalResults[1 + s_iGradientDegree];
 
         curve.Evaluate(t, s_iGradientDegree, evalResults);
 
         pos = evalResults[0];
-        double delta = pos[0] - targetDistance;
-        if (fabs(delta) < epsilon) {
+        achievedPrecision = pos[0] - targetDistance;
+        if (fabs(achievedPrecision) < epsilon) {
             prevT = t;
             break;
         }
 
         bool fSuccess = false;
-        if (T_GradientDescent) {
-            // Use gradient to predict next sample point.
-            double evalRise = evalResults[1][0];
-            double evalStep = -(delta / evalRise);
+        if (T_GradientDescent && fGradientPossible) {
 
-            // Gradient descent can fail if unlucky.
-            // If suggested next sample point is out of range then fall back
-            // to binary search.
-            if (t + evalStep >= 0. && t + evalStep <= 1.) {
-                step = evalStep;
-                fSuccess = true;
+            if (!gph.Push(achievedPrecision, gss)) {
+                fGradientPossible = false;
+            } else {
+                // Try to use gradient to predict next sample point.
+                double evalRise = evalResults[1][0];
+
+                // Abandon gradient descent if slope is too close to zero.
+                if (evalRise == 0.) {
+                    fGradientPossible = false;
+                }
+                else {
+                    int exp;
+                    std::frexp(evalRise, &exp);
+                    if (exp < -10) {
+                        fGradientPossible = false;
+                    }
+                }
+
+                if (fGradientPossible) {
+                    double evalStep = -(achievedPrecision / evalRise);
+
+                    // Gradient descent can fail if unlucky.
+                    // If suggested next sample point is out of range then fall back
+                    // to binary search.
+                    if (t + evalStep >= 0. && t + evalStep <= 1.) {
+
+                        gss.Save(t, step, achievedPrecision, fGoingUp);
+
+                        step = evalStep;
+                        fGoingUp = (step > 0);
+                        fSuccess = true;
+                    }
+                }
+            }
+
+            // Restore previos step if gradient descent ran off the rails.
+            if (!fGradientPossible) {
+                gph.GetBestState(gss);
+                gss.Restore(t, step, achievedPrecision, fGoingUp);
             }
         }
 
         if (!fSuccess) {
-            bool directionChange = (delta > 0) == fGoingUp;
+            bool directionChange = (achievedPrecision > 0) == fGoingUp;
             if (directionChange) {
                 step /= -2.;
                 fGoingUp = !fGoingUp;
@@ -727,7 +843,7 @@ bool EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilon,
         t += step;
     }
 
-    return true;
+    return achievedPrecision;
 }
 
 // Create new distance/altitude curve
@@ -736,7 +852,11 @@ bool EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilon,
 template <typename T_Curve, typename T_Pos>
 bool InterpolateBSplineCurve(const std::vector<T_Pos> &inControls, std::vector<T_Pos> &outControls, T_Curve &curve, unsigned &evalCountSum)
 {
-    static const double precision = 0.0001; // 10cm
+    // Tell eval it can stop if it finds this precision.
+    static const double s_desiredPrecision = 0.0001; // 10cm
+
+    // Fail eval if required precision isn't achieved.
+    static const double s_requiredPrecision = 0.001; // 1m.
 
     outControls.resize(0);
 
@@ -746,9 +866,11 @@ bool InterpolateBSplineCurve(const std::vector<T_Pos> &inControls, std::vector<T
 
         T_Pos pos;
         unsigned evalCount = 0;
-        bool fConvergence = EvalAtTargetDistance<T_Curve, T_Pos, true>(curve, targetDistance, precision, (unsigned)inControls.size(), t, pos, evalCount);
+        double obtainedPrecision = EvalAtTargetDistance<T_Curve, T_Pos, true>(curve, targetDistance, s_desiredPrecision, (unsigned)inControls.size(), t, pos, evalCount);
         evalCountSum += evalCount;
-        if (!fConvergence) {
+
+        // Fail if required precision not met.
+        if (fabs(obtainedPrecision) > s_requiredPrecision) {
             outControls.resize(0);
             return false;
         }
@@ -788,6 +910,18 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
 
     // Spline undefined if degree is less than 3.
     if (degree0 < 3) return false;
+
+    // First thing, check for monotonaity. This smoothing
+    // cannot work if distance can decrease. User should
+    // recompute distance before try again.
+    double dist = 0.;
+    for (int i = 0; i < inControls.size(); i++) {
+        double newDist = inControls[i][0];
+        if (newDist < dist) {
+            return false;
+        }
+        dist = newDist;
+    }
 
     // Degree can't exceed control size - 1.
     degree0 = std::min(degree0, (unsigned)inControls.size() - 1);

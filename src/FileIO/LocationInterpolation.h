@@ -880,7 +880,7 @@ public:
 
             // Step 3
             double linearDistance = p2.DistanceFrom(pm1);
-            if (linearDistance < 0.000001)
+            if (linearDistance < 0.0001)
                 break;
 
             // Step 4
