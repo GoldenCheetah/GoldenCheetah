@@ -62,6 +62,8 @@
 
 const QChar deltaChar(0x0394);
 
+static const double s_SecondsInOneYear = 365. * 24. * 60. * 60.;
+
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             wstale(true), startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), wprime_(NULL), 
@@ -2849,7 +2851,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
         if (inframes >= insamples) break;
 
         // yuck! nasty data -- ignore it
-        if (p->secs > (25*60*60)) continue;
+        if (p->secs > (s_SecondsInOneYear)) continue;
 
         // always start at 0 seconds
         if (first) {
@@ -2950,7 +2952,6 @@ RideFile::resample(double newRecIntSecs, int interpolate)
 RideFile *
 RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 {
-
     // resample if interval has changed
     if (newRecIntSecs != recIntSecs()) {
 
@@ -2980,7 +2981,7 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
                 foreach(RideFilePoint *p, dataPoints()) {
 
                     // yuck! nasty data -- ignore it
-                    if (p->secs > (25*60*60)) continue;
+                    if (p->secs > (s_SecondsInOneYear)) continue;
 
                     // always start at 0 seconds
                     if (first) {
@@ -3097,7 +3098,7 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
         foreach(RideFilePoint *p, dataPoints()) {
 
             // yuck! nasty data -- ignore it
-            if (p->secs > (25*60*60)) continue;
+            if (p->secs > (s_SecondsInOneYear)) continue;
 
             // always start at 0 seconds
             if (first) {
