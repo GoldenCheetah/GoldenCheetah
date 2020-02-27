@@ -2547,7 +2547,7 @@ void TrainSidebar::adjustIntensity(int value)
                     add.val = last.val / from * to;
 
                     // recalibrate altitude if gradient changing
-                    if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    if (context->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
                     else add.y = add.val;
 
                     context->currentErgFile()->Points.insert(i, add);
@@ -2563,7 +2563,7 @@ void TrainSidebar::adjustIntensity(int value)
 
             // recalibrate altitude if in CRS mode
             p->val = p->val / from * to;
-            if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) {
+            if (context->currentErgFile()->format == CRS) {
                 if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
             }
             else p->y = p->val;
