@@ -135,6 +135,8 @@ void ErgFile::parseZwift()
     Points.clear();
     Laps.clear();
 
+    gpi.Reset();
+
     // parse the file
     QFile zwo(filename);
     QXmlInputSource source(&zwo);
@@ -193,6 +195,8 @@ void ErgFile::parseErg2(QString p)
     format = ERG; // default to couse until we know
     Points.clear();
     Laps.clear();
+
+    gpi.Reset();
 
     // open the file
     if (p == "" && ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
@@ -258,6 +262,8 @@ void ErgFile::parseTacx()
     format = CRS; // default to couse until we know
     Points.clear();
     Laps.clear();
+
+    gpi.Reset();
 
     // running totals
     double rdist = 0; // running total for distance
@@ -705,6 +711,8 @@ void ErgFile::parseGpx()
     Points.clear();
     Laps.clear();
 
+    gpi.Reset();
+
     // TTS File Gradient Should be smoothly interpolated from Altitude.
     StrictGradient = false;
 
@@ -832,6 +840,8 @@ void ErgFile::parseTTS()
     Points.clear();
     Laps.clear();
 
+    gpi.Reset();
+
     // TTS File Gradient Should be smoothly interpolated from Altitude.
     StrictGradient = false;
 
@@ -861,8 +871,7 @@ void ErgFile::parseTTS()
 
     // Enumerate the data types that are available.
     bool fHasKm    = ttsReader.hasKm();
-    bool fHasLat   = ttsReader.hasLatitude();
-    bool fHasLon   = ttsReader.hasLongitude();
+    bool fHasGPS   = ttsReader.hasGPS();
     bool fHasAlt   = ttsReader.hasElevation();
     bool fHasSlope = ttsReader.hasGradient();
 
@@ -877,20 +886,19 @@ void ErgFile::parseTTS()
 
     prevPoint = NULL;
     point = NULL;
-    nextPoint = &ttsPoints[1];
+    nextPoint = &ttsPoints[0];
 
     double alt = 0;
     if (fHasAlt) {
-        // Start with altitude of second point.
-        alt = ttsPoints[1].getElevation();
+        alt = ttsPoints[0].getElevation();
     }
 
-    for (int i = 1; i <= pointCount; i++) { // first data point is actually the last...
+    for (int i = 0; i <= pointCount; i++) { // first data point is actually the last...
         ErgFilePoint add;
 
         prevPoint = point;
         point = nextPoint;
-        nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[0] : &ttsPoints[i + 1];
+        nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[i] : &ttsPoints[i + 1];
 
         // Determine slope to next point
         double slope = 0.0;
@@ -922,8 +930,11 @@ void ErgFile::parseTTS()
         add.y = alt;
         add.val = slope;
 
-        if (fHasLat) add.lat = point->getLatitude();
-        if (fHasLon) add.lon = point->getLongitude();
+        if (fHasGPS) {
+            add.lat = point->getLatitude();
+            add.lon = point->getLongitude();
+        }
+
         if (add.y > MaxWatts) MaxWatts = add.y;
 
         Points.append(add);

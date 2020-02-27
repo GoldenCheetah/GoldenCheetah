@@ -74,9 +74,9 @@ namespace NS_TTSReader {
         double elevation;
         double distanceFromStart;
         double gradient;
-        int    power;
+        double power;
         double speed;
-        long   time;
+        double time;
 
     public:
 
@@ -90,11 +90,11 @@ namespace NS_TTSReader {
             this->speed = _speed;
         }
 
-        long getTime() const {
+        double getTime() const {
             return time;
         }
 
-        void setTime(long _time) {
+        void setTime(double _time) {
             this->time = _time;
         }
 
@@ -102,7 +102,7 @@ namespace NS_TTSReader {
             return gradient;
         }
 
-        int getPower() const {
+        double getPower() const {
             return power; // overload gradient with power
         }
 
@@ -110,7 +110,7 @@ namespace NS_TTSReader {
             this->gradient = _gradient;
         }
 
-        void setPower(int _power) {
+        void setPower(double _power) {
             this->power = _power;
         }
 
@@ -158,34 +158,46 @@ namespace NS_TTSReader {
      */
 
     struct ProgramPoint {
-        long distance;
+        double distance;
         double slope;
+    };
+
+    struct GPSPoint{
+        double distance;
+        double lat;
+        double lon;
+        double alt;
+
+        GPSPoint(double _distance, double _lat, double _lon, double _alt) :
+            distance(_distance), lat(_lat), lon(_lon), alt(_alt) {}
     };
 
     class TTSReader {
 
-        double frameRate;
-        std::vector<Point> pointList;
+        std::vector<Point>        pointList;   // frame mapping data
+        std::vector<ProgramPoint> programList; // slope data
+        std::vector<GPSPoint>     gpsPoints;   // gps data
 
-        std::vector<ProgramPoint> programList;
-        std::vector<ByteArray> content;
+        std::vector<ByteArray>    content;
         ByteArray pre;
 
         int imageId;
+
+        double   frameRate;
 
         double   maxSlope;
         double   minSlope;
         XYSeries series;
 
-        std::vector<Point> points;
+        std::vector<Point> points;  // Final list of combined data
 
         double totalDistance;
 
         bool fHasKM;
-        bool fHasLat;
-        bool fHasLon;
+        bool fHasGPS;
         bool fHasAlt;
         bool fHasSlope;
+        bool fHasFrameMapping;
 
         // Block Types
         static const int PROGRAM_DATA = 1032;
@@ -199,7 +211,9 @@ namespace NS_TTSReader {
 
     public:
 
-        TTSReader() : maxSlope(0), minSlope(0), totalDistance(0), fHasKM(false), fHasLat(false), fHasLon(false), fHasAlt(false), fHasSlope(false) {}
+        TTSReader() : maxSlope(0), minSlope(0), totalDistance(0), fHasKM(false),
+                      fHasGPS(false), fHasAlt(false), fHasSlope(false),
+                      fHasFrameMapping(false) {}
 
         enum StringType {
             NONPRINTABLE, BLOCK, STRING, IMAGE, CRC
@@ -216,9 +230,6 @@ namespace NS_TTSReader {
 
         bool                       deriveMinMaxSlopes(double &minSlope, double &maxSlope, double &variance) const;
 
-        unsigned                   findNextNonDuplicateGeolocation(unsigned u) const;
-        unsigned                   interpolateLocationsWithinSpan(unsigned u0, unsigned u1);
-        unsigned                   interpolateDuplicateLocations();
         void                       recomputeAltitudeFromGradient();
 
 #if 0
@@ -239,12 +250,14 @@ namespace NS_TTSReader {
         }
 #endif
 
-        bool hasKm()        { return fHasKM; }
-        bool hasGradient()  { return fHasSlope; }
-        bool hasLatitude()  { return fHasLat; }
-        bool hasLongitude() { return fHasLon; }
-        bool hasElevation() { return fHasAlt; }
+        double getFrameRate()     const { return frameRate; }
+        double getTotalDistance() const { return totalDistance; }
 
+        bool hasKm()              const { return fHasKM; }
+        bool hasGradient()        const { return fHasSlope; }
+        bool hasGPS()             const { return fHasGPS; }
+        bool hasElevation()       const { return fHasAlt; }
+        bool hasFrameMapping()    const { return fHasFrameMapping; }
 
         bool loadHeaders();
         void blockProcessing(int blockType, int version, ByteArray &data);
