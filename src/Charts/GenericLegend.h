@@ -50,11 +50,17 @@ class GenericLegendItem : public QWidget {
     public:
         GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color);
 
+    Q_SIGNALS:
+        void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
+
+    protected:
+        bool eventFilter(QObject *, QEvent *e);
+
     public slots:
 
         void paintEvent(QPaintEvent *event);
-        void setValue(double p) { hasvalue=true; value=p; update(); } // set value to display
-        void noValue() { hasvalue=false; update(); } // no value to display
+        void setValue(double p) { if (enabled) { hasvalue=true; value=p; update(); } } // set value to display
+        void noValue() { if (enabled) { hasvalue=false; update(); } } // no value to display
         void configChanged(qint32); // context changed
 
     private:
@@ -63,10 +69,11 @@ class GenericLegendItem : public QWidget {
         QColor color;
 
         bool hasvalue;
+        bool enabled;
         double value;
 
         // geometry for painting fast / updated on config changes
-        QRectF blockrect, namerect, valuerect, linerect;
+        QRectF blockrect, namerect, valuerect, linerect, hoverrect;
 
 };
 

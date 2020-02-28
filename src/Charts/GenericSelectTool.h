@@ -83,6 +83,9 @@ class GenericSelectTool : public QObject, public QGraphicsItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 
+    static constexpr double gl_linemarker = 7;
+    static constexpr double gl_scattermarker = 10;
+
     friend class ::GenericPlot;
 
     public:
@@ -94,6 +97,9 @@ class GenericSelectTool : public QObject, public QGraphicsItem
 
         // set mode
         void setMode(SelectionMode mode) { this->mode=mode;  }
+
+        // some series was shown or hidden...
+        void setSeriesVisible(QString name, bool visible);
 
         // is invisible and tiny. we are just an observer
         bool sceneEventFilter(QGraphicsItem *watched, QEvent *event);

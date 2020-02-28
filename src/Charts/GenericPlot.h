@@ -124,6 +124,10 @@ class GenericPlot : public QWidget {
         static QColor seriesColor(QAbstractSeries* series);
 
     public slots:
+
+        // do we want to see this series?
+        void setSeriesVisible(QString name, bool visible);
+
         void configChanged(qint32);
 
         // set chart settings

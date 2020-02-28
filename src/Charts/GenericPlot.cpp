@@ -76,6 +76,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     connect(selector, SIGNAL(hover(QPointF,QString,QAbstractSeries*)), legend, SLOT(hover(QPointF,QString,QAbstractSeries*)));
     connect(selector, SIGNAL(unhover(QString)), legend, SLOT(unhover(QString)));
     connect(selector, SIGNAL(unhoverx()), legend, SLOT(unhoverx()));
+    connect(legend, SIGNAL(clicked(QString,bool)), this, SLOT(setSeriesVisible(QString,bool)));
 
     // config changed...
     configChanged(0);
@@ -209,6 +210,23 @@ GenericPlot::configChanged(qint32)
     chartview->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
     qchart->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
     qchart->setBackgroundPen(QPen(GColor(CPLOTMARKER)));
+}
+
+void
+GenericPlot::setSeriesVisible(QString name, bool visible)
+{
+    // find the curve
+    QAbstractSeries *series = curves.value(name, NULL);
+
+    // does it exist and did it change?
+    if (series && series->isVisible() != visible) {
+
+        // show/hide
+        series->setVisible(visible);
+
+        // tell selector we hid/show a series so it can respond.
+        selector->setSeriesVisible(name, visible);
+    }
 }
 
 bool

@@ -64,6 +64,8 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
             // current position for each series - we only do first, coz only interested in x axis anyway
             foreach(QAbstractSeries *series, host->qchart->series()) {
 
+                if (series->isVisible() == false) continue; // ignore invisble curves
+
                 // convert screen position to value for series
                 QPointF v = host->qchart->mapToValue(spos,series);
                 double miny=0;
@@ -96,7 +98,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                 QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                 painter->setBrush(invert);
                 painter->setPen(invert);
-                QRectF circle(0,0,5*dpiXFactor,5*dpiYFactor);
+                QRectF circle(0,0,gl_linemarker*dpiXFactor,gl_linemarker*dpiYFactor);
                 circle.moveCenter(pos);
                 painter->drawEllipse(circle);
                 painter->setBrush(Qt::NoBrush);
@@ -121,7 +123,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                         painter->setBrush(invert);
                         painter->setPen(invert);
-                        QRectF circle(0,0,10*dpiXFactor,10*dpiYFactor);
+                        QRectF circle(0,0,gl_scattermarker*dpiXFactor,gl_scattermarker*dpiYFactor);
                         circle.moveCenter(hoverpoint);
                         painter->drawEllipse(circle);
                         painter->setBrush(Qt::NoBrush);
@@ -131,6 +133,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     // current position for each series
                     foreach(QAbstractSeries *series, host->qchart->series()) {
 
+                        if (series->isVisible() == false) continue; // ignore invisble curves
 
                         // convert screen position to value for series
                         QPointF v = host->qchart->mapToValue(spos,series);
@@ -483,6 +486,8 @@ GenericSelectTool::moved(QPointF pos)
             hoverseries = NULL;
             foreach(QAbstractSeries *series, host->qchart->series()) {
 
+                if (series->isVisible() == false) continue; // ignore invisble curves
+
                 Quadtree *tree= host->quadtrees.value(series,NULL);
                 if (tree != NULL) {
 
@@ -539,7 +544,7 @@ GenericSelectTool::moved(QPointF pos)
             double nearestx=-9999;
             foreach(QAbstractSeries *series, host->qchart->series()) {
 
-                if (ignore.contains(series)) continue;
+                if (series->isVisible() == false || ignore.contains(series)) continue;
 
                 // get x value to search
                 double xvalue=host->qchart->mapToValue(spos,series).x();
@@ -672,193 +677,222 @@ GenericCalculator::finalise()
     }
 }
 
+void
+GenericSelectTool::setSeriesVisible(QString name, bool visible)
+{
+    // a series got hidden or showm, so do whats needed.
+    QString selectionName = QString("%1_select").arg(name);
+    foreach(QAbstractSeries *x,  host->qchart->series())
+        if (x->name() == selectionName)
+            x->setVisible(visible);
+
+    // as a special case we clear the hoverpoints.
+    // they will get redisplayed when the cursor moves
+    // but for now this is the quickes and simplest way
+    // to avoid artefacts
+    hoverpoints.clear();
+    hoverpoint=QPointF();
+
+    // hide/show and updatescenes may overlap/get out of sync
+    // so we update scene to be absolutely sure the scene
+    // reflects the current visible settings (and others later)
+    rectchanged = true;
+    updateScene();
+}
+
 // selector needs to update the chart for selections
 void
 GenericSelectTool::updateScene()
 {
     // is the selection active?
     if (rectchanged) {
-    if (state != GenericSelectTool::INACTIVE && state != DRAGGING) {
 
-        // selection tool is active so set curves gray
-        // and create curves for highlighted points etc
-        QList<QAbstractSeries*> originallist=host->qchart->series();
-        foreach(QAbstractSeries *x, originallist) { // because we update it below (!)
+        // clear incidental state that gets reset when needed
+        stats.clear();
 
-            if (ignore.contains(x)) continue;
+        if (state != GenericSelectTool::INACTIVE && state != DRAGGING) {
 
-            // Run through all the curves, setting them gray
-            // selecting the points that fall into the selection
-            // and creating selection curves and stats for painting
-            // onto the plot
-            //
-            // We duplicate code by curve type (but not chart type)
-            // so we can e.g. put a scatter curve on a line chart
-            // and vice versa later.
+            // selection tool is active so set curves gray
+            // and create curves for highlighted points etc
+            QList<QAbstractSeries*> originallist=host->qchart->series();
+            foreach(QAbstractSeries *x, originallist) { // because we update it below (!)
 
-            switch(x->type()) {
-            case QAbstractSeries::SeriesTypeLine: {
-                QLineSeries *line = static_cast<QLineSeries*>(x);
+                if (x->isVisible() == false || ignore.contains(x)) continue;
 
-                // ignore empty series
-                if (line->count() < 1) continue;
+                // Run through all the curves, setting them gray
+                // selecting the points that fall into the selection
+                // and creating selection curves and stats for painting
+                // onto the plot
+                //
+                // We duplicate code by curve type (but not chart type)
+                // so we can e.g. put a scatter curve on a line chart
+                // and vice versa later.
 
-                // this will be used to plot selected points on the plot
-                QLineSeries *selection =NULL;
+                switch(x->type()) {
+                case QAbstractSeries::SeriesTypeLine: {
+                    QLineSeries *line = static_cast<QLineSeries*>(x);
 
-                // the axes for the current series
-                QAbstractAxis *xaxis=NULL, *yaxis=NULL;
-                foreach (QAbstractAxis *ax, x->attachedAxes()) {
-                    if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
-                    if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
-                }
+                    // ignore empty series
+                    if (line->count() < 1) continue;
 
-                if ((selection=static_cast<QLineSeries*>(selections.value(x, NULL))) == NULL) {
+                    // this will be used to plot selected points on the plot
+                    QLineSeries *selection =NULL;
 
-                    selection = new QLineSeries();
-
-                    // all of this curve cloning should be in a new method xxx todo
-                    selection->setUseOpenGL(line->useOpenGL());
-                    selection->setPen(line->pen());
-                    if (line->useOpenGL())
-                        selection->setColor(Qt::gray); // use opengl ignores changing colors
-                    else {
-                        selection->setColor(line->color());
-                        static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                    // the axes for the current series
+                    QAbstractAxis *xaxis=NULL, *yaxis=NULL;
+                    foreach (QAbstractAxis *ax, x->attachedAxes()) {
+                        if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
+                        if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
                     }
-                    selections.insert(x, selection);
-                    ignore.append(selection);
 
-                    // add after done all aesthetic for opengl snafus
-                    host->qchart->addSeries(selection); // before adding data and axis
+                    if ((selection=static_cast<QLineSeries*>(selections.value(x, NULL))) == NULL) {
 
-                    // only do when creating it.
-                    if (yaxis) selection->attachAxis(yaxis);
-                    if (xaxis) selection->attachAxis(xaxis);
-                }
+                        selection = new QLineSeries();
+                        selection->setName(QString("%1_select").arg(line->name()));
 
-                // lets work out what range of values we need to be
-                // selecting is, reverse since possible to have a backwards
-                // rectangle in the selection tool
-                double minx=0,maxx=0;
-                minx =this->minx(x);
-                maxx =this->maxx(x);
-                if (maxx < minx) { double t=minx; minx=maxx; maxx=t; }
+                        // all of this curve cloning should be in a new method xxx todo
+                        selection->setUseOpenGL(line->useOpenGL());
+                        selection->setPen(line->pen());
+                        if (line->useOpenGL())
+                            selection->setColor(Qt::gray); // use opengl ignores changing colors
+                        else {
+                            selection->setColor(line->color());
+                            static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                        }
+                        selections.insert(x, selection);
+                        ignore.append(selection);
 
-                //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
+                        // add after done all aesthetic for opengl snafus
+                        host->qchart->addSeries(selection); // before adding data and axis
 
-                // add points to the selection curve and calculate as you go
-                QList<QPointF> points;
-                GenericCalculator calc;
-                calc.initialise();
-                calc.color = selection->color(); // should this go into constructor?! xxx todo
-                calc.xaxis = xaxis;
-                calc.yaxis = yaxis;
-                calc.series = line;
-                for(int i=0; i<line->count(); i++) {
-                    QPointF point = line->at(i); // avoid deep copy
-                    if (point.x() >= minx && point.x() <= maxx) {
-                        if (!points.contains(point)) points << point; // avoid dupes
-                        calc.addPoint(point);
+                        // only do when creating it.
+                        if (yaxis) selection->attachAxis(yaxis);
+                        if (xaxis) selection->attachAxis(xaxis);
                     }
-                }
-                calc.finalise();
-                stats.insert(line, calc);
 
-                selection->clear();
-                if (points.count()) selection->append(points);
+                    // lets work out what range of values we need to be
+                    // selecting is, reverse since possible to have a backwards
+                    // rectangle in the selection tool
+                    double minx=0,maxx=0;
+                    minx =this->minx(x);
+                    maxx =this->maxx(x);
+                    if (maxx < minx) { double t=minx; minx=maxx; maxx=t; }
 
-            }
-            break;
-            case QAbstractSeries::SeriesTypeScatter: {
+                    //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
 
-                QScatterSeries *scatter = static_cast<QScatterSeries*>(x);
-
-                // ignore empty series
-                if (scatter->count() < 1) continue;
-
-                // this will be used to plot selected points on the plot
-                QScatterSeries *selection =NULL;
-
-                // the axes for the current series
-                QAbstractAxis *xaxis=NULL, *yaxis=NULL;
-                foreach (QAbstractAxis *ax, x->attachedAxes()) {
-                    if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
-                    if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
-                }
-
-                if ((selection=static_cast<QScatterSeries*>(selections.value(x, NULL))) == NULL) {
-
-                    selection = new QScatterSeries();
-
-                    // all of this curve cloning should be in a new method xxx todo
-                    host->qchart->addSeries(selection); // before adding data and axis
-                    selection->setUseOpenGL(scatter->useOpenGL());
-                    if (selection->useOpenGL())
-                        selection->setColor(Qt::gray); // use opengl ignores changing colors
-                    else {
-                        selection->setColor(scatter->color());
-                        static_cast<QScatterSeries*>(x)->setColor(Qt::gray);
+                    // add points to the selection curve and calculate as you go
+                    QList<QPointF> points;
+                    GenericCalculator calc;
+                    calc.initialise();
+                    calc.color = selection->color(); // should this go into constructor?! xxx todo
+                    calc.xaxis = xaxis;
+                    calc.yaxis = yaxis;
+                    calc.series = line;
+                    for(int i=0; i<line->count(); i++) {
+                        QPointF point = line->at(i); // avoid deep copy
+                        if (point.x() >= minx && point.x() <= maxx) {
+                            if (!points.contains(point)) points << point; // avoid dupes
+                            calc.addPoint(point);
+                        }
                     }
-                    selection->setMarkerSize(scatter->markerSize());
-                    selection->setMarkerShape(scatter->markerShape());
-                    selection->setPen(scatter->pen());
-                    selections.insert(x, selection);
-                    ignore.append(selection);
+                    calc.finalise();
+                    stats.insert(line, calc);
 
-                    // only do when creating it.
-                    if (yaxis) selection->attachAxis(yaxis);
-                    if (xaxis) selection->attachAxis(xaxis);
+                    selection->clear();
+                    if (points.count()) selection->append(points);
+
                 }
-
-                // lets work out what range of values we need to be
-                // selecting is, reverse since possible to have a backwards
-                // rectangle in the selection tool
-                double miny=0,maxy=0,minx=0,maxx=0;
-                miny =this->miny(x);
-                maxy =this->maxy(x);
-                if (maxy < miny) { double t=miny; miny=maxy; maxy=t; }
-
-                minx =this->minx(x);
-                maxx =this->maxx(x);
-                if (maxx < minx) { double t=minx; minx=maxx; maxx=t; }
-
-                //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
-
-                // add points to the selection curve and calculate as you go
-                QList<QPointF> points;
-                GenericCalculator calc;
-                calc.initialise();
-                calc.color = selection->color(); // should this go into constructor?! xxx todo
-                calc.xaxis = xaxis;
-                calc.yaxis = yaxis;
-                calc.series = scatter;
-                for(int i=0; i<scatter->count(); i++) {
-                    QPointF point = scatter->at(i); // avoid deep copy
-                    if (point.y() >= miny && point.y() <= maxy &&
-                        point.x() >= minx && point.x() <= maxx) {
-                        if (!points.contains(point)) points << point; // avoid dupes
-                        calc.addPoint(point);
-                    }
-                }
-                calc.finalise();
-                stats.insert(scatter, calc);
-
-                selection->clear();
-                if (points.count()) selection->append(points);
-            }
-            break;
-            default:
                 break;
+                case QAbstractSeries::SeriesTypeScatter: {
+
+                    QScatterSeries *scatter = static_cast<QScatterSeries*>(x);
+
+                    // ignore empty series
+                    if (scatter->count() < 1) continue;
+
+                    // this will be used to plot selected points on the plot
+                    QScatterSeries *selection =NULL;
+
+                    // the axes for the current series
+                    QAbstractAxis *xaxis=NULL, *yaxis=NULL;
+                    foreach (QAbstractAxis *ax, x->attachedAxes()) {
+                        if (ax->orientation() == Qt::Vertical && yaxis==NULL) yaxis=ax;
+                        if (ax->orientation() == Qt::Horizontal && xaxis==NULL) xaxis=ax;
+                    }
+
+                    if ((selection=static_cast<QScatterSeries*>(selections.value(x, NULL))) == NULL) {
+
+                        selection = new QScatterSeries();
+
+                        // all of this curve cloning should be in a new method xxx todo
+                        host->qchart->addSeries(selection); // before adding data and axis
+                        selection->setUseOpenGL(scatter->useOpenGL());
+                        if (selection->useOpenGL())
+                            selection->setColor(Qt::gray); // use opengl ignores changing colors
+                        else {
+                            selection->setColor(scatter->color());
+                            static_cast<QScatterSeries*>(x)->setColor(Qt::gray);
+                        }
+                        selection->setMarkerSize(scatter->markerSize());
+                        selection->setMarkerShape(scatter->markerShape());
+                        selection->setPen(scatter->pen());
+                        selection->setName(QString("%1_select").arg(scatter->name()));
+                        selections.insert(x, selection);
+                        ignore.append(selection);
+
+                        // only do when creating it.
+                        if (yaxis) selection->attachAxis(yaxis);
+                        if (xaxis) selection->attachAxis(xaxis);
+                    }
+
+                    // lets work out what range of values we need to be
+                    // selecting is, reverse since possible to have a backwards
+                    // rectangle in the selection tool
+                    double miny=0,maxy=0,minx=0,maxx=0;
+                    miny =this->miny(x);
+                    maxy =this->maxy(x);
+                    if (maxy < miny) { double t=miny; miny=maxy; maxy=t; }
+
+                    minx =this->minx(x);
+                    maxx =this->maxx(x);
+                    if (maxx < minx) { double t=minx; minx=maxx; maxx=t; }
+
+                    //fprintf(stderr, "xaxis range %f-%f, yaxis range %f-%f, [%s] %d points to check\n", minx,maxx,miny,maxy,scatter->name().toStdString().c_str(), scatter->count());
+
+                    // add points to the selection curve and calculate as you go
+                    QList<QPointF> points;
+                    GenericCalculator calc;
+                    calc.initialise();
+                    calc.color = selection->color(); // should this go into constructor?! xxx todo
+                    calc.xaxis = xaxis;
+                    calc.yaxis = yaxis;
+                    calc.series = scatter;
+                    for(int i=0; i<scatter->count(); i++) {
+                        QPointF point = scatter->at(i); // avoid deep copy
+                        if (point.y() >= miny && point.y() <= maxy &&
+                            point.x() >= minx && point.x() <= maxx) {
+                            if (!points.contains(point)) points << point; // avoid dupes
+                            calc.addPoint(point);
+                        }
+                    }
+                    calc.finalise();
+                    stats.insert(scatter, calc);
+
+                    selection->clear();
+                    if (points.count()) selection->append(points);
+                }
+                break;
+                default:
+                    break;
+                }
             }
+
+            rectchanged = false;
+
+        } else {
+
+            resetSelections();
         }
-
-        rectchanged = false;
-
-    } else {
-
-        resetSelections();
-    }
     }
 
     // repaint everything
@@ -873,7 +907,7 @@ GenericSelectTool::updateScene()
 
         foreach(QAbstractSeries *x, host->qchart->series()) {
 
-            if (ignore.contains(x)) continue;
+            if (ignore.contains(x)) continue; // we still reset selections for invisible curves
 
             switch(x->type()) {
 

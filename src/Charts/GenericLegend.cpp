@@ -31,10 +31,15 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
 {
 
     value=0;
+    enabled=true;
     hasvalue=false;
 
     // set height and width, gets reset when configchanges
     configChanged(0);
+
+    // we want to track our own events - for hover and click
+    installEventFilter(this);
+    setMouseTracking(true);
 
     // watch for changes...
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -45,8 +50,8 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
 void
 GenericLegendItem::configChanged(qint32)
 {
-    static const double gl_margin = 3 * dpiXFactor;
-    static const double gl_spacer = 3 * dpiXFactor;
+    static const double gl_margin = 5 * dpiXFactor;
+    static const double gl_spacer = 2 * dpiXFactor;
     static const double gl_block = 7 * dpiXFactor;
     static const double gl_linewidth = 1 * dpiXFactor;
 
@@ -62,7 +67,7 @@ GenericLegendItem::configChanged(qint32)
                               + gl_spacer + fm.boundingRect(valuelabel).width() + gl_margin;
 
     // maximum height of widget = margin + textheight + spacer + line
-    double height = gl_margin + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
+    double height = (gl_margin*2) + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
 
     // now set geometry of widget
     setFixedWidth(width);
@@ -70,13 +75,37 @@ GenericLegendItem::configChanged(qint32)
 
     // calculate all the rects used by the painter now since static
     blockrect = QRectF(gl_margin, gl_margin, gl_block, height-gl_margin);
-    linerect = QRectF(gl_margin+gl_block, height-gl_linewidth, width-gl_margin, gl_linewidth);
+    linerect = QRectF(gl_margin+gl_block, gl_spacer+height-gl_linewidth-(gl_margin*2), width-gl_block-(gl_margin*2), gl_linewidth);
     namerect = QRectF(gl_margin + gl_block + gl_spacer, gl_margin, fm.boundingRect(name).width(), fm.boundingRect(name).height());
     valuerect =QRectF(namerect.x() + namerect.width() + gl_spacer, gl_margin, fm.boundingRect(valuelabel).width(), fm.boundingRect(valuelabel).height());
+    hoverrect = QRectF(gl_block, 0, width-gl_block,height);
 
 
     // redraw
     update();
+}
+
+bool
+GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
+{
+    if (obj != this) return false;
+
+    switch (e->type()) {
+    case QEvent::MouseButtonRelease: // for now just one event, but may do more later
+        {
+            if (underMouse()) {
+                enabled=!enabled;
+                if (!enabled) hasvalue=false;
+                emit clicked(name, enabled);
+            }
+        }
+        // fall through
+    default:
+        //fprintf(stderr, "event %d on %s\n", e->type(), name.toStdString().c_str()); fflush(stderr);
+        update();
+        break;
+    }
+    return false;
 }
 
 void
@@ -90,8 +119,18 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.drawRect(0,0,geometry().width()-1, geometry().height()-1);
 
-    // block and line
-    painter.setBrush(QBrush(color));
+    // under mouse show
+    if (underMouse()) {
+        QColor mask=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+        mask.setAlphaF(0.1);
+        painter.setBrush(mask);
+        painter.setPen(Qt::NoPen);
+        painter.drawRect(hoverrect);
+    }
+
+    // block and line - gray means disabled
+    if (enabled) painter.setBrush(QBrush(color));
+    else painter.setBrush(QBrush(Qt::gray));
     painter.setPen(Qt::NoPen);
     //painter.drawRect(blockrect);
     painter.drawRect(linerect);
@@ -105,7 +144,8 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     string = Utils::removeDP(string);
 
     // set pen to series color for now
-    painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND))); // use invert - usually black or white
+    if (enabled)  painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND))); // use invert - usually black or white
+    else painter.setPen(Qt::gray);
     painter.setFont(QFont());
 
     // series
@@ -136,6 +176,9 @@ GenericLegend::addSeries(QString name, QAbstractSeries *series)
 
     // lets see ya!
     add->show();
+
+    // connect signals
+    connect(add, SIGNAL(clicked(QString,bool)), this, SIGNAL(clicked(QString,bool)));
 }
 
 void
@@ -153,6 +196,9 @@ GenericLegend::addX(QString name)
 
     // remember the x axis
     xname = name;
+
+    // we don't connect -- there is no such series, its a meta legend item
+    // NOPE: connect(add, SIGNAL(clicked(QString,bool)), this, SIGNAL(clicked(QString,bool)));
 }
 
 void
