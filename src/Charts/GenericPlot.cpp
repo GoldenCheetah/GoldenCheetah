@@ -73,7 +73,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // get notifications when values change
-    connect(selector, SIGNAL(hover(QPointF,QString,QAbstractSeries*)), legend, SLOT(hover(QPointF,QString,QAbstractSeries*)));
+    connect(selector, SIGNAL(hover(QPointF,QString,QAbstractSeries*)), legend, SLOT(setValue(QPointF,QString)));
     connect(selector, SIGNAL(unhover(QString)), legend, SLOT(unhover(QString)));
     connect(selector, SIGNAL(unhoverx()), legend, SLOT(unhoverx()));
     connect(legend, SIGNAL(clicked(QString,bool)), this, SLOT(setSeriesVisible(QString,bool)));
@@ -131,8 +131,11 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     case QEvent::GraphicsSceneMouseMove:
         spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
     //case QEvent::MouseMove:
-        //fprintf(stderr,"POS: %f:%f\n", spos.x(), spos.y());
-        //fprintf(stderr,"%s: mouse MOVE for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        //fprintf(stderr,"POS: %f:%f SCENE: %d,%d to %d width %d height AREA: %f,%f %f width %f height\n",
+                //spos.x(), spos.y(),
+                //qchart->scene()->views()[0]->geometry().x(),  qchart->scene()->views()[0]->geometry().y(),  qchart->scene()->views()[0]->geometry().width(),  qchart->scene()->views()[0]->geometry().height(),
+                //qchart->plotArea().x(), qchart->plotArea().y(), qchart->plotArea().width(), qchart->plotArea().height());
+                //fflush(stderr);
         {
             // see if selection tool cares about new mouse position
             updatescene = selector->moved(spos);
@@ -159,7 +162,7 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     case QEvent::GraphicsSceneHoverMove: {
 
         // debug info
-        //fprintf(stderr,"%s: HOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
+        //fprintf(stderr,"HOVER scene item for obj=%u\n", (void*)obj); fflush(stderr);
     }
     break;
 
@@ -226,6 +229,15 @@ GenericPlot::setSeriesVisible(QString name, bool visible)
 
         // tell selector we hid/show a series so it can respond.
         selector->setSeriesVisible(name, visible);
+    }
+}
+
+// handle hover on barset
+void GenericPlot::barsetHover(bool status, int index, QBarSet *)
+{
+    foreach(QBarSet *barset, barsets) {
+        if (status)  legend->setValue(QPointF(0, barset->at(index)), barset->label());
+        else legend->unhover(barset->label());
     }
 }
 
@@ -345,6 +357,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
             add->setUseOpenGL(opengl); // for scatter or line only apparently
+            qchart->setDropShadowEnabled(false);
 
             // chart
             qchart->addSeries(add);
@@ -395,11 +408,10 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
             add->setUseOpenGL(opengl); // for scatter or line only apparently
+            qchart->setDropShadowEnabled(false);
 
             // chart
             qchart->addSeries(add);
-            qchart->legend()->setMarkerShape(QLegend::MarkerShapeRectangle);
-            qchart->setDropShadowEnabled(false);
 
             // add to list of curves
             curves.insert(name,add);
@@ -429,6 +441,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             // we are very particular regarding axis
             yaxis->type = GenericAxisInfo::CONTINUOUS;
             xaxis->type = GenericAxisInfo::CATEGORY;
+
+            // shadows on bar charts
+            qchart->setDropShadowEnabled(false);
 
             // add to list of barsets
             barsets << add;
@@ -460,6 +475,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 else slice->setBrush(Qt::red);
                 i++;
             }
+
+            // shadows on pie
+            qchart->setDropShadowEnabled(false);
 
             // set the pie chart
             qchart->addSeries(add);
@@ -531,8 +549,14 @@ GenericPlot::finaliseChart()
                         add=caxis;
 
                         // add the bar series
-                        if (!barseries) { barseries = new QBarSeries(); qchart->addSeries(barseries); }
-                        else barseries->clear();
+                        if (!barseries) {
+                            barseries = new QBarSeries();
+                            qchart->addSeries(barseries);
+
+                            // connect hover events
+                            connect(barseries, SIGNAL(hovered(bool,int,QBarSet*)), this, SLOT(barsetHover(bool,int,QBarSet*)));
+
+                        } else barseries->clear();
 
                         // add the new barsets
                         foreach (QBarSet *bs, barsets)
@@ -605,16 +629,24 @@ GenericPlot::finaliseChart()
             }
 
             // add to the legend xxx might make some hidden?
-            legend->addSeries(series->name(), series);
+            legend->addSeries(series->name(), GenericPlot::seriesColor(series));
 
         }
 
         legend->show();
     }
 
-    if (charttype ==GC_CHART_PIE || charttype== GC_CHART_BAR) { //XXX bar chart legend?
-        // pie, never want a legend
-        legend->hide();
+    if (charttype== GC_CHART_PIE) {
+        foreach(QAbstractSeries *series, qchart->series()) {
+            if (series->type()== QAbstractSeries::SeriesTypePie) {
+                foreach (QPieSlice *slice, static_cast<QPieSeries*>(series)->slices()) {
+                    legend->addSeries(slice->label(), slice->color());
+                    legend->setValue(QPointF(0,slice->value()), slice->label());
+                }
+            }
+        }
+        legend->setClickable(false);
+        legend->show();
     }
 
     // barseries special case
@@ -623,6 +655,13 @@ GenericPlot::finaliseChart()
         // need to attach barseries to the value axes
         foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))
             barseries->attachAxis(axis);
+
+        // and legend
+        foreach(QBarSet *set, barsets)
+            legend->addSeries(set->label(), set->color());
+
+        legend->setClickable(false);
+        legend->show();
     }
 
     // install event filters on thes scene objects for Pie and Bar

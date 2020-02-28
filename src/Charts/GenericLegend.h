@@ -61,6 +61,7 @@ class GenericLegendItem : public QWidget {
         void paintEvent(QPaintEvent *event);
         void setValue(double p) { if (enabled) { hasvalue=true; value=p; update(); } } // set value to display
         void noValue() { if (enabled) { hasvalue=false; update(); } } // no value to display
+        void setClickable(bool x) { clickable=x; }
         void configChanged(qint32); // context changed
 
     private:
@@ -70,6 +71,7 @@ class GenericLegendItem : public QWidget {
 
         bool hasvalue;
         bool enabled;
+        bool clickable;
         double value;
 
         // geometry for painting fast / updated on config changes
@@ -84,7 +86,7 @@ class GenericLegend : public QWidget {
     public:
         GenericLegend(Context *context, GenericPlot *parent);
 
-        void addSeries(QString name, QAbstractSeries *series);
+        void addSeries(QString name, QColor color);
         void addX(QString name);
         void removeSeries(QString name);
         void removeAllSeries();
@@ -93,9 +95,10 @@ class GenericLegend : public QWidget {
         void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
 
     public slots:
-        void hover(QPointF value, QString name, QAbstractSeries*series);
+        void setValue(QPointF value, QString name);
         void unhover(QString name);
         void unhoverx();
+        void setClickable(bool x);
 
     private:
         // a label has a unique name, not directly tide to
@@ -105,6 +108,7 @@ class GenericLegend : public QWidget {
         QHBoxLayout *layout;
         QMap<QString,GenericLegendItem*> items;
         QString xname;
+        bool clickable;
 };
 
 #endif

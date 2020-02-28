@@ -128,6 +128,9 @@ class GenericPlot : public QWidget {
         // do we want to see this series?
         void setSeriesVisible(QString name, bool visible);
 
+        // bar hover, process and update legend
+        void barsetHover(bool status, int index, QBarSet *barset);
+
         void configChanged(qint32);
 
         // set chart settings

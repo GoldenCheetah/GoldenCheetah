@@ -32,6 +32,7 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
 
     value=0;
     enabled=true;
+    clickable=true;
     hasvalue=false;
 
     // set height and width, gets reset when configchanges
@@ -93,7 +94,7 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
     switch (e->type()) {
     case QEvent::MouseButtonRelease: // for now just one event, but may do more later
         {
-            if (underMouse()) {
+            if (clickable && underMouse()) {
                 enabled=!enabled;
                 if (!enabled) hasvalue=false;
                 emit clicked(name, enabled);
@@ -120,7 +121,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.drawRect(0,0,geometry().width()-1, geometry().height()-1);
 
     // under mouse show
-    if (underMouse()) {
+    if (clickable && underMouse()) {
         QColor mask=GCColor::invertColor(GColor(CPLOTBACKGROUND));
         mask.setAlphaF(0.1);
         painter.setBrush(mask);
@@ -161,16 +162,18 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     layout->addStretch();
 
     xname="";
+    clickable=true;
 
 }
 
 void
-GenericLegend::addSeries(QString name, QAbstractSeries *series)
+GenericLegend::addSeries(QString name, QColor color)
 {
     // if it already exists remove it
     if (items.value(name,NULL) != NULL) removeSeries(name);
 
-    GenericLegendItem *add = new GenericLegendItem(context, this, name, GenericPlot::seriesColor(series));
+    GenericLegendItem *add = new GenericLegendItem(context, this, name, color);
+    add->setClickable(clickable);
     layout->insertWidget(0, add);
     items.insert(name,add);
 
@@ -188,6 +191,7 @@ GenericLegend::addX(QString name)
     if (items.value(name,NULL) != NULL) removeSeries(name);
 
     GenericLegendItem *add = new GenericLegendItem(context, this, name, GColor(CPLOTMARKER));
+    add->setClickable(false);
     layout->insertWidget(0, add);
     items.insert(name,add);
 
@@ -224,7 +228,7 @@ GenericLegend::removeAllSeries()
 }
 
 void
-GenericLegend::hover(QPointF value, QString name, QAbstractSeries*)
+GenericLegend::setValue(QPointF value, QString name)
 {
     GenericLegendItem *call = items.value(name, NULL);
     if (call) call->setValue(value.y());
@@ -232,6 +236,18 @@ GenericLegend::hover(QPointF value, QString name, QAbstractSeries*)
     // xaxis
     GenericLegendItem *xaxis = items.value(xname, NULL);
     if (xaxis) xaxis->setValue(value.x());
+}
+
+void
+GenericLegend::setClickable(bool clickable)
+{
+    this->clickable=clickable;
+    QMapIterator<QString, GenericLegendItem*> i(items);
+    while (i.hasNext()) {
+        i.next();
+        if (i.key() != xname)
+            i.value()->setClickable(clickable);
+    }
 }
 
 void
