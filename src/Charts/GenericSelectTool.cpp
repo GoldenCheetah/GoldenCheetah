@@ -176,7 +176,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                 // there is a rectangle to draw on the screen
                 QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
                 QColor color = GColor(CPLOTMARKER);
-                color.setAlphaF(state == ACTIVE ? 0.05 : 0.2); // almost hidden if not moving/sizing
+                color.setAlphaF((state == ACTIVE && !isUnderMouse()) ? 0.05 : 0.2); // almost hidden if not moving/sizing
                 painter->fillRect(r,QBrush(color));
 
                 // now paint the statistics
