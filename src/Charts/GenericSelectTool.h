@@ -51,7 +51,7 @@ class GenericLegend;
 class GenericCalculator
 {
     public:
-    GenericCalculator() {}
+    GenericCalculator() { initialise(); }
 
     void initialise();
     void addPoint(QPointF);
