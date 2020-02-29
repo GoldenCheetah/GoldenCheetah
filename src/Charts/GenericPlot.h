@@ -125,12 +125,6 @@ class GenericPlot : public QWidget {
 
     public slots:
 
-        // do we want to see this series?
-        void setSeriesVisible(QString name, bool visible);
-
-        // bar hover, process and update legend
-        void barsetHover(bool status, int index, QBarSet *barset);
-
         void configChanged(qint32);
 
         // set chart settings
@@ -148,8 +142,14 @@ class GenericPlot : public QWidget {
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
 
+        // do we want to see this series?
+        void setSeriesVisible(QString name, bool visible);
+
         // watching scene events and managing interaction
         bool eventHandler(int eventsource, void *obj, QEvent *event);
+        void barsetHover(bool status, int index, QBarSet *barset);
+        void plotAreaChanged();
+
 
     protected:
 
@@ -161,6 +161,10 @@ class GenericPlot : public QWidget {
         // trap widget events and pass to event handler
         bool eventFilter(QObject *, QEvent *e);
 
+        // axes geometry (hacked from scene)
+        // used by select tool to know when
+        // over an axis and where to paint
+        QMap<QAbstractAxis*,QRectF> axisRect;
 
         // the legend
         GenericLegend *legend;

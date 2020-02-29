@@ -42,23 +42,23 @@ GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphi
 // a lassoo or rectangle shape
 void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
-   // don't paint outside the canvas
-   painter->save();
-   painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+    // don't paint outside the canvas
+    painter->save();
+    painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
-   // min max texts
-   QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
-   stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-   stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    // min max texts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
-   switch (mode) {
-   case CIRCLE:
+    switch (mode) {
+    case CIRCLE:
         {
 
         }
         break;
 
-   case XRANGE:
+    case XRANGE:
         {
 
             // current position for each series - we only do first, coz only interested in x axis anyway
@@ -108,7 +108,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
         // DROPS THROUGH INTO RECTANGLE FOR SELECTION RECTANGLE
         //
         // fall through
-   case RECTANGLE:
+    case RECTANGLE:
         {
             if (mode == RECTANGLE && (state == ACTIVE || state == INACTIVE)) {
 
@@ -197,6 +197,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     if (calc.xaxis != NULL) {
 
                         if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) { //XXX todo for log date etc?
+
                             double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
                             double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
                             QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b),calc.series));
@@ -288,13 +289,13 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
         }
         break;
 
-   case LASSOO:
+    case LASSOO:
         {
 
         }
         break;
-   }
-   painter->restore();
+    }
+    painter->restore();
 }
 
 // rect is updated during selection etc in the event handler

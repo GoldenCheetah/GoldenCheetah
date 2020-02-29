@@ -77,6 +77,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     connect(selector, SIGNAL(unhover(QString)), legend, SLOT(unhover(QString)));
     connect(selector, SIGNAL(unhoverx()), legend, SLOT(unhoverx()));
     connect(legend, SIGNAL(clicked(QString,bool)), this, SLOT(setSeriesVisible(QString,bool)));
+    connect(qchart, SIGNAL(plotAreaChanged(QRectF)), this, SLOT(plotAreaChanged()));
 
     // config changed...
     configChanged(0);
@@ -92,9 +93,7 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     if (block) return false;
     else block=true;
 
-    // lets get some basic info first
     // where is the cursor?
-    //QPoint wpos=cursor().pos();
     QPointF spos=QPointF();
 
     // so we want to trigger a scene update?
@@ -107,80 +106,52 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
 
     // mouse clicked
     case QEvent::GraphicsSceneMousePress:
+    {
         spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
-    //case QEvent::MouseButtonPress:
-        //fprintf(stderr,"POS: %g:%g \n", spos.x(), spos.y());
-        //fprintf(stderr,"%s: mouse PRESSED for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
-        {
-            updatescene = selector->clicked(spos);
-        }
+        updatescene = selector->clicked(spos);
+    }
     break;
 
     // mouse released
     case QEvent::GraphicsSceneMouseRelease:
+    {
         spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
-    //case QEvent::MouseButtonRelease:
-        //fprintf(stderr,"POS: %g:%g | %d:%d\n", spos.x(), spos.y(), wpos.x(), wpos.y());
-        //fprintf(stderr,"%s: mouse RELEASED for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
-        {
-            updatescene = selector->released(spos);
-        }
+        updatescene = selector->released(spos);
+    }
     break;
 
     // mouse move
     case QEvent::GraphicsSceneMouseMove:
+    {
         spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
-    //case QEvent::MouseMove:
-        //fprintf(stderr,"POS: %f:%f SCENE: %d,%d to %d width %d height AREA: %f,%f %f width %f height\n",
-                //spos.x(), spos.y(),
-                //qchart->scene()->views()[0]->geometry().x(),  qchart->scene()->views()[0]->geometry().y(),  qchart->scene()->views()[0]->geometry().width(),  qchart->scene()->views()[0]->geometry().height(),
-                //qchart->plotArea().x(), qchart->plotArea().y(), qchart->plotArea().width(), qchart->plotArea().height());
-                //fflush(stderr);
-        {
-            // see if selection tool cares about new mouse position
-            updatescene = selector->moved(spos);
-        }
+        updatescene = selector->moved(spos);
+    }
     break;
 
     case QEvent::GraphicsSceneWheel:
-        {
-            QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(e);
-            //fprintf(stderr,"%s: mouse WHEEL [%d] for obj=%u\n", source ? "widget" : "scene", w->delta(),(void*)obj); fflush(stderr);
-            updatescene = selector->wheel(w->delta());
-        }
-        break;
-
-    // resize
-    case QEvent::Resize: {
-        //canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
+    {
+        QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(e);
+        updatescene = selector->wheel(w->delta());
     }
     break;
+
+    // resize
+    case QEvent::Resize:
+        break;
 
     // tooltip, paused for a moment..
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHelp:
-    case QEvent::GraphicsSceneHoverMove: {
-
-        // debug info
-        //fprintf(stderr,"HOVER scene item for obj=%u\n", (void*)obj); fflush(stderr);
-    }
-    break;
+    case QEvent::GraphicsSceneHoverMove:
+        break;
 
     // tooltip, paused for a moment..
-    case QEvent::GraphicsSceneHoverLeave: {
-
-        // debug info
-        //fprintf(stderr,"%s: UNHOVER scene item for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
-    }
-    break;
+    case QEvent::GraphicsSceneHoverLeave:
+        break;
 
     // tooltip, paused for a moment..
-    case QEvent::ToolTip: {
-
-        // debug info
-        //fprintf(stderr,"%s: tooltip for obj=%u\n", source ? "widget" : "scene", (void*)obj); fflush(stderr);
-    }
-    break;
+    case QEvent::ToolTip:
+        break;
 
 
     default:
@@ -238,6 +209,109 @@ void GenericPlot::barsetHover(bool status, int index, QBarSet *)
     foreach(QBarSet *barset, barsets) {
         if (status)  legend->setValue(QPointF(0, barset->at(index)), barset->label());
         else legend->unhover(barset->label());
+    }
+}
+
+struct axisrect {
+    bool operator< (axisrect right) const { return rect.x() < right.rect.x(); }
+    axisrect(QAbstractAxis *ax, QRectF ar) : rect(ar), axis(ax) {}
+    QRectF rect;
+    QAbstractAxis *axis;
+};
+
+// for sorting rectangles
+static bool myqRectLess(const QRectF left, const QRectF right)
+{
+    return (left.x() < right.x());
+}
+
+// resizing, so plot area changed and likely all the scene moved
+void
+GenericPlot::plotAreaChanged()
+{
+    // we need to recalculate the axis geometries
+    // since the qchart methods do not make any of
+    // this public we have to search through the
+    // graphic items in the axis areas and associate
+    // them with an axis. Fortunately all label items
+    // have a common parentItem() and are actually
+    // added to the scene as QGraphicsTextItem so we
+    // find them safely and group them together.
+    //
+    // Sadly, there is not direct link between the parentItem
+    // and the axisitem but the title text is available
+    // so we use that.
+    //
+
+    // Step One: Hunt for labels and turn into bounding rectangles
+    QList<axisrect> ar; // axis + title rect
+    QList <QRectF> lr;  // consolidated label rects
+
+    static Qt::AlignmentFlag sides[2]= { Qt::AlignLeft, Qt::AlignRight };
+    for(int i=0; i<2; i++) {
+
+        // create a rectangle that covers the area
+        // in the scene where labels will be located
+        QRectF zone;
+        switch (sides[i]) {
+        case Qt::AlignLeft:
+                zone =QRectF(QPointF(0, 0),
+                      QPointF(qchart->plotArea().x(), qchart->scene()->height()));
+            break;
+        case Qt::AlignRight:
+                zone =QRectF(QPointF(qchart->plotArea().x()+qchart->plotArea().width(), 0),
+                             QPointF(qchart->scene()->width(), qchart->scene()->height()));
+            break;
+        default:
+            break;
+        }
+
+        // temporarily keep track of label rectangles
+        QMap<QGraphicsItem*, QRectF> bounds;
+        foreach(QGraphicsItem *item, qchart->scene()->items(zone, Qt::ItemSelectionMode::ContainsItemShape)) {
+            if (item->type() != QGraphicsTextItem::Type) continue;
+
+            // is this an axis title?
+            QAbstractAxis *found=NULL;
+            foreach(QAbstractAxis *axis, qchart->axes()) {
+                if (axis->titleText() == static_cast<QGraphicsTextItem*>(item)->toPlainText()) {
+                    found=axis;
+                    break;
+                }
+            }
+
+            // update the maps
+            if (found) {
+                ar.append(axisrect(found, QRectF(item->scenePos().x(), item->scenePos().y(),
+                                            item->boundingRect().width(), item->boundingRect().height())));
+            } else {
+                QRectF bound = bounds.value(item->parentItem(), QRectF());
+                QRectF ir = QRectF(item->scenePos().x(), item->scenePos().y(),
+                                   item->boundingRect().width(), item->boundingRect().height());
+                if (bound == QRectF()) bound=ir;
+                else bound = bound.united(ir);
+                bounds.insert(item->parentItem(), bound);
+            }
+        }
+
+        // take united label rects and make a list
+        QMapIterator<QGraphicsItem*, QRectF> rr(bounds);
+        while(rr.hasNext()) {
+            rr.next();
+            lr.append(rr.value());
+        }
+    }
+
+    // Step two: Sort both lists by ascending x values- both will match 1:1 by index
+    //           because we're only doing y-axis- label rects and title rects have
+    //           same sort order left to right (x-axis) so we can then associate
+    //           the label rect at position [i] with the axisrect at position [i]
+    qSort(ar);
+    qSort(lr.begin(), lr.end(), myqRectLess);
+
+    axisRect.clear(); // class member that tracks axis->scene rectangle
+    for(int i=0; i< ar.count() && i <lr.count(); i++) {
+        axisRect.insert(ar[i].axis, lr[i]);
     }
 }
 

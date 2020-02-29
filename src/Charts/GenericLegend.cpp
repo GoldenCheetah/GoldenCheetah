@@ -122,9 +122,9 @@ GenericLegendItem::paintEvent(QPaintEvent *)
 
     // under mouse show
     if (clickable && underMouse()) {
-        QColor mask=GCColor::invertColor(GColor(CPLOTBACKGROUND));
-        mask.setAlphaF(0.1);
-        painter.setBrush(mask);
+        QColor color = GColor(CPLOTMARKER);
+        color.setAlphaF(0.2); // same as plotarea
+        painter.setBrush(color);
         painter.setPen(Qt::NoPen);
         painter.drawRect(hoverrect);
     }
