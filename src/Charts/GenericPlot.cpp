@@ -271,6 +271,9 @@ GenericPlot::plotAreaChanged()
         foreach(QGraphicsItem *item, qchart->scene()->items(zone, Qt::ItemSelectionMode::ContainsItemShape)) {
             if (item->type() != QGraphicsTextItem::Type) continue;
 
+            // for some reason 5.10 or earlier has errant text items we should ignore
+            if (static_cast<QGraphicsTextItem*>(item)->toPlainText() == "") continue;
+
             // is this an axis title?
             QAbstractAxis *found=NULL;
             foreach(QAbstractAxis *axis, qchart->axes()) {
