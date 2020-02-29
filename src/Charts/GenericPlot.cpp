@@ -748,6 +748,8 @@ GenericPlot::finaliseChart()
             item->installSceneEventFilter(selector); // XXX create sceneitem to help us here!
 
     }
+
+    plotAreaChanged(); // make sure get updated before paint
 }
 
 bool

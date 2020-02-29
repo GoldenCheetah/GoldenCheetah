@@ -44,7 +44,6 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 {
     // don't paint outside the canvas
     painter->save();
-    painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
     // min max texts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
@@ -60,38 +59,6 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
     case XRANGE:
         {
-
-            // current position for each series - we only do first, coz only interested in x axis anyway
-            foreach(QAbstractSeries *series, host->qchart->series()) {
-
-                if (series->isVisible() == false) continue; // ignore invisble curves
-
-                // convert screen position to value for series
-                QPointF v = host->qchart->mapToValue(spos,series);
-                double miny=0;
-                foreach (QAbstractAxis *axis, series->attachedAxes()) {
-                    if (axis->orientation() == Qt::Vertical && axis->type()==QAbstractAxis::AxisTypeValue) {
-                        miny=static_cast<QValueAxis*>(axis)->min();
-                        break;
-                    }
-                }
-                QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),miny),series));
-
-                QPen markerpen(GColor(CPLOTMARKER));
-                painter->setPen(markerpen);
-                painter->setBrush(QBrush(GColor(CPLOTBACKGROUND)));
-
-                QFontMetrics fm(stGiles); // adjust position to align centre
-                painter->setFont(stGiles);
-
-                // x value
-                QString label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
-                label = Utils::removeDP(label); // remove unneccessary decimal places
-                painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
-                break;
-
-            }
-
             // draw the points we are hovering over
             foreach(SeriesPoint p, hoverpoints) {
                 QPointF pos = mapFromScene(host->qchart->mapToPosition(p.xy,p.series));
@@ -106,11 +73,12 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
         }
         //
         // DROPS THROUGH INTO RECTANGLE FOR SELECTION RECTANGLE
+        // AND SERIES VALUES IN AXIS FOR CURRENT CURSOR POSITION
         //
         // fall through
     case RECTANGLE:
         {
-            if (mode == RECTANGLE && (state == ACTIVE || state == INACTIVE)) {
+            if (state == ACTIVE || state == INACTIVE) {
 
                 if (host->charttype == GC_CHART_LINE || host->charttype == GC_CHART_SCATTER) {
 
@@ -137,9 +105,28 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                         // convert screen position to value for series
                         QPointF v = host->qchart->mapToValue(spos,series);
-
-                        QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),0),series));
                         QPointF posyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, v.y()),series));
+                        QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),0),series));
+
+                        // get the scene rect for the y axis
+                        QAbstractAxis *yaxis = NULL;
+                        foreach (QAbstractAxis *axis, series->attachedAxes()) {
+                            if (axis->orientation() == Qt::Vertical) {
+                                yaxis=axis;
+                                break;
+                            }
+                        }
+                        if (yaxis) {
+                            QRectF ar = host->axisRect.value(yaxis, QRectF());
+
+                            // we have the scene rect for the y axis, so lets use the x value
+                            if (ar != QRectF()) {
+                                posyp.setX(mapFromScene(ar.topLeft()).x()); // move onto axis
+                            }
+                        }
+
+                        // of course posxp should be at the bottom of the plot area
+                        posxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
 
                         QPen markerpen(GColor(CPLOTMARKER));
                         painter->setPen(markerpen);
@@ -154,6 +141,9 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                         if (series->type() == QAbstractSeries::SeriesTypeScatter) {
                             QPen markerpen(static_cast<QScatterSeries*>(series)->color());
+                            painter->setPen(markerpen);
+                        } else if (series->type() == QAbstractSeries::SeriesTypeLine) {
+                            QPen markerpen(static_cast<QLineSeries*>(series)->color());
                             painter->setPen(markerpen);
                         } else {
                             QPen markerpen(Qt::gray); // dunno?
@@ -170,6 +160,8 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     }
                 }
             }
+
+            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
             if (state != INACTIVE) {
 
@@ -220,6 +212,11 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         QPointF maxyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.max),calc.series));
                         QPointF avgyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, calc.y.mean),calc.series));
                         QPointF avgxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, 0),calc.series));
+
+                        // bottom of plotarea, remember Y-axis range doesn't always start from 0
+                        minxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
+                        maxxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
+                        avgxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
 
                         QColor linecol=GColor(CPLOTMARKER);
                         linecol.setAlphaF(0.25);
