@@ -123,6 +123,12 @@ class GenericPlot : public QWidget {
         // some helper functions
         static QColor seriesColor(QAbstractSeries* series);
 
+        enum annotationType { LINE=0,                 // Continious range
+                              RECTANGLE=1,                  // Date
+                              TEXT=2,                       // Duration, Time
+                          };
+        typedef enum annotationType AnnotationType;
+
     public slots:
 
         void configChanged(qint32);
@@ -134,6 +140,9 @@ class GenericPlot : public QWidget {
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl);
+
+        // adding annotations
+        void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue);
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,

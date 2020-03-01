@@ -34,6 +34,7 @@ GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphi
     setZValue(100); // always on top.
     hoverpoint = QPointF();
     hoverseries = NULL;
+    hoveraxis = NULL;
     rect = QRectF(0,0,0,0);
     connect(&drag, SIGNAL(timeout()), this, SLOT(dragStart()));
 }
@@ -49,6 +50,26 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
     stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    QFontMetrics fm(stGiles); // adjust position to align centre
+
+    //
+    // HOVERING OVER AN AXIS
+    //
+    if (hoveraxis) {
+        QRectF fr = host->axisRect.value(hoveraxis, QRectF());
+        if (fr != QRectF()) {
+            QColor color = GColor(CPLOTMARKER);
+            color.setAlphaF(0.2); // almost hidden if not moving/sizing
+            painter->fillRect(mapRectFromScene(fr),QBrush(color));
+        }
+
+        // straight line is drawn below when running
+        // through the series, as all axis info is
+        // available at that point.
+    }
+
+    // clip to plot area by default
+    painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
     switch (mode) {
     case CIRCLE:
@@ -59,7 +80,9 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
     case XRANGE:
         {
-            // draw the points we are hovering over
+            //
+            // LINE CHART HOVERED POINTS ON DATA SERIES
+            //
             foreach(SeriesPoint p, hoverpoints) {
                 QPointF pos = mapFromScene(host->qchart->mapToPosition(p.xy,p.series));
                 QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
@@ -85,7 +108,9 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                     painter->setFont(stGiles);
 
-                    // hovering around - draw label for current position in axis
+                    //
+                    // SCATTER PLOT HOVERED POINT
+                    //
                     if (hoverpoint != QPointF()) {
                         // draw a circle using marker color
                         QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
@@ -103,12 +128,15 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                         if (series->isVisible() == false) continue; // ignore invisble curves
 
+                        //
+                        // PAINT Y-VALUE IN AXIS (AND DEFERRED PAINT OF AXIS HOVER LINE)
+                        //
                         // convert screen position to value for series
                         QPointF v = host->qchart->mapToValue(spos,series);
                         QPointF posyp = mapFromScene(host->qchart->mapToPosition(QPointF(0, v.y()),series));
-                        QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),0),series));
 
                         // get the scene rect for the y axis
+                        // we are a little careful since axisRect
                         QAbstractAxis *yaxis = NULL;
                         foreach (QAbstractAxis *axis, series->attachedAxes()) {
                             if (axis->orientation() == Qt::Vertical) {
@@ -118,6 +146,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         }
                         if (yaxis) {
                             QRectF ar = host->axisRect.value(yaxis, QRectF());
+                            painter->setClipRect(mapRectFromScene(ar));
 
                             // we have the scene rect for the y axis, so lets use the x value
                             if (ar != QRectF()) {
@@ -125,45 +154,50 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             }
                         }
 
-                        // of course posxp should be at the bottom of the plot area
-                        posxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
-
-                        QPen markerpen(GColor(CPLOTMARKER));
-                        painter->setPen(markerpen);
-                        painter->setBrush(QBrush(GColor(CPLOTBACKGROUND)));
-
-                        QFontMetrics fm(stGiles); // adjust position to align centre
-
-                        // x value
-                        QString label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
-                        label = Utils::removeDP(label); // remove unneccessary decimal places
-                        painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
-
-                        if (series->type() == QAbstractSeries::SeriesTypeScatter) {
-                            QPen markerpen(static_cast<QScatterSeries*>(series)->color());
-                            painter->setPen(markerpen);
-                        } else if (series->type() == QAbstractSeries::SeriesTypeLine) {
-                            QPen markerpen(static_cast<QLineSeries*>(series)->color());
-                            painter->setPen(markerpen);
-                        } else {
-                            QPen markerpen(Qt::gray); // dunno?
-                            painter->setPen(markerpen);
-                        }
+                        // get y-axis color
+                        QColor axisColor=Qt::gray;
+                        if (yaxis) axisColor = yaxis->labelsColor();
+                        else if (series->type() == QAbstractSeries::SeriesTypeScatter) axisColor = static_cast<QScatterSeries*>(series)->color();
+                        else if (series->type() == QAbstractSeries::SeriesTypeLine) axisColor = static_cast<QLineSeries*>(series)->color();
+                        painter->setPen(QPen(axisColor));
 
                         // y value
-                        label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
+                        QString label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
 
-                        // tell the legend or whoever else is listening
-                        //fprintf(stderr,"cursor (%f,%f) @(%f,%f) for series %s\n", spos.x(), spos.y(),v.x(),v.y(),series->name().toStdString().c_str()); fflush(stderr);
+                        // axis hover line (plot area only)
+                        if (yaxis && yaxis == hoveraxis) {
+                            QPointF left = mapFromScene(host->qchart->mapToPosition(QPointF(0, v.y()),series));
+                            left.setX(mapFromScene(host->qchart->plotArea().x(),0).x());
+                            QPointF right=left;
+                            right.setX(mapFromScene(host->qchart->plotArea().bottomRight()).x());
+                            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+                            painter->drawLine(left, right);
+                        }
+
+                        //
+                        // PAINT X VALUE BOTTOM OF PLOT AREA
+                        //
+                        QPointF posxp = mapFromScene(host->qchart->mapToPosition(QPointF(v.x(),0),series));
+                        posxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y()); // bottom of plot, 0 is not always origin
+
+                        // x value
+                        painter->setPen(QPen(GColor(CPLOTMARKER)));
+                        label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                        label = Utils::removeDP(label); // remove unneccessary decimal places
+                        painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+                        painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
                     }
                 }
             }
 
-            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
             if (state != INACTIVE) {
+
+                //
+                // SELECTION AREA AND STATS/SLOPE ETC
+                //
 
                 // there is a rectangle to draw on the screen
                 QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
@@ -173,8 +207,11 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                 // now paint the statistics
                 foreach(GenericCalculator calc, stats) {
+
                     // slope and intercept?
                     if (calc.count<2) continue;
+
+                    if (calc.series->isVisible() == false) continue;
 
                     // slope calcs way over the top for a line chart
                     // where there are multiple series being plotted
@@ -225,31 +262,6 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         gridpen.setWidthF(1 *dpiXFactor);
                         painter->setPen(gridpen);
 
-#if 0 // way too busy on the chart
-                        QPointF minxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,calc.y.min),calc.series));
-                        QPointF maxxpinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max,calc.y.max),calc.series));
-                        QPointF minypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min, calc.y.min),calc.series));
-                        QPointF maxypinf = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.max, calc.y.max),calc.series));
-                        QPointF avgmid = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.mean, calc.y.mean),calc.series));
-
-                        // min/max guides
-                        painter->drawLine(minxp,minxpinf);
-                        painter->drawLine(maxxp,maxxpinf);
-                        painter->drawLine(minyp,minypinf);
-                        painter->drawLine(maxyp,maxypinf);
-
-                        linecol = QColor(Qt::red);
-                        linecol.setAlphaF(0.25);
-                        gridpen = QColor(linecol);
-                        gridpen.setStyle(Qt::DashLine);
-                        gridpen.setWidthF(1 *dpiXFactor);
-                        painter->setPen(gridpen);
-
-                        // avg guides
-                        painter->drawLine(avgxp,avgmid);
-                        painter->drawLine(avgyp,avgmid);
-#endif
-
                         // min max texts
                         QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
                         stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
@@ -265,6 +277,9 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         label=QString("%1").arg(calc.x.mean);
                         painter->drawText(avgxp-QPointF(0,4), label);
 
+                        //
+                        // MIN AVG MAX Y VALUE ON PLOT AREA
+                        //
                         if (host->charttype == GC_CHART_SCATTER) {
 
                             // too noisy on a line chart, where there are
@@ -313,6 +328,7 @@ GenericSelectTool::reset()
     hoverpoint = QPointF();
     hoverseries = NULL;
     hoverpoints.clear();
+    hoveraxis = NULL;
     resetSelections();
     rectchanged=true;
     update();
@@ -326,6 +342,8 @@ GenericSelectTool::clicked(QPointF pos)
     bool updatescene = false;
 
     if (mode == XRANGE || mode == RECTANGLE) {
+
+        if (hoveraxis) return false;
 
         hoverpoints.clear();
         hoverpoint=QPointF();
@@ -375,9 +393,40 @@ GenericSelectTool::clicked(QPointF pos)
 }
 
 bool
-GenericSelectTool::released(QPointF)
+GenericSelectTool::released(QPointF pos)
 {
     if (mode == RECTANGLE || mode == XRANGE) {
+
+        // ignore if in axis, likely adding line.
+        if (hoveraxis) {
+
+            // we clicked to add a line, not to start
+            // a selection etc (that must be done from
+            // the plot area)
+
+            // use first series that uses the axis
+            QAbstractSeries *yseries=NULL;
+            foreach(QAbstractSeries *series, host->qchart->series()) {
+                foreach(QAbstractAxis *axis, series->attachedAxes()) {
+                    if (axis->orientation() == Qt::Vertical && axis == hoveraxis) {
+                        yseries = series;
+                        break;
+                    }
+                }
+                if (yseries) break;
+            }
+
+            if (yseries) {
+
+                // convert value to series value
+                QPointF v = host->qchart->mapToValue(pos,yseries);
+
+                // add to chart
+                host->addAnnotation(GenericPlot::LINE, yseries, v.y());
+            }
+
+            return true; // don't drop through into selection logic
+        }
 
         // width and heights can be negative if dragged in reverse
         if (state == DRAGGING ||
@@ -467,6 +516,13 @@ GenericSelectTool::moved(QPointF pos)
     } else {
 
         // HOVERING around.. the big one...
+
+        // first off, are we hovering over axes, as might need to isolate
+        // or are we isolating and need to reset back again
+        if (isolateAxes(spos))  {
+            update(rect);
+            return true;
+        }
 
         if (mode == RECTANGLE) {
             // remember screen pos of cursor for tracking values
@@ -604,6 +660,63 @@ GenericSelectTool::wheel(int delta)
         }
     }
     return false;
+}
+
+bool
+GenericSelectTool::isolateAxes(QPointF scenepos)
+{
+    QAbstractAxis *over=NULL;
+
+    // check if mouse in axes
+    QMapIterator<QAbstractAxis*, QRectF>i(host->axisRect);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value().contains(scenepos)) {
+            over = i.key();
+            break;
+        }
+    }
+
+    // just debug for now
+    if (over && over != hoveraxis) {
+
+        // clear up from old hover?
+        foreach(QAbstractSeries *series, hidden) series->setVisible(true);
+        hidden.clear();
+
+        // hide all visible curves that are not attached to this axis
+        foreach(QAbstractSeries *series, host->qchart->series()) {
+            if (series->isVisible() == false) continue; // ignore already hidden curves
+
+            // is it on this axis?
+            bool ours=false;
+            foreach(QAbstractAxis *axis, series->attachedAxes())
+                if (axis==over)
+                    ours=true;
+
+            // hide if not one of ours
+            if (!ours) {
+                hidden.append(series);
+                series->setVisible(false);
+            }
+        }
+
+        // now set hoveraxis to the one we're over
+        hoveraxis = over;
+        return true;
+
+    } else if (over == NULL && hoveraxis) {
+
+        // clear up from old hover?
+        foreach(QAbstractSeries *series, hidden) series->setVisible(true);
+        hidden.clear();
+
+        // we are no longer hovering over an axis
+        hoveraxis = NULL;
+        return true;
+    }
+    return false;
+
 }
 
 double

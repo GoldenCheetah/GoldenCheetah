@@ -101,6 +101,9 @@ class GenericSelectTool : public QObject, public QGraphicsItem
         // some series was shown or hidden...
         void setSeriesVisible(QString name, bool visible);
 
+        // check cursor and isolate/unisolate
+        bool isolateAxes(QPointF scenepos);
+
         // is invisible and tiny. we are just an observer
         bool sceneEventFilter(QGraphicsItem *watched, QEvent *event);
 
@@ -145,8 +148,13 @@ class GenericSelectTool : public QObject, public QGraphicsItem
         // scatter does this xxx TODO refactor into hoverpoints
         QPointF hoverpoint;
         QAbstractSeries *hoverseries;
+
         // line plot uses this
         QList<SeriesPoint> hoverpoints;
+
+        // axis we are hovering over?
+        QAbstractAxis *hoveraxis;
+        QList<QAbstractSeries*> hidden; // hidden by isolate axis
 
         // selections from original during selection
         QMap<QAbstractSeries*, QAbstractSeries*> selections;

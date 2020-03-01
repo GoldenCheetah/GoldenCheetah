@@ -203,6 +203,14 @@ GenericPlot::setSeriesVisible(QString name, bool visible)
     }
 }
 
+// annotations
+void
+GenericPlot::addAnnotation(AnnotationType type, QAbstractSeries*series, double value)
+{
+    fprintf(stderr, "add annotation line: for %s at value %f\n", series->name().toStdString().c_str(), value);
+    fflush(stderr);
+}
+
 // handle hover on barset
 void GenericPlot::barsetHover(bool status, int index, QBarSet *)
 {
