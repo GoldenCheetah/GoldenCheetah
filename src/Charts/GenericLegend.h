@@ -95,20 +95,23 @@ class GenericLegend : public QWidget {
         void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
 
     public slots:
+
         void setValue(QPointF value, QString name);
         void unhover(QString name);
         void unhoverx();
         void setClickable(bool x);
+        void setOrientation(Qt::Orientation);
 
     private:
         // a label has a unique name, not directly tide to
         // a series or axis value, it depends...
         Context *context;
         GenericPlot *plot;
-        QHBoxLayout *layout;
+        QBoxLayout *layout;
         QMap<QString,GenericLegendItem*> items;
         QString xname;
         bool clickable;
+        Qt::Orientation orientation;
 };
 
 #endif

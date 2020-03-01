@@ -33,9 +33,10 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     barseries=NULL;
     bottom=left=true;
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
+    leftLayout = new QHBoxLayout();
 
     // setup the chart
     qchart = new QChart();
@@ -67,7 +68,9 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
 
     // add all widgets to the view
     mainLayout->addWidget(legend);
-    mainLayout->addWidget(chartview);
+    holder=mainLayout;
+    mainLayout->addLayout(leftLayout);
+    leftLayout->addWidget(chartview);
 
     // watch for colors changing
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -327,7 +330,7 @@ GenericPlot::plotAreaChanged()
 }
 
 bool
-GenericPlot::initialiseChart(QString title, int type, bool animate)
+GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 {
     // if we changed the type, all series must go
     if (charttype != type) {
@@ -360,6 +363,31 @@ GenericPlot::initialiseChart(QString title, int type, bool animate)
     // by default they are disabled anyway
     qchart->setAnimationOptions(animate ? QChart::SeriesAnimations : QChart::NoAnimation);
 
+    // lets move the legend, only support top or bottom for now
+    holder->removeWidget(legend);
+    switch (legpos) {
+    case 0: // bottom
+        legend->setOrientation(Qt::Horizontal);
+        mainLayout->insertWidget(-1, legend); // at end
+        holder=mainLayout;
+        break;
+    case 1: // left
+        legend->setOrientation(Qt::Vertical);
+        leftLayout->insertWidget(0, legend); // at beginning
+        holder=leftLayout;
+        break;
+    case 2: // top
+        legend->setOrientation(Qt::Horizontal);
+        mainLayout->insertWidget(0, legend); // at front
+        holder=mainLayout;
+        break;
+    case 3: // right
+        legend->setOrientation(Qt::Vertical);
+        leftLayout->insertWidget(-1, legend); // at end
+        holder=leftLayout;
+        break;
+    }
+
     // what kind of selector do we use?
     if (charttype==GC_CHART_LINE) selector->setMode(GenericSelectTool::XRANGE);
     else selector->setMode(GenericSelectTool::RECTANGLE);
@@ -371,7 +399,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate)
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int /*line TODO*/, int /*symbol TODO */, int size, QString color, int opacity, bool opengl)
+                      int linestyle, int /*symbol TODO */, int size, QString color, int opacity, bool opengl)
 {
     // if curve already exists, remove it
     if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
@@ -425,7 +453,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             // aesthetics
             add->setBrush(Qt::NoBrush);
             QPen pen(color);
-            pen.setStyle(Qt::SolidLine);
+            pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
             pen.setWidth(size);
             add->setPen(pen);
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values

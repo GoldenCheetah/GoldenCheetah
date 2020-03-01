@@ -161,6 +161,7 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     layout = new QHBoxLayout(this);
     layout->addStretch();
 
+    orientation=Qt::Horizontal;
     xname="";
     clickable=true;
 
@@ -184,6 +185,33 @@ GenericLegend::addSeries(QString name, QColor color)
     connect(add, SIGNAL(clicked(QString,bool)), this, SIGNAL(clicked(QString,bool)));
 }
 
+void
+GenericLegend::setOrientation(Qt::Orientation o)
+{
+    if (orientation == o) return; // already is.
+
+    // set new orientation
+    orientation = o;
+
+    QBoxLayout *newlayout;
+    if (orientation == Qt::Horizontal)  newlayout = new QHBoxLayout();
+    else newlayout = new QVBoxLayout();
+    newlayout->addStretch();
+
+    // remove from layout and redo
+    QMapIterator<QString, GenericLegendItem*> i(items);
+    while (i.hasNext()) {
+        i.next();
+        layout->removeWidget(i.value());
+        newlayout->insertWidget(0, i.value());
+    }
+
+    // replace the layout
+    delete layout;
+    setLayout(newlayout);
+    layout = newlayout;
+
+}
 void
 GenericLegend::addX(QString name)
 {

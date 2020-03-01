@@ -134,7 +134,7 @@ class GenericPlot : public QWidget {
         void configChanged(qint32);
 
         // set chart settings
-        bool initialiseChart(QString title, int type, bool animate);
+        bool initialiseChart(QString title, int type, bool animate, int legendpos);
 
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
@@ -166,6 +166,9 @@ class GenericPlot : public QWidget {
         QChartView *chartview;
         GenericSelectTool *selector;
         QChart *qchart;
+        QVBoxLayout *mainLayout;
+        QBoxLayout *leftLayout;
+        QBoxLayout *holder; // who has me at the mo?
 
         // trap widget events and pass to event handler
         bool eventFilter(QObject *, QEvent *e);

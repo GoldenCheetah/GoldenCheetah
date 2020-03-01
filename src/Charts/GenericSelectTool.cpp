@@ -274,7 +274,10 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         painter->drawText(maxxp-QPointF(0,4), label);
                         label=QString("%1").arg(calc.x.min);
                         painter->drawText(minxp-QPointF(0,4), label);
-                        label=QString("%1").arg(calc.x.mean);
+
+                        // scatter sees mean, line/timeseries more likely to want dx
+                        if (host->charttype == GC_CHART_SCATTER)  label=QString("%1").arg(calc.x.mean);
+                        else label=QString("%1").arg(calc.x.max - calc.x.min);
                         painter->drawText(avgxp-QPointF(0,4), label);
 
                         //
@@ -329,6 +332,7 @@ GenericSelectTool::reset()
     hoverseries = NULL;
     hoverpoints.clear();
     hoveraxis = NULL;
+    hidden.clear();
     resetSelections();
     rectchanged=true;
     update();

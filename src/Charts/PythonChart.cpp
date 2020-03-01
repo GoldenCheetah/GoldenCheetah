@@ -454,7 +454,7 @@ PythonChart::setWeb(bool x)
         renderlayout->insertWidget(0,plot);
 
         // signals to update it
-        connect(this, SIGNAL(emitChart(QString,int,bool)), plot, SLOT(initialiseChart(QString,int,bool)));
+        connect(this, SIGNAL(emitChart(QString,int,bool,int)), plot, SLOT(initialiseChart(QString,int,bool,int)));
         connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)),
                 plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool)));
         connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),

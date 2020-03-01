@@ -388,7 +388,7 @@ public:
     bool postProcess(QString processor, PyObject *activity = NULL) const;
 
     // working with qt charts
-    bool configChart(QString title, int type, bool animate) const;
+    bool configChart(QString title, int type, bool animate, int legpos) const;
     bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl) const;
