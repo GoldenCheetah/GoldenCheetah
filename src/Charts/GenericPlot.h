@@ -54,59 +54,7 @@
 class GenericPlot;
 class GenericLegend;
 class GenericSelectTool;
-
-// general axis info
-class GenericAxisInfo {
-public:
-        enum axisinfoType { CONTINUOUS=0,                 // Continious range
-                            DATERANGE=1,                  // Date
-                            TIME=2,                       // Duration, Time
-                            CATEGORY=3                // labelled with categories
-                          };
-        typedef enum axisinfoType AxisInfoType;
-
-        GenericAxisInfo(Qt::Orientations orientation, QString name) : name(name), orientation(orientation) {
-            miny=maxy=minx=maxx=0;
-            fixed=log=false;
-            visible=minorgrid=majorgrid=true;
-            type=CONTINUOUS;
-            axiscolor=labelcolor=GColor(CPLOTMARKER);
-        }
-
-        void point(double x, double y) {
-            if (fixed) return;
-            if (x>maxx) maxx=x;
-            if (x<minx) minx=x;
-            if (y>maxy) maxy=y;
-            if (y<miny) miny=y;
-        }
-
-        double min() {
-            if (orientation == Qt::Horizontal) return minx;
-            else return miny;
-        }
-        double max() {
-            if (orientation == Qt::Horizontal) return maxx;
-            else return maxy;
-        }
-
-        Qt::AlignmentFlag locate() {
-            return align;
-        }
-
-        // series we are associated with
-        QList<QAbstractSeries*> series;
-
-        // data is all public to avoid tedious get/set
-        QString name;
-        Qt::Orientations orientation;
-        Qt::AlignmentFlag align;
-        double miny, maxy, minx, maxx; // updated as we see points, set the range
-        bool visible,fixed, log, minorgrid, majorgrid; // settings
-        QColor labelcolor, axiscolor; // aesthetics
-        QStringList categories;
-        AxisInfoType type; // what type of axis is this?
-};
+class GenericAxisInfo;
 
 // the chart
 class GenericPlot : public QWidget {
@@ -202,6 +150,4 @@ class GenericPlot : public QWidget {
         // alternates as axis added
         bool left, bottom;
 };
-
-
 #endif

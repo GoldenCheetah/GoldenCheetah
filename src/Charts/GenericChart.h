@@ -30,6 +30,154 @@
 #include "GenericLegend.h"
 #include "GenericPlot.h"
 
+// keeping track of the series info
+class GenericSeriesInfo {
+
+    public:
+
+        GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+                      QStringList labels, QStringList colors,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl) :
+                      name(name), xseries(xseries), yseries(yseries), xname(xname), yname(yname),
+                      labels(labels), colors(colors),
+                      line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl)
+                      {}
+
+        // properties, from setCurve(...)
+        QString name;
+        QVector<double> xseries;
+        QVector<double> yseries;
+        QString xname;
+        QString yname;
+        QStringList labels;
+        QStringList colors;
+        int line;
+        int symbol;
+        int size;
+        QString color;
+        int opacity;
+        bool opengl;
+};
+
+// keeping track of all our plots
+class GenericPlotInfo {
+
+    public:
+
+        // when working out what to do with existing plots
+        enum { init, active, matched, deleteme } state;
+
+        // initial
+        GenericPlotInfo(QString xaxis) : state(init), plot(NULL), xaxis(xaxis) {}
+
+        bool matches(const GenericPlotInfo &other) const {
+            // we need to have same series and same xaxis
+            if (other.xaxis != xaxis) return false;
+
+            // same number of series
+            if (other.series.count() != series.count()) return false;
+
+            // all my series are in their series?
+            foreach(GenericSeriesInfo info, series) {
+                bool found=false;
+                // is in other?
+                foreach(GenericSeriesInfo oinfo, other.series) {
+                    if (oinfo.name == info.name && oinfo.yname == info.yname && oinfo.xname == info.xname)
+                        found=true;
+                }
+                if (found == false) return false;
+            }
+            return true;
+        }
+
+        static int findPlot(const QList<GenericPlotInfo>list, const GenericPlotInfo findme) {
+            for(int i=0; i<list.count(); i++) {
+                // find a plot with same xaxis and series
+                if (list[i].matches(findme))
+                    return i;
+            }
+            return -1;
+        }
+
+        // the plot object created- and then matched against
+        GenericPlot *plot;
+
+        // axes
+        QString xaxis;
+
+        QList<GenericSeriesInfo> series;
+        QList<GenericAxisInfo> axes;
+};
+
+// general axis info
+class GenericAxisInfo {
+public:
+        GenericAxisInfo(QString name, bool visible, int align, double min, double max,
+                      int type, QString labelcolor, QString color, bool log, QStringList categories) :
+                      type(static_cast<AxisInfoType>(type)),
+                      name(name), align(static_cast<Qt::AlignmentFlag>(align)),
+                      minx(min), maxx(max), visible(visible), log(log),
+                      labelcolorstring(labelcolor), axiscolorstring(color),  categories(categories)
+                      {}
+
+        enum axisinfoType { CONTINUOUS=0,                 // Continious range
+                            DATERANGE=1,                  // Date
+                            TIME=2,                       // Duration, Time
+                            CATEGORY=3                // labelled with categories
+                          };
+        typedef enum axisinfoType AxisInfoType;
+
+        static int findAxis(QList<GenericAxisInfo>infos, QString name) {
+            for (int i=0; i<infos.count(); i++)
+                if (infos[i].name == name)
+                    return i;
+            return -1; // not found
+        }
+
+        GenericAxisInfo(Qt::Orientations orientation, QString name) : name(name), orientation(orientation) {
+            miny=maxy=minx=maxx=0;
+            fixed=log=false;
+            visible=minorgrid=majorgrid=true;
+            type=CONTINUOUS;
+            axiscolor=labelcolor=GColor(CPLOTMARKER);
+        }
+
+        void point(double x, double y) {
+            if (fixed) return;
+            if (x>maxx) maxx=x;
+            if (x<minx) minx=x;
+            if (y>maxy) maxy=y;
+            if (y<miny) miny=y;
+        }
+
+        double min() {
+            if (orientation == Qt::Horizontal) return minx;
+            else return miny;
+        }
+        double max() {
+            if (orientation == Qt::Horizontal) return maxx;
+            else return maxy;
+        }
+
+        Qt::AlignmentFlag locate() {
+            return align;
+        }
+
+        // series we are associated with
+        QList<QAbstractSeries*> series;
+
+        // data is all public to avoid tedious get/set
+        AxisInfoType type; // what type of axis is this?
+        QString name;
+        Qt::Orientations orientation;
+        Qt::AlignmentFlag align;
+        double miny, maxy, minx, maxx; // updated as we see points, set the range
+        bool visible,fixed, log, minorgrid, majorgrid; // settings
+        QColor labelcolor, axiscolor; // aesthetics
+        QString labelcolorstring, axiscolorstring;
+        QStringList categories;
+};
+
 // the chart
 class GenericChart : public QWidget {
 
@@ -63,15 +211,28 @@ class GenericChart : public QWidget {
 
         // legend and selector need acces to these
         QVBoxLayout *mainLayout;
-        GenericPlot *plot; // for now...
 
-        // layout options
+        // chart settings
+        QString title;
+        int type;
+        bool animate;
+        int legendpos;
         bool stack; // stack series instead of on same chart
-        Qt::Orientation orientation; // layout horizontal or vertical
+        int orientation; // layout horizontal or vertical
+
+        // when we get new settings/calls we
+        // collect together to prepare before
+        // actually creating plots since we want
+        // to see the whole picture- try to reuse
+        // plots as much as possible to avoid
+        // the cost of creating new ones.
+        QList<GenericSeriesInfo> newSeries;
+        QList<GenericAxisInfo> newAxes;
+
+        // active plots
+        QList<GenericPlotInfo> currentPlots;
 
     private:
         Context *context;
 };
-
-
 #endif
