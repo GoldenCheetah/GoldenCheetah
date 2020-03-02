@@ -24,6 +24,7 @@
 #include "Utils.h"
 
 #include <limits>
+#include <QScrollArea>
 
 //
 // The generic chart manages collections of genericplots
@@ -39,14 +40,67 @@
 //
 // Charts have a minimum width and height that needs to be
 // honoured too, since multiple series stacked can get
-// cramped, so these are placed into a scroll area XXX TODO
+// cramped, so these are placed into a scroll area
 //
 GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
-    // intitialise state info
-    mainLayout = new QVBoxLayout(this);
+    // for scrollarea, since we see a little of it.
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+
+    // main layout for widget
+    QVBoxLayout *main=new QVBoxLayout(this);
+    main->setSpacing(0);
+    main->setContentsMargins(0,0,0,0);
+
+    // main layout used for charts
+    mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
+    lrLayout = new QHBoxLayout();
+    mainLayout->addLayout(lrLayout);
+
+    // stack for scrolling
+    QWidget *stackWidget = new QWidget(this);
+    stackWidget->setAutoFillBackground(false);
+    stackWidget->setLayout(mainLayout);
+    stackWidget->setPalette(palette);
+
+    // put everything inside a scrollarea
+    stackFrame = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
+    stackFrame->setStyle(cde);
+#endif
+    stackFrame->setAutoFillBackground(false);
+    stackFrame->setWidgetResizable(true);
+    stackFrame->setFrameStyle(QFrame::NoFrame);
+    stackFrame->setContentsMargins(0,0,0,0);
+    stackFrame->setPalette(palette);
+    main->addWidget(stackFrame);
+    stackFrame->setWidget(stackWidget);
+
+    // watch for color/themes change
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    configChanged(0);
+}
+
+void
+GenericChart::configChanged(qint32)
+{
+    setUpdatesEnabled(false);
+
+    setProperty("color", GColor(CPLOTBACKGROUND));
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    setPalette(palette); // propagates to children
+
+    // set style sheets
+#ifndef Q_OS_MAC
+    stackFrame->setStyleSheet(TabView::ourStyleSheet());
+#endif
+    setUpdatesEnabled(true);
 }
 
 // set chart settings
@@ -157,17 +211,33 @@ GenericChart::finaliseChart()
     // first we mark all existing plots as deleteme
     for(int i=0; i<currentPlots.count(); i++) currentPlots[i].state = GenericPlotInfo::deleteme;
 
+    // source and target layouts
+    QBoxLayout *source, *target;
+    if (orientation == Qt::Vertical) {
+        source = lrLayout;
+        target = mainLayout;
+    } else {
+        source = mainLayout;
+        target = lrLayout;
+    }
+
     // match what we want with what we got
     for(int i=0; i<newPlots.count(); i++) {
         int index = GenericPlotInfo::findPlot(currentPlots, newPlots[i]);
         if (index <0) {
             // new one required
             newPlots[i].plot = new GenericPlot(this, context);
-            mainLayout->addWidget(newPlots[i].plot);
-            mainLayout->setStretchFactor(newPlots[i].plot, 10);// make them all the same
+
+            target->addWidget(newPlots[i].plot);
+            target->setStretchFactor(newPlots[i].plot, 10);// make them all the same
         } else {
             newPlots[i].plot = currentPlots[index].plot; // reuse
             currentPlots[index].state = GenericPlotInfo::matched; // don't deleteme !
+
+            // make sure its in the right layout (might remove and add back to the same layout!)
+            source->removeWidget(newPlots[i].plot);
+            target->addWidget(newPlots[i].plot);
+            target->setStretchFactor(newPlots[i].plot, 10);// make them all the same
         }
     }
 

@@ -61,6 +61,8 @@ class GenericPlot : public QWidget {
 
     Q_OBJECT
 
+    static constexpr double gl_minheight = 225;
+
     public:
 
         friend class GenericSelectTool;

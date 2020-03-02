@@ -30,6 +30,8 @@
 #include "GenericLegend.h"
 #include "GenericPlot.h"
 
+#include <QScrollArea>
+
 // keeping track of the series info
 class GenericSeriesInfo {
 
@@ -207,10 +209,14 @@ class GenericChart : public QWidget {
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
 
+        // config changed?
+        void configChanged(qint32);
+
     protected:
 
         // legend and selector need acces to these
         QVBoxLayout *mainLayout;
+        QHBoxLayout *lrLayout;
 
         // chart settings
         QString title;
@@ -234,5 +240,6 @@ class GenericChart : public QWidget {
 
     private:
         Context *context;
+        QScrollArea *stackFrame;
 };
 #endif

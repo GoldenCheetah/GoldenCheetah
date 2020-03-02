@@ -28,6 +28,10 @@
 
 GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+
+    // set a minimum height
+    setMinimumHeight(gl_minheight *dpiXFactor);
+
     // intitialise state info
     charttype=0;
     chartview=NULL;

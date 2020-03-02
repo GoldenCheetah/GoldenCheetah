@@ -53,8 +53,8 @@ GC.addCurve=__GCsetCurve
 GC.setAxis=__GCconfigAxis
 
 # orientation
-GC_VERTICAL=1
-GC_HORIZONTAL=2
+GC_HORIZONTAL=1
+GC_VERTICAL=2
 
 # line style
 GC_LINE_NONE=0
