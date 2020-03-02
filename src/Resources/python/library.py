@@ -29,8 +29,8 @@ def __GCactivityXdata(name="", activity=None):
    return rd
 
 # setting up the chart
-def __GCsetChart(title="",type=1,animate=False,legpos=2):
-    GC.configChart(title,type,animate,legpos)
+def __GCsetChart(title="",type=1,animate=False,legpos=2,stack=False,orientation=2):
+    GC.configChart(title,type,animate,legpos,stack,orientation)
 
 # add a curve
 def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=0,size=15,color="cyan",opacity=0,opengl=True):
@@ -51,6 +51,10 @@ GC.activityXdata=__GCactivityXdata
 GC.setChart=__GCsetChart
 GC.addCurve=__GCsetCurve
 GC.setAxis=__GCconfigAxis
+
+# orientation
+GC_VERTICAL=1
+GC_HORIZONTAL=2
 
 # line style
 GC_LINE_NONE=0

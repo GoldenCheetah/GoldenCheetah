@@ -58,9 +58,9 @@ Bindings::webpage(QString url) const
 }
 
 bool 
-Bindings::configChart(QString title, int type, bool animate, int pos) const
+Bindings::configChart(QString title, int type, bool animate, int pos, bool stack, int orientation) const
 {
-    python->chart->emitChart(title, type, animate, pos);
+    python->chart->emitChart(title, type, animate, pos, stack, orientation);
     return true;
 }
 

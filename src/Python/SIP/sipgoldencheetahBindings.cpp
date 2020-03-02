@@ -1057,6 +1057,8 @@ static PyObject *meth_Bindings_configChart(PyObject *sipSelf, PyObject *sipArgs,
         int a1;
         bool a2;
         int a3;
+        bool a4;
+        int a5;
         const  ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
@@ -1064,13 +1066,15 @@ static PyObject *meth_Bindings_configChart(PyObject *sipSelf, PyObject *sipArgs,
             sipName_type,
             sipName_animate,
             sipName_legpos,
+            sipName_stack,
+            sipName_orientation,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1ibi", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, &a3))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1ibibi", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, &a3, &a4, &a5))
         {
             bool sipRes;
 
-            sipRes = sipCpp->configChart(*a0,a1,a2,a3);
+            sipRes = sipCpp->configChart(*a0,a1,a2,a3,a4,a5);
             sipReleaseType(a0,sipType_QString,a0State);
 
             return PyBool_FromLong(sipRes);

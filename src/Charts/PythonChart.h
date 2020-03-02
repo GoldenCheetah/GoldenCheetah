@@ -39,13 +39,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "Colors.h"
-#include "GenericPlot.h"
-
-// keep aligned to library.py
-#define GC_CHART_LINE      1
-#define GC_CHART_SCATTER   2
-#define GC_CHART_BAR       3
-#define GC_CHART_PIE       4
+#include "GenericChart.h"
 
 class PythonChart;
 
@@ -120,7 +114,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
 
         // rendering via a web page or a generic plot
         QWebEngineView *canvas;
-        GenericPlot *plot;
+        GenericChart *plot;
 
         void emitUrl(QUrl x) { emit setUrl(x); }
 
@@ -141,7 +135,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
 
     signals:
         void setUrl(QUrl);
-        void emitChart(QString title, int type, bool animate, int legpos);
+        void emitChart(QString title, int type, bool animate, int legpos, bool stack, int orientation);
         void emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl);
