@@ -299,18 +299,16 @@ Strava::readFile(QByteArray *data, QString remotename, QString remoteid)
 bool
 Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
-    Q_UNUSED(ride);
+    // Manual activity upload or File upload according to available data
+    bool manual = ride->dataPoints().isEmpty();
 
-    printd("Strava::writeFile(%s)\n", remotename.toStdString().c_str());
+    printd("Strava::writeFile(%s) manual(%s)\n", remotename.toStdString().c_str(), manual ? "true" : "false");
 
     QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
 
-    // access the original file for ride start
-    QDateTime rideDateTime = ride->startTime();
-
-    // trap network response from access manager
-
-    QUrl url = QUrl( "https://www.strava.com/api/v3/uploads" ); // The V3 API doc said "https://api.strava.com" but it is not working yet
+    // The V3 API doc said "https://api.strava.com" but it is not working yet
+    QUrl url = manual ?  QUrl( "https://www.strava.com/api/v3/activities" )
+                      :  QUrl( "https://www.strava.com/api/v3/uploads" );
     QNetworkRequest request = QNetworkRequest(url);
 
     //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
@@ -326,18 +324,29 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     accessTokenPart.setHeader(QNetworkRequest::ContentDispositionHeader,
                               QVariant("form-data; name=\"access_token\""));
     accessTokenPart.setBody(token.toLatin1());
+    multiPart->append(accessTokenPart);
 
     QHttpPart activityTypePart;
     activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                               QVariant("form-data; name=\"activity_type\""));
+                               manual ? QVariant("form-data; name=\"type\"")
+                                      : QVariant("form-data; name=\"activity_type\""));
+
+    // Map some known sports and default to ride for anything else
+    QString sport = ride->getTag("Sport", "");
+    QString subSport = ride->getTag("SubSport", "");
     if (ride->isRun())
       activityTypePart.setBody("run");
     else if (ride->isSwim())
       activityTypePart.setBody("swim");
+    else if (sport == "Rowing")
+      activityTypePart.setBody("Rowing");
+    else if (sport == "XC Ski" || sport == "Cross country skiing")
+      activityTypePart.setBody("BackcountrySki");
+    else if (sport == "Strength" || subSport == "strength_training")
+      activityTypePart.setBody("WeightTraining");
     else
       activityTypePart.setBody("ride");
-
-    QString filename = QFileInfo(remotename).baseName();
+    multiPart->append(activityTypePart);
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
@@ -349,6 +358,8 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
         activityName = ride->getTag(activityNameFieldname, "");
     activityNamePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain;charset=utf-8"));
     activityNamePart.setBody(activityName.toUtf8());
+    if (activityName != "")
+        multiPart->append(activityNamePart);
 
     QHttpPart activityDescriptionPart;
     activityDescriptionPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"description\""));
@@ -357,48 +368,72 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
         activityDescription = ride->getTag("Notes", "");
     activityDescriptionPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain;charset=utf-8"));
     activityDescriptionPart.setBody(activityDescription.toUtf8());
-
-    QHttpPart dataTypePart;
-    dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
-    dataTypePart.setBody("tcx.gz");
-
-    QHttpPart externalIdPart;
-    externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
-    externalIdPart.setBody(filename.toStdString().c_str());
+    if (activityDescription != "")
+        multiPart->append(activityDescriptionPart);
 
     //XXXQHttpPart privatePart;
     //XXXprivatePart.setHeader(QNetworkRequest::ContentDispositionHeader,
     //XXX                      QVariant("form-data; name=\"private\""));
     //XXXprivatePart.setBody(parent->privateChk->isChecked() ? "1" : "0");
+    //XXXmultiPart->append(privatePart);
 
     //XXXQHttpPart commutePart;
     //XXXcommutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
     //XXX                      QVariant("form-data; name=\"commute\""));
     //XXXcommutePart.setBody(parent->commuteChk->isChecked() ? "1" : "0");
+    //XXXmultiPart->append(commutePart);
+
     //XXXQHttpPart trainerPart;
     //XXXtrainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
     //XXX                      QVariant("form-data; name=\"trainer\""));
     //XXXtrainerPart.setBody(parent->trainerChk->isChecked() ? "1" : "0");
-
-    QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+"\"; type=\"text/xml\""));
-    filePart.setBody(data);
-
-    multiPart->append(accessTokenPart);
-    multiPart->append(activityTypePart);
-    if (activityName != "") {
-        multiPart->append(activityNamePart);
-    }
-    if (activityDescription != "") {
-        multiPart->append(activityDescriptionPart);
-    }
-    multiPart->append(dataTypePart);
-    multiPart->append(externalIdPart);
-    //XXXmultiPart->append(privatePart);
-    //XXXmultiPart->append(commutePart);
     //XXXmultiPart->append(trainerPart);
-    multiPart->append(filePart);
+
+    if (manual) {
+
+        // create manual activity data
+        QDateTime rideDateTime = ride->startTime();
+        QHttpPart startDateTimePart;
+        startDateTimePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"start_date_local\""));
+        startDateTimePart.setBody(rideDateTime.toString(Qt::ISODate).toStdString().c_str());
+        multiPart->append(startDateTimePart);
+
+        if (ride->metricOverrides.contains("workout_time")) {
+            QString duration = ride->metricOverrides.value("workout_time").value("value");
+            QHttpPart elapsedTimePart;
+            elapsedTimePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"elapsed_time\""));
+            elapsedTimePart.setBody(duration.toStdString().c_str());
+            multiPart->append(elapsedTimePart);
+        }
+
+        if (ride->metricOverrides.contains("total_distance")) {
+            QString distance = QString::number(ride->metricOverrides.value("total_distance").value("value").toDouble() * 1000.0);
+            QHttpPart distancePart;
+            distancePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"distance\""));
+            distancePart.setBody(distance.toStdString().c_str());
+            multiPart->append(distancePart);
+        }
+    } else {
+
+        // upload file data
+        QString filename = QFileInfo(remotename).baseName();
+
+        QHttpPart dataTypePart;
+        dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
+        dataTypePart.setBody("tcx.gz");
+        multiPart->append(dataTypePart);
+
+        QHttpPart externalIdPart;
+        externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
+        externalIdPart.setBody(filename.toStdString().c_str());
+        multiPart->append(externalIdPart);
+
+        QHttpPart filePart;
+        filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
+        filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+"\"; type=\"text/xml\""));
+        filePart.setBody(data);
+        multiPart->append(filePart);
+    }
 
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
