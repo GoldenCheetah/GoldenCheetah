@@ -248,6 +248,13 @@ GenericChart::finaliseChart()
         }
     }
 
+    // update plot to stop the jarring effect as chart
+    // is updated, especially when multiple series in
+    // stack mode. I would expect this to make things
+    // worse but for some reason, it solves the problem.
+    // do not remove !!!
+    QApplication::processEvents();
+
     // now initialise all the newPlots
     for(int i=0; i<newPlots.count(); i++) {
 
