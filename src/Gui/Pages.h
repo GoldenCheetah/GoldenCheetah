@@ -589,6 +589,10 @@ class CustomMetricsPage : public QWidget
         void deleteClicked();
         void addClicked();
         void editClicked();
+#ifdef GC_HAS_CLOUD_DB
+        void uploadClicked();
+        void downloadClicked();
+#endif
         void exportClicked();
         void importClicked();
         void doubleClicked(QTreeWidgetItem *item, int column);
@@ -599,6 +603,10 @@ class CustomMetricsPage : public QWidget
         QPushButton *addButton,
                     *deleteButton,
                     *editButton,
+#ifdef GC_HAS_CLOUD_DB
+                    *uploadButton,
+                    *downloadButton,
+#endif
                     *exportButton,
                     *importButton;
         QTreeWidget *table;

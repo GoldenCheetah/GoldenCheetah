@@ -107,6 +107,7 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBCurator.h"
 #include "CloudDBStatus.h"
 #include "CloudDBTelemetry.h"
@@ -484,10 +485,12 @@ MainWindow::MainWindow(const QDir &home)
 
     QMenu *cloudDBMenu = optionsMenu->addMenu(tr("Cloud Contributions"));
     cloudDBMenu->addAction(tr("Maintain charts"), this, SLOT(cloudDBuserEditChart()));
+    cloudDBMenu->addAction(tr("Maintain user metrics"), this, SLOT(cloudDBuserEditUserMetric()));
 
     if (CloudDBCommon::addCuratorFeatures) {
         QMenu *cloudDBCurator = optionsMenu->addMenu(tr("Cloud Curator"));
         cloudDBCurator->addAction(tr("Curate charts"), this, SLOT(cloudDBcuratorEditChart()));
+        cloudDBCurator->addAction(tr("Curate user metrics"), this, SLOT(cloudDBcuratorEditUserMetric()));
     }
 
 #endif
@@ -2306,6 +2309,27 @@ MainWindow::cloudDBuserEditChart()
 }
 
 void
+MainWindow::cloudDBuserEditUserMetric()
+{
+    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
+    if (currentTab->context->cdbUserMetricListDialog == NULL) {
+        currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    }
+
+    // force refresh in prepare to allways get the latest data here
+    if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
+        currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
+    }
+}
+
+void
 MainWindow::cloudDBcuratorEditChart()
 {
     // first check if the user is a curator
@@ -2319,6 +2343,27 @@ MainWindow::cloudDBcuratorEditChart()
         // force refresh in prepare to allways get the latest data here
         if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
             currentTab->context->cdbChartListDialog->exec(); // no action when closed
+        }
+    } else {
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));
+
+    }
+}
+
+void
+MainWindow::cloudDBcuratorEditUserMetric()
+{
+    // first check if the user is a curator
+    CloudDBCuratorClient *curatorClient = new CloudDBCuratorClient;
+    if (curatorClient->isCurator(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
+
+        if (currentTab->context->cdbUserMetricListDialog == NULL) {
+            currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+        }
+
+        // force refresh in prepare to allways get the latest data here
+        if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+            currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
         }
     } else {
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));

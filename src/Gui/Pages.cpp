@@ -38,6 +38,7 @@
 #include "OAuthDialog.h"
 #include "RideAutoImportConfig.h"
 #include "HelpWhatsThis.h"
+#include "GcUpgrade.h"
 #if QT_VERSION >= 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
@@ -48,6 +49,9 @@
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #include "FixPySettings.h"
+#endif
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBUserMetric.h"
 #endif
 extern ConfigDialog *configdialog_ptr;
 
@@ -3220,6 +3224,10 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     editButton = new QPushButton(tr("Edit"));
     exportButton = new QPushButton(tr("Export"));
     importButton = new QPushButton(tr("Import"));
+#ifdef GC_HAS_CLOUD_DB
+    uploadButton = new QPushButton(tr("Upload"));
+    downloadButton = new QPushButton(tr("Download"));
+#endif
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
@@ -3233,6 +3241,11 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     buttons->addWidget(exportButton);
     buttons->addWidget(importButton);
     buttons->addStretch();
+#ifdef GC_HAS_CLOUD_DB
+    buttons->addWidget(uploadButton);
+    buttons->addWidget(downloadButton);
+    buttons->addStretch();
+#endif
     buttons->addWidget(editButton);
     buttons->addStretch();
     buttons->addWidget(addButton);
@@ -3245,6 +3258,10 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
     connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
     connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
+#ifdef GC_HAS_CLOUD_DB
+    connect(uploadButton, SIGNAL(clicked()), this, SLOT(uploadClicked()));
+    connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
+#endif
 }
 
 void
@@ -3448,6 +3465,114 @@ CustomMetricsPage::importClicked()
 
     }
 }
+
+#ifdef GC_HAS_CLOUD_DB
+void
+CustomMetricsPage::uploadClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // metric to export
+    UserMetricSettings here = metrics[row+skipcompat];
+
+    // check for CloudDB T&C acceptance
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+        CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Rejected) {
+            return;
+        }
+    }
+
+    UserMetricAPIv1 usermetric;
+    usermetric.Header.Key = here.symbol;
+    usermetric.Header.Name = here.name;
+    usermetric.Header.Description = here.description;
+    int version = VERSION_LATEST;
+    usermetric.Header.GcVersion =  QString::number(version);
+    // get the usermetric - definition xml
+    QTextStream out(&usermetric.UserMetricXML);
+    UserMetricParser::serializeToQTextStream(out, QList<UserMetricSettings>() << here);
+
+    usermetric.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    usermetric.Header.Curated = false;
+    usermetric.Header.Deleted = false;
+
+    // now complete the usermetric with for the user manually added fields
+    CloudDBUserMetricObjectDialog dialog(usermetric, context->athlete->cyclist);
+    if (dialog.exec() == QDialog::Accepted) {
+        CloudDBUserMetricClient c;
+        if (c.postUserMetric(dialog.getUserMetric())) {
+            CloudDBHeader::setUserMetricHeaderStale(true);
+        }
+    }
+
+}
+
+void
+CustomMetricsPage::downloadClicked()
+{
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       }
+    }
+
+    if (context->cdbUserMetricListDialog == NULL) {
+        context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    }
+
+    if (context->cdbUserMetricListDialog->prepareData(context->athlete->cyclist, CloudDBCommon::UserImport)) {
+        if (context->cdbUserMetricListDialog->exec() == QDialog::Accepted) {
+
+            QList<QString> usermetricDefs = context->cdbUserMetricListDialog->getSelectedSettings();
+
+            foreach (QString usermetricDef, usermetricDefs) {
+                QList<UserMetricSettings> imported;
+
+                // setup XML processor
+                QXmlInputSource source;
+                source.setData(usermetricDef);
+                QXmlSimpleReader xmlReader;
+                UserMetricParser handler;
+                xmlReader.setContentHandler(&handler);
+                xmlReader.setErrorHandler(&handler);
+
+                // parse and get return values
+                xmlReader.parse(source);
+                imported = handler.getSettings();
+                if (imported.isEmpty()) {
+                    QMessageBox::critical(this, tr("Download Metric"), tr("No valid Metric found!"));
+                    continue;
+                }
+
+                UserMetricSettings here = imported.first();
+
+                EditUserMetricDialog editor(this, context, here);
+                if (editor.exec() == QDialog::Accepted) {
+
+                    // add to the list
+                    metrics.append(here);
+                    refreshTable();
+
+                }
+            }
+        }
+    }
+}
+#endif
 
 qint32
 CustomMetricsPage::saveClicked()

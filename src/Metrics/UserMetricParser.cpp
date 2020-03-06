@@ -110,7 +110,15 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
         return;
     };
     file.resize(0);
+
     QTextStream out(&file);
+    serializeToQTextStream(out, metrics);
+    file.close();
+}
+
+void
+UserMetricParser::serializeToQTextStream(QTextStream& out, QList<UserMetricSettings> metrics)
+{
     out.setCodec("UTF-8");
 
     // begin document
@@ -145,6 +153,6 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
     // end document
     out << "</usermetrics>\n";
 
-    // close file
-    file.close();
+    // flush stream
+    out.flush();
 }

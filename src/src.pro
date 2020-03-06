@@ -580,10 +580,12 @@ equals(CloudDB, active) {
 
             HEADERS += Cloud/CloudDBChart.h Cloud/CloudDBCommon.h \
                        Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h \
-                       Cloud/CloudDBVersion.h Cloud/CloudDBTelemetry.h
+                       Cloud/CloudDBVersion.h Cloud/CloudDBTelemetry.h \
+                       Cloud/CloudDBUserMetric.h
             SOURCES += Cloud/CloudDBChart.cpp Cloud/CloudDBCommon.cpp \
                        Cloud/CloudDBCurator.cpp Cloud/CloudDBStatus.cpp \
-                       Cloud/CloudDBVersion.cpp Cloud/CloudDBTelemetry.cpp
+                       Cloud/CloudDBVersion.cpp Cloud/CloudDBTelemetry.cpp \
+                       Cloud/CloudDBUserMetric.cpp
 
             DEFINES += GC_HAS_CLOUD_DB
 

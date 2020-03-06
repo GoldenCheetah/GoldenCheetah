@@ -31,6 +31,7 @@
 #include "DragBar.h"
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBVersion.h"
 #include "CloudDBTelemetry.h"
 #endif
@@ -248,6 +249,8 @@ class MainWindow : public QMainWindow
         // CloudDB actions
         void cloudDBuserEditChart();
         void cloudDBcuratorEditChart();
+        void cloudDBuserEditUserMetric();
+        void cloudDBcuratorEditUserMetric();
         void cloudDBshowStatus();
         void addChartFromCloudDB();
         void exportChartToCloudDB();
