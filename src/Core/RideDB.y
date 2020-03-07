@@ -919,15 +919,14 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
         // first lets read in meta config
         QDir config(home.absolutePath() + "/" + athlete + "/config");
         QString metaConfig = config.canonicalPath()+"/metadata.xml";
-        if (QFile(metaConfig).exists()) {
+        if (!QFile(metaConfig).exists()) metaConfig = ":/xml/metadata.xml";
 
-            // params to readXML - we ignore them
-            QList<KeywordDefinition> keywordDefinitions;
-            QString colorfield;
-            QList<DefaultDefinition> defaultDefinitions;
+        // params to readXML - we ignore them
+        QList<KeywordDefinition> keywordDefinitions;
+        QString colorfield;
+        QList<DefaultDefinition> defaultDefinitions;
 
-            RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, colorfield, defaultDefinitions);
-        }
+        RideMetadata::readXML(metaConfig, keywordDefinitions, settings.metafields, colorfield, defaultDefinitions);
 
         SpecialFields sp;
 
