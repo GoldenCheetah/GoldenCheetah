@@ -375,21 +375,28 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
         legend->setOrientation(Qt::Horizontal);
         mainLayout->insertWidget(-1, legend); // at end
         holder=mainLayout;
+        legend->show();
         break;
     case 1: // left
         legend->setOrientation(Qt::Vertical);
         leftLayout->insertWidget(0, legend); // at beginning
         holder=leftLayout;
+        legend->show();
         break;
     case 2: // top
         legend->setOrientation(Qt::Horizontal);
         mainLayout->insertWidget(0, legend); // at front
         holder=mainLayout;
+        legend->show();
         break;
     case 3: // right
         legend->setOrientation(Qt::Vertical);
         leftLayout->insertWidget(-1, legend); // at end
         holder=leftLayout;
+        legend->show();
+        break;
+    case 4: // none
+        legend->hide();
         break;
     }
 
@@ -751,7 +758,6 @@ GenericPlot::finaliseChart()
 
         }
 
-        legend->show();
     }
 
     if (charttype== GC_CHART_PIE) {
@@ -764,7 +770,6 @@ GenericPlot::finaliseChart()
             }
         }
         legend->setClickable(false);
-        legend->show();
     }
 
     // barseries special case
@@ -779,7 +784,6 @@ GenericPlot::finaliseChart()
             legend->addSeries(set->label(), set->color());
 
         legend->setClickable(false);
-        legend->show();
     }
 
     // install event filters on thes scene objects for Pie and Bar

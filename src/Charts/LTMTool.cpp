@@ -2707,6 +2707,9 @@ LTMTool::setFilter(QStringList files)
 DataFilterEdit::DataFilterEdit(QWidget *parent, Context *context)
 : QTextEdit(parent), c(0), context(context)
 {
+    QFont font;
+    font.setFamily("Courier");
+    setFont(font);
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(checkErrors()));
 }
 

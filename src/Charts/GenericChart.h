@@ -40,13 +40,26 @@ class GenericSeriesInfo {
         GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl) :
+                      user1(NULL), user2(NULL), user3(NULL), user4(NULL),
                       name(name), xseries(xseries), yseries(yseries), xname(xname), yname(yname),
                       labels(labels), colors(colors),
                       line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl)
                       {}
 
+        GenericSeriesInfo() :
+            user1(NULL), user2(NULL), user3(NULL), user4(NULL),
+            line(static_cast<int>(Qt::PenStyle::SolidLine)),
+            symbol(0), //XXX todo
+            color("red"), opacity(1.0), opengl(true)
+        {}
+
+        // available for use (e.g. UserChartSettings)
+        void *user1, *user2, *user3, *user4;
+        QString string1, string2, string3, string4;
+
         // properties, from setCurve(...)
         QString name;
+        QString group;
         QVector<double> xseries;
         QVector<double> yseries;
         QString xname;
@@ -55,7 +68,7 @@ class GenericSeriesInfo {
         QStringList colors;
         int line;
         int symbol;
-        int size;
+        double size;
         QString color;
         int opacity;
         bool opengl;
@@ -111,9 +124,55 @@ class GenericPlotInfo {
         QList<GenericAxisInfo> axes;
 };
 
+class GenericChartInfo {
+
+    // not actually used by genericchart as the info
+    // is all maintained within the chart itself, but
+    // can be used by others when configuring a chart
+    // so for example is used by the UserChartSettings
+    // dialog
+    public:
+
+        // default values, better here than spread across the codebase.
+        GenericChartInfo() : localinfo(NULL), type(GC_CHART_LINE), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical) {}
+
+        // available for use (e.g. UserChartSettings)
+        void *localinfo;
+
+        QString title;
+        QString description;
+
+        int type;
+        bool animate;
+        int legendpos;
+        bool stack; // stack series instead of on same chart
+        int orientation; // layout horizontal or vertical
+};
+
+
 // general axis info
 class GenericAxisInfo {
-public:
+
+    public:
+        enum axisinfoType { CONTINUOUS=0,                 // Continious range
+                            DATERANGE=1,                  // Date
+                            TIME=2,                       // Duration, Time
+                            CATEGORY=3,                   // labelled with categories
+                            LAST=3                        // maintain as list grows
+                          };
+        typedef enum axisinfoType AxisInfoType;
+
+        // used for settings / user interaction
+        static QString axisTypeDescription(AxisInfoType x) {
+            switch (x) {
+            default:
+            case CONTINUOUS: return (QObject::tr("Continuous")); break;
+            case DATERANGE: return (QObject::tr("Date")); break;
+            case TIME: return (QObject::tr("Time")); break;
+            case CATEGORY: return (QObject::tr("Category")); break;
+            }
+        }
+
         GenericAxisInfo(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories) :
                       type(static_cast<AxisInfoType>(type)),
@@ -122,12 +181,9 @@ public:
                       labelcolorstring(labelcolor), axiscolorstring(color),  categories(categories)
                       {}
 
-        enum axisinfoType { CONTINUOUS=0,                 // Continious range
-                            DATERANGE=1,                  // Date
-                            TIME=2,                       // Duration, Time
-                            CATEGORY=3                // labelled with categories
-                          };
-        typedef enum axisinfoType AxisInfoType;
+        GenericAxisInfo() : type(AxisInfoType::CONTINUOUS), orientation(Qt::Vertical), align(Qt::AlignLeft),
+                            miny(0), maxy(0), minx(0), maxx(0), visible (true), fixed(false), log(false),
+                            minorgrid(false), majorgrid(true), labelcolor(GColor(CPLOTMARKER)), axiscolor(GColor(CPLOTMARKER)) {}
 
         static int findAxis(QList<GenericAxisInfo>infos, QString name) {
             for (int i=0; i<infos.count(); i++)
