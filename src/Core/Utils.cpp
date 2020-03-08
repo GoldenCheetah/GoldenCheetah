@@ -217,6 +217,9 @@ QString jsonunprotect(const QString &string)
     s.replace("\\f", "\f");  // formfeed
     s.replace("\\/", "/");   // solidus
     s.replace("\\\\", "\\"); // backslash
+
+    // those trailing spaces.
+    while (s.endsWith(" ")) s = s.mid(0,s.length()-1);
     return s;
 }
 
