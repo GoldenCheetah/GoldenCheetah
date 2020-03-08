@@ -1837,7 +1837,7 @@ Bindings::seasonMeanmax(bool all, DateRange range, QString filter) const
     }
 
     // RideFileCache for a date range with our filters (if any)
-    RideFileCache cache(context, range.from, range.to, filt, filelist, false, NULL);
+    RideFileCache cache(context, range.from, range.to, filt, filelist, true, NULL);
 
     return rideFileCacheMeanmax(&cache);
 }

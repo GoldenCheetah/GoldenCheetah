@@ -2558,7 +2558,7 @@ RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
     UNPROTECT(1);
 
     // RideFileCache for a date range with our filters (if any)
-    RideFileCache cache(rtool->context, range.from, range.to, filt, filelist, false, NULL);
+    RideFileCache cache(rtool->context, range.from, range.to, filt, filelist, true, NULL);
 
     return dfForRideFileCache(&cache);
 
