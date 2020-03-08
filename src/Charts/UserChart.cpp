@@ -133,26 +133,16 @@ UserChart::setRide(RideItem *ride)
                         series.line, series.symbol, series.size, series.color, series.opacity, series.opengl);
     }
 
-    // now configure the axes - setting align to balance above/below and left/right
-    int xalign=0;
-    int yalign=1;
-
     foreach (GenericAxisInfo axis, axisinfo) {
 
-        // we try and balance left and right etc
-        // we could let the user control this but it
-        // gets too much when there are multiple charts etc
-        // we use 0,1,2,3 for bottom, left, top, right
-        int align;
-        if (axis.orientation == Qt::Vertical) {
-            align=yalign;
-            yalign = (yalign == 1) ? 3 : 1;
-        } else {
-            align=xalign;
-            xalign = (xalign == 0) ? 2 : 0;
+        double min=-1,max=-1;
+        if (axis.fixed) {
+            min = axis.min();
+            max = axis.max();
         }
-
-        chart->configureAxis(axis.name, axis.visible, align, axis.min(), axis.max(), axis.type,
+        // we do NOT set align, this is managed in generic plot on our behalf
+        // we also don't hide axes, so visible is always set to true
+        chart->configureAxis(axis.name, true, -1, min, max, axis.type,
                              axis.labelcolor.name(), axis.axiscolor.name(), axis.log, axis.categories);
     }
 
@@ -764,6 +754,7 @@ UserChartSettings::refreshAxesTab()
                 }
             }
             found.axiscolor = GColor(CPLOTMARKER);
+            found.labelcolor = GColor(CPLOTMARKER);
             want << found;
             have << series.xname;
         }
