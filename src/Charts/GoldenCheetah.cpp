@@ -916,7 +916,7 @@ GcChartWindow::saveChart()
     QString suffix; // what was selected?
     QString filename = QFileDialog::getSaveFileName(this, tr("Export Chart"),
                        QDir::homePath()+"/"+ property("title").toString() + ".gchart",
-                       ("*.gchart;;"), &suffix);
+                       ("*.gchart;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (filename.length() == 0) return;
 
