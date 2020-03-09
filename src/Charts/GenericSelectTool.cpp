@@ -237,10 +237,13 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             line.setStyle(Qt::SolidLine);
                             line.setWidthF(0.5 * dpiXFactor);
                             painter->setPen(line);
-                            //painter->setClipRect(r);
-                            painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+                            if (host->charttype == GC_CHART_LINE) painter->setClipRect(r); // too jarring on a line plot
+                            else painter->setClipRect(mapRectFromScene(host->qchart->plotArea())); // need context for a scatter plot
                             painter->drawLine(startp, stopp);
                         }
+
+                        // reset clip to the plot area
+                        painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
 
                         // scene coordinate for min/max (remember we get clipped)
                         QPointF minxp = mapFromScene(host->qchart->mapToPosition(QPointF(calc.x.min,0),calc.series));

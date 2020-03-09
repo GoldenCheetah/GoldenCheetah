@@ -4119,8 +4119,6 @@ RTool::configureAxis(SEXP name, SEXP visible, SEXP align, SEXP min, SEXP max,
     Q_UNUSED(align) // we always pass -1 for now
     Q_UNUSED(categories) // XXX TODO
 
-    fprintf(stderr, "configure axis...\n"); fflush(stderr);
-
     if (rtool == NULL || rtool->context == NULL || rtool->chart == NULL)   return Rf_allocVector(INTSXP, 0);
 
     GenericAxisInfo info;
