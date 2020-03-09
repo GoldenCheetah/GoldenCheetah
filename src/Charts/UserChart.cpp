@@ -893,6 +893,13 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, GenericSeriesInfo &
 
     color = new ColorButton(this, "Color", Qt::red);
     cf->addRow(tr("Color"), color);
+    opacity = new QSpinBox(this);
+    opacity->setRange(1,100);
+    opacity->setValue(100);// default
+    zz = new QHBoxLayout();
+    zz->addWidget(opacity);
+    zz->addStretch();
+    cf->addRow(tr("Opacity (%)"), zz);
 
     size = new QDoubleSpinBox(this);
     zz = new QHBoxLayout();
@@ -929,6 +936,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, GenericSeriesInfo &
     color->setColor(QColor(original.color));
     //original.opacity = opacity->value();
     opengl->setChecked(original.opengl != 0);
+    opacity->setValue(original.opacity);
     // update the source
 
     // connect up slots
@@ -959,8 +967,8 @@ EditUserSeriesDialog::okClicked()
     original.symbol = symbol->itemData(symbol->currentIndex()).toInt();
     original.size = size->value();
     original.color = color->getColor().name();
-    //original.opacity = opacity->value();
     original.opengl = opengl->isChecked();
+    original.opacity = opacity->value();
     // update the source
 
     accept();

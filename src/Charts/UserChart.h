@@ -172,6 +172,7 @@ class EditUserSeriesDialog : public QDialog
         QComboBox *line, *symbol;
         QDoubleSpinBox *size;
         ColorButton *color;
+        QSpinBox *opacity;
         QCheckBox *opengl;
         QLineEdit *labels, *colors;
 
