@@ -271,11 +271,11 @@ GenericPlot::plotAreaChanged()
         QRectF zone;
         switch (sides[i]) {
         case Qt::AlignLeft:
-                zone =QRectF(QPointF(0, 0),
+                zone =QRectF(QPointF(0, -10),
                       QPointF(qchart->plotArea().x(), qchart->scene()->height()));
             break;
         case Qt::AlignRight:
-                zone =QRectF(QPointF(qchart->plotArea().x()+qchart->plotArea().width(), 0),
+                zone =QRectF(QPointF(qchart->plotArea().x()+qchart->plotArea().width(), -10),
                              QPointF(qchart->scene()->width(), qchart->scene()->height()));
             break;
         default:
