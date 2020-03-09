@@ -654,7 +654,9 @@ GenericPlot::finaliseChart()
             case GenericAxisInfo::TIME:      // TODO
             case GenericAxisInfo::CONTINUOUS:
                 {
-                    QValueAxis *vaxis= new QValueAxis(qchart);
+                    QAbstractAxis *vaxis=NULL;
+                    if (axisinfo->log) vaxis= new QLogValueAxis(qchart);
+                    else vaxis= new QValueAxis(qchart);
                     add=vaxis; // gets added later
 
                     vaxis->setMin(axisinfo->min());
@@ -745,8 +747,9 @@ GenericPlot::finaliseChart()
 
                 // look for first series with a horizontal axis (we will use this later)
                 foreach(QAbstractAxis *axis, series->attachedAxes()) {
-                    if (axis->orientation() == Qt::Horizontal && axis->type()==QAbstractAxis::AxisTypeValue) {
-                        legend->addX(static_cast<QValueAxis*>(axis)->titleText());
+                    if (axis->orientation() == Qt::Horizontal) {
+                        if (axis->type()==QAbstractAxis::AxisTypeValue)  legend->addX(static_cast<QValueAxis*>(axis)->titleText());
+                        else if (axis->type()==QAbstractAxis::AxisTypeLogValue)  legend->addX(static_cast<QLogValueAxis*>(axis)->titleText());
                         havexaxis=true;
                         break;
                     }

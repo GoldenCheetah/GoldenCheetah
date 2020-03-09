@@ -213,19 +213,18 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                     if (calc.series->isVisible() == false) continue;
 
-                    // slope calcs way over the top for a line chart
-                    // where there are multiple series being plotted
-                    if (host->charttype == GC_CHART_SCATTER) {
-                        QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
-                        QPen line(calc.color);
-                        painter->setPen(line);
-                        painter->drawText(QPointF(0,0), lr);
-                    }
-
-                    // slope
                     if (calc.xaxis != NULL) {
 
-                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) { //XXX todo for log date etc?
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) {
+
+                            // slope calcs way over the top for a line chart
+                            // where there are multiple series being plotted
+                            if (host->charttype == GC_CHART_SCATTER) {
+                                QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
+                                QPen line(calc.color);
+                                painter->setPen(line);
+                                painter->drawText(QPointF(0,0), lr);
+                            }
 
                             double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
                             double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
