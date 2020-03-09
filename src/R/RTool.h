@@ -69,6 +69,13 @@ class RTool {
         static SEXP pmc(SEXP all, SEXP metric);
         static SEXP measures(SEXP all, SEXP group);
 
+        // charts
+        static SEXP setChart(SEXP title, SEXP type, SEXP animate, SEXP legpos, SEXP stack, SEXP orientation);
+        static SEXP addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP xname, SEXP yname, SEXP labels, SEXP colors,
+                             SEXP line, SEXP symbol, SEXP size, SEXP color, SEXP opacity, SEXP opengl);
+        static SEXP configureAxis(SEXP name, SEXP visible, SEXP align, SEXP min, SEXP max,
+                                  SEXP type, SEXP labelcolor, SEXP color, SEXP log, SEXP categories);
+
         bool starting;
         bool failed;
         bool cancelled;

@@ -36,6 +36,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+#include "GenericChart.h"
 
 // Structure used to register routines has changed in v3.4 of R
 //
@@ -132,6 +133,9 @@ RTool::RTool()
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0 },
             { "GC.season.measures", (DL_FUNC) &RTool::measures, 0,0 },
+            { "GC.chart.set", (DL_FUNC) &RTool::setChart, 0,0 },
+            { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 0,0 },
+            { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 0,0 },
             { NULL, NULL, 0,0 }
         };
 
@@ -156,6 +160,9 @@ RTool::RTool()
             { "GC.season.meanmax", (DL_FUNC) &RTool::seasonMeanmax, 0,0,0 },
             { "GC.season.peaks", (DL_FUNC) &RTool::seasonPeaks, 0,0,0 },
             { "GC.season.measures", (DL_FUNC) &RTool::measures, 0,0,0 },
+            { "GC.chart.set", (DL_FUNC) &RTool::setChart, 0,0,0 },
+            { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 0,0,0 },
+            { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 0,0,0 },
             { NULL, NULL, 0,0,0 }
         };
 
@@ -192,6 +199,9 @@ RTool::RTool()
             { "GC.season.pmc", (DL_FUNC) &RTool::pmc, 2 },
             // return a data.frame of measure fields (all=FALSE, group="Body")
             { "GC.season.measures", (DL_FUNC) &RTool::measures, 2 },
+            { "GC.chart.set", (DL_FUNC) &RTool::setChart, 6 },
+            { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 13 },
+            { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 10 },
             { NULL, NULL, 0 }
         };
 
@@ -290,10 +300,33 @@ RTool::RTool()
                                "GC.metrics <- function(all=FALSE, filter=\"\", compare=FALSE) { .Call(\"GC.season.metrics\", all, filter, compare) }\n"
                                "GC.pmc <- function(all=FALSE, metric=\"BikeStress\") { .Call(\"GC.season.pmc\", all, metric) }\n"
 
+                               // charts
+                               "GC.setChart <- function(title=\"\", type=1, animate=FALSE, legpos=2, stack=FALSE, orientation=2) { .Call(\"GC.chart.set\", title, type, animate, legpos ,stack, orientation)}\n"
+                               "GC.addCurve <- function(name=\"curve\", xseries=c(), yseries=c(), xname=\"xaxis\", yname=\"yaxis\", min=-1, max=-1, labels=c(), colors=c(), line=1,symbol=0,size=2,color=\"red\",opacity=100,opengl=TRUE) { .Call(\"GC.chart.addCurve\", name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl)}\n"
+                               "GC.setAxis <- function(name=\"xaxis\",visible=TRUE, align=-1, min=-1, max=-1, type=0, labelcolor=\"\", color=\"\", log=FALSE, categories=c()) { .Call(\"GC.chart.configureAxis\", name, visible, align, min, max, type, labelcolor,color,log,categories)}\n"
+
+                                // constants
+                                "GC.HORIZONTAL<-1\n"
+                                "GC.VERTICAL<-2\n"
+                                "GC.ALIGN.TOP<-2\n"
+                                "GC.ALIGN.BOTTOM<-0\n"
+                                "GC.ALIGN.LEFT<-1\n"
+                                "GC.ALIGN.RIGHT<-3\n"
+                                "GC.LINE.NONE<-0\n"
+                                "GC.LINE.SOLID<-1\n"
+                                "GC.LINE.DASH<-2\n"
+                                "GC.LINE.DOT<-3\n"
+                                "GC.LINE.DASHDOT<-4\n"
+                                "GC.CHART.LINE<-1\n"
+                                "GC.CHART.SCATTER<-2\n"
+                                "GC.CHART.BAR<-3\n"
+                                "GC.CHART.PIE<-4\n"
+
                                // version and build
                                "GC.version <- function() { return(\"%1\") }\n"
                                "GC.build <- function() { return(%2) }\n"
-                               "par.default <- par()\n")
+                               "par.default <- par()\n"
+                               )
                        .arg(VERSION_STRING)
                        .arg(VERSION_LATEST)
                        .arg("https://cloud.r-project.org/"));
@@ -3949,4 +3982,195 @@ RTool::dfForActivityXData(RideFile*f, QString name)
 
     // return a valid result
     return ans;
+}
+
+//
+// Working with Generic Charts
+//
+SEXP
+RTool::setChart(SEXP title, SEXP type, SEXP animate, SEXP legpos, SEXP stack, SEXP orientation)
+{
+
+    if (rtool == NULL || rtool->context == NULL || rtool->chart == NULL)   return Rf_allocVector(INTSXP, 0);
+
+    GenericChartInfo info;
+
+    // title
+    PROTECT(title=Rf_coerceVector(title, STRSXP));
+    info.title=QString(CHAR(STRING_ELT(title,0)));
+    UNPROTECT(1);
+
+    // type
+    PROTECT(type=Rf_coerceVector(type,INTSXP));
+    info.type=INTEGER(type)[0];
+    UNPROTECT(1);
+
+    // animation
+    animate = Rf_coerceVector(animate, LGLSXP);
+    info.animate = LOGICAL(animate)[0];
+
+    // legend position
+    PROTECT(legpos=Rf_coerceVector(legpos,INTSXP));
+    info.legendpos=INTEGER(legpos)[0];
+    UNPROTECT(1);
+
+    // stack
+    stack = Rf_coerceVector(stack, LGLSXP);
+    info.stack = LOGICAL(stack)[0];
+
+    // type
+    PROTECT(orientation=Rf_coerceVector(orientation,INTSXP));
+    info.orientation=INTEGER(orientation)[0];
+    UNPROTECT(1);
+
+    // call generic chart
+    rtool->chart->chart->initialiseChart(info.title, info.type, info.animate, info.legendpos, info.stack, info.orientation);
+
+    // return 0
+    return Rf_allocVector(INTSXP,0);
+}
+
+SEXP
+RTool::addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP xname, SEXP yname, SEXP labels, SEXP colors,
+              SEXP line, SEXP symbol, SEXP size, SEXP color, SEXP opacity, SEXP opengl)
+{
+    Q_UNUSED(labels) //XXX todo
+    Q_UNUSED(colors) //XXX todo
+
+    if (rtool == NULL || rtool->context == NULL || rtool->chart == NULL)   return Rf_allocVector(INTSXP, 0);
+
+    GenericSeriesInfo info;
+
+    // name
+    PROTECT(name=Rf_coerceVector(name, STRSXP));
+    info.name=QString(CHAR(STRING_ELT(name,0)));
+    UNPROTECT(1);
+
+    // xseries
+    PROTECT(xseries=Rf_coerceVector(xseries,REALSXP));
+    long vs=Rf_length(xseries);
+    info.xseries.resize(vs);
+    for(int i=0; i<vs; i++) info.xseries[i]=REAL(xseries)[i];
+    UNPROTECT(1);
+
+    // yseries
+    PROTECT(yseries=Rf_coerceVector(yseries,REALSXP));
+    vs=Rf_length(yseries);
+    info.yseries.resize(vs);
+    for(int i=0; i<vs; i++) info.yseries[i]=REAL(yseries)[i];
+    UNPROTECT(1);
+
+    // yname
+    PROTECT(yname=Rf_coerceVector(yname, STRSXP));
+    info.yname=QString(CHAR(STRING_ELT(yname,0)));
+    UNPROTECT(1);
+
+    // xname
+    PROTECT(xname=Rf_coerceVector(xname, STRSXP));
+    info.xname=QString(CHAR(STRING_ELT(xname,0)));
+    UNPROTECT(1);
+
+    // labels
+    // XXX todo
+
+    // colors
+    // XXX todo
+
+    // line
+    PROTECT(line=Rf_coerceVector(line,INTSXP));
+    info.line=INTEGER(line)[0];
+    UNPROTECT(1);
+
+    // symbol
+    PROTECT(symbol=Rf_coerceVector(symbol,INTSXP));
+    info.symbol=INTEGER(symbol)[0];
+    UNPROTECT(1);
+
+    // size
+    PROTECT(size=Rf_coerceVector(size,REALSXP));
+    info.size=REAL(size)[0];
+    UNPROTECT(1);
+
+    // color
+    PROTECT(color=Rf_coerceVector(color, STRSXP));
+    info.color=QString(CHAR(STRING_ELT(color,0)));
+    UNPROTECT(1);
+
+    // opacity
+    PROTECT(opacity=Rf_coerceVector(opacity,INTSXP));
+    info.opacity=INTEGER(opacity)[0];
+    UNPROTECT(1);
+
+    // opengl
+    opengl = Rf_coerceVector(opengl, LGLSXP);
+    info.opengl = LOGICAL(opengl)[0];
+
+    // add to chart
+    rtool->chart->chart->addCurve(info.name, info.xseries, info.yseries, info.xname, info.yname, info.labels, info.colors, info.line, info.symbol, info.size, info.color, info.opacity, info.opengl);
+
+    // return 0
+    return Rf_allocVector(INTSXP,0);
+}
+
+SEXP
+RTool::configureAxis(SEXP name, SEXP visible, SEXP align, SEXP min, SEXP max,
+                                  SEXP type, SEXP labelcolor, SEXP axiscolor, SEXP log, SEXP categories)
+{
+    Q_UNUSED(align) // we always pass -1 for now
+    Q_UNUSED(categories) // XXX TODO
+
+    fprintf(stderr, "configure axis...\n"); fflush(stderr);
+
+    if (rtool == NULL || rtool->context == NULL || rtool->chart == NULL)   return Rf_allocVector(INTSXP, 0);
+
+    GenericAxisInfo info;
+
+    // name
+    PROTECT(name=Rf_coerceVector(name, STRSXP));
+    info.name=QString(CHAR(STRING_ELT(name,0)));
+    UNPROTECT(1);
+
+    // visible
+    visible = Rf_coerceVector(visible, LGLSXP);
+    info.visible = LOGICAL(visible)[0];
+
+    // align- ignore !
+
+    // min
+    PROTECT(min=Rf_coerceVector(min,REALSXP));
+    info.minx=REAL(min)[0];
+    UNPROTECT(1);
+
+    // max
+    PROTECT(max=Rf_coerceVector(max,REALSXP));
+    info.maxx=REAL(max)[0];
+    UNPROTECT(1);
+
+    // type
+    PROTECT(type=Rf_coerceVector(type,INTSXP));
+    info.type=static_cast<GenericAxisInfo::AxisInfoType>(INTEGER(type)[0]);
+    UNPROTECT(1);
+
+    // labelcolor string
+    PROTECT(labelcolor=Rf_coerceVector(labelcolor, STRSXP));
+    info.labelcolor=QString(CHAR(STRING_ELT(labelcolor,0)));
+    UNPROTECT(1);
+
+    // color string
+    PROTECT(axiscolor=Rf_coerceVector(axiscolor, STRSXP));
+    info.axiscolor=QString(CHAR(STRING_ELT(axiscolor,0)));
+    UNPROTECT(1);
+
+    // log scale
+    log = Rf_coerceVector(log, LGLSXP);
+    info.log = LOGICAL(log)[0];
+
+    // categories
+    //XXX todo
+
+    // add to chart -- XXX need to think on how to set axis colors -- or if we even should allow it
+    rtool->chart->chart->configureAxis(info.name, info.visible, -1 /*info.align*/, info.minx, info.maxx, info.type, "" /*info.labelcolor.name()*/, ""/*info.axiscolor.name()*/, info.log, info.categories);
+
+    // return 0
+    return Rf_allocVector(INTSXP,0);
 }
