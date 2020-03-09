@@ -229,7 +229,8 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                             double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
                             double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
-                            QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b),calc.series));
+
+                            QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b+(startx*calc.m)),calc.series));
                             QPointF stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
                             QColor col=GColor(CPLOTMARKER);
                             col.setAlphaF(1);
@@ -237,9 +238,9 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             line.setStyle(Qt::SolidLine);
                             line.setWidthF(0.5 * dpiXFactor);
                             painter->setPen(line);
-                            painter->setClipRect(r);
-                            painter->drawLine(startp, stopp);
+                            //painter->setClipRect(r);
                             painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
+                            painter->drawLine(startp, stopp);
                         }
 
                         // scene coordinate for min/max (remember we get clipped)
