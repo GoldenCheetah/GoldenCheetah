@@ -136,6 +136,9 @@ static struct {
 
     // working with vectors
     { "c", 0 }, // return an array from concatated from paramaters (same as R) e.g. c(1,2,3,4,5)
+    { "seq", 3 }, // create a vector with a range seq(start,stop,step)
+    { "rep", 2 }, // create a vector of repeated values rep(value, n)
+    { "length", 1}, // get length of a vector (can be zero where isnumber not a vector)
 
     // add new ones above this line
     { "", -1 }
@@ -188,6 +191,21 @@ DataFilter::builtins()
 
             // concat
             returning << "c(...)";
+
+        } else if (i == 46) {
+
+            // seq
+            returning << "seq(start,stop,step)";
+
+        } else if (i == 47) {
+
+            // seq
+            returning << "rep(value,n)";
+
+        } else if (i == 48) {
+
+            // length
+            returning << "length(vector)";
 
         } else {
             QString function;
@@ -1199,6 +1217,27 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     // .. but still check parameters
                     foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
 
+                } else if (leaf->function == "rep") {
+
+                    if (leaf->fparms.count() != 2) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be rep(value, n)"));
+                    }
+
+                } else if (leaf->function == "seq") {
+
+                    if (leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be seq(start, stop, step)"));
+                    }
+
+                } else if (leaf->function == "length") {
+
+                    if (leaf->fparms.count() != 1) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be length(expr)"));
+                    }
+
                 } else if (leaf->function == "banister") {
 
                     // 3 parameters
@@ -1976,6 +2015,60 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 }
             }
             return returning;
+        }
+
+        // seq
+        if (leaf->function == "seq") {
+            Result returning(0);
+
+            double start= eval(df, leaf->fparms[0], x, m, p, c, s).number;
+            double stop= eval(df, leaf->fparms[1], x, m, p, c, s).number;
+            double step= eval(df, leaf->fparms[2], x, m, p, c, s).number;
+
+            if (step == 0) return returning; // nope!
+            if (start > stop && step >0) return returning; // nope
+            if (stop > start && step <0) return returning; // nope
+
+            // ok lets go
+            if (step > 0) {
+                while(start <= stop) {
+                    returning.vector.append(start);
+                    start += step;
+                    returning.number += start;
+                }
+            } else {
+                while (start >= stop) {
+                    returning.vector.append(start);
+                    start += step;
+                    returning.number += start;
+                }
+            }
+
+            // sequence
+            return returning;
+        }
+
+        // rep
+        if (leaf->function == "rep") {
+            Result returning(0);
+
+            double value= eval(df, leaf->fparms[0], x, m, p, c, s).number;
+            double count= eval(df, leaf->fparms[1], x, m, p, c, s).number;
+
+            if (count <= 0) return returning;
+
+            while (count >0) {
+                returning.vector.append(value);
+                returning.number += value;
+                count--;
+            }
+            return returning;
+        }
+
+        // seq
+        if (leaf->function == "length") {
+
+            return Result(eval(df, leaf->fparms[0], x, m, p, c, s).vector.count());
         }
 
         // banister
