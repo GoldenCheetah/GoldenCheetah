@@ -134,6 +134,9 @@ static struct {
     // banister function
     { "banister", 3 }, // banister(load_metric, perf_metric, nte|pte|perf|cp)
 
+    // working with vectors
+    { "c", 0 }, // return an array from concatated from paramaters (same as R) e.g. c(1,2,3,4,5)
+
     // add new ones above this line
     { "", -1 }
 };
@@ -180,6 +183,12 @@ DataFilter::builtins()
         } else if (i == 44) {
             // banister
             returning << "banister(load_metric, perf_metric, nte|pte|perf|cp)";
+
+        } else if (i == 45) {
+
+            // concat
+            returning << "c(...)";
+
         } else {
             QString function;
             function = DataFilterFunctions[i].name + "(";
@@ -1184,6 +1193,12 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
 
+                } else if (leaf->function == "c") {
+
+                    // pretty much anything goes, can be empty or a list..
+                    // .. but still check parameters
+                    foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
                 } else if (leaf->function == "banister") {
 
                     // 3 parameters
@@ -1936,6 +1951,31 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             if (symbol == "units") {
                 return Result(m->context->athlete->useMetricUnits ? 1 : 0);
             }
+        }
+
+        // c (concat into a vector)
+        if (leaf->function == "c") {
+
+            // the return value of a vector is always its sum
+            // so we need to keep that up to date too
+            Result returning(0);
+
+            for(int i=0; i<leaf->fparms.count(); i++) {
+                Result r=eval(df, leaf->fparms[i], x, m, p, c, s);
+                if (r.vector.count()) {
+                    returning.vector.append(r.vector);
+                    returning.number += r.number;
+                } else if (r.isNumber) {
+                    returning.vector.append(r.number);
+                    returning.number += r.number;
+                } else {
+                    // convert strings to a number, or at least try
+                    double val = r.string.toDouble();
+                    returning.number += val;
+                    returning.vector.append(val);
+                }
+            }
+            return returning;
         }
 
         // banister
