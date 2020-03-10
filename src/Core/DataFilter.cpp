@@ -135,10 +135,14 @@ static struct {
     { "banister", 3 }, // banister(load_metric, perf_metric, nte|pte|perf|cp)
 
     // working with vectors
+
     { "c", 0 }, // return an array from concatated from paramaters (same as R) e.g. c(1,2,3,4,5)
     { "seq", 3 }, // create a vector with a range seq(start,stop,step)
     { "rep", 2 }, // create a vector of repeated values rep(value, n)
     { "length", 1}, // get length of a vector (can be zero where isnumber not a vector)
+
+    { "append", 0}, // append vector append(symbol, expr [, at]) -- must reference a symbol
+    { "remove", 3}, // remove vector elements remove(symbol, start, count) -- must reference a symbol
 
     // add new ones above this line
     { "", -1 }
@@ -206,6 +210,14 @@ DataFilter::builtins()
 
             // length
             returning << "length(vector)";
+
+        } else if (i == 49) {
+            // append
+            returning << "append(a,b,[pos])"; // position is optional
+
+        } else if (i == 50) {
+            // remove
+            returning << "remove(a,pos,count)";
 
         } else {
             QString function;
@@ -1224,6 +1236,9 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("should be rep(value, n)"));
                     }
 
+                    // still normal parm check !
+                    foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
                 } else if (leaf->function == "seq") {
 
                     if (leaf->fparms.count() != 3) {
@@ -1231,11 +1246,64 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("should be seq(start, stop, step)"));
                     }
 
+                    // still normal parm check !
+                    foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
                 } else if (leaf->function == "length") {
 
                     if (leaf->fparms.count() != 1) {
                         leaf->inerror = true;
                         DataFiltererrors << QString(tr("should be length(expr)"));
+                    }
+
+                    // still normal parm check !
+                    foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
+                } else if (leaf->function == "append") {
+
+                    if (leaf->fparms.count() != 2 && leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be append(a,b,[pos])"));
+                    } else {
+
+                        // still normal parm check !
+                        foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
+                        // check parameter 1 is actually a symbol
+                        if (leaf->fparms[0]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("append(a,b,[pos]) but 'a' must be a symbol"));
+                        } else {
+                            QString symbol = *(leaf->fparms[0]->lvalue.n);
+                            if (!df->symbols.contains(symbol)) {
+                                DataFiltererrors << QString(tr("append(a,b,[pos]) but 'a' must be a user symbol"));
+                                leaf->inerror = true;
+                            }
+                        }
+                    }
+
+                } else if (leaf->function == "remove") {
+
+                    if (leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be remove(a,pos,count)"));
+                    } else {
+                        // still normal parm check !
+                        foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
+                        // check parameter 1 is actually a symbol
+                        if (leaf->fparms[0]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("remove(a,pos,count) but 'a' must be a symbol"));
+                        } else {
+                            QString symbol = *(leaf->fparms[0]->lvalue.n);
+                            if (!df->symbols.contains(symbol)) {
+                                DataFiltererrors << QString(tr("remove(a,pos, count) but 'a' must be a user symbol"));
+                                leaf->inerror = true;
+                            }
+
+                        }
+
                     }
 
                 } else if (leaf->function == "banister") {
@@ -2067,8 +2135,80 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
         // seq
         if (leaf->function == "length") {
+            double len = eval(df, leaf->fparms[0], x, m, p, c, s).vector.count();
+            return Result(len);
+        }
 
-            return Result(eval(df, leaf->fparms[0], x, m, p, c, s).vector.count());
+        // append
+        if (leaf->function == "append") {
+
+            // append (symbol, stuff, pos)
+
+            // lets get the symbol and a pointer to it's value
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            Result current = df->symbols.value(symbol);
+
+            // where to place it? -1 on end (not passed as a parameter)
+            int pos=-1;
+            if (leaf->fparms.count() == 3) pos = eval(df, leaf->fparms[2], x, m, p, c, s).number;
+
+            // check for bounds
+            if (pos <0 || pos >current.vector.count()) pos=-1;
+
+            // ok, what to append
+            Result append = eval(df, leaf->fparms[1], x, m, p, c, s);
+
+            // do it...
+            if (append.vector.count()) {
+
+                if (pos==-1) current.vector.append(append.vector);
+                else {
+                    // insert at pos
+                    for(int i=0; i<append.vector.count(); i++)
+                        current.vector.insert(pos+i, append.vector.at(i));
+                }
+
+            } else {
+
+                if (pos == -1) current.vector.append(append.number); // just a single number
+                else current.vector.insert(pos, append.number); // just a single number
+            }
+
+            // update value
+            df->symbols.insert(symbol, current);
+
+            return Result(current.vector.count());
+        }
+
+        // remove
+        if (leaf->function == "remove") {
+
+            // remove (symbol, pos, count)
+
+            // lets get the symbol and a pointer to it's value
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            Result current = df->symbols.value(symbol);
+
+            // where to place it? -1 on end (not passed as a parameter)
+            long pos = eval(df, leaf->fparms[1], x, m, p, c, s).number;
+
+            // ok, what to append
+            long count = eval(df, leaf->fparms[2], x, m, p, c, s).number;
+
+
+            // check.. and return unchanged if out of bounds
+            if (pos < 0 || pos > current.vector.count() || pos+count >current.vector.count()) {
+                return Result(current.vector.count());
+            }
+
+            // so lets do it
+            // do it...
+            current.vector.remove(pos, count);
+
+            // update value
+            df->symbols.insert(symbol, current);
+
+            return Result(current.vector.count());
         }
 
         // banister
@@ -2915,7 +3055,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             // LHS MUST be a symbol...
             if (leaf->lvalue.l->type == Leaf::Symbol || leaf->lvalue.l->type == Leaf::Index) {
 
-                Result  value(rhs.isNumber ? rhs.number : 0);
+                Result  value(rhs.isNumber ? rhs : Result(0));
 
                 if (leaf->lvalue.l->type == Leaf::Symbol) {
 
