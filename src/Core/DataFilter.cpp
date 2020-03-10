@@ -143,6 +143,7 @@ static struct {
 
     { "append", 0}, // append vector append(symbol, expr [, at]) -- must reference a symbol
     { "remove", 3}, // remove vector elements remove(symbol, start, count) -- must reference a symbol
+    { "mid", 3}, // subset of a vector mid(a,pos,count) -- returns a vector of size count from pos ion a
 
     // add new ones above this line
     { "", -1 }
@@ -219,7 +220,12 @@ DataFilter::builtins()
             // remove
             returning << "remove(a,pos,count)";
 
+        } else if (i == 51) {
+            // mid
+            returning << "mid(a,pos,count)"; // subset
+
         } else {
+
             QString function;
             function = DataFilterFunctions[i].name + "(";
             for(int j=0; j<DataFilterFunctions[i].parameters; j++) {
@@ -1306,6 +1312,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                     }
 
+                } else if (leaf->function == "mid") {
+
+                    if (leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be mid(a,pos,count)"));
+                    }
+
                 } else if (leaf->function == "banister") {
 
                     // 3 parameters
@@ -2209,6 +2222,31 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             df->symbols.insert(symbol, current);
 
             return Result(current.vector.count());
+        }
+
+        // mid
+        if (leaf->function == "mid") {
+
+            Result returning(0);
+
+            // mid (a, pos, count)
+            // where to place it? -1 on end (not passed as a parameter)
+            Result v = eval(df, leaf->fparms[0], x, m, p, c, s);
+            long pos = eval(df, leaf->fparms[1], x, m, p, c, s).number;
+            long count = eval(df, leaf->fparms[2], x, m, p, c, s).number;
+
+
+            // check.. and return unchanged if out of bounds
+            if (pos < 0 || pos > v.vector.count() || pos+count >v.vector.count()) {
+                return returning;
+            }
+
+            // so lets do it- remember to sum
+            returning.vector = v.vector.mid(pos, count);
+            returning.number = 0;
+            for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
+
+            return returning;
         }
 
         // banister
