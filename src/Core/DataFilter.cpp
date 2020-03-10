@@ -145,6 +145,8 @@ static struct {
     { "remove", 3}, // remove vector elements remove(symbol, start, count) -- must reference a symbol
     { "mid", 3}, // subset of a vector mid(a,pos,count) -- returns a vector of size count from pos ion a
 
+    { "samples", 1 }, // e.g. samples(POWER) - when on analysis view get vector of samples for the current activity}
+
     // add new ones above this line
     { "", -1 }
 };
@@ -223,6 +225,11 @@ DataFilter::builtins()
         } else if (i == 51) {
             // mid
             returning << "mid(a,pos,count)"; // subset
+
+        } else if (i == 52) {
+
+            // get a vector of data series samples
+            returning << "samples(POWER|HR etc)";
 
         } else {
 
@@ -1319,6 +1326,21 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("should be mid(a,pos,count)"));
                     }
 
+                } else if (leaf->function == "samples") {
+
+                    // is the param 1 a valid data series?
+                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc."));
+                    } else {
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        leaf->seriesType = RideFile::seriesForSymbol(symbol);
+                        if (leaf->seriesType==RideFile::none) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        }
+                    }
+
                 } else if (leaf->function == "banister") {
 
                     // 3 parameters
@@ -2149,6 +2171,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         // seq
         if (leaf->function == "length") {
             double len = eval(df, leaf->fparms[0], x, m, p, c, s).vector.count();
+            //fprintf(stderr, "len: %f\n",len); fflush(stderr);
             return Result(len);
         }
 
@@ -2247,6 +2270,32 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
 
             return returning;
+        }
+
+        if (leaf->function == "samples") {
+
+            // nothing to return -- note we check if the ride is open
+            // this is to avoid misuse outside of a filter when working
+            // with a specific ride.
+            if (m == NULL || !m->isOpen() || m->ride(false) == NULL || m->ride(false)->dataPoints().count() == 0) {
+                return Result(0);
+
+            } else {
+
+                // create a vector for the currently selected ride.
+                // should be used with care by the user !!
+                // if they use it in a filter or metric sample() function
+                // it could get ugly.. but thats no reason to avoid
+                // the usefulness of getting the entire data series
+                // in one hit for those that want to work with vectors
+                Result returning(0);
+                foreach(RideFilePoint *p, m->ride()->dataPoints()) {
+                    double value=p->value(leaf->seriesType);
+                    returning.number += value;
+                    returning.vector.append(value);
+                }
+                return returning;
+            }
         }
 
         // banister
