@@ -145,7 +145,8 @@ static struct {
     { "remove", 3}, // remove vector elements remove(symbol, start, count) -- must reference a symbol
     { "mid", 3}, // subset of a vector mid(a,pos,count) -- returns a vector of size count from pos ion a
 
-    { "samples", 1 }, // e.g. samples(POWER) - when on analysis view get vector of samples for the current activity}
+    { "samples", 1 }, // e.g. samples(POWER) - when on analysis view get vector of samples for the current activity
+    { "metrics", 1 }, // e.g. metrics(BikeStress) - when on trend view get vector of activity metrics for current daterange}
 
     // add new ones above this line
     { "", -1 }
@@ -230,6 +231,11 @@ DataFilter::builtins()
 
             // get a vector of data series samples
             returning << "samples(POWER|HR etc)";
+
+        } else if (i == 53) {
+
+            // get a vector of activity metrics - date is integer as days since epoch
+            returning << "metrics(symbol|date)";
 
         } else {
 
@@ -1341,6 +1347,22 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "metrics") {
+
+                    // is the param a symbol and either a metric name or 'date'
+                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("metrics(symbol|date), symbol should be a metric name"));
+
+                    } else {
+
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (symbol != "date" && df->lookupMap.value(symbol,"") == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'date'").arg(symbol));
+                        }
+                    }
+
                 } else if (leaf->function == "banister") {
 
                     // 3 parameters
@@ -2296,6 +2318,38 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 }
                 return returning;
             }
+        }
+
+        if (leaf->function == "metrics") {
+
+            bool wantdate=false;
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            if (symbol == "date") wantdate=true;
+            Result returning(0);
+
+            FilterSet fs;
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+            spec.setDateRange(m->context->currentDateRange());
+
+            // loop through rides for daterange
+            int count=0;
+            foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+                count++;
+
+                double value = wantdate ? QDate(1970,01,01).daysTo(ride->dateTime.date()) :
+                               ride->getForSymbol(symbol);
+
+                returning.number += value;
+                returning.vector.append(value);
+            }
+            return returning;
         }
 
         // banister
