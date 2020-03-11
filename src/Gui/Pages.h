@@ -502,17 +502,36 @@ public:
         LastPart
     };
 
+    enum BicycleStats {
+        StatsLabel = 0,
+        StatsTotalKEMass,
+        StatsFrontWheelKEMass,
+        StatsFrontWheelMass,
+        StatsFrontWheelEquivMass,
+        StatsFrontWheelI,
+        StatsRearWheelKEMass,
+        StatsRearWheelMass,
+        StatsRearWheelEquivMass,
+        StatsRearWheelI,
+        StatsLastPart
+    };
+
     static const SimBicyclePartEntry& GetSimBicyclePartEntry(int e);
 
     static double                     GetBicyclePartValue(Context *context, int e);
 
+public slots:
+    void SetStatsLabelArray(double d = 0.);
+
 private:
     void AddSpecBox(int ePart);
+
 
     Context         *context;
 
     QLabel          *m_LabelArr  [LastPart];
     QDoubleSpinBox  *m_SpinBoxArr[LastPart];
+    QLabel          *m_StatsLabelArr[StatsLastPart];
 };
 
 class BestsMetricsPage : public QWidget

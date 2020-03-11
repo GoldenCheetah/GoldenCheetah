@@ -2296,6 +2296,68 @@ SimBicyclePage::AddSpecBox(int ePart)
     m_SpinBoxArr[ePart] = pSpinBox;
 }
 
+void
+SimBicyclePage::SetStatsLabelArray(double d)
+{
+    double riderMassKG = 0;
+
+    const double bicycleMassWithoutWheelsG = m_SpinBoxArr[SimBicyclePage::BicycleWithoutWheelsG]->value();
+    const double bareFrontWheelG           = m_SpinBoxArr[SimBicyclePage::FrontWheelG          ]->value();
+    const double frontSpokeCount           = m_SpinBoxArr[SimBicyclePage::FrontSpokeCount      ]->value();
+    const double frontSpokeNippleG         = m_SpinBoxArr[SimBicyclePage::FrontSpokeNippleG    ]->value();
+    const double frontWheelOuterRadiusM    = m_SpinBoxArr[SimBicyclePage::FrontOuterRadiusM    ]->value();
+    const double frontRimInnerRadiusM      = m_SpinBoxArr[SimBicyclePage::FrontRimInnerRadiusM ]->value();
+    const double frontRimG                 = m_SpinBoxArr[SimBicyclePage::FrontRimG            ]->value();
+    const double frontRotorG               = m_SpinBoxArr[SimBicyclePage::FrontRotorG          ]->value();
+    const double frontSkewerG              = m_SpinBoxArr[SimBicyclePage::FrontSkewerG         ]->value();
+    const double frontTireG                = m_SpinBoxArr[SimBicyclePage::FrontTireG           ]->value();
+    const double frontTubeOrSealantG       = m_SpinBoxArr[SimBicyclePage::FrontTubeSealantG    ]->value();
+    const double bareRearWheelG            = m_SpinBoxArr[SimBicyclePage::RearWheelG           ]->value();
+    const double rearSpokeCount            = m_SpinBoxArr[SimBicyclePage::RearSpokeCount       ]->value();
+    const double rearSpokeNippleG          = m_SpinBoxArr[SimBicyclePage::RearSpokeNippleG     ]->value();
+    const double rearWheelOuterRadiusM     = m_SpinBoxArr[SimBicyclePage::RearOuterRadiusM     ]->value();
+    const double rearRimInnerRadiusM       = m_SpinBoxArr[SimBicyclePage::RearRimInnerRadiusM  ]->value();
+    const double rearRimG                  = m_SpinBoxArr[SimBicyclePage::RearRimG             ]->value();
+    const double rearRotorG                = m_SpinBoxArr[SimBicyclePage::RearRotorG           ]->value();
+    const double rearSkewerG               = m_SpinBoxArr[SimBicyclePage::RearSkewerG          ]->value();
+    const double rearTireG                 = m_SpinBoxArr[SimBicyclePage::RearTireG            ]->value();
+    const double rearTubeOrSealantG        = m_SpinBoxArr[SimBicyclePage::RearTubeSealantG     ]->value();
+    const double cassetteG                 = m_SpinBoxArr[SimBicyclePage::CassetteG            ]->value();
+
+    const double frontWheelG = bareFrontWheelG + frontRotorG + frontSkewerG + frontTireG + frontTubeOrSealantG;
+    const double frontWheelRotatingG = frontRimG + frontTireG + frontTubeOrSealantG + (frontSpokeCount * frontSpokeNippleG);
+    const double frontWheelCenterG = frontWheelG - frontWheelRotatingG;
+
+    BicycleWheel frontWheel(frontWheelOuterRadiusM, frontRimInnerRadiusM, frontWheelG / 1000, frontWheelCenterG /1000, frontSpokeCount, frontSpokeNippleG/1000);
+
+    const double rearWheelG = bareRearWheelG + cassetteG + rearRotorG + rearSkewerG + rearTireG + rearTubeOrSealantG;
+    const double rearWheelRotatingG = rearRimG + rearTireG + rearTubeOrSealantG + (rearSpokeCount * rearSpokeNippleG);
+    const double rearWheelCenterG = rearWheelG - rearWheelRotatingG;
+
+    BicycleWheel rearWheel (rearWheelOuterRadiusM,  rearRimInnerRadiusM,  rearWheelG / 1000,  rearWheelCenterG / 1000,  rearSpokeCount,  rearSpokeNippleG/1000);
+
+    BicycleConstants constants(
+        m_SpinBoxArr[SimBicyclePage::CRR]->value(),
+        m_SpinBoxArr[SimBicyclePage::Cm] ->value(),
+        m_SpinBoxArr[SimBicyclePage::Cd] ->value(),
+        m_SpinBoxArr[SimBicyclePage::Am2]->value(),
+        m_SpinBoxArr[SimBicyclePage::Tk] ->value());
+
+    Bicycle bicycle(NULL, constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
+
+    m_StatsLabelArr[StatsLabel]              ->setText(QString(tr("------ Derived Stats -------")));
+    m_StatsLabelArr[StatsTotalKEMass]        ->setText(QString(tr("Total KEMass:         \t%1g")).arg(bicycle.KEMass()));
+    m_StatsLabelArr[StatsFrontWheelKEMass]   ->setText(QString(tr("FrontWheel KEMass:    \t%1g")).arg(bicycle.FrontWheel().KEMass() * 1000));
+    m_StatsLabelArr[StatsFrontWheelMass]     ->setText(QString(tr("FrontWheel Mass:      \t%1g")).arg(bicycle.FrontWheel().MassKG() * 1000));
+    m_StatsLabelArr[StatsFrontWheelEquivMass]->setText(QString(tr("FrontWheel EquivMass: \t%1g")).arg(bicycle.FrontWheel().EquivalentMassKG() * 1000));
+    m_StatsLabelArr[StatsFrontWheelI]        ->setText(QString(tr("FrontWheel I:         \t%1")).arg(bicycle.FrontWheel().I()));
+    m_StatsLabelArr[StatsRearWheelKEMass]    ->setText(QString(tr("Rear Wheel KEMass:    \t%1g")).arg(bicycle.RearWheel().KEMass() * 1000));
+    m_StatsLabelArr[StatsRearWheelMass]      ->setText(QString(tr("Rear Wheel Mass:      \t%1g")).arg(bicycle.RearWheel().MassKG() * 1000));
+    m_StatsLabelArr[StatsRearWheelEquivMass] ->setText(QString(tr("Rear Wheel EquivMass: \t%1g")).arg(bicycle.RearWheel().EquivalentMassKG() * 1000));
+    m_StatsLabelArr[StatsRearWheelI]         ->setText(QString(tr("Rear Wheel I:         \t%1")).arg(bicycle.RearWheel().I()));
+}
+
+
 SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     QVBoxLayout *all = new QVBoxLayout(this);
@@ -2348,7 +2410,7 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
                                "slope mode' option is set on the training preferences\n"
                                " tab."), row, column, alignment);
 
-    int section2FirstRow = row + 1;;
+    int section2FirstRow = row + 1;
 
     // Now add section 2.
     row = section2FirstRow;
@@ -2365,8 +2427,33 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
         row++;
     }
 
+    // There is still room below section 2... lets put in some useful stats
+    // about the virtual bicycle.
+
+    int statsFirstRow = row + 1;
+    column = 2;
+
+    // Create Stats Labels
+    for (int i = StatsLabel; i < StatsLastPart; i++) {
+        m_StatsLabelArr[i] = new QLabel();
+    }
+
+    // Populate Stats Labels
+    SetStatsLabelArray();
+
+    row = statsFirstRow;
+    for (int i = StatsLabel; i < StatsLastPart; i++) {
+        grid->addWidget(m_StatsLabelArr[i], row, column, alignment);
+        row++;
+    }
+
     all->addLayout(grid);
     all->addStretch();
+
+    for (int i = 0; i < LastPart; i++) {
+        connect(m_SpinBoxArr[i], SIGNAL(valueChanged(double)), this, SLOT(SetStatsLabelArray(double)));
+    }
+
 }
 
 qint32
