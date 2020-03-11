@@ -160,6 +160,8 @@ static struct {
     { "head", 2 }, // head(list, n) - returns vector of first n elements of list (or fewer if not so big)
     { "tail", 2 }, // tail(list, n) - returns vector of last n elements of list (or fewer if not so big)
 
+    { "meanmax", 1 }, // meanmax(POWER) - when on trend view get a vector of meanmaximal data for the specific series
+
     // add new ones above this line
     { "", -1 }
 };
@@ -268,6 +270,10 @@ DataFilter::builtins()
 
             // tail
             returning << "tail(list, n)";
+
+        } else if (i== 58) {
+            // meanmax
+            returning << "meanmax(POWER|WPK|HR|CADENCE|SPEED)";
 
         } else {
 
@@ -1441,6 +1447,21 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                        DataFiltererrors << QString(tr("argsort(ascend|descend, list), need to specify ascend or descend"));
                     }
 
+                } else if (leaf->function == "meanmax") {
+
+                    // is the param 1 a valid data series?
+                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("meanmax(SERIES), SERIES should be POWER, HEARTRATE etc."));
+                    } else {
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        leaf->seriesType = RideFile::seriesForSymbol(symbol);
+                        if (leaf->seriesType==RideFile::none) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        }
+                    }
+
                 } else if (leaf->function == "banister") {
 
                     // 3 parameters
@@ -2427,6 +2448,29 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 returning.number += value;
                 returning.vector.append(value);
             }
+            return returning;
+        }
+
+        // meanmax array
+        if (leaf->function == "meanmax") {
+
+            Result returning(0);
+
+            // go get it for the current date range
+            RideFileCache *bestsCache = new RideFileCache(m->context, m->context->currentDateRange().from, m->context->currentDateRange().to, false, QStringList(), true, NULL);
+
+            // extract the meanmaxarray
+            returning.vector = bestsCache->meanMaxArray(leaf->seriesType);
+
+            // really annoying that it starts from 0s not 1s, this is a legacy
+            // bug that we cannot fix easily, but this is new, so lets not
+            // have that damned 0s 0w entry!
+            if (returning.vector.count()>0) returning.vector.remove(0);
+
+            // compute the sum, ugh.
+            for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
+
+            // return a vector
             return returning;
         }
 
