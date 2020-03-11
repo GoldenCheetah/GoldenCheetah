@@ -20,10 +20,17 @@
 #define _LOCATION_INTERPOLATION_H
 
 #include <tuple>
+#include <ratio>
 
 #include "qwt_math.h"
 
 struct geolocation;
+
+#if defined(_MSC_VER)
+#define NOINLINE __declspec(noinline)
+#else
+#define NOINLINE
+#endif
 
 class v3
 {
@@ -169,15 +176,127 @@ struct SphericalTwoPointInterpolator : public TwoPointInterpolator
     xyz InterpolateNext(xyz p0, xyz p1);
 };
 
+// Coefficient caching. A large benefit is that by performing compute separate
+// from use the use will be inlined. Cache efficiency depends on route point
+// distances but typical rides cache succeeds 5-10 times before invalidated.
+class LazyCoefficients
+{
+    mutable bool m_CoefsValid;
+public:
+    bool Valid()       const { return m_CoefsValid; }
+    void Validate()    const { m_CoefsValid = true; }
+    void Invalidate()  const { m_CoefsValid = false; }
+
+    LazyCoefficients() : m_CoefsValid(false) {}
+};
+
+template <typename T_SourceCoefType, typename T_Ratio>
+class LazyLocationCoefficients : public LazyCoefficients
+{
+    // Cache of computed coefficients for location computation.
+    mutable std::tuple<double, double, double, double> m_coefs;
+
+    // Computes and stores coefficients for cubic splne location calculation.
+    NOINLINE void Compute(const T_SourceCoefType& base) const
+    {
+        // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
+        // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
+
+        double t = (double)T_Ratio::num / (double)T_Ratio::den;
+
+        double p0 = std::get<0>(base);
+        double p1 = std::get<1>(base);
+        double p2 = std::get<2>(base);
+        double p3 = std::get<3>(base);
+
+        double A = ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1);
+        double B = ((-p3 - 2 * p2 + p1 + 2 * p0) * t + 3 * p2 - 3 * p1);
+        double C = (p2 - p0) * t;
+        double D = p1;
+
+        std::get<0>(m_coefs) = A;
+        std::get<1>(m_coefs) = B;
+        std::get<2>(m_coefs) = C;
+        std::get<3>(m_coefs) = D;
+
+        Validate();
+    }
+
+public:
+
+    void Get(const T_SourceCoefType &base, double &A, double &B, double &C, double &D) const
+    {
+        if (!Valid()) {
+            Compute(base);
+        }
+
+        A = std::get<0>(m_coefs);
+        B = std::get<1>(m_coefs);
+        C = std::get<2>(m_coefs);
+        D = std::get<3>(m_coefs);
+    }
+};
+
+template <typename T_SourceCoefType, typename T_Ratio>
+class LazyTangentCoefficients : public LazyCoefficients
+{
+    // Cache of computed coefficients for tangent computation.
+    mutable std::tuple<double, double, double> m_coefs;
+
+    // Computes and stores coefficients for cubic splne tangent calculation.
+    NOINLINE void Compute(const T_SourceCoefType &base) const
+    {
+        // d f(u)/ du of Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
+        // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
+        double t = (double)T_Ratio::num / (double)T_Ratio::den;
+
+        double p0 = std::get<0>(base);
+        double p1 = std::get<1>(base);
+        double p2 = std::get<2>(base);
+        double p3 = std::get<3>(base);
+
+        double A = 3 * ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1);
+        double B = 2 * ((-p3 - 2 * p2 + p1 + 2 * p0)*t + 3 * p2 - 3 * p1);
+        double C = (p2 - p0) * t;
+
+        std::get<0>(m_coefs) = A;
+        std::get<1>(m_coefs) = B;
+        std::get<2>(m_coefs) = C;
+
+        Validate();
+    }
+
+public:
+
+    LazyTangentCoefficients() {};
+
+    void Get(const T_SourceCoefType &base, double &A, double &B, double &C) const
+    {
+        if (!Valid()) {
+            Compute(base);
+        }
+
+        A = std::get<0>(m_coefs);
+        B = std::get<1>(m_coefs);
+        C = std::get<2>(m_coefs);
+    }
+};
+
+
 class UnitCatmullRomInterpolator
 {
-    // Optimization Note: Currently everything is computed from control
-    // parameters in m_p. If someone wished this to run faster the
-    // roots and coefficients could be precomputed whenever init is called.
+    // Control curvature:
+    //   0   is standard (straigtest)
+    //   0.5 is called centripetal
+    //   1   is chordal (loopiest)
+    typedef std::ratio<1, 2> T;
 
-    std::tuple<double, double, double, double> m_p;
+    typedef std::tuple<double, double, double, double> CoefType;
 
-    static double T(); // rounding coefficient
+    CoefType m_baseCoefs;
+
+    LazyLocationCoefficients<CoefType, T> m_locCoefs;
+    LazyTangentCoefficients<CoefType, T>  m_tanCoefs;
 
 public:
 
@@ -359,111 +478,114 @@ public:
         m_DidChange = true;
     }
 
+    bool NeedsUpdate() { return m_DidChange; }
+
     // Update interpolator if input state has changed
     // This method synthesizes fake points to allow interpolation on partially filled point queue
     // which occurs when there are insufficient points or at the start and end of the interpolation.
-    void update()
+    NOINLINE void Update()
     {
         // Queue changed, update interpolator with new points, interpolate new points if necessary
-        if (m_DidChange) {
-            xyz pm1(m_PointWindow.pm1());
-            xyz p0(m_PointWindow.p0());
-            xyz p1(m_PointWindow.p1());
-            xyz p2(m_PointWindow.p2());
+        xyz pm1(m_PointWindow.pm1());
+        xyz p0(m_PointWindow.p0());
+        xyz p1(m_PointWindow.p1());
+        xyz p2(m_PointWindow.p2());
 
-            switch (m_PointWindow.Count()) {
-            case 4:
-                // All points are set.
-                break;
-
-            case 3:
-                // Either pm1 or p2 is missing, interpolate the missing one.
-            {
-                xyz *s, *e, *pr;
-                if (!m_PointWindow.haspm1()) {
-                    s = &p1;
-                    e = &p0;
-                    pr = &pm1;
-                } else {
-                    s = &p0;
-                    e = &p1;
-                    pr = &p2;
-                }
-                *pr = this->InterpolateNext(*s, *e);
-            }
+        switch (m_PointWindow.Count()) {
+        case 4:
+            // All points are set.
             break;
 
-            case 2:
-
-            {
-                xyz *pr0, *pr1, *s0, *s1, *e0, *e1;
-
-                // pm1 and p2
-                // p1 and p2
-                if (!m_PointWindow.haspm1() && !m_PointWindow.hasp0()) {
-                    pr0 = &p0;
-                    s0 = &p2;
-                    e0 = &p1;
-
-                    pr1 = &pm1;
-                    s1 = &p1;
-                    e1 = pr0;
-                } else if (!m_PointWindow.haspm1()) {
-                    // interpolate to pm1 and p2
-                    pr0 = &pm1;
-                    s0 = &p1;
-                    e0 = &p0;
-
-                    pr1 = &p2;
-                    s1 = &p0;
-                    e1 = &p1;
-                } else {
-                    // interpolate to p1 and p2
-                    pr0 = &p1;
-                    s0 = &pm1;
-                    e0 = &p0;
-
-                    pr1 = &p2;
-                    s1 = &p0;
-                    e1 = pr0;
-                }
-
-                *pr0 = this->InterpolateNext(*s0, *e0);
-                *pr1 = this->InterpolateNext(*s1, *e1);
+        case 3:
+            // Either pm1 or p2 is missing, interpolate the missing one.
+        {
+            xyz *s, *e, *pr;
+            if (!m_PointWindow.haspm1()) {
+                s = &p1;
+                e = &p0;
+                pr = &pm1;
             }
-            break;
-
-            case 1:
-                // one point is present, propagate it to remaining entries.
-            {
-                xyz t = p2;
-                if (m_PointWindow.hasp1()) t = p1;
-                else if (m_PointWindow.hasp0()) t = p0;
-                else if (m_PointWindow.haspm1()) t = pm1;
-
-                pm1 = t;
-                p0 = t;
-                p1 = t;
-                p2 = t;
+            else {
+                s = &p0;
+                e = &p1;
+                pr = &p2;
             }
-            break;
-
-            case 0:
-            {
-                // no points, default 0.0 is as good as anything.
-                // or assert?
-                xyz zero(0, 0, 0);
-                pm1 = zero;
-                p0 = zero;
-                p1 = zero;
-                p2 = zero;
-            }
-            break;
-            }
-
-            m_Interpolator.Init(pm1, p0, p1, p2);
-            m_DidChange = false;
+            *pr = this->InterpolateNext(*s, *e);
         }
+        break;
+
+        case 2:
+
+        {
+            xyz *pr0, *pr1, *s0, *s1, *e0, *e1;
+
+            // pm1 and p2
+            // p1 and p2
+            if (!m_PointWindow.haspm1() && !m_PointWindow.hasp0()) {
+                pr0 = &p0;
+                s0 = &p2;
+                e0 = &p1;
+
+                pr1 = &pm1;
+                s1 = &p1;
+                e1 = pr0;
+            }
+            else if (!m_PointWindow.haspm1()) {
+                // interpolate to pm1 and p2
+                pr0 = &pm1;
+                s0 = &p1;
+                e0 = &p0;
+
+                pr1 = &p2;
+                s1 = &p0;
+                e1 = &p1;
+            }
+            else {
+                // interpolate to p1 and p2
+                pr0 = &p1;
+                s0 = &pm1;
+                e0 = &p0;
+
+                pr1 = &p2;
+                s1 = &p0;
+                e1 = pr0;
+            }
+
+            *pr0 = this->InterpolateNext(*s0, *e0);
+            *pr1 = this->InterpolateNext(*s1, *e1);
+        }
+        break;
+
+        case 1:
+            // one point is present, propagate it to remaining entries.
+        {
+            xyz t = p2;
+            if (m_PointWindow.hasp1()) t = p1;
+            else if (m_PointWindow.hasp0()) t = p0;
+            else if (m_PointWindow.haspm1()) t = pm1;
+
+            pm1 = t;
+            p0 = t;
+            p1 = t;
+            p2 = t;
+        }
+        break;
+
+        case 0:
+        {
+            // no points, default 0.0 is as good as anything.
+            // or assert?
+            xyz zero(0, 0, 0);
+            pm1 = zero;
+            p0 = zero;
+            p1 = zero;
+            p2 = zero;
+        }
+        break;
+        }
+
+        m_Interpolator.Init(pm1, p0, p1, p2);
+        m_DidChange = false;
     }
 
     // Interpolate between points[1] and points[2].
@@ -472,7 +594,8 @@ public:
     xyz Location(double frac)
     {
         // Ensure interpolator has current state - synthesize fake points if needed.
-        update();
+        if (NeedsUpdate())
+            Update();
 
         return m_Interpolator.Location(frac);
     }
@@ -483,7 +606,8 @@ public:
     xyz Tangent(double frac)
     {
         // Ensure interpolator has current state - synthesize fake points if needed.
-        update();
+        if (NeedsUpdate())
+            Update();
 
         return m_Interpolator.Tangent(frac);
     }
@@ -756,7 +880,7 @@ public:
 
             // Step 3
             double linearDistance = p2.DistanceFrom(pm1);
-            if (linearDistance < 0.000001)
+            if (linearDistance < 0.0001)
                 break;
 
             // Step 4

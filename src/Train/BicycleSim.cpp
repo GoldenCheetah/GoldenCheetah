@@ -175,43 +175,43 @@ struct MotionStatePair
     double T0() const { return m_t0; }
     double T1() const { return m_t1; }
     double DT() const { return m_t1 - m_t0; }
-    double CalcV(const BicycleSimState& s, double v, double t) const { return m_pb->V(s, v, t); }
 
     BicycleSimState Interpolate(double t) const
     {
         return BicycleSimState::Interpolate(m_s0, m_s1, m_t0, m_t1, t);
     }
 
+    double CalcV(double v, double t) const 
+    {
+        // Linear interpolate the state info before sampling at t.
+        BicycleSimState st = this->Interpolate(t);
+
+        double newV = m_pb->V(st, v, t);
+
+        return newV;
+    }
+
     double dVdT(double v, double t) const
     {
-        static const double s_step = 0.01;
+        // Linear interpolate the state info before sampling at t.
+        BicycleSimState st = this->Interpolate(t);
 
-        // Linear interpolate the state info before sampling velocities at t and t+step.
-        BicycleSimState tn0 = this->Interpolate(t);
-        double v0 = CalcV(tn0, v, t);
-
-        BicycleSimState tn1 = this->Interpolate(t + s_step);
-        double v1 = CalcV(tn1, v, t + s_step);
-
-        double m = (v1 - v0) / s_step;
+        double m = m_pb->DV(st, v);
 
         return m;
     }
 };
 
-// Compute new velocity from current state and impulse duration.
-double Bicycle::V(const BicycleSimState &simState,     // current sim state
-                  double v,                            // current velocity
-                  double dt) const                     // duration that state was applied
+// Returns power needed to maintain speed v against current simstate.
+double Bicycle::WattsForV(const BicycleSimState &simState, double v) const
 {
-    if (dt == 0.0) return v;
-
     double sl = simState.Slope() / 100; // 10% = 0.1
     const double CrV = 0.1;             // Coefficient for velocity - dependent dynamic rolling resistance, here approximated with 0.1
     double CrVn = CrV * cos(sl);        // Coefficient for the dynamic rolling resistance, normalized to road inclination; CrVn = CrV*cos(slope)
-    double Beta = atan(sl);
-    double cosBeta = cos(Beta);
-    double sinBeta = sin(Beta);
+
+    double cosBeta = 1 / std::sqrt(sl*sl + 1); // cos(atan(sl))
+    double sinBeta = sl * cosBeta;             // sin(atan(sl))
+
     double m = MassKG();
     double Frg = s_g0 * m * (m_constants.m_crr * cosBeta + sinBeta);
 
@@ -221,13 +221,38 @@ double Bicycle::V(const BicycleSimState &simState,     // current sim state
 
     const double W = 0;                 // Windspeed
     double wattsForV = m_constants.m_Cm * v * (CdARho / 2 * (v + W)*(v + W) + Frg + v * CrVn);
+
+    return wattsForV;
+}
+
+// Return ms/s from current state, speed and impulse duration.
+// This is linear application of watts over time to determine
+// new speed.
+double Bicycle::V(const BicycleSimState &simState,     // current sim state
+                  double v,                            // current speed
+                  double dt) const                     // duration that state was applied
+{
+    // Zero means no impulse, no change.
+    //Negative means... we're not going there.
+    if (dt <= 0.0) return v;
+
+    double wattsForV = WattsForV(simState, v);
     double extraWatts = simState.Watts() - wattsForV;
 
-    double j = KEFromV(v);
-    double newJ = j + (extraWatts * dt);
-    double newV = VFromKE(newJ);
+    double j = KEFromV(v);               // state and speed to joules
+    double newJ = j + (extraWatts * dt); // joules + (watts * time == more joules)
+    double newV = VFromKE(newJ);         // new joules back to speed.
 
     return newV;
+}
+
+// returns m/s^2 for current state.
+double Bicycle::DV(const BicycleSimState &simState,  // current sim state
+                   double v) const                   // current speed
+{
+    double newV = V(simState, v, 1.);    // new speed with 1s impulse.
+                                         
+    return (newV - v);                   // implicit divide by 1s.
 }
 
 template <typename T>
@@ -235,8 +260,10 @@ SpeedDistance
 Integrate_EulerDirect(const T &state, double v)
 {
     double dt = state.DT();
-    double vt = state.CalcV(state.m_s1, v, dt);
+    double vt = state.CalcV(v, dt);
+
     SpeedDistance ret = { vt, vt * dt};
+
     return ret;
 }
 
@@ -536,6 +563,7 @@ struct Integrator
             Integrate_Hairer8<T>,
             Integrate_KahanLi8<T>
         };
+
         return fpa[e](state, v);
     }
 };

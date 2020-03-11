@@ -192,10 +192,13 @@ xyz SphericalTwoPointInterpolator::InterpolateNext(xyz p0, xyz p1)
 
 void UnitCatmullRomInterpolator::Init(double pm1, double p0, double p1, double p2)
 {
-    std::get<0>(m_p) = pm1;
-    std::get<1>(m_p) = p0;
-    std::get<2>(m_p) = p1;
-    std::get<3>(m_p) = p2;
+    std::get<0>(m_baseCoefs) = pm1;
+    std::get<1>(m_baseCoefs) = p0;
+    std::get<2>(m_baseCoefs) = p1;
+    std::get<3>(m_baseCoefs) = p2;
+
+    m_locCoefs.Invalidate();
+    m_tanCoefs.Invalidate();
 }
 
 UnitCatmullRomInterpolator::UnitCatmullRomInterpolator()
@@ -208,53 +211,27 @@ UnitCatmullRomInterpolator::UnitCatmullRomInterpolator(double pm1, double p0, do
     Init(pm1, p0, p1, p2);
 }
 
-double UnitCatmullRomInterpolator::T()
-{
-    // Control curvature:
-    //   0   is standard (straigtest)
-    //   0.5 is called centripetal
-    //   1   is chordal (loopiest)
-    double t = 0.5;
-
-    return t;
-}
-
 double UnitCatmullRomInterpolator::Location(double u) const
 {
-    double t = T();
+    double A, B, C, D;
+    m_locCoefs.Get(m_baseCoefs, A, B, C, D);
 
-    double p0 = std::get<0>(m_p);
-    double p1 = std::get<1>(m_p);
-    double p2 = std::get<2>(m_p);
-    double p3 = std::get<3>(m_p);
-
-    // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
-    // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
-
-    double retval = p0 * u * (u * (2 * t - t * u) - t) +
-        u * (u * (u * (p1 * (-t) + 2 * p1 + p2 * (t - 2) + p3 * t) + p1 * t - 3 * p1 + p2 * (3 - 2 * t) - p3 * t) + p2 * t) + p1;
+    double retval = (u * u * u) * A +
+                    (u * u)     * B +
+                    (u)         * C +
+                                  D;
 
     return retval;
 }
 
 double UnitCatmullRomInterpolator::Tangent(double u) const
 {
-    double t = T();
+    double A, B, C;
+    m_tanCoefs.Get(m_baseCoefs, A, B, C);
 
-    double p0 = std::get<0>(m_p);
-    double p1 = std::get<1>(m_p);
-    double p2 = std::get<2>(m_p);
-    double p3 = std::get<3>(m_p);
-
-    // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
-    // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
-
-    // d f(u)/du
-
-    // Closed form slope for cubic at point u in 0..1.
-    double retval = 3 * (u *u) * ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1) +
-                    2 * (u)    * ((-p3 - 2 * p2 + p1 + 2 * p0)*t + 3 * p2 - 3 * p1) +
-                                 (p2 - p0) * t;
+    double retval = (u * u) * A +
+                    (u)     * B +
+                              C;
 
     return retval;
 }
@@ -264,18 +241,10 @@ double UnitCatmullRomInterpolator::Tangent(double u) const
 // the distance spline which is monotonic, etc.)
 bool UnitCatmullRomInterpolator::Inverse(double r, double &u) const
 {
-    const double t = T();
+    double a, b, c, d;
+    m_locCoefs.Get(m_baseCoefs, a, b, c, d);
 
-    double p0 = std::get<0>(m_p);
-    double p1 = std::get<1>(m_p);
-    double p2 = std::get<2>(m_p);
-    double p3 = std::get<3>(m_p);
-
-    // Normalized form of equation from Location.
-    double a = ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1);
-    double b = ((-p3 - 2 * p2 + p1 + 2 * p0)*t + 3 * p2 - 3 * p1);
-    double c = (p2 - p0) * t;
-    double d = p1 - r; // "- r" because root finder expects coefficients for expression that equals zero.
+    d -= r; // "- r" because root finder solves expressions that equal zero.
 
     Roots roots = BlinnCubicSolver(a, b, c, d);
 
