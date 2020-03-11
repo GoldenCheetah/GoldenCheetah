@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QDebug>
 #include <QDir>
+#include <QVector>
 #include <QRegularExpression>
 
 namespace Utils
@@ -274,6 +275,26 @@ removeDP(QString in)
     } else {
         return in;
     }
+}
+
+static bool qpointflessthan(const QPointF &s1, const QPointF &s2) { return s1.x() < s2.x(); }
+static bool qpointfgreaterthan(const QPointF &s1, const QPointF &s2) { return s1.x() > s2.x(); }
+
+QVector<int>
+argsort(QVector<double> &v, bool ascending)
+{
+    // we will use an x/y - x is the sort, y is the index
+    QVector<QPointF> tuple;
+    for(int i=0; i<v.count(); i++) tuple << QPointF(v[i],i);
+
+    if (ascending) qSort(tuple.begin(), tuple.end(), qpointflessthan);
+    else qSort(tuple.begin(), tuple.end(), qpointfgreaterthan);
+
+    // now create vector of indexes
+    QVector<int> returning;
+    for(int i=0; i<tuple.count(); i++) returning << static_cast<int>(tuple[i].y());
+
+    return returning;
 }
 
 };

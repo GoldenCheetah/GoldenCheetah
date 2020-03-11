@@ -20,6 +20,7 @@
 #define _GC_Utils_h
 
 // Common shared utility functions
+#include <QVector>
 
 #ifdef WIN32
 #define PATHSEP ";"
@@ -37,6 +38,7 @@ namespace Utils
     QString jsonunprotect(const QString &buffer);
     QStringList searchPath(QString path, QString binary, bool isexec=true);
     QString removeDP(QString);
+    QVector<int> argsort(QVector<double>&, bool ascending=false);
 };
 
 

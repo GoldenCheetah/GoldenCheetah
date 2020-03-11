@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Utils.h"
 #include "DataFilter.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -148,6 +149,17 @@ static struct {
     { "samples", 1 }, // e.g. samples(POWER) - when on analysis view get vector of samples for the current activity
     { "metrics", 1 }, // e.g. metrics(BikeStress) - when on trend view get vector of activity metrics for current daterange}
 
+    { "argsort", 2 }, // argsort(ascend|descend, list) - return a sorting index (ala numpy.argsort).
+
+    { "sort", 0 }, // sort(ascend|descend, list1 [, list2, listn]) - sorts each list together, based upon list1, no limit to the
+                   // number of lists but they must have the same length. the first list contains the values that define
+                   // the sort order. since the sort is 'in-situ' the lists must all be user symbols. returns number of items
+                   // sorted. this is impure from a functional programming perspective, but allows us to avoid using dataframes
+                   // to manage x,y,z,t style data series when sorting.
+
+    { "head", 2 }, // head(list, n) - returns vector of first n elements of list (or fewer if not so big)
+    { "tail", 2 }, // tail(list, n) - returns vector of last n elements of list (or fewer if not so big)
+
     // add new ones above this line
     { "", -1 }
 };
@@ -236,6 +248,26 @@ DataFilter::builtins()
 
             // get a vector of activity metrics - date is integer as days since epoch
             returning << "metrics(symbol|date)";
+
+        } else if (i == 54) {
+
+            // argsort
+            returning << "argsort(ascend|descend, list)";
+
+        } else if (i == 55) {
+
+            // argsort
+            returning << "sort(ascend|descend, list [, list2 .. ,listn])";
+
+        } else if (i == 56) {
+
+            // head
+            returning << "head(list, n)";
+
+        } else if (i == 57) {
+
+            // tail
+            returning << "tail(list, n)";
 
         } else {
 
@@ -949,8 +981,16 @@ void Leaf::print(int level, DataFilterRuntime *df)
         break;
     case Leaf::Symbol :
         {
-            double value = (df ? df->symbols.value(*lvalue.n).number : 0);
-            qDebug()<<"symbol"<<*lvalue.n<<dynamic<<value;
+            Result value = df->symbols.value(*lvalue.n), Result(11);
+            qDebug()<<"symbol"<<*lvalue.n<<dynamic<<value.number;
+
+            // output vectors, truncate to 20 els
+            if (value.vector.count()) {
+                QString output = QString("Vector[%1]:").arg(value.vector.count());
+                for(int i=0; i<value.vector.count() && i<20; i++)
+                    output += QString("%1, ").arg(value.vector[i]);
+                qDebug() <<output;
+            }
         }
         break;
     case Leaf::Logical :
@@ -1361,6 +1401,44 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'date'").arg(symbol));
                         }
+                    }
+
+                } else if (leaf->function == "sort") {
+
+                    if (leaf->fparms.count() < 2) {
+                        leaf->inerror = true;
+                       DataFiltererrors << QString(tr("argsort(ascend|descend, list [, .. list n])"));
+                    }
+
+                    // need ascend|descend then a list
+                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("argsort(ascend|descend, list [, .. list n]), need to specify ascend or descend"));
+                    }
+
+                    // need all remaining parameters to be symbols
+                    for(int i=1; i<fparms.count(); i++) {
+
+                        // check parameter is actually a symbol
+                        if (leaf->fparms[i]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("sort: list arguments must be a symbol"));
+                        } else {
+                            QString symbol = *(leaf->fparms[i]->lvalue.n);
+                            if (!df->symbols.contains(symbol)) {
+                                DataFiltererrors << QString(tr("'%1' is not a user symbol").arg(symbol));
+                                leaf->inerror = true;
+                            }
+
+                        }
+                    }
+
+                } else if (leaf->function == "argsort") {
+
+                    // need ascend|descend then a list
+                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("argsort(ascend|descend, list), need to specify ascend or descend"));
                     }
 
                 } else if (leaf->function == "banister") {
@@ -2190,7 +2268,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             return returning;
         }
 
-        // seq
+        // length
         if (leaf->function == "length") {
             double len = eval(df, leaf->fparms[0], x, m, p, c, s).vector.count();
             //fprintf(stderr, "len: %f\n",len); fflush(stderr);
@@ -2349,6 +2427,103 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 returning.number += value;
                 returning.vector.append(value);
             }
+            return returning;
+        }
+
+        // argsort
+        if (leaf->function == "argsort") {
+            Result returning(0);
+
+            // ascending or descending?
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            bool ascending= (symbol=="ascend") ? true : false;
+
+            // use the utils function to actually do it
+            Result v = eval(df, leaf->fparms[1], x, m, p, c, s);
+            QVector<int> r = Utils::argsort(v.vector, ascending);
+
+            // put the index into the result we are returning.
+            foreach(int x, r) {
+                returning.vector << static_cast<double>(x);
+                returning.number += x;
+            }
+
+            return returning;
+        }
+
+        // sort
+        if (leaf->function == "sort") {
+
+            // ascend/descend?
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            bool ascending=symbol=="ascend" ? true : false;
+
+            // evaluate all the lists
+            for(int i=1; i<fparms.count(); i++) eval(df, leaf->fparms[i], x, m, p, c, s);
+
+            // get first and argsort it
+            symbol = *(leaf->fparms[1]->lvalue.n);
+            Result current = df->symbols.value(symbol);
+            long len = current.vector.count();
+            QVector<int> index = Utils::argsort(current.vector, ascending);
+
+            // sort all the lists in place
+            int count=0;
+            for (int i=1; i<leaf->fparms.count(); i++) {
+                // get the vector
+                symbol = *(leaf->fparms[i]->lvalue.n);
+                Result current = df->symbols.value(symbol);
+
+                // diff length?
+                if (current.vector.count() != len) {
+                    fprintf(stderr, "sort list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
+                    continue;
+                }
+
+                // ok so now we can adjust
+                QVector<double> replace = current.vector;
+                for(int idx=0; idx<index.count(); idx++) replace[idx] = current.vector[index[idx]];
+                current.vector = replace;
+
+                // replace
+                df->symbols.insert(symbol, current);
+
+                count++;
+            }
+            return Result(count);
+        }
+
+        if (leaf->function == "head") {
+
+            Result returning(0);
+
+            Result list= eval(df, leaf->fparms[0], x, m, p, c, s);
+            Result count= eval(df, leaf->fparms[1], x, m, p, c, s);
+            int n=count.number;
+            if (n > list.vector.count()) n=list.vector.count();
+
+            if (n<=0) return Result(0);// nope
+
+            returning.vector = list.vector.mid(0, n);
+            for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
+
+            return returning;
+        }
+
+        if (leaf->function == "tail") {
+
+            Result returning(0);
+
+            Result list= eval(df, leaf->fparms[0], x, m, p, c, s);
+            Result count= eval(df, leaf->fparms[1], x, m, p, c, s);
+            int n=count.number;
+            if (n > list.vector.count()) n=list.vector.count();
+
+            if (n<=0) return Result(0);// nope
+
+            returning.vector = list.vector.mid(list.vector.count()-n, n);
+            for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
+
             return returning;
         }
 
