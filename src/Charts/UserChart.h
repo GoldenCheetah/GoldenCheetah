@@ -56,6 +56,12 @@ class UserChart : public GcChartWindow {
         // runtime - ride item changed
         void setRide(RideItem*);
 
+        // runtime - date range was selected
+        void setDateRange(DateRange);
+
+        // redraw
+        void refresh();
+
         // global config changed?
         void configChanged(qint32);
 
@@ -76,6 +82,9 @@ class UserChart : public GcChartWindow {
         bool stale;
         RideItem *last; // the last ride we plotted
 
+        RideItem *ride;
+        DateRange dr;
+
         GenericChart *chart;
         UserChartSettings *settingsTool;
 };
@@ -85,10 +94,11 @@ class UserChartSettings : public QWidget {
     Q_OBJECT
 
     public:
-        UserChartSettings(Context *, GenericChartInfo &, QList<GenericSeriesInfo> &, QList<GenericAxisInfo> &);
+        UserChartSettings(Context *, bool rangemode, GenericChartInfo &, QList<GenericSeriesInfo> &, QList<GenericAxisInfo> &);
 
     private:
         Context *context;
+        bool rangemode;
 
         // settings maintained here
         GenericChartInfo &chartinfo;
@@ -155,7 +165,7 @@ class EditUserSeriesDialog : public QDialog
     Q_OBJECT
 
     public:
-        EditUserSeriesDialog(Context *,GenericSeriesInfo &);
+        EditUserSeriesDialog(Context *, bool rangemode, GenericSeriesInfo &);
 
     public slots:
         void okClicked();

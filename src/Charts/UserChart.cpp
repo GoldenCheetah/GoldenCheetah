@@ -34,7 +34,7 @@
 UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context), context(context), rangemode(rangemode), stale(true), last(NULL)
 {
     // the config
-    settingsTool = new UserChartSettings(context, chartinfo, seriesinfo, axisinfo);
+    settingsTool = new UserChartSettings(context, rangemode, chartinfo, seriesinfo, axisinfo);
     setControls(settingsTool);
 
     // layout
@@ -51,7 +51,7 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
     if (!rangemode) {
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(setRide(RideItem*)));
     } else {
-        // XXX TODO
+        connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(setDateRange(DateRange)));
     }
 
     // need to refresh when chart settings change
@@ -79,29 +79,54 @@ UserChart::chartConfigChanged()
     if (!myRideItem) return;
 
     stale = true;
-    setRide(myRideItem);
+
+    if (rangemode) setDateRange(context->currentDateRange());
+    else setRide(myRideItem);
 }
 
 //
 // Ride selected
 //
 void
-UserChart::setRide(RideItem *ride)
+UserChart::setRide(RideItem *item)
 {
     // not being shown so just ignore
     if (!amVisible()) { stale=true; return; }
 
     // make sure its not NULL etc
-    if (ride == NULL || ride->ride() == NULL) return;
+    if (item == NULL || item->ride() == NULL) return;
 
     // have we already seen it?
-    if (last == ride && !stale) return;
+    if (last == item && !stale) return;
 
     // do we have any series to plot?!
     if (seriesinfo.count() == 0) return;
 
-    last = ride;
+    ride = last = item;
     stale = false;
+
+    dr=DateRange(); // always set to no range
+
+    refresh();
+ }
+
+ void
+ UserChart::setDateRange(DateRange d)
+ {
+    if (!amVisible()) return;
+
+    // we don't really need to worry too much
+    // about not refreshing as it doesn't get
+    // called so often in trends view.
+    dr = d;
+    ride = myRideItem; // always current
+
+    refresh();
+ }
+
+ void
+ UserChart::refresh()
+ {
 
     // ok, we've run out of excuses, looks like we need to plot
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
@@ -114,7 +139,7 @@ UserChart::setRide(RideItem *ride)
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
-        ucd->compute(ride, Specification());
+        ucd->compute(ride, Specification(), dr);
 
         // data now generated so can add curve
         chart->addCurve(series.name, ucd->x.vector, ucd->y.vector, series.xname, series.yname,
@@ -305,8 +330,8 @@ UserChart::applySettings(QString x)
 //
 // core user chart settings
 //
-UserChartSettings::UserChartSettings(Context *context, GenericChartInfo &chart, QList<GenericSeriesInfo> &series, QList<GenericAxisInfo> &axes) :
-  context(context), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
+UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericChartInfo &chart, QList<GenericSeriesInfo> &series, QList<GenericAxisInfo> &axes) :
+  context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     tabs = new QTabWidget(this);
@@ -539,7 +564,7 @@ void
 UserChartSettings::addSeries()
 {
     GenericSeriesInfo add;
-    EditUserSeriesDialog dialog(context, add);
+    EditUserSeriesDialog dialog(context, rangemode, add);
 
     if (dialog.exec()) {
 
@@ -557,7 +582,7 @@ UserChartSettings::seriesClicked(int row,int)
 {
 
     GenericSeriesInfo edit = seriesinfo[row];
-    EditUserSeriesDialog dialog(context, edit);
+    EditUserSeriesDialog dialog(context, rangemode, edit);
 
     if (dialog.exec()) {
 
@@ -579,7 +604,7 @@ UserChartSettings::editSeries()
     int index = seriesTable->row(items.first());
 
     GenericSeriesInfo edit = seriesinfo[index];
-    EditUserSeriesDialog dialog(context, edit);
+    EditUserSeriesDialog dialog(context, rangemode, edit);
 
     if (dialog.exec()) {
 
@@ -804,7 +829,7 @@ UserChartSettings::refreshAxesTab()
 //
 // Data series settings
 //
-EditUserSeriesDialog::EditUserSeriesDialog(Context *context, GenericSeriesInfo &info)
+EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, GenericSeriesInfo &info)
     : QDialog(context->mainWindow, Qt::Dialog), context(context), original(info)
 {
     setWindowTitle(tr("Edit Data Series"));
@@ -902,32 +927,62 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, GenericSeriesInfo &
 
     // lets put a sensible default in to guide the user
     if (original.string1 == "") {
-        original.string1=
-        "{\n"
-        "    init {\n"
-        "        xx<-c();\n"
-        "        yy<-c();\n"
-        "        count<-0;\n"
-        "    }\n"
-        "\n"
-        "    relevant {\n"
-        "        Data contains \"P\";\n"
-        "    }\n"
-        "\n"
-        "    sample {\n"
-        "        # as we iterate over activity data points\n"
-        "        count <- count + 1;\n"
-        "    }\n"
-        "\n"
-        "    finalise {\n"
-        "        # we just fetch samples at end\n"
-        "        xx <- samples(SECS);\n"
-        "        yy <- samples(POWER);\n"
-        "    }\n"
-        "\n"
-        "    x { xx; }\n"
-        "    y { yy; }\n"
-        "}\n";
+
+        if (rangemode) {
+
+            // working for a date range
+            original.string1 =
+            "{\n"
+            "    init {\n"
+            "        xx<-c();\n"
+            "        yy<-c();\n"
+            "        activities<-0;\n"
+            "    }\n"
+            "\n"
+            "    activity {\n"
+            "        # as we iterate over activities\n"
+            "        activities <- activities + 1;\n"
+            "    }\n"
+            "\n"
+            "    finalise {\n"
+            "        # we just fetch metrics at the end\n"
+            "        xx <- metrics(date);\n"
+            "        yy <- metrics(BikeStress);\n"
+            "    }\n"
+            "\n"
+            "    x { xx; }\n"
+            "    y { yy; }\n"
+            "}\n";
+
+        } else {
+
+            original.string1=
+            "{\n"
+            "    init {\n"
+            "        xx<-c();\n"
+            "        yy<-c();\n"
+            "        count<-0;\n"
+            "    }\n"
+            "\n"
+            "    relevant {\n"
+            "        Data contains \"P\";\n"
+            "    }\n"
+            "\n"
+            "    sample {\n"
+            "        # as we iterate over activity data points\n"
+            "        count <- count + 1;\n"
+            "    }\n"
+            "\n"
+            "    finalise {\n"
+            "        # we just fetch samples at end\n"
+            "        xx <- samples(SECS);\n"
+            "        yy <- samples(POWER);\n"
+            "    }\n"
+            "\n"
+            "    x { xx; }\n"
+            "    y { yy; }\n"
+            "}\n";
+        }
     }
     program->setText(original.string1);
     xname->setText(original.xname);

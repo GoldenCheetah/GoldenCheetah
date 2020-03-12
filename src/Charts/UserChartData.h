@@ -33,8 +33,8 @@ public:
     UserChartData(Context *context, QString script);
     ~UserChartData();
 
-    // Compute the ride metric from a file.
-    void compute(RideItem *item, Specification spec);
+    // Compute from samples
+    void compute(RideItem *item, Specification spec, DateRange=DateRange());
 
     // the results ...
     Result relevant, x, y, z, t, d;

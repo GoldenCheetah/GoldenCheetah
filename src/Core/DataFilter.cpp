@@ -2035,7 +2035,7 @@ void DataFilter::configChanged(qint32)
     rt.dataSeriesSymbols = RideFile::symbols();
 }
 
-Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s)
+Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
 {
     // if error state all bets are off
     //if (inerror) return Result(0);
@@ -2050,26 +2050,26 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         switch (leaf->op) {
             case AND :
             {
-                Result left = eval(df, leaf->lvalue.l, x, m, p, c, s);
+                Result left = eval(df, leaf->lvalue.l,x, m, p, c, s, d);
                 if (left.isNumber && left.number) {
-                    Result right = eval(df, leaf->rvalue.l, x, m, p, c, s);
+                    Result right = eval(df, leaf->rvalue.l,x, m, p, c, s, d);
                     if (right.isNumber && right.number) return Result(true);
                 }
                 return Result(false);
             }
             case OR :
             {
-                Result left = eval(df, leaf->lvalue.l, x, m, p, c, s);
+                Result left = eval(df, leaf->lvalue.l,x, m, p, c, s, d);
                 if (left.isNumber && left.number) return Result(true);
 
-                Result right = eval(df, leaf->rvalue.l, x, m, p, c, s);
+                Result right = eval(df, leaf->rvalue.l,x, m, p, c, s, d);
                 if (right.isNumber && right.number) return Result(true);
 
                 return Result(false);
             }
 
             default : // parenthesis
-                return (eval(df, leaf->lvalue.l, x, m, p, c, s));
+                return (eval(df, leaf->lvalue.l,x, m, p, c, s, d));
         }
     }
     break;
@@ -2094,7 +2094,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 return Result(0);
             }
 
-            Result res = eval(df, df->functions.value(leaf->function), x, m, p, c, s);
+            Result res = eval(df, df->functions.value(leaf->function),x, m, p, c, s, d);
 
             // pop stack - if we haven't overflowed and reset
             if (df->stack > 0) df->stack -= 1;
@@ -2227,7 +2227,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             Result returning(0);
 
             for(int i=0; i<leaf->fparms.count(); i++) {
-                Result r=eval(df, leaf->fparms[i], x, m, p, c, s);
+                Result r=eval(df, leaf->fparms[i],x, m, p, c, s, d);
                 if (r.vector.count()) {
                     returning.vector.append(r.vector);
                     returning.number += r.number;
@@ -2248,9 +2248,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         if (leaf->function == "seq") {
             Result returning(0);
 
-            double start= eval(df, leaf->fparms[0], x, m, p, c, s).number;
-            double stop= eval(df, leaf->fparms[1], x, m, p, c, s).number;
-            double step= eval(df, leaf->fparms[2], x, m, p, c, s).number;
+            double start= eval(df, leaf->fparms[0],x, m, p, c, s, d).number;
+            double stop= eval(df, leaf->fparms[1],x, m, p, c, s, d).number;
+            double step= eval(df, leaf->fparms[2],x, m, p, c, s, d).number;
 
             if (step == 0) return returning; // nope!
             if (start > stop && step >0) return returning; // nope
@@ -2279,8 +2279,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         if (leaf->function == "rep") {
             Result returning(0);
 
-            double value= eval(df, leaf->fparms[0], x, m, p, c, s).number;
-            double count= eval(df, leaf->fparms[1], x, m, p, c, s).number;
+            double value= eval(df, leaf->fparms[0],x, m, p, c, s, d).number;
+            double count= eval(df, leaf->fparms[1],x, m, p, c, s, d).number;
 
             if (count <= 0) return returning;
 
@@ -2294,7 +2294,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
         // length
         if (leaf->function == "length") {
-            double len = eval(df, leaf->fparms[0], x, m, p, c, s).vector.count();
+            double len = eval(df, leaf->fparms[0],x, m, p, c, s, d).vector.count();
             //fprintf(stderr, "len: %f\n",len); fflush(stderr);
             return Result(len);
         }
@@ -2310,13 +2310,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
             // where to place it? -1 on end (not passed as a parameter)
             int pos=-1;
-            if (leaf->fparms.count() == 3) pos = eval(df, leaf->fparms[2], x, m, p, c, s).number;
+            if (leaf->fparms.count() == 3) pos = eval(df, leaf->fparms[2],x, m, p, c, s, d).number;
 
             // check for bounds
             if (pos <0 || pos >current.vector.count()) pos=-1;
 
             // ok, what to append
-            Result append = eval(df, leaf->fparms[1], x, m, p, c, s);
+            Result append = eval(df, leaf->fparms[1],x, m, p, c, s, d);
 
             // do it...
             if (append.vector.count()) {
@@ -2350,10 +2350,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             Result current = df->symbols.value(symbol);
 
             // where to place it? -1 on end (not passed as a parameter)
-            long pos = eval(df, leaf->fparms[1], x, m, p, c, s).number;
+            long pos = eval(df, leaf->fparms[1],x, m, p, c, s, d).number;
 
             // ok, what to append
-            long count = eval(df, leaf->fparms[2], x, m, p, c, s).number;
+            long count = eval(df, leaf->fparms[2],x, m, p, c, s, d).number;
 
 
             // check.. and return unchanged if out of bounds
@@ -2378,9 +2378,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
             // mid (a, pos, count)
             // where to place it? -1 on end (not passed as a parameter)
-            Result v = eval(df, leaf->fparms[0], x, m, p, c, s);
-            long pos = eval(df, leaf->fparms[1], x, m, p, c, s).number;
-            long count = eval(df, leaf->fparms[2], x, m, p, c, s).number;
+            Result v = eval(df, leaf->fparms[0],x, m, p, c, s, d);
+            long pos = eval(df, leaf->fparms[1],x, m, p, c, s, d).number;
+            long count = eval(df, leaf->fparms[2],x, m, p, c, s, d).number;
 
 
             // check.. and return unchanged if out of bounds
@@ -2434,7 +2434,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
             Specification spec;
             spec.setFilterSet(fs);
-            spec.setDateRange(m->context->currentDateRange());
+            spec.setDateRange(d);
 
             // loop through rides for daterange
             int count=0;
@@ -2445,8 +2445,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                 count++;
 
-                double value = wantdate ? QDate(1970,01,01).daysTo(ride->dateTime.date()) :
-                               ride->getForSymbol(symbol);
+                double value=0;
+                if(wantdate) value= QDate(1970,01,01).daysTo(ride->dateTime.date());
+                else value =  ride->getForSymbol(df->lookupMap.value(symbol,""), c);
 
                 returning.number += value;
                 returning.vector.append(value);
@@ -2460,10 +2461,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             Result returning(0);
 
             // go get it for the current date range
-            RideFileCache bestsCache(m->context, m->context->currentDateRange().from, m->context->currentDateRange().to, false, QStringList(), true, NULL);
+            if (d.from==QDate() && d.to==QDate()) {
+                // the ride mean max
+                returning.vector = m->fileCache()->meanMaxArray(leaf->seriesType);
+            } else {
+                // use a season meanmax
+                RideFileCache bestsCache(m->context, d.from, d.to, false, QStringList(), true, NULL);
+                returning.vector = bestsCache.meanMaxArray(leaf->seriesType);
+            }
 
-            // extract the meanmaxarray
-            returning.vector = bestsCache.meanMaxArray(leaf->seriesType);
 
             // really annoying that it starts from 0s not 1s, this is a legacy
             // bug that we cannot fix easily, but this is new, so lets not
@@ -2486,7 +2492,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             bool ascending= (symbol=="ascend") ? true : false;
 
             // use the utils function to actually do it
-            Result v = eval(df, leaf->fparms[1], x, m, p, c, s);
+            Result v = eval(df, leaf->fparms[1],x, m, p, c, s, d);
             QVector<int> r = Utils::argsort(v.vector, ascending);
 
             // put the index into the result we are returning.
@@ -2506,7 +2512,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             bool ascending=symbol=="ascend" ? true : false;
 
             // evaluate all the lists
-            for(int i=1; i<fparms.count(); i++) eval(df, leaf->fparms[i], x, m, p, c, s);
+            for(int i=1; i<fparms.count(); i++) eval(df, leaf->fparms[i],x, m, p, c, s, d);
 
             // get first and argsort it
             symbol = *(leaf->fparms[1]->lvalue.n);
@@ -2544,8 +2550,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
             Result returning(0);
 
-            Result list= eval(df, leaf->fparms[0], x, m, p, c, s);
-            Result count= eval(df, leaf->fparms[1], x, m, p, c, s);
+            Result list= eval(df, leaf->fparms[0],x, m, p, c, s, d);
+            Result count= eval(df, leaf->fparms[1],x, m, p, c, s, d);
             int n=count.number;
             if (n > list.vector.count()) n=list.vector.count();
 
@@ -2561,8 +2567,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
             Result returning(0);
 
-            Result list= eval(df, leaf->fparms[0], x, m, p, c, s);
-            Result count= eval(df, leaf->fparms[1], x, m, p, c, s);
+            Result list= eval(df, leaf->fparms[0],x, m, p, c, s, d);
+            Result count= eval(df, leaf->fparms[1],x, m, p, c, s, d);
             int n=count.number;
             if (n > list.vector.count()) n=list.vector.count();
 
@@ -2605,7 +2611,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 default:
                 case Leaf::Function :
                 {
-                    duration = eval(df, leaf->lvalue.l, x, m, p, c, s).number; // duration will be zero if string
+                    duration = eval(df, leaf->lvalue.l,x, m, p, c, s, d).number; // duration will be zero if string
                 }
                 break;
 
@@ -2667,36 +2673,36 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         if (fnum < 0) return Result(0);
 
         switch (fnum) {
-        case 0 : { return Result(cos(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // COS(x)
-        case 1 : { return Result(tan(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // TAN(x)
-        case 2 : { return Result(sin(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // SIN(x)
-        case 3 : { return Result(acos(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ACOS(x)
-        case 4 : { return Result(atan(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ATAN(x)
-        case 5 : { return Result(asin(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ASIN(x)
-        case 6 : { return Result(cosh(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // COSH(x)
-        case 7 : { return Result(tanh(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // TANH(x)
-        case 8 : { return Result(sinh(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // SINH(x)
-        case 9 : { return Result(acosh(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ACOSH(x)
-        case 10 : { return Result(atanh(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ATANH(x)
-        case 11 : { return Result(asinh(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ASINH(x)
+        case 0 : { return Result(cos(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // COS(x)
+        case 1 : { return Result(tan(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // TAN(x)
+        case 2 : { return Result(sin(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // SIN(x)
+        case 3 : { return Result(acos(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ACOS(x)
+        case 4 : { return Result(atan(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ATAN(x)
+        case 5 : { return Result(asin(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ASIN(x)
+        case 6 : { return Result(cosh(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // COSH(x)
+        case 7 : { return Result(tanh(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // TANH(x)
+        case 8 : { return Result(sinh(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // SINH(x)
+        case 9 : { return Result(acosh(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ACOSH(x)
+        case 10 : { return Result(atanh(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ATANH(x)
+        case 11 : { return Result(asinh(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ASINH(x)
 
-        case 12 : { return Result(exp(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // EXP(x)
-        case 13 : { return Result(log(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // LOG(x)
-        case 14 : { return Result(log10(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // LOG10(x)
+        case 12 : { return Result(exp(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // EXP(x)
+        case 13 : { return Result(log(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // LOG(x)
+        case 14 : { return Result(log10(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // LOG10(x)
 
-        case 15 : { return Result(ceil(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // CEIL(x)
-        case 16 : { return Result(floor(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // FLOOR(x)
-        case 17 : { return Result(round(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ROUND(x)
+        case 15 : { return Result(ceil(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // CEIL(x)
+        case 16 : { return Result(floor(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // FLOOR(x)
+        case 17 : { return Result(round(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ROUND(x)
 
-        case 18 : { return Result(fabs(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // FABS(x)
-        case 19 : { return Result(std::isinf(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ISINF(x)
-        case 20 : { return Result(std::isnan(eval(df, leaf->fparms[0], x, m, p, c, s).number)); } // ISNAN(x)
+        case 18 : { return Result(fabs(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // FABS(x)
+        case 19 : { return Result(std::isinf(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ISINF(x)
+        case 20 : { return Result(std::isnan(eval(df, leaf->fparms[0],x, m, p, c, s, d).number)); } // ISNAN(x)
 
         case 21 : { /* SUM( ... ) */
                     double sum=0;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        sum += eval(df, l, x, m, p, c, s).number; // for vectors number is sum
+                        sum += eval(df, l,x, m, p, c, s, d).number; // for vectors number is sum
                     }
                     return Result(sum);
                   }
@@ -2707,7 +2713,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     int count=0;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(df, l, x, m, p, c, s); // for vectors number is sum
+                        Result res = eval(df, l,x, m, p, c, s, d); // for vectors number is sum
                         sum += res.number;
                         if (res.vector.count()) count += res.vector.count();
                         else count++;
@@ -2721,7 +2727,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     bool set=false;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(df, l, x, m, p, c, s);
+                        Result res = eval(df, l,x, m, p, c, s, d);
                         if (res.vector.count()) {
                             foreach(double x, res.vector) {
                                 if (set && x>max) max=x;
@@ -2742,7 +2748,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     bool set=false;
 
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(df, l, x, m, p, c, s);
+                        Result res = eval(df, l,x, m, p, c, s, d);
                         if (res.vector.count()) {
                             foreach(double x, res.vector) {
                                 if (set && x<min) min=x;
@@ -2762,7 +2768,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                     int count = 0;
                     foreach(Leaf *l, leaf->fparms) {
-                        Result res = eval(df, l, x, m, p, c, s);
+                        Result res = eval(df, l,x, m, p, c, s, d);
                         if (res.vector.count()) count += res.vector.count();
                         else count++;
                     }
@@ -2808,7 +2814,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     // what we looking for ?
                     QString parm = leaf->fparms[1]->type == Leaf::Symbol ? *leaf->fparms[1]->lvalue.n : "";
                     bool toDuration = parm == "" ? true : false;
-                    double duration = toDuration ? eval(df, leaf->fparms[1], x, m, p, c, s).number : 0;
+                    double duration = toDuration ? eval(df, leaf->fparms[1],x, m, p, c, s, d).number : 0;
 
                     // get the PD Estimate for this date - note we always work with the absolulte
                     // power estimates in formulas, since the user can just divide by config(weight)
@@ -2868,7 +2874,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     for(int i=1; i< leaf->fparms.count(); i++) {
 
                         // evaluate the parameter
-                        Result ex = eval(df, leaf->fparms[i], x, m, p, c, s);
+                        Result ex = eval(df, leaf->fparms[i],x, m, p, c, s, d);
 
                         if (ex.vector.count()) {
 
@@ -2876,7 +2882,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                             foreach(double x, ex.vector) {
 
                                 // did it get selected?
-                                Result which = eval(df, leaf->fparms[0], x, m, p, c, s);
+                                Result which = eval(df, leaf->fparms[0],x, m, p, c, s, d);
                                 if (which.number) {
                                     returning.vector << x;
                                     returning.number += x;
@@ -2902,7 +2908,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     Result returning(0);
 
                     if (leaf->fparms.count() < 3) return returning;
-                    else returning = eval(df, leaf->fparms[2], x, m, p, c, s);
+                    else returning = eval(df, leaf->fparms[2],x, m, p, c, s, d);
 
                     if (returning.number) {
 
@@ -2920,7 +2926,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                         if (!f) return Result(0); // eek!
 
                         // evaluate second argument, its the value
-                        Result r = eval(df, leaf->fparms[1], x, m, p, c, s);
+                        Result r = eval(df, leaf->fparms[1],x, m, p, c, s, d);
 
                         // now set an override or a tag
                         if (o_symbol != "" && e) { // METRIC OVERRIDE
@@ -2972,7 +2978,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     Result returning(0);
 
                     if (leaf->fparms.count() < 2) return returning;
-                    else returning = eval(df, leaf->fparms[1], x, m, p, c, s);
+                    else returning = eval(df, leaf->fparms[1],x, m, p, c, s, d);
 
                     if (returning.number) {
 
@@ -3048,7 +3054,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                     if (leaf->fparms.count() != 2) return Result(0);
 
-                    return Result (60*VDOTCalculator::eqvTime(eval(df, leaf->fparms[0], x, m, p, c, s).number, 1000*eval(df, leaf->fparms[1], x, m, p, c, s).number));
+                    return Result (60*VDOTCalculator::eqvTime(eval(df, leaf->fparms[0],x, m, p, c, s, d).number, 1000*eval(df, leaf->fparms[1],x, m, p, c, s, d).number));
                 }
                 break;
 
@@ -3057,7 +3063,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
 
                     if (leaf->fparms.count() != 1 || m->fileCache() == NULL) return Result(0);
 
-                    return Result (m->fileCache()->bestTime(eval(df, leaf->fparms[0], x, m, p, c, s).number));
+                    return Result (m->fileCache()->bestTime(eval(df, leaf->fparms[0],x, m, p, c, s, d).number));
                  }
 
         case 37 :
@@ -3112,7 +3118,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     Result returning(0);
 
                     if (leaf->fparms.count() != 1) return returning;
-                    else returning = eval(df, leaf->fparms[0], x, m, p, c, s);
+                    else returning = eval(df, leaf->fparms[0],x, m, p, c, s, d);
 
                     if (returning.number) {
 
@@ -3136,7 +3142,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     Result returning(0);
 
                     if (leaf->fparms.count() < 2) return returning;
-                    else returning = eval(df, leaf->fparms[1], x, m, p, c, s);
+                    else returning = eval(df, leaf->fparms[1],x, m, p, c, s, d);
 
                     if (returning.number) {
 
@@ -3197,7 +3203,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 {   // MEASURE (DATE, GROUP, FIELD) get measure
                     if (leaf->fparms.count() < 3) return Result(0);
 
-                    Result days = eval(df, leaf->fparms[0], x, m, p, c, s);
+                    Result days = eval(df, leaf->fparms[0],x, m, p, c, s, d);
                     if (!days.isNumber) return Result(0); // invalid date
                     QDate date = QDate(1900,01,01).addDays(days.number);
                     if (!date.isValid()) return Result(0); // invalid date
@@ -3381,7 +3387,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     case Leaf::UnaryOperation :
     {
         // get result
-        Result lhs = eval(df, leaf->lvalue.l, x, m, p, c, s);
+        Result lhs = eval(df, leaf->lvalue.l,x, m, p, c, s, d);
 
         // unary minus
         if (leaf->op == '-') return Result(lhs.number * -1);
@@ -3402,12 +3408,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     {
         // lhs and rhs
         Result lhs;
-        if (leaf->op != ASSIGN) lhs = eval(df, leaf->lvalue.l, x, m, p, c, s);
+        if (leaf->op != ASSIGN) lhs = eval(df, leaf->lvalue.l,x, m, p, c, s, d);
 
         // if elvis we only evaluate rhs if we are null
         Result rhs;
         if (leaf->op != ELVIS || lhs.number == 0) {
-            rhs = eval(df, leaf->rvalue.l, x, m, p, c, s);
+            rhs = eval(df, leaf->rvalue.l,x, m, p, c, s, d);
         }
 
         // NOW PERFORM OPERATION
@@ -3430,7 +3436,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                     if (leaf->lvalue.l->seriesType == RideFile::none) {
 
                         QString symbol = *(leaf->lvalue.l->lvalue.l->lvalue.n);
-                        int index = eval(df,leaf->lvalue.l->fparms[0], x, m, p, c, s).number;
+                        int index = eval(df,leaf->lvalue.l->fparms[0],x, m, p, c, s, d).number;
 
                         // generic symbol
                         if (df->symbols.contains(symbol)) {
@@ -3577,12 +3583,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         case IF_:
         case 0 :
             {
-                Result cond = eval(df, leaf->cond.l, x, m, p, c, s);
-                if (cond.isNumber && cond.number) return eval(df, leaf->lvalue.l, x, m, p, c, s);
+                Result cond = eval(df, leaf->cond.l,x, m, p, c, s, d);
+                if (cond.isNumber && cond.number) return eval(df, leaf->lvalue.l,x, m, p, c, s, d);
                 else {
 
                     // conditional may not have an else clause!
-                    if (leaf->rvalue.l) return eval(df, leaf->rvalue.l, x, m, p, c, s);
+                    if (leaf->rvalue.l) return eval(df, leaf->rvalue.l,x, m, p, c, s, d);
                     else return Result(0);
                 }
             }
@@ -3596,8 +3602,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 timer.start();
 
                 Result returning(0);
-                while (count++ < maxwhile && eval(df, leaf->cond.l, x, m, p, c, s).number) {
-                    returning = eval(df, leaf->lvalue.l, x, m, p, c, s);
+                while (count++ < maxwhile && eval(df, leaf->cond.l,x, m, p, c, s, d).number) {
+                    returning = eval(df, leaf->lvalue.l,x, m, p, c, s, d);
                 }
 
                 // we had to terminate warn user !
@@ -3632,8 +3638,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         Specification spec;
 
         // get date range
-        int fromDS = eval(df, leaf->fparms[0], x, m, p, c, s).number;
-        int toDS = eval(df, leaf->fparms[1], x, m, p, c, s).number;
+        int fromDS = eval(df, leaf->fparms[0],x, m, p, c, s, d).number;
+        int toDS = eval(df, leaf->fparms[1],x, m, p, c, s, d).number;
 
         // swap dates if needed
         if (toDS < fromDS) {
@@ -3674,7 +3680,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
     case Leaf::Index :
     {
         if (!p) return Result(0); // only applies when iterating over samples
-        int index = eval(df,leaf->fparms[0], x, m, p, c, s).number;
+        int index = eval(df,leaf->fparms[0],x, m, p, c, s, d).number;
 
         // ZERO if out of bounds (save a check)
         if (index < 0 || index >= m->ride()->dataPoints().count())
@@ -3708,7 +3714,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
         Result returning(0);
 
         // evaluate each statement
-        foreach(Leaf *statement, *(leaf->lvalue.b)) returning = eval(df, statement, x, m, p, c, s);
+        foreach(Leaf *statement, *(leaf->lvalue.b)) returning = eval(df, statement,x, m, p, c, s, d);
 
         // compound statements evaluate to the value of the last statement
         return returning;
