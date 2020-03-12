@@ -2457,10 +2457,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             Result returning(0);
 
             // go get it for the current date range
-            RideFileCache *bestsCache = new RideFileCache(m->context, m->context->currentDateRange().from, m->context->currentDateRange().to, false, QStringList(), true, NULL);
+            RideFileCache bestsCache(m->context, m->context->currentDateRange().from, m->context->currentDateRange().to, false, QStringList(), true, NULL);
 
             // extract the meanmaxarray
-            returning.vector = bestsCache->meanMaxArray(leaf->seriesType);
+            returning.vector = bestsCache.meanMaxArray(leaf->seriesType);
 
             // really annoying that it starts from 0s not 1s, this is a legacy
             // bug that we cannot fix easily, but this is new, so lets not
