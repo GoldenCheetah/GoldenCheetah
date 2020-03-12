@@ -820,8 +820,55 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
     if (align == 3) axis->align = Qt::AlignRight;
 
     // -1 if not passed
-    if (min != -1)  axis->minx = axis->miny = min;
-    if (max != -1)  axis->maxx = axis->maxy = max;
+    if (min == -1) {
+
+        // automatically set the start/stop values for this axis- based upon
+        // the data in all the series attached to the axis
+        bool usey = axis->orientation == Qt::Vertical;
+        min=0;
+        bool setmin=false;
+        // min should be minimum value for all attached series
+        foreach(QAbstractSeries *series, axis->series) {
+            if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
+                series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
+                foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                    if (usey) {
+                        if (setmin && point.y() < min) min=point.y();
+                        else if (!setmin) { min=point.y(); setmin=true; }
+                    } else {
+                        if (setmin && point.x() < min) min=point.x();
+                        else if (!setmin) { min=point.x(); setmin=true; }
+                    }
+                }
+            }
+        }
+    }
+    axis->minx = axis->miny = min;
+
+    if (max == -1) {
+
+        // automatically set the start/stop values for this axis- based upon
+        // the data in all the series attached to the axis
+        bool usey = axis->orientation == Qt::Vertical;
+        max=0;
+        bool setmax=false;
+        // min should be minimum value for all attached series
+        foreach(QAbstractSeries *series, axis->series) {
+            if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
+                series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
+                foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                    if (usey) {
+                        if (setmax && point.y() > max) max=point.y();
+                        else if (!setmax) { max=point.y(); setmax=true; }
+                    } else {
+                        if (setmax && point.x() > max) max=point.x();
+                        else if (!setmax) { max=point.x(); setmax=true; }
+                    }
+                }
+            }
+        }
+    }
+    axis->maxx = axis->maxy = max;
 
     // type
     if (type != -1) axis->type = static_cast<GenericAxisInfo::AxisInfoType>(type);
@@ -830,8 +877,10 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
     if (labelcolor != "") axis->labelcolor=QColor(labelcolor);
     if (color != "") axis->axiscolor=QColor(color);
 
-    // log .. hmmm
+    // log ..
     axis->log = log;
+    if (min==0 && log) min = 1; // 0 are no-no on log axes
+    if (max==0 && log) max = 1; // 0 are no-no on log axes
 
     // categories
     if (categories.count()) axis->categories = categories;
