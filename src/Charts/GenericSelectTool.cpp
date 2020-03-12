@@ -138,10 +138,12 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         // get the scene rect for the y axis
                         // we are a little careful since axisRect
                         QAbstractAxis *yaxis = NULL;
+                        QAbstractAxis *xaxis = NULL;
                         foreach (QAbstractAxis *axis, series->attachedAxes()) {
                             if (axis->orientation() == Qt::Vertical) {
                                 yaxis=axis;
-                                break;
+                            } else {
+                                xaxis=axis;
                             }
                         }
                         if (yaxis) {
@@ -184,7 +186,11 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                         // x value
                         painter->setPen(QPen(GColor(CPLOTMARKER)));
-                        label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                        // datetime?
+                        if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime)
+                            label=QDateTime::fromMSecsSinceEpoch(v.x()).toString("dd MMM yy");
+                        else
+                            label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
                         painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
@@ -215,7 +221,8 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                     if (calc.xaxis != NULL) {
 
-                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue) {
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue ||
+                            calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) {
 
                             // slope calcs way over the top for a line chart
                             // where there are multiple series being plotted
@@ -273,14 +280,23 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                         QPen markerpen(GColor(CPLOTMARKER));
                         painter->setPen(markerpen);
-                        QString label=QString("%1").arg(calc.x.max);
+                        QString label;
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) label=QDateTime::fromMSecsSinceEpoch(calc.x.max).toString("dd MMM yy");
+                        else label=QString("%1").arg(calc.x.max);
                         painter->drawText(maxxp-QPointF(0,4), label);
-                        label=QString("%1").arg(calc.x.min);
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) label=QDateTime::fromMSecsSinceEpoch(calc.x.min).toString("dd MMM yy");
+                        else label=QString("%1").arg(calc.x.min);
                         painter->drawText(minxp-QPointF(0,4), label);
 
                         // scatter sees mean, line/timeseries more likely to want dx
-                        if (host->charttype == GC_CHART_SCATTER)  label=QString("%1").arg(calc.x.mean);
-                        else label=QString("%1").arg(calc.x.max - calc.x.min);
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) {
+                            int days = QDate(1970,01,01).daysTo(QDateTime::fromMSecsSinceEpoch(calc.x.max).date()) -
+                                       QDate(1970,01,01).daysTo(QDateTime::fromMSecsSinceEpoch(calc.x.min).date());
+                             label=QString("%1 days").arg(days);
+                        } else {
+                            if (host->charttype == GC_CHART_SCATTER)  label=QString("%1").arg(calc.x.mean);
+                            else label=QString("%1").arg(calc.x.max - calc.x.min);
+                        }
                         painter->drawText(avgxp-QPointF(0,4), label);
 
                         //

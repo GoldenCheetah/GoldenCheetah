@@ -2446,7 +2446,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
                 count++;
 
                 double value=0;
-                if(wantdate) value= QDate(1970,01,01).daysTo(ride->dateTime.date());
+                if(wantdate) value= ride->dateTime.toMSecsSinceEpoch();
                 else value =  ride->getForSymbol(df->lookupMap.value(symbol,""), c);
 
                 returning.number += value;

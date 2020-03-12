@@ -62,6 +62,7 @@ class GenericLegendItem : public QWidget {
         void setValue(double p) { if (enabled) { hasvalue=true; value=p; update(); } } // set value to display
         void noValue() { if (enabled) { hasvalue=false; update(); } } // no value to display
         void setClickable(bool x) { clickable=x; }
+        void setDateTime(bool x) { datetime=x; }
         void configChanged(qint32); // context changed
 
     private:
@@ -72,6 +73,7 @@ class GenericLegendItem : public QWidget {
         bool hasvalue;
         bool enabled;
         bool clickable;
+        bool datetime;
         double value;
 
         // geometry for painting fast / updated on config changes
@@ -87,7 +89,7 @@ class GenericLegend : public QWidget {
         GenericLegend(Context *context, GenericPlot *parent);
 
         void addSeries(QString name, QColor color);
-        void addX(QString name);
+        void addX(QString name, bool datetime);
         void removeSeries(QString name);
         void removeAllSeries();
 

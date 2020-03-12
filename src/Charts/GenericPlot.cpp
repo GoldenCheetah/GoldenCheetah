@@ -650,7 +650,20 @@ GenericPlot::finaliseChart()
 //fflush(stderr);
             QAbstractAxis *add=NULL;
             switch (axisinfo->type) {
-            case GenericAxisInfo::DATERANGE: // TODO
+            case GenericAxisInfo::DATERANGE:
+                {
+
+                    QDateTimeAxis *vaxis = new QDateTimeAxis(qchart);
+                    add=vaxis; // gets added later
+
+                    vaxis->setMin(QDateTime::fromMSecsSinceEpoch(axisinfo->min()));
+                    vaxis->setMax(QDateTime::fromMSecsSinceEpoch(axisinfo->max()));
+                    vaxis->setFormat("dd MMM yy");
+
+                    // attach to the chart
+                    qchart->addAxis(add, axisinfo->locate());
+                }
+                break;
             case GenericAxisInfo::TIME:      // TODO
             case GenericAxisInfo::CONTINUOUS:
                 {
@@ -748,8 +761,9 @@ GenericPlot::finaliseChart()
                 // look for first series with a horizontal axis (we will use this later)
                 foreach(QAbstractAxis *axis, series->attachedAxes()) {
                     if (axis->orientation() == Qt::Horizontal) {
-                        if (axis->type()==QAbstractAxis::AxisTypeValue)  legend->addX(static_cast<QValueAxis*>(axis)->titleText());
-                        else if (axis->type()==QAbstractAxis::AxisTypeLogValue)  legend->addX(static_cast<QLogValueAxis*>(axis)->titleText());
+                        if (axis->type()==QAbstractAxis::AxisTypeValue)  legend->addX(static_cast<QValueAxis*>(axis)->titleText(), false);
+                        else if (axis->type()==QAbstractAxis::AxisTypeLogValue)  legend->addX(static_cast<QLogValueAxis*>(axis)->titleText(), false);
+                        else if (axis->type()==QAbstractAxis::AxisTypeDateTime)  legend->addX(static_cast<QDateTimeAxis*>(axis)->titleText(), true);
                         havexaxis=true;
                         break;
                     }
