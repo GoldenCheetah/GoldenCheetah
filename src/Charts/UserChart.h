@@ -167,7 +167,7 @@ class EditUserSeriesDialog : public QDialog
 
         // series page
         QLineEdit *name, *xname, *yname, *groupname;
-        DataFilterEdit *xformula, *yformula;
+        DataFilterEdit *program;
 
         QComboBox *line, *symbol;
         QDoubleSpinBox *size;

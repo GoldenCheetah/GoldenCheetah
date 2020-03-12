@@ -25,7 +25,7 @@
 #include "LTMTool.h"
 #include "ColorButton.h"
 #include "MainWindow.h"
-#include "UserData.h"
+#include "UserChartData.h"
 
 #include <limits>
 #include <QScrollArea>
@@ -109,26 +109,15 @@ UserChart::setRide(RideItem *ride)
     // now generate the series data
     foreach (GenericSeriesInfo series, seriesinfo) {
 
-        // create user data - Y series
-        if (series.user1 == NULL)  series.user1 = new UserData(series.name, series.yname, series.string1, "", QColor(series.color));
+        // create program
+        if (series.user1 == NULL)  series.user1 = new UserChartData(context, series.string1);
 
-        // in case it changed since we last tried
-        UserData *yseries = static_cast<UserData*>(series.user1);
-        yseries->formula = series.string1;
-        yseries->units = series.yname;
-        yseries->setRideItem(ride);
-
-        // create user data - Y series
-        if (series.user2 == NULL)  series.user2 = new UserData(series.name, series.xname, series.string2, "", QColor(series.color));
-
-        // in case it changed since we last tried
-        UserData *xseries = static_cast<UserData*>(series.user2);
-        xseries->formula = series.string2;
-        xseries->units = series.xname;
-        xseries->setRideItem(ride);
+        // cast so we can work with it
+        UserChartData *ucd = static_cast<UserChartData*>(series.user1);
+        ucd->compute(ride, Specification());
 
         // data now generated so can add curve
-        chart->addCurve(series.name, xseries->vector, yseries->vector, series.xname, series.yname,
+        chart->addCurve(series.name, ucd->x.vector, ucd->y.vector, series.xname, series.yname,
                         series.labels, series.colors,
                         series.line, series.symbol, series.size, series.color, series.opacity, series.opengl);
     }
@@ -188,8 +177,7 @@ UserChart::settings() const
         out << "\"group\": \""   << Utils::jsonprotect(series.group) << "\", ";
         out << "\"xname\": \""   << Utils::jsonprotect(series.xname) << "\", ";
         out << "\"yname\": \""   << Utils::jsonprotect(series.yname) << "\", ";
-        out << "\"yformula\": \""   << Utils::jsonprotect(series.string1) << "\", ";
-        out << "\"xformula\": \""   << Utils::jsonprotect(series.string2) << "\", ";
+        out << "\"program\": \"" << Utils::jsonprotect(series.string1) << "\", ";
         out << "\"line\": "      << series.line << ", ";
         out << "\"symbol\": "    << series.symbol << ", ";
         out << "\"size\": "      << series.size << ", ";
@@ -267,8 +255,7 @@ UserChart::applySettings(QString x)
         add.group = Utils::jsonunprotect(series["group"].toString());
         add.xname = Utils::jsonunprotect(series["xname"].toString());
         add.yname = Utils::jsonunprotect(series["yname"].toString());
-        add.string1 = Utils::jsonunprotect(series["yformula"].toString());
-        add.string2 = Utils::jsonunprotect(series["xformula"].toString());
+        add.string1 = Utils::jsonunprotect(series["program"].toString());
         add.line = series["line"].toInt();
         add.symbol = series["symbol"].toInt();
         add.size = series["size"].toDouble();
@@ -848,26 +835,22 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, GenericSeriesInfo &
 
     cf->addRow(tr("Series Name"), zz);
 
-    cf->addRow(" ", (QWidget *)NULL);
+    program = new DataFilterEdit(this, context);
+    program->setMinimumHeight(250 * dpiXFactor); // give me some space!
+    cf->addRow(tr("Program"), (QWidget *)NULL);
+    cf->addRow(program);
 
-    yformula = new DataFilterEdit(this, context);
-    cf->addRow(tr("Y Formula"), yformula);
     yname = new QLineEdit(this);
     zz = new QHBoxLayout();
     zz->addWidget(yname);
     zz->addStretch();
     cf->addRow("Y units", zz);
-
-    cf->addRow(" ", (QWidget *)NULL);
-    xformula = new DataFilterEdit(this, context);
-    cf->addRow(tr("X Formula"), xformula);
     xname = new QLineEdit(this);
     zz = new QHBoxLayout();
     zz->addWidget(xname);
     zz->addStretch();
     cf->addRow("X units", zz);
 
-    cf->addRow(" ", (QWidget *)NULL);
     cf->addRow(" ", (QWidget *)NULL);
 
     line = new QComboBox(this);
@@ -916,8 +899,37 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, GenericSeriesInfo &
     // update gui items from series info
     name->setText(original.name);
     groupname->setText(original.group);
-    yformula->setText(original.string1);
-    xformula->setText(original.string2);
+
+    // lets put a sensible default in to guide the user
+    if (original.string1 == "") {
+        original.string1=
+        "{\n"
+        "    init {\n"
+        "        xx<-c();\n"
+        "        yy<-c();\n"
+        "        count<-0;\n"
+        "    }\n"
+        "\n"
+        "    relevant {\n"
+        "        Data contains \"P\";\n"
+        "    }\n"
+        "\n"
+        "    sample {\n"
+        "        # as we iterate over activity data points\n"
+        "        count <- count + 1;\n"
+        "    }\n"
+        "\n"
+        "    finalise {\n"
+        "        # we just fetch samples at end\n"
+        "        xx <- samples(SECS);\n"
+        "        yy <- samples(POWER);\n"
+        "    }\n"
+        "\n"
+        "    x { xx; }\n"
+        "    y { yy; }\n"
+        "}\n";
+    }
+    program->setText(original.string1);
     xname->setText(original.xname);
     yname->setText(original.yname);
 
@@ -957,8 +969,7 @@ EditUserSeriesDialog::okClicked()
     // update seriesinfo from gui components
     original.name = name->text();
     original.group = groupname->text();
-    original.string1 = yformula->toPlainText();
-    original.string2 = xformula->toPlainText();
+    original.string1 = program->toPlainText();
     original.xname = xname->text();
     original.yname = yname->text();
     //labels;

@@ -158,6 +158,9 @@ class DataFilter : public QObject
         // runtime passed by datafilter
         DataFilterRuntime rt;
 
+        // compile time errors
+        QStringList &errorList() { return errors; }
+
         // get a signature for a datafilter
         static QString fingerprint(QString &query);
 

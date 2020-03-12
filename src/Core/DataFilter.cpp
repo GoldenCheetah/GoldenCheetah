@@ -1380,8 +1380,11 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 } else if (leaf->function == "samples") {
 
-                    // is the param 1 a valid data series?
-                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                    if (leaf->fparms.count() < 1) {
+                        leaf->inerror=true;
+                        DataFiltererrors << QString(tr("samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc."));
+
+                    } else if (leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc."));
                     } else {
@@ -1396,7 +1399,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 } else if (leaf->function == "metrics") {
 
                     // is the param a symbol and either a metric name or 'date'
-                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("metrics(symbol|date), symbol should be a metric name"));
 
@@ -1417,7 +1420,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     }
 
                     // need ascend|descend then a list
-                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                    if (leaf->fparms.count() > 0 && leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("argsort(ascend|descend, list [, .. list n]), need to specify ascend or descend"));
                     }
@@ -1442,7 +1445,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 } else if (leaf->function == "argsort") {
 
                     // need ascend|descend then a list
-                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("argsort(ascend|descend, list), need to specify ascend or descend"));
                     }
@@ -1450,7 +1453,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 } else if (leaf->function == "meanmax") {
 
                     // is the param 1 a valid data series?
-                    if (leaf->fparms[0]->type != Leaf::Symbol) {
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("meanmax(SERIES), SERIES should be POWER, HEARTRATE etc."));
                     } else {
