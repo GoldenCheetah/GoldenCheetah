@@ -208,7 +208,7 @@ DataFilter::builtins()
                     returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
         } else if (i == 44) {
             // banister
-            returning << "banister(load_metric, perf_metric, nte|pte|perf|cp)";
+            returning << "banister(load_metric, perf_metric, nte|pte|perf|cp|date)";
 
         } else if (i == 45) {
 
@@ -1497,7 +1497,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     // 3 parameters
                     if (leaf->fparms.count() != 3) {
                         leaf->inerror = true;
-                        DataFiltererrors << QString(tr("should be banister(load_metric, perf_metric, nte|pte|perf|cp)"));
+                        DataFiltererrors << QString(tr("should be banister(load_metric, perf_metric, nte|pte|perf|cp|date)"));
                     } else {
 
                         Leaf *first=leaf->fparms[0];
@@ -1522,7 +1522,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                         // check value
                         QString value = third->signature();
-                        QRegExp banSymbols("^(nte|pte|perf|cp)$", Qt::CaseInsensitive);
+                        QRegExp banSymbols("^(nte|pte|perf|cp|date)$", Qt::CaseInsensitive);
                         if (!banSymbols.exactMatch(value)) {
                             leaf->inerror = true;
                             DataFiltererrors << QString("unknown %1, should be nte,pte,perf or cp.").arg(value);
@@ -2651,15 +2651,30 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             QString value = third->signature();
             QDate when = m->dateTime.date();
             Banister *banister = m->context->athlete->getBanisterFor(metric, perf_metric, 0,0);
-            int type = BANISTER_PERFORMANCE;
 
-            if (value == "nte") type = BANISTER_NTE;
-            if (value == "pte") type = BANISTER_PTE;
-            if (value == "perf") type = BANISTER_PERFORMANCE;
-            if (value == "cp") type = BANISTER_CP;
+            // prepare result
+            Result returning(0);
+            int  si=0;
 
-            // value for the date..
-            return Result(banister->value(when, type));
+            for(QDate date=banister->start; date < banister->stop; date=date.addDays(1)) {
+                // index
+                if (date >= d.from && date <= d.to) {
+                    double x=0;
+
+                    // lets copy into our array
+                    if (value == "nte") x =banister->data[si].nte;
+                    if (value == "pte") x =banister->data[si].pte;
+                    if (value == "perf") x =banister->data[si].perf;
+                    if (value == "cp") x = banister->data[si].perf ? (banister->data[si].perf * 261.0 / 100.0) : 0;
+                    if (value == "date") x = QDateTime(date, QTime(0,0,0)).toMSecsSinceEpoch();
+
+                    returning.vector << x;
+                    returning.number += x;
+                }
+
+                si++;
+            }
+            return returning;
         }
 
         // get here for tiz and best
