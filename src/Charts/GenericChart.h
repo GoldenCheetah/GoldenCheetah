@@ -282,6 +282,11 @@ class GenericChart : public QWidget {
         bool stack; // stack series instead of on same chart
         int orientation; // layout horizontal or vertical
 
+        // once series, axis etc have all been
+        // cached, we need to pre-process the data
+        // before setting up plots.
+        void preprocessData();
+
         // when we get new settings/calls we
         // collect together to prepare before
         // actually creating plots since we want

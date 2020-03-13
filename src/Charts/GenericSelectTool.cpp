@@ -188,7 +188,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         painter->setPen(QPen(GColor(CPLOTMARKER)));
                         // datetime?
                         if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime)
-                            label=QDateTime::fromMSecsSinceEpoch(v.x()).toString("dd MMM yy");
+                            label=QDateTime::fromMSecsSinceEpoch(v.x()).toString(static_cast<QDateTimeAxis*>(xaxis)->format());
                         else
                             label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
@@ -281,18 +281,34 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         QPen markerpen(GColor(CPLOTMARKER));
                         painter->setPen(markerpen);
                         QString label;
-                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) label=QDateTime::fromMSecsSinceEpoch(calc.x.max).toString("dd MMM yy");
+                        QString datetimeformat;
+
+                        // ok, if its datetime lets get the format...
+                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime)  datetimeformat = static_cast<QDateTimeAxis*>(calc.xaxis)->format();
+
+                        // max
+                        if (datetimeformat!="") label=QDateTime::fromMSecsSinceEpoch(calc.x.max).toString(datetimeformat);
                         else label=QString("%1").arg(calc.x.max);
                         painter->drawText(maxxp-QPointF(0,4), label);
-                        if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) label=QDateTime::fromMSecsSinceEpoch(calc.x.min).toString("dd MMM yy");
+
+                        // min
+                        if (datetimeformat!="") label=QDateTime::fromMSecsSinceEpoch(calc.x.min).toString(datetimeformat);
                         else label=QString("%1").arg(calc.x.min);
                         painter->drawText(minxp-QPointF(0,4), label);
 
                         // scatter sees mean, line/timeseries more likely to want dx
                         if (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime) {
-                            int days = QDate(1970,01,01).daysTo(QDateTime::fromMSecsSinceEpoch(calc.x.max).date()) -
-                                       QDate(1970,01,01).daysTo(QDateTime::fromMSecsSinceEpoch(calc.x.min).date());
-                             label=QString("%1 days").arg(days);
+
+                            if (datetimeformat == GenericPlot::gl_dateformat) {
+                                // number of days, not an average in selection
+                                int days = QDateTime::fromMSecsSinceEpoch(calc.x.min).daysTo(QDateTime::fromMSecsSinceEpoch(calc.x.max));
+                                label=QString("%1 days").arg(days);
+                             } else {
+                                // selection in h:m:s format
+                                int secs = QDateTime::fromMSecsSinceEpoch(calc.x.min).secsTo(QDateTime::fromMSecsSinceEpoch(calc.x.max));
+                                label=time_to_string(secs, true);
+                             }
+
                         } else {
                             if (host->charttype == GC_CHART_SCATTER)  label=QString("%1").arg(calc.x.mean);
                             else label=QString("%1").arg(calc.x.max - calc.x.min);

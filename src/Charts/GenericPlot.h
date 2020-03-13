@@ -61,9 +61,11 @@ class GenericPlot : public QWidget {
 
     Q_OBJECT
 
-    static constexpr double gl_minheight = 225;
-
     public:
+
+        static constexpr double gl_minheight = 225;
+        static QString gl_dateformat;
+        static QString gl_timeformat;
 
         friend class GenericSelectTool;
         friend class GenericLegend;

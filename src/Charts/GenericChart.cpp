@@ -142,11 +142,62 @@ GenericChart::configureAxis(QString name, bool visible, int align, double min, d
     return true;
 }
 
+// preprocess data before updating the qt charts
+void
+GenericChart::preprocessData()
+{
+    // any series on an axis that is time based
+    // will need to have the values scaled from
+    // seconds to MSSinceEpoch
+    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), Qt::UTC);
+    for(int ai=0; ai<newAxes.count(); ai++) {
+        GenericAxisInfo &axis=newAxes[ai];
+
+        if (axis.type == GenericAxisInfo::TIME) {
+
+            // it's time based, so update series
+            // associated with this axies
+            bool usey = (axis.orientation == Qt::Vertical);
+
+            // adjust the min/max set by the user to MS since epoch
+            if (usey) {
+                if (axis.miny != -1) axis.miny=midnight.addSecs(axis.miny).toMSecsSinceEpoch();
+                if (axis.maxy != -1) axis.maxy=midnight.addSecs(axis.maxy).toMSecsSinceEpoch();
+            } else {
+                if (axis.minx != -1) axis.minx=midnight.addSecs(axis.minx).toMSecsSinceEpoch();
+                if (axis.maxx != -1) axis.maxx=midnight.addSecs(axis.maxx).toMSecsSinceEpoch();
+            }
+
+            for(int si=0; si<newSeries.count(); si++) {
+                GenericSeriesInfo &series=newSeries[si];
+                if (!usey && series.xname == axis.name) {
+                    // adjust x values
+                    for(int i=0; i<series.xseries.count(); i++)
+                        series.xseries[i] = midnight.addSecs(series.xseries[i]).toMSecsSinceEpoch();
+                }
+                if (usey && series.yname == axis.name) {
+                    // adjust y values
+                    for(int i=0; i<series.yseries.count(); i++)
+                        series.yseries[i] = midnight.addSecs(series.yseries[i]).toMSecsSinceEpoch();
+                }
+            }
+        }
+    } // end TIME AXIS scaling
+
+}
+
 // post processing clean up / add decorations / helpers etc
 void
 GenericChart::finaliseChart()
 {
     setUpdatesEnabled(false); // lets not open our kimono here
+
+    // now we know the axis/series and relationships we can
+    // adapt the data provided, prior to updating the qt charts
+    // the most obvious thing here is converting seconds to
+    // qdatetime MS since midnight. But later we may also need
+    // to perform scaling or filtering.
+    preprocessData();
 
     // ok, so lets work out what we need, run through the curves
     // and allocate to a plot, where we have separate plots if

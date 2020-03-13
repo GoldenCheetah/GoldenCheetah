@@ -139,7 +139,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     // just paint the value for now
     QString string;
     if (hasvalue) {
-        if (datetime) string=QDateTime::fromMSecsSinceEpoch(value).toString("dd MMM yy");
+        if (datetime) string=QDateTime::fromMSecsSinceEpoch(value).toString(datetimeformat);
         else string=QString("%1").arg(value, 0, 'f', 2);
     } else string="   ";
 
@@ -215,14 +215,14 @@ GenericLegend::setOrientation(Qt::Orientation o)
 
 }
 void
-GenericLegend::addX(QString name, bool datetime)
+GenericLegend::addX(QString name, bool datetime, QString datetimeformat)
 {
     // if it already exists remove it
     if (items.value(name,NULL) != NULL) removeSeries(name);
 
     GenericLegendItem *add = new GenericLegendItem(context, this, name, GColor(CPLOTMARKER));
     add->setClickable(false);
-    add->setDateTime(datetime);
+    add->setDateTime(datetime, datetimeformat);
     layout->insertWidget(0, add);
     items.insert(name,add);
 

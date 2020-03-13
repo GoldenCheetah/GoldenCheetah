@@ -26,6 +26,10 @@
 
 #include <limits>
 
+// used to format dates/times on axes
+QString GenericPlot::gl_dateformat = QString("dd MMM yy");
+QString GenericPlot::gl_timeformat = QString("hh:mm:ss");
+
 GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
 
@@ -658,13 +662,25 @@ GenericPlot::finaliseChart()
 
                     vaxis->setMin(QDateTime::fromMSecsSinceEpoch(axisinfo->min()));
                     vaxis->setMax(QDateTime::fromMSecsSinceEpoch(axisinfo->max()));
-                    vaxis->setFormat("dd MMM yy");
 
                     // attach to the chart
                     qchart->addAxis(add, axisinfo->locate());
+                    vaxis->setFormat(GenericPlot::gl_dateformat);
                 }
                 break;
-            case GenericAxisInfo::TIME:      // TODO
+            case GenericAxisInfo::TIME:
+                {
+                    QDateTimeAxis *vaxis = new QDateTimeAxis(qchart);
+                    add=vaxis; // gets added later
+
+                    vaxis->setMin(QDateTime::fromMSecsSinceEpoch(axisinfo->min()));
+                    vaxis->setMax(QDateTime::fromMSecsSinceEpoch(axisinfo->max()));
+
+                    // attach to the chart
+                    qchart->addAxis(add, axisinfo->locate());
+                    vaxis->setFormat(GenericPlot::gl_timeformat);
+                }
+                break;
             case GenericAxisInfo::CONTINUOUS:
                 {
                     QAbstractAxis *vaxis=NULL;
@@ -741,10 +757,8 @@ GenericPlot::finaliseChart()
                 if (charttype != GC_CHART_SCATTER && add->orientation()==Qt::Horizontal) // no x grids unless a scatter
                     add->setGridLineVisible(false);
 
-                // add the series that are associated with this
                 foreach(QAbstractSeries *series, axisinfo->series)
                     series->attachAxis(add);
-
             }
         }
     }
@@ -761,9 +775,12 @@ GenericPlot::finaliseChart()
                 // look for first series with a horizontal axis (we will use this later)
                 foreach(QAbstractAxis *axis, series->attachedAxes()) {
                     if (axis->orientation() == Qt::Horizontal) {
-                        if (axis->type()==QAbstractAxis::AxisTypeValue)  legend->addX(static_cast<QValueAxis*>(axis)->titleText(), false);
-                        else if (axis->type()==QAbstractAxis::AxisTypeLogValue)  legend->addX(static_cast<QLogValueAxis*>(axis)->titleText(), false);
-                        else if (axis->type()==QAbstractAxis::AxisTypeDateTime)  legend->addX(static_cast<QDateTimeAxis*>(axis)->titleText(), true);
+                        if (axis->type()==QAbstractAxis::AxisTypeValue)  legend->addX(static_cast<QValueAxis*>(axis)->titleText(), false, "");
+                        else if (axis->type()==QAbstractAxis::AxisTypeLogValue)  legend->addX(static_cast<QLogValueAxis*>(axis)->titleText(), false, "");
+                        else if (axis->type()==QAbstractAxis::AxisTypeDateTime)  {
+                            QDateTimeAxis *dta = static_cast<QDateTimeAxis*>(axis);
+                            legend->addX(dta->titleText(), true, dta->format());
+                        }
                         havexaxis=true;
                         break;
                     }
@@ -886,6 +903,13 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
 
     // type
     if (type != -1) axis->type = static_cast<GenericAxisInfo::AxisInfoType>(type);
+    else {
+        if (axis->orientation == Qt::Horizontal) {
+            // infer x-axis type from name, helps a little...
+            if (!axis->name.compare(tr("date"), Qt::CaseInsensitive)) axis->type = GenericAxisInfo::DATERANGE;
+            if (!axis->name.compare(tr("time"), Qt::CaseInsensitive)) axis->type = GenericAxisInfo::TIME;
+        }
+    }
 
     // color
     if (labelcolor != "") axis->labelcolor=QColor(labelcolor);
