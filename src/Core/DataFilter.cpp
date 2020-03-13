@@ -161,6 +161,7 @@ static struct {
     { "tail", 2 }, // tail(list, n) - returns vector of last n elements of list (or fewer if not so big)
 
     { "meanmax", 1 }, // meanmax(POWER) - when on trend view get a vector of meanmaximal data for the specific series
+    { "pmc", 2 },  // pmc(symbol, stress|lts|sts|sb|rr|date) - get a vector of PMC series for the metric in symbol for the current date range.
 
     // add new ones above this line
     { "", -1 }
@@ -274,6 +275,11 @@ DataFilter::builtins()
         } else if (i== 58) {
             // meanmax
             returning << "meanmax(POWER|WPK|HR|CADENCE|SPEED)";
+
+        } else if (i == 59) {
+
+            // pmc
+            returning << "pmc(metric, stress|lts|sts|sb|rr|date)";
 
         } else {
 
@@ -1217,6 +1223,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
+            QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -1462,6 +1469,26 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         if (leaf->seriesType==RideFile::none) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        }
+                    }
+
+                } else if (leaf->function == "pmc") {
+
+
+                    if (leaf->fparms.count() < 2 || leaf->fparms[1]->type != Leaf::Symbol) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("pmc(metric, stress|lts|sts|sb|rr|date), need to specify a metric and series."));
+
+                    } else {
+
+                        // expression good?
+                        validateFilter(context, df, leaf->fparms[0]);
+
+                        QString symbol=*(leaf->fparms[1]->lvalue.n);
+                        if (!pmcValidSymbols.exactMatch(symbol)) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid PMC series '%1'").arg(symbol));
                         }
                     }
 
@@ -2577,6 +2604,38 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, RideItem *m, RideF
             returning.vector = list.vector.mid(list.vector.count()-n, n);
             for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
 
+            return returning;
+        }
+
+        // pmc
+        if (leaf->function == "pmc") {
+
+            if (d.from==QDate() || d.to==QDate()) return Result(0);
+
+            QString series = *(leaf->fparms[1]->lvalue.n);
+            PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df); // use default days
+            Result returning(0);
+            int  si=0;
+
+            for(QDate date=pmcData->start(); date < pmcData->end(); date=date.addDays(1)) {
+                // index
+                if (date >= d.from && date <= d.to) {
+                    double value=0;
+
+                    // lets copy into our array
+                    if (series == "date") value = QDateTime(date, QTime(0,0,0)).toMSecsSinceEpoch();
+                    if (series == "lts") value = pmcData->lts()[si];
+                    if (series == "stress") value = pmcData->stress()[si];
+                    if (series == "sts") value = pmcData->sts()[si];
+                    if (series == "rr") value = pmcData->rr()[si];
+                    if (series == "sb") value = pmcData->sb()[si];
+
+                    returning.vector << value;
+                    returning.number += value;
+                }
+
+                si++;
+            }
             return returning;
         }
 
