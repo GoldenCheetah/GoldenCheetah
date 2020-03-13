@@ -297,7 +297,7 @@ lexpr:
                                                 }
         ;
 
-array:  symbol '[' expr ']'                    {
+array:  expr '[' expr ']'                    {
                                                   $$ = new Leaf(@1.first_column, @4.last_column);
                                                   $$->type = Leaf::Index;
                                                   $$->lvalue.l = $1;
