@@ -52,6 +52,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "PolarFlow") site = this->site = POLAR;
         if (service->id() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
         if (service->id() == "Xert") site = this->site = XERT;
+        if (service->id() == "RideWithGPS") site = this->site = RIDEWITHGPS;
     }
 
     // check if SSL is available - if not - message and end
@@ -301,7 +302,7 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("grant_type", "authorization_code");
                 params.addQueryItem("redirect_uri", "https://goldencheetah.github.io/blank.html");
 
-            }  else if (site == XERT) {
+            } else if (site == XERT) {
 
                 urlstr = QString("https://www.xertonline.com/oauth/token");
                 params.addQueryItem("username", service->getSetting(GC_XERTUSER, "").toString());
@@ -309,6 +310,12 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("grant_type", "password");
 
                 authheader = QString("%1:%1").arg("xert_public");
+            } else if (site == RIDEWITHGPS) {
+
+                urlstr = QString("https://www.ridewithgps.com/users/current.json");
+                params.addQueryItem("email", service->getSetting(GC_RWGPSUSER, "").toString());
+                params.addQueryItem("password", service->getSetting(GC_RWGPSPASS, "").toString());
+
             } else if (site == WITHINGS) {
 
                 urlstr = QString("https://account.withings.com/oauth2/token?");
