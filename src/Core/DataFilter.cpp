@@ -163,6 +163,9 @@ static struct {
     { "meanmax", 1 }, // meanmax(POWER) - when on trend view get a vector of meanmaximal data for the specific series
     { "pmc", 2 },  // pmc(symbol, stress|lts|sts|sb|rr|date) - get a vector of PMC series for the metric in symbol for the current date range.
 
+    { "sapply", 2 }, // sapply(vector, expr) - returns a vector where expr has been applied to every element. x and i
+                     // are both available in the expr for element value and index position.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -280,6 +283,11 @@ DataFilter::builtins()
 
             // pmc
             returning << "pmc(metric, stress|lts|sts|sb|rr|date)";
+
+        } else if (i == 60) {
+
+            // sapply
+            returning << "sapply(list, expr)";
 
         } else {
 
@@ -1482,8 +1490,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
-                } else if (leaf->function == "pmc") {
+                } else if (leaf->function == "sapply") {
 
+                    if (leaf->fparms.count() != 2) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("sapply(list, expr), need 2 parameters."));
+                    } else {
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+                    }
+
+                } else if (leaf->function == "pmc") {
 
                     if (leaf->fparms.count() < 2 || leaf->fparms[1]->type != Leaf::Symbol) {
 
@@ -2624,6 +2641,27 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             returning.vector = list.vector.mid(list.vector.count()-n, n);
             for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
 
+            return returning;
+        }
+
+        // sapply
+        if (leaf->function == "sapply") {
+            Result returning(0);
+
+            Result value = eval(df,leaf->fparms[0],x, it, m, p, c, s, d); // lhs might also be a symbol
+
+            // need a vector, always
+            if (!value.vector.count()) return returning;
+
+            // loop and evaluate, non-zero we keep, zero we lose
+            for(int i=0; i<value.vector.count(); i++) {
+                x = value.vector.at(i);
+                double r = eval(df,leaf->fparms[1],x, i, m, p, c, s, d).number;
+
+                // we want it
+                returning.vector << r;
+                returning.number += r;
+            }
             return returning;
         }
 
