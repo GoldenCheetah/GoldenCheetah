@@ -3827,12 +3827,29 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
     // INDEXING INTO VECTORS
     case Leaf::Index :
     {
-        int index = eval(df,leaf->fparms[0],x, it, m, p, c, s, d).number;
+        Result index = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
         Result value = eval(df,leaf->lvalue.l,x, it, m, p, c, s, d); // lhs might also be a symbol
 
-        if (index < 0 || index >= value.vector.count()) return Result(0); // out of bounds
+        // are we returning the value or a vector of values?
+        if (index.vector.count()) {
 
-        return Result(value.vector[index]);
+            Result returning(0);
+
+            // a range
+            for(int i=0; i<index.vector.count(); i++) {
+                int it=index.vector[i];
+                if (it < 0 || it >= value.vector.count()) continue; // ignore out of bounds
+                returning.vector << value.vector[it];
+                returning.number += value.vector[it];
+            }
+
+            return returning;
+
+        } else {
+            // a single value
+            if (index.number < 0 || index.number >= value.vector.count()) return Result(0);
+            return Result(value.vector[index.number]);
+        }
     }
 
     // SELECTING FROM VECTORS
