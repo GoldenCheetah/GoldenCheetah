@@ -70,7 +70,7 @@ class Leaf {
         // User Metric - using symbols from QHash<..> (RideItem + Interval) and
         // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
+        Result eval(DataFilterRuntime *df, Leaf *, float x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
 
         // tree traversal etc
         void print(int level, DataFilterRuntime*);  // print leaf and all children
@@ -84,7 +84,7 @@ class Leaf {
 
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
-               Function, Conditional, Vector, Index,
+               Function, Conditional, Vector, Index, Select,
                Compound, Script } type;
 
         union value {

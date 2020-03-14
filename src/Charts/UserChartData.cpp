@@ -60,11 +60,11 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
     relevant=x=y=z=d=t=Result(0);
 
     // always init first
-    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (finit) root->eval(rt, finit, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
 
     // is it relevant ?
     if (frelevant) {
-        relevant = root->eval(rt, frelevant, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+        relevant = root->eval(rt, frelevant, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
         if (relevant.number == 0) return;
     }
 
@@ -74,20 +74,20 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point, NULL, spec, dr);
+            root->eval(rt, fsample, 0, 0, const_cast<RideItem*>(item), point, NULL, spec, dr);
         }
     }
 
     // finalise computation
     if (ffinalise) {
-        root->eval(rt, ffinalise, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+        root->eval(rt, ffinalise, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
     }
 
     // values
-    if (fx) x = root->eval(rt, fx, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (fy) y = root->eval(rt, fy, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (fz) z = root->eval(rt, fz, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (ft) t = root->eval(rt, ft, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (fd) d = root->eval(rt, fd, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fx) x = root->eval(rt, fx, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fy) y = root->eval(rt, fy, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fz) z = root->eval(rt, fz, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (ft) t = root->eval(rt, ft, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fd) d = root->eval(rt, fd, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
 
 }

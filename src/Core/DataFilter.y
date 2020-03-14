@@ -75,7 +75,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <leaf> python_script;
 %type <comp> statements
@@ -306,6 +306,15 @@ array:  expr '[' expr ']'                    {
                                                 }
         ;
 
+select: expr '[' lexpr ']'                   {
+                                                  $$ = new Leaf(@1.first_column, @4.last_column);
+                                                  $$->type = Leaf::Select;
+                                                  $$->lvalue.l = $1;
+                                                  $$->fparms << $3;
+                                                  $$->op = 0;
+                                             }
+        ;
+
 /*
  * A compare expression evaluates to bool
  */
@@ -466,6 +475,7 @@ expr:
                                                   $$->op = 0;
                                                 }
         | array                                 { $$ = $1; }
+        | select                                { $$ = $1; }
         | literal                               { $$ = $1; }
         | symbol                                { $$ = $1; }
         | python_script                         { $$ = $1; }
