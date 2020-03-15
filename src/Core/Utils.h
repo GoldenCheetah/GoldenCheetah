@@ -30,6 +30,10 @@
 class QString;
 class QStringList;
 
+#define GC_SMOOTH_FORWARD 0
+#define GC_SMOOTH_BACKWARD 1
+#define GC_SMOOTH_CENTERED 2
+
 namespace Utils
 {
     QString xmlprotect(const QString &string);
@@ -39,6 +43,7 @@ namespace Utils
     QStringList searchPath(QString path, QString binary, bool isexec=true);
     QString removeDP(QString);
     QVector<int> argsort(QVector<double>&, bool ascending=false);
+    QVector<double> smooth_sma(QVector<double>&, int pos, int window);
 };
 
 

@@ -166,7 +166,10 @@ static struct {
 
     { "sapply", 2 }, // sapply(vector, expr) - returns a vector where expr has been applied to every element. x and i
                      // are both available in the expr for element value and index position.
+
     { "lr", 2 },   // lr(xlist, ylist) - linear regression on x,y co-ords returns vector [slope, intercept, r2, see]
+
+    { "smooth", 0 }, // smooth(list, algorithm, ... parameters) - returns smoothed data.
 
     // add new ones above this line
     { "", -1 }
@@ -1220,6 +1223,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
+            QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -1466,6 +1470,49 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
                         }
+                    }
+
+                } else if (leaf->function == "smooth") {
+
+                    if (leaf->fparms.count() < 2 || leaf->fparms[1]->type != Leaf::Symbol) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("smooth(list, algorithm [,parameters]) need at least 2 parameters."));
+
+                    } else {
+
+                        QString algo = *(leaf->fparms[1]->lvalue.n);
+                        if (!smoothAlgos.exactMatch(algo)) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("smoothing algorithm '%1' not available").arg(algo));
+                        } else {
+
+                            if (algo == "sma") {
+                                // smooth(list, sma, centred|forward|backward, window)
+                                if (leaf->fparms.count() != 4 || leaf->fparms[2]->type != Leaf::Symbol) {
+                                    leaf->inerror = true;
+                                    DataFiltererrors << QString(tr("smooth(list, sma, forward|centered|backward, windowsize"));
+
+                                } else {
+                                    QRegExp parms("^(forward|centered|backward)$");
+                                    QString parm1 = *(leaf->fparms[2]->lvalue.n);
+                                    if (!parms.exactMatch(parm1)) {
+
+                                        leaf->inerror = true;
+                                        DataFiltererrors << QString(tr("smooth(list, sma, forward|centered|backward, windowsize"));
+                                    }
+
+                                    // check list and windowsize
+                                    validateFilter(context, df, leaf->fparms[0]);
+                                    validateFilter(context, df, leaf->fparms[3]);
+                                }
+
+                            } else if (algo == "ewma") {
+                                // smooth(list, ewma, alpha)
+                                // TODO
+                            }
+                        }
+
                     }
 
                 } else if (leaf->function == "lr") {
@@ -2651,6 +2698,33 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.vector << r;
                 returning.number += r;
             }
+            return returning;
+        }
+
+        // smooth
+        if (leaf->function == "smooth") {
+
+            Result returning(0);
+
+            // moving average
+            if (*(leaf->fparms[1]->lvalue.n) == "sma") {
+
+                QString type =  *(leaf->fparms[2]->lvalue.n);
+                int window = eval(df,leaf->fparms[3],x, it, m, p, c, s, d).number;
+                Result data = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
+                int pos=2; // fallback
+
+                if (type=="backward") pos=0;
+                if (type=="forward") pos=1;
+                if (type=="centered") pos=2;
+
+                // smooth in different ways....
+                returning.vector = Utils::smooth_sma(data.vector, pos, window);
+
+                // sum. ugh.
+                for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
+            }
+
             return returning;
         }
 

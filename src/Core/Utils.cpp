@@ -297,5 +297,60 @@ argsort(QVector<double> &v, bool ascending)
     return returning;
 }
 
+// simple moving average
+static double mean(QVector<double>&data, int start, int end)
+{
+    double sum=0;
+    double count=0;
+
+    // add em up and handle out of bounds
+    for (int i=start; i<end; i++) {
+        if (i < 0) sum += data[0];
+        else if (i>=data.count()) sum += data[data.count()-1];
+        else sum += data[i];
+        count ++;
+    }
+    return sum/count;
+}
+
+QVector<double>
+smooth_sma(QVector<double>&data, int pos, int window)
+{
+    QVector<double> returning;
+
+    int window_start=0, window_end=0;
+    int index=0;
+    double ma=0;
+
+    // window is offset from index depending upon the forward/backward/centred position
+    switch (pos) {
+    case GC_SMOOTH_FORWARD:
+        window_start=0;
+        window_end=window;
+        break;
+
+    case GC_SMOOTH_BACKWARD:
+        window_end=0;
+        window_start=window *-1;
+        break;
+
+    case GC_SMOOTH_CENTERED: // we should handle odd/even size better
+        window_start = (window*-1)/2;
+        window_end = (window)/2;
+    }
+
+    while (index < data.count()) {
+
+        returning << mean(data, window_start, window_end);
+
+        index ++;
+        window_start++;
+        window_end++;
+    }
+
+    return returning;
+
+}
+
 };
 
