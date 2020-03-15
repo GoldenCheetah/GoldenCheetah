@@ -352,5 +352,21 @@ smooth_sma(QVector<double>&data, int pos, int window)
 
 }
 
+QVector<double>
+smooth_ewma(QVector<double>&data, double alpha)
+{
+    if (alpha < 0 || alpha > 1) alpha = 0.3; // if user is an idiot....
+
+    QVector<double> returning;
+    double value=0, last=0;
+    for(int i=0; i<data.count(); i++) {
+        if (i == 0)  value = data[i];
+        else value = (alpha * data[i]) + ((1.0-alpha) * last);
+        returning << value;
+        last = value;
+    }
+    return returning;
+}
+
 };
 

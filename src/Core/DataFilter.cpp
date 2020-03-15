@@ -1509,10 +1509,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                             } else if (algo == "ewma") {
                                 // smooth(list, ewma, alpha)
-                                // TODO
+
+                                if (leaf->fparms.count() != 3) {
+                                    leaf->inerror = true;
+                                    DataFiltererrors << QString(tr("smooth(list, ewma, alpha (between 0 and 1)"));
+                                } else {
+                                    // check list and windowsize
+                                    validateFilter(context, df, leaf->fparms[0]);
+                                    validateFilter(context, df, leaf->fparms[2]);
+                                }
                             }
                         }
-
                     }
 
                 } else if (leaf->function == "lr") {
@@ -2718,12 +2725,19 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 if (type=="forward") pos=1;
                 if (type=="centered") pos=2;
 
-                // smooth in different ways....
                 returning.vector = Utils::smooth_sma(data.vector, pos, window);
 
-                // sum. ugh.
-                for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
+            } else if (*(leaf->fparms[1]->lvalue.n) == "ewma") {
+
+                // exponentially weighted moving average
+                double alpha = eval(df,leaf->fparms[2],x, it, m, p, c, s, d).number;
+                Result data = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
+
+                returning.vector = Utils::smooth_ewma(data.vector, alpha);
             }
+
+            // sum. ugh.
+            for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
 
             return returning;
         }
