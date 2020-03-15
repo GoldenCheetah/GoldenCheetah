@@ -2705,6 +2705,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             returning.vector[1]=calc.b;
             returning.vector[2]=calc.r2;
             returning.vector[3]=calc.see;
+            returning.number = calc.m + calc.b + calc.r2 + calc.see; // sum
 
             return returning;
         }

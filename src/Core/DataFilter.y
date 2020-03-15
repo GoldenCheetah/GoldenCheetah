@@ -297,7 +297,17 @@ lexpr:
                                                 }
         ;
 
-array:  expr '[' expr ']'                    {
+array:
+         symbol '[' expr ']'                    { // reduce/reduce conflict, but added here so gets resolved
+                                                  // first (order appeared in this file.
+                                                  // e.g. a+b[1] is resolved as a+(b[1]) rather than (a+b)[1]
+                                                  $$ = new Leaf(@1.first_column, @4.last_column);
+                                                  $$->type = Leaf::Index;
+                                                  $$->lvalue.l = $1;
+                                                  $$->fparms << $3;
+                                                  $$->op = 0;
+                                                }
+         | expr '[' expr ']'                    {
                                                   $$ = new Leaf(@1.first_column, @4.last_column);
                                                   $$->type = Leaf::Index;
                                                   $$->lvalue.l = $1;
