@@ -144,7 +144,7 @@ UserChart::setRide(RideItem *item)
         // data now generated so can add curve
         chart->addCurve(series.name, ucd->x.vector, ucd->y.vector, series.xname, series.yname,
                         series.labels, series.colors,
-                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl);
+                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend);
     }
 
     foreach (GenericAxisInfo axis, axisinfo) {
@@ -208,6 +208,7 @@ UserChart::settings() const
         out << "\"size\": "      << series.size << ", ";
         out << "\"color\": \""   << series.color << "\", ";
         out << "\"opacity\": "   << series.opacity << ", ";
+        out << "\"legend\": "    << (series.legend ? "true" : "false") << ", "; // noter no trailing comma
         out << "\"opengl\": "    << (series.opengl ? "true" : "false"); // noter no trailing comma
         out << "}"; // note no trailing comman
     }
@@ -286,6 +287,7 @@ UserChart::applySettings(QString x)
         add.size = series["size"].toDouble();
         add.color = series["color"].toString();
         add.opacity = series["opacity"].toDouble();
+        add.legend = series["legend"].toBool();
         add.opengl = series["opengl"].toBool();
 
         seriesinfo.append(add);
@@ -885,6 +887,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     line->addItem(tr("Dot"), static_cast<int>(Qt::PenStyle::DotLine));
     line->addItem(tr("Dash Dot"), static_cast<int>(Qt::PenStyle::DashDotLine));
     opengl = new QCheckBox(tr("Fast Graphics"));
+    legend = new QCheckBox(tr("Show on Legend"));
 
     zz = new QHBoxLayout();
     zz->addWidget(line);
@@ -896,7 +899,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz = new QHBoxLayout();
     zz->addWidget(symbol);
     zz->addStretch();
-    zz->addStretch();
+    zz->addWidget(legend);
     cf->addRow(tr("Symbol"), zz);
 
     color = new ColorButton(this, "Color", Qt::red);
@@ -1003,6 +1006,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     color->setColor(QColor(original.color));
     //original.opacity = opacity->value();
     opengl->setChecked(original.opengl != 0);
+    legend->setChecked(original.legend != 0);
     opacity->setValue(original.opacity);
     // update the source
 
@@ -1035,6 +1039,7 @@ EditUserSeriesDialog::okClicked()
     original.color = color->getColor().name();
     original.opengl = opengl->isChecked();
     original.opacity = opacity->value();
+    original.legend = legend->isChecked();
     // update the source
 
     accept();

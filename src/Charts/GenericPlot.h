@@ -91,7 +91,7 @@ class GenericPlot : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl);
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend);
 
         // adding annotations
         void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue);
@@ -132,6 +132,7 @@ class GenericPlot : public QWidget {
 
         // the legend
         GenericLegend *legend;
+        QStringList havelegend;
 
         // quadtrees
         QMap<QAbstractSeries*, Quadtree*> quadtrees;

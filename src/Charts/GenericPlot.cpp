@@ -357,6 +357,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
     left=true;
     bottom=true;
     barsets.clear();
+    havelegend.clear();
 
     // reset selections etc
     selector->reset();
@@ -415,7 +416,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int linestyle, int /*symbol TODO */, int size, QString color, int opacity, bool opengl)
+                      int linestyle, int /*symbol TODO */, int size, QString color, int opacity, bool opengl, bool legend)
 {
     // if curve already exists, remove it
     if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
@@ -425,6 +426,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             delete existing; // XXX is this such a great idea.. causes a lot of flicker...
         }
     }
+
+    // want a legend?
+    if (legend) havelegend << name;
 
     // lets find that axis - even blank ones
     GenericAxisInfo *xaxis, *yaxis;
@@ -787,8 +791,8 @@ GenericPlot::finaliseChart()
                 }
             }
 
-            // add to the legend xxx might make some hidden?
-            legend->addSeries(series->name(), GenericPlot::seriesColor(series));
+            // add to the legend
+            if (havelegend.contains(series->name())) legend->addSeries(series->name(), GenericPlot::seriesColor(series));
 
         }
 

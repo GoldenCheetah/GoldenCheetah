@@ -117,7 +117,7 @@ class Bindings {
         bool configChart(QString title, int type, bool animate, int pos, bool stack, int orientation) const;
         bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
                       QStringList labels,  QStringList colors,
-                      int line, int symbol, int symbolsize, QString color, int opacity, bool opengl) const;
+                      int line, int symbol, int symbolsize, QString color, int opacity, bool opengl, bool legend) const;
         bool configAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
 
