@@ -2,8 +2,8 @@
 // BSplineCurve.h from Geometric Tools along with all the GTC headers
 // it requires.
 
-#define LogError(a) (a); return 0;
-#define LogAssert(a,b) (a)
+#define LogError(a)    (0); return 0;
+#define LogAssert(a,b) (0)
 
 // -----------------------------------------------------------------------
 // Mathematics/Math.h
