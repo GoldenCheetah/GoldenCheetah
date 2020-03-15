@@ -370,7 +370,6 @@ Leaf::isDynamic(Leaf *leaf)
                 leaf->isDynamic(leaf->lvalue.l) ||
                 (leaf->rvalue.l && leaf->isDynamic(leaf->rvalue.l)));
     case Leaf::Script :
-    case Leaf::Vector :
         return true;
 
     }
@@ -859,13 +858,6 @@ void Leaf::color(Leaf *leaf, QTextDocument *document)
                     }
                     break;
 
-    case Leaf::Vector :
-                    leaf->color(leaf->lvalue.l, document);
-                    leaf->color(leaf->fparms[0], document);
-                    leaf->color(leaf->fparms[1], document);
-                    return;
-                    break;
-
     case Leaf::Conditional :
         {
                     leaf->color(leaf->cond.l, document);
@@ -954,11 +946,6 @@ Leaf::toString()
                         return f;
                     }
                     break;
-    case Leaf::Vector :
-                    return QString("%1[%2:%3]")
-                        .arg(lvalue.l->toString())
-                        .arg(fparms[0]->toString())
-                        .arg(fparms[1]->toString());
 
     case Leaf::Conditional : //qDebug()<<"cond:"<<op;
         {
@@ -1060,12 +1047,6 @@ void Leaf::print(int level, DataFilterRuntime *df)
         lvalue.l->print(level+1, df);
         fparms[0]->print(level+1,df);
         break;
-    case Leaf::Vector:
-        qDebug()<<"vector";
-        lvalue.l->print(level+1, df);
-        fparms[0]->print(level+1, df);
-        fparms[1]->print(level+1, df);
-        break;
     case Leaf::Conditional:
         qDebug()<<"cond"<<op;
         cond.l->print(level+1, df);
@@ -1129,7 +1110,6 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
     case Leaf::UnaryOperation : return true;
     case Leaf::BinaryOperation : return true;
     case Leaf::Function : return true;
-    case Leaf::Vector :
     case Leaf::Select :
     case Leaf::Index :
     case Leaf::Conditional :
@@ -1210,14 +1190,6 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             }
         }
         break;
-
-    case Leaf::Vector :
-        {
-            leaf->validateFilter(context, df, leaf->lvalue.l);
-            leaf->validateFilter(context, df, leaf->fparms[0]);
-            leaf->validateFilter(context, df, leaf->fparms[1]);
-        }
-        return;
 
     case Leaf::Select:
         {
@@ -3809,63 +3781,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 return returning;
             }
         }
-    }
-    break;
-
-    //
-    // VECTORS
-    //
-    case Leaf::Vector :
-    {
-        // places results in vector, and number is sum of all
-        // explicit funcions sum/avg/max/min will return non-sum
-        // values. No vector operations are supported at present
-        // as a DESIGN DECISION. They are too complex for the average
-        // user to understand. We will integrate to R for users
-        // that want that kind of power.
-        //
-        // Vectors are about collecting data from across a date range
-        // so you can use them within a formula for simple kinds of
-        // operations; e.g. how much of todays' workouts in time
-        // does this workout represent would be:
-        // Duration / Duration[[today:today]] * 100.00
-
-        Specification spec;
-
-        // get date range
-        int fromDS = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
-        int toDS = eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number;
-
-        // swap dates if needed
-        if (toDS < fromDS) {
-            int swap=fromDS;
-            fromDS = toDS;
-            toDS = swap;
-        }
-
-        spec.setDateRange(DateRange(QDate(1900,01,01).addDays(fromDS),QDate(1900,01,01).addDays(toDS)));
-
-        Result returning;
-
-        // now iterate and evaluate for each
-        int count=0;
-        foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
-
-            if (!spec.pass(ride)) continue;
-
-            count++;
-
-            // calculate value
-            Result res = eval(df, leaf->lvalue.l, x, it, ride, p, c, s);
-            if (res.isNumber) {
-                returning.number += res.number; // sum for easy access
-                returning.vector.resize(count);
-                returning.vector[count-1] = res.number;
-            }
-        }
-
-        // always return as sum number (for now)
-        return returning;
     }
     break;
 
