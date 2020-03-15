@@ -58,13 +58,15 @@ class GenericCalculator
     void finalise();
 
     int count;
-    double m,b,r2; // r2 and y=mx +b
+    double m,b,r2,see; // r2 and y=mx +b
     double lrsumx2, lrsumxy; // used to resolve m and b
     struct {
         double max, min, sum, mean;
         double lrsum;
     } x,y;
     QColor color; // for paint
+
+    QVector<QPointF> actual;// keep track of data for finalise to use
 
     // what were we calculated on? (so paint can transform)
     QAbstractAxis *xaxis,*yaxis;

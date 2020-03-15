@@ -227,7 +227,8 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             // slope calcs way over the top for a line chart
                             // where there are multiple series being plotted
                             if (host->charttype == GC_CHART_SCATTER) {
-                                QString lr=QString("y = %1 x + %2").arg(calc.m).arg(calc.b);
+                                QString lr=QString("y = %1 x + %2 \nr2=%3, see=%4").arg(calc.m,0,'f',3).arg(calc.b, 0,'f', 3)
+                                                                                   .arg(calc.r2,0,'f',3).arg(calc.see,0,'f',3);
                                 QPen line(calc.color);
                                 painter->setPen(line);
                                 painter->drawText(QPointF(0,0), lr);
@@ -786,7 +787,7 @@ void
 GenericCalculator::initialise()
 {
     count=0;
-    m = b = lrsumxy = lrsumx2 = x.lrsum = y.lrsum =
+    m = b = lrsumxy = lrsumx2 = x.lrsum = y.lrsum = r2 = see =
     x.max = x.min = x.sum = x.mean =
     y.max = y.min = y.sum = y.mean = 0;
     xaxis=yaxis=NULL;
@@ -837,16 +838,37 @@ GenericCalculator::addPoint(QPointF point)
     lrsumxy += lr.x() * lr.y();
     x.lrsum += lr.x();
     y.lrsum += lr.y();
+
+    // keep a record
+    actual << lr;
 }
 
 void
 GenericCalculator::finalise()
 {
     // add calcs for stuff cannot do on the fly
-    if (count >=2) {
+    if (actual.count() >=2) {
         m = (count * lrsumxy - x.lrsum * y.lrsum) / (count * lrsumx2 - (x.lrsum * x.lrsum));
         b = (y.lrsum - m * x.lrsum) / count;
+
+        // r2
+        double sumActualErrors=0, sumPredictErrors=0;
+        see = 0;
+        for(int i=0; i<actual.count(); i++) {
+            sumActualErrors += pow(actual[i].y() - y.mean, 2);
+            sumPredictErrors += pow(((actual[i].x()*m)+b) - y.mean, 2);
+            see += pow(((actual[i].x() * m) + b) - actual[i].y(), 2);
+        }
+        r2 = sumPredictErrors / sumActualErrors;
+
+        if (actual.count() >2) see = sqrt(see/(actual.count()-2));
+        else see=0;
+
+    } else {
+        m = b = r2 = see = 0;
     }
+
+    actual.clear();
 }
 
 void

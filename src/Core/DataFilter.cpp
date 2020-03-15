@@ -29,6 +29,7 @@
 #include "LTMSettings.h"
 #include "VDOTCalculator.h"
 #include "DataProcessor.h"
+#include "GenericSelectTool.h" // for generic calculator
 #include <QDebug>
 #include <QMutex>
 
@@ -165,6 +166,7 @@ static struct {
 
     { "sapply", 2 }, // sapply(vector, expr) - returns a vector where expr has been applied to every element. x and i
                      // are both available in the expr for element value and index position.
+    { "lr", 2 },   // lr(xlist, ylist) - linear regression on x,y co-ords returns vector [slope, intercept, r2, see]
 
     // add new ones above this line
     { "", -1 }
@@ -288,6 +290,10 @@ DataFilter::builtins()
 
             // sapply
             returning << "sapply(list, expr)";
+
+        } else if (i == 61) {
+
+            returning << "lr(xlist, ylist)";
 
         } else {
 
@@ -1490,6 +1496,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "lr") {
+
+                    if (leaf->fparms.count() != 2) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("lr(x, y), need x and y vectors."));
+
+                    } else {
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+                    }
+
                 } else if (leaf->function == "sapply") {
 
                     if (leaf->fparms.count() != 2) {
@@ -2662,6 +2679,33 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.vector << r;
                 returning.number += r;
             }
+            return returning;
+        }
+
+        // linear regression
+        if (leaf->function == "lr") {
+            Result returning(0);
+            returning.vector << 0 << 0 << 0 << 0; // set slope, intercept, r2 and see to 0
+
+            Result xv = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
+            Result yv = eval(df,leaf->fparms[1],x, it, m, p, c, s, d);
+
+            // check ok to proceed
+            if (xv.vector.count() < 2 || xv.vector.count() != yv.vector.count()) return returning;
+
+            // use the generic calculator, its quick and easy
+            GenericCalculator calc;
+            calc.initialise();
+            for (int i=0; i< xv.vector.count(); i++)
+                calc.addPoint(QPointF(xv.vector[i], yv.vector[i]));
+            calc.finalise();
+
+            // extract LR results
+            returning.vector[0]=calc.m;
+            returning.vector[1]=calc.b;
+            returning.vector[2]=calc.r2;
+            returning.vector[3]=calc.see;
+
             return returning;
         }
 
