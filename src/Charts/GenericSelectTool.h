@@ -59,15 +59,17 @@ class GenericCalculator
 
     int count;
     double m,b,r2; // r2 and y=mx +b
-    double sumx2, sumxy; // used to resolve m and b
+    double lrsumx2, lrsumxy; // used to resolve m and b
     struct {
         double max, min, sum, mean;
+        double lrsum;
     } x,y;
     QColor color; // for paint
 
     // what were we calculated on? (so paint can transform)
     QAbstractAxis *xaxis,*yaxis;
     QAbstractSeries *series;
+    QDateTime midnight; // used for transform time to seconds
 };
 
 // hover points etc

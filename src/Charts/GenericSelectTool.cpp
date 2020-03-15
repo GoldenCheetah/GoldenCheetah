@@ -786,15 +786,32 @@ void
 GenericCalculator::initialise()
 {
     count=0;
-    m = b = sumxy = sumx2 =
+    m = b = lrsumxy = lrsumx2 = x.lrsum = y.lrsum =
     x.max = x.min = x.sum = x.mean =
     y.max = y.min = y.sum = y.mean = 0;
+    xaxis=yaxis=NULL;
+    midnight=QDateTime(QDate::currentDate(), QTime(0,0,0));
 
 }
 
 void
 GenericCalculator::addPoint(QPointF point)
 {
+    // translate points if they've been adjusted to be time values for the
+    // Qt chart time axis, i.e from MS since Epoch to seconds - this is because
+    // we need original values for linear regress, all other calcs are fine
+    // at this point
+    QPointF lr=point;
+
+    // X
+    if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime &&
+        static_cast<QDateTimeAxis*>(xaxis)->format() == GenericPlot::gl_timeformat)
+        lr.setX(midnight.secsTo(QDateTime::fromMSecsSinceEpoch(point.x())));
+
+    // Y
+    if (yaxis && yaxis->type() == QAbstractAxis::AxisTypeDateTime &&
+        static_cast<QDateTimeAxis*>(yaxis)->format() == GenericPlot::gl_timeformat)
+        lr.setY(midnight.secsTo(QDateTime::fromMSecsSinceEpoch(point.y())));
 
     // max min set from values we've seen
     if (count >0) {
@@ -808,13 +825,18 @@ GenericCalculator::addPoint(QPointF point)
         y.min = y.max = point.y();
     }
 
+    // basic
     count ++;
     x.sum += point.x();
     y.sum += point.y();
     x.mean = x.sum / double(count);
     y.mean = y.sum / double(count);
-    sumx2 += point.x() * point.x();
-    sumxy += point.x() * point.y();
+
+    // lr
+    lrsumx2 += lr.x() * lr.x();
+    lrsumxy += lr.x() * lr.y();
+    x.lrsum += lr.x();
+    y.lrsum += lr.y();
 }
 
 void
@@ -822,8 +844,8 @@ GenericCalculator::finalise()
 {
     // add calcs for stuff cannot do on the fly
     if (count >=2) {
-        m = (count * sumxy - x.sum * y.sum) / (count * sumx2 - (x.sum * x.sum));
-        b = (y.sum - m * x.sum) / count;
+        m = (count * lrsumxy - x.lrsum * y.lrsum) / (count * lrsumx2 - (x.lrsum * x.lrsum));
+        b = (y.lrsum - m * x.lrsum) / count;
     }
 }
 
