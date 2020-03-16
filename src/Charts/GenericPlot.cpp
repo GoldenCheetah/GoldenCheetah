@@ -416,14 +416,26 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int linestyle, int /*symbol TODO */, int size, QString color, int opacity, bool opengl, bool legend)
+                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend)
 {
+    // a curve can have a decoration associated with it
+    // on a line chart the decoration is the symbols
+    // on a scatter chart the decoration is the line
+    QString dname = QString("d_%1").arg(name);
+
     // if curve already exists, remove it
     if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
         QAbstractSeries *existing = curves.value(name);
         if (existing) {
             qchart->removeSeries(existing);
-            delete existing; // XXX is this such a great idea.. causes a lot of flicker...
+            delete existing;
+            curves.remove(name);
+        }
+        QAbstractSeries *decor = decorations.value(dname);
+        if (decor) {
+            qchart->removeSeries(decor);
+            delete decor;
+            decorations.remove(dname);
         }
     }
 
@@ -446,6 +458,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
         // add to list
         axisinfos.insert(xname, xaxis);
+
     }
     if (yaxis==NULL) {
         yaxis=new GenericAxisInfo(Qt::Vertical, yname);
@@ -492,6 +505,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             add->setUseOpenGL(opengl); // for scatter or line only apparently
             qchart->setDropShadowEnabled(false);
 
+            // no line, we are invisible
+            if (linestyle == 0) add->setVisible(false);
+
             // chart
             qchart->addSeries(add);
 
@@ -499,6 +515,40 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             curves.insert(name,add);
             xaxis->series.append(add);
             yaxis->series.append(add);
+
+            // so do we need to decorate with a symbol?
+            if (symbol > 0) {
+
+                // set up the curves
+                QScatterSeries *add = new QScatterSeries();
+                add->setName(dname);
+
+                // data
+                for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+                    add->append(xseries.at(i), yseries.at(i));
+
+                // aesthetics
+                if (symbol == 1) add->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+                else if (symbol == 2)  add->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+                add->setMarkerSize(size*6);
+                QColor col=QColor(color);
+                add->setBrush(QBrush(col));
+                add->setPen(Qt::NoPen);
+                add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
+
+                // hardware support?
+                chartview->setRenderHint(QPainter::Antialiasing);
+                add->setUseOpenGL(opengl); // for scatter or line only apparently
+                qchart->setDropShadowEnabled(false);
+
+                // chart
+                qchart->addSeries(add);
+
+                // add to list of curves
+                decorations.insert(dname,add);
+                xaxis->decorations.append(add);
+                yaxis->decorations.append(add);
+            }
         }
         break;
 
@@ -509,7 +559,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             add->setName(name);
 
             // aesthetics
-            add->setMarkerShape(QScatterSeries::MarkerShapeCircle); //TODO: use 'symbol'
+            if (symbol == 0) add->setVisible(false); // no marker !
+            else if (symbol == 1) add->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+            else if (symbol == 2)  add->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
             add->setMarkerSize(size);
             QColor col=QColor(color);
             add->setBrush(QBrush(col));
@@ -551,6 +603,36 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             xaxis->series.append(add);
             yaxis->series.append(add);
 
+            if (linestyle > 0) {
+                // set up the curves
+                QLineSeries *add = new QLineSeries();
+                add->setName(dname);
+
+                // aesthetics
+                add->setBrush(Qt::NoBrush);
+                QPen pen(color);
+                pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
+                pen.setWidth(size);
+                add->setPen(pen);
+                add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
+
+                // data
+                for (int i=0; i<xseries.size() && i<yseries.size(); i++)
+                    add->append(xseries.at(i), yseries.at(i));
+
+                // hardware support?
+                chartview->setRenderHint(QPainter::Antialiasing);
+                add->setUseOpenGL(opengl); // for scatter or line only apparently
+                qchart->setDropShadowEnabled(false);
+
+                // chart
+                qchart->addSeries(add);
+
+                // add to list of curves
+                decorations.insert(dname,add);
+                xaxis->decorations.append(add);
+                yaxis->decorations.append(add);
+            }
         }
         break;
 
@@ -762,6 +844,8 @@ GenericPlot::finaliseChart()
                     add->setGridLineVisible(false);
 
                 foreach(QAbstractSeries *series, axisinfo->series)
+                    series->attachAxis(add);
+                foreach(QAbstractSeries *series, axisinfo->decorations)
                     series->attachAxis(add);
             }
         }

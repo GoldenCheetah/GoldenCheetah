@@ -895,7 +895,10 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz->addWidget(opengl);
     cf->addRow(tr("Line Style"), zz);
 
-    symbol = new QComboBox(this); //XXX TODO
+    symbol = new QComboBox(this);
+    symbol->addItem(tr("None"), 0);
+    symbol->addItem(tr("Circle"), 1);
+    symbol->addItem(tr("Rectangle"), 2);
     zz = new QHBoxLayout();
     zz->addWidget(symbol);
     zz->addStretch();
@@ -1000,7 +1003,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     index = symbol->findData(original.symbol);
     if (index >= 0) symbol->setCurrentIndex(index);
-    else symbol->setCurrentIndex(0);
+    else symbol->setCurrentIndex(1); // circle if not set
 
     size->setValue(original.size);
     color->setColor(QColor(original.color));

@@ -33,7 +33,7 @@ def __GCsetChart(title="",type=1,animate=False,legpos=2,stack=False,orientation=
     GC.configChart(title,type,animate,legpos,stack,orientation)
 
 # add a curve
-def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=0,size=15,color="cyan",opacity=0,opengl=True,legend=True):
+def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=1,size=15,color="cyan",opacity=0,opengl=True,legend=True):
     if (name == ""):
        raise ValueError("curve 'name' must be set and unique.")
     GC.setCurve(name,list(x),list(y),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl,legend)

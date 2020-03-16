@@ -224,6 +224,7 @@ class GenericAxisInfo {
 
         // series we are associated with
         QList<QAbstractSeries*> series;
+        QList<QAbstractSeries*> decorations;
 
         // data is all public to avoid tedious get/set
         AxisInfoType type; // what type of axis is this?

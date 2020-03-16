@@ -302,7 +302,7 @@ RTool::RTool()
 
                                // charts
                                "GC.setChart <- function(title=\"\", type=1, animate=FALSE, legpos=2, stack=FALSE, orientation=2) { .Call(\"GC.chart.set\", title, type, animate, legpos ,stack, orientation)}\n"
-                               "GC.addCurve <- function(name=\"curve\", xseries=c(), yseries=c(), xname=\"xaxis\", yname=\"yaxis\", min=-1, max=-1, labels=c(), colors=c(), line=1,symbol=0,size=2,color=\"red\",opacity=100,opengl=TRUE, legend=TRUE) { .Call(\"GC.chart.addCurve\", name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend)}\n"
+                               "GC.addCurve <- function(name=\"curve\", xseries=c(), yseries=c(), xname=\"xaxis\", yname=\"yaxis\", min=-1, max=-1, labels=c(), colors=c(), line=1,symbol=1,size=2,color=\"red\",opacity=100,opengl=TRUE, legend=TRUE) { .Call(\"GC.chart.addCurve\", name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend)}\n"
                                "GC.setAxis <- function(name=\"xaxis\",visible=TRUE, align=-1, min=-1, max=-1, type=0, labelcolor=\"\", color=\"\", log=FALSE, categories=c()) { .Call(\"GC.chart.configureAxis\", name, visible, align, min, max, type, labelcolor,color,log,categories)}\n"
 
                                 // constants
