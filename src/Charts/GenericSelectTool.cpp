@@ -638,7 +638,13 @@ GenericSelectTool::moved(QPointF pos)
             double nearestx=-9999;
             foreach(QAbstractSeries *series, host->qchart->series()) {
 
-                if (series->isVisible() == false || ignore.contains(series)) continue;
+                if (ignore.contains(series)) continue;
+
+                if (series->isVisible() == false) {
+                    // but is there a decoration visible?
+                    QAbstractSeries *dec = host->decorations.value(series);
+                    if (dec==NULL || dec->isVisible()== false) continue;
+                }
 
                 // get x value to search
                 double xvalue=host->qchart->mapToValue(spos,series).x();

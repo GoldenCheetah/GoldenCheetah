@@ -145,7 +145,7 @@ class GenericPlot : public QWidget {
         QMap<QString, QAbstractSeries *>curves;
 
         // decorations (symbols for line charts, lines for scatter)
-        QMap<QString, QAbstractSeries *>decorations;
+        QMap<QAbstractSeries*, QAbstractSeries *>decorations;
 
         // axes
         QMap<QString, GenericAxisInfo *>axisinfos;
