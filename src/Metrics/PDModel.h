@@ -58,6 +58,41 @@
 #define PDMODEL_MAXT 18000 // maximum value for t we will provide p(t) for
 #define PDMODEL_INTERVAL 1 // intervals used in seconds; 0t, 1t, 2t .. 18000t
 
+class PDModelDescriptor
+{
+    public:
+        PDModelDescriptor(int position, bool hasWPrime, bool hasCP, bool hasFTP, bool hasPMax,
+                          QString name, QString code);
+
+        const int position; // position of the model in a container
+
+        const bool hasWPrime; // can estimate W'
+        const bool hasCP;     // can estimate CP
+        const bool hasFTP;    // can estimate FTP
+        const bool hasPMax;   // can estimate PMax
+
+        const QString name; // model name e.g. CP 2 parameter model
+        const QString code; // short name used in metric names e.g. 2P model
+};
+
+struct PDModelRegistryImpl;
+
+class PDModelRegistry
+{
+    public:
+        static PDModelRegistry &instance();
+        
+        const QList<const PDModelDescriptor *> descriptors() const;
+        const PDModelDescriptor *getDescriptorByCode(QString code) const;
+
+    private:
+        PDModelRegistry();
+        PDModelRegistry(const PDModelRegistry &) {}
+        PDModelRegistry & operator=(const PDModelRegistry &) { return *this; }
+        ~PDModelRegistry();
+        
+        PDModelRegistryImpl *impl;
+};
 
 class PDModel : public QObject, public QwtSyntheticPointData
 {
@@ -70,7 +105,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
                        LinearRegression=2         // using slope and intercept of linear regression
                      } fit;
 
-        PDModel(Context *context);
+        PDModel(Context *context, const PDModelDescriptor &descriptor);
 
         // set which variant of the model to use (if the model
         // supports such a thing it needs to reimplement)
@@ -101,10 +136,10 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         // what capabilities do you have ?
         // sticking with 4 key measures for now
-        virtual bool hasWPrime() { return false; }  // can estimate W'
-        virtual bool hasCP()     { return false; }  // can estimate W'
-        virtual bool hasFTP()    { return false; }  // can estimate W'
-        virtual bool hasPMax()   { return false; }  // can estimate W'
+        bool hasWPrime() const { return descriptor.hasWPrime; }  // can estimate W'
+        bool hasCP()     const { return descriptor.hasCP; }      // can estimate CP
+        bool hasFTP()    const { return descriptor.hasFTP; }     // can estimate FTP
+        bool hasPMax()   const { return descriptor.hasPMax; }    // can estimate PMax
 
         virtual double WPrime()     { return 0; }      // return estimated W'
         virtual double CP()         { return 0; }      // return CP
@@ -120,8 +155,8 @@ class PDModel : public QObject, public QwtSyntheticPointData
         virtual void saveParameters(QList<double>&here) = 0;
         virtual void loadParameters(QList<double>&here) = 0;
 
-        virtual QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
-        virtual QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
+        const QString name() const { return descriptor.name; }  // model name e.g. CP 2 parameter model
+        const QString code() const { return descriptor.code; }  // short name used in metric names e.g. 2P model
 
         bool inverseTime;
 
@@ -155,6 +190,8 @@ class PDModel : public QObject, public QwtSyntheticPointData
         void intervalsChanged();
 
     protected:
+        
+        const PDModelDescriptor &descriptor;
 
         Context *context;
         int model;
@@ -223,20 +260,14 @@ class CP2Model : public PDModel
             return true;
         }
 
-        bool hasWPrime() { return true; }  // can estimate W'
-        bool hasCP()     { return true; }  // can estimate W'
-        bool hasFTP()    { return false; }  // can estimate W'
-        bool hasPMax()   { return false; }  // can estimate W'
-
         // 2 parameter model can calculate these
         double WPrime();
         double CP();
 
-        QString name()   { return "Classic 2 Parameter"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "2 Parm"; }        // short name used in metric names e.g. 2P model
-
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
+
+        static const PDModelDescriptor &descriptor;
 
     public slots:
 
@@ -274,21 +305,15 @@ class CP3Model : public PDModel
             return true;
         }
 
-        bool hasWPrime() { return true; }  // can estimate W'
-        bool hasCP()     { return true; }  // can CP
-        bool hasFTP()    { return false; }  // can estimate FTP
-        bool hasPMax()   { return true; }  // can estimate p-Max
-
         // 2 parameter model can calculate these
         double WPrime();
         double CP();
         double PMax();
 
-        QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
-
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
+
+        static const PDModelDescriptor &descriptor;
 
     public slots:
 
@@ -306,22 +331,16 @@ class WSModel : public PDModel // ward-smith
         // synthetic data for a curve
         virtual double y(double t) const;
 
-        bool hasWPrime() { return true; }  // can estimate W'
-        bool hasCP()     { return true; }  // can CP
-        bool hasFTP()    { return true; }  // can estimate FTP
-        bool hasPMax()   { return true; }  // can estimate p-Max
-
         // 2 parameter model can calculate these
         double WPrime();
         double CP();
         double FTP();
         double PMax();
 
-        QString name()   { return "Ward-Smith"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "WS"; }        // short name used in metric names e.g. 2P model
-
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
+
+        static const PDModelDescriptor &descriptor;
 
     public slots:
 
@@ -341,19 +360,11 @@ class MultiModel : public PDModel
         // synthetic data for a curve
         virtual double y(double t) const;
 
-        bool hasWPrime() { return true; }  // can estimate W'
-        bool hasCP()     { return true; }  // can CP
-        bool hasFTP()    { return true; }  // can estimate FTP
-        bool hasPMax()   { return true; }  // can estimate p-Max
-
         // 2 parameter model can calculate these
         double WPrime();
         double CP();
         double FTP();
         double PMax();
-
-        QString name()   { return "Veloclinic Multicomponent"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "Velo"; }        // short name used in metric names e.g. 2P model
 
         // veloclinic has multiple additional parameters
         int variant;
@@ -361,6 +372,8 @@ class MultiModel : public PDModel
 
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
+
+        static const PDModelDescriptor &descriptor;
 
     public slots:
 
@@ -454,25 +467,19 @@ class ExtendedModel : public PDModel
         const double ecp_del_delta_max = 1e-4;
         const double ecp_dec_delta_max  = 1e-8;
 
-        bool hasWPrime() { return true; }  // can estimate W'
-        bool hasCP()     { return true; }  // can CP
-        bool hasFTP()    { return true; }  // can estimate FTP
-        bool hasPMax()   { return true; }  // can estimate p-Max
-
         // 4 parameter model can calculate these
         double WPrime();
         double CP();
         double FTP();
         double PMax();
 
-        QString name()   { return "Extended CP"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "Ext"; }        // short name used in metric names e.g. 2P model
-
         // Extended has multiple additional parameters
         double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del;
 
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
+
+        static const PDModelDescriptor &descriptor;
 
     public slots:
 

@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "RideCache.h"
 #include "PDModel.h"
+#include "Zones.h"
 
 #include <QThread>
 #include <QMutex>
@@ -46,6 +47,22 @@ class Performance {
 };
 
 class Banister;
+
+struct ZoneRangeEstimateComparisonResult
+{
+    bool isCpDifferent;
+    bool isFtpDifferent;
+    bool isWPrimeDifferent;
+    bool isPMaxDifferent;
+
+    bool isDifferent() const {
+        return isCpDifferent ||
+               isFtpDifferent ||
+               isWPrimeDifferent ||
+               isPMaxDifferent;
+    }
+};
+
 class Estimator : public QThread {
 
     Q_OBJECT
@@ -66,6 +83,9 @@ class Estimator : public QThread {
 
         // filter marks performances as submax
         QList<Performance> filter(QList<Performance>);
+
+        static ZoneRangeEstimateComparisonResult compareZoneRangeToEstimate(ZoneRange range, PDEstimate est);
+
 
     public slots:
 
@@ -88,6 +108,9 @@ class Estimator : public QThread {
         QTimer singleshot;
 
         bool abort;
+
+    private:
+        void updateCPRangeSettings();
 };
 
 #endif
