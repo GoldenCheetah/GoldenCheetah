@@ -32,6 +32,7 @@
 #include "GenericSelectTool.h" // for generic calculator
 #include <QDebug>
 #include <QMutex>
+#include "lmcurve.h"
 
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
@@ -171,6 +172,15 @@ static struct {
 
     { "smooth", 0 }, // smooth(list, algorithm, ... parameters) - returns smoothed data.
 
+    { "sqrt", 1 }, // sqrt(x) - returns square root, for vectors returns the sqrt of the sum
+
+    { "lm", 3 }, // lm(formula, xseries, yseries) - fit using LM and return fit goodness.
+                 // formula is an expression involving existing user symbols, their current values
+                 // will be used as the starting values by the fit. once the fit has been completed
+                 // the user symbols will contain the estimated parameters and lm will return some
+                 // diagnostics goodness of fit measures [ success, RMSE, CV ] where a non-zero value
+                 // for success means true, if it is false, RMSE and CV will be set to -1
+
     // add new ones above this line
     { "", -1 }
 };
@@ -297,6 +307,10 @@ DataFilter::builtins()
         } else if (i == 61) {
 
             returning << "lr(xlist, ylist)";
+
+        } else if (i == 64) {
+
+            returning << "lm(formula, xlist, ylist)";
 
         } else {
 
@@ -972,6 +986,54 @@ Leaf::toString()
     return "";
 }
 
+void
+Leaf::findSymbols(QStringList &symbols)
+{
+    switch(type) {
+    case Leaf::Script :
+        break;
+    case Leaf::Compound :
+        foreach(Leaf *p, *(lvalue.b)) p->findSymbols(symbols);
+        break;
+
+    case Leaf::Float :
+    case Leaf::Integer :
+    case Leaf::String :
+        break;
+    case Leaf::Symbol :
+        {
+            symbols << (*lvalue.n);
+        }
+        break;
+    case Leaf::Operation:
+    case Leaf::BinaryOperation:
+    case Leaf::Logical :
+        lvalue.l->findSymbols(symbols);
+        if (op) rvalue.l->findSymbols(symbols);
+        break;
+        break;
+    case Leaf::UnaryOperation:
+        lvalue.l->findSymbols(symbols);
+        break;
+    case Leaf::Function:
+        foreach(Leaf* l, fparms) l->findSymbols(symbols);
+        break;
+    case Leaf::Index:
+    case Leaf::Select:
+        lvalue.l->findSymbols(symbols);
+        fparms[0]->findSymbols(symbols);
+        break;
+    case Leaf::Conditional:
+        cond.l->findSymbols(symbols);
+        lvalue.l->findSymbols(symbols);
+        if (rvalue.l) rvalue.l->findSymbols(symbols);
+        break;
+
+    default:
+        break;
+    }
+}
+
 void Leaf::print(int level, DataFilterRuntime *df)
 {
     qDebug()<<"LEVEL"<<level;
@@ -1531,6 +1593,34 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else {
                         validateFilter(context, df, leaf->fparms[0]);
                         validateFilter(context, df, leaf->fparms[1]);
+                    }
+
+                } else if (leaf->function == "lm") {
+
+                    if (leaf->fparms.count() != 3) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("lm(expr, xlist, ylist), need formula, x and y data to fit to."));
+
+                    } else {
+
+                        // at this point pretty much anything goes, so long as it is
+                        // syntactically correct. user needs to know what they are doing !
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                        QStringList symbols;
+                        leaf->fparms[0]->findSymbols(symbols);
+                        symbols.removeDuplicates();
+
+                        // do we have any parameters that are not x ????
+                        int count=0;
+                        foreach(QString s, symbols)  if (s != "x") count++;
+
+                        if (count == 0) {
+                            leaf->inerror= true;
+                            DataFiltererrors << QString(tr("lm(expr, xlist, ylist), formula must have at least one parameter to estimate.\n"));
+                        }
                     }
 
                 } else if (leaf->function == "sapply") {
@@ -2742,6 +2832,49 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             return returning;
         }
 
+        // levenberg-marquardt nls
+        if (leaf->function == "lm") {
+            Result returning(0);
+            returning.vector << 0 << -1 << -1 ; // assume failure
+
+            Leaf *formula = leaf->fparms[0];
+            Result xv = eval(df,leaf->fparms[1],x, it, m, p, c, s, d);
+            Result yv = eval(df,leaf->fparms[2],x, it, m, p, c, s, d);
+
+            // check ok to proceed
+            if (xv.vector.count() < 3 || xv.vector.count() != yv.vector.count()) return returning;
+
+            // use the power duration model using for a data filter expression
+            DFModel model(m, formula, df);
+            bool success = model.fitData(xv.vector, yv.vector);
+
+            if (success) {
+                // first  entry is sucess
+                returning.vector[0] = 1;
+
+                // second entry is RMSE
+                double sume2=0, sum=0;
+                for(int index=0; index<xv.vector.count(); index++) {
+                    double predict = eval(df,formula, xv.vector[index], 0, m, p, c, s, d).number;
+                    double actual = yv.vector[index];
+                    double error = predict - actual;
+                    sume2 +=  pow(error, 2);
+                    sum += predict;
+                }
+                double mean = sum / xv.vector.count();
+
+                // RMSE
+                returning.vector[1] = sqrt(sume2 / double(xv.vector.count()-2));
+
+                // CV
+                returning.vector[2] = (returning.vector[1] / mean) * 100.0;
+                //fprintf(stderr, "RMSE=%f, CV=%f%% \n", returning.vector[1], returning.vector[2]); fflush(stderr);
+
+            }
+
+            return returning;
+        }
+
         // linear regression
         if (leaf->function == "lr") {
             Result returning(0);
@@ -3473,6 +3606,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     }
                 }
                 break;
+        case 63 : { return Result(sqrt(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // SQRT(x)
+
         default:
             return Result(0);
         }
@@ -3944,6 +4079,77 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         break;
     }
     return Result(0); // false
+}
+
+DFModel::DFModel(RideItem *item, Leaf *formula, DataFilterRuntime *df) : PDModel(item->context), item(item), formula(formula), df(df)
+{
+    // extract info from the passed params
+    formula->findSymbols(parameters);
+    parameters.removeDuplicates();
+    parameters.removeOne("x"); // not a parameter we declare to lmfit
+
+}
+
+double
+DFModel::f(double t, const double *parms)
+{
+    // set parms in the runtime
+    for (int i=0; i< parameters.count(); i++)  df->symbols.insert(parameters[i], Result(parms[i]));
+
+    // calulcate
+    return formula->eval(df, formula, t, 0, item, NULL, NULL, Specification(), DateRange()).number;
+}
+
+double
+DFModel::y(double t) const
+{
+    // calculate using current runtime
+    return formula->eval(df, formula, t, 0, item, NULL, NULL, Specification(), DateRange()).number;
+}
+
+bool
+DFModel::fitData(QVector<double>&x, QVector<double>&y)
+{
+    // lets call the fitting routine
+    if (parameters.count() < 1) return false;
+
+    // unpack starting parameters
+    QVector<double> startingparms;
+    foreach(QString symbol, parameters)  startingparms << df->symbols.value(symbol).number;
+
+    // get access to lmfit, single threaded :(
+    lm_control_struct control = lm_control_double;
+    lm_status_struct status;
+
+    // use forwarder via global variable, so mutex around this !
+    calllmfit.lock();
+    calllmfitmodel = this;
+
+    //fprintf(stderr, "Fitting ...\n" ); fflush(stderr);
+    lmcurve(parameters.count(), const_cast<double*>(startingparms.constData()), x.count(), x.constData(), y.constData(), calllmfitf, &control, &status);
+
+    // release for others
+    calllmfit.unlock();
+
+    // starting parms now contain final output lets
+    // update the runtime to get them back to the user
+    int i=0;
+    foreach(QString symbol, parameters) {
+        Result value(startingparms[i]);
+        df->symbols.insert(symbol, value);
+        i++;
+    }
+
+    //fprintf(stderr, "Results:\n" );
+    //fprintf(stderr, "status after %d function evaluations:\n  %s\n",
+    //        status.nfev, lm_infmsg[status.outcome] ); fflush(stderr);
+    //fprintf(stderr,"obtained parameters:\n"); fflush(stderr);
+    //for (int i = 0; i < this->nparms(); ++i)
+    //    fprintf(stderr,"  par[%i] = %12g\n", i, startingparms[i]);
+    //fprintf(stderr,"obtained norm:\n  %12g\n", status.fnorm ); fflush(stderr);
+
+    if (status.outcome < 4) return true;
+    return false;
 }
 
 #ifdef GC_WANT_PYTHON

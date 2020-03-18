@@ -128,8 +128,8 @@ PDModel::setIntervals(double sanI1, double sanI2, double anI1, double anI2,
 
 // used to wrap a function call when deriving parameters
 QMutex calllmfit;
-static PDModel *calllmfitmodel = NULL;
-static double calllmfitf(double t, const double *p) {
+PDModel *calllmfitmodel = NULL;
+double calllmfitf(double t, const double *p) {
     return static_cast<PDModel*>(calllmfitmodel)->f(t, p);
 }
 

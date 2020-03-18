@@ -78,6 +78,7 @@ class Leaf {
         bool isDynamic(Leaf *);
         void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate
         bool isNumber(DataFilterRuntime *df, Leaf *leaf);
+        void findSymbols(QStringList &symbols); // when working with formulas
         void clear(Leaf*);
         QString toString(); // return as string
         QString signature() { return toString(); }
@@ -205,6 +206,60 @@ class DataFilter : public QObject
         QString sig;
 };
 
+// general purpose model fitting to x/y data
+class DFModel : public PDModel
+{
+    Q_OBJECT
+
+    public:
+        DFModel(RideItem *item, Leaf *formula, DataFilterRuntime *df);
+
+        // we override locally because we are more general
+        // purpose and also, always use lmfit
+        // we don't fit in to the usual PDModel framework
+        // so just do our own thing mostly.
+        bool fitData(QVector<double>&x, QVector<double>&y);
+
+        // synthetic data for a curve
+        virtual double y(double t) const;
+
+        //  number of parameters (not including t)
+        int nparms() { return parameters.count(); }
+
+        // passed value t and candidate parameters
+        // must unpack into df symbols and calulate a result
+        // used during the fitting process
+        double f(double t, const double *parms);
+
+        // managing the formula and parameters
+        RideItem *item;
+        Leaf *formula;          // the actual formula
+        DataFilterRuntime *df;  // runtime with symbols and values
+        QStringList parameters; // parameter names and position
+
+        // basically everything else below here is
+        // ignored for the most part
+        bool setParms(double *) {  return true;}
+
+        // model methods for CP chart are irrelevant
+        // but we need to set them anyway
+        bool hasWPrime() { return false; }  // can estimate W'
+        bool hasCP()     { return false; }  // can CP
+        bool hasFTP()    { return false; }  // can estimate FTP
+        bool hasPMax()   { return false; }  // can estimate p-Max
+
+        QString name()   { return "Datafilter General Purpose Model"; }
+        QString code()   { return "DF Model"; }        // short name used in metric names e.g. 2P model
+
+        void saveParameters(QList<double>&) {}
+        void loadParameters(QList<double>&) {}
+
+    public slots:
+
+        // we are only used in data filter expressions
+        void onDataChanged() {}
+        void onIntervalsChanged() {}
+};
 extern int DataFilterdebug;
 
 // some constants we provide to help accessed via const(name)
