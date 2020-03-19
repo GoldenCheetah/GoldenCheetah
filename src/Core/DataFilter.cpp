@@ -181,6 +181,11 @@ static struct {
                  // diagnostics goodness of fit measures [ success, RMSE, CV ] where a non-zero value
                  // for success means true, if it is false, RMSE and CV will be set to -1
 
+    { "bool", 1 }, // bool(e) - will turn the passed parameter into a boolean with value 0 or 1
+                   // this is useful for embedding logical expresissions into formulas. Since the
+                   // grammar does not support (a*x>1), instead we can use a*bool(x>1). All non
+                   // zero expressions will evaluate to 1.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -2414,6 +2419,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             if (symbol == "units") {
                 return Result(m->context->athlete->useMetricUnits ? 1 : 0);
             }
+        }
+
+        // bool(expr)
+        if (leaf->function == "bool") {
+            Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            if (r.number != 0) return Result(1);
+            else return Result(0);
         }
 
         // c (concat into a vector)
