@@ -91,6 +91,7 @@ class GenericLegend : public QWidget {
 
         void addSeries(QString name, QColor color);
         void addX(QString name, bool datetime, QString datetimeformat);
+        void addLabel(QLabel *label);
         void removeSeries(QString name);
         void removeAllSeries();
 

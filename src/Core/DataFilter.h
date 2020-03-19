@@ -146,6 +146,8 @@ public:
     double runPythonScript(Context *context, QString script, RideItem *m, const QHash<QString,RideMetric*> *metrics, Specification spec);
 #endif
 
+    DataFilter *owner;
+
 };
 
 class DataFilter : public QObject
@@ -191,9 +193,9 @@ class DataFilter : public QObject
     signals:
         void parseGood();
         void parseBad(QStringList erorrs);
-
         void results(QStringList);
 
+        void annotateLabel(QStringList&);
 
     private:
         void setSignature(QString &query);

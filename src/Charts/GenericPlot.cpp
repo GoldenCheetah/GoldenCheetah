@@ -218,11 +218,27 @@ GenericPlot::setSeriesVisible(QString name, bool visible)
 }
 
 // annotations
+
+// line by user
 void
 GenericPlot::addAnnotation(AnnotationType , QAbstractSeries*series, double value)
 {
     fprintf(stderr, "add annotation line: for %s at value %f\n", series->name().toStdString().c_str(), value);
     fflush(stderr);
+}
+
+void
+GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
+{
+    QFont std;
+    QFontMetrics fm(std);
+
+    QLabel *add = new QLabel(this);
+    add->setText(string);
+    add->setStyleSheet(QString("color: %1").arg(color.name()));
+    add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
+    add->setAlignment(Qt::AlignCenter);
+    labels << add;
 }
 
 // handle hover on barset
@@ -343,12 +359,17 @@ GenericPlot::plotAreaChanged()
 bool
 GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 {
+fprintf(stderr, "init chart\n"); fflush(stderr);
+
     // if we changed the type, all series must go
     if (charttype != type) {
         qchart->removeAllSeries();
         curves.clear();
         barseries=NULL;
     }
+
+    foreach(QLabel *label, labels) delete label;
+    labels.clear();
 
     foreach(Quadtree *tree, quadtrees) delete tree;
     quadtrees.clear();
@@ -713,6 +734,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 void
 GenericPlot::finaliseChart()
 {
+fprintf(stderr, "finalise chart\n"); fflush(stderr);
     if (!qchart) return;
 
     // clear ALL axes
@@ -921,6 +943,9 @@ GenericPlot::finaliseChart()
             item->installSceneEventFilter(selector); // XXX create sceneitem to help us here!
 
     }
+
+    // add labels after legend items
+    foreach(QLabel *label, labels) legend->addLabel(label);
 
     plotAreaChanged(); // make sure get updated before paint
 }

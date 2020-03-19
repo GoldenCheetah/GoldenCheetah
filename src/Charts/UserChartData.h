@@ -39,20 +39,18 @@ public:
     // the results ...
     Result relevant, x, y, z, t, d;
 
-    private:
-    
-        Context *context;
+    Context *context;
 
-        // script and "compiled" program
-        QString script;
-        DataFilter *program;
-        Leaf *root;
+    // script and "compiled" program
+    QString script;
+    DataFilter *program;
+    Leaf *root;
 
-        // functions, to save lots of lookups
-        Leaf *frelevant, *finit, *fsample, *factivity, *ffinalise, *fx, *fy, *fz, *ft, *fd;
+    // functions, to save lots of lookups
+    Leaf *frelevant, *finit, *fsample, *factivity, *ffinalise, *fx, *fy, *fz, *ft, *fd;
 
-        // our runtime
-        DataFilterRuntime *rt;
+    // our runtime
+    DataFilterRuntime *rt;
 
 };
 

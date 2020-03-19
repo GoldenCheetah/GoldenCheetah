@@ -76,8 +76,9 @@ class GenericPlot : public QWidget {
         static QColor seriesColor(QAbstractSeries* series);
 
         enum annotationType { LINE=0,                 // Continious range
-                              RECTANGLE=1,                  // Date
-                              TEXT=2,                       // Duration, Time
+                              RECTANGLE=1,
+                              TEXT=2,
+                              LABEL=3
                           };
         typedef enum annotationType AnnotationType;
 
@@ -94,7 +95,8 @@ class GenericPlot : public QWidget {
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend);
 
         // adding annotations
-        void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue);
+        void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue); // LINE
+        void addAnnotation(AnnotationType, QString, QColor=QColor(Qt::gray)); // LABEL
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
@@ -136,6 +138,10 @@ class GenericPlot : public QWidget {
 
         // quadtrees
         QMap<QAbstractSeries*, Quadtree*> quadtrees;
+
+
+        // annotation labels
+        QList<QLabel *> labels;
 
     private:
         Context *context;

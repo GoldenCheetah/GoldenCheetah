@@ -133,6 +133,16 @@ GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> ys
     return true;
 }
 
+// add a label to a series
+bool
+GenericChart::annotateLabel(QString name, QStringList list)
+{
+    // add to the curve
+    for(int i=0; i<newSeries.count(); i++)
+        if (newSeries[i].name == name)
+            newSeries[i].annotateLabels << list;
+}
+
 // configure axis, after curves added
 bool
 GenericChart::configureAxis(QString name, bool visible, int align, double min, double max,
@@ -317,6 +327,14 @@ GenericChart::finaliseChart()
         while(s.hasNext()) {
             GenericSeriesInfo p=s.next();
             newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend);
+
+            // did we get some labels associated with the curve?
+            QListIterator<QStringList>l(p.annotateLabels);
+            while(l.hasNext()) {
+                QStringList list=l.next();
+                newPlots[i].plot->addAnnotation(GenericPlot::LABEL, list.join(" "), QColor(p.color));
+            }
+
         }
 
         // set axis

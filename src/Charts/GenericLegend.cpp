@@ -237,6 +237,12 @@ GenericLegend::addX(QString name, bool datetime, QString datetimeformat)
 }
 
 void
+GenericLegend::addLabel(QLabel *label)
+{
+    layout->addWidget(label);
+}
+
+void
 GenericLegend::removeSeries(QString name)
 {
     GenericLegendItem *remove = items.value(name, NULL);

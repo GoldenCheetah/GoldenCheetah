@@ -129,15 +129,21 @@ UserChart::setRide(RideItem *item)
  void
  UserChart::refresh()
  {
-
     // ok, we've run out of excuses, looks like we need to plot
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
 
     // now generate the series data
     foreach (GenericSeriesInfo series, seriesinfo) {
 
+        // clear old annotations for this series
+        annotations.clear();
+
         // create program
-        if (series.user1 == NULL)  series.user1 = new UserChartData(context, series.string1);
+        if (series.user1 == NULL)  {
+
+            series.user1 = new UserChartData(context, series.string1);
+            connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
+        }
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
@@ -147,6 +153,10 @@ UserChart::setRide(RideItem *item)
         chart->addCurve(series.name, ucd->x.vector, ucd->y.vector, series.xname, series.yname,
                         series.labels, series.colors,
                         series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend);
+
+        // add series annotations
+        foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
+
     }
 
     foreach (GenericAxisInfo axis, axisinfo) {
@@ -166,6 +176,11 @@ UserChart::setRide(RideItem *item)
     chart->finaliseChart();
 }
 
+void
+UserChart::annotateLabel(QStringList &list)
+{
+    annotations << list;
+}
 
 //
 // Read amd Write settings from a JSON document

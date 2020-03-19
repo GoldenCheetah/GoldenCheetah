@@ -186,6 +186,11 @@ static struct {
                    // grammar does not support (a*x>1), instead we can use a*bool(x>1). All non
                    // zero expressions will evaluate to 1.
 
+    { "annotate", 0 }, // annotate(type, parms) - add an annotation to the chart, will no doubt
+                       // extend over time to cover lots of different types, but for now
+                       // supports 'label', which has n texts and numbers which are concatenated
+                       // together to make a label; eg. annotate(label, "CP ", cpval, " watts");
+
     // add new ones above this line
     { "", -1 }
 };
@@ -316,6 +321,10 @@ DataFilter::builtins()
         } else if (i == 64) {
 
             returning << "lm(formula, xlist, ylist)";
+
+        } else if (i == 66) {
+
+            returning << "annotate(label, ...)";
 
         } else {
 
@@ -1291,6 +1300,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
+            QRegExp annotateTypes("^(label)$", Qt::CaseInsensitive);
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -1536,6 +1546,22 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         if (leaf->seriesType==RideFile::none) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        }
+                    }
+
+                } else if (leaf->function == "annotate") {
+
+                    if (leaf->fparms.count() < 2 || leaf->fparms[0]->type != Leaf::Symbol) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("annotate(label, list of strings, numbers) need at least 2 parameters."));
+
+                    } else {
+
+                        QString type = *(leaf->fparms[0]->lvalue.n);
+                        if (!annotateTypes.exactMatch(type)) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("annotation type '%1' not available").arg(type));
                         }
                     }
 
@@ -1999,6 +2025,9 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
 DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
 {
+    // let folks know who owns this rumtime for signalling
+    rt.owner = this;
+
     // be sure not to enable this by accident!
     rt.isdynamic = false;
 
@@ -2016,6 +2045,9 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
 
 DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL)
 {
+    // let folks know who owns this rumtime for signalling
+    rt.owner = this;
+
     // be sure not to enable this by accident!
     rt.isdynamic = false;
 
@@ -2808,6 +2840,30 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.number += r;
             }
             return returning;
+        }
+
+        // annotate
+        if (leaf->function == "annotate") {
+
+
+            if (*(leaf->fparms[0]->lvalue.n) == "label") {
+
+                QStringList list;
+
+                // loop through parameters
+                for(int i=1; i<leaf->fparms.count(); i++) {
+
+                    if (leaf->fparms[i]->type == Leaf::String)
+                        list << *(leaf->fparms[i]->lvalue.s);
+                    else {
+                        double value =  eval(df,leaf->fparms[i],x, i, m, p, c, s, d).number;
+                        list << Utils::removeDP(QString("%1").arg(value));
+                    }
+                }
+
+                // send the signal.
+                if (list.count())  df->owner->annotateLabel(list);
+            }
         }
 
         // smooth

@@ -73,6 +73,8 @@ class GenericSeriesInfo {
         int opacity;
         bool opengl;
         bool legend;
+
+        QList <QStringList> annotateLabels;
 };
 
 // keeping track of all our plots
@@ -263,6 +265,9 @@ class GenericChart : public QWidget {
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
+
+        // annotations
+        bool annotateLabel(QString name, QStringList strings); // add a label alongside a series
 
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
