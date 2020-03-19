@@ -141,6 +141,8 @@ GenericChart::annotateLabel(QString name, QStringList list)
     for(int i=0; i<newSeries.count(); i++)
         if (newSeries[i].name == name)
             newSeries[i].annotateLabels << list;
+
+    return true;
 }
 
 // configure axis, after curves added

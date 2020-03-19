@@ -359,8 +359,6 @@ GenericPlot::plotAreaChanged()
 bool
 GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 {
-fprintf(stderr, "init chart\n"); fflush(stderr);
-
     // if we changed the type, all series must go
     if (charttype != type) {
         qchart->removeAllSeries();
@@ -734,7 +732,6 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 void
 GenericPlot::finaliseChart()
 {
-fprintf(stderr, "finalise chart\n"); fflush(stderr);
     if (!qchart) return;
 
     // clear ALL axes
