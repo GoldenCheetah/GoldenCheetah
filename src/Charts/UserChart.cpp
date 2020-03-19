@@ -22,7 +22,9 @@
 #include "TabView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
+#include "Tab.h"
 #include "LTMTool.h"
+#include "RideNavigator.h"
 #include "ColorButton.h"
 #include "MainWindow.h"
 #include "UserChartData.h"
@@ -828,6 +830,10 @@ UserChartSettings::refreshAxesTab()
     //if (selected) seriesTable->setCurrentItem(selected);
 }
 
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
+}
 //
 // Data series settings
 //
@@ -862,10 +868,84 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     cf->addRow(tr("Series Name"), zz);
 
+    QList<QString> list;
+    QString last;
+    SpecialFields sp;
+
+    // get sorted list
+    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+
+    // start with just a list of functions
+    list = DataFilter::builtins();
+
+    // ridefile data series symbols
+    list += RideFile::symbols();
+
+    // add special functions (older code needs fixing !)
+    list << "config(cranklength)";
+    list << "config(cp)";
+    list << "config(ftp)";
+    list << "config(w')";
+    list << "config(pmax)";
+    list << "config(cv)";
+    list << "config(scv)";
+    list << "config(height)";
+    list << "config(weight)";
+    list << "config(lthr)";
+    list << "config(maxhr)";
+    list << "config(rhr)";
+    list << "config(units)";
+    list << "const(e)";
+    list << "const(pi)";
+    list << "daterange(start)";
+    list << "daterange(stop)";
+    list << "ctl";
+    list << "tsb";
+    list << "atl";
+    list << "sb(BikeStress)";
+    list << "lts(BikeStress)";
+    list << "sts(BikeStress)";
+    list << "rr(BikeStress)";
+    list << "tiz(power, 1)";
+    list << "tiz(hr, 1)";
+    list << "best(power, 3600)";
+    list << "best(hr, 3600)";
+    list << "best(cadence, 3600)";
+    list << "best(speed, 3600)";
+    list << "best(torque, 3600)";
+    list << "best(isopower, 3600)";
+    list << "best(xpower, 3600)";
+    list << "best(vam, 3600)";
+    list << "best(wpk, 3600)";
+
+    qSort(names.begin(), names.end(), insensitiveLessThan);
+
+    foreach(QString name, names) {
+
+        // handle dups
+        if (last == name) continue;
+        last = name;
+
+        // Handle bikescore tm
+        if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+        //  Always use the "internalNames" in Filter expressions
+        name = sp.internalName(name);
+
+        // we do very little to the name, just space to _ and lower case it for now...
+        name.replace(' ', '_');
+        list << name;
+    }
     program = new DataFilterEdit(this, context);
     program->setMinimumHeight(250 * dpiXFactor); // give me some space!
+    DataFilterCompleter *completer = new DataFilterCompleter(list, this);
+    program->setCompleter(completer);
     cf->addRow(tr("Program"), (QWidget *)NULL);
     cf->addRow(program);
+    errors = new QLabel(this);
+    errors->setStyleSheet("color: red;");
+    cf->addRow(errors); //
+
 
     yname = new QLineEdit(this);
     zz = new QHBoxLayout();
@@ -1016,8 +1096,15 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     // connect up slots
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(program, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
 }
 
+void
+EditUserSeriesDialog::setErrors(QStringList &list)
+{
+    errors->setText(list.join(";"));
+
+}
 
 void
 EditUserSeriesDialog::cancelClicked()

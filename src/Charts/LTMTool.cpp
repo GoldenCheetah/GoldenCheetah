@@ -2725,8 +2725,8 @@ DataFilterEdit::checkErrors()
     QStringList errors = checker.check(toPlainText());
     checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
 
-    // need to fixup for errors!
-    // XXX next commit
+    // even if no errors need to tell folks
+    emit syntaxErrors(errors);
 }
 
 bool

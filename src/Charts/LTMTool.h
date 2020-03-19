@@ -265,6 +265,9 @@ protected:
     void keyPressEvent(QKeyEvent *e);
     void focusInEvent(QFocusEvent *e);
 
+Q_SIGNALS:
+    void syntaxErrors(QStringList&);
+
 public slots:
     void setText(const QString&);
     void insertCompletion(const QString &completion);

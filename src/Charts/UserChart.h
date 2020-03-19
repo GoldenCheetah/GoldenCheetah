@@ -171,6 +171,8 @@ class EditUserSeriesDialog : public QDialog
         void okClicked();
         void cancelClicked();
 
+        void setErrors(QStringList &errors);
+
     private:
         Context *context;
         GenericSeriesInfo &original;
@@ -178,6 +180,7 @@ class EditUserSeriesDialog : public QDialog
         // series page
         QLineEdit *name, *xname, *yname, *groupname;
         DataFilterEdit *program;
+        QLabel *errors;
 
         QComboBox *line, *symbol;
         QDoubleSpinBox *size;

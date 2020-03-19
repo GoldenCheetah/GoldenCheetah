@@ -99,6 +99,8 @@ class EditUserMetricDialog : public QDialog {
         void okClicked();
         void enableOk();
 
+        void setErrors(QStringList&);
+
     private:
 
         bool validSettings();
@@ -122,6 +124,7 @@ class EditUserMetricDialog : public QDialog {
                        *precision;
 
         DataFilterEdit *formulaEdit; // edit your formula
+        QLabel *errors; // for highlighting errors
 
         QLabel *mValue, *iValue, *elapsed;
 

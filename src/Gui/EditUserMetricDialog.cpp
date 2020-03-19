@@ -182,6 +182,9 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     // create an empty completer, configchanged will fix it
     DataFilterCompleter *completer = new DataFilterCompleter(list, this);
     formulaEdit->setCompleter(completer);
+    errors= new QLabel(this);
+    errors->setStyleSheet("color: red");
+    connect(formulaEdit, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
 
     QLabel *eval = new QLabel(tr("Evaluates"), this);
     QLabel *metric = new QLabel(tr("Metric"), this);
@@ -234,7 +237,8 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     head->addWidget(formulaEditLabel, 6,0);
 
     // 8 - 16 row; program editor
-    head->addWidget(formulaEdit, 7,0, 8, 5);
+    head->addWidget(formulaEdit, 7,0, 7, 5);
+    head->addWidget(errors, 15,0,1,5);
 
     // 17th row; labels for estimates
     head->addWidget(test, 16, 0);
@@ -267,6 +271,12 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
 
     // initialize button state
     enableOk();
+}
+
+void
+EditUserMetricDialog::setErrors(QStringList &list)
+{
+    errors->setText(list.join(";"));
 }
 
 void

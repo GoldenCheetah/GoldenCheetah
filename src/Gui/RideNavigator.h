@@ -49,6 +49,7 @@ class RideTreeView;
 class EditMetricDetailDialog;
 class EditUserDataDialog;
 class EditUserMetricDialog;
+class EditUserSeriesDialog;
 
 //
 // The RideNavigator
@@ -78,6 +79,7 @@ class RideNavigator : public GcChartWindow
     friend class ::EditMetricDetailDialog;
     friend class ::EditUserDataDialog;
     friend class ::EditUserMetricDialog;
+    friend class ::EditUserSeriesDialog;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);
