@@ -136,6 +136,7 @@ RTool::RTool()
             { "GC.chart.set", (DL_FUNC) &RTool::setChart, 0,0 },
             { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 0,0 },
             { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 0,0 },
+            { "GC.chart.annotate", (DL_FUNC) &RTool::annotate, 0,0 },
             { NULL, NULL, 0,0 }
         };
 
@@ -163,6 +164,7 @@ RTool::RTool()
             { "GC.chart.set", (DL_FUNC) &RTool::setChart, 0,0,0 },
             { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 0,0,0 },
             { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 0,0,0 },
+            { "GC.chart.annotate", (DL_FUNC) &RTool::annotate, 0,0,0 },
             { NULL, NULL, 0,0,0 }
         };
 
@@ -202,6 +204,7 @@ RTool::RTool()
             { "GC.chart.set", (DL_FUNC) &RTool::setChart, 6 },
             { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 14 },
             { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 10 },
+            { "GC.chart.annotate", (DL_FUNC) &RTool::annotate, 4 },
             { NULL, NULL, 0 }
         };
 
@@ -304,6 +307,7 @@ RTool::RTool()
                                "GC.setChart <- function(title=\"\", type=1, animate=FALSE, legpos=2, stack=FALSE, orientation=2) { .Call(\"GC.chart.set\", title, type, animate, legpos ,stack, orientation)}\n"
                                "GC.addCurve <- function(name=\"curve\", xseries=c(), yseries=c(), xname=\"xaxis\", yname=\"yaxis\", min=-1, max=-1, labels=c(), colors=c(), line=1,symbol=1,size=2,color=\"red\",opacity=100,opengl=TRUE, legend=TRUE) { .Call(\"GC.chart.addCurve\", name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend)}\n"
                                "GC.setAxis <- function(name=\"xaxis\",visible=TRUE, align=-1, min=-1, max=-1, type=0, labelcolor=\"\", color=\"\", log=FALSE, categories=c()) { .Call(\"GC.chart.configureAxis\", name, visible, align, min, max, type, labelcolor,color,log,categories)}\n"
+                               "GC.annotate <- function(type=\"label\", series=\"curve\", strings=c()) { .Call(\"GC.chart.annotate\", type, series, strings, FALSE)}\n"
 
                                 // constants
                                 "GC.HORIZONTAL<-1\n"
@@ -4172,6 +4176,42 @@ RTool::configureAxis(SEXP name, SEXP visible, SEXP align, SEXP min, SEXP max,
 
     // add to chart -- XXX need to think on how to set axis colors -- or if we even should allow it
     rtool->chart->chart->configureAxis(info.name, info.visible, -1 /*info.align*/, info.minx, info.maxx, info.type, "" /*info.labelcolor.name()*/, ""/*info.axiscolor.name()*/, info.log, info.categories);
+
+    // return 0
+    return Rf_allocVector(INTSXP,0);
+}
+
+SEXP
+RTool::annotate(SEXP type, SEXP p1, SEXP p2, SEXP p3)
+{
+    if (rtool == NULL || rtool->context == NULL || rtool->chart == NULL)   return Rf_allocVector(INTSXP, 0);
+
+    // type
+    PROTECT(type=Rf_coerceVector(type, STRSXP));
+    QString atype=QString(CHAR(STRING_ELT(type,0)));
+    UNPROTECT(1);
+
+    if (atype == "label") {
+        Q_UNUSED(p3);
+
+        // p1 is the series name
+        PROTECT(p1=Rf_coerceVector(p1, STRSXP));
+        QString series=QString(CHAR(STRING_ELT(p1,0)));
+        UNPROTECT(1);
+
+        // p2 is a list of strings
+        PROTECT(p2=Rf_coerceVector(p2, STRSXP));
+        QStringList list;
+        for(int i=0; i<Rf_length(p2); i++) {
+
+            // if not empty write a filter
+            QString f(CHAR(STRING_ELT(p2,i)));
+            list << f;
+        }
+        UNPROTECT(1);
+
+        if (list.count() > 0) rtool->chart->chart->annotateLabel(series, list);
+    }
 
     // return 0
     return Rf_allocVector(INTSXP,0);

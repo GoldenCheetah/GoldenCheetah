@@ -76,6 +76,8 @@ class RTool {
         static SEXP configureAxis(SEXP name, SEXP visible, SEXP align, SEXP min, SEXP max,
                                   SEXP type, SEXP labelcolor, SEXP color, SEXP log, SEXP categories);
 
+        static SEXP annotate(SEXP type, SEXP p1, SEXP p2, SEXP p3);
+
         bool starting;
         bool failed;
         bool cancelled;
