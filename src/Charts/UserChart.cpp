@@ -152,7 +152,7 @@ UserChart::setRide(RideItem *item)
         // data now generated so can add curve
         chart->addCurve(series.name, ucd->x.vector, ucd->y.vector, series.xname, series.yname,
                         series.labels, series.colors,
-                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend);
+                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels);
 
         // add series annotations
         foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
@@ -225,8 +225,9 @@ UserChart::settings() const
         out << "\"size\": "      << series.size << ", ";
         out << "\"color\": \""   << series.color << "\", ";
         out << "\"opacity\": "   << series.opacity << ", ";
-        out << "\"legend\": "    << (series.legend ? "true" : "false") << ", "; // noter no trailing comma
-        out << "\"opengl\": "    << (series.opengl ? "true" : "false"); // noter no trailing comma
+        out << "\"legend\": "    << (series.legend ? "true" : "false") << ", ";
+        out << "\"opengl\": "    << (series.opengl ? "true" : "false") << ", ";
+        out << "\"datalabels\": "    << (series.datalabels ? "true" : "false"); // noter no trailing comma
         out << "}"; // note no trailing comman
     }
     if (seriesinfo.count()) out << " ]\n"; // end of array
@@ -306,6 +307,10 @@ UserChart::applySettings(QString x)
         add.opacity = series["opacity"].toDouble();
         add.legend = series["legend"].toBool();
         add.opengl = series["opengl"].toBool();
+
+        // added later, may be null, if so, unset
+        if (!series["datalabels"].isNull())  add.datalabels = series["datalabels"].toBool();
+        else add.datalabels = false;
 
         seriesinfo.append(add);
     }
@@ -983,6 +988,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     line->addItem(tr("Dash Dot"), static_cast<int>(Qt::PenStyle::DashDotLine));
     opengl = new QCheckBox(tr("Fast Graphics"));
     legend = new QCheckBox(tr("Show on Legend"));
+    datalabels = new QCheckBox(tr("Show Data Labels"));
 
     zz = new QHBoxLayout();
     zz->addWidget(line);
@@ -1001,7 +1007,12 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     cf->addRow(tr("Symbol"), zz);
 
     color = new ColorButton(this, "Color", Qt::red);
-    cf->addRow(tr("Color"), color);
+    zz = new QHBoxLayout();
+    zz->addWidget(color);
+    zz->addStretch();
+    zz->addWidget(datalabels);
+    cf->addRow(tr("Color"), zz);
+
     opacity = new QSpinBox(this);
     opacity->setRange(1,100);
     opacity->setValue(100);// default
@@ -1105,6 +1116,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     //original.opacity = opacity->value();
     opengl->setChecked(original.opengl != 0);
     legend->setChecked(original.legend != 0);
+    datalabels->setChecked(original.datalabels != 0);
     opacity->setValue(original.opacity);
     // update the source
 
@@ -1145,6 +1157,7 @@ EditUserSeriesDialog::okClicked()
     original.opengl = opengl->isChecked();
     original.opacity = opacity->value();
     original.legend = legend->isChecked();
+    original.datalabels = datalabels->isChecked();
     // update the source
 
     accept();

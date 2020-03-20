@@ -92,7 +92,7 @@ class GenericPlot : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend);
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels);
 
         // adding annotations
         void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue); // LINE

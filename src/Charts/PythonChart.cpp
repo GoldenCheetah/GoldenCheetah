@@ -455,8 +455,8 @@ PythonChart::setWeb(bool x)
 
         // signals to update it
         connect(this, SIGNAL(emitChart(QString,int,bool,int,bool,int)), plot, SLOT(initialiseChart(QString,int,bool,int,bool,int)));
-        connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool)),
-                plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool)));
+        connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool,bool)),
+                plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool,bool)));
         connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
                 plot,   SLOT(configureAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
         connect(this,SIGNAL(emitAnnotation(QString,QStringList)), plot,  SLOT(annotateLabel(QString,QStringList)));

@@ -437,7 +437,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend)
+                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels)
 {
     // a curve can have a decoration associated with it
     // on a line chart the decoration is the symbols
@@ -529,6 +529,13 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // no line, we are invisible
             if (linestyle == 0) add->setVisible(false);
+            else {
+                if (datalabels) {
+                    add->setPointLabelsVisible(true);    // is false by default
+                    add->setPointLabelsColor(QColor(color));
+                    add->setPointLabelsFormat("@yPoint");
+                }
+            }
 
             // chart
             qchart->addSeries(add);
@@ -548,6 +555,14 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 // data
                 for (int i=0; i<xseries.size() && i<yseries.size(); i++)
                     dec->append(xseries.at(i), yseries.at(i));
+
+                // if no line, but we still want labels then show
+                // for our data points
+                if (linestyle == 0 && datalabels) {
+                    dec->setPointLabelsVisible(true);    // is false by default
+                    dec->setPointLabelsColor(QColor(color));
+                    dec->setPointLabelsFormat("@yPoint");
+                }
 
                 // aesthetics
                 if (symbol == 1) dec->setMarkerShape(QScatterSeries::MarkerShapeCircle);
@@ -602,6 +617,12 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 // calculate stuff
                 calc.addPoint(QPointF(xseries.at(i), yseries.at(i)));
 
+            }
+
+            if (datalabels) {
+                add->setPointLabelsVisible(true);    // is false by default
+                add->setPointLabelsColor(QColor(color));
+                add->setPointLabelsFormat("@yPoint");
             }
 
             // set the quadtree up - now we know the ranges...

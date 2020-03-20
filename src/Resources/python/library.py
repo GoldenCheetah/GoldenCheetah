@@ -33,10 +33,10 @@ def __GCsetChart(title="",type=1,animate=False,legpos=2,stack=False,orientation=
     GC.configChart(title,type,animate,legpos,stack,orientation)
 
 # add a curve
-def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=1,size=15,color="cyan",opacity=0,opengl=True,legend=True):
+def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=1,size=15,color="cyan",opacity=0,opengl=True,legend=True,datalabels=False):
     if (name == ""):
        raise ValueError("curve 'name' must be set and unique.")
-    GC.setCurve(name,list(x),list(y),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl,legend)
+    GC.setCurve(name,list(x),list(y),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl,legend,datalabels)
 
 # setting the axis
 def __GCconfigAxis(name,visible=True,align=-1,min=-1,max=-1,type=-1,labelcolor="",color="",log=False,categories=list()):

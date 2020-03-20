@@ -126,10 +126,10 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend)
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels)
 {
 
-    newSeries << GenericSeriesInfo(name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend);
+    newSeries << GenericSeriesInfo(name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels);
     return true;
 }
 
@@ -328,7 +328,7 @@ GenericChart::finaliseChart()
         QListIterator<GenericSeriesInfo>s(newPlots[i].series);
         while(s.hasNext()) {
             GenericSeriesInfo p=s.next();
-            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend);
+            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels);
 
             // did we get some labels associated with the curve?
             QListIterator<QStringList>l(p.annotateLabels);
