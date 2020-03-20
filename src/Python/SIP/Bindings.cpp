@@ -110,6 +110,18 @@ Bindings::configAxis(QString name, bool visible, int align, double min, double m
     return false;
 }
 
+bool
+Bindings::addAnnotation(QString, QString s1, QString s2, double)
+{
+    // we will reuse later but for now just assume its a label
+    // will likely need to refactor all of this and create an
+    // annotation class to throw around, but lets wait till we
+    // get there !
+    QStringList labels;
+    labels << s2;
+    python->chart->emitAnnotation(s1, labels);
+}
+
 void
 Bindings::result(double value)
 {

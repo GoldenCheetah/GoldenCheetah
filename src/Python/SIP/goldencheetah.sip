@@ -394,5 +394,7 @@ public:
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl, bool legend) const;
     bool configAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
+
+    bool addAnnotation(QString type, QString s1, QString s2, double value);
 };
 

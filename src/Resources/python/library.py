@@ -44,6 +44,9 @@ def __GCconfigAxis(name,visible=True,align=-1,min=-1,max=-1,type=-1,labelcolor="
         raise ValueError("axis 'name' must be passed.")
     GC.configAxis(name, visible, align, min, max, type, labelcolor, color, log, categories)
 
+# adding annotations
+def __GCannotate(type="label", series="", label="", value=0):
+    GC.addAnnotation(type,series,label,value)
 
 # add to main GC entrypoint
 GC.activity=__GCactivity
@@ -51,6 +54,7 @@ GC.activityXdata=__GCactivityXdata
 GC.setChart=__GCsetChart
 GC.addCurve=__GCsetCurve
 GC.setAxis=__GCconfigAxis
+GC.annotate=__GCannotate
 
 # orientation
 GC_HORIZONTAL=1

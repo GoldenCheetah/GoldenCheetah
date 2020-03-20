@@ -1212,6 +1212,48 @@ static PyObject *meth_Bindings_configAxis(PyObject *sipSelf, PyObject *sipArgs, 
 }
 
 
+extern "C" {static PyObject *meth_Bindings_addAnnotation(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_addAnnotation(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+         ::QString* a1;
+        int a1State = 0;
+         ::QString* a2;
+        int a2State = 0;
+        double a3;
+         ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_type,
+            sipName_s1,
+            sipName_s2,
+            sipName_value,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1J1d", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, sipType_QString,&a2, &a2State, &a3))
+        {
+            bool sipRes;
+
+            sipRes = sipCpp->addAnnotation(*a0,*a1,*a2,a3);
+            sipReleaseType(a0,sipType_QString,a0State);
+            sipReleaseType(a1,sipType_QString,a1State);
+            sipReleaseType(a2,sipType_QString,a2State);
+
+            return PyBool_FromLong(sipRes);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_addAnnotation, NULL);
+
+    return NULL;
+}
+
+
 /* Call the instance's destructor. */
 extern "C" {static void release_Bindings(void *, int);}
 static void release_Bindings(void *sipCppV, int)
@@ -1286,6 +1328,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_activityMeanmax), (PyCFunction)meth_Bindings_activityMeanmax, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityMetrics), (PyCFunction)meth_Bindings_activityMetrics, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_activityWbal), (PyCFunction)meth_Bindings_activityWbal, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_addAnnotation), (PyCFunction)meth_Bindings_addAnnotation, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_athlete), meth_Bindings_athlete, METH_VARARGS, NULL},
     {SIP_MLNAME_CAST(sipName_athleteZones), (PyCFunction)meth_Bindings_athleteZones, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_build), meth_Bindings_build, METH_VARARGS, NULL},
@@ -1331,7 +1374,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        34, methods_Bindings,
+        35, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

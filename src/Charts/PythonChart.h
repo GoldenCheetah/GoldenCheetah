@@ -141,6 +141,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend);
         void emitAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
+        void emitAnnotation(QString, QStringList);
 
     public slots:
         void configChanged(qint32);

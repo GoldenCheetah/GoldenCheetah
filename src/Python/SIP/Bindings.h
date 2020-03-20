@@ -120,6 +120,7 @@ class Bindings {
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl, bool legend) const;
         bool configAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
+        bool addAnnotation(QString, QString, QString, double);
 
     private:
         // find a RideItem by DateTime
