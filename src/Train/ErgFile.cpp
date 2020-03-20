@@ -41,6 +41,7 @@ static bool setSupported()
     ::supported << ".pgmf";
     ::supported << ".zwo";
     ::supported << ".gpx";
+    ::supported << ".fit";
     ::supported << ".tts";
     return true;
 }
@@ -112,6 +113,7 @@ void ErgFile::reload()
     if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
     else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
+    else if (filename.endsWith(".fit", Qt::CaseInsensitive)) parseGpx();
     else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
     else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
@@ -693,7 +695,7 @@ void ErgFile::parseComputrainer(QString p)
     }
 }
 
-// parse gpx into ergfile
+// parse gpx or fit into ergfile
 void ErgFile::parseGpx()
 {
     // Initialise
@@ -720,20 +722,16 @@ void ErgFile::parseGpx()
 
     QFile gpxFile(filename);
 
-    // open the file
-    if (gpxFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
+    // check file exists
+    if (!gpxFile.exists()) {
         valid = false;
         return;
     }
 
-    // Instantiate ride
-    //RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
-    //    QStringList &errors, QList<RideFile*> *rideList) const
-
+    // instantiate ride
     QStringList errors_;
     RideFile* ride = RideFileFactory::instance().openRideFile(context, gpxFile, errors_);
-    if (ride == NULL)
-    {
+    if (ride == NULL) {
         valid = false;
         return;
     }
@@ -742,6 +740,7 @@ void ErgFile::parseGpx()
     bool fHasKm    = ride->areDataPresent()->km;
     bool fHasLat   = ride->areDataPresent()->lat;
     bool fHasLon   = ride->areDataPresent()->lon;
+    bool fHasGPS   = fHasLat && fHasLon;
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
 
@@ -787,15 +786,20 @@ void ErgFile::parseGpx()
             double km1 = nextPoint->km;
             double alt1 = nextPoint->alt / 1000;
 
-            slope = 100 * (alt1 - alt0) / (km1 - km0);
+            double rise = alt1 - alt0;
+            double h = km1 - km0;
+
+            slope = 100 * (rise / (sqrt(h * h - rise * rise)));
         }
 
         add.x   = 1000 * point->km; // record distance in meters
         add.y   = alt;
         add.val = slope;
 
-        if (fHasLat) add.lat = point->lat;
-        if (fHasLon) add.lon = point->lon;
+        if (fHasGPS) {
+            add.lat = point->lat;
+            add.lon = point->lon;
+        }
 
         if (add.y > MaxWatts) MaxWatts = add.y;
 

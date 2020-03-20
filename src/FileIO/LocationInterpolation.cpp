@@ -321,14 +321,15 @@ geolocation GeoPointInterpolator::Location(double distance, double &slope)
     double rise = l1.Alt() - l0.Alt();
 
     // Tangent vector's magnitude is velocity in terms of distance spline.
-    // Will be unit vector when distance spline has constant rate.
+    // Will be unit vector when distance spline has constant rate. Can have
+    // zero length when processing points without motion.
     double hyp = tangentVector.magnitude();
 
     // Compute adjacent speed.
-    double run = sqrt(fabs((hyp * hyp) - (rise * rise)));
+    double adj = fabs((hyp * hyp) - (rise * rise));
 
     // Gradient.
-    slope = run ? rise / run : 0;
+    slope = (adj > 0.) ? rise / sqrt(adj) : 0.;
 
     // No matter what we still don't permit slopes above 40%.
     slope = std::min(slope,  .4);
