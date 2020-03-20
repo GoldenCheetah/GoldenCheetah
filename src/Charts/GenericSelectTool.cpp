@@ -234,11 +234,31 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                                 painter->drawText(QPointF(0,0), lr);
                             }
 
-                            double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
-                            double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
+                            // get start and stop points for slope line
+                            QPointF startp, stopp;
+                            if (calc.xaxis->type() == QAbstractAxis::AxisTypeValue ||
+                                (calc.xaxis->type() == QAbstractAxis::AxisTypeDateTime &&
+                                 static_cast<QDateTimeAxis*>(calc.xaxis)->format() == GenericPlot::gl_dateformat)) {
 
-                            QPointF startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b+(startx*calc.m)),calc.series));
-                            QPointF stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
+                                // continuous or date don't need transforming
+                                double startx = static_cast<QValueAxis*>(calc.xaxis)->min();
+                                double stopx = static_cast<QValueAxis*>(calc.xaxis)->max();
+                                startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b+(startx*calc.m)),calc.series));
+                                stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopx*calc.m)),calc.series));
+
+                            } else {
+
+                                // time formats need transforming
+                                double startx = static_cast<QDateTimeAxis*>(calc.xaxis)->min().toMSecsSinceEpoch();
+                                double stopx = static_cast<QDateTimeAxis*>(calc.xaxis)->max().toMSecsSinceEpoch();
+                                double startsecs = calc.midnight.secsTo(static_cast<QDateTimeAxis*>(calc.xaxis)->min());
+                                double stopsecs= calc.midnight.secsTo(static_cast<QDateTimeAxis*>(calc.xaxis)->max());
+                                startp = mapFromScene(host->qchart->mapToPosition(QPointF(startx,calc.b+(startsecs*calc.m)),calc.series));
+                                stopp = mapFromScene(host->qchart->mapToPosition(QPointF(stopx,calc.b+(stopsecs*calc.m)),calc.series));
+
+                            }
+
+                            // draw slope line
                             QColor col=GColor(CPLOTMARKER);
                             col.setAlphaF(1);
                             QPen line(col);
