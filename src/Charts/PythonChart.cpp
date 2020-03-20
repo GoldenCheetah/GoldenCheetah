@@ -290,7 +290,6 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     // settings
     QVBoxLayout *clv = new QVBoxLayout(c);
     web = new QCheckBox(tr("Web charting"), this);
-    web->setChecked(true);
     clv->addWidget(web);
     clv->addStretch();
 
@@ -411,6 +410,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         showCon = NULL;
         leftsplitter = NULL;
     }
+    web->setChecked(true);
 }
 
 
@@ -425,6 +425,7 @@ PythonChart::setWeb(bool x)
         if (plot) {
             renderlayout->removeWidget(plot);
             delete plot; // deletes associated chart too
+            plot = NULL;
         }
 
         // setup the canvas

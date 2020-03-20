@@ -118,7 +118,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
 
         void emitUrl(QUrl x) { emit setUrl(x); }
 
-        bool asWeb() const { return (web ? web->isChecked() : true); }
+        bool asWeb() const { return web->isChecked(); }
         void setWeb(bool);
 
         bool showConsole() const { return (showCon ? showCon->isChecked() : true); }
