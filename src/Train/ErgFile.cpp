@@ -125,18 +125,6 @@ void ErgFile::reload()
     // like we do with ride files if we end up with lots of different formats
     if      (filename.endsWith(".pgmf",   Qt::CaseInsensitive)) parseTacx();
     else if (filename.endsWith(".zwo",    Qt::CaseInsensitive)) parseZwift();
-
-    //else if (filename.endsWith(".bin",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".bin2",   Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".fit",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".fitlog", Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".hrm",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".pwx",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".srd",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".srm",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".tcx",    Qt::CaseInsensitive)) parseFactory();
-    //else if (filename.endsWith(".wko",    Qt::CaseInsensitive)) parseFactory();
-
     else if (fact.exactMatch(filename))                         parseFromRideFileFactory();
     else if (filename.endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
     else if (filename.endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
