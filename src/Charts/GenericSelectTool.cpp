@@ -284,7 +284,10 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         // bottom of plotarea, remember Y-axis range doesn't always start from 0
                         minxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
                         maxxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
-                        avgxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y());
+
+
+                        if (host->charttype == GC_CHART_SCATTER) avgxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y()-4);
+                        else avgxp.setY(mapFromScene(host->qchart->plotArea().topLeft()).y()+fm.tightBoundingRect("XXX").height()+4);
 
                         QColor linecol=GColor(CPLOTMARKER);
                         linecol.setAlphaF(0.25);
@@ -334,7 +337,9 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             if (host->charttype == GC_CHART_SCATTER)  label=QString("%1").arg(calc.x.mean);
                             else label=QString("%1").arg(calc.x.max - calc.x.min);
                         }
-                        painter->drawText(avgxp-QPointF(0,4), label);
+
+                        // paint centered
+                        painter->drawText(avgxp-QPointF(fm.tightBoundingRect(label).width()/2.0,0), label);
 
                         //
                         // MIN AVG MAX Y VALUE ON PLOT AREA
