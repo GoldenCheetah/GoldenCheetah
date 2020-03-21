@@ -40,9 +40,20 @@ static bool setSupported()
     ::supported << ".crs";
     ::supported << ".pgmf";
     ::supported << ".zwo";
-    ::supported << ".gpx";
-    ::supported << ".fit";
     ::supported << ".tts";
+
+    ::supported << ".bin";
+    ::supported << ".bin2";
+    ::supported << ".fit";
+    ::supported << ".fitlog";
+    ::supported << ".gpx";
+    ::supported << ".hrm";
+    ::supported << ".pwx";
+    ::supported << ".srd";
+    ::supported << ".srm";
+    ::supported << ".tcx";
+    ::supported << ".wko";
+
     return true;
 }
 static bool isinit = setSupported();
@@ -108,16 +119,28 @@ ErgFile::fromContent2(QString contents, Context *context)
 
 void ErgFile::reload()
 {
+    QRegExp fact(".+[.](gpx|bin|bin2|fit|fit|fitlog|hrm|pwx|srd|srm|tcx|wko)$", Qt::CaseInsensitive);
+
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
-    if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
-    else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
-    else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
-    else if (filename.endsWith(".fit", Qt::CaseInsensitive)) parseGpx();
-    else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
-    else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
-    else parseComputrainer();
+    if      (filename.endsWith(".pgmf",   Qt::CaseInsensitive)) parseTacx();
+    else if (filename.endsWith(".zwo",    Qt::CaseInsensitive)) parseZwift();
 
+    //else if (filename.endsWith(".bin",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".bin2",   Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".fit",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".fitlog", Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".hrm",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".pwx",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".srd",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".srm",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".tcx",    Qt::CaseInsensitive)) parseFactory();
+    //else if (filename.endsWith(".wko",    Qt::CaseInsensitive)) parseFactory();
+
+    else if (fact.exactMatch(filename))                         parseFromRideFileFactory();
+    else if (filename.endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
+    else if (filename.endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
+    else parseComputrainer();
 }
 
 void ErgFile::parseZwift()
@@ -695,8 +718,22 @@ void ErgFile::parseComputrainer(QString p)
     }
 }
 
-// parse gpx or fit into ergfile
-void ErgFile::parseGpx()
+// Parse anything that the ridefile factory knows how to load
+// and which contains gps data, altitude or slope.
+//
+// File types supported:
+// .bin     Joule GPS File
+// .bin2    Joule GPS File
+// .fit     Garmin FIT
+// .fitlog  Sporttracks FITLOG
+// .gpx     GPS Track
+// .hrm     Polar Precision
+// .pwx     TrainingPeaks PWX
+// .srd     Polar SRD
+// .srm     SRM Powercontrol
+// .tcx     Garmin TCX
+// .wko     TrainingPeaks WKO
+void ErgFile::parseFromRideFileFactory()
 {
     // Initialise
     Version = "";
@@ -706,7 +743,7 @@ void ErgFile::parseGpx()
     Duration = -1;
     Ftp = 0;            // FTP this file was targetted at
     MaxWatts = 0;       // maxWatts in this ergfile (scaling)
-    valid = false;             // did it parse ok?
+    valid = false;      // did it parse ok?
     rightPoint = leftPoint = 0;
     interpolatorReadIndex = 0;
     format = mode = CRS;
@@ -773,8 +810,7 @@ void ErgFile::parseGpx()
         if (fHasSlope) {
             slope = point->slope;
 
-            if (!fHasAlt && prevPoint)
-            {
+            if (!fHasAlt && prevPoint) {
                 alt += ((slope * (point->km - prevPoint->km))) / 100.0;
             }
 

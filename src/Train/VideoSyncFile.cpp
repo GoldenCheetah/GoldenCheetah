@@ -58,7 +58,6 @@ void VideoSyncFile::reload()
     // which parser to call?
     if (filename.endsWith(".rlv", Qt::CaseInsensitive)) parseRLV();
     if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
-//TODO    else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGPX();
 }
 
 void VideoSyncFile::parseTTS()
