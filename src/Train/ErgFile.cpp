@@ -41,18 +41,19 @@ static bool setSupported()
     ::supported << ".pgmf";
     ::supported << ".zwo";
     ::supported << ".tts";
-
-    ::supported << ".bin";
-    ::supported << ".bin2";
-    ::supported << ".fit";
-    ::supported << ".fitlog";
     ::supported << ".gpx";
-    ::supported << ".hrm";
-    ::supported << ".pwx";
-    ::supported << ".srd";
-    ::supported << ".srm";
-    ::supported << ".tcx";
-    ::supported << ".wko";
+
+    // Additional supportable ridefile types.
+    //::supported << ".bin";
+    //::supported << ".bin2";
+    //::supported << ".fit";
+    //::supported << ".fitlog";
+    //::supported << ".hrm";
+    //::supported << ".pwx";
+    //::supported << ".srd";
+    //::supported << ".srm";
+    //::supported << ".tcx";
+    //::supported << ".wko";
 
     return true;
 }
@@ -119,7 +120,10 @@ ErgFile::fromContent2(QString contents, Context *context)
 
 void ErgFile::reload()
 {
-    QRegExp fact(".+[.](gpx|bin|bin2|fit|fit|fitlog|hrm|pwx|srd|srm|tcx|wko)$", Qt::CaseInsensitive);
+    QRegExp fact(".+[.](gpx)$", Qt::CaseInsensitive);
+
+    // Use this instead to activate all relevant ridefile types.
+    //QRegExp fact(".+[.](gpx|bin|bin2|fit|fit|fitlog|hrm|pwx|srd|srm|tcx|wko)$", Qt::CaseInsensitive);
 
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
