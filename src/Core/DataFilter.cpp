@@ -33,6 +33,7 @@
 #include <QDebug>
 #include <QMutex>
 #include "lmcurve.h"
+#include "LTMTrend.h" // for LR when copying CP chart filtering mechanism
 
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
@@ -1543,7 +1544,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else {
                         QString symbol=*(leaf->fparms[0]->lvalue.n);
                         leaf->seriesType = RideFile::seriesForSymbol(symbol);
-                        if (leaf->seriesType==RideFile::none) {
+                        if (symbol != "efforts" && leaf->seriesType==RideFile::none) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
                         }
@@ -2701,16 +2702,152 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             Result returning(0);
 
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+
             // go get it for the current date range
+            bool rangemode = true;
             if (d.from==QDate() && d.to==QDate()) {
+
+                // not in rangemode
+                rangemode = false;
+
                 // the ride mean max
-                returning.vector = m->fileCache()->meanMaxArray(leaf->seriesType);
+                if (symbol == "efforts") {
+
+                    // keep all from a ride -- XXX TODO averaging tails removal...
+                    returning.vector = m->fileCache()->meanMaxArray(RideFile::watts);
+                    for(int i=0; i<returning.vector.count(); i++) returning.vector[i]=i;
+
+                } else returning.vector = m->fileCache()->meanMaxArray(leaf->seriesType);
+
             } else {
+
                 // use a season meanmax
                 RideFileCache bestsCache(m->context, d.from, d.to, false, QStringList(), true, NULL);
-                returning.vector = bestsCache.meanMaxArray(leaf->seriesType);
-            }
 
+                // get meanmax, unless its efforts, where we do rather more...
+                if (symbol != "efforts") returning.vector = bestsCache.meanMaxArray(leaf->seriesType);
+
+                else {
+
+                    // get power anyway
+                    returning.vector = bestsCache.meanMaxArray(RideFile::watts);
+
+                    // need more than 2 entries
+                    if (returning.vector.count() > 3) {
+
+                        // we need to return an index to use to filter values
+                        // in the meanmax array; remove sub-maximals by
+                        // averaging tails or clearly submaximal using the
+                        // same filter that is used in the CP plot
+
+                        // get data to filter
+                        QVector<double> t;
+                        t.resize(returning.vector.size());
+                        for (int i=0; i<t.count(); i++) t[i]=i;
+
+                        QVector<double> p = returning.vector;
+                        QVector<QDate> w = bestsCache.meanMaxDates(leaf->seriesType);
+                        t.remove(0);
+                        p.remove(0);
+                        w.remove(0);
+
+
+                        // linear regression of the full data, to help determine
+                        // the maximal point on the MMP curve for each day
+                        // using brace to set scope and descope temporary variables
+                        // as we use a fair few, but not worth making a function
+                        double slope=0, intercept=0;
+                        {
+                            // we want 2m to 20min data (check bounds)
+                            int want = p.count() > 1200 ? 1200-121 : p.count()-121;
+                            QVector<double> j = p.mid(120, want);
+                            QVector<double> ts = t.mid(120, want);
+
+                            // convert time data to seconds (is in minutes)
+                            // and power to joules (power x time)
+                            for(int i=0; i<j.count(); i++) {
+                                ts[i] = ts[i];
+                                j[i] = (j[i] * ts[i]) ;
+                            }
+
+                            // LTMTrend does a linear regression for us, lets reuse it
+                            // I know, we see, to have a zillion ways to do this...
+                            LTMTrend regress(ts.data(), j.data(), ts.count());
+
+                            // save away the slope and intercept
+                            slope = regress.slope();
+                            intercept = regress.intercept();
+                        }
+
+                        // filter out efforts on same day that are the furthest
+                        // away from a linear regression
+
+                        // the best we found is stored in here
+                        struct { int i; double p, t, d, pix; } keep;
+
+                        for(int i=0; i<t.count(); i++) {
+
+                            // reset our holding variable - it will be updated
+                            // with the maximal point we want to retain for the
+                            // day we are filtering for. Initial means no value
+                            // has been set yet, so the first point will set it.
+                            if (w[i] != QDate()) {
+
+                                // lets filter all on today, use first one to set the best found so far
+                                keep.d = (p[i] * t[i] ) - ((slope * t[i] ) + intercept);
+                                keep.i=i;
+                                keep.p=p[i];
+                                keep.t=t[i];
+                                keep.pix=powerIndex(keep.p, keep.t);
+
+                                // but clear since we iterate beyond
+                                if (i>0) { // always keep pmax point
+                                    p[i]=0;
+                                    t[i]=0;
+                                }
+
+                                // from here to the end of all the points, lets see if there is one further away?
+                                for(int z=i+1; z<t.count(); z++) {
+
+                                    if (w[z] == w[i]) {
+
+                                        // if its beloe the line multiply distance by -1
+                                        double d = (p[z] * t[z] ) - ((slope * t[z]) + intercept);
+                                        double pix = powerIndex(p[z],t[z]);
+
+                                        // use the regression for shorter durations and 3p for longer
+                                        if ((keep.t < 120 && keep.d < d) || (keep.t >= 120 && keep.pix < pix)) {
+                                            keep.d = d;
+                                            keep.i = z;
+                                            keep.p = p[z];
+                                            keep.t = t[z];
+                                        }
+
+                                        if (z>0) { // always keep pmax point
+                                            w[z] = QDate();
+                                            p[z] = 0;
+                                            t[z] = 0;
+                                        }
+                                    }
+                                }
+
+                                // reinstate best we found
+                                p[keep.i] = keep.p;
+                                t[keep.i] = keep.t;
+                            }
+                        }
+
+                        // so lets send over the indexes
+                        // we keep t[0] as it gets removed in
+                        // all cases below, saves a bit of
+                        // torturous logic later
+                        returning.vector.clear();
+                        returning.vector << 0;// it gets removed
+                        for(int i=0; i<t.count(); i++)  if (t[i] > 0) returning.vector << i;
+                    }
+                }
+            }
 
             // really annoying that it starts from 0s not 1s, this is a legacy
             // bug that we cannot fix easily, but this is new, so lets not
