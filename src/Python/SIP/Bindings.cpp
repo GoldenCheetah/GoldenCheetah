@@ -120,6 +120,8 @@ Bindings::addAnnotation(QString, QString s1, QString s2, double)
     QStringList labels;
     labels << s2;
     python->chart->emitAnnotation(s1, labels);
+
+    return true;
 }
 
 void
