@@ -113,7 +113,7 @@ class FixGPSConfig : public DataProcessorConfig
 
         // Altitude Outlier Criteria
         QLabel      *outlierLabel;
-        QSpinBox    *outlierSpinBox;
+        QDoubleSpinBox *outlierSpinBox;
 
         // Altitude Stats
         QLabel      *minSlopeLabel;
@@ -132,7 +132,7 @@ class FixGPSConfig : public DataProcessorConfig
 
         // Route Outlier Criteria
         QLabel      *outlierLabelRoute;
-        QSpinBox    *outlierSpinBoxRoute;
+        QDoubleSpinBox *outlierSpinBoxRoute;
 
         // Route Stats
         QLabel      *variance0LabelRoute;
@@ -367,9 +367,10 @@ class FixGPSConfig : public DataProcessorConfig
             // Altitude Outlier Criteria
 
             outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier criteria %:"));
-            outlierSpinBox = new QSpinBox();
-            outlierSpinBox->setRange(1, 10000);
+            outlierSpinBox = new QDoubleSpinBox();
+            outlierSpinBox->setRange(0.001, 10000);
             outlierSpinBox->setSingleStep(10);
+            outlierSpinBox->setDecimals(3);
             outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
             outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA (%)\n"
                                           "Outlier percent is used to decide outlier points that will be discarded after\n"
@@ -413,9 +414,10 @@ class FixGPSConfig : public DataProcessorConfig
                                                "used for the second pass spline made after outliers are removed.\n"));
 
             outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria %:"));
-            outlierSpinBoxRoute = new QSpinBox();
-            outlierSpinBoxRoute->setRange(1, 10000);
+            outlierSpinBoxRoute = new QDoubleSpinBox();
+            outlierSpinBoxRoute->setRange(0.001, 10000);
             outlierSpinBoxRoute->setSingleStep(10);
+            outlierSpinBoxRoute->setDecimals(3);
             outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
             outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA (%)"
                                                "Outlier percent is used to decide outlier points that will be discarded after\n"
