@@ -192,6 +192,15 @@ static struct {
                        // supports 'label', which has n texts and numbers which are concatenated
                        // together to make a label; eg. annotate(label, "CP ", cpval, " watts");
 
+    { "arguniq", 1 },  // returns an index of the uniq values in a vector, in the same way
+                       // argsort returns an index, can then be used to select from samples
+                       // or activity vectors
+
+    { "uniq", 0 },     // stable uniq will keep original sequence but remove duplicates, does
+                       // not need the data to be sorted, as it uses argsort internally. As
+                       // you can pass multiple vectors they are uniqued in sync with the first list.
+
+
     // add new ones above this line
     { "", -1 }
 };
@@ -326,6 +335,10 @@ DataFilter::builtins()
         } else if (i == 66) {
 
             returning << "annotate(label, ...)";
+
+        } else if (i == 67) {
+
+            returning << "arguniq(list)";
 
         } else {
 
@@ -1501,13 +1514,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                     if (leaf->fparms.count() < 2) {
                         leaf->inerror = true;
-                       DataFiltererrors << QString(tr("argsort(ascend|descend, list [, .. list n])"));
+                       DataFiltererrors << QString(tr("sort(ascend|descend, list [, .. list n])"));
                     }
 
                     // need ascend|descend then a list
                     if (leaf->fparms.count() > 0 && leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("argsort(ascend|descend, list [, .. list n]), need to specify ascend or descend"));
+                       DataFiltererrors << QString(tr("sort(ascend|descend, list [, .. list n]), need to specify ascend or descend"));
                     }
 
                     // need all remaining parameters to be symbols
@@ -1533,6 +1546,44 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("argsort(ascend|descend, list), need to specify ascend or descend"));
+                    }
+
+                } else if (leaf->function == "uniq") {
+
+                    if (leaf->fparms.count() < 1) {
+                        leaf->inerror = true;
+                       DataFiltererrors << QString(tr("uniq(list [, .. list n])"));
+                    }
+
+                    // need all remaining parameters to be symbols
+                    for(int i=0; i<fparms.count(); i++) {
+
+                        // check parameter is actually a symbol
+                        if (leaf->fparms[i]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("uniq: list arguments must be a symbol"));
+                        } else {
+                            QString symbol = *(leaf->fparms[i]->lvalue.n);
+                            if (!df->symbols.contains(symbol)) {
+                                DataFiltererrors << QString(tr("'%1' is not a user symbol").arg(symbol));
+                                leaf->inerror = true;
+                            }
+
+                        }
+                    }
+
+                } else if (leaf->function == "arguniq") {
+
+                    // need ascend|descend then a list
+                    if (leaf->fparms.count() != 1 ||  leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("argsort(ascend|descend, list), need to specify ascend or descend"));
+                    } else {
+                        QString symbol = *(leaf->fparms[0]->lvalue.n);
+                        if (!df->symbols.contains(symbol)) {
+                            DataFiltererrors << QString(tr("'%1' is not a user symbol").arg(symbol));
+                            leaf->inerror = true;
+                        }
                     }
 
                 } else if (leaf->function == "meanmax") {
@@ -2880,6 +2931,58 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             }
 
             return returning;
+        }
+
+        // arguniq
+        if (leaf->function == "arguniq") {
+            Result returning(0);
+
+            // get vector and an argsort
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            QVector<int> r = Utils::arguniq(v.vector);
+
+            for(int i=0; i<r.count(); i++) {
+                returning.vector << r[i];
+                returning.number += r[i];
+            }
+            return returning;
+        }
+
+        if (leaf->function == "uniq") {
+
+            // evaluate all the lists
+            for(int i=0; i<fparms.count(); i++) eval(df, leaf->fparms[i],x, it, m, p, c, s, d);
+
+            // get first and argsort it
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            Result current = df->symbols.value(symbol);
+            long len = current.vector.count();
+            QVector<int> index = Utils::arguniq(current.vector);
+
+            // sort all the lists in place
+            int count=0;
+            for (int i=0; i<leaf->fparms.count(); i++) {
+                // get the vector
+                symbol = *(leaf->fparms[i]->lvalue.n);
+                Result current = df->symbols.value(symbol);
+
+                // diff length?
+                if (current.vector.count() != len) {
+                    fprintf(stderr, "sort list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
+                    continue;
+                }
+
+                // ok so now we can adjust
+                QVector<double> replace;
+                for(int idx=0; idx<index.count(); idx++) replace << current.vector[index[idx]];
+                current.vector = replace;
+
+                // replace
+                df->symbols.insert(symbol, current);
+
+                count++;
+            }
+            return Result(count);
         }
 
         // sort

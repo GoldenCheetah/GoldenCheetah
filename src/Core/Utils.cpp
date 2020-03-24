@@ -17,6 +17,7 @@
  */
 
 #include "Utils.h"
+#include <math.h>
 #include <QTextEdit>
 #include <QString>
 #include <QStringList>
@@ -293,6 +294,44 @@ argsort(QVector<double> &v, bool ascending)
     // now create vector of indexes
     QVector<int> returning;
     for(int i=0; i<tuple.count(); i++) returning << static_cast<int>(tuple[i].y());
+
+    return returning;
+}
+
+QVector<int>
+arguniq(QVector<double> &v)
+{
+    QVector<int> returning;
+    QVector<int> r = Utils::argsort(v, false);
+
+    // now loop thru looking for uniq, since we are working
+    // with a double we need the values to be different by
+    // a small amount.
+    bool first=true;
+    double last=0;
+
+    // look for uniqs
+    for(int i=0; i<v.count(); i++) {
+
+        // make sure they are different
+        if (first || fabs(v[r[i]] - last) > std::numeric_limits<double>::epsilon()) {
+
+            // ok its changed, lets find the lowest index
+            int low=r[i];
+            last = v[r[i]];
+            while (i < v.count() && fabs(v[r[i]] - last) <=  std::numeric_limits<double>::epsilon()) {
+                if (r[i] < low) low=r[i];
+                i++;
+            }
+
+            // remember
+            returning << low;
+            first = false;
+
+            i--;
+        }
+    }
+    qSort(returning);
 
     return returning;
 }
