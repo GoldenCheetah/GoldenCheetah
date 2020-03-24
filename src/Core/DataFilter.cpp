@@ -17,6 +17,7 @@
  */
 
 #include "Utils.h"
+#include "Statistic.h"
 #include "DataFilter.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -199,6 +200,9 @@ static struct {
     { "uniq", 0 },     // stable uniq will keep original sequence but remove duplicates, does
                        // not need the data to be sorted, as it uses argsort internally. As
                        // you can pass multiple vectors they are uniqued in sync with the first list.
+
+    { "variance", 1 }, // variance(v) - calculates the variance for the elements in the vector.
+    { "stddev", 1 },   // stddev(v) - calculates the standard deviation for elements in the vector.
 
 
     // add new ones above this line
@@ -2948,6 +2952,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             return returning;
         }
 
+        // uniq
         if (leaf->function == "uniq") {
 
             // evaluate all the lists
@@ -2968,7 +2973,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 // diff length?
                 if (current.vector.count() != len) {
-                    fprintf(stderr, "sort list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
+                    fprintf(stderr, "uniq list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
                     continue;
                 }
 
@@ -3209,6 +3214,21 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             returning.number = calc.m + calc.b + calc.r2 + calc.see; // sum
 
             return returning;
+        }
+
+        // stddev
+        if (leaf->function == "variance") {
+            // array
+            Result v = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
+            Statistic calc;
+            return calc.variance(v.vector, v.vector.count());
+        }
+
+        if (leaf->function == "stddev") {
+            // array
+            Result v = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
+            Statistic calc;
+            return calc.standarddeviation(v.vector, v.vector.count());
         }
 
         // pmc
