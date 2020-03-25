@@ -2325,6 +2325,9 @@ void DataFilter::configChanged(qint32)
     rt.dataSeriesSymbols = RideFile::symbols();
 }
 
+static double myisinf(double x) { return std::isinf(x); }
+static double myisnan(double x) { return std::isnan(x); }
+
 Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
 {
     // if error state all bets are off
@@ -3372,30 +3375,59 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         if (fnum < 0) return Result(0);
 
         switch (fnum) {
-        case 0 : { return Result(cos(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // COS(x)
-        case 1 : { return Result(tan(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // TAN(x)
-        case 2 : { return Result(sin(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // SIN(x)
-        case 3 : { return Result(acos(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ACOS(x)
-        case 4 : { return Result(atan(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ATAN(x)
-        case 5 : { return Result(asin(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ASIN(x)
-        case 6 : { return Result(cosh(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // COSH(x)
-        case 7 : { return Result(tanh(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // TANH(x)
-        case 8 : { return Result(sinh(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // SINH(x)
-        case 9 : { return Result(acosh(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ACOSH(x)
-        case 10 : { return Result(atanh(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ATANH(x)
-        case 11 : { return Result(asinh(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ASINH(x)
+            case 0 : case 1 : case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10:
+            case 11 : case 12: case 13: case 14: case 15: case 16: case 17: case 18: case 19: case 20:
+            {
+                Result returning(0);
 
-        case 12 : { return Result(exp(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // EXP(x)
-        case 13 : { return Result(log(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // LOG(x)
-        case 14 : { return Result(log10(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // LOG10(x)
+                // TRIG FUNCTIONS
 
-        case 15 : { return Result(ceil(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // CEIL(x)
-        case 16 : { return Result(floor(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // FLOOR(x)
-        case 17 : { return Result(round(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ROUND(x)
+                // bit ugly but cleanest way of doing this without repeating
+                // looping stuff - we use a function pointer to save that...
+                double (*func)(double);
+                switch (fnum) {
+                default:
+                case 0: func = cos; break;
+                case 1 : func = tan; break;
+                case 2 : func = sin; break;
+                case 3 : func = acos; break;
+                case 4 : func = atan; break;
+                case 5 : func = asin; break;
+                case 6 : func = cosh; break;
+                case 7 : func = tanh; break;
+                case 8 : func = sinh; break;
+                case 9 : func = acosh; break;
+                case 10 : func = atanh; break;
+                case 11 : func = asinh; break;
 
-        case 18 : { return Result(fabs(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // FABS(x)
-        case 19 : { return Result(std::isinf(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ISINF(x)
-        case 20 : { return Result(std::isnan(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number)); } // ISNAN(x)
+                case 12 : func = exp; break;
+                case 13 : func = log; break;
+                case 14 : func = log10; break;
+
+                case 15 : func = ceil; break;
+                case 16 : func = floor; break;
+                case 17 : func = round; break;
+
+                case 18 : func = fabs; break;
+                case 19 : func = myisinf; break;
+                case 20 : func = myisnan; break;
+                }
+
+                Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+                if (v.vector.count()) {
+                    for(int i=0; i<v.vector.count(); i++) {
+                        double r = func(v.vector[i]);
+                        returning.vector << r;
+                        returning.number += r;
+                    }
+                } else {
+                    returning.number =  func(v.number);
+                }
+                return returning;
+            }
+            break;
+
+
 
         case 21 : { /* SUM( ... ) */
                     double sum=0;
