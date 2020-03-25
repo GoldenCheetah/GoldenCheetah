@@ -20,12 +20,13 @@
 #include "UserChartData.h"
 #include "DataFilter.h"
 
-UserChartData::UserChartData(Context *context, QString script) : context(context), script(script)
+UserChartData::UserChartData(Context *context, UserChart *parent, QString script) : context(context), script(script)
 {
     // compile the program - built in a context that can close.
     program = new DataFilter(NULL, context, script);
     root = program->root();
     rt = &program->rt;
+    rt->chart = parent;
 
     // lookup functions we need
     finit = rt->functions.contains("init") ? rt->functions.value("init") : NULL;

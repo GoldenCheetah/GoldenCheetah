@@ -133,7 +133,10 @@ UserChart::setRide(RideItem *item)
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
 
     // now generate the series data
-    foreach (GenericSeriesInfo series, seriesinfo) {
+    for (int ii=0; ii<seriesinfo.count(); ii++) {
+
+        // get a reference to it as we update it
+        GenericSeriesInfo &series = seriesinfo[ii];
 
         // clear old annotations for this series
         annotations.clear();
@@ -141,16 +144,18 @@ UserChart::setRide(RideItem *item)
         // create program
         if (series.user1 == NULL)  {
 
-            series.user1 = new UserChartData(context, series.string1);
+            series.user1 = new UserChartData(context, this, series.string1);
             connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
         }
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
         ucd->compute(ride, Specification(), dr);
+        series.xseries = ucd->x.vector;
+        series.yseries = ucd->y.vector;
 
         // data now generated so can add curve
-        chart->addCurve(series.name, ucd->x.vector, ucd->y.vector, series.xname, series.yname,
+        chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,
                         series.labels, series.colors,
                         series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels);
 
@@ -287,7 +292,11 @@ UserChart::applySettings(QString x)
     chartinfo.stack = obj["stack"].toBool();
     chartinfo.orientation = obj["orientation"].toInt();
 
-    // array of series
+    // array of series, but userchartdata needs to be deleted
+    foreach(GenericSeriesInfo series, seriesinfo)
+        if (series.user1 != NULL)
+            delete static_cast<UserChartData*>(series.user1);
+
     seriesinfo.clear();
     foreach(QJsonValue it, obj["SERIES"].toArray()) {
 

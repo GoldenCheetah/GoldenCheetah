@@ -112,6 +112,7 @@ class Leaf {
         RideFile::XDataJoin xjoin; // how to join xdata with main
 };
 
+class UserChart;
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -125,6 +126,10 @@ public:
 
     // needs to be reapplied as the ride selection changes
     bool isdynamic;
+
+    // the user chart if were used for that
+    // enables use of cache() command
+    UserChart *chart;
 
     // Lookup tables
     QMap<QString,QString> lookupMap;

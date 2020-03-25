@@ -23,6 +23,7 @@
 #include "DataFilter.h"
 #include "Specification.h"
 
+class UserChart;
 class UserChartData : public QObject {
 
     Q_OBJECT
@@ -30,7 +31,7 @@ class UserChartData : public QObject {
 public:
 
     // new program
-    UserChartData(Context *context, QString script);
+    UserChartData(Context *context, UserChart *parent, QString script);
     ~UserChartData();
 
     // Compute from samples
@@ -51,6 +52,9 @@ public:
 
     // our runtime
     DataFilterRuntime *rt;
+
+    // our owner
+    UserChart *parent;
 
 };
 

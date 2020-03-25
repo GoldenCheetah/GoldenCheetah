@@ -44,6 +44,7 @@ QMutex pythonMutex;
 #include "Zones.h"
 #include "PaceZones.h"
 #include "HrZones.h"
+#include "UserChart.h"
 
 #include "DataFilter_yacc.h"
 
@@ -204,6 +205,10 @@ static struct {
     { "variance", 1 }, // variance(v) - calculates the variance for the elements in the vector.
     { "stddev", 1 },   // stddev(v) - calculates the standard deviation for elements in the vector.
 
+    { "curve", 2 },    // curve(series, x|y|z|d|t) - fetch the computed values for another curve
+                       // will need to be on a user chart, and the series will need to have already
+                       // been computed.
+
 
     // add new ones above this line
     { "", -1 }
@@ -343,6 +348,14 @@ DataFilter::builtins()
         } else if (i == 67) {
 
             returning << "arguniq(list)";
+
+        } else if (i == 68) {
+
+            returning << "uniq(list [,list n])";
+
+        } else if (i == 71) {
+
+            returning << "curve(series, x|y|z|d|t)";
 
         } else {
 
@@ -1319,6 +1332,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
             QRegExp annotateTypes("^(label)$", Qt::CaseInsensitive);
+            QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -1586,6 +1600,22 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         QString symbol = *(leaf->fparms[0]->lvalue.n);
                         if (!df->symbols.contains(symbol)) {
                             DataFiltererrors << QString(tr("'%1' is not a user symbol").arg(symbol));
+                            leaf->inerror = true;
+                        }
+                    }
+
+                } else if (leaf->function == "curve") {
+
+                    // on a user chart we can access computed values
+                    // for other series, reduces overhead etc
+                    if (leaf->fparms.count() != 2 || leaf->fparms[0]->type != Leaf::Symbol || leaf->fparms[1]->type != Leaf::Symbol) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("curve(seriesname, x|y|z|d|t), need to specify series name and data."));
+                    } else {
+                        // check series data
+                        QString symbol = *(leaf->fparms[1]->lvalue.n);
+                        if (!curveData.exactMatch(symbol)) {
+                            DataFiltererrors << QString(tr("'%1' is not a valid, x, y, z, d or t expected").arg(symbol));
                             leaf->inerror = true;
                         }
                     }
@@ -2083,6 +2113,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
 {
     // let folks know who owns this rumtime for signalling
     rt.owner = this;
+    rt.chart = NULL;
 
     // be sure not to enable this by accident!
     rt.isdynamic = false;
@@ -2103,6 +2134,7 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
 {
     // let folks know who owns this rumtime for signalling
     rt.owner = this;
+    rt.chart = NULL;
 
     // be sure not to enable this by accident!
     rt.isdynamic = false;
@@ -3014,6 +3046,28 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 count++;
             }
             return Result(count);
+        }
+
+        // access user chart curve data, if it's there
+        if (leaf->function == "curve") {
+
+            // not on a chart m8
+            if (df->chart == NULL) return Result(0);
+
+            Result returning(0);
+
+            // lets see if we can find the series
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            for(int i=0; i<df->chart->seriesinfo.count(); i++) {
+                if (df->chart->seriesinfo[i].name == symbol) {
+                    // woop!
+                    QString data=*(leaf->fparms[1]->lvalue.n);
+                    if (data == "x") returning.vector = df->chart->seriesinfo[i].xseries;
+                    if (data == "y") returning.vector = df->chart->seriesinfo[i].yseries;
+                    // z d t still todo XXX
+                }
+            }
+            return returning;
         }
 
         // sort

@@ -31,6 +31,7 @@
 #include "GenericChart.h"
 #include "GenericPlot.h"
 #include "ColorButton.h"
+#include "DataFilter.h"
 
 // the chart
 class UserChartSettings;
@@ -42,6 +43,8 @@ class UserChart : public GcChartWindow {
     // settings are saved as a json document and parsed using qt5 json support
     // we can rely on JSON support since we also need Qt Charts which is qt5 also
     Q_PROPERTY(QString settings READ settings WRITE applySettings USER true)
+
+    friend class ::Leaf; // data filter eval accessing our curve data
 
     public:
 
