@@ -141,12 +141,10 @@ UserChart::setRide(RideItem *item)
         // clear old annotations for this series
         annotations.clear();
 
-        // create program
-        if (series.user1 == NULL)  {
-
-            series.user1 = new UserChartData(context, this, series.string1);
-            connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
-        }
+        // re-create program (may be edited)
+        if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
+        series.user1 = new UserChartData(context, this, series.string1);
+        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
