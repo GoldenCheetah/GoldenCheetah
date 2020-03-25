@@ -74,10 +74,11 @@ class VideoSyncFile
 
         static bool isVideoSync(QString); // is this a supported videosync?
 
-        void reload();          // reload after messed about
-        void parseRLV();        // its a rlv file
-        void parseTTS();        // its a tts file
-        bool isValid();         // is the file valid or not?
+        void reload();                    // reload after messed about
+        void parseRLV();                  // its a rlv file
+        void parseTTS();                  // its a tts file
+        void parseFromRideFileFactory();  // try an skrimp video sync info from a ride file.
+        bool isValid();                   // is the file valid or not?
 
         double VideoFrameRate;
 
