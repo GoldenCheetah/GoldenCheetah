@@ -45,6 +45,9 @@ class Result {
         Result (QString value) : isNumber(false), string(value), number(0.0f) {}
         Result () : isNumber(true), string(""), number(0) {}
 
+        // vectorize, turn into vector of size n
+        void vectorize(int size);
+
         // we can't use QString with union
         bool isNumber;           // if true, value is numeric
         QString string;

@@ -2328,6 +2328,29 @@ void DataFilter::configChanged(qint32)
 static double myisinf(double x) { return std::isinf(x); }
 static double myisnan(double x) { return std::isnan(x); }
 
+void
+Result::vectorize(int count)
+{
+
+    if (vector.count() >= count) return;
+
+    // ok, so must have at least 1 element to repeat
+    if (vector.count() == 0) vector << number;
+
+    // repeat for size
+    int it=0;
+    int n=vector.count();
+
+    // repeat whatever we have
+    while (vector.count() < count) {
+        vector << vector[it];
+        number += vector[it];
+
+        // loop thru wot we have
+        it++; if (it == n) it=0;
+    }
+}
+
 Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
 {
     // if error state all bets are off
@@ -4212,39 +4235,57 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         }
         break;
 
+        break;
+
+        // basic operations should all work with vectors or numbers
         case ADD:
-        {
-            if (lhs.isNumber) return Result(lhs.number + rhs.number);
-            else return Result(0);
-        }
-        break;
-
         case SUBTRACT:
-        {
-            if (lhs.isNumber) return Result(lhs.number - rhs.number);
-            else return Result(0);
-        }
-        break;
-
         case DIVIDE:
-        {
-            // avoid divide by zero
-            if (lhs.isNumber && rhs.number) return Result(lhs.number / rhs.number);
-            else return Result(0);
-        }
-        break;
-
         case MULTIPLY:
-        {
-            if (lhs.isNumber && rhs.isNumber) return Result(lhs.number * rhs.number);
-            else return Result(0);
-        }
-        break;
-
         case POW:
         {
-            if (lhs.isNumber && rhs.number) return Result(pow(lhs.number,rhs.number));
-            else return Result(0);
+            Result returning(0);
+
+            // only if numberic on both sides
+            if (lhs.isNumber && rhs.isNumber) {
+
+
+                // its a vector operation...
+                if (lhs.vector.count() || rhs.vector.count()) {
+
+                    int size = lhs.vector.count() > rhs.vector.count() ? lhs.vector.count() : rhs.vector.count();
+
+                    // coerce both into a vector of matching size
+                    lhs.vectorize(size);
+                    rhs.vectorize(size);
+
+                    for(int i=0; i<size; i++) {
+                        double left = lhs.vector[i];
+                        double right = rhs.vector[i];
+                        double value = 0;
+
+                        switch (leaf->op) {
+                        case ADD: value = left + right; break;
+                        case SUBTRACT: value = left - right; break;
+                        case DIVIDE: value = right ? left / right : 0; break;
+                        case MULTIPLY: value = left * right; break;
+                        case POW: value = pow(left,right); break;
+                        }
+                        returning.vector << value;
+                        returning.number += value;
+                    }
+
+                } else {
+                    switch (leaf->op) {
+                    case ADD: returning.number = lhs.number + rhs.number; break;
+                    case SUBTRACT: returning.number = lhs.number - rhs.number; break;
+                    case DIVIDE: returning.number = rhs.number ? lhs.number / rhs.number : 0; break;
+                    case MULTIPLY: returning.number = lhs.number * rhs.number; break;
+                    case POW: returning.number = pow(lhs.number, rhs.number); break;
+                    }
+                }
+            }
+            return returning;
         }
         break;
 
