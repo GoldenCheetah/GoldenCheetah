@@ -209,6 +209,10 @@ static struct {
                        // will need to be on a user chart, and the series will need to have already
                        // been computed.
 
+    { "lowerbound", 2 }, // lowerbound(list, value) - returns the index of the first entry in list
+                         // that does not compare less than value, analogous to std::lower_bound
+                         // will return -1 if no value found.
+
 
     // add new ones above this line
     { "", -1 }
@@ -356,6 +360,10 @@ DataFilter::builtins()
         } else if (i == 71) {
 
             returning << "curve(series, x|y|z|d|t)";
+
+        } else if (i == 72) {
+
+            returning << "lowerbound(list, value";
 
         } else {
 
@@ -1701,6 +1709,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "lowerbound") {
+
+                    if (leaf->fparms.count() != 2) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("lowerbound(list, value), need list and value to find"));
+
+                    } else {
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+                    }
+
                 } else if (leaf->function == "lr") {
 
                     if (leaf->fparms.count() != 2) {
@@ -2382,6 +2401,9 @@ Result::vectorize(int count)
         it++; if (it == n) it=0;
     }
 }
+
+// used by lowerbound
+struct comparedouble { bool operator()(const double p1, const double p2) { return p1 < p2; } };
 
 Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
 {
@@ -3068,6 +3090,24 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 }
             }
             return returning;
+        }
+
+        // lowerbound
+        if (leaf->function == "lowerbound") {
+
+            Result returning(-1);
+
+            Result list= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result value= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            // empty list - error
+            if (list.vector.count() == 0) return returning;
+
+            // lets do it with std::lower_bound then
+            QVector<double>::const_iterator i = std::lower_bound(list.vector.begin(), list.vector.end(), value.number, comparedouble());
+
+            if (i == list.vector.end()) return Result(list.vector.size());
+            return Result(i - list.vector.begin());
         }
 
         // sort
