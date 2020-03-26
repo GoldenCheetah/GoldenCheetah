@@ -166,7 +166,21 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     orientation=Qt::Horizontal;
     xname="";
     clickable=true;
+    setAutoFillBackground(true);
 
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    configChanged(0);
+}
+
+
+void
+GenericLegend::configChanged(qint32)
+{
+    QPalette pal;
+    pal.setBrush(backgroundRole(), GColor(CPLOTBACKGROUND));
+    setPalette(pal);
+    repaint();
 }
 
 void

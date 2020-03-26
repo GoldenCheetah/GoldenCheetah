@@ -58,6 +58,7 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
 
     // need to refresh when chart settings change
     connect(settingsTool, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 }
@@ -67,10 +68,19 @@ UserChart::configChanged(qint32)
 {
     setUpdatesEnabled(false);
 
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    if (rangemode) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
+    else setProperty("color", GColor(CPLOTBACKGROUND));
+
+    // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
-    setPalette(palette); // propagates to children
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+
+    // redraw
+    chartConfigChanged();
 
     setUpdatesEnabled(true);
 }
@@ -169,6 +179,12 @@ UserChart::setRide(RideItem *item)
             min = axis.min();
             max = axis.max();
         }
+
+        // force plot marker color for x-axis, helps to refresh after
+        // config has changed. might be a better way to handle this but
+        // it works for now.
+        if (axis.orientation == Qt::Horizontal)  axis.labelcolor = axis.axiscolor = GColor(CPLOTMARKER);
+
         // we do NOT set align, this is managed in generic plot on our behalf
         // we also don't hide axes, so visible is always set to true
         chart->configureAxis(axis.name, true, -1, min, max, axis.type,
@@ -343,7 +359,7 @@ UserChart::applySettings(QString x)
         add.log = axis["log"].toBool();
         add.minorgrid = axis["minorgrid"].toBool();
         add.majorgrid = axis["majorgrid"].toBool();
-        add.labelcolor = QColor(axis["labelcolot"].toString());
+        add.labelcolor = QColor(axis["labelcolor"].toString());
         add.axiscolor = QColor(axis["axiscolor"].toString());
 
         axisinfo.append(add);

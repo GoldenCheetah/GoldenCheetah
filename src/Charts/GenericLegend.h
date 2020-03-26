@@ -105,6 +105,7 @@ class GenericLegend : public QWidget {
         void unhoverx();
         void setClickable(bool x);
         void setOrientation(Qt::Orientation);
+        void configChanged(qint32);
 
     private:
         // a label has a unique name, not directly tide to
