@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2020 Ale Martinez (amtriathlon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,10 +17,10 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef CLOUDDBCHART_H
-#define CLOUDDBCHART_H
+#ifndef CLOUDDBUSERMETRIC_H
+#define CLOUDDBUSERMETRIC_H
 
-#include "LTMSettings.h"
+#include "UserMetricSettings.h"
 #include "Settings.h"
 #include "CloudDBCommon.h"
 
@@ -35,34 +36,29 @@
 // API Structure V1 must be in sync with the Structure used for the V1 on CloudDB
 // but uses the correct QT datatypes
 
-struct ChartAPIv1 {
+struct UserMetricAPIv1 {
     CommonAPIHeaderV1 Header;
-    QString ChartSport;
-    QString ChartType;
-    QString ChartView;
-    QString ChartDef;
-    QByteArray Image;
+    QString UserMetricXML;
     QString CreatorNick;
     QString CreatorEmail;
 };
 
 
-class CloudDBChartClient : public QObject
+class CloudDBUserMetricClient : public QObject
 {
     Q_OBJECT
 
 public:
 
-    CloudDBChartClient();
-    ~CloudDBChartClient();
+    CloudDBUserMetricClient();
+    ~CloudDBUserMetricClient();
 
-    bool postChart(ChartAPIv1 chart);
-    bool putChart(ChartAPIv1 chart);
-    bool getChartByID(qint64 id, ChartAPIv1 *chart);
-    bool deleteChartByID(qint64 id);
-    bool curateChartByID(qint64 id, bool newStatus);
-    void incrementDownloadCounterByID(qint64 id);
-    bool getAllChartHeader(QList<CommonAPIHeaderV1>* header);
+    bool postUserMetric(UserMetricAPIv1 usermetric);
+    bool putUserMetric(UserMetricAPIv1 usermetric);
+    bool getUserMetricByID(qint64 id, UserMetricAPIv1 *usermetric);
+    bool deleteUserMetricByID(qint64 id);
+    bool curateUserMetricByID(qint64 id, bool newStatus);
+    bool getAllUserMetricHeader(QList<CommonAPIHeaderV1>* header);
 
     bool sslLibMissing() { return noSSLlib; }
 
@@ -78,49 +74,45 @@ private:
     QNetworkReply *g_reply;
     QString g_cacheDir;
 
-    static const int chart_magic_string = 1029384756;
-    static const int chart_cache_version = 3;
+    static const int usermetric_magic_string = 1029384756;
+    static const int usermetric_cache_version = 3;
 
-    QString  g_chart_url_base;
-    QString  g_chart_url_header;
-    QString  g_chartcuration_url_base;
-    QString  g_chartdownloadincr_url_base;
+    QString  g_usermetric_url_base;
+    QString  g_usermetric_url_header;
+    QString  g_usermetriccuration_url_base;
+    QString  g_usermetricdownloadincr_url_base;
 
-    bool writeChartCache(ChartAPIv1 *);
-    bool readChartCache(qint64 id, ChartAPIv1 *chart);
-    void deleteChartCache(qint64 id);
-    void cleanChartCache(QList<CommonAPIHeaderV1> *objectHeader);
+    bool writeUserMetricCache(UserMetricAPIv1 *);
+    bool readUserMetricCache(qint64 id, UserMetricAPIv1 *usermetric);
+    void deleteUserMetricCache(qint64 id);
+    void cleanUserMetricCache(QList<CommonAPIHeaderV1> *objectHeader);
 
-    static bool unmarshallAPIv1(QByteArray , QList<ChartAPIv1>* );
-    static void unmarshallAPIv1Object(QJsonObject* , ChartAPIv1* );
+    static bool unmarshallAPIv1(QByteArray , QList<UserMetricAPIv1>* );
+    static void unmarshallAPIv1Object(QJsonObject* , UserMetricAPIv1* );
 
 };
 
-struct ChartWorkingStructure {
+struct UserMetricWorkingStructure {
     qint64  id;
     QString name;
     QString description;
     QString creatorNick;
     QString language;
     QDateTime createdAt;
-    QPixmap image;
-    QString gchartType;
-    QString gchartView;
-    QString gchartDef;
-    QString gchartSport;
+    QString usermetricXML;
     bool createdByMe;
 };
 
-class CloudDBChartListDialog : public QDialog
+class CloudDBUserMetricListDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    CloudDBChartListDialog();
-    ~CloudDBChartListDialog();
+    CloudDBUserMetricListDialog();
+    ~CloudDBUserMetricListDialog();
 
-    bool prepareData(QString athlete, CloudDBCommon::UserRole role, int chartView = 0);
+    bool prepareData(QString athlete, CloudDBCommon::UserRole role);
     QList<QString> getSelectedSettings() {return g_selected; }
 
     // re-implemented
@@ -133,10 +125,9 @@ private slots:
     void resetToStartClicked();
     void nextSetClicked();
     void prevSetClicked();
-    void ownChartsToggled(bool);
+    void ownUserMetricsToggled(bool);
     void toggleTextFilterApply();
     void curationStateFilterChanged(int);
-    void sportComboFilterChanged(int);
     void languageFilterChanged(int);
     void textFilterEditingFinished();
     void cellDoubleClicked(int, int);
@@ -156,8 +147,8 @@ private:
 
     const int const_stepSize;
 
-    CloudDBChartClient* g_client;
-    QList<ChartWorkingStructure> *g_currentPresets;
+    CloudDBUserMetricClient* g_client;
+    QList<UserMetricWorkingStructure> *g_currentPresets;
     int g_currentIndex;
     QList<CommonAPIHeaderV1>* g_currentHeaderList;
     QList<CommonAPIHeaderV1>* g_fullHeaderList;
@@ -172,10 +163,9 @@ private:
     QPushButton *resetToStart;
     QPushButton *nextSet;
     QPushButton *prevSet;
-    QCheckBox *ownChartsOnly;
+    QCheckBox *ownUserMetricsOnly;
     QComboBox *curationStateCombo;
     QComboBox *langCombo;
-    QComboBox *sportCombo;
     QLineEdit *textFilter;
     QPushButton *textFilterApply;
 
@@ -190,7 +180,6 @@ private:
 
     // UserRole - UserEdit
     QPushButton *deleteUserEditButton, *editUserEditButton, *closeUserEditButton;
-    int g_chartView;
 
     // UserRole - Curator Edit
     QPushButton *curateCuratorEditButton, *editCuratorEditButton, *deleteCuratorEditButton, *closeCuratorButton;
@@ -199,46 +188,21 @@ private:
     void updateCurrentPresets(int, int);
     void setVisibleButtonsForRole();
     void applyAllFilters();
-    bool refreshStaleChartHeader();
+    bool refreshStaleUserMetricHeader();
+    QString encodeHTML ( const QString& );
 
 };
 
-class CloudDBChartShowPictureDialog : public QDialog
+class CloudDBUserMetricObjectDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    CloudDBChartShowPictureDialog(QByteArray imageData);
-    ~CloudDBChartShowPictureDialog();
+    CloudDBUserMetricObjectDialog(UserMetricAPIv1 data, QString athlete, bool update = false);
+    ~CloudDBUserMetricObjectDialog();
 
-public slots:
-    void resizeEvent(QResizeEvent *);
-
-private slots:
-    void okClicked();
-
-
-private:
-
-    QByteArray imageData;
-    QPixmap chartImage;
-    QLabel *imageLabel;
-    QPushButton *okButton;
-
-};
-
-
-class CloudDBChartObjectDialog : public QDialog
-{
-    Q_OBJECT
-
-public:
-
-    CloudDBChartObjectDialog(ChartAPIv1 data, QString athlete, bool update = false);
-    ~CloudDBChartObjectDialog();
-
-    ChartAPIv1 getChart() { return data; }
+    UserMetricAPIv1 getUserMetric() { return data; }
 
 private slots:
     void publishClicked();
@@ -251,7 +215,7 @@ private slots:
 
 private:
 
-    ChartAPIv1 data;
+    UserMetricAPIv1 data;
     QString athlete;
     bool update;
 
@@ -262,9 +226,6 @@ private:
     bool nameOk;
 
     QComboBox *langCombo;
-    QComboBox *sportCombo;
-
-    QLabel *image;
 
     QTextEdit *description;
     QString descriptionDefault;
@@ -274,12 +235,10 @@ private:
     QLineEdit *email;
     bool emailOk;
 
-    //QComboBox *language;
     QLabel *gcVersionString;
     QLabel *creatorId;
-
 
 };
 
 
-#endif // CLOUDDBCHART_H
+#endif // CLOUDDBUSERMETRIC_H

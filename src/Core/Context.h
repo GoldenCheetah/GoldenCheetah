@@ -28,6 +28,7 @@
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #endif
 
 // when config changes we need to notify widgets what changed
@@ -119,6 +120,7 @@ class Context : public QObject
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB - common data
         CloudDBChartListDialog *cdbChartListDialog;
+        CloudDBUserMetricListDialog *cdbUserMetricListDialog;
 #endif
 
     public slots:

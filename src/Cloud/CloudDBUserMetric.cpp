@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2020 Ale Martinez (amtriathlon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,21 +17,13 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBCommon.h"
 #include "CloudDBStatus.h"
 
-#include "LTMChartParser.h"
+#include "UserMetricParser.h"
 #include "GcUpgrade.h"
 #include "Colors.h"
-
-#ifdef GC_WANT_R
-#include <RTool.h>
-#endif
-
-#ifdef GC_WANT_PYTHON
-#include "PythonEmbed.h"
-#endif
 
 #include <QtGlobal>
 #include <QNetworkRequest>
@@ -44,7 +37,7 @@
 #include <QXmlSimpleReader>
 #include <QDesktopWidget>
 
-CloudDBChartClient::CloudDBChartClient()
+CloudDBUserMetricClient::CloudDBUserMetricClient()
 {
     g_nam = new QNetworkAccessManager(this);
     QDir cacheDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0));
@@ -61,107 +54,95 @@ CloudDBChartClient::CloudDBChartClient()
 
     // common definitions used
 
-    g_chart_url_base = g_chart_url_header = g_chartcuration_url_base = g_chartdownloadincr_url_base = CloudDBCommon::cloudDBBaseURL;
+    g_usermetric_url_base = g_usermetric_url_header = g_usermetriccuration_url_base = g_usermetricdownloadincr_url_base = CloudDBCommon::cloudDBBaseURL;
 
-    g_chart_url_base.append("gchart/");
-    g_chart_url_header.append("gchartheader");
-    g_chartcuration_url_base.append("gchartcuration/");
-    g_chartdownloadincr_url_base.append("gchartuse/");
+    g_usermetric_url_base.append("usermetric/");
+    g_usermetric_url_header.append("usermetricheader");
+    g_usermetriccuration_url_base.append("usermetriccuration/");
+    g_usermetricdownloadincr_url_base.append("usermetricuse/");
 
 }
-CloudDBChartClient::~CloudDBChartClient() {
+CloudDBUserMetricClient::~CloudDBUserMetricClient() {
     delete g_nam;
 }
 
 
 bool
-CloudDBChartClient::postChart(ChartAPIv1 chart) {
+CloudDBUserMetricClient::postUserMetric(UserMetricAPIv1 usermetric) {
 
     // check if Athlete ID is filled
 
-    if (chart.Header.CreatorId.isEmpty()) return CloudDBCommon::APIresponseOthers;
+    if (usermetric.Header.CreatorId.isEmpty()) return CloudDBCommon::APIresponseOthers;
 
     // default where it may be necessary
-    if (chart.Header.Language.isEmpty()) chart.Header.Language = "en";
+    if (usermetric.Header.Language.isEmpty()) usermetric.Header.Language = "en";
 
     // first create the JSON object
     // only a subset of fields is required for POST
     QJsonObject json_header;
-    CloudDBCommon::marshallAPIHeaderV1Object(json_header, chart.Header);
+    CloudDBCommon::marshallAPIHeaderV1Object(json_header, usermetric.Header);
 
     QJsonObject json;
     json["header"] = json_header;
-    json["chartSport"] = chart.ChartSport;
-    json["chartType"] = chart.ChartType;
-    json["chartView"] = chart.ChartView;
-    json["chartDef"] = chart.ChartDef;
-    QString image;
-    image.append(chart.Image.toBase64());
-    json["image"] = image;
-    json["creatornick"] = chart.CreatorNick;
-    json["creatoremail"] = chart.CreatorEmail;
+    json["metrictxml"] = usermetric.UserMetricXML;
+    json["creatornick"] = usermetric.CreatorNick;
+    json["creatoremail"] = usermetric.CreatorEmail;
     QJsonDocument document;
     document.setObject(json);
 
     QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_chart_url_base);
+    CloudDBCommon::prepareRequest(request, g_usermetric_url_base);
     g_reply = g_nam->post(request, document.toJson());
 
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    CloudDBHeader::setChartHeaderStale(true);
+    CloudDBHeader::setUserMetricHeaderStale(true);
     return true;
 
 }
 
 bool
-CloudDBChartClient::putChart(ChartAPIv1 chart) {
+CloudDBUserMetricClient::putUserMetric(UserMetricAPIv1 usermetric) {
 
     // we assume all field are filled properly / not further check or modification
 
     // first create the JSON object / all fields are required for PUT / only LastChanged i
     QJsonObject json_header;
-    CloudDBCommon::marshallAPIHeaderV1Object(json_header, chart.Header);
+    CloudDBCommon::marshallAPIHeaderV1Object(json_header, usermetric.Header);
 
     QJsonObject json;
     json["header"] = json_header;
-    json["chartSport"] = chart.ChartSport;
-    json["chartType"] = chart.ChartType;
-    json["chartView"] = chart.ChartView;
-    json["chartDef"] = chart.ChartDef;
-    QString image;
-    image.append(chart.Image.toBase64());
-    json["image"] = image;
-    json["creatornick"] = chart.CreatorNick;
-    json["creatoremail"] = chart.CreatorEmail;
+    json["metrictxml"] = usermetric.UserMetricXML;
+    json["creatornick"] = usermetric.CreatorNick;
+    json["creatoremail"] = usermetric.CreatorEmail;
     QJsonDocument document;
     document.setObject(json);
 
     QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_chart_url_base);
+    CloudDBCommon::prepareRequest(request, g_usermetric_url_base);
     g_reply = g_nam->put(request, document.toJson());
 
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
     // cache is stale
-    deleteChartCache(chart.Header.Id);
-    CloudDBHeader::setChartHeaderStale(true);
+    deleteUserMetricCache(usermetric.Header.Id);
+    CloudDBHeader::setUserMetricHeaderStale(true);
     return true;
 
 }
 
 
 bool
-CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
+CloudDBUserMetricClient::getUserMetricByID(qint64 id, UserMetricAPIv1 *usermetric) {
 
     // read from Cache first
-    if (readChartCache(id, chart)) return CloudDBCommon::APIresponseOk;
+    if (readUserMetricCache(id, usermetric)) return CloudDBCommon::APIresponseOk;
 
     // now from GAE
     QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_chart_url_base+QString::number(id, 10));
+    CloudDBCommon::prepareRequest(request, g_usermetric_url_base+QString::number(id, 10));
     g_reply = g_nam->get(request);
 
     // wait for reply (synchronously) and process error codes as necessary
@@ -169,41 +150,41 @@ CloudDBChartClient::getChartByID(qint64 id, ChartAPIv1 *chart) {
 
     // call successfull
     QByteArray result = g_reply->readAll();
-    QList<ChartAPIv1>* charts = new QList<ChartAPIv1>;
-    unmarshallAPIv1(result, charts);
-    if (charts->size() > 0) {
-        *chart = charts->value(0);
-        writeChartCache(chart);
-        charts->clear();
-        delete charts;
+    QList<UserMetricAPIv1>* usermetrics = new QList<UserMetricAPIv1>;
+    unmarshallAPIv1(result, usermetrics);
+    if (usermetrics->size() > 0) {
+        *usermetric = usermetrics->value(0);
+        writeUserMetricCache(usermetric);
+        usermetrics->clear();
+        delete usermetrics;
         return true;
     }
-    delete charts;
+    delete usermetrics;
     return false;
 }
 
 bool
-CloudDBChartClient::deleteChartByID(qint64 id) {
+CloudDBUserMetricClient::deleteUserMetricByID(qint64 id) {
 
     QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_chart_url_base+QString::number(id, 10));
+    CloudDBCommon::prepareRequest(request, g_usermetric_url_base+QString::number(id, 10));
     g_reply = g_nam->deleteResource(request);
 
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    deleteChartCache(id);
+    deleteUserMetricCache(id);
     return true;
 }
 
 
 bool
-CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
+CloudDBUserMetricClient::curateUserMetricByID(qint64 id, bool newStatus) {
 
     QUrlQuery query;
     query.addQueryItem("newStatus", (newStatus ? "true": "false"));
     QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_chartcuration_url_base+QString::number(id, 10), &query);
+    CloudDBCommon::prepareRequest(request, g_usermetriccuration_url_base+QString::number(id, 10), &query);
 
     // add a payload to "PUT" even though it's not processed
     g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
@@ -211,27 +192,16 @@ CloudDBChartClient::curateChartByID(qint64 id, bool newStatus) {
     // wait for reply (synchronously) and process error codes as necessary
     if (!CloudDBCommon::replyReceivedAndOk(g_reply)) return false;
 
-    deleteChartCache(id);
+    deleteUserMetricCache(id);
     return true;
 }
 
-void
-CloudDBChartClient::incrementDownloadCounterByID(qint64 id) {
-
-    QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_chartdownloadincr_url_base+QString::number(id, 10));
-    g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
-
-    // ignore any errors or reply - user does not need to be informed in case of problems
-}
-
-
 
 bool
-CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
-    bool request_ok = CloudDBHeader::getAllCachedHeader(header, CloudDBHeader::CloudDB_Chart, g_cacheDir, g_chart_url_header, g_nam, g_reply);
+CloudDBUserMetricClient::getAllUserMetricHeader(QList<CommonAPIHeaderV1>* header) {
+    bool request_ok = CloudDBHeader::getAllCachedHeader(header, CloudDBHeader::CloudDB_UserMetric, g_cacheDir, g_usermetric_url_header, g_nam, g_reply);
     if (request_ok && header->size()>0) {
-        cleanChartCache(header);
+        cleanUserMetricCache(header);
     }
     return request_ok;
 }
@@ -241,7 +211,7 @@ CloudDBChartClient::getAllChartHeader(QList<CommonAPIHeaderV1>* header) {
 // Trap SSL errors
 //
 void
-CloudDBChartClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
+CloudDBUserMetricClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 {
     CloudDBCommon::sslErrors(reply, errors);
 }
@@ -250,16 +220,16 @@ CloudDBChartClient::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
 
 
 bool
-CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
+CloudDBUserMetricClient::writeUserMetricCache(UserMetricAPIv1 * usermetric) {
 
     // make sure the subdir exists
     QDir cacheDir(g_cacheDir);
     if (cacheDir.exists()) {
-        cacheDir.mkdir("charts");
+        cacheDir.mkdir("usermetrics");
     } else {
         return false;
     }
-    QFile file(g_cacheDir+"/charts/"+QString::number(chart->Header.Id)+".dat");
+    QFile file(g_cacheDir+"/usermetrics/"+QString::number(usermetric->Header.Id)+".dat");
     if (file.exists()) {
        // overwrite data
        file.resize(0);
@@ -269,24 +239,20 @@ CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_4_6);
     // track a version to be able change data structure
-    out << chart_magic_string;
-    out << chart_cache_version;
-    out << chart->Header.LastChanged; // start
-    out << chart->Header.CreatorId;
-    out << chart->Header.Curated;
-    out << chart->Header.Deleted;
-    out << chart->Header.Description;
-    out << chart->Header.GcVersion;
-    out << chart->Header.Id;
-    out << chart->Header.Language;
-    out << chart->Header.Name;
-    out << chart->ChartSport;
-    out << chart->ChartType;
-    out << chart->ChartView;
-    out << chart->ChartDef;
-    out << chart->CreatorEmail;
-    out << chart->CreatorNick;
-    out << chart->Image;
+    out << usermetric_magic_string;
+    out << usermetric_cache_version;
+    out << usermetric->Header.LastChanged; // start
+    out << usermetric->Header.CreatorId;
+    out << usermetric->Header.Curated;
+    out << usermetric->Header.Deleted;
+    out << usermetric->Header.Description;
+    out << usermetric->Header.GcVersion;
+    out << usermetric->Header.Id;
+    out << usermetric->Header.Language;
+    out << usermetric->Header.Name;
+    out << usermetric->UserMetricXML;
+    out << usermetric->CreatorEmail;
+    out << usermetric->CreatorNick;
 
     file.close();
     return true;
@@ -294,9 +260,9 @@ CloudDBChartClient::writeChartCache(ChartAPIv1 * chart) {
 
 
 
-bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
+bool CloudDBUserMetricClient::readUserMetricCache(qint64 id, UserMetricAPIv1 *usermetric) {
 
-    QFile file(g_cacheDir+"/charts/"+QString::number(id)+".dat");
+    QFile file(g_cacheDir+"/usermetrics/"+QString::number(id)+".dat");
     if (!file.open(QIODevice::ReadOnly)) return false;
     QDataStream in(&file);
     in.setVersion(QDataStream::Qt_4_6);
@@ -305,35 +271,31 @@ bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
     int version;
 
     in >> magic_string;
-    if (magic_string != chart_magic_string) {
+    if (magic_string != usermetric_magic_string) {
         // wrong file format / close and exit
         file.close();
         return false;
     }
 
     in >> version;
-    if (version != chart_cache_version) {
+    if (version != usermetric_cache_version) {
        // change of version, delete old cache entry
        file.remove();
        return false;
     }
 
-    in >> chart->Header.LastChanged; // start
-    in >> chart->Header.CreatorId;
-    in >> chart->Header.Curated;
-    in >> chart->Header.Deleted;
-    in >> chart->Header.Description;
-    in >> chart->Header.GcVersion;
-    in >> chart->Header.Id;
-    in >> chart->Header.Language;
-    in >> chart->Header.Name;
-    in >> chart->ChartSport;
-    in >> chart->ChartType;
-    in >> chart->ChartView;
-    in >> chart->ChartDef;
-    in >> chart->CreatorEmail;
-    in >> chart->CreatorNick;
-    in >> chart->Image;
+    in >> usermetric->Header.LastChanged; // start
+    in >> usermetric->Header.CreatorId;
+    in >> usermetric->Header.Curated;
+    in >> usermetric->Header.Deleted;
+    in >> usermetric->Header.Description;
+    in >> usermetric->Header.GcVersion;
+    in >> usermetric->Header.Id;
+    in >> usermetric->Header.Language;
+    in >> usermetric->Header.Name;
+    in >> usermetric->UserMetricXML;
+    in >> usermetric->CreatorEmail;
+    in >> usermetric->CreatorNick;
 
     file.close();
     return true;
@@ -341,9 +303,9 @@ bool CloudDBChartClient::readChartCache(qint64 id, ChartAPIv1 *chart) {
 }
 
 void
-CloudDBChartClient::deleteChartCache(qint64 id) {
+CloudDBUserMetricClient::deleteUserMetricCache(qint64 id) {
 
-    QFile file(g_cacheDir+"/charts/"+QString::number(id)+".dat");
+    QFile file(g_cacheDir+"/usermetrics/"+QString::number(id)+".dat");
     if (file.exists()) {
        file.remove();
     }
@@ -351,27 +313,27 @@ CloudDBChartClient::deleteChartCache(qint64 id) {
 }
 
 void
-CloudDBChartClient::cleanChartCache(QList<CommonAPIHeaderV1> *objectHeader) {
+CloudDBUserMetricClient::cleanUserMetricCache(QList<CommonAPIHeaderV1> *objectHeader) {
     // remove Deleted Entries from Cache
     int deleted = 0;
     QMutableListIterator<CommonAPIHeaderV1> it(*objectHeader);
     while (it.hasNext()) {
         CommonAPIHeaderV1 header = it.next();
         if (header.Deleted) {
-            deleteChartCache(header.Id);
+            deleteUserMetricCache(header.Id);
             it.remove();
             deleted ++;
         }
     }
     if (deleted > 0) {
         // store cache for next time
-        CloudDBHeader::writeHeaderCache(objectHeader, CloudDBHeader::CloudDB_Chart, g_cacheDir);
+        CloudDBHeader::writeHeaderCache(objectHeader, CloudDBHeader::CloudDB_UserMetric, g_cacheDir);
     }
 
 }
 
 bool
-CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) {
+CloudDBUserMetricClient::unmarshallAPIv1(QByteArray json, QList<UserMetricAPIv1> *usermetrics) {
 
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
@@ -383,24 +345,24 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
 
     // do we have a single object or an array ?
     if (document.isObject()) {
-        ChartAPIv1 chart;
+        UserMetricAPIv1 usermetric;
         QJsonObject object = document.object();
-        unmarshallAPIv1Object(&object, &chart);
+        unmarshallAPIv1Object(&object, &usermetric);
         QJsonObject header = object["header"].toObject();
-        CloudDBCommon::unmarshallAPIHeaderV1Object(&header, &chart.Header);
-        charts->append(chart);
+        CloudDBCommon::unmarshallAPIHeaderV1Object(&header, &usermetric.Header);
+        usermetrics->append(usermetric);
 
     } else if (document.isArray()) {
         QJsonArray array(document.array());
         for (int i = 0; i< array.size(); i++) {
             QJsonValue value = array.at(i);
             if (value.isObject()) {
-                ChartAPIv1 chart;
+                UserMetricAPIv1 usermetric;
                 QJsonObject object = value.toObject();
-                unmarshallAPIv1Object(&object, &chart);
+                unmarshallAPIv1Object(&object, &usermetric);
                 QJsonObject header = object["header"].toObject();
-                CloudDBCommon::unmarshallAPIHeaderV1Object(&header, &chart.Header);
-                charts->append(chart);
+                CloudDBCommon::unmarshallAPIHeaderV1Object(&header, &usermetric.Header);
+                usermetrics->append(usermetric);
             }
         }
     }
@@ -409,18 +371,11 @@ CloudDBChartClient::unmarshallAPIv1(QByteArray json, QList<ChartAPIv1> *charts) 
 }
 
 void
-CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart) {
+CloudDBUserMetricClient::unmarshallAPIv1Object(QJsonObject* object, UserMetricAPIv1* usermetric) {
 
-    chart->ChartSport = object->value("chartSport").toString();
-    chart->ChartType = object->value("chartType").toString();
-    chart->ChartView = object->value("chartView").toString();
-    chart->ChartDef = object->value("chartDef").toString();
-    QString imageString = object->value("image").toString();
-    QByteArray ba;
-    ba.append(imageString);
-    chart->Image = QByteArray::fromBase64(ba);
-    chart->CreatorNick = object->value("creatorNick").toString();
-    chart->CreatorEmail = object->value("creatorEmail").toString();
+    usermetric->UserMetricXML = object->value("metrictxml").toString();
+    usermetric->CreatorNick = object->value("creatorNick").toString();
+    usermetric->CreatorEmail = object->value("creatorEmail").toString();
 
 }
 
@@ -428,25 +383,20 @@ CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart
 
 
 //------------------------------------------------------------------------------------------------------------
-//  Dialog to show and retrieve Shared Charts
+//  Dialog to show and retrieve Shared UserMetrics
 //------------------------------------------------------------------------------------------------------------
 
-// define size if image preview at one place
-static const int chartImageWidth = 320;
-static const int chartImageHeight = 240;
-
-CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
+CloudDBUserMetricListDialog::CloudDBUserMetricListDialog() : const_stepSize(5)
 {
-   g_client = new CloudDBChartClient();
+   g_client = new CloudDBUserMetricClient();
    g_currentHeaderList = new QList<CommonAPIHeaderV1>;
    g_fullHeaderList = new QList<CommonAPIHeaderV1>;
-   CloudDBHeader::setChartHeaderStale(true);  //Force Headers to be loaded
-   g_currentPresets = new QList<ChartWorkingStructure>;
+   CloudDBHeader::setUserMetricHeaderStale(true);  //Force Headers to be loaded
+   g_currentPresets = new QList<UserMetricWorkingStructure>;
    g_textFilterActive = false;
    g_networkrequestactive = false; // don't allow Dialog to close while we are retrieving data
 
    showing = new QLabel;
-   showingTextTemplate = tr("Showing %1 to %2 of %3 charts for %4 / Total uploaded %5");
    resetToStart = new QPushButton(tr("First"));
    nextSet = new QPushButton(tr("Next %1").arg(QString::number(const_stepSize)));
    prevSet = new QPushButton(tr("Prev %1").arg(QString::number(const_stepSize)));
@@ -466,28 +416,20 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    showingLayout->addWidget(prevSet);
    showingLayout->addWidget(nextSet);
 
-   ownChartsOnly = new QCheckBox(tr("My Charts"));
-   ownChartsOnly->setChecked(false);
+   ownUserMetricsOnly = new QCheckBox(tr("My UserMetrics"));
+   ownUserMetricsOnly->setChecked(false);
 
-   connect(ownChartsOnly, SIGNAL(toggled(bool)), this, SLOT(ownChartsToggled(bool)));
+   connect(ownUserMetricsOnly, SIGNAL(toggled(bool)), this, SLOT(ownUserMetricsToggled(bool)));
 
    curationStateCombo = new QComboBox();
    curationStateCombo->addItem(tr("All"));
    curationStateCombo->addItem(tr("Curated Only"));
    curationStateCombo->addItem(tr("Uncurated Only"));
 
-   // default to curated charts only
+   // default to curated usermetrics only
    curationStateCombo->setCurrentIndex(1);
 
    connect(curationStateCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(curationStateFilterChanged(int)));
-
-   sportCombo = new QComboBox();
-   sportCombo->addItem(tr("Any Sport"));
-   foreach (QString sport, CloudDBCommon::cloudDBSports) {
-       sportCombo->addItem(sport);
-   }
-
-   connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(sportComboFilterChanged(int)));
 
    langCombo = new QComboBox();
    langCombo->addItem(tr("Any Language"));
@@ -505,11 +447,9 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    connect(textFilterApply, SIGNAL(clicked()), this, SLOT(toggleTextFilterApply()));
 
    filterLayout = new QHBoxLayout;
-   filterLayout->addWidget(ownChartsOnly);
+   filterLayout->addWidget(ownUserMetricsOnly);
    filterLayout->addStretch();
    filterLayout->addWidget(curationStateCombo);
-   filterLayout->addStretch();
-   filterLayout->addWidget(sportCombo);
    filterLayout->addStretch();
    filterLayout->addWidget(langCombo);
    filterLayout->addStretch();
@@ -525,13 +465,13 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    tableWidget->verticalHeader()->setVisible(false);
    tableWidget->setShowGrid(true);
 
-   // the preview shall have a dedicated size
-   tableWidget->setColumnWidth(0, chartImageWidth);
+   // the name shall have a dedicated size
+   tableWidget->setColumnWidth(0, 200*dpiXFactor);
 
    connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
 
    // UserGet Role
-   addAndCloseUserGetButton = new QPushButton(tr("Download selected chart(s)"));
+   addAndCloseUserGetButton = new QPushButton(tr("Download selected usermetric(s)"));
    closeUserGetButton = new QPushButton(tr("Close"));
 
    addAndCloseUserGetButton->setEnabled(true);
@@ -547,8 +487,8 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    buttonUserGetLayout->addWidget(closeUserGetButton);
 
    // UserEdit Role
-   deleteUserEditButton = new QPushButton(tr("Delete selected chart"));
-   editUserEditButton = new QPushButton(tr("Edit selected chart"));
+   deleteUserEditButton = new QPushButton(tr("Delete selected usermetric"));
+   editUserEditButton = new QPushButton(tr("Edit selected usermetric"));
    closeUserEditButton = new QPushButton(tr("Close"));
 
    connect(deleteUserEditButton, SIGNAL(clicked()), this, SLOT(deleteUserEdit()));
@@ -562,9 +502,9 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
    buttonUserEditLayout->addWidget(closeUserEditButton);
 
    // CuratorEdit Role
-   curateCuratorEditButton = new QPushButton(tr("Set selected chart 'Curated'"));
-   editCuratorEditButton = new QPushButton(tr("Edit selected chart"));
-   deleteCuratorEditButton = new QPushButton(tr("Delete selected chart"));
+   curateCuratorEditButton = new QPushButton(tr("Set selected usermetric 'Curated'"));
+   editCuratorEditButton = new QPushButton(tr("Edit selected usermetric"));
+   deleteCuratorEditButton = new QPushButton(tr("Delete selected usermetric"));
    closeCuratorButton = new QPushButton(tr("Close"));
 
    connect(curateCuratorEditButton, SIGNAL(clicked()), this, SLOT(curateCuratorEdit()));
@@ -595,7 +535,7 @@ CloudDBChartListDialog::CloudDBChartListDialog() : const_stepSize(5)
 
 }
 
-CloudDBChartListDialog::~CloudDBChartListDialog() {
+CloudDBUserMetricListDialog::~CloudDBUserMetricListDialog() {
     delete g_client;
     delete g_currentHeaderList;
     delete g_fullHeaderList;
@@ -604,7 +544,7 @@ CloudDBChartListDialog::~CloudDBChartListDialog() {
 
 // block DialogWindow close while networkrequest is processed
 void
-CloudDBChartListDialog::closeEvent(QCloseEvent* event) {
+CloudDBUserMetricListDialog::closeEvent(QCloseEvent* event) {
 
      if (g_networkrequestactive) {
          event->ignore();
@@ -614,34 +554,33 @@ CloudDBChartListDialog::closeEvent(QCloseEvent* event) {
 }
 
 bool
-CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole role, int chartView) {
+CloudDBUserMetricListDialog::prepareData(QString athlete, CloudDBCommon::UserRole role) {
 
     g_role = role;
-    g_chartView = chartView;
     // and now initialize the dialog
     setVisibleButtonsForRole();
 
     if (g_role == CloudDBCommon::UserEdit) {
-        ownChartsOnly->setChecked(true);
-        ownChartsOnly->setEnabled(false);
-        setWindowTitle(tr("Chart maintenance - Edit or Delete your Charts"));
+        ownUserMetricsOnly->setChecked(true);
+        ownUserMetricsOnly->setEnabled(false);
+        setWindowTitle(tr("UserMetric maintenance - Edit or Delete your UserMetrics"));
         tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     } else if (role == CloudDBCommon::CuratorEdit) {
-        ownChartsOnly->setChecked(false);
+        ownUserMetricsOnly->setChecked(false);
         curationStateCombo->setCurrentIndex(2); // start with uncurated
-        setWindowTitle(tr("Curator chart maintenance - Curate, Edit or Delete Charts"));
+        setWindowTitle(tr("Curator usermetric maintenance - Curate, Edit or Delete UserMetrics"));
         tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     } else {
-        setWindowTitle(tr("Select charts to download"));
+        setWindowTitle(tr("Select usermetrics to download"));
         tableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     }
 
-    if (CloudDBHeader::isStaleChartHeader()) {
-        if (!refreshStaleChartHeader()) return false;
-        CloudDBHeader::setChartHeaderStale(false);
+    if (CloudDBHeader::isStaleUserMetricHeader()) {
+        if (!refreshStaleUserMetricHeader()) return false;
+        CloudDBHeader::setUserMetricHeaderStale(false);
     }
     g_currentAthleteId = appsettings->cvalue(athlete, GC_ATHLETE_ID, "").toString();
     applyAllFilters();
@@ -650,7 +589,7 @@ CloudDBChartListDialog::prepareData(QString athlete, CloudDBCommon::UserRole rol
 
 
 void
-CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
+CloudDBUserMetricListDialog::updateCurrentPresets(int index, int count) {
 
     // while getting the data (which may take of few seconds), disable the UI
     resetToStart->setEnabled(false);
@@ -659,9 +598,8 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     closeUserGetButton->setEnabled(false);
     addAndCloseUserGetButton->setEnabled(false);
     curationStateCombo->setEnabled(false);
-    ownChartsOnly->setEnabled(false);
+    ownUserMetricsOnly->setEnabled(false);
     textFilterApply->setEnabled(false);
-    sportCombo->setEnabled(false);
     langCombo->setEnabled(false);
     deleteUserEditButton->setEnabled(false);
     editUserEditButton->setEnabled(false);
@@ -673,80 +611,59 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
 
     // now get the presets
     g_currentPresets->clear();
-    ChartAPIv1* chart = new ChartAPIv1;
+    UserMetricAPIv1* usermetric = new UserMetricAPIv1;
     g_networkrequestactive = true;
     bool noError = true;
     for (int i = index; i< index+count && i<g_currentHeaderList->count() && noError; i++) {
-        if (g_client->getChartByID(g_currentHeaderList->at(i).Id, chart)) {
-
-            ChartWorkingStructure preset;
-            preset.id = chart->Header.Id;
-            preset.name = chart->Header.Name;
-            preset.description = chart->Header.Description;
-            preset.language = chart->Header.Language;
-            preset.createdAt = chart->Header.LastChanged;
-            preset.image.loadFromData(chart->Image);
-            preset.gchartType = chart->ChartType;
-            preset.gchartView = chart->ChartView;
-            preset.gchartDef = chart->ChartDef;
-            preset.creatorNick = chart->CreatorNick;
-            preset.gchartSport = chart->ChartSport;
+        if (g_client->getUserMetricByID(g_currentHeaderList->at(i).Id, usermetric)) {
+            UserMetricWorkingStructure preset;
+            preset.id = usermetric->Header.Id;
+            preset.name = usermetric->Header.Name;
+            preset.description = usermetric->Header.Description;
+            preset.language = usermetric->Header.Language;
+            preset.createdAt = usermetric->Header.LastChanged;
+            preset.usermetricXML = usermetric->UserMetricXML;
+            preset.creatorNick = usermetric->CreatorNick;
             g_currentPresets->append(preset);
         } else {
             noError = false;
         }
     }
     g_networkrequestactive = false;
-    delete chart;
+    delete usermetric;
 
     // update table with current list
     tableWidget->clearContents();
     tableWidget->setRowCount(0);
 
-    int chartCount = (g_currentHeaderList->size() == 0) ? 0 : g_currentIndex+1;
+    int usermetricCount = (g_currentHeaderList->size() == 0) ? 0 : g_currentIndex+1;
     int lastIndex = (g_currentIndex+const_stepSize > g_currentHeaderList->size()) ? g_currentHeaderList->size() : g_currentIndex+const_stepSize;
 
-    QString view = tr("unknown");
-    if (g_role == CloudDBCommon::UserImport ) {
-        switch(g_chartView) {
-        case 0 : view = tr("Trends"); break;
-        case 1 : view = tr("Activities"); break;
-        case 2 : view = tr("Diary"); break;
-        case 3 : view = tr("Train"); break;
-        }
-    } else
-    {
-        view = tr("All Views");
-    }
-    showing->setText(QString(showingTextTemplate)
-                     .arg(QString::number(chartCount))
+    showing->setText(tr("Showing %1 to %2 of %3 usermetrics / Total uploaded %4")
+                     .arg(QString::number(usermetricCount))
                      .arg(QString::number(lastIndex))
                      .arg(QString::number(g_currentHeaderList->size()))
-                     .arg(view)
                      .arg(QString::number(g_fullHeaderList->size())));
 
     for (int i = 0; i< g_currentPresets->size(); i++ ) {
         tableWidget->insertRow(i);
-        ChartWorkingStructure preset =  g_currentPresets->at(i);
+        UserMetricWorkingStructure preset =  g_currentPresets->at(i);
 
-        QTableWidgetItem *newPxItem = new QTableWidgetItem("");
-        newPxItem->setData(Qt::DecorationRole, QVariant(preset.image.scaled(chartImageWidth, chartImageHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-        newPxItem->setSizeHint(QSize(chartImageWidth, chartImageHeight));
-        newPxItem->setFlags(newPxItem->flags() & ~Qt::ItemIsEditable);
-        tableWidget->setItem(i, 0, newPxItem);
+        QTableWidgetItem *newItem = new QTableWidgetItem(preset.name);
+        newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
+        tableWidget->setItem(i, 0, newItem);
         tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
-        tableWidget->setRowHeight(i, chartImageHeight+20);
+        tableWidget->setRowHeight(i, 80*dpiYFactor);
 
-        QString cellText = QString(tr("<h3>%1</h3><h4>Last Edited At: %2 - Creator: %3</h4>%4"))
-                .arg(CloudDBCommon::encodeHTML(preset.name))
+        QString cellText = QString(tr("%1<h4>Last Edited At: %2 - Creator: %3</h4>"))
+                .arg(CloudDBCommon::encodeHTML(preset.description))
                 .arg(preset.createdAt.date().toString(Qt::ISODate))
-                .arg(CloudDBCommon::encodeHTML(preset.creatorNick))
-                .arg(CloudDBCommon::encodeHTML(preset.description));
+                .arg(CloudDBCommon::encodeHTML(preset.creatorNick));
 
         QTextEdit *formattedText = new QTextEdit;
         formattedText->setHtml(cellText);
         formattedText->setReadOnly(true);
-        tableWidget->setCellWidget(i,1, formattedText);
+        tableWidget->setCellWidget(i, 1, formattedText);
     }
 
 
@@ -757,9 +674,8 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
     closeUserGetButton->setEnabled(true);
     addAndCloseUserGetButton->setEnabled(true);
     curationStateCombo->setEnabled(true);
-    ownChartsOnly->setEnabled(true);
+    ownUserMetricsOnly->setEnabled(true);
     textFilterApply->setEnabled(true);
-    sportCombo->setEnabled(true);
     langCombo->setEnabled(true);
     deleteUserEditButton->setEnabled(true);
     editUserEditButton->setEnabled(true);
@@ -771,13 +687,13 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
 
     // role dependent UI settings
     if (g_role == CloudDBCommon::UserEdit) {
-        ownChartsOnly->setEnabled(false);
+        ownUserMetricsOnly->setEnabled(false);
     }
 
 }
 
 void
-CloudDBChartListDialog::setVisibleButtonsForRole() {
+CloudDBUserMetricListDialog::setVisibleButtonsForRole() {
     if (g_role == CloudDBCommon::UserEdit) {
         deleteUserEditButton->setVisible(true);
         editUserEditButton->setVisible(true);
@@ -813,13 +729,13 @@ CloudDBChartListDialog::setVisibleButtonsForRole() {
 }
 
 bool
-CloudDBChartListDialog::refreshStaleChartHeader() {
+CloudDBUserMetricListDialog::refreshStaleUserMetricHeader() {
 
     g_fullHeaderList->clear();
     g_currentHeaderList->clear();
     g_currentIndex = 0;
     g_networkrequestactive = true;
-    if (!g_client->getAllChartHeader(g_fullHeaderList)) {
+    if (!g_client->getAllUserMetricHeader(g_fullHeaderList)) {
         g_networkrequestactive = false;
         return false;
     }
@@ -831,7 +747,7 @@ CloudDBChartListDialog::refreshStaleChartHeader() {
 
 
 void
-CloudDBChartListDialog::addAndCloseClicked() {
+CloudDBUserMetricListDialog::addAndCloseClicked() {
 
     // check if an item of the table is selected
 
@@ -844,35 +760,7 @@ CloudDBChartListDialog::addAndCloseClicked() {
         for (int i = 0; i< selected.count(); i++) {
             QTableWidgetItem* s = selected.at(i);
             if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
-#if defined(GC_WANT_R) || defined (GC_WANT_PYTHON)
-                int chartType = g_currentPresets->at(s->row()).gchartType.toInt();
-#ifdef GC_WANT_R
-                if (chartType == GcWindowTypes::RConsole ||
-                    chartType == GcWindowTypes::RConsoleSeason ) {
-                    if (rtool == NULL) {
-                        QMessageBox::information(0, tr("Chart requires 'R'"), tr("The chart your are downloading requires 'R' to be installed \
-                                                                              and activated for GoldenCheetah to show any graphics. Either 'R' is not activated \
-                                                                              in the preferences, or not even installed.<br><br> Please ensure 'R' \
-                                                                              is installed and activated to be able to use this chart."));
-                    }
-                }
-#endif
-#ifdef GC_WANT_PYTHON
-                if (chartType == GcWindowTypes::Python ||
-                    chartType == GcWindowTypes::PythonSeason ) {
-                    if (python == NULL) {
-                        QMessageBox::information(0, tr("Chart requires 'Python'"), tr("The chart your are downloading requires 'Python' to be installed \
-                                                                              and activated for GoldenCheetah to show any graphics. Either 'Python' is not activated \
-                                                                              in the preferences, or not even installed.<br><br> Please ensure 'Python' \
-                                                                              is installed and activated to be able to use this chart."));
-                    }
-                }
-#endif
-#endif
-                g_selected << g_currentPresets->at(s->row()).gchartDef;
-
-                // increment download counter
-                g_client->incrementDownloadCounterByID(g_currentPresets->at(s->row()).id);
+                g_selected << g_currentPresets->at(s->row()).usermetricXML;
             }
         }
         accept();
@@ -881,13 +769,13 @@ CloudDBChartListDialog::addAndCloseClicked() {
 
 
 void
-CloudDBChartListDialog::closeClicked()  {
+CloudDBUserMetricListDialog::closeClicked()  {
     reject();
 }
 
 
 void
-CloudDBChartListDialog::resetToStartClicked()  {
+CloudDBUserMetricListDialog::resetToStartClicked()  {
 
     if (g_currentIndex == 0) return;
 
@@ -897,7 +785,7 @@ CloudDBChartListDialog::resetToStartClicked()  {
 }
 
 void
-CloudDBChartListDialog::nextSetClicked()  {
+CloudDBUserMetricListDialog::nextSetClicked()  {
 
     g_currentIndex += const_stepSize;
     if (g_currentIndex >= g_currentHeaderList->size()) {
@@ -909,7 +797,7 @@ CloudDBChartListDialog::nextSetClicked()  {
 }
 
 void
-CloudDBChartListDialog::prevSetClicked()  {
+CloudDBUserMetricListDialog::prevSetClicked()  {
 
     g_currentIndex -= const_stepSize;
     if (g_currentIndex < 0) g_currentIndex = 0;
@@ -918,7 +806,7 @@ CloudDBChartListDialog::prevSetClicked()  {
 }
 
 void
-CloudDBChartListDialog::curateCuratorEdit() {
+CloudDBUserMetricListDialog::curateCuratorEdit() {
 
     if (tableWidget->selectedItems().size()>0)
     {
@@ -926,48 +814,48 @@ CloudDBChartListDialog::curateCuratorEdit() {
         QTableWidgetItem* s = tableWidget->selectedItems().at(0);
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
             qint64 id = g_currentPresets->at(s->row()).id;
-            if (!g_client->curateChartByID(id, true)) {
+            if (!g_client->curateUserMetricByID(id, true)) {
                 return;
             }
             // refresh header buffer
-            refreshStaleChartHeader();
+            refreshStaleUserMetricHeader();
 
-            // curated chart appears on top of the list / and needs to be filtered
+            // curated usermetric appears on top of the list / and needs to be filtered
             applyAllFilters();
         }
     }
 
 }
 void
-CloudDBChartListDialog::deleteCuratorEdit(){
+CloudDBUserMetricListDialog::deleteCuratorEdit(){
    // currently same like User
    deleteUserEdit();
 }
 void
-CloudDBChartListDialog::editCuratorEdit(){
+CloudDBUserMetricListDialog::editCuratorEdit(){
     // currently same like User
     editUserEdit();
 }
 
 void
-CloudDBChartListDialog::deleteUserEdit(){
+CloudDBUserMetricListDialog::deleteUserEdit(){
 
     if (tableWidget->selectedItems().size()>0)
     {
-        // chart selected for deletion - but ask again to be sure
-        if (QMessageBox::question(0, tr("Chart Maintenance"), QString(tr("Do you really want to delete this chart definition ?"))) != QMessageBox::Yes) return;
+        // usermetric selected for deletion - but ask again to be sure
+        if (QMessageBox::question(0, tr("UserMetric Maintenance"), QString(tr("Do you really want to delete this usermetric definition ?"))) != QMessageBox::Yes) return;
 
         // the selectionMode allows only 1 item to be selected at a time
         QTableWidgetItem* s = tableWidget->selectedItems().at(0);
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
             qint64 id = g_currentPresets->at(s->row()).id;
-            if (!g_client->deleteChartByID(id)) {
+            if (!g_client->deleteUserMetricByID(id)) {
                 return;
             }
             // set stale for subsequent list dialog calls
-            CloudDBHeader::setChartHeaderStale(true);
+            CloudDBHeader::setUserMetricHeaderStale(true);
 
-            // remove deleted chart from both lists
+            // remove deleted usermetric from both lists
             QMutableListIterator<CommonAPIHeaderV1> it1(*g_currentHeaderList);
             while (it1.hasNext()) {
                 if (it1.next().Id == id) {
@@ -992,7 +880,7 @@ CloudDBChartListDialog::deleteUserEdit(){
 }
 
 void
-CloudDBChartListDialog::editUserEdit(){
+CloudDBUserMetricListDialog::editUserEdit(){
 
     if (tableWidget->selectedItems().size()>0)
     {
@@ -1000,16 +888,16 @@ CloudDBChartListDialog::editUserEdit(){
         QTableWidgetItem* s = tableWidget->selectedItems().at(0);
         if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
             qint64 id = g_currentPresets->at(s->row()).id;
-            ChartAPIv1 chart;
-            if (!g_client->getChartByID(id, &chart)) {
+            UserMetricAPIv1 usermetric;
+            if (!g_client->getUserMetricByID(id, &usermetric)) {
                 return;
             }
 
-            // now complete the chart with for the user manually added fields
-            CloudDBChartObjectDialog dialog(chart, "", true);
+            // now complete the usermetric with for the user manually added fields
+            CloudDBUserMetricObjectDialog dialog(usermetric, "", true);
             if (dialog.exec() == QDialog::Accepted) {
-                if (g_client->putChart(dialog.getChart())) {
-                    refreshStaleChartHeader();
+                if (g_client->putUserMetric(dialog.getUserMetric())) {
+                    refreshStaleUserMetricHeader();
                 } else {
                     return;
                 }
@@ -1019,29 +907,24 @@ CloudDBChartListDialog::editUserEdit(){
 
         }
 
-        // updated chart appears on top of the list / and needs to be filtered
+        // updated usermetric appears on top of the list / and needs to be filtered
         applyAllFilters();
 
     }
 }
 
 void
-CloudDBChartListDialog::curationStateFilterChanged(int)  {
+CloudDBUserMetricListDialog::curationStateFilterChanged(int)  {
    applyAllFilters();
 }
 
 void
-CloudDBChartListDialog::sportComboFilterChanged(int)  {
+CloudDBUserMetricListDialog::ownUserMetricsToggled(bool)  {
    applyAllFilters();
 }
 
 void
-CloudDBChartListDialog::ownChartsToggled(bool)  {
-   applyAllFilters();
-}
-
-void
-CloudDBChartListDialog::toggleTextFilterApply()  {
+CloudDBUserMetricListDialog::toggleTextFilterApply()  {
     if (g_textFilterActive) {
         g_textFilterActive = false;
         textFilterApply->setText(tr("Search Keyword"));
@@ -1054,25 +937,13 @@ CloudDBChartListDialog::toggleTextFilterApply()  {
 }
 
 void
-CloudDBChartListDialog::languageFilterChanged(int) {
+CloudDBUserMetricListDialog::languageFilterChanged(int) {
     applyAllFilters();
 }
 
 
 void
-CloudDBChartListDialog::applyAllFilters() {
-
-
-    // setup to only show charts that are relevant to the current view
-    unsigned int mask=0;
-    switch(g_chartView) {
-        case 0 : mask = VIEW_HOME; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
-        case 3 : mask = VIEW_TRAIN; break;
-        case 4 : mask = VIEW_INTERVAL; break;
-    }
+CloudDBUserMetricListDialog::applyAllFilters() {
 
     QStringList searchList;
     g_currentHeaderList->clear();
@@ -1080,64 +951,39 @@ CloudDBChartListDialog::applyAllFilters() {
         // split by any whitespace
         searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
     }
-    foreach (CommonAPIHeaderV1 chart, *g_fullHeaderList) {
+    foreach (CommonAPIHeaderV1 usermetric, *g_fullHeaderList) {
 
-        // list does not contain any deleted chart id's
-
-
-        // first filter based on the current view (Home, Analysis, Diary) - but only on Imp
-        bool chartOkForView = false;
-        if (g_role == CloudDBCommon::UserImport) {
-            int winId = chart.ChartType.toInt();
-            for (int i = 0; GcWindows[i].relevance; i++) {
-                if (GcWindows[i].id == winId && (GcWindows[i].relevance & mask)) {
-                    chartOkForView = true;
-                    break;
-                }
-            }
-        } else {
-            // for editing and curation all charts are shown
-            chartOkForView = true;
-        }
-
+        // list does not contain any deleted usermetric id's
         int curationState = curationStateCombo->currentIndex();
-        if (chartOkForView) {
+        // check curated first
+        if (curationState == 0 ||
+                (curationState == 1 && usermetric.Curated) ||
+                (curationState == 2 && !usermetric.Curated ) ) {
 
-            // check curated first
-            if (curationState == 0 ||
-                    (curationState == 1 && chart.Curated) ||
-                    (curationState == 2 && !chart.Curated ) ) {
+            //check own usermetric only
+            if (!ownUserMetricsOnly->isChecked() ||
+                    (ownUserMetricsOnly->isChecked() && usermetric.CreatorId == g_currentAthleteId)) {
 
-                //check own chart only
-                if (!ownChartsOnly->isChecked() ||
-                        (ownChartsOnly->isChecked() && chart.CreatorId == g_currentAthleteId)) {
+                // then check language (observe that we have an additional entry "all" in the combo !
+                if (langCombo->currentIndex() == 0 ||
+                        (langCombo->currentIndex() > 0 && CloudDBCommon::cloudDBLangsIds[langCombo->currentIndex()-1] == usermetric.Language )) {
 
-                    // then check sport (observe that we have an additional entry "all" in the combo !
-                    if (sportCombo->currentIndex() == 0 ||
-                            (sportCombo->currentIndex() > 0 && CloudDBCommon::cloudDBSportIds[sportCombo->currentIndex()-1] == chart.ChartSport )) {
-
-                        // then check language (observe that we have an additional entry "all" in the combo !
-                        if (langCombo->currentIndex() == 0 ||
-                                (langCombo->currentIndex() > 0 && CloudDBCommon::cloudDBLangsIds[langCombo->currentIndex()-1] == chart.Language )) {
-
-                            // at last check text filter
-                            if (g_textFilterActive) {
-                                // search with filter Keywords
-                                QString chartInfo = chart.Name + " " + chart.Description;
-                                foreach (QString search, searchList) {
-                                    if (chartInfo.contains(search, Qt::CaseInsensitive)) {
-                                        g_currentHeaderList->append(chart);
-                                        break;
-                                    }
-                                }
-                            } else {
-                                g_currentHeaderList->append(chart);
+                    // at last check text filter
+                    if (g_textFilterActive) {
+                        // search with filter Keywords
+                        QString usermetricInfo = usermetric.Name + " " + usermetric.Description;
+                        foreach (QString search, searchList) {
+                            if (usermetricInfo.contains(search, Qt::CaseInsensitive)) {
+                                g_currentHeaderList->append(usermetric);
+                                break;
                             }
                         }
+                    } else {
+                        g_currentHeaderList->append(usermetric);
                     }
                 }
-
             }
+
         }
     }
     g_currentIndex = 0;
@@ -1149,109 +995,50 @@ CloudDBChartListDialog::applyAllFilters() {
 
 
 void
-CloudDBChartListDialog::textFilterEditingFinished() {
+CloudDBUserMetricListDialog::textFilterEditingFinished() {
     if (g_textFilterActive) {
         applyAllFilters();
     }
 }
 
 void
-CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
-    ChartAPIv1* chart = new ChartAPIv1;
+CloudDBUserMetricListDialog::cellDoubleClicked(int row, int /*column */) {
+    UserMetricAPIv1* usermetric = new UserMetricAPIv1;
     if (row >= 0 && row < g_currentHeaderList->size() ) {
         g_networkrequestactive = true;
-        if (g_client->getChartByID(g_currentHeaderList->at(g_currentIndex+row).Id, chart)) {
-            CloudDBChartShowPictureDialog showImage(chart->Image);
-            showImage.exec();
+        if (g_client->getUserMetricByID(g_currentHeaderList->at(g_currentIndex+row).Id, usermetric)) {
+            //TODO CloudDBUserMetricShowPictureDialog showImage(usermetric->Image);
+            //showImage.exec();
 
         }
     }
     g_networkrequestactive = false;
-    delete chart;
+    delete usermetric;
 }
 
-
-CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageData) : imageData(imageData) {
-
-    QRect rec = QApplication::desktop()->screenGeometry();
-    imageLabel = new QLabel();
-    imageLabel->setMinimumSize(150,100); // not scaled to hi-dpi screens (cloud db constraint not device)
-    chartImage.loadFromData(imageData);
-    QSize size = chartImage.size();
-    int w = rec.width()/2;
-    int h = (qreal)size.width()*w/size.height();
-    imageLabel->setPixmap(chartImage.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-    okButton = new QPushButton(tr("Close"));
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(okButton);
-
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(imageLabel);
-    layout->addLayout(buttonLayout);
-
-    setLayout(layout);
-
-}
-
-CloudDBChartShowPictureDialog::~CloudDBChartShowPictureDialog() {
-    delete imageLabel;
-    delete okButton;
-}
-
-void
-CloudDBChartShowPictureDialog::okClicked() {
-    accept();
-}
-
-
-void
-CloudDBChartShowPictureDialog::resizeEvent(QResizeEvent *) {
-
-    int w = imageLabel->width();
-    int h = imageLabel->height();
-
-    // set a scaled pixmap to a w x h window keeping its aspect ratio
-    imageLabel->setPixmap(chartImage.scaled(w,h,Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-}
 
 
 //------------------------------------------------------------------------------------------------------------
-//  Dialog for publishing Chart Details
+//  Dialog for publishing UserMetric Details
 //------------------------------------------------------------------------------------------------------------
 
 
-CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athlete, bool update) : data(data), athlete(athlete), update(update) {
+CloudDBUserMetricObjectDialog::CloudDBUserMetricObjectDialog(UserMetricAPIv1 data, QString athlete, bool update) : data(data), athlete(athlete), update(update) {
 
-   QLabel *chartName = new QLabel(tr("Chart Name"));
+   QLabel *usermetricName = new QLabel(tr("UserMetric Name"));
    name = new QLineEdit();
-   nameDefault = tr("<Chart Name>");
+   nameDefault = tr("<UserMetric Name>");
    name->setMaxLength(50);
-   if (update) {
-       name->setText(data.Header.Name);
-       nameOk = true; // no need to re-check
-   } else {
+   if (data.Header.Name.isEmpty()) {
        name->setText(nameDefault);
        nameOk = false;
+   } else {
+       name->setText(data.Header.Name);
+       nameOk = true; // no need to re-check
    }
    QRegExp name_rx("^.{5,50}$");
    QValidator *name_validator = new QRegExpValidator(name_rx, this);
    name->setValidator(name_validator);
-
-   QLabel* sportLabel = new QLabel(tr("Sport"));
-   sportCombo = new QComboBox();
-   foreach (QString sport, CloudDBCommon::cloudDBSports) {
-       sportCombo->addItem(sport);
-   }
-   if (update) {
-       int index = CloudDBCommon::cloudDBSportIds.indexOf(data.ChartSport);
-       sportCombo->setCurrentIndex( index<0 ? 0 : index);
-   }
-
 
    QLabel* langLabel = new QLabel(tr("Language"));
    langCombo = new QComboBox();
@@ -1300,13 +1087,11 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    creatorId = new QLabel(data.Header.CreatorId);
 
    QGridLayout *detailsLayout = new QGridLayout;
-   detailsLayout->addWidget(chartName, 0, 0, Qt::AlignLeft);
+   detailsLayout->addWidget(usermetricName, 0, 0, Qt::AlignLeft);
    detailsLayout->addWidget(name, 0, 1);
 
-   detailsLayout->addWidget(sportLabel, 1, 0, Qt::AlignLeft);
-   detailsLayout->addWidget(sportCombo, 1, 1, Qt::AlignLeft);
-   detailsLayout->addWidget(langLabel, 1, 2, Qt::AlignLeft);
-   detailsLayout->addWidget(langCombo, 1, 3, Qt::AlignLeft);
+   detailsLayout->addWidget(langLabel, 1, 0, Qt::AlignLeft);
+   detailsLayout->addWidget(langCombo, 1, 1, Qt::AlignLeft);
 
    detailsLayout->addWidget(nickLabel, 2, 0, Qt::AlignLeft);
    detailsLayout->addWidget(nickName, 2, 1);
@@ -1320,17 +1105,13 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
 
    description = new QTextEdit();
    description->setAcceptRichText(false);
-   descriptionDefault = tr("<Enter the description of the chart here>");
+   descriptionDefault = tr("<Enter the description of the usermetric here>");
    description->setText(descriptionDefault);
-   if (update) {
-       description->setText(data.Header.Description);
-   } else {
+   if (data.Header.Description.isEmpty()) {
        description->setText(descriptionDefault);
+   } else {
+       description->setText(data.Header.Description);
    }
-   QPixmap *chartImage = new QPixmap();
-   chartImage->loadFromData(data.Image);
-   image = new QLabel();
-   image->setPixmap(chartImage->scaled(chartImageWidth*2, chartImageHeight*2, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
    publishButton = new QPushButton(tr("Upload"), this);
    cancelButton = new QPushButton(tr("Cancel"), this);
@@ -1348,49 +1129,47 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
    QVBoxLayout *mainLayout = new QVBoxLayout(this);
    mainLayout->addLayout(detailsLayout);
    mainLayout->addWidget(description);
-   mainLayout->addWidget(image);
    mainLayout->addLayout(buttonLayout);
 
    setLayout(mainLayout);
 
 }
 
-CloudDBChartObjectDialog::~CloudDBChartObjectDialog() {
+CloudDBUserMetricObjectDialog::~CloudDBUserMetricObjectDialog() {
 
 }
 
 void
-CloudDBChartObjectDialog::publishClicked() {
+CloudDBUserMetricObjectDialog::publishClicked() {
 
     // check data consistency
 
     if (name->text().isEmpty() || name->text() == nameDefault || !nameOk) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid chart name with min. 5 characters length.")));
+        QMessageBox::warning(0, tr("Upload UserMetric"), QString(tr("Please enter a valid usermetric name with min. 5 characters length.")));
         return;
     }
 
     if (nickName->text().isEmpty()) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a nickname for this athlete.")));
+        QMessageBox::warning(0, tr("Upload UserMetric"), QString(tr("Please enter a nickname for this athlete.")));
         return;
     }
     if (email->text().isEmpty() || !emailOk) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid e-mail address.")));
+        QMessageBox::warning(0, tr("Upload UserMetric"), QString(tr("Please enter a valid e-mail address.")));
         return;
     }
 
     if (description->toPlainText().isEmpty() || description->toPlainText() == descriptionDefault) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a sensible chart description.")));
+        QMessageBox::warning(0, tr("Upload UserMetric"), QString(tr("Please enter a sensible usermetric description.")));
         return;
     }
 
-    if (QMessageBox::question(0, tr("Cloud Upload"), QString(tr("Do you want to upload this chart definition ?"))) != QMessageBox::Yes) return;
+    if (QMessageBox::question(0, tr("Cloud Upload"), QString(tr("Do you want to upload this usermetric definition ?"))) != QMessageBox::Yes) return;
 
     data.Header.Name = name->text();
     data.Header.Description = description->toPlainText();
     data.CreatorEmail = email->text();
     data.CreatorNick = nickName->text();
     data.Header.Language = CloudDBCommon::cloudDBLangsIds.at(langCombo->currentIndex());
-    data.ChartSport = CloudDBCommon::cloudDBSportIds.at(sportCombo->currentIndex());
 
     if (!update) {
         appsettings->setCValue(athlete, GC_NICKNAME, data.CreatorNick);
@@ -1401,44 +1180,39 @@ CloudDBChartObjectDialog::publishClicked() {
 
 
 void
-CloudDBChartObjectDialog::cancelClicked()  {
+CloudDBUserMetricObjectDialog::cancelClicked()  {
     reject();
 }
 
 
 void
-CloudDBChartObjectDialog::emailTextChanged(QString text)  {
+CloudDBUserMetricObjectDialog::emailTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid e-mail address.")));
+        QMessageBox::warning(0, tr("Upload UserMetric"), QString(tr("Please enter a valid e-mail address.")));
     } else {
         emailOk = false;
     }
 }
 
 void
-CloudDBChartObjectDialog::emailEditingFinished()  {
+CloudDBUserMetricObjectDialog::emailEditingFinished()  {
     // validator check passed
     emailOk = true;
 }
 
 void
-CloudDBChartObjectDialog::nameTextChanged(QString text)  {
+CloudDBUserMetricObjectDialog::nameTextChanged(QString text)  {
 
     if (text.isEmpty()) {
-        QMessageBox::warning(0, tr("Upload Chart"), QString(tr("Please enter a valid chart name with min. 5 characters length.")));
+        QMessageBox::warning(0, tr("Upload UserMetric"), QString(tr("Please enter a valid usermetric name with min. 5 characters length.")));
     } else {
         nameOk = false;
     }
 }
 
 void
-CloudDBChartObjectDialog::nameEditingFinished()  {
+CloudDBUserMetricObjectDialog::nameEditingFinished()  {
     // validator check passed
     nameOk = true;
 }
-
-
-
-
-
