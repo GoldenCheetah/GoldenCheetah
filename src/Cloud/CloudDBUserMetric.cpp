@@ -196,17 +196,6 @@ CloudDBUserMetricClient::curateUserMetricByID(qint64 id, bool newStatus) {
     return true;
 }
 
-void
-CloudDBUserMetricClient::incrementDownloadCounterByID(qint64 id) {
-
-    QNetworkRequest request;
-    CloudDBCommon::prepareRequest(request, g_usermetricdownloadincr_url_base+QString::number(id, 10));
-    g_reply = g_nam->put(request, "{ \"id\": \"dummy\" }");
-
-    // ignore any errors or reply - user does not need to be informed in case of problems
-}
-
-
 
 bool
 CloudDBUserMetricClient::getAllUserMetricHeader(QList<CommonAPIHeaderV1>* header) {
@@ -772,9 +761,6 @@ CloudDBUserMetricListDialog::addAndCloseClicked() {
             QTableWidgetItem* s = selected.at(i);
             if (s->row() >= 0 && s->row() <= g_currentPresets->count()) {
                 g_selected << g_currentPresets->at(s->row()).usermetricXML;
-
-                // increment download counter
-                g_client->incrementDownloadCounterByID(g_currentPresets->at(s->row()).id);
             }
         }
         accept();

@@ -58,10 +58,8 @@ public:
     bool getUserMetricByID(qint64 id, UserMetricAPIv1 *usermetric);
     bool deleteUserMetricByID(qint64 id);
     bool curateUserMetricByID(qint64 id, bool newStatus);
-    void incrementDownloadCounterByID(qint64 id);
     bool getAllUserMetricHeader(QList<CommonAPIHeaderV1>* header);
 
-    void updateUserMetricInCache(qint64 id);
     bool sslLibMissing() { return noSSLlib; }
 
 public slots:
