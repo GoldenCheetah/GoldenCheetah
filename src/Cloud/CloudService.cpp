@@ -26,6 +26,8 @@
 #include "CsvRideFile.h"
 #include "Colors.h"
 #include "Units.h"
+#include "DataProcessor.h"  // to run auto data processors
+#include "RideMetadata.h"   // for linked defaults processing
 
 #include <QIcon>
 #include <QFileIconProvider>
@@ -1651,6 +1653,15 @@ CloudServiceSyncDialog::saveRide(RideFile *ride, QStringList &errors)
         return false;
     }
 
+    // process linked defaults
+    context->athlete->rideMetadata()->setLinkedDefaults(ride);
+
+    // run the processor first... import
+    DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
+    ride->recalculateDerivedSeries();
+    // now metrics have been calculated
+    DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
+
     JsonFileReader reader;
     QFile file(filename);
     reader.writeRideFile(context, ride, file);
@@ -1932,6 +1943,15 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
         delete ride;
         return;
     }
+
+    // process linked defaults
+    context->athlete->rideMetadata()->setLinkedDefaults(ride);
+
+    // run the processor first... import
+    DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
+    ride->recalculateDerivedSeries();
+    // now metrics have been calculated
+    DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
 
     JsonFileReader reader;
     QFile file(filename);
