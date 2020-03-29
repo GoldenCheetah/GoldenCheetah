@@ -751,7 +751,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/GProgressDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
            Gui/IntervalTreeView.h Gui/LTMSidebar.h Gui/MainWindow.h Gui/NewCyclistDialog.h Gui/Pages.h Gui/RideNavigator.h Gui/RideNavigatorProxy.h \
            Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/SolveCPDialog.h Gui/Tab.h Gui/TabView.h Gui/ToolsRhoEstimator.h \
-           Gui/Views.h Gui/BatchExportDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h \
+           Gui/Views.h Gui/BatchExportDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/NewMainWindow.h \
            Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h Gui/SolverDisplay.h
 
 # metrics and models
@@ -849,7 +849,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/GcWindowRegistry.cpp Gui/GenerateHeatMapDialog.cpp Gui/GProgressDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
            Gui/IntervalTreeView.cpp Gui/LTMSidebar.cpp Gui/MainWindow.cpp Gui/NewCyclistDialog.cpp Gui/Pages.cpp Gui/RideNavigator.cpp Gui/SaveDialogs.cpp \
            Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/SolveCPDialog.cpp Gui/Tab.cpp Gui/TabView.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp \
-           Gui/BatchExportDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp \
+           Gui/BatchExportDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp Gui/NewMainWindow.cpp \
            Gui/MergeActivityWizard.cpp Gui/RideImportWizard.cpp Gui/SplitActivityWizard.cpp Gui/SolverDisplay.cpp
 
 ## Models and Metrics
