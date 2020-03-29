@@ -1,0 +1,20 @@
+{
+	"CHART":{
+		"VERSION":"1",
+		"VIEW":"analysis",
+		"TYPE":"43",
+		"PROPERTIES":{
+			"title":"Python ",
+			"subtitle":" ",
+			"widthFactor":"2",
+			"heightFactor":"2",
+			"style":"0",
+			"resizable":"0",
+			"script":"# python script\n\n## Retrieve power and cadence\nxx = GC.series(GC.SERIES_SECS)\nyy = GC.series(GC.SERIES_WATTS)\n\n## using qt charts\nGC.setChart(title=\"Power Time Series\", \n            type=GC.CHART_LINE, \n            animate=False);\n\nGC.addCurve(name=\"cadp\",x=xx,y=yy,\n            size=2, color=\"gold\",\n            #opacity=65, opengl=False,\n            xaxis=\"Seconds\", yaxis=\"Power\")\n\n\n ",
+			"state":" ",
+			"showConsole":"1",
+			"asWeb":"0",
+			"__LAST__":"1",
+		}
+	}
+}

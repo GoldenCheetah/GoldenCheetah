@@ -240,7 +240,7 @@ void
 WorkoutWindow::resizeEvent(QResizeEvent *)
 {
     // show or hide toolbar if big enough
-    if (!recording && height() > MINTOOLHEIGHT) toolbar->show();
+    if (!recording && height() > (MINTOOLHEIGHT*dpiYFactor)) toolbar->show();
     else toolbar->hide();
 }
 
@@ -438,6 +438,11 @@ WorkoutWindow::saveAs()
     // if they didn't select, give up.
     if (filename.isEmpty()) {
         return;
+    }
+
+    // filetype defaults to .erg
+    if(!filename.endsWith(".erg") && !filename.endsWith(".zwo")) {
+        filename.append(".erg");
     }
 
     // New ergfile will be created almost empty

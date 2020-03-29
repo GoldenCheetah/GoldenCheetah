@@ -81,6 +81,9 @@
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 // GUI Widgets
 #include "Tab.h"
@@ -104,6 +107,7 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBCurator.h"
 #include "CloudDBStatus.h"
 #include "CloudDBTelemetry.h"
@@ -481,10 +485,12 @@ MainWindow::MainWindow(const QDir &home)
 
     QMenu *cloudDBMenu = optionsMenu->addMenu(tr("Cloud Contributions"));
     cloudDBMenu->addAction(tr("Maintain charts"), this, SLOT(cloudDBuserEditChart()));
+    cloudDBMenu->addAction(tr("Maintain user metrics"), this, SLOT(cloudDBuserEditUserMetric()));
 
     if (CloudDBCommon::addCuratorFeatures) {
         QMenu *cloudDBCurator = optionsMenu->addMenu(tr("Cloud Curator"));
         cloudDBCurator->addAction(tr("Curate charts"), this, SLOT(cloudDBcuratorEditChart()));
+        cloudDBCurator->addAction(tr("Curate user metrics"), this, SLOT(cloudDBcuratorEditUserMetric()));
     }
 
 #endif
@@ -502,7 +508,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors();
+    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
 
     if (processors.count()) {
 
@@ -520,6 +526,13 @@ MainWindow::MainWindow(const QDir &home)
             toolMapper->setMapping(action, i.key());
         }
     }
+
+#ifdef GC_WANT_PYTHON
+    // add custom python fix entry to edit menu
+    pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
+    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
+#endif
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -810,9 +823,11 @@ MainWindow::setChartMenu(QMenu *menu)
 void
 MainWindow::addChart(QAction*action)
 {
+    // & removed to avoid issues with kde AutoCheckAccelerators
+    QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
     for (int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].name == action->text()) {
+        if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
         }
@@ -1078,6 +1093,26 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
     if (rideitem) {
+
+#ifdef GC_WANT_PYTHON
+        if (name.startsWith("_fix_py_")) {
+            name = name.remove(0, 8);
+
+            FixPyScript *script = fixPySettings->getScript(name);
+            if (script == nullptr) {
+                return;
+            }
+
+            QString errText;
+            FixPyRunner pyRunner(currentTab->context);
+            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
+                QMessageBox::critical(this, "GoldenCheetah", errText);
+            }
+
+            return;
+        }
+#endif
+
         ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
@@ -1250,7 +1285,8 @@ MainWindow::dropEvent(QDropEvent *event)
             xmlReader.parse(source);
             imported += handler.getSettings();
 
-        } else if (ErgFile::isWorkout(filename)) {
+        // Look for Workout files only in Train view
+        } else if (currentTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
             workouts << filename;
         } else {
             filenames.append(filename);
@@ -1280,7 +1316,7 @@ MainWindow::dropEvent(QDropEvent *event)
     if (list.count())  importCharts(list);
 
     // import workouts
-    if (workouts.count()) Library::importFiles(currentTab->context, filenames, true);
+    if (workouts.count()) Library::importFiles(currentTab->context, workouts, true);
 
     // if there is anything left, process based upon view...
     if (filenames.count()) {
@@ -2065,12 +2101,22 @@ MainWindow::checkCloud()
 }
 
 void
+MainWindow::importCloud()
+{
+    // lets get a new cloud service account
+    AddCloudWizard *p = new AddCloudWizard(currentTab->context, "", true);
+    p->show();
+}
+
+void
 MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
+        // & removed to avoid issues with kde AutoCheckAccelerators
+        QString actionText = QString(action->text()).replace("&", "");
 
-        if (action->text() == "University of Kent") {
+        if (actionText == "University of Kent") {
 #if QT_VERSION > 0x50000
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
             KentUniversityUploadDialog uploader(this, db, currentTab->context->ride);
@@ -2185,6 +2231,41 @@ MainWindow::ridesAutoImport() {
 
 }
 
+#ifdef GC_WANT_PYTHON
+void MainWindow::onEditMenuAboutToShow()
+{
+    bool embedPython = appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool();
+    pyFixesMenu->menuAction()->setVisible(embedPython);
+}
+
+void MainWindow::buildPyFixesMenu()
+{
+    pyFixesMenu->clear();
+
+    QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
+    foreach (FixPyScript *fixPyScript, fixPyScripts) {
+        QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
+        pyFixesMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+        toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
+    }
+
+    pyFixesMenu->addSeparator();
+    pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
+    pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
+}
+
+void MainWindow::showManageFixPyScriptsDlg() {
+    ManageFixPyScriptsDialog dlg(currentTab->context);
+    dlg.exec();
+}
+
+void MainWindow::showCreateFixPyScriptDlg() {
+    EditFixPyScriptDialog dlg(currentTab->context, nullptr, this);
+    dlg.exec();
+}
+#endif
+
 // grow/shrink searchbox if there is space...
 void
 MainWindow::searchFocusIn()
@@ -2228,6 +2309,27 @@ MainWindow::cloudDBuserEditChart()
 }
 
 void
+MainWindow::cloudDBuserEditUserMetric()
+{
+    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
+    if (currentTab->context->cdbUserMetricListDialog == NULL) {
+        currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    }
+
+    // force refresh in prepare to allways get the latest data here
+    if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
+        currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
+    }
+}
+
+void
 MainWindow::cloudDBcuratorEditChart()
 {
     // first check if the user is a curator
@@ -2241,6 +2343,27 @@ MainWindow::cloudDBcuratorEditChart()
         // force refresh in prepare to allways get the latest data here
         if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
             currentTab->context->cdbChartListDialog->exec(); // no action when closed
+        }
+    } else {
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));
+
+    }
+}
+
+void
+MainWindow::cloudDBcuratorEditUserMetric()
+{
+    // first check if the user is a curator
+    CloudDBCuratorClient *curatorClient = new CloudDBCuratorClient;
+    if (curatorClient->isCurator(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
+
+        if (currentTab->context->cdbUserMetricListDialog == NULL) {
+            currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+        }
+
+        // force refresh in prepare to allways get the latest data here
+        if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+            currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
         }
     } else {
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));

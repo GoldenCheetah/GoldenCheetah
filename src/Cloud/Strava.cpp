@@ -21,6 +21,7 @@
 #include "JsonRideFile.h"
 #include "Athlete.h"
 #include "Settings.h"
+#include "Secrets.h"
 #include "mvjson.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
@@ -65,6 +66,8 @@ Strava::Strava(Context *context) : CloudService(context), context(context), root
 
     // config
     settings.insert(OAuthToken, GC_STRAVA_TOKEN);
+    settings.insert(Local1, GC_STRAVA_REFRESH_TOKEN);
+    settings.insert(Local2, GC_STRAVA_LAST_REFRESH);
     settings.insert(Metadata1, QString("%1::Activity Name").arg(GC_STRAVA_ACTIVITY_NAME));
 }
 
@@ -87,11 +90,67 @@ bool
 Strava::open(QStringList &errors)
 {
     printd("Strava::open\n");
-    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
+    QString token = getSetting(GC_STRAVA_REFRESH_TOKEN, "").toString();
     if (token == "") {
         errors << tr("No authorisation token configured.");
         return false;
     }
+
+    printd("Get access token for this session.\n");
+
+    // refresh endpoint
+    QNetworkRequest request(QUrl("https://www.strava.com/oauth/token?"));
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // set params
+    QString data;
+    data += "client_id=" GC_STRAVA_CLIENT_ID;
+    data += "&client_secret=" GC_STRAVA_CLIENT_SECRET;
+    data += "&refresh_token=" + getSetting(GC_STRAVA_REFRESH_TOKEN).toString();
+    data += "&grant_type=refresh_token";
+
+    // make request
+    QNetworkReply* reply = nam->post(request, data.toLatin1());
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    printd("HTTP response code: %d\n", statusCode);
+
+    // oops, no dice
+    if (reply->error() != 0) {
+        printd("Got error %s\n", reply->errorString().toStdString().c_str());
+        errors << reply->errorString();
+        return false;
+    }
+
+    // lets extract the access token, and possibly a new refresh token
+    QByteArray r = reply->readAll();
+    printd("Got response: %s\n", r.data());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // failed to parse result !?
+    if (parseError.error != QJsonParseError::NoError) {
+        printd("Parse error!\n");
+        errors << tr("JSON parser error") << parseError.errorString();
+        return false;
+    }
+
+    QString access_token = document.object()["access_token"].toString();
+    QString refresh_token = document.object()["refresh_token"].toString();
+
+    // update our settings
+    if (access_token != "") setSetting(GC_STRAVA_TOKEN, access_token);
+    if (refresh_token != "") setSetting(GC_STRAVA_REFRESH_TOKEN, refresh_token);
+    setSetting(GC_STRAVA_LAST_REFRESH, QDateTime::currentDateTime());
+
+    // get the factory to save our settings permanently
+    CloudServiceFactory::instance().saveSettings(this, context);
     return true;
 }
 
@@ -240,18 +299,16 @@ Strava::readFile(QByteArray *data, QString remotename, QString remoteid)
 bool
 Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
 {
-    Q_UNUSED(ride);
+    // Manual activity upload or File upload according to available data
+    bool manual = ride->dataPoints().isEmpty();
 
-    printd("Strava::writeFile(%s)\n", remotename.toStdString().c_str());
+    printd("Strava::writeFile(%s) manual(%s)\n", remotename.toStdString().c_str(), manual ? "true" : "false");
 
     QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
 
-    // access the original file for ride start
-    QDateTime rideDateTime = ride->startTime();
-
-    // trap network response from access manager
-
-    QUrl url = QUrl( "https://www.strava.com/api/v3/uploads" ); // The V3 API doc said "https://api.strava.com" but it is not working yet
+    // The V3 API doc said "https://api.strava.com" but it is not working yet
+    QUrl url = manual ?  QUrl( "https://www.strava.com/api/v3/activities" )
+                      :  QUrl( "https://www.strava.com/api/v3/uploads" );
     QNetworkRequest request = QNetworkRequest(url);
 
     //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
@@ -267,66 +324,116 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     accessTokenPart.setHeader(QNetworkRequest::ContentDispositionHeader,
                               QVariant("form-data; name=\"access_token\""));
     accessTokenPart.setBody(token.toLatin1());
+    multiPart->append(accessTokenPart);
 
     QHttpPart activityTypePart;
     activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-                               QVariant("form-data; name=\"activity_type\""));
+                               manual ? QVariant("form-data; name=\"type\"")
+                                      : QVariant("form-data; name=\"activity_type\""));
+
+    // Map some known sports and default to ride for anything else
+    QString sport = ride->getTag("Sport", "");
+    QString subSport = ride->getTag("SubSport", "");
     if (ride->isRun())
       activityTypePart.setBody("run");
     else if (ride->isSwim())
       activityTypePart.setBody("swim");
+    else if (sport == "Rowing")
+      activityTypePart.setBody("Rowing");
+    else if (sport == "XC Ski" || sport == "Cross country skiing")
+      activityTypePart.setBody("BackcountrySki");
+    else if (sport == "Strength" || subSport == "strength_training")
+      activityTypePart.setBody("WeightTraining");
     else
       activityTypePart.setBody("ride");
-
-    QString filename = QFileInfo(remotename).baseName();
+    multiPart->append(activityTypePart);
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
 
     // use metadata config if the user selected it
-    QString fieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+    QString activityNameFieldname = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
     QString activityName = "";
-    if (fieldname != "") activityName = ride->getTag(fieldname, "");
-    activityNamePart.setBody(activityName.toLatin1());
+    if (activityNameFieldname != "")
+        activityName = ride->getTag(activityNameFieldname, "");
+    activityNamePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain;charset=utf-8"));
+    activityNamePart.setBody(activityName.toUtf8());
+    if (activityName != "")
+        multiPart->append(activityNamePart);
 
-    QHttpPart dataTypePart;
-    dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
-    dataTypePart.setBody("tcx.gz");
-
-    QHttpPart externalIdPart;
-    externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
-    externalIdPart.setBody(filename.toStdString().c_str());
+    QHttpPart activityDescriptionPart;
+    activityDescriptionPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"description\""));
+    QString activityDescription = "";
+    if (activityNameFieldname != "Notes")
+        activityDescription = ride->getTag("Notes", "");
+    activityDescriptionPart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/plain;charset=utf-8"));
+    activityDescriptionPart.setBody(activityDescription.toUtf8());
+    if (activityDescription != "")
+        multiPart->append(activityDescriptionPart);
 
     //XXXQHttpPart privatePart;
     //XXXprivatePart.setHeader(QNetworkRequest::ContentDispositionHeader,
     //XXX                      QVariant("form-data; name=\"private\""));
     //XXXprivatePart.setBody(parent->privateChk->isChecked() ? "1" : "0");
+    //XXXmultiPart->append(privatePart);
 
     //XXXQHttpPart commutePart;
     //XXXcommutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
     //XXX                      QVariant("form-data; name=\"commute\""));
     //XXXcommutePart.setBody(parent->commuteChk->isChecked() ? "1" : "0");
+    //XXXmultiPart->append(commutePart);
+
     //XXXQHttpPart trainerPart;
     //XXXtrainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
     //XXX                      QVariant("form-data; name=\"trainer\""));
     //XXXtrainerPart.setBody(parent->trainerChk->isChecked() ? "1" : "0");
-
-    QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+"\"; type=\"text/xml\""));
-    filePart.setBody(data);
-
-    multiPart->append(accessTokenPart);
-    multiPart->append(activityTypePart);
-    if (activityName != "") {
-        multiPart->append(activityNamePart);
-    }
-    multiPart->append(dataTypePart);
-    multiPart->append(externalIdPart);
-    //XXXmultiPart->append(privatePart);
-    //XXXmultiPart->append(commutePart);
     //XXXmultiPart->append(trainerPart);
-    multiPart->append(filePart);
+
+    if (manual) {
+
+        // create manual activity data
+        QDateTime rideDateTime = ride->startTime();
+        QHttpPart startDateTimePart;
+        startDateTimePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"start_date_local\""));
+        startDateTimePart.setBody(rideDateTime.toString(Qt::ISODate).toStdString().c_str());
+        multiPart->append(startDateTimePart);
+
+        if (ride->metricOverrides.contains("workout_time")) {
+            QString duration = ride->metricOverrides.value("workout_time").value("value");
+            QHttpPart elapsedTimePart;
+            elapsedTimePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"elapsed_time\""));
+            elapsedTimePart.setBody(duration.toStdString().c_str());
+            multiPart->append(elapsedTimePart);
+        }
+
+        if (ride->metricOverrides.contains("total_distance")) {
+            QString distance = QString::number(ride->metricOverrides.value("total_distance").value("value").toDouble() * 1000.0);
+            QHttpPart distancePart;
+            distancePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"distance\""));
+            distancePart.setBody(distance.toStdString().c_str());
+            multiPart->append(distancePart);
+        }
+    } else {
+
+        // upload file data
+        QString filename = QFileInfo(remotename).baseName();
+
+        QHttpPart dataTypePart;
+        dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
+        dataTypePart.setBody("tcx.gz");
+        multiPart->append(dataTypePart);
+
+        QHttpPart externalIdPart;
+        externalIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"external_id\""));
+        externalIdPart.setBody(filename.toStdString().c_str());
+        multiPart->append(externalIdPart);
+
+        QHttpPart filePart;
+        filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("text/xml"));
+        filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+remotename+"\"; type=\"text/xml\""));
+        filePart.setBody(data);
+        multiPart->append(filePart);
+    }
 
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
@@ -787,13 +894,18 @@ Strava::prepareResponse(QByteArray* data)
         // 1s samples with start time
         RideFile *ride = new RideFile(starttime.toUTC(), 1.0f);
 
+        // set strava id in metadata (to show where we got it from - to add View on Strava link in Summary view
+        if (!each["id"].isNull()) ride->setTag("StravaID",  QString("%1").arg(each["id"].toVariant().toULongLong()));
+
         // what sport?
         if (!each["type"].isNull()) {
             QString stype = each["type"].toString();
-            if (stype == "Ride") ride->setTag("Sport", "Bike");
-            else if (stype == "Run") ride->setTag("Sport", "Run");
-            else if (stype == "Swim") ride->setTag("Sport", "Swim");
+            if (stype.endsWith("Ride")) ride->setTag("Sport", "Bike");
+            else if (stype.endsWith("Run")) ride->setTag("Sport", "Run");
+            else if (stype.endsWith("Swim")) ride->setTag("Sport", "Swim");
             else ride->setTag("Sport", stype);
+            // Set SubSport to preserve the original when Sport was mapped
+            if (stype != ride->getTag("Sport", "")) ride->setTag("SubSport", stype);
         }
 
         if (each["device_name"].toString().length()>0)
@@ -805,6 +917,12 @@ Strava::prepareResponse(QByteArray* data)
         if (!each["name"].isNull()) {
             QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
             if (meta != "") ride->setTag(meta, each["name"].toString());
+        }
+
+        // description saved to Notes, if Notes is not already used for name
+        if (!each["description"].isNull()) {
+            QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
+            if (meta != "Notes") ride->setTag("Notes", each["description"].toString());
         }
 
         if (each["manual"].toBool()) {

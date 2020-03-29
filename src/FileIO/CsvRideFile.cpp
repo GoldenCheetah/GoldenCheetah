@@ -130,6 +130,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *rrSeries=NULL;
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
+    XDataSeries *vo2Series=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -1380,6 +1381,74 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         delete rideFile;
         return NULL;
     }
+
+    // Is there an associated .vo2 file?
+    QFile vo2file(file.fileName().replace(".csv",".vo2"));
+    if (vo2file.open(QFile::ReadOnly))
+    {
+        // create the XDATA series
+        vo2Series = new XDataSeries();
+        vo2Series->name = "VO2 Measurements";
+        vo2Series->valuename << "Rf" << "RMV" << "VO2" << "VCO2" << "Tv" << "FeO2";
+        vo2Series->unitname << "bpm" << "l/min" << "ml/min" << "ml/min" << "l" << "%";
+
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&vo2file);
+
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
+                continue;
+            }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
+
+                if (line.length()==0) {
+                    continue;
+                }
+
+                // first line is a header line
+                if (lineno > 1) {
+
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", QString::KeepEmptyParts);
+
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(1).toDouble();
+                    p->number[1] = values.at(2).toDouble();
+                    p->number[2] = values.at(3).toDouble();
+                    p->number[3] = values.at(4).toDouble();
+                    p->number[4] = values.at(5).toDouble();
+                    p->number[5] = values.at(6).toDouble();
+                    vo2Series->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
+            }
+        }
+        // free handle
+        vo2file.close();
+
+        // add if we got any ....
+        if (vo2Series->datapoints.count() > 0)
+        {
+            rideFile->addXData("VO2", vo2Series);
+        }
+    }
+
 
     // last, is there an associated rr file?
     //

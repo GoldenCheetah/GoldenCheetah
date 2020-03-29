@@ -355,7 +355,8 @@ MergeActivityWizard::mergeRideSamplesByDistance()
         }
 
         // Compute interpolated location from current distance.
-        geolocation interpLoc = gpi.Interpolate(add.km);
+        double interpSlope = 0.;
+        geolocation interpLoc = gpi.Location(add.km, interpSlope);
 
         RideFilePoint source = *(ride2->dataPoints()[j]);
 
@@ -379,21 +380,7 @@ MergeActivityWizard::mergeRideSamplesByDistance()
                         add.setValue(io.key(), interpLoc.Alt());
                         break;
                     case RideFile::slope:
-                        {
-                            // Obtain interpolated future altitude using next unique ride1 distance
-                            // since that location is of the next altitude that will be recorded.
-                            // This is more stable than using the actual point slope at current
-                            // location and ensures that slope will match recorded altitudes.
-                            double slope = 0.0;
-                            if (ride1nextdistance != add.km)
-                            {
-                                geolocation interpLocE = gpi.Interpolate(ride1nextdistance);
-                                double altitudeDeltaM = (interpLocE.Alt() - interpLoc.Alt());
-                                double distanceDeltaM = 1000 * (ride1nextdistance - add.km);
-                                slope = 100.0 * (altitudeDeltaM / distanceDeltaM);
-                            }
-                            add.setValue(io.key(), slope);
-                        }
+                        add.setValue(io.key(), interpSlope * 100);
                         break;
                     default:
                         add.setValue(io.key(), source.value(io.key()));

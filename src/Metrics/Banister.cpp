@@ -498,11 +498,9 @@ banisterFit::combine(banisterFit other)
 }
 
 // used to wrap a function call when deriving parameters
-static QMutex calllmfit;
-static banisterFit *calllmfitmodel = NULL;
-static double calllmfitf(double t, const double *p) {
-return static_cast<banisterFit*>(calllmfitmodel)->f(t, p);
-
+static banisterFit *calllmfitm = NULL;
+static double calllmfitb(double t, const double *p) {
+return static_cast<banisterFit*>(calllmfitm)->f(t, p);
 }
 
 void Banister::setDecay(double one, double two)
@@ -529,11 +527,11 @@ void Banister::fit()
 
         // use forwarder via global variable, so mutex around this !
         calllmfit.lock();
-        calllmfitmodel=&windows[i];
+        calllmfitm=&windows[i];
 
         //fprintf(stderr, "Fitting ...\n" ); fflush(stderr);
         lmcurve(3, prior, windows[i].tests, performanceDay.constData()+windows[i].testoffset, performanceScore.constData()+windows[i].testoffset,
-                calllmfitf, &control, &status);
+                calllmfitb, &control, &status);
 
         // release for others
         calllmfit.unlock();

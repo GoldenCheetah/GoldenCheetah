@@ -558,6 +558,8 @@ static const QStringList timeInZonesWBAL = QStringList()
 void
 Card::setData(RideItem *item)
 {
+    if (item == NULL || item->ride() == NULL) return;
+
     // use ride colors in painting?
     ridecolor = item->color;
 
@@ -2747,7 +2749,7 @@ OverviewWindow::eventFilter(QObject *, QEvent *event)
 
             // min max width
             if (setcolumn < 800) setcolumn = 800;
-            if (setcolumn > 2400) setcolumn = 2400;
+            if (setcolumn > 4400) setcolumn = 4400;
 
             columns[stateData.xresize.column] = setcolumn;
 

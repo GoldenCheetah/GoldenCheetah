@@ -19,6 +19,7 @@
 #include "LTMSettings.h"
 #include "MainWindow.h"
 #include "LTMTool.h"
+#include "Colors.h" //dpixfactor
 #include "Context.h"
 #include "LTMChartParser.h"
 #include "Utils.h"
@@ -56,7 +57,7 @@ EditChartDialog::EditChartDialog(Context *context, LTMSettings *settings, QList<
     mainLayout->addLayout(buttonLayout);
 
     // make it wide enough
-    setMinimumWidth(250);
+    setMinimumWidth(250 *dpiXFactor);
 
     // connect up slots
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));

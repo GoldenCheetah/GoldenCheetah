@@ -235,7 +235,8 @@ public:
     bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
     // the config widget
-    DataProcessorConfig* processorConfig(QWidget *parent) {
+    DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        Q_UNUSED(ride);
         return new FilterHrvOutliersConfig(parent);
     }
 
@@ -252,8 +253,8 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
 {
     Q_UNUSED(op)
 
-    if (ride->areDataPresent()->hrv) {
-        XDataSeries *series = ride->xdata("HRV");
+    XDataSeries *series = ride->xdata("HRV");
+    if (series && series->datapoints.count() > 0) {
 
         // Read settings
         double rrMax;

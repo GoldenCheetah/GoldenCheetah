@@ -28,11 +28,57 @@ def __GCactivityXdata(name="", activity=None):
       rd[str(xd)] = xd
    return rd
 
+# setting up the chart
+def __GCsetChart(title="",type=1,animate=False,legpos=2,stack=False,orientation=2):
+    GC.configChart(title,type,animate,legpos,stack,orientation)
+
+# add a curve
+def __GCsetCurve(name="",x=list(),y=list(),xaxis="x",yaxis="y", labels=list(), colors=list(),line=1,symbol=1,size=15,color="cyan",opacity=0,opengl=True,legend=True,datalabels=False):
+    if (name == ""):
+       raise ValueError("curve 'name' must be set and unique.")
+    GC.setCurve(name,list(x),list(y),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl,legend,datalabels)
+
+# setting the axis
+def __GCconfigAxis(name,visible=True,align=-1,min=-1,max=-1,type=-1,labelcolor="",color="",log=False,categories=list()):
+    if (name == ""):
+        raise ValueError("axis 'name' must be passed.")
+    GC.configAxis(name, visible, align, min, max, type, labelcolor, color, log, categories)
+
+# adding annotations
+def __GCannotate(type="label", series="", label="", value=0):
+    GC.addAnnotation(type,series,label,value)
+
 # add to main GC entrypoint
 GC.activity=__GCactivity
 GC.activityXdata=__GCactivityXdata
+GC.setChart=__GCsetChart
+GC.addCurve=__GCsetCurve
+GC.setAxis=__GCconfigAxis
+GC.annotate=__GCannotate
+
+# orientation
+GC_HORIZONTAL=1
+GC_VERTICAL=2
+
+# line style
+GC_LINE_NONE=0
+GC_LINE_SOLID=1
+GC_LINE_DASH=2
+GC_LINE_DOT=3
+GC_LINE_DASHDOT=4
 
 # constants
+GC_ALIGN_BOTTOM=0
+GC_ALIGN_LEFT=1
+GC_ALIGN_TOP=2
+GC_ALIGN_RIGHT=3
+
+# 0 reserved for uninitialised
+GC.CHART_LINE=1
+GC.CHART_SCATTER=2
+GC.CHART_BAR=3
+GC.CHART_PIE=4
+
 GC.SERIES_SECS = 0
 GC.SERIES_CAD = 1
 GC.SERIES_CADD = 2

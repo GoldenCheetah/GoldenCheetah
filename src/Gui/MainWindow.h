@@ -31,6 +31,7 @@
 #include "DragBar.h"
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBVersion.h"
 #include "CloudDBTelemetry.h"
 #endif
@@ -172,6 +173,7 @@ class MainWindow : public QMainWindow
         void setUploadMenu();
         void setSyncMenu();
         void checkCloud();
+        void importCloud(); // used to setup and sync in one on first run (see BlankState.cpp)
 
         void showOptions();
 
@@ -235,10 +237,20 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
+#ifdef GC_WANT_PYTHON
+        // Python fix scripts
+        void onEditMenuAboutToShow();
+        void buildPyFixesMenu();
+        void showManageFixPyScriptsDlg();
+        void showCreateFixPyScriptDlg();
+#endif
+
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();
         void cloudDBcuratorEditChart();
+        void cloudDBuserEditUserMetric();
+        void cloudDBcuratorEditUserMetric();
         void cloudDBshowStatus();
         void addChartFromCloudDB();
         void exportChartToCloudDB();
@@ -302,6 +314,9 @@ class MainWindow : public QMainWindow
         // Miscellany
         QSignalMapper *toolMapper;
 
+#ifdef GC_WANT_PYTHON
+        QMenu *pyFixesMenu;
+#endif
 
 #ifdef GC_HAS_CLOUD_DB
         CloudDBVersionClient *versionClient;

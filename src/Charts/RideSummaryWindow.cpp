@@ -1517,6 +1517,12 @@ RideSummaryWindow::htmlSummary()
             summary += " <li>" + i.next();
         summary += "</ul>";
     }
+
+    // add link to view on Strava if was downloaded from there (StravaID will be set)
+    if (ridesummary && rideItem && rideItem->ride() && rideItem->ride()->getTag("StravaID","") != "") {
+        summary += "<a href=\"https://www.strava.com/activities/" + rideItem->ride()->getTag("StravaID","") + "\">View on Strava</a>";
+    }
+
     summary += "<br></center>";
 
     return summary;

@@ -17,14 +17,129 @@
  */
 
 #include "Utils.h"
+#include <math.h>
 #include <QTextEdit>
 #include <QString>
 #include <QStringList>
 #include <QDebug>
 #include <QDir>
+#include <QVector>
+#include <QRegularExpression>
 
 namespace Utils
 {
+
+// Class for performing multiple string substitutions in a single
+// pass over string. This implementation is only valid when substitutions
+// will not inject additional substitution opportunities.
+class StringSubstitutionizer
+{
+    QVector<QString> v;
+    QMap<QString, QString> qm;
+    QRegularExpression qr;
+
+    QString GetSubstitute(QString s) const
+    {
+        if (!qm.contains(s)) return QString();
+        return qm.value(s);
+    }
+
+    void BuildFindAnyRegex()
+    {
+        QString qRegexString;
+
+        for (int i = 0; i < v.size(); i++)
+        {
+            if (i > 0) qRegexString.append("|");
+
+            qRegexString.append(v[i]);
+        }
+
+        qr = QRegularExpression(qRegexString);
+    }
+
+protected:
+
+    void PushSubstitution(QString regexstring, QString matchstring, QString substitute)
+    {
+        if (!qm.contains(matchstring))
+        {
+            v.push_back(regexstring);
+            qm[matchstring] = substitute;
+        }
+    }
+
+    void FinalizeInit()
+    {
+        BuildFindAnyRegex();
+    }
+
+    QRegularExpression GetFindAnyRegex() const
+    {
+        return qr;
+    }
+
+public:
+
+    QString BuildSubstitutedString(QStringRef s) const
+    {
+        QRegularExpression qr = GetFindAnyRegex();
+
+        QRegularExpressionMatchIterator i = qr.globalMatch(s);
+
+        if (!i.hasNext())
+            return s.toString();
+
+        QString newstring;
+
+        unsigned iCopyIdx = 0;
+        do
+        {
+            QRegularExpressionMatch match = i.next();
+            int copysize = match.capturedStart() - iCopyIdx;
+
+            if (copysize > 0)
+                newstring.append(s.mid(iCopyIdx, copysize));
+
+            newstring.append(GetSubstitute(match.captured()));
+
+            iCopyIdx = (match.capturedStart() + match.captured().size());
+        } while (i.hasNext());
+
+        int copysize = s.size() - iCopyIdx;
+        if (copysize > 0)
+            newstring.append(s.mid(iCopyIdx, copysize));
+
+        return newstring;
+    }
+};
+
+struct RidefileUnEscaper : public StringSubstitutionizer
+{
+    RidefileUnEscaper()
+    {
+        //                regex       match   replacement
+        PushSubstitution("\\\\t",    "\\t",  "\t");       // tab
+        PushSubstitution("\\\\n",    "\\n",  "\n");       // newline
+        PushSubstitution("\\\\r",    "\\r",  "\r");       // carriage-return
+        PushSubstitution("\\\\b",    "\\b",  "\b");       // backspace
+        PushSubstitution("\\\\f",    "\\f",  "\f");       // formfeed
+        PushSubstitution("\\\\/",    "\\/",  "/");        // solidus
+        PushSubstitution("\\\\\"",   "\\\"", "\"");       // quote
+        PushSubstitution("\\\\\\\\", "\\\\", "\\");       // backslash
+
+        FinalizeInit();
+    }
+};
+
+QString RidefileUnEscape(const QStringRef s)
+{
+    // Static const object constructs it's search regex at load time.
+    static const RidefileUnEscaper s_RidefileUnescaper;
+
+    return s_RidefileUnescaper.BuildSubstitutedString(s);
+}
+
 // when writing xml...
 QString xmlprotect(const QString &string)
 {
@@ -43,7 +158,7 @@ QString xmlprotect(const QString &string)
     return s;
 }
 
-// BEWARE: this function is tide closely to RideFile parsing
+// BEWARE: this function is tied closely to RideFile parsing
 //           DO NOT CHANGE IT UNLESS YOU KNOW WHAT YOU ARE DOING
 QString unprotect(const QString &buffer)
 {
@@ -104,6 +219,9 @@ QString jsonunprotect(const QString &string)
     s.replace("\\f", "\f");  // formfeed
     s.replace("\\/", "/");   // solidus
     s.replace("\\\\", "\\"); // backslash
+
+    // those trailing spaces.
+    while (s.endsWith(" ")) s = s.mid(0,s.length()-1);
     return s;
 }
 
@@ -136,6 +254,155 @@ searchPath(QString path, QString binary, bool isexec)
                 returning << filename;
             }
         }
+    }
+    return returning;
+}
+
+QString
+removeDP(QString in)
+{
+    QString out;
+    if (in.contains('.')) {
+
+        int n=in.indexOf('.');
+        out += in.mid(0,n);
+        int i=in.length()-1;
+        for(; in[i] != '.'; i--)
+            if (in[i] != '0')
+                break;
+        if (in[i]=='.') return out;
+        else out += in.mid(n, i-n+1);
+        return out;
+    } else {
+        return in;
+    }
+}
+
+static bool qpointflessthan(const QPointF &s1, const QPointF &s2) { return s1.x() < s2.x(); }
+static bool qpointfgreaterthan(const QPointF &s1, const QPointF &s2) { return s1.x() > s2.x(); }
+
+QVector<int>
+argsort(QVector<double> &v, bool ascending)
+{
+    // we will use an x/y - x is the sort, y is the index
+    QVector<QPointF> tuple;
+    for(int i=0; i<v.count(); i++) tuple << QPointF(v[i],i);
+
+    if (ascending) qSort(tuple.begin(), tuple.end(), qpointflessthan);
+    else qSort(tuple.begin(), tuple.end(), qpointfgreaterthan);
+
+    // now create vector of indexes
+    QVector<int> returning;
+    for(int i=0; i<tuple.count(); i++) returning << static_cast<int>(tuple[i].y());
+
+    return returning;
+}
+
+QVector<int>
+arguniq(QVector<double> &v)
+{
+    QVector<int> returning;
+    QVector<int> r = Utils::argsort(v, false);
+
+    // now loop thru looking for uniq, since we are working
+    // with a double we need the values to be different by
+    // a small amount.
+    bool first=true;
+    double last=0;
+
+    // look for uniqs
+    for(int i=0; i<v.count(); i++) {
+
+        // make sure they are different
+        if (first || fabs(v[r[i]] - last) > std::numeric_limits<double>::epsilon()) {
+
+            // ok its changed, lets find the lowest index
+            int low=r[i];
+            last = v[r[i]];
+            while (i < v.count() && fabs(v[r[i]] - last) <=  std::numeric_limits<double>::epsilon()) {
+                if (r[i] < low) low=r[i];
+                i++;
+            }
+
+            // remember
+            returning << low;
+            first = false;
+
+            i--;
+        }
+    }
+    qSort(returning);
+
+    return returning;
+}
+
+// simple moving average
+static double mean(QVector<double>&data, int start, int end)
+{
+    double sum=0;
+    double count=0;
+
+    // add em up and handle out of bounds
+    for (int i=start; i<end; i++) {
+        if (i < 0) sum += data[0];
+        else if (i>=data.count()) sum += data[data.count()-1];
+        else sum += data[i];
+        count ++;
+    }
+    return sum/count;
+}
+
+QVector<double>
+smooth_sma(QVector<double>&data, int pos, int window)
+{
+    QVector<double> returning;
+
+    int window_start=0, window_end=0;
+    int index=0;
+    double ma=0;
+
+    // window is offset from index depending upon the forward/backward/centred position
+    switch (pos) {
+    case GC_SMOOTH_FORWARD:
+        window_start=0;
+        window_end=window;
+        break;
+
+    case GC_SMOOTH_BACKWARD:
+        window_end=0;
+        window_start=window *-1;
+        break;
+
+    case GC_SMOOTH_CENTERED: // we should handle odd/even size better
+        window_start = (window*-1)/2;
+        window_end = (window)/2;
+    }
+
+    while (index < data.count()) {
+
+        returning << mean(data, window_start, window_end);
+
+        index ++;
+        window_start++;
+        window_end++;
+    }
+
+    return returning;
+
+}
+
+QVector<double>
+smooth_ewma(QVector<double>&data, double alpha)
+{
+    if (alpha < 0 || alpha > 1) alpha = 0.3; // if user is an idiot....
+
+    QVector<double> returning;
+    double value=0, last=0;
+    for(int i=0; i<data.count(); i++) {
+        if (i == 0)  value = data[i];
+        else value = (alpha * data[i]) + ((1.0-alpha) * last);
+        returning << value;
+        last = value;
     }
     return returning;
 }

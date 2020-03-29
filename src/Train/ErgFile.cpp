@@ -29,6 +29,8 @@
 #include "Units.h"
 #include "Utils.h"
 
+#include "TTSReader.h"
+
 // Supported file types
 static QStringList supported;
 static bool setSupported()
@@ -39,6 +41,7 @@ static bool setSupported()
     ::supported << ".pgmf";
     ::supported << ".zwo";
     ::supported << ".gpx";
+    ::supported << ".tts";
     return true;
 }
 static bool isinit = setSupported();
@@ -51,7 +54,7 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), context(context)
+    filename(filename), mode(mode), context(context), StrictGradient(true)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -60,7 +63,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), context(context)
+ErgFile::ErgFile(Context *context) : mode(0), context(context), StrictGradient(true)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -110,6 +113,7 @@ void ErgFile::reload()
     else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
     else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
     else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
+    else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
 
 }
@@ -130,6 +134,8 @@ void ErgFile::parseZwift()
     format = ERG; // default to couse until we know
     Points.clear();
     Laps.clear();
+
+    gpi.Reset();
 
     // parse the file
     QFile zwo(filename);
@@ -190,6 +196,8 @@ void ErgFile::parseErg2(QString p)
     Points.clear();
     Laps.clear();
 
+    gpi.Reset();
+
     // open the file
     if (p == "" && ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
         valid = false;
@@ -225,10 +233,16 @@ void ErgFile::parseErg2(QString p)
                 add.val = add.y = int((segment.at(2).toDouble() /100.00) * CP);
                 Points.append(add);
             }
-        }
+            // set ErgFile duration
+            Duration = Points.last().x;      // last is the end point in msecs
 
-        qDebug() << "document" << object["title"];
-        valid = true;
+            leftPoint = 0;                   // setup initial sample bracketing
+            rightPoint = 1;
+            interpolatorReadIndex = 0;
+
+            calculateMetrics();
+            valid = true;
+        }
     }
 }
 
@@ -248,6 +262,8 @@ void ErgFile::parseTacx()
     format = CRS; // default to couse until we know
     Points.clear();
     Laps.clear();
+
+    gpi.Reset();
 
     // running totals
     double rdist = 0; // running total for distance
@@ -401,6 +417,13 @@ void ErgFile::parseTacx()
     // if we got here and are still happy then it
     // must have been a valid file.
     if (happy) {
+        // Set the end point for the workout
+        ErgFilePoint end;
+        end.x = rdist;
+        end.y = Points.last().y;
+        end.val = Points.last().val;
+        Points.append(end);
+
         valid = true;
 
         // set ErgFile duration
@@ -688,6 +711,11 @@ void ErgFile::parseGpx()
     Points.clear();
     Laps.clear();
 
+    gpi.Reset();
+
+    // TTS File Gradient Should be smoothly interpolated from Altitude.
+    StrictGradient = false;
+
     static double km = 0;
 
     QFile gpxFile(filename);
@@ -716,11 +744,6 @@ void ErgFile::parseGpx()
     bool fHasLon   = ride->areDataPresent()->lon;
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
-
-    if (fHasLat && fHasLon)
-    {
-        format = mode = CRS_LOC;
-    }
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -794,6 +817,146 @@ void ErgFile::parseGpx()
     calculateMetrics();
 }
 
+// Parse TTS into ergfile
+void ErgFile::parseTTS()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;                   // FTP this file was targetted at
+    MaxWatts = 0;              // maxWatts in this ergfile (scaling)
+    valid = false;             // did it parse ok?
+    rightPoint = leftPoint = 0;
+    interpolatorReadIndex = 0;
+    format = mode = CRS;
+    Points.clear();
+    Laps.clear();
+
+    gpi.Reset();
+
+    // TTS File Gradient Should be smoothly interpolated from Altitude.
+    StrictGradient = false;
+
+    QFile ttsFile(filename);
+    if (ttsFile.open(QIODevice::ReadOnly) == false) {
+        valid = false;
+       return;
+    }
+    QStringList errors_;
+
+    QDataStream qttsStream(&ttsFile);
+    qttsStream.setByteOrder(QDataStream::LittleEndian);
+
+    NS_TTSReader::TTSReader ttsReader;
+    bool success = ttsReader.parseFile(qttsStream);
+    if (!success) {
+        valid = false;
+        return;
+    }
+
+    const std::vector<NS_TTSReader::Point> &ttsPoints = ttsReader.getPoints();
+    int pointCount = (int)ttsPoints.size();
+    if (pointCount < 2) {
+        valid = false;
+        return;
+    }
+
+    // Enumerate the data types that are available.
+    bool fHasKm    = ttsReader.hasKm();
+    bool fHasGPS   = ttsReader.hasGPS();
+    bool fHasAlt   = ttsReader.hasElevation();
+    bool fHasSlope = ttsReader.hasGradient();
+
+    if (fHasKm && fHasSlope) {}     // same as crs file
+    else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
+    else {
+        valid = false;
+        return;
+    }
+
+    const NS_TTSReader::Point *prevPoint, *point, *nextPoint;
+
+    prevPoint = NULL;
+    point = NULL;
+    nextPoint = &ttsPoints[0];
+
+    double alt = 0;
+    if (fHasAlt) {
+        alt = ttsPoints[0].getElevation();
+    }
+
+    for (int i = 0; i <= pointCount; i++) { // first data point is actually the last...
+        ErgFilePoint add;
+
+        prevPoint = point;
+        point = nextPoint;
+        nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[i] : &ttsPoints[i + 1];
+
+        // Determine slope to next point
+        double slope = 0.0;
+
+        if (fHasAlt) {
+            alt = point->getElevation();
+        }
+
+        if (fHasSlope) {
+            slope = point->getGradient();
+            if (!fHasAlt && prevPoint)
+            {
+                alt += ((slope * (point->getDistanceFromStart() - prevPoint->getDistanceFromStart()))) / 100.0;
+            }
+        } else if (nextPoint && fHasAlt) {
+            double km0 = (i == 0) ? 0 : point->getDistanceFromStart(); // first entry holds total distance
+            double alt0 = point->getElevation();
+        
+            double km1 = nextPoint->getDistanceFromStart();
+            double alt1 = nextPoint->getElevation();
+        
+            double rise = alt1 - alt0;
+            double h = km1 - km0;
+
+            slope = 100 * (rise / (sqrt(h*h - rise * rise)));
+        }
+
+        add.x = point->getDistanceFromStart(); // record distance in meters
+        add.y = alt;
+        add.val = slope;
+
+        if (fHasGPS) {
+            add.lat = point->getLatitude();
+            add.lon = point->getLongitude();
+        }
+
+        if (add.y > MaxWatts) MaxWatts = add.y;
+
+        Points.append(add);
+    }
+
+    // Altitude is interpolated if there is slope. Actually this slope is
+    // smooth so we might consider it usable (even though its wrong.)
+    if (fHasSlope) {
+        fHasAlt = true;
+    }
+
+    ttsFile.close();
+
+    valid = true;
+
+    // set ErgFile duration
+    Duration = Points.last().x;      // end point in meters
+
+    leftPoint = 0;                   // setup initial sample bracketing
+    rightPoint = 1;
+    interpolatorReadIndex = 0;
+
+    // calculate climbing etc
+    calculateMetrics();
+}
+
+
 // convert points to set of sections
 QList<ErgFileSection>
 ErgFile::Sections()
@@ -822,7 +985,7 @@ ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS || format == CRS_LOC) {
+    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
@@ -832,7 +995,6 @@ ErgFile::save(QStringList &errors)
     if (format==ERG) typestring = "ERG";
     if (format==MRC) typestring = "MRC";
     if (format==CRS) typestring = "CRS";
-    if (format == CRS_LOC) typestring = "CRS";
     if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
@@ -1133,8 +1295,8 @@ ErgFile::isValid()
     return valid;
 }
 
-int
-ErgFile::wattsAt(long x, int &lapnum)
+double
+ErgFile::wattsAt(double x, int &lapnum)
 {
     // workout what wattage load should be set for any given
     // point in time in msecs.
@@ -1192,14 +1354,14 @@ ErgFile::wattsAt(long x, int &lapnum)
 }
 
 double
-ErgFile::gradientAt(long x, int &lapnum)
+ErgFile::gradientAt(double x, int &lapnum)
 {
     // workout what wattage load should be set for any given
     // point in time in msecs.
     if (!isValid()) return -100; // not a valid ergfile
 
     // is it in bounds?
-    if (x < 0 || x > Duration) return -100;   // out of bounds!!! (-10 through +15 are valid return vals)
+    if (x < 0 || x > Duration) return -100;   // out of bounds!!! (-40 through +40 are valid return vals)
 
     // do we need to return the Lap marker?
     if (Laps.count() > 0) {
@@ -1221,11 +1383,14 @@ ErgFile::gradientAt(long x, int &lapnum)
             rightPoint++;
         }
     }
-    return Points.at(leftPoint).val;
+
+    double gradient = Points.at(leftPoint).val;
+
+    return gradient;
 }
 
 // Returns true if a location is determined, otherwise returns false.
-bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
+bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double &slope100)
 {
     if (!isValid()) return false; // not a valid ergfile
 
@@ -1233,7 +1398,7 @@ bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
     if (meters < 0 || meters > Duration) return false;
 
     // No location unless... format contains location...
-    if (format != CRS_LOC)  return 1;
+    if (format != CRS)  return false;
 
     if (Laps.count() > 0) {
         int lap = 0;
@@ -1288,8 +1453,14 @@ bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
     while (gpi.WantsInput(meters)) {
         if (interpolatorReadIndex < Points.count()) {
             const ErgFilePoint * pii = &(Points.at(interpolatorReadIndex));
-            geolocation geo(pii->lat, pii->lon, pii->y);
-            gpi.Push(pii->x, geo);
+
+            // When there is no geolocation, invent something to support tangent interpolation.
+            if (pii->lat || pii->lon) {
+                geolocation geo(pii->lat, pii->lon, pii->y);
+                gpi.Push(pii->x, geo);
+            } else {
+                gpi.Push(pii->x, pii->y);
+            }
 
             interpolatorReadIndex++;
         }
@@ -1299,8 +1470,10 @@ bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
         }
     }
 
-    geoLoc = gpi.Interpolate(meters);
+    geoLoc = gpi.Location(meters, slope100);
 
+    slope100 *= 100;
+    
     return true;
 }
 
@@ -1349,7 +1522,7 @@ ErgFile::calculateMetrics()
     // is it valid?
     if (!isValid()) return;
 
-    if (format == CRS || format == CRS_LOC) {
+    if (format == CRS) {
 
         ErgFilePoint last;
         bool first = true;

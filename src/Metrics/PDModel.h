@@ -17,6 +17,7 @@
  */
 
 #include <QObject>
+#include <QMutex>
 #include <QString>
 
 #include "Context.h"
@@ -57,7 +58,6 @@
 
 #define PDMODEL_MAXT 18000 // maximum value for t we will provide p(t) for
 #define PDMODEL_INTERVAL 1 // intervals used in seconds; 0t, 1t, 2t .. 18000t
-
 
 class PDModel : public QObject, public QwtSyntheticPointData
 {
@@ -128,7 +128,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
         // using data from setData() and intervals from setIntervals()
         // this is the old function from CPPlot to extract the best points
         // in the data series to calculate cp, tau and t0.
-        void deriveCPParameters(int model); 
+        virtual void deriveCPParameters(int model);
 
         // when using lest squares fitting
         virtual int nparms() { return -1; }
@@ -177,7 +177,12 @@ class PDModel : public QObject, public QwtSyntheticPointData
         bool minutes;
 };
 
-// estimates are recorded 
+// control calling lmfit
+extern QMutex calllmfit;
+extern PDModel *calllmfitmodel;
+extern double calllmfitf(double t, const double *p);
+
+// estimates are recorded
 class PDEstimate
 {
     public:

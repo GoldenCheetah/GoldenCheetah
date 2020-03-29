@@ -41,6 +41,7 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 
 #ifdef GC_HAS_CLOUD_DB
     cdbChartListDialog = NULL;
+    cdbUserMetricListDialog = NULL;
 #endif
 
     _contexts.append(this);

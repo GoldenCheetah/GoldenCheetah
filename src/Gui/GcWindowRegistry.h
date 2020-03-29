@@ -70,7 +70,9 @@ enum gcwinid {
         WebPageWindow = 41,
         Overview = 42,
         Python = 43,
-        PythonSeason = 44
+        PythonSeason = 44,
+        UserTrends=45,
+        UserAnalysis=46
 
 };
 };

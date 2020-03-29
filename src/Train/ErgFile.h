@@ -44,8 +44,7 @@
 #define ERG     1
 #define MRC     2
 #define CRS     3
-#define CRS_LOC 4
-#define ERG2    5
+#define ERG2    4
 
 class ErgFilePoint
 {
@@ -116,13 +115,15 @@ class ErgFile
         void parseZwift();      // its a zwo file (zwift xml)
         void parseGpx();        // its a gpx...
         void parseErg2(QString p = "");       // ergdb
+        void parseTTS();        // its ahh tts
 
         bool isValid();         // is the file valid or not?
+
         double Cp;
-        int format;             // ERG, CRS, MRC and CRS_LOC currently supported
-        int wattsAt(long, int&);      // return the watts value for the passed msec
-        double gradientAt(long, int&);      // return the gradient value for the passed meter
-        bool locationAt(long x, int& lapnum, geolocation &geoLoc); // location at meter
+        int format;                      // ERG, CRS, MRC, ERG2 currently supported
+        double wattsAt   (double, int&); // return the watts value for the passed msec
+        double gradientAt(double, int&); // return the gradient value for the passed meter
+        bool locationAt  (double x, int& lapnum, geolocation &geoLoc, double &slope100); // location at meter
 
         int nextLap(long);      // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         int currentLap(long);   // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
@@ -146,6 +147,7 @@ class ErgFile
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
         int mode;
+        bool    StrictGradient; // should gradient be strict or smoothed?
 
         int leftPoint, rightPoint;     // current points we are between
         int interpolatorReadIndex;     // next point to be fed to interpolator

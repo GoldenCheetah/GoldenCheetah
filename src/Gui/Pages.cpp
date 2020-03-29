@@ -38,6 +38,7 @@
 #include "OAuthDialog.h"
 #include "RideAutoImportConfig.h"
 #include "HelpWhatsThis.h"
+#include "GcUpgrade.h"
 #if QT_VERSION >= 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
@@ -47,6 +48,10 @@
 #include "Utils.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
+#include "FixPySettings.h"
+#endif
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBUserMetric.h"
 #endif
 extern ConfigDialog *configdialog_ptr;
 
@@ -277,6 +282,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(pythonBrowseButton, 8 + offset,2);
     offset++;
 
+    bool embedPython = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
+    embedPythonchanged(embedPython);
+
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
 #endif
 
@@ -362,6 +370,7 @@ GeneralPage::saveClicked()
 #endif
 #ifdef GC_WANT_PYTHON
     appsettings->setValue(GC_EMBED_PYTHON, embedPython->isChecked());
+    if (!embedPython->isChecked()) fixPySettings->disableFixPy();
 #endif
 
 
@@ -2069,6 +2078,9 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    useSimulatedSpeed = new QCheckBox(tr("Use simulated Speed in slope mode"), this);
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+
     autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
     autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
 
@@ -2085,6 +2097,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
     QVBoxLayout *all = new QVBoxLayout(this);
+    all->addWidget(useSimulatedSpeed);
     all->addWidget(multiCheck);
     all->addWidget(autoConnect);
     all->addWidget(autoHide);
@@ -2097,6 +2110,7 @@ qint32
 TrainOptionsPage::saveClicked()
 {
     // Save the train view settings...
+    appsettings->setValue(TRAIN_USESIMULATEDSPEED, useSimulatedSpeed->isChecked());
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
     appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
@@ -2209,6 +2223,256 @@ RemotePage::saveClicked()
     remote->writeConfig(cmdMaps);
     return 0;
 }
+
+const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
+{
+    // Bike mass values approximate a good current bike. Wheels are shimano c40 with conti tubeless tires.
+
+    static const SimBicyclePartEntry arr[] = {
+          // SpinBox Title                          Path to athlete value                Default Value      Decimal      Tooltip                                                                              enum
+        { "Bicycle Mass Without Wheels (g)"       , GC_SIM_BICYCLE_MASSWITHOUTWHEELSG,   4000,              0,           "Mass of everything that isn't wheels, tires, skewers..."},                       // BicycleWithoutWheelsG
+        { "Front Wheel Mass (g)"                  , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0,           "Mass of front wheel including tires and skewers..."},                            // FrontWheelG
+        { "Front Spoke Count"                     , GC_SIM_BICYCLE_FRONTSPOKECOUNT,      24,                0,           ""},                                                                              // FrontSpokeCount
+        { "Front Spoke & Nipple Mass - Each (g)"  , GC_SIM_BICYCLE_FRONTSPOKENIPPLEG,    5.6,               1,           "Mass of a single spoke and nipple, washers, etc."},                              // FrontSpokeNippleG
+        { "Front Rim Mass (g)"                    , GC_SIM_BICYCLE_FRONTRIMG,            330,               0,           ""},                                                                              // FrontRimG
+        { "Front Rotor Mass (g)"                  , GC_SIM_BICYCLE_FRONTROTORG,          120,               0,           "Mass of rotor including bolts"},                                                 // FrontRotorG
+        { "Front Skewer Mass (g)"                 , GC_SIM_BICYCLE_FRONTSKEWERG,         40,                0,           ""},                                                                              // FrontSkewerG
+        { "Front Tire Mass (g)"                   , GC_SIM_BICYCLE_FRONTTIREG,           220,               0,           ""},                                                                              // FrontTireG
+        { "Front Tube or Sealant Mass (g)"        , GC_SIM_BICYCLE_FRONTTUBESEALANTG,    26,                0,           "Mass of anything inside the tire: sealant, tube..."},                            // FrontTubeSealantG
+        { "Front Rim Outer Radius (m)"            , GC_SIM_BICYCLE_FRONTOUTERRADIUSM,    .35,               3,           "Functional outer radius of wheel, used for computing wheel circumference"},      // FrontOuterRadiusM
+        { "Front Rim Inner Radius (m)"            , GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM, .3,                3,           "Inner radius of rim, for computing wheel inertia"},                              // FrontRimInnerRadiusM
+        { "Rear Wheel Mass (g)"                   , GC_SIM_BICYCLE_REARWHEELG,           739,               0,           "Mass of front wheel including tires and skewers..."},                            // RearWheelG
+        { "Rear Spoke Count"                      , GC_SIM_BICYCLE_REARSPOKECOUNT,       24,                0,           ""},                                                                              // RearSpokeCount
+        { "Rear Spoke & Nipple Mass - Each (g)"   , GC_SIM_BICYCLE_REARSPOKENIPPLEG,     5.6,               1,           "Mass of a single spoke and nipple, washers, etc."},                              // RearSpokeNippleG
+        { "Rear Rim Mass (g)"                     , GC_SIM_BICYCLE_REARRIMG,             330,               0,           ""},                                                                              // RearRimG
+        { "Rear Rotor Mass (g)"                   , GC_SIM_BICYCLE_REARROTORG,           120,               0,           "Mass of rotor including bolts"},                                                 // RearRotorG
+        { "Rear Skewer Mass (g)"                  , GC_SIM_BICYCLE_REARSKEWERG,           40,               0,           "Mass of skewer/axle/funbolts, etc..."},                                          // RearSkewerG
+        { "Rear Tire Mass (g)"                    , GC_SIM_BICYCLE_REARTIREG,            220,               0,           "Mass of tire not including tube or sealant"},                                    // RearTireG
+        { "Rear Tube or Sealant Mass (g)"         , GC_SIM_BICYCLE_REARTUBESEALANTG,      26,               0,           "Mass of anything inside the tire: sealant, tube..."},                            // RearTubeSealantG
+        { "Rear Rim Outer Radius (m)"             , GC_SIM_BICYCLE_REAROUTERRADIUSM,     .35,               3,           "Functional outer radius of wheel, used for computing wheel circumference"},      // RearOuterRadiusM
+        { "Rear Rim Inner Radius (m)"             , GC_SIM_BICYCLE_REARRIMINNERRADIUSM,  .3,                3,           "Inner radius of rim, for computing wheel inertia"},                              // RearRimInnerRadiusM
+        { "Rear Cassette Mass(g)"                 , GC_SIM_BICYCLE_CASSETTEG,            190,               0,           "Mass of rear cassette, including lockring"},                                     // CassetteG
+        { "Coefficient of rolling resistance"     , GC_SIM_BICYCLE_CRR,                  0.004,             4,           "Total coefficient of rolling resistance for bicycle"},                           // CRR
+        { "Coefficient of power train loss"       , GC_SIM_BICYCLE_Cm,                   1.0,               3,           "Power train loss between reported watts and wheel. For direct drive trainer like kickr there is no relevant loss and value shold be 1.0."},      // Cm
+        { "Coefficient of drag"                   , GC_SIM_BICYCLE_Cd,        (1.0 - 0.0045),               5,           "Coefficient of drag of rider and bicycle"},                                      // Cd
+        { "Frontal Area (m^2)"                    , GC_SIM_BICYCLE_Am2,                  0.5,               2,           "Effective frontal area of rider and bicycle"},                                   // Am2
+        { "Temperature (K)"                       , GC_SIM_BICYCLE_Tk,                 293.15,              2,           "Temperature in kelvin, used with altitude to compute air density"}               // Tk
+    };
+
+    if (e < 0 || e >= LastPart) e = 0;
+
+    return arr[e];
+}
+
+double
+SimBicyclePage::GetBicyclePartValue(Context* context, int e)
+{
+    const SimBicyclePartEntry &r = GetSimBicyclePartEntry(e);
+
+    if (!context) return r.m_defaultValue;
+
+    return appsettings->cvalue(
+        context->athlete->cyclist,
+        r.m_path,
+        r.m_defaultValue).toDouble();
+}
+
+void
+SimBicyclePage::AddSpecBox(int ePart)
+{
+    const SimBicyclePartEntry & entry = GetSimBicyclePartEntry(ePart);
+
+    m_LabelArr[ePart] = new QLabel(entry.m_label);
+
+    QDoubleSpinBox * pSpinBox = new QDoubleSpinBox(this);
+
+    pSpinBox->setMaximum(99999);
+    pSpinBox->setMinimum(0.0);
+    pSpinBox->setDecimals(entry.m_decimalPlaces);
+    pSpinBox->setValue(GetBicyclePartValue(context, ePart));
+    pSpinBox->setToolTip(entry.m_tooltip);
+    double singlestep = 1.;
+    for (int i = 0; i < entry.m_decimalPlaces; i++)
+        singlestep /= 10.;
+
+    pSpinBox->setSingleStep(singlestep);
+
+    m_SpinBoxArr[ePart] = pSpinBox;
+}
+
+void
+SimBicyclePage::SetStatsLabelArray(double d)
+{
+    double riderMassKG = 0;
+
+    const double bicycleMassWithoutWheelsG = m_SpinBoxArr[SimBicyclePage::BicycleWithoutWheelsG]->value();
+    const double bareFrontWheelG           = m_SpinBoxArr[SimBicyclePage::FrontWheelG          ]->value();
+    const double frontSpokeCount           = m_SpinBoxArr[SimBicyclePage::FrontSpokeCount      ]->value();
+    const double frontSpokeNippleG         = m_SpinBoxArr[SimBicyclePage::FrontSpokeNippleG    ]->value();
+    const double frontWheelOuterRadiusM    = m_SpinBoxArr[SimBicyclePage::FrontOuterRadiusM    ]->value();
+    const double frontRimInnerRadiusM      = m_SpinBoxArr[SimBicyclePage::FrontRimInnerRadiusM ]->value();
+    const double frontRimG                 = m_SpinBoxArr[SimBicyclePage::FrontRimG            ]->value();
+    const double frontRotorG               = m_SpinBoxArr[SimBicyclePage::FrontRotorG          ]->value();
+    const double frontSkewerG              = m_SpinBoxArr[SimBicyclePage::FrontSkewerG         ]->value();
+    const double frontTireG                = m_SpinBoxArr[SimBicyclePage::FrontTireG           ]->value();
+    const double frontTubeOrSealantG       = m_SpinBoxArr[SimBicyclePage::FrontTubeSealantG    ]->value();
+    const double bareRearWheelG            = m_SpinBoxArr[SimBicyclePage::RearWheelG           ]->value();
+    const double rearSpokeCount            = m_SpinBoxArr[SimBicyclePage::RearSpokeCount       ]->value();
+    const double rearSpokeNippleG          = m_SpinBoxArr[SimBicyclePage::RearSpokeNippleG     ]->value();
+    const double rearWheelOuterRadiusM     = m_SpinBoxArr[SimBicyclePage::RearOuterRadiusM     ]->value();
+    const double rearRimInnerRadiusM       = m_SpinBoxArr[SimBicyclePage::RearRimInnerRadiusM  ]->value();
+    const double rearRimG                  = m_SpinBoxArr[SimBicyclePage::RearRimG             ]->value();
+    const double rearRotorG                = m_SpinBoxArr[SimBicyclePage::RearRotorG           ]->value();
+    const double rearSkewerG               = m_SpinBoxArr[SimBicyclePage::RearSkewerG          ]->value();
+    const double rearTireG                 = m_SpinBoxArr[SimBicyclePage::RearTireG            ]->value();
+    const double rearTubeOrSealantG        = m_SpinBoxArr[SimBicyclePage::RearTubeSealantG     ]->value();
+    const double cassetteG                 = m_SpinBoxArr[SimBicyclePage::CassetteG            ]->value();
+
+    const double frontWheelG = bareFrontWheelG + frontRotorG + frontSkewerG + frontTireG + frontTubeOrSealantG;
+    const double frontWheelRotatingG = frontRimG + frontTireG + frontTubeOrSealantG + (frontSpokeCount * frontSpokeNippleG);
+    const double frontWheelCenterG = frontWheelG - frontWheelRotatingG;
+
+    BicycleWheel frontWheel(frontWheelOuterRadiusM, frontRimInnerRadiusM, frontWheelG / 1000, frontWheelCenterG /1000, frontSpokeCount, frontSpokeNippleG/1000);
+
+    const double rearWheelG = bareRearWheelG + cassetteG + rearRotorG + rearSkewerG + rearTireG + rearTubeOrSealantG;
+    const double rearWheelRotatingG = rearRimG + rearTireG + rearTubeOrSealantG + (rearSpokeCount * rearSpokeNippleG);
+    const double rearWheelCenterG = rearWheelG - rearWheelRotatingG;
+
+    BicycleWheel rearWheel (rearWheelOuterRadiusM,  rearRimInnerRadiusM,  rearWheelG / 1000,  rearWheelCenterG / 1000,  rearSpokeCount,  rearSpokeNippleG/1000);
+
+    BicycleConstants constants(
+        m_SpinBoxArr[SimBicyclePage::CRR]->value(),
+        m_SpinBoxArr[SimBicyclePage::Cm] ->value(),
+        m_SpinBoxArr[SimBicyclePage::Cd] ->value(),
+        m_SpinBoxArr[SimBicyclePage::Am2]->value(),
+        m_SpinBoxArr[SimBicyclePage::Tk] ->value());
+
+    Bicycle bicycle(NULL, constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
+
+    m_StatsLabelArr[StatsLabel]              ->setText(QString(tr("------ Derived Stats -------")));
+    m_StatsLabelArr[StatsTotalKEMass]        ->setText(QString(tr("Total KEMass:         \t%1g")).arg(bicycle.KEMass()));
+    m_StatsLabelArr[StatsFrontWheelKEMass]   ->setText(QString(tr("FrontWheel KEMass:    \t%1g")).arg(bicycle.FrontWheel().KEMass() * 1000));
+    m_StatsLabelArr[StatsFrontWheelMass]     ->setText(QString(tr("FrontWheel Mass:      \t%1g")).arg(bicycle.FrontWheel().MassKG() * 1000));
+    m_StatsLabelArr[StatsFrontWheelEquivMass]->setText(QString(tr("FrontWheel EquivMass: \t%1g")).arg(bicycle.FrontWheel().EquivalentMassKG() * 1000));
+    m_StatsLabelArr[StatsFrontWheelI]        ->setText(QString(tr("FrontWheel I:         \t%1")).arg(bicycle.FrontWheel().I()));
+    m_StatsLabelArr[StatsRearWheelKEMass]    ->setText(QString(tr("Rear Wheel KEMass:    \t%1g")).arg(bicycle.RearWheel().KEMass() * 1000));
+    m_StatsLabelArr[StatsRearWheelMass]      ->setText(QString(tr("Rear Wheel Mass:      \t%1g")).arg(bicycle.RearWheel().MassKG() * 1000));
+    m_StatsLabelArr[StatsRearWheelEquivMass] ->setText(QString(tr("Rear Wheel EquivMass: \t%1g")).arg(bicycle.RearWheel().EquivalentMassKG() * 1000));
+    m_StatsLabelArr[StatsRearWheelI]         ->setText(QString(tr("Rear Wheel I:         \t%1")).arg(bicycle.RearWheel().I()));
+}
+
+
+SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+
+#ifdef Q_OS_MAX
+    setContentsMargins(10, 10, 10, 10);
+    grid->setSpacing(5 * dpiXFactor);
+    all->setSpacing(5 * dpiXFactor);
+#endif
+
+    // Populate m_LabelArr and m_SpinBoxArr
+    for (int e = 0; e < LastPart; e++)
+    {
+        AddSpecBox(e);
+    }
+
+    Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter;
+
+    // Two sections. Bike mass properties are in two rows to the left.
+    // Other properties like cd, ca and temp go in section to the right.
+
+    int Section1Start = 0;
+    int Section1End = BicycleParts::CRR;
+    int Section2Start = Section1End;
+    int Section2End = BicycleParts::LastPart;
+
+    // Column 0
+    int column = 0;
+    int row = 0;
+    for (int i = Section1Start; i < Section1End; i++) {
+        grid->addWidget(m_LabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    // Column 1
+    column = 1;
+    row = 0;
+    for (int i = Section1Start; i < Section1End; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
+        row++;
+    }
+
+    // Column 2
+    column = 2;
+    row = 0;
+    grid->addWidget(new QLabel("These values are used to compute correct inertia\n"
+                               "for simulated speed in trainer mode.These values\n"
+                               "only have effect when the 'Use simulated speed in\n"
+                               "slope mode' option is set on the training preferences\n"
+                               " tab."), row, column, alignment);
+
+    int section2FirstRow = row + 1;
+
+    // Now add section 2.
+    row = section2FirstRow;
+    for (int i = Section2Start; i < Section2End; i++) {
+        grid->addWidget(m_LabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    column++;
+
+    row = section2FirstRow;
+    for (int i = Section2Start; i < Section2End; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
+        row++;
+    }
+
+    // There is still room below section 2... lets put in some useful stats
+    // about the virtual bicycle.
+
+    int statsFirstRow = row + 1;
+    column = 2;
+
+    // Create Stats Labels
+    for (int i = StatsLabel; i < StatsLastPart; i++) {
+        m_StatsLabelArr[i] = new QLabel();
+    }
+
+    // Populate Stats Labels
+    SetStatsLabelArray();
+
+    row = statsFirstRow;
+    for (int i = StatsLabel; i < StatsLastPart; i++) {
+        grid->addWidget(m_StatsLabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    all->addLayout(grid);
+    all->addStretch();
+
+    for (int i = 0; i < LastPart; i++) {
+        connect(m_SpinBoxArr[i], SIGNAL(valueChanged(double)), this, SLOT(SetStatsLabelArray(double)));
+    }
+
+}
+
+qint32
+SimBicyclePage::saveClicked()
+{
+    for (int e = 0; e < BicycleParts::LastPart; e++) {
+        const SimBicyclePartEntry& entry = GetSimBicyclePartEntry(e);
+        appsettings->setCValue(context->athlete->cyclist, entry.m_path, m_SpinBoxArr[e]->value());
+    }
+
+    qint32 state = CONFIG_ATHLETE;
+
+    return state;
+}
+
 
 static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
 
@@ -2958,6 +3222,12 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
 
     editButton = new QPushButton(tr("Edit"));
+    exportButton = new QPushButton(tr("Export"));
+    importButton = new QPushButton(tr("Import"));
+#ifdef GC_HAS_CLOUD_DB
+    uploadButton = new QPushButton(tr("Upload"));
+    downloadButton = new QPushButton(tr("Download"));
+#endif
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
@@ -2968,7 +3238,14 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(exportButton);
+    buttons->addWidget(importButton);
     buttons->addStretch();
+#ifdef GC_HAS_CLOUD_DB
+    buttons->addWidget(uploadButton);
+    buttons->addWidget(downloadButton);
+    buttons->addStretch();
+#endif
     buttons->addWidget(editButton);
     buttons->addStretch();
     buttons->addWidget(addButton);
@@ -2979,6 +3256,12 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+    connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
+    connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
+#ifdef GC_HAS_CLOUD_DB
+    connect(uploadButton, SIGNAL(clicked()), this, SLOT(uploadClicked()));
+    connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
+#endif
 }
 
 void
@@ -2992,6 +3275,14 @@ CustomMetricsPage::refreshTable()
             skipcompat++;
             continue;
         }
+
+        // user metrics are silently discarded if the symbol is already in use
+        if (!table->findItems(m.symbol, Qt::MatchExactly, 0).isEmpty())
+            QMessageBox::warning(this, tr("User Metrics"), tr("Duplicate Symbol: %1, one metric will be discarded").arg(m.symbol));
+
+        // duplicate names are allowed, but not recommended
+        if (!table->findItems(m.name, Qt::MatchExactly, 1).isEmpty())
+            QMessageBox::warning(this, tr("User Metrics"), tr("Duplicate Name: %1, one metric will not be acessible in formulas").arg(m.name));
 
         QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
         add->setText(0, m.symbol);
@@ -3107,6 +3398,181 @@ CustomMetricsPage::doubleClicked(QTreeWidgetItem *item, int)
 
     }
 }
+
+void
+CustomMetricsPage::exportClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // metric to export
+    UserMetricSettings here = metrics[row+skipcompat];
+
+    // get a filename to export to...
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export Metric"), QDir::homePath() + "/" + here.symbol + ".gmetric", tr("GoldenCheetah Metric File (*.gmetric)"));
+
+    // nothing given
+    if (filename.isEmpty()) return;
+
+    UserMetricParser::serialize(filename, QList<UserMetricSettings>() << here);
+}
+
+void
+CustomMetricsPage::importClicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Metric file to import"), "", tr("GoldenCheetah Metric Files (*.gmetric)"));
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Metric"), tr("No Metric file selected!"));
+        return;
+    }
+
+    QList<UserMetricSettings> imported;
+    QFile metricFile(fileName);
+
+    // setup XML processor
+    QXmlInputSource source( &metricFile );
+    QXmlSimpleReader xmlReader;
+    UserMetricParser handler;
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+
+    // parse and get return values
+    xmlReader.parse(source);
+    imported = handler.getSettings();
+    if (imported.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Metric"), tr("No Metric found in the selected file!"));
+        return;
+    }
+
+    UserMetricSettings here = imported.first();
+
+    EditUserMetricDialog editor(this, context, here);
+    if (editor.exec() == QDialog::Accepted) {
+
+        // add to the list
+        metrics.append(here);
+        refreshTable();
+
+    }
+}
+
+#ifdef GC_HAS_CLOUD_DB
+void
+CustomMetricsPage::uploadClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // metric to export
+    UserMetricSettings here = metrics[row+skipcompat];
+
+    // check for CloudDB T&C acceptance
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+        CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Rejected) {
+            return;
+        }
+    }
+
+    UserMetricAPIv1 usermetric;
+    usermetric.Header.Key = here.symbol;
+    usermetric.Header.Name = here.name;
+    usermetric.Header.Description = here.description;
+    int version = VERSION_LATEST;
+    usermetric.Header.GcVersion =  QString::number(version);
+    // get the usermetric - definition xml
+    QTextStream out(&usermetric.UserMetricXML);
+    UserMetricParser::serializeToQTextStream(out, QList<UserMetricSettings>() << here);
+
+    usermetric.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    usermetric.Header.Curated = false;
+    usermetric.Header.Deleted = false;
+
+    // now complete the usermetric with for the user manually added fields
+    CloudDBUserMetricObjectDialog dialog(usermetric, context->athlete->cyclist);
+    if (dialog.exec() == QDialog::Accepted) {
+        CloudDBUserMetricClient c;
+        if (c.postUserMetric(dialog.getUserMetric())) {
+            CloudDBHeader::setUserMetricHeaderStale(true);
+        }
+    }
+
+}
+
+void
+CustomMetricsPage::downloadClicked()
+{
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       }
+    }
+
+    if (context->cdbUserMetricListDialog == NULL) {
+        context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    }
+
+    if (context->cdbUserMetricListDialog->prepareData(context->athlete->cyclist, CloudDBCommon::UserImport)) {
+        if (context->cdbUserMetricListDialog->exec() == QDialog::Accepted) {
+
+            QList<QString> usermetricDefs = context->cdbUserMetricListDialog->getSelectedSettings();
+
+            foreach (QString usermetricDef, usermetricDefs) {
+                QList<UserMetricSettings> imported;
+
+                // setup XML processor
+                QXmlInputSource source;
+                source.setData(usermetricDef);
+                QXmlSimpleReader xmlReader;
+                UserMetricParser handler;
+                xmlReader.setContentHandler(&handler);
+                xmlReader.setErrorHandler(&handler);
+
+                // parse and get return values
+                xmlReader.parse(source);
+                imported = handler.getSettings();
+                if (imported.isEmpty()) {
+                    QMessageBox::critical(this, tr("Download Metric"), tr("No valid Metric found!"));
+                    continue;
+                }
+
+                UserMetricSettings here = imported.first();
+
+                EditUserMetricDialog editor(this, context, here);
+                if (editor.exec() == QDialog::Accepted) {
+
+                    // add to the list
+                    metrics.append(here);
+                    refreshTable();
+
+                }
+            }
+        }
+    }
+}
+#endif
 
 qint32
 CustomMetricsPage::saveClicked()

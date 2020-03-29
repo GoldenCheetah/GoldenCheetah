@@ -114,9 +114,30 @@ void
 BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
 {
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
-	BT40Device* dev = new BT40Device(this, info);
-	devices.append(dev);
-	dev->connectDevice();
+        // Check if device is already created for this uuid/address
+        // At least on MacOS the deviceDiscovered signal can/will be sent multiple times
+        // for the same device during discovery.
+        foreach(BT40Device* dev, devices)
+        {
+            if (info.address().isNull())
+            {
+                // On MacOS there's no address, so check deviceUuid
+                if (dev->deviceInfo().deviceUuid() == info.deviceUuid())
+                {
+                    return;
+                }
+            } else {
+                if (dev->deviceInfo().address() == info.address())
+                {
+                    return;
+                }
+            }
+        }
+
+        BT40Device* dev = new BT40Device(this, info);
+        devices.append(dev);
+        dev->connectDevice();
+        connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
     }
 }
 

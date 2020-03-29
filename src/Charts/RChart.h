@@ -28,6 +28,7 @@
 #include <QCheckBox>
 #include <QSplitter>
 #include <QByteArray>
+#include <QStackedWidget>
 #include <string.h>
 
 #include "GoldenCheetah.h"
@@ -36,6 +37,7 @@
 #include "RCanvas.h"
 
 class RChart;
+class GenericChart;
 
 // a console widget to type commands and display response
 class RConsole : public QTextEdit {
@@ -83,6 +85,7 @@ class RChart : public GcChartWindow {
 
     Q_PROPERTY(QString script READ getScript WRITE setScript USER true)
     Q_PROPERTY(QString state READ getState WRITE setState USER true)
+    Q_PROPERTY(bool plotOnChart READ plotOnChart WRITE setPlotOnChart USER true)
     Q_PROPERTY(bool showConsole READ showConsole WRITE setConsole USER true)
 
     public:
@@ -96,6 +99,7 @@ class RChart : public GcChartWindow {
         QTextEdit *script;
         RConsole *console;
         RCanvas *canvas;
+        GenericChart *chart;
 
         bool showConsole() const { return (showCon ? showCon->isChecked() : true); }
         void setConsole(bool);
@@ -106,17 +110,23 @@ class RChart : public GcChartWindow {
         QString getState() const;
         void setState(QString);
 
+        bool plotOnChart() const;
+        void setPlotOnChart(bool x);
+
     public slots:
         void configChanged(qint32);
         void showConChanged(int state);
+        void plotOnChartChanged();
         void runScript();
 
     protected:
         // enable stopping long running scripts
         bool eventFilter(QObject *, QEvent *e);
 
+        QStackedWidget *stack;
         QSplitter *splitter;
         QSplitter *leftsplitter;
+        QCheckBox *plotOnChartSetting;
 
     private:
         Context *context;

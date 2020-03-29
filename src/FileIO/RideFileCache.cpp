@@ -582,7 +582,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::watts : return 0; break;
         case RideFile::xPower : return 0; break;
         case RideFile::IsoPower : return 0; break;
-        case RideFile::alt : return 1; break;
+        case RideFile::alt : return 6; break;
         case RideFile::lon : return 6; break;
         case RideFile::lat : return 6; break;
         case RideFile::headwind : return 1; break;

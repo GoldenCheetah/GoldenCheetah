@@ -310,7 +310,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
     if (ergfile) {
 
         // is this by distance or time?
-        bydist = (ergfile->format == CRS || ergfile->format == CRS_LOC) ? true : false;
+        bydist = (ergfile->format == CRS) ? true : false;
 
         if (bydist == true) {
 
@@ -545,7 +545,7 @@ ErgFilePlot::reset()
     wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
     wbalData->clear();
     wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
-    wbalData->clear();
+    cadData->clear();
     cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
     hrData->clear();
     hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());

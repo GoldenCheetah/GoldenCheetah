@@ -30,6 +30,7 @@ RealtimeData::RealtimeData()
     thb = smo2 = o2hb = hhb = 0.0;
     lrbalance = rte = lte = lps = rps = 0.0;
     latitude = longitude = altitude = 0.0;
+    rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     trainerStatusAvailable = false;
     trainerReady = true;
     trainerRunning = true;
@@ -394,6 +395,27 @@ double RealtimeData::value(DataSeries series) const
     case Altitude: return altitude;
         break;
 
+    case Rf: return rf;
+        break;
+
+    case RMV: return rmv;
+        break;
+
+    case VO2: return vo2;
+        break;
+
+    case VCO2: return vco2;
+        break;
+
+    case RER: return rer;
+        break;
+
+    case TidalVolume: return tv;
+        break;
+
+    case FeO2: return feo2;
+        break;
+
     case None:
     default:
         return 0;
@@ -434,6 +456,13 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << tHb;
         seriesList << HHb;
         seriesList << O2Hb;
+        seriesList << Rf;
+        seriesList << RMV;
+        seriesList << VO2;
+        seriesList << VCO2;
+        seriesList << RER;
+        seriesList << TidalVolume;
+        seriesList << FeO2;
         seriesList << AvgWatts;
         seriesList << AvgSpeed;
         seriesList << AvgCadence;
@@ -606,6 +635,27 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case Altitude: return tr("Altitude");
         break;
+
+    case Rf: return tr("Respiratory Frequency");
+        break;
+
+    case RMV: return tr("Respiratory Minute Volume");
+        break;
+
+    case VO2: return tr("VO2");
+        break;
+
+    case VCO2: return tr("VCO2");
+        break;
+
+    case RER: return tr("Respiratory Exchange Ratio");
+        break;
+
+    case TidalVolume: return tr("Tidal Volume");
+        break;
+
+    case FeO2: return tr("Fraction O2 Expired");
+        break;
     }
 }
 
@@ -647,3 +697,26 @@ double RealtimeData::getAltitude() const { return altitude; }
 void RealtimeData::setLatitude(double d) { latitude = d; }
 void RealtimeData::setLongitude(double d) { longitude = d; }
 void RealtimeData::setAltitude(double d) { altitude = d; }
+
+void RealtimeData::setRf(double rf) { this->rf = rf; }
+void RealtimeData::setRMV(double rmv) { this->rmv = rmv; }
+void RealtimeData::setTv(double tv) { this->tv = tv; }
+void RealtimeData::setFeO2(double feo2) {this->feo2 = feo2; }
+
+void RealtimeData::setVO2_VCO2(double vo2, double vco2)
+{
+    this->vo2 = vo2;
+    this->vco2 = vco2;
+
+    if (vo2 > 0 && vco2 > 0) {
+        rer = vco2/vo2;
+    }
+}
+
+double RealtimeData::getRf() const { return rf; }
+double RealtimeData::getRMV() const { return rmv; }
+double RealtimeData::getVO2() const { return vo2; }
+double RealtimeData::getVCO2() const { return vco2; }
+double RealtimeData::getRER() const { return rer; }
+double RealtimeData::getTv() const { return tv; }
+double RealtimeData::getFeO2() const { return feo2; }

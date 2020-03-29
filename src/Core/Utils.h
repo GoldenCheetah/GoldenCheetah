@@ -20,6 +20,7 @@
 #define _GC_Utils_h
 
 // Common shared utility functions
+#include <QVector>
 
 #ifdef WIN32
 #define PATHSEP ";"
@@ -29,6 +30,10 @@
 class QString;
 class QStringList;
 
+#define GC_SMOOTH_FORWARD 0
+#define GC_SMOOTH_BACKWARD 1
+#define GC_SMOOTH_CENTERED 2
+
 namespace Utils
 {
     QString xmlprotect(const QString &string);
@@ -36,6 +41,11 @@ namespace Utils
     QString jsonprotect(const QString &buffer);
     QString jsonunprotect(const QString &buffer);
     QStringList searchPath(QString path, QString binary, bool isexec=true);
+    QString removeDP(QString);
+    QVector<int> argsort(QVector<double>&, bool ascending=false);
+    QVector<int> arguniq(QVector<double> &v);
+    QVector<double> smooth_sma(QVector<double>&, int pos, int window);
+    QVector<double> smooth_ewma(QVector<double>&, double alpha);
 };
 
 

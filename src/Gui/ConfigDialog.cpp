@@ -479,6 +479,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     devicePage = new DevicePage(this, context);
     optionsPage = new TrainOptionsPage(this, context);
     remotePage = new RemotePage(this, context);
+    simBicyclePage = new SimBicyclePage(this, context);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -489,6 +490,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     tabs->addTab(devicePage, tr("Train Devices"));
     tabs->addTab(optionsPage, tr("Preferences"));
     tabs->addTab(remotePage, tr("Remote Controls"));
+    tabs->addTab(simBicyclePage, tr("Virtual Bicycle Specifications"));
 
     mainLayout->addWidget(tabs);
 }
@@ -500,6 +502,7 @@ qint32 TrainConfig::saveClicked()
     state |= devicePage->saveClicked();
     state |= optionsPage->saveClicked();
     state |= remotePage->saveClicked();
+    state |= simBicyclePage->saveClicked();
 
     return state;
 }

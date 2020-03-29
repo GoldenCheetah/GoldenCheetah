@@ -20,6 +20,7 @@
 #include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
+#include "Athlete.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "MeterWidget.h"
@@ -103,13 +104,19 @@ VideoWindow::VideoWindow(Context *context)  :
         layout->addWidget(container);
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
 
+        // Video Overlays Initialization: if video config file is not present
+        // copy a default one to be used as a model by the user.
+        // An empty video-layout.xml file disables video overlays
         QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
-        QFileInfo finfo(filename);
-
-        if (finfo.exists())
+        QFile file(filename);
+        if (!file.exists())
         {
-            QFile file(filename);
-
+            file.setFileName(":/xml/video-layout.xml");
+            file.copy(filename);
+            QFile::setPermissions(filename, QFileDevice::ReadUser|QFileDevice::WriteUser);
+        }
+        if (file.exists())
+        {
             // clean previous layout
             foreach(MeterWidget* p_meterWidget, m_metersWidget)
             {
@@ -199,8 +206,10 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    if (context->currentVideoSyncFile())
+    if (context->currentVideoSyncFile()) {
         context->currentVideoSyncFile()->manualOffset = 0.0;
+        context->currentVideoSyncFile()->km = 0.0;
+    }
 
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
@@ -211,8 +220,12 @@ void VideoWindow::startPlayback()
     /* set the media to playback */
     libvlc_media_player_set_media (mp, m);
 
-    /* set the playback rate to the media default - since there may be a different one set from RLV */
-    libvlc_media_player_set_rate(mp, libvlc_media_player_get_fps(mp));
+    /* Reset playback rate */
+    /* If video speed will be controlled by a sync file, set almost stationary
+       until first telemetry update. Otherwise (re)set to normal rate */
+    if (context->currentVideoSyncFile() && context->currentVideoSyncFile()->Points.count() > 1)
+        libvlc_media_player_set_rate(mp, 0.1f);
+    else libvlc_media_player_set_rate(mp, 1.0f);
 
     /* play the media_player */
     libvlc_media_player_play (mp);
@@ -289,6 +302,8 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
+    bool metric = context->athlete->useMetricUnits;
+
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
         if (p_meterWidget->Source() == QString("None"))
@@ -297,9 +312,9 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         else if (p_meterWidget->Source() == QString("Speed"))
         {
-            p_meterWidget->Value = rtd.getSpeed();
-            p_meterWidget->Text = QString::number((int) rtd.getSpeed());
-            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + tr(" kph");
+            p_meterWidget->Value = rtd.getSpeed() * (metric ? 1.0 : MILES_PER_KM);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph"));
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
@@ -314,7 +329,43 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("HRM"))
         {
             p_meterWidget->Value =  rtd.getHr();
-            p_meterWidget->Text = QString::number((int)p_meterWidget->Value) + tr(" bpm");
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("Load"))
+        {
+            if (rtd.mode == ERG || rtd.mode == MRC) {
+                p_meterWidget->Value = rtd.getLoad();
+                p_meterWidget->Text = QString("%1").arg(round(p_meterWidget->Value));
+            } else {
+                p_meterWidget->Value = rtd.getSlope();
+                p_meterWidget->Text = QString("%1").arg(p_meterWidget->Value, 0, 'f', 1);
+            }
+        }
+        else if (p_meterWidget->Source() == QString("Distance"))
+        {
+            p_meterWidget->Value = rtd.getDistance() * (metric ? 1.0 : MILES_PER_KM);
+            p_meterWidget->Text = QString::number((int) p_meterWidget->Value);
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" km") : tr(" mi"));
+        }
+        else if (p_meterWidget->Source() == QString("Time"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::Time)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("LapTime"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::LapTime)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("LapTimeRemaining"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::LapTimeRemaining)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+        }
+        else if (p_meterWidget->Source() == QString("ErgTimeRemaining"))
+        {
+            p_meterWidget->Value = round(rtd.value(RealtimeData::ErgTimeRemaining)/100.0)/10.0;
+            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
         }
         else if (p_meterWidget->Source() == QString("TrainerStatus"))
         {
@@ -357,11 +408,12 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 #endif
 
 #ifdef GC_VIDEO_VLC
-    if (!m) return;
+    if (!m || !context->isRunning || context->isPaused)
+        return;
 
     QList<ErgFilePoint> *ErgFilePoints = NULL;
     if (context->currentErgFile()) {
-        if (context->currentErgFile()->format == CRS || context->currentErgFile()->format == CRS_LOC) {
+        if (context->currentErgFile()->format == CRS) {
             ErgFilePoints = &(context->currentErgFile()->Points);
         }
     }
@@ -386,11 +438,44 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         while ((VideoSyncFiledataPoints[curPosition].km <= CurrentDistance) && (curPosition < VideoSyncFiledataPoints.count()-1))
             curPosition++;
 
-        // update the rfp
-        float weighted_average = (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km != 0.0)?(CurrentDistance-VideoSyncFiledataPoints[curPosition-1].km) / (VideoSyncFiledataPoints[curPosition].km - VideoSyncFiledataPoints[curPosition-1].km):0.0;
+        /* Create an RFP to represent where we are */
+        VideoSyncFilePoint syncPrevious = VideoSyncFiledataPoints[curPosition-1];
+        VideoSyncFilePoint syncNext = VideoSyncFiledataPoints[curPosition];
+        double syncKmDelta = syncNext.km - syncPrevious.km;
+        double syncKphDelta = syncNext.kph - syncPrevious.kph;
+        double syncTimeDelta = syncNext.secs - syncPrevious.secs;
+        double distanceFactor, speedFactor, timeFactor, timeExtra;
+
+        // Calculate how far we are between points in terms of distance
+        if (syncKmDelta == 0) distanceFactor = 0.0;
+        else distanceFactor = (CurrentDistance - syncPrevious.km) / syncKmDelta;
+
+        // Now create the appropriate factors and interpolate the
+        // video speed and time for the point we have reached.
+        // If there has been no acceleration we can just use use the distance factor
+        if (syncKphDelta == 0) {
+            // Constant filming speed
+            rfp.kph = syncPrevious.kph;
+            rfp.secs = syncPrevious.secs + syncTimeDelta * distanceFactor;
+        }
+        else {
+            // Calculate time difference because of change in speed
+            timeExtra = syncTimeDelta - ((syncKmDelta / syncPrevious.kph) * 3600);
+            if (syncKphDelta > 0) {
+                // The filming speed increased
+                speedFactor = qPow(distanceFactor, 0.66667);
+                timeFactor = qPow(distanceFactor, 0.33333);
+                rfp.kph = syncPrevious.kph + speedFactor * syncKphDelta;
+            }
+            else {
+                // The filming speed decreased
+                speedFactor = 1 - qPow(distanceFactor, 1.5);
+                timeFactor = qPow(distanceFactor, 3.0);
+                rfp.kph = syncNext.kph - speedFactor * syncKphDelta;
+            }
+            rfp.secs = syncPrevious.secs + (distanceFactor * (syncTimeDelta - timeExtra)) + (timeFactor * timeExtra);
+        }
         rfp.km = CurrentDistance;
-        rfp.secs = VideoSyncFiledataPoints[curPosition-1].secs + weighted_average * (VideoSyncFiledataPoints[curPosition].secs - VideoSyncFiledataPoints[curPosition-1].secs);
-        rfp.kph = VideoSyncFiledataPoints[curPosition-1].kph + weighted_average * (VideoSyncFiledataPoints[curPosition].kph - VideoSyncFiledataPoints[curPosition-1].kph);
 
         /*
         //TODO : GPX file format

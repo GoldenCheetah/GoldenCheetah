@@ -23,6 +23,11 @@
 #include <QLowEnergyController>
 #include <QLowEnergyService>
 
+typedef struct btle_sensor_type {
+    const char *descriptive_name;
+    const char *iconname;
+} btle_sensor_type_t;
+
 class BT40Device: public QObject
 {
     Q_OBJECT
@@ -32,6 +37,8 @@ public:
     ~BT40Device();
     void connectDevice();
     void disconnectDevice();
+    static QMap<QBluetoothUuid, btle_sensor_type_t> supportedServices;
+    QBluetoothDeviceInfo deviceInfo() const;
 
 private slots:
     void deviceConnected();
@@ -46,11 +53,12 @@ private slots:
 				  const QByteArray &value);
     void serviceError(QLowEnergyService::ServiceError e);
 
+signals:
+    void setNotification(QString msg, int timeout);
 private:
     QObject *parent;
     QBluetoothDeviceInfo m_currentDevice;
     QLowEnergyController *m_control;
-    static QList<QBluetoothUuid> supportedServiceUuids;
     QList<QLowEnergyService*> m_services;
     int prevCrankStaleness;
     quint16 prevCrankTime;

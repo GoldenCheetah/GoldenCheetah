@@ -26,7 +26,7 @@
 #include <QMessageBox>
 
 #ifndef WITHINGS_DEBUG
-#define WITHINGS_DEBUG true
+#define WITHINGS_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \

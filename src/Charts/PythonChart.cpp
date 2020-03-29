@@ -22,6 +22,7 @@
 
 #include "Colors.h"
 #include "TabView.h"
+#include "RideFileCommand.h"
 
 #include <QtConcurrent>
 
@@ -38,9 +39,9 @@
 // unique identifier for each chart
 static int id=0;
 
-PythonConsole::PythonConsole(Context *context, PythonChart *parent)
+PythonConsole::PythonConsole(Context *context, PythonHost *pythonHost, QWidget *parent)
     : QTextEdit(parent)
-    , context(context), localEchoEnabled(true), parent(parent)
+    , context(context), localEchoEnabled(true), pythonHost(pythonHost)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     setFrameStyle(QFrame::NoFrame);
@@ -188,16 +189,25 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             //qDebug()<<"RUN:" << line;
 
             // set the context for the call
-            python->canvas = parent->canvas;
-            python->chart = parent;
+            if (pythonHost->chart()) {
+                python->canvas = pythonHost->chart()->canvas;
+                python->chart = pythonHost->chart();
+            }
 
             try {
 
                 // replace $$ with chart identifier (to avoid shared data)
                 line = line.replace("$$", chartid);
 
+                bool readOnly = pythonHost->readOnly();
+                QList<RideFile *> editedRideFiles;
                 python->cancelled = false;
-                python->runline(ScriptContext(context, nullptr, nullptr, Specification(), true), line);
+                python->runline(ScriptContext(context, nullptr, true, readOnly, &editedRideFiles), line);
+
+                // finish up commands on edited rides
+                foreach (RideFile *f, editedRideFiles) {
+                    f->command->endLUW();
+                }
 
                 // the run command should result in some messages being generated
                 putData(GColor(CPLOTMARKER), python->messages.join(""));
@@ -271,7 +281,21 @@ void PythonConsole::contextMenuEvent(QContextMenuEvent *e)
 
 PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
-    setControls(NULL);
+    // controls widget
+    QWidget *c = new QWidget;
+    setControls(c);
+    //HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    //c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
+
+    // settings
+    QVBoxLayout *clv = new QVBoxLayout(c);
+    web = new QCheckBox(tr("Web charting"), this);
+    clv->addWidget(web);
+    clv->addStretch();
+
+    // sert no render widget
+    canvas=NULL;
+    plot=NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -286,6 +310,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         QHBoxLayout *rev = new QHBoxLayout();
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
+
 
         rev->addStretch();
         rev->addWidget(showCon);
@@ -314,7 +339,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         setScript("##\n## Python program will run on selection.\n##\n");
 
         leftsplitter->addWidget(script);
-        console = new PythonConsole(context, this);
+        console = new PythonConsole(context, this, this);
         console->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         leftsplitter->addWidget(console);
 
@@ -325,34 +350,29 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         splitter->addWidget(leftsplitter);
 
-        canvas = new QWebEngineView(this);
-        canvas->setContentsMargins(0,0,0,0);
-        canvas->page()->view()->setContentsMargins(0,0,0,0);
-        canvas->setZoomFactor(dpiXFactor);
-        canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-#if QT_VERSION >= 0x050800
-        // stop stealing focus!
-        canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
-        splitter->addWidget(canvas);
+        // for Chart or webpage
+        render = new QWidget(this);
+        renderlayout = new QVBoxLayout(render);
+        splitter->addWidget(render);
 
         // make splitter reasonable
         QList<int> sizes;
         sizes << 300 << 500;
         splitter->setSizes(sizes);
 
+        // passing data across python and gui threads
         connect(this, SIGNAL(setUrl(QUrl)), this, SLOT(webpage(QUrl)));
 
         if (ridesummary) {
-            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
 
             // refresh when comparing
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(runScript()));
 
             // refresh when intervals changed / selected
-            connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
-            connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
+            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript())); // not needed since get signal below
+            //connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
+            //connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
 
         } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
@@ -368,6 +388,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         // reveal controls
         connect(showCon, SIGNAL(stateChanged(int)), this, SLOT(showConChanged(int)));
+        connect(web, SIGNAL(stateChanged(int)), this, SLOT(showWebChanged(int)));
 
         // config changes
         connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -389,26 +410,89 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         showCon = NULL;
         leftsplitter = NULL;
     }
+    web->setChecked(true);
+}
+
+
+// switch between rendering to a web page and rendering to a chart page
+void
+PythonChart::setWeb(bool x)
+{
+    // toggle the use of a web chart or a qt chart for rendering the data
+    if (x && canvas==NULL) {
+
+        // delete the chart view if exists
+        if (plot) {
+            renderlayout->removeWidget(plot);
+            delete plot; // deletes associated chart too
+            plot = NULL;
+        }
+
+        // setup the canvas
+        canvas = new QWebEngineView(this);
+        canvas->setContentsMargins(0,0,0,0);
+        canvas->page()->view()->setContentsMargins(0,0,0,0);
+        canvas->setZoomFactor(dpiXFactor);
+        canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+#if QT_VERSION >= 0x050800
+        // stop stealing focus!
+        canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+#endif
+        renderlayout->insertWidget(0, canvas);
+    }
+
+    if (!x && plot==NULL) {
+
+        // delete the canvas if exists
+        if (canvas) {
+            renderlayout->removeWidget(canvas);
+            delete canvas;
+            canvas = NULL;
+        }
+
+        // setup the chart
+        plot = new GenericChart(NULL,context); //XXX todo: null to avoid crash on close...
+        renderlayout->insertWidget(0,plot);
+
+        // signals to update it
+        connect(this, SIGNAL(emitChart(QString,int,bool,int,bool,int)), plot, SLOT(initialiseChart(QString,int,bool,int,bool,int)));
+        connect(this, SIGNAL(emitCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool,bool)),
+                plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool,bool)));
+        connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
+                plot,   SLOT(configureAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
+        connect(this,SIGNAL(emitAnnotation(QString,QStringList)), plot,  SLOT(annotateLabel(QString,QStringList)));
+
+    }
+
+    // set the check state!
+    web->setChecked(x);
+
+    // config changed...
+    configChanged(0);
 }
 
 bool
 PythonChart::eventFilter(QObject *, QEvent *e)
 {
+    // running script, just watch of escape
+    if (python->chart) {
+
+        // is it an ESC key?
+        if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
+            // stop!
+            python->cancel();
+            return true;
+        }
+
+        // otherwise lets just ignore it while active
+        return false;
+    }
+
     // on resize event scale the display
     if (e->type() == QEvent::Resize) {
         //canvas->fitInView(canvas->sceneRect(), Qt::KeepAspectRatio);
     }
 
-    // not running a script
-    if (!python) return false;
-
-    // is it an ESC key?
-    if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
-        // stop!
-        python->cancel();
-        return true;
-    }
-    // otherwise do nothing
     return false;
 }
 
@@ -425,6 +509,7 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+
 }
 
 void
@@ -437,6 +522,12 @@ void
 PythonChart::showConChanged(int state)
 {
     if (leftsplitter) leftsplitter->setVisible(state);
+}
+
+void
+PythonChart::showWebChanged(int state)
+{
+    setWeb(state);
 }
 
 QString
@@ -542,6 +633,9 @@ PythonChart::runScript()
 
         }
 
+        // polish  the chart if needed
+        if (plot) plot->finaliseChart();
+
         // turn off updates for a sec
         setUpdatesEnabled(true);
 
@@ -561,8 +655,9 @@ PythonChart::runScript()
     }
 }
 
+// rendering to a web page
 void
 PythonChart::webpage(QUrl url)
 {
-    canvas->setUrl(url);
+    if (canvas) canvas->setUrl(url);
 }

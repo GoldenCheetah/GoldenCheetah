@@ -41,6 +41,7 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QGraphicsDropShadowEffect>
+#include <QSvgGenerator>
 
 Q_DECLARE_METATYPE(QWidget*)
 
@@ -874,18 +875,33 @@ GcChartWindow::addHelper(QString name, QWidget *widget)
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  QString(), title()+".png (*.png)");
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  fileName, title()+".png (*.png)"+";;"+title()+".svg (*.svg)");
 
-    if (!fileName.isEmpty()) {
+    if (fileName.isEmpty()) return; // no filename selected, abort
+
+    if (!fileName.isEmpty() && fileName.endsWith(".svg")) {
+
+        QSvgGenerator generator;
+        generator.setFileName(fileName);
+        generator.setSize(size());
+        generator.setViewBox(rect());
+        generator.setTitle(title());
+        render(&generator);
+
+    } else {
+
+        // default, export to png adding extension if missing
+        if (!fileName.endsWith(".png")) fileName += ".png";
 
         QPixmap picture;
         menuButton->hide();
 #if QT_VERSION > 0x050000
-        picture = grab(geometry());
+        picture = grab(rect());
 #else
         picture = QPixmap::grabWidget (this);
 #endif
         picture.save(fileName);
+
     }
 }
 
@@ -900,7 +916,7 @@ GcChartWindow::saveChart()
     QString suffix; // what was selected?
     QString filename = QFileDialog::getSaveFileName(this, tr("Export Chart"),
                        QDir::homePath()+"/"+ property("title").toString() + ".gchart",
-                       ("*.gchart;;"), &suffix);
+                       ("*.gchart;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (filename.length() == 0) return;
 
@@ -1107,6 +1123,15 @@ GcChartWindow::exportChartToCloudDB()
     QPixmap picture;
     menuButton->hide();
     picture = grab(geometry());
+
+    // limit size of picture to not go beyong GAE datastore_V3 request call size
+    // these size limits provide images below 1000k which is expected to work for all known cases
+    if ( picture.size().width()> 1024 ) {
+        picture = picture.scaledToWidth(1024, Qt::SmoothTransformation);
+    }
+    if (picture.size().height() > 768) {
+        picture = picture.scaledToHeight(768, Qt::SmoothTransformation);
+    }
 
     QBuffer buffer(&chart.Image);
     buffer.open(QIODevice::WriteOnly);

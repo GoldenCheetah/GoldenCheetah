@@ -63,9 +63,6 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 %type <op> AND OR;
 
-// Date Range markers for vector expressions
-%token <op> LSB RSB
-
 %union {
    Leaf *leaf;
    QList<Leaf*> *comp;
@@ -75,19 +72,18 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <leaf> python_script;
 %type <comp> statements
 
 %right '?' ':'
-%right '[' ']'
-%right LSB RSB
 %right AND OR
 %right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %left ADD SUBTRACT
 %left MULTIPLY DIVIDE
 %right POW
+%right '[' ']'
 
 %start filter;
 %%
@@ -270,13 +266,6 @@ lexpr:
                                                   $$->rvalue.l = $5;
                                                   $$->cond.l = $1;
                                                 }
-        | lexpr LSB lexpr ':' lexpr RSB { $$ = new Leaf(@1.first_column, @6.last_column);
-                                                  $$->type = Leaf::Vector;
-                                                  $$->lvalue.l = $1;
-                                                  $$->fparms << $3;
-                                                  $$->fparms << $5;
-                                                  $$->op = 0;
-                                                }
         | '!' lexpr %prec OR                    { $$ = new Leaf(@1.first_column, @2.last_column);
                                                   $$->type = Leaf::UnaryOperation;
                                                   $$->lvalue.l = $2;
@@ -297,13 +286,23 @@ lexpr:
                                                 }
         ;
 
-array:  symbol '[' expr ']'                    {
+array:
+         expr '[' expr ']'                    {
                                                   $$ = new Leaf(@1.first_column, @4.last_column);
                                                   $$->type = Leaf::Index;
                                                   $$->lvalue.l = $1;
                                                   $$->fparms << $3;
                                                   $$->op = 0;
                                                 }
+        ;
+
+select: expr '[' lexpr ']'                   {
+                                                  $$ = new Leaf(@1.first_column, @4.last_column);
+                                                  $$->type = Leaf::Select;
+                                                  $$->lvalue.l = $1;
+                                                  $$->fparms << $3;
+                                                  $$->op = 0;
+                                             }
         ;
 
 /*
@@ -466,6 +465,7 @@ expr:
                                                   $$->op = 0;
                                                 }
         | array                                 { $$ = $1; }
+        | select                                { $$ = $1; }
         | literal                               { $$ = $1; }
         | symbol                                { $$ = $1; }
         | python_script                         { $$ = $1; }

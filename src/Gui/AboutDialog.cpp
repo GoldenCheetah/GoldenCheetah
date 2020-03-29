@@ -59,8 +59,8 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<h2>GoldenCheetah</h2>"
                 "Cycling Power Analysis Software<br>for Linux, Mac, and Windows"
                 "<p>GoldenCheetah is licensed under the<br>"
-                "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
-                "Public License</a>."
+                "<a href=\"https://opensource.org/licenses/GPL-2.0\">GNU General "
+                "Public License 2.0</a>."
                 "<p>Source code can be obtained from<br>"
                 "<a href=\"http://goldencheetah.org/\">"
                 "http://goldencheetah.org/</a>."
@@ -75,6 +75,7 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<br>The core body temperature module was developed by the <br>"
                 "<a href=\"http://www.usariem.army.mil/\">U.S. Army Research Institute of Environmental Medicine</a>"
                 "<br> and is patent pending<br>"
+                "<br><img src=\":images/services/strava_compatible.png\"/><br>"
                 "</center>"
                 )
                 .arg(QString(QUrl::fromLocalFile(context->athlete->home->root().absolutePath()).toEncoded()))
@@ -135,6 +136,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Dean Junk");
     contributors.append("Dmitry Monakhov");
     contributors.append("Eric Brandt");
+    contributors.append("Eric Christoffersen");
     contributors.append("Eric Murray");
     contributors.append("Erik Boto");
     contributors.append("Frank Zschockelt");

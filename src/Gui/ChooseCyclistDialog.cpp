@@ -100,6 +100,10 @@ ChooseCyclistDialog::getList()
     while (i.hasNext()) {
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+
+        // ignore dot folders
+        if (name.startsWith(".")) continue;
+
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
         // get avatar image if it exists

@@ -738,10 +738,10 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         tableWidget->setRowHeight(i, chartImageHeight+20);
 
         QString cellText = QString(tr("<h3>%1</h3><h4>Last Edited At: %2 - Creator: %3</h4>%4"))
-                .arg(encodeHTML(preset.name))
+                .arg(CloudDBCommon::encodeHTML(preset.name))
                 .arg(preset.createdAt.date().toString(Qt::ISODate))
-                .arg(encodeHTML(preset.creatorNick))
-                .arg(encodeHTML(preset.description));
+                .arg(CloudDBCommon::encodeHTML(preset.creatorNick))
+                .arg(CloudDBCommon::encodeHTML(preset.description));
 
         QTextEdit *formattedText = new QTextEdit;
         formattedText->setHtml(cellText);
@@ -1170,41 +1170,6 @@ CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
     delete chart;
 }
 
-
-QString
-CloudDBChartListDialog::encodeHTML ( const QString& encodeMe )
-{
-    QString temp;
-
-    for (int index(0); index < encodeMe.size(); index++)
-    {
-        QChar character(encodeMe.at(index));
-
-        switch (character.unicode())
-        {
-        case '&':
-            temp += "&amp;"; break;
-
-        case '\'':
-            temp += "&apos;"; break;
-
-        case '"':
-            temp += "&quot;"; break;
-
-        case '<':
-            temp += "&lt;"; break;
-
-        case '>':
-            temp += "&gt;"; break;
-
-        default:
-            temp += character;
-            break;
-        }
-    }
-
-    return temp;
-}
 
 CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageData) : imageData(imageData) {
 

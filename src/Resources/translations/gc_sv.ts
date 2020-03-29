@@ -29,7 +29,7 @@
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="73"/>
         <source>Found Garmin Express service</source>
-        <translation>Hittade Garmin Express service</translation>
+        <translation>Hittade Garmin Express tjänsten</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="74"/>
@@ -37,27 +37,27 @@
 This can block GoldenCheetah from accessing your ANT+ stick.
 
 Do you want to temporarily disable the service?</source>
-        <translation>Garmin Express service kör på din dator.
+        <translation>Garmin Express tjänsten kör på din dator.
 Detta kan förhindra Golden Cheetah att använda ANT+ stickan
 
-Vill du stoppa Garmin Express service tillfälligt?</translation>
+Vill du stoppa Garmin Express tjänsten tillfälligt?</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="84"/>
         <source>Failed stopping Garmin Express service</source>
-        <translation>Misslyckades stoppa Garmin Express service</translation>
+        <translation>Misslyckades stoppa Garmin Express tjänsten</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="85"/>
         <source>GoldenCheetah failed to stop the Garmin Express service.
 It might be necessary to manually disable it.</source>
-        <translation>Golden Cheetah misslyckades med att stoppa Garmin Express service.
+        <translation>Golden Cheetah misslyckades med att stoppa Garmin Express tjänsten.
 Det kan behövas göras manuellt.</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="164"/>
         <source>Cannot open ANT+ device</source>
-        <translation>Ingen kontakt med ANT+ enhet</translation>
+        <translation>Ingen kontakt med ANT+ enheten</translation>
     </message>
 </context>
 <context>
@@ -97,7 +97,7 @@ Det kan behövas göras manuellt.</translation>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="35"/>
         <source>Contributors</source>
-        <translation>Medverkande</translation>
+        <translation>Medskapare</translation>
     </message>
 </context>
 <context>
@@ -2678,7 +2678,7 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="410"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="412"/>
@@ -4781,12 +4781,12 @@ För att gå vidare välj &quot;Fortsätt&quot;
     <message>
         <location filename="../../Gui/Pages.cpp" line="2751"/>
         <source>Available Metrics</source>
-        <translation>Tillgängliga nyckeltal</translation>
+        <translation>Tillgängliga mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2756"/>
         <source>Selected Metrics</source>
-        <translation>Utvalda Nyckeltal</translation>
+        <translation>Utvalda Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2772"/>
@@ -4853,7 +4853,7 @@ Låt oss börja med ett exempel.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="159"/>
         <source>Download from serial device.</source>
-        <translation>Ladda ner från serieports enhet.</translation>
+        <translation>Ladda ner från serieportsenhet.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="160"/>
@@ -5356,12 +5356,12 @@ Går till inställningar.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4393"/>
         <source>Use CP for all metrics</source>
-        <translation>Använd CP för alla nyckeltal</translation>
+        <translation>Använd CP för alla mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4394"/>
         <source>Use FTP for Coggan metrics</source>
-        <translation>Använd FTP till Coggan Nyckeltal</translation>
+        <translation>Använd FTP till Coggan Mätetalen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4452"/>
@@ -5912,7 +5912,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5953"/>
         <source>Metric Pace</source>
-        <translation>Tempo metriskt</translation>
+        <translation>Tempo</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="5997"/>
@@ -6363,8 +6363,7 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudDBChart.cpp" line="551"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="566"/>
         <source>Edit selected chart</source>
-        <translatorcomment>Editera valt diagram</translatorcomment>
-        <translation>Ausgewähltes Diagramm Editieren</translation>
+        <translation>Editera valt diagram</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="535"/>
@@ -6381,22 +6380,22 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="534"/>
         <source>Download selected chart(s)</source>
-        <translation>Ladda ner valt/valda diagramm</translation>
+        <translation>Ladda ner valt/valda diagram</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="565"/>
         <source>Set selected chart &apos;Curated&apos;</source>
-        <translation>Markera valt diagramm som &apos;Granskat&apos;</translation>
+        <translation>Markera valt diagram som &apos;Granskat&apos;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="627"/>
         <source>Chart maintenance - Edit or Delete your Charts</source>
-        <translation>Diagram underhåll - Editiera eller Radera</translation>
+        <translation>Diagramunderhåll - Editiera eller Radera</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="633"/>
         <source>Curator chart maintenance - Curate, Edit or Delete Charts</source>
-        <translation>Granskare diagramunderhåll - Granska, Editiera eller Radera</translation>
+        <translation>Granskares diagramunderhåll - Granska, Editiera eller Radera</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="740"/>
@@ -7284,7 +7283,7 @@ Detta kan leda till skillnader mellan lokalt sparade träningspass och de som la
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="96"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="100"/>
@@ -7691,7 +7690,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="250"/>
         <source>Show curve heat</source>
-        <translation>Visa &quot;Heat&quot; linje</translation>
+        <translation>Visa &quot;Heat&quot; histogram</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="255"/>
@@ -7880,7 +7879,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="449"/>
         <source>Endurance Index</source>
-        <translation>Uthållighets Index</translation>
+        <translation>Uthållighetsindex</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="504"/>
@@ -8038,7 +8037,7 @@ Skall ändringen genomföras och Golden Cheetah startas om?</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3016"/>
         <source>Are you sure you want to delete this metric?</source>
-        <translation>Är du säker på att du vill radera detta nyckeltal?</translation>
+        <translation>Är du säker på att du vill radera detta mätetal?</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3018"/>
@@ -8953,7 +8952,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1610"/>
         <source>Metric</source>
-        <translation>Nyckeltal</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1611"/>
@@ -9063,7 +9062,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
         <translation># skriv in en formel (på Engelska)
 # tex för BikeStress / Tid
 # medans du skriver kommer de
-#tillgängliga storheterna att
+#tillgängliga mätetalen att
 #föreslås automatiskt
 </translation>
     </message>
@@ -9140,7 +9139,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1992"/>
         <source>PMC metric</source>
-        <translation>PMC Nyckeltal</translation>
+        <translation>PMC mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2017"/>
@@ -9353,7 +9352,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2641"/>
         <source>Choose Metric Color</source>
-        <translation>Välj färg på Storheter</translation>
+        <translation>Välj färg på Mätetal</translation>
     </message>
 </context>
 <context>
@@ -9586,7 +9585,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
         <translation># skriv in en formel (på Engelska)
 # tex för BikeStress / Tid
 # medans du skriver kommer de
-#tillgängliga storheterna att
+#tillgängliga mätetalen att
 #föreslås automatiskt
 </translation>
     </message>
@@ -9628,7 +9627,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Core/UserData.cpp" line="247"/>
         <source>Choose Metric Color</source>
-        <translation>Välj färg på Storhet</translation>
+        <translation>Välj färg på Mätetal</translation>
     </message>
 </context>
 <context>
@@ -9636,7 +9635,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="44"/>
         <source>User Defined Metric</source>
-        <translation>Användarbestämd Storhet</translation>
+        <translation>Användarbestämt Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="53"/>
@@ -10575,7 +10574,7 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="182"/>
         <source>Set Rest Hrv</source>
-        <translation>Ange Vilo HRV</translation>
+        <translation>Ange Vilopuls</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="197"/>
@@ -10585,7 +10584,12 @@ välj sedan &quot;Sök igen&quot;för ett nytt försök.</translation>
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation></translation>
+        <translation>Filtrera R-R outliers (se &quot;R-R flag&quot; i HRV Xdata). Icke outliers markeras med &quot;1&quot;.
+  - &quot;R-R min och maximum&quot; exkluderar samples utanför (markeras &quot;-1&quot;). Även exkluderad då område filtreras.
+  - &quot;Filter område&quot; medelvärde med fönster (markeras &quot;0&quot;)
+  - &quot;Filter fönsterstorlek&quot; avstånd på var sida av nuvarande intervall
+  - Om &quot;Ange vilopuls&quot;är markerad är de beräknade HRV mätetalen utifrån vilopuls mätningar
+</translation>
     </message>
     <message>
         <source>Filter R-R outliers (see &quot;R-R flag&quot; in HRV Xdata). Non outliers are marked &quot;1&quot;.
@@ -10800,7 +10804,8 @@ Beräknade distansvärden skapas (och skriver över de värden som ev redan finn
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="69"/>
         <source>Draft mult.</source>
-        <translation>Ligga på rulle (faktor).</translation>
+        <translatorcomment>no longer abbreviated but tool insist on an ending period</translatorcomment>
+        <translation>Slipstreamfaktor.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="70"/>
@@ -10832,15 +10837,15 @@ Note: if the ride file already contain wind data
 
 Cykelns vikt adderas till idrottarens vikt för att få total vikt,inklusive kläder, skor, etc
 
-CRR är rullmotståndskonstanten, den beror på däck och vägyta
+CRR är rullmotståndskonstanten, den beror på en kombination av däck och vägytans ojämnhet
 
 CdA är produkten av luftmotståndskoefficienten och den effektiva projicerade ytan i m^2, den beror på sittposition och utrustning. Om satt till 0 görs en uppskattning från kroppsmått
 
-På-rulle faktorn används för att beskriva vinsten av att ligga på rulle (drafting), välj 1 för solokörning och 0.7 för klunga
+Slipstreamfaktor är en parameter som används för att beskriva vinsten av att ligga på rulle (drafting), välj 1 för solokörning och 0.7 för klunga
 
 ange vindhastighet i km/h
 vindriktning (varifrån vinden kommer) anges i grader från -179 till +180 (-90=V, 0=N, 90=Ö, 180=S)
-Obs:ev vind värden kommer att skrivas över om vindhastighet anges</translation>
+Obs: befintliga vind värden kommer att skrivas över om vindhastighet anges</translation>
     </message>
     <message>
         <source>, direction</source>
@@ -10984,7 +10989,7 @@ Denna funktion gör detta och har två inparametrar som kan ställas in.
 
 Tolerans -detta är minsta längden ( i sekunder) på de tomrum som skall fyllas. Kortare tomrum fylls ej.
 
-Stopp - detta är största längden (i sekunder) som kommer att fyllas med uppskattningar. Luckorstörre än Stopp  fylls med nollor.</translation>
+Stopp - detta är största längden (i sekunder) som kommer att fyllas med uppskattningar. Luckorstörre än Stopp fylls med nollor.</translation>
     </message>
 </context>
 <context>
@@ -11171,7 +11176,8 @@ Detta verktyg gör om data mätt på båda benen till bara ett ben (dvs frekvens
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="63"/>
         <source>Draft mult.</source>
-        <translation>Ta Rygg (faktor).</translation>
+        <translatorcomment>no longer abbreviated but tool insist on an ending period</translatorcomment>
+        <translation>Slipstreamfaktor.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="64"/>
@@ -11198,8 +11204,8 @@ Note: if the file already contain wind data it will be overridden if wind is ent
 
 Utrustningsvikt (kläder, skor, elektronik, näring, vätska, etc) läggs till idrottarens vikt för att beräkna totalvikten.
 
-&apos;Ta rygg (faktor)&apos; är en multiplikationskonstant som modellerar om idrottaren ligger i vindskugga bakom framförvarande löpare,
-faktorn 1 används om idrottaren tar all vind själv och 0.7 om idrottaren befinner sig inne i en klunga
+&apos;Slipstreamfaktor&apos; är en multiplikationskonstant som modellerar om löparen ligger i vindskugga bakom framförvarande löpare,
+faktorn 1 används om löparen tar all vind själv och 0.7 om löparen befinner sig inne i en klunga
 
 Vindhastighet anges i km/h (metrisk)
 Vindriktning anges i grader och anger från vilket håll vinden kommer ifrån, tillåtna värden är -179 upp till +180 (-90=Väst, 0=Nord, 90=Öst, 180=Syd)
@@ -11589,7 +11595,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Colors.cpp" line="164"/>
         <source>Load</source>
-        <translation>Stress</translation>
+        <translation>Load</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="165"/>
@@ -11905,7 +11911,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Metrics/GOVSS.cpp" line="373"/>
         <source>Gravity Ordered Velocity Stress Score, the BikeStress like metric defined by Dr. Skiba for Running, accounts for variations in speed, slope and relative intensity and duration</source>
-        <translation>Gravity Ordered Velocity Stress Score, BikeStress liknande storhet definierad av Dr. Skiba för löpning, tar hänsyn till variationer i fart, lutning, relativ intensitet och tidslängd</translation>
+        <translation>Gravity Ordered Velocity Stress Score, BikeStress liknande mätetal definierad av Dr. Skiba för löpning, tar hänsyn till variationer i fart, lutning, relativ intensitet och tidslängd</translation>
     </message>
 </context>
 <context>
@@ -12162,7 +12168,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
         <location filename="../../Core/GcUpgrade.cpp" line="252"/>
         <location filename="../../Core/GcUpgrade.cpp" line="268"/>
         <source>Metric</source>
-        <translation>Storhet</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="254"/>
@@ -12440,7 +12446,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="84"/>
         <source>Collection TreeMap</source>
-        <translation>Kacheldiagramm</translation>
+        <translation>Kacheldiagram</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="86"/>
@@ -12450,7 +12456,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="83"/>
         <source>Metric Trends</source>
-        <translation>Nyckeltalstrender</translation>
+        <translation>Mätetalstrender</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="89"/>
@@ -13283,7 +13289,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="73"/>
         <source>Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types</source>
-        <translation>Utökad Kalendervy och konfigurerbar aktivitetslista, samt långtidsmätetal diagramm</translation>
+        <translation>Utökad Kalendervy och konfigurerbar aktivitetslista, samt långtidsmätetaldiagram</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="79"/>
@@ -13763,22 +13769,22 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
         <source>Metrics shown in &apos;Bests&apos;</source>
-        <translation>Mätvärden visade i &apos;Personbästa&apos;</translation>
+        <translation>Mätetal visade i &apos;Personbästa&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
-        <translation>Mätvärden visade i &apos;Sammanfattning&apos;</translation>
+        <translation>Mätetal visade i &apos;Sammanfattning&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="317"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
-        <translation>Mätvärden visade i &apos;Intervall&apos;</translation>
+        <translation>Mätetal visade i &apos;Intervall&apos;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="319"/>
@@ -13829,7 +13835,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HistogramWindow.cpp" line="130"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/HistogramWindow.cpp" line="233"/>
@@ -13901,7 +13907,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HistogramWindow.cpp" line="231"/>
         <source>Percentage Time</source>
-        <translation>Procentuell tid)</translation>
+        <translation>Procentuell tid</translation>
     </message>
     <message>
         <location filename="../../Charts/HistogramWindow.cpp" line="253"/>
@@ -14094,7 +14100,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1598"/>
         <source>Stress</source>
-        <translation>Stress</translation>
+        <translation>Träningsbelastning</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1599"/>
@@ -14115,7 +14121,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1603"/>
         <source>Tracker</source>
-        <translation>Nyckeltal</translation>
+        <translation>Mätetal Historik</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1604"/>
@@ -15396,7 +15402,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
         <location filename="../../Core/ICalendar.cpp" line="85"/>
         <source>Percent Complete</source>
         <translatorcomment>??? Currently code is inactive</translatorcomment>
-        <translation></translation>
+        <translation>Procent avklarade</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="86"/>
@@ -15876,12 +15882,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/Pages.cpp" line="2554"/>
         <source>Available Metrics</source>
-        <translation>Vorhandene Metriken</translation>
+        <translation>Tillgängliga Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2559"/>
         <source>Selected Metrics</source>
-        <translation>Ausgewählte Metriken</translation>
+        <translation>Utvalda Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2575"/>
@@ -16022,7 +16028,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../FileIO/JouleDevice.cpp" line="48"/>
         <source>Make sure the Joule (1.0, GPS or GPS+) unit is turned ON</source>
-        <translation>Säkerställ att Joule (1.0, GPS oder GPS+) enheten är igång</translation>
+        <translation>Säkerställ att Joule (1.0, GPS eller GPS+) enheten är igång</translation>
     </message>
 </context>
 <context>
@@ -16701,7 +16707,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="435"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPopup.cpp" line="462"/>
@@ -16947,7 +16953,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1508"/>
         <source>Import Charts</source>
-        <translation>Impoertera Diagram</translation>
+        <translation>Importera Diagram</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1515"/>
@@ -16991,7 +16997,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1308"/>
         <source>Metric</source>
-        <translation>Metrisk</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="78"/>
@@ -17248,12 +17254,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
         <location filename="../../Charts/LTMTool.cpp" line="813"/>
         <location filename="../../Charts/LTMTool.cpp" line="828"/>
         <source>Stress (Kj)</source>
-        <translation>STress (kJ)</translation>
+        <translation>Stress (kJ)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="674"/>
         <source>Work (Kj) Short Term Stress</source>
-        <translation>Arbete (kJ) Korttidsstress ( STS)</translation>
+        <translation>Arbete (kJ) Korttidsstress (STS)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="689"/>
@@ -17394,12 +17400,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1084"/>
         <source>TRIMP Long Term Stress</source>
-        <translation>TRIMP Långtidsbelastning (LTS)</translation>
+        <translation>TRIMP Långtidsstress (LTS)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1098"/>
         <source>TRIMP Short Term Stress</source>
-        <translation>TRIMP Korttidsbelastning (STS)</translation>
+        <translation>TRIMP Korttidsstress (STS)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1113"/>
@@ -17439,12 +17445,12 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1159"/>
         <source>TriScore Long Term Stress</source>
-        <translation>TriScore Långtidsbelastning (LTS)</translation>
+        <translation>TriScore Långtidsstress (LTS)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1174"/>
         <source>TriScore Short Term Stress</source>
-        <translation>TriScore Korttidsbelastning (STS)</translation>
+        <translation>TriScore Korttidsstress (STS)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1189"/>
@@ -17578,7 +17584,7 @@ Vridmomentsoffset - Anges i Nm (eller ibs*inch). Negativa tal minskarvridmomente
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="260"/>
         <source>Banister Model</source>
-        <translation>Banister Model</translation>
+        <translation>Banister Modell</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="273"/>
@@ -18484,7 +18490,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="475"/>
         <source>Export Metrics as CSV...</source>
-        <translation>Exportera storheter som .CSV...</translation>
+        <translation>Exportera mätetal som .CSV...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1257"/>
@@ -18584,7 +18590,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="482"/>
         <source>Cloud Contributions</source>
-        <translation>Cloud Medverkande</translation>
+        <translation>Cloud Bidrag</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="486"/>
@@ -18756,7 +18762,7 @@ och att det står &quot;PC Link&quot; på dess display</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="483"/>
         <source>Maintain charts</source>
-        <translation>Underhåll diagram</translation>
+        <translation>Underhålla diagram</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="487"/>
@@ -18972,7 +18978,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1257"/>
         <source>Imported %1 metric charts</source>
-        <translation>Importerade %1 Storhetsdiagram</translation>
+        <translation>Importerade %1 Mätetalsdiagram</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1422"/>
@@ -18988,7 +18994,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1942"/>
         <source>Export Metrics</source>
-        <translation>Exportera Storheter</translation>
+        <translation>Exportera Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1942"/>
@@ -19135,7 +19141,7 @@ Vänligen kontrollera inställningarna.</translation>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="313"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="558"/>
@@ -23341,7 +23347,7 @@ Vill du göra detta?</translation>
         <location filename="../../Charts/PowerHist.cpp" line="88"/>
         <location filename="../../Charts/PowerHist.cpp" line="2370"/>
         <source>Time (percent)</source>
-        <translation>Tid (Procent)</translation>
+        <translation>Tid (procent)</translation>
     </message>
     <message>
         <location filename="../../Charts/PowerHist.cpp" line="2325"/>
@@ -24895,7 +24901,7 @@ Python stängs av i  inställningarna.</translation>
     <message>
         <location filename="../../FileIO/ManualRideFile.cpp" line="119"/>
         <source>Unknown ride metric &quot;%1&quot;.</source>
-        <translation>Okända mätvärden (%1).</translation>
+        <translation>Okända mätetal (%1).</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="44"/>
@@ -26349,7 +26355,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Core/RideItem.cpp" line="889"/>
         <source>Entire Activity</source>
-        <translation>Hel Aktivitet</translation>
+        <translation>Hela Aktiviteten</translation>
     </message>
     <message>
         <location filename="../../Core/RideItem.cpp" line="953"/>
@@ -26701,7 +26707,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1627"/>
         <source>Metrics*</source>
-        <translation>Mätvärden*</translation>
+        <translation>Mätetal*</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="770"/>
@@ -26787,7 +26793,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="473"/>
         <source>Metrics</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="773"/>
@@ -26897,13 +26903,13 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1217"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1223"/>
         <source> ride</source>
-        <translation> cykelpass</translation>
+        <translation> cykeltur</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1217"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1223"/>
         <source> rides</source>
-        <translation> cykelpass</translation>
+        <translation> cykelturer</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1232"/>
@@ -26930,13 +26936,13 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1317"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1323"/>
         <source> run</source>
-        <translation> löppass</translation>
+        <translation> löprunda</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1317"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1323"/>
         <source> runs</source>
-        <translation> löppass</translation>
+        <translation> löprundor</translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="1416"/>
@@ -27950,7 +27956,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Gui/Pages.cpp" line="4201"/>
         <source>Percent of CP</source>
-        <translation>Procent av Critical Power</translation>
+        <translation>Procent av CP</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="4246"/>
@@ -28587,12 +28593,12 @@ Skall konvertering ske?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="27"/>
         <source>Start Date</source>
-        <translation>Start Datum</translation>
+        <translation>Startdatum</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="28"/>
         <source>Start Time</source>
-        <translation>Start Tid</translation>
+        <translation>Starttid</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="29"/>
@@ -28608,12 +28614,12 @@ Skall konvertering ske?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="31"/>
         <source>Change History</source>
-        <translation>Ändra Historik</translation>
+        <translation>Förändringshistorik</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="33"/>
         <source>Source Filename</source>
-        <translation>Källa Filnamn</translation>
+        <translation>Källfilnamn</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="34"/>
@@ -28691,7 +28697,7 @@ Skall konvertering ske?
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="131"/>
         <source>Metric</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="132"/>
@@ -29354,12 +29360,12 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Gui/Pages.cpp" line="3139"/>
         <source>Available Metrics</source>
-        <translation>Tillgängliga Mätvärden</translation>
+        <translation>Tillgängliga Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3144"/>
         <source>Selected Metrics</source>
-        <translation>Valda  Mätvärden</translation>
+        <translation>Valda  Mätetal</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3160"/>
@@ -29484,7 +29490,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="314"/>
         <source>SwimScore swimming stress metric as defined by Dr. Skiba</source>
-        <translation>SwimScore simnings stress mätvärden som definierat av Dr Skiba</translation>
+        <translation>SwimScore simstressmätetal som definierat av Dr Skiba</translation>
     </message>
 </context>
 <context>
@@ -29679,7 +29685,7 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Metrics/VDOT.cpp" line="114"/>
         <source>Daniels&apos; TPace, computed as 90%vVDOT from VDOT metric, in min/km or min/mile</source>
-        <translation>Daniels&apos; TPace, beräknad som 90%vVDOT från VDOT metric, i min/km eller min/mile</translation>
+        <translation>Daniels&apos; TPace, beräknad som 90%vVDOT från VDOT mätetal, i min/km eller min/mile</translation>
     </message>
 </context>
 <context>
@@ -30171,12 +30177,12 @@ Om en ny aktivitet kolliderar tidsmässigt med en befintlig kommer den nyas star
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="54"/>
         <source>Metric</source>
-        <translation>Metrisk</translation>
+        <translation>Metersystemet</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="57"/>
         <source>Imperial</source>
-        <translation>Brittiska</translation>
+        <translation>Brittiska enheter</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="72"/>
@@ -30924,7 +30930,7 @@ Tryck F3 när det är klart.</translation>
         <location filename="../../Charts/TreeMapWindow.cpp" line="110"/>
         <location filename="../../Charts/TreeMapWindow.cpp" line="137"/>
         <source>Metric</source>
-        <translation>Mätvärden</translation>
+        <translation>Mätetal</translation>
     </message>
     <message>
         <location filename="../../Charts/TreeMapWindow.cpp" line="140"/>
@@ -31130,7 +31136,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Metrics/UserMetricParser.cpp" line="107"/>
         <source>Problem Saving User Metric Configuration</source>
-        <translation>Problem då Användarmätvärdeskonfigurationen Sparades</translation>
+        <translation>Problem då Användarmätetalskonfigurationen Sparades</translation>
     </message>
     <message>
         <location filename="../../Metrics/UserMetricParser.cpp" line="108"/>
@@ -31617,7 +31623,7 @@ Tryck F3 när det är klart.</translation>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="689"/>
         <source>&lt;td align=&quot;center&quot;&gt;Above CP Time&lt;/td&gt;</source>
-        <translation>&quot;&lt;td align=\&quot;center\&quot;&gt;Tid ovan CP&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Tid över CP&lt;/td&gt;</translation>
     </message>
 </context>
 <context>
@@ -32028,7 +32034,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Train/WorkoutWizard.h" line="210"/>
         <source>Workout Metrics</source>
-        <translation>Träningspassets Mätvärden</translation>
+        <translation>Träningspassets Mätetal</translation>
     </message>
 </context>
 <context>
@@ -33087,7 +33093,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="249"/>
         <source>Aerobic Training Impact Scoring System. It&apos;s a metric to quantify the training strain or response on the aerobic system</source>
-        <translation>Aerobic Training Impact Scoring System. Det är ett mätvärde som uppskattar träningsstressen på kroppens aeroba energisystem</translation>
+        <translation>Aerobic Training Impact Scoring System. Det är ett mätetal som uppskattar träningsbelastningen på kroppens aeroba energisystem</translation>
     </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="303"/>
@@ -33097,7 +33103,7 @@ Det är möjligt att ta bort länkar via &quot;context menu&quot; inställningar
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="306"/>
         <source>Anaerobic Training Impact Scoring System. It&apos;s a metric to quantify the training strain or response on the anaerobic system</source>
-        <translation>Anaerobic Training Impact Scoring System. Det är ett mätvärde som uppskattar träningsstressen på kroppens anaeroba energisystem</translation>
+        <translation>Anaerobic Training Impact Scoring System. Det är ett mätetal som uppskattar träningsbelastningen på kroppens anaeroba energisystem</translation>
     </message>
 </context>
 <context>

@@ -95,6 +95,11 @@
 // 3969 - V3.5 DEVELOPMENT 1901
 // 3970 - V3.5 DEVELOPMENT 1903
 // 3980 - V3.5 RC1
+// 3981 - V3.5 RC2
+// 3982 - V3.5 RC2X
+// 3990 - V3.5 RELEASE (January 2020)
+// 3991 - V3.5 RELEASE RE-ISSUE STRAVA RATE LIMIT (January 2020)
+// 3992 - V3.6 DEVELOPMENT
 
 
 #define VERSION3_BUILD    3010 // released
@@ -105,17 +110,17 @@
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
-#define VERSION35_BUILD   3980 // rc1
+#define VERSION35_BUILD   3990 // released
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3980
-#define VERSION_STRING "V3.5 RC1"
+#define VERSION_LATEST 3992
+#define VERSION_STRING "V3.6-DEV"
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
 
 class GcUpgradeLogDialog : public QDialog
 {

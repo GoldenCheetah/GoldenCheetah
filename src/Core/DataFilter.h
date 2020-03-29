@@ -45,6 +45,9 @@ class Result {
         Result (QString value) : isNumber(false), string(value), number(0.0f) {}
         Result () : isNumber(true), string(""), number(0) {}
 
+        // vectorize, turn into vector of size n
+        void vectorize(int size);
+
         // we can't use QString with union
         bool isNumber;           // if true, value is numeric
         QString string;
@@ -70,7 +73,7 @@ class Leaf {
         // User Metric - using symbols from QHash<..> (RideItem + Interval) and
         // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification());
+        Result eval(DataFilterRuntime *df, Leaf *, float x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
 
         // tree traversal etc
         void print(int level, DataFilterRuntime*);  // print leaf and all children
@@ -78,13 +81,14 @@ class Leaf {
         bool isDynamic(Leaf *);
         void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate
         bool isNumber(DataFilterRuntime *df, Leaf *leaf);
+        void findSymbols(QStringList &symbols); // when working with formulas
         void clear(Leaf*);
         QString toString(); // return as string
         QString signature() { return toString(); }
 
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
-               Function, Conditional, Vector, Index,
+               Function, Conditional, Index, Select,
                Compound, Script } type;
 
         union value {
@@ -108,6 +112,7 @@ class Leaf {
         RideFile::XDataJoin xjoin; // how to join xdata with main
 };
 
+class UserChart;
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -121,6 +126,10 @@ public:
 
     // needs to be reapplied as the ride selection changes
     bool isdynamic;
+
+    // the user chart if were used for that
+    // enables use of cache() command
+    UserChart *chart;
 
     // Lookup tables
     QMap<QString,QString> lookupMap;
@@ -145,6 +154,8 @@ public:
     double runPythonScript(Context *context, QString script, RideItem *m, const QHash<QString,RideMetric*> *metrics, Specification spec);
 #endif
 
+    DataFilter *owner;
+
 };
 
 class DataFilter : public QObject
@@ -157,6 +168,9 @@ class DataFilter : public QObject
 
         // runtime passed by datafilter
         DataFilterRuntime rt;
+
+        // compile time errors
+        QStringList &errorList() { return errors; }
 
         // get a signature for a datafilter
         static QString fingerprint(QString &query);
@@ -187,9 +201,9 @@ class DataFilter : public QObject
     signals:
         void parseGood();
         void parseBad(QStringList erorrs);
-
         void results(QStringList);
 
+        void annotateLabel(QStringList&);
 
     private:
         void setSignature(QString &query);
@@ -202,6 +216,60 @@ class DataFilter : public QObject
         QString sig;
 };
 
+// general purpose model fitting to x/y data
+class DFModel : public PDModel
+{
+    Q_OBJECT
+
+    public:
+        DFModel(RideItem *item, Leaf *formula, DataFilterRuntime *df);
+
+        // we override locally because we are more general
+        // purpose and also, always use lmfit
+        // we don't fit in to the usual PDModel framework
+        // so just do our own thing mostly.
+        bool fitData(QVector<double>&x, QVector<double>&y);
+
+        // synthetic data for a curve
+        virtual double y(double t) const;
+
+        //  number of parameters (not including t)
+        int nparms() { return parameters.count(); }
+
+        // passed value t and candidate parameters
+        // must unpack into df symbols and calulate a result
+        // used during the fitting process
+        double f(double t, const double *parms);
+
+        // managing the formula and parameters
+        RideItem *item;
+        Leaf *formula;          // the actual formula
+        DataFilterRuntime *df;  // runtime with symbols and values
+        QStringList parameters; // parameter names and position
+
+        // basically everything else below here is
+        // ignored for the most part
+        bool setParms(double *) {  return true;}
+
+        // model methods for CP chart are irrelevant
+        // but we need to set them anyway
+        bool hasWPrime() { return false; }  // can estimate W'
+        bool hasCP()     { return false; }  // can CP
+        bool hasFTP()    { return false; }  // can estimate FTP
+        bool hasPMax()   { return false; }  // can estimate p-Max
+
+        QString name()   { return "Datafilter General Purpose Model"; }
+        QString code()   { return "DF Model"; }        // short name used in metric names e.g. 2P model
+
+        void saveParameters(QList<double>&) {}
+        void loadParameters(QList<double>&) {}
+
+    public slots:
+
+        // we are only used in data filter expressions
+        void onDataChanged() {}
+        void onIntervalsChanged() {}
+};
 extern int DataFilterdebug;
 
 // some constants we provide to help accessed via const(name)

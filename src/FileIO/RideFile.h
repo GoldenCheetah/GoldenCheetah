@@ -63,7 +63,7 @@ extern const QChar deltaChar;
 struct RideFileDataPresent
 {
     // basic (te = torqueeffectiveness, ps = pedal smoothness)
-    bool secs, cad, hr, hrv, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
+    bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
     bool lrbalance, lte, rte, lps, rps, lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe;
     bool smo2, thb, interval;
 
@@ -75,7 +75,7 @@ struct RideFileDataPresent
 
     // whether non-zero data of each field is present
     RideFileDataPresent():
-        secs(false), cad(false), hr(false), hrv(false), km(false),
+        secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false),
@@ -188,6 +188,7 @@ class RideFile : public QObject // QObject to emit signals
         // fix tools
         friend class FixLapSwim;
         friend class Snippets;
+        friend struct FitFileReaderState;
 
         // utility
         static unsigned int computeFileCRC(QString); 
@@ -211,7 +212,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal, tcore, clength, aPowerKg, index, hrv,
+                          wbal, tcore, clength, aPowerKg, index,
                           none }; // none must ALWAYS be last
         typedef enum seriestype SeriesType;
 
@@ -578,7 +579,11 @@ public:
         valuename = other.valuename;
         unitname = other.unitname;
         valuetype = other.valuetype;
-        datapoints = other.datapoints;
+        // we need to create new objects since we are holding pointers to objects
+        // otherwise we would end up w/ multiple frees or dangling ptrs!
+        foreach (XDataPoint *p, other.datapoints) {
+            datapoints.push_back(new XDataPoint(*p));
+        }
     }
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }

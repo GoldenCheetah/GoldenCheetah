@@ -97,9 +97,13 @@ class EditUserMetricDialog : public QDialog {
         // the current ride, time to compute all rides)
         void refreshStats();
         void okClicked();
+        void enableOk();
+
+        void setErrors(QStringList&);
 
     private:
 
+        bool validSettings();
         void setSettings(UserMetricSettings &);
 
         Context *context;
@@ -120,6 +124,7 @@ class EditUserMetricDialog : public QDialog {
                        *precision;
 
         DataFilterEdit *formulaEdit; // edit your formula
+        QLabel *errors; // for highlighting errors
 
         QLabel *mValue, *iValue, *elapsed;
 

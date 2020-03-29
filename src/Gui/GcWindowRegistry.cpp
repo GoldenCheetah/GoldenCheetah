@@ -63,6 +63,7 @@
 #ifdef GC_HAVE_OVERVIEW
 #include "OverviewWindow.h"
 #endif
+#include "UserChart.h"
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -80,19 +81,21 @@ GcWindowRegistry::initialize()
 {
   static GcWindowRegistry GcWindowsInit[34] = {
     // name                     GcWinID
-    { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
-    { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
+    { VIEW_HOME|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
+    { VIEW_HOME|VIEW_DIARY, tr("Trends"),GcWindowTypes::LTM },
+    { VIEW_HOME|VIEW_DIARY, tr("TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
-    { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
+    { VIEW_HOME|VIEW_DIARY,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
     //{ VIEW_HOME,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
-    { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
-    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Activity Summary"),GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
+    { VIEW_HOME|VIEW_DIARY, tr("User Defined"),GcWindowTypes::UserTrends },
+    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
     { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Performance"),GcWindowTypes::AllPlot },
-    { VIEW_ANALYSIS, tr("Critical Mean Maximals"),GcWindowTypes::CriticalPower },
+    { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
     { VIEW_HOME|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
@@ -103,11 +106,11 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
     { VIEW_HOME, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
-    { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
-    { VIEW_ANALYSIS, tr("Aerolab Chung Analysis"),GcWindowTypes::Aerolab },
+    { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
+    { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
     { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
     { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
-    { VIEW_DIARY|VIEW_HOME, tr("Summary"), GcWindowTypes::DateRangeSummary },
+    { VIEW_DIARY|VIEW_HOME, tr("Summary "), GcWindowTypes::DateRangeSummary },
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
@@ -254,6 +257,8 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Overview: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
+    case GcWindowTypes::UserAnalysis: returning = new UserChart(context, false); break;
+    case GcWindowTypes::UserTrends: returning = new UserChart(context, true); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));
