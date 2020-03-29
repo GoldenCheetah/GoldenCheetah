@@ -16,7 +16,10 @@ class NewMainWindow : public QMainWindow
         // with the simplest methods for dragging a
         // frameless window
         void mousePressEvent(QMouseEvent *event);
+        void mouseReleaseEvent(QMouseEvent *event);
+        void mouseDoubleClickEvent(QMouseEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
+        bool isHotSpot(QPoint);
 
     protected:
 
@@ -40,4 +43,5 @@ class NewMainWindow : public QMainWindow
         QPushButton *quitbutton, *minimisebutton;
 
         QPoint clickPos;
+        enum { None, Drag, Resize } state;
 };

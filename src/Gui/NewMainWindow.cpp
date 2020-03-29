@@ -7,14 +7,14 @@
 // we resize for smaller screens but only so you
 // can close the app.
 constexpr double gl_minwidth = 1024;
-constexpr double gl_minheight = 700;
-constexpr double gl_toolbarheight = 46;
+constexpr double gl_minheight = 768;
+constexpr double gl_toolbarheight = 50;
 constexpr double gl_searchwidth = 350;
-constexpr double gl_searchheight = 26;
-constexpr double gl_quitheight = 26;
-constexpr double gl_quitwidth = 26;
+constexpr double gl_searchheight = 38;
+constexpr double gl_quitheight = 38;
+constexpr double gl_quitwidth = 38;
 
-NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), app(app)
+NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), app(app), state(None)
 {
     // setup
     main = new QWidget(this);
@@ -41,7 +41,7 @@ NewMainWindow::setupToolbar()
     // toolbar
     toolbar = new QToolBar(this);
     toolbar->setFixedHeight(gl_toolbarheight * dpiYFactor);
-    toolbar->setStyleSheet(QString("background: %1;").arg(QColor(Qt::lightGray).name()));
+    toolbar->setStyleSheet("background-color: lightGray;");
     toolbar->setAutoFillBackground(true);
     layout->addWidget(toolbar);
     layout->addStretch();
@@ -51,7 +51,8 @@ NewMainWindow::setupToolbar()
     searchbox->setFixedWidth(gl_searchwidth * dpiXFactor);
     searchbox->setFixedHeight(gl_searchheight * dpiXFactor);
     searchbox->setFrame(QFrame::NoFrame);
-    searchbox->setStyleSheet("background: white; border-radius: 7px;");
+    searchbox->setStyleSheet("QLineEdit       { background: #eeeeee; border-radius: 7px; }"
+                             "QLineEdit:focus { background: white; }");
     searchbox->setPlaceholderText(tr("                    Search or type a command "));
 
     // spacer to balance the minimize and close buttons
@@ -77,23 +78,29 @@ NewMainWindow::setupToolbar()
 
     // and close push buttons on the right
     minimisebutton = new QPushButton(this);
-    minimisebutton->setFlat(true);
+    minimisebutton->setAutoFillBackground(true);
     minimisebutton->setFixedSize(gl_quitwidth * dpiXFactor, gl_quitheight *dpiXFactor);
-    minimisebutton->setStyleSheet("background: lightGray; color: white;");
+    minimisebutton->setStyleSheet("QPushButton { border: none; background-color: lightGray; color: white; margin: 3px; }"
+                                  "QPushButton:hover { background-color: darkGray; color: white; }");
     minimisebutton->setText("_"); // fix with icon later
     toolbar->addWidget(minimisebutton);
 
     // and close push buttons on the right
     quitbutton = new QPushButton(this);
-    quitbutton->setFlat(true);
+    quitbutton->setAutoFillBackground(true);
     quitbutton->setFixedSize(gl_quitwidth * dpiXFactor, gl_quitheight *dpiXFactor);
-    quitbutton->setStyleSheet("background: lightGray; color: white;");
+    quitbutton->setStyleSheet("QPushButton { border: none; background-color: lightGray; color: white; margin: 3px; }"
+                                  "QPushButton:hover { background-color: red; color: white; }");
+
     quitbutton->setText("X"); // fix with icon later
     toolbar->addWidget(quitbutton);
 
     // connect up
     connect(quitbutton, SIGNAL(clicked()), this, SLOT(close()));
     connect(minimisebutton, SIGNAL(clicked()), this, SLOT(minimizeWindow()));
+
+    // remove focus from linedit
+    setFocus();
 
     toolbar->show();
 }
@@ -131,16 +138,42 @@ NewMainWindow::initialPosition()
 // mouse events when no window manager to help us
 // start with drag, but will need resize at some
 // point too.
+bool
+NewMainWindow::isHotSpot(QPoint pos)
+{
+    if (pos.y() < gl_toolbarheight * dpiYFactor) return true;
+    return false;
+
+}
 
 void
 NewMainWindow::mousePressEvent(QMouseEvent *event) {
-    clickPos.setX(event->x());
-    clickPos.setY(event->y());
+
+    if (isHotSpot(event->pos())) {
+        clickPos.setX(event->x());
+        clickPos.setY(event->y());
+        state = Drag;
+    }
+}
+
+void
+NewMainWindow::mouseReleaseEvent(QMouseEvent *) {
+    state = None;
 }
 
 void
 NewMainWindow::mouseMoveEvent(QMouseEvent *event) {
-    move(event->globalX()-clickPos.x(),event->globalY()-clickPos.y());
+
+    if (state == Drag) move(event->globalX()-clickPos.x(),event->globalY()-clickPos.y());
+}
+
+void
+NewMainWindow::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->y() < gl_toolbarheight * dpiYFactor) {
+        if (windowState() & Qt::WindowMaximized) setWindowState(windowState() & ~Qt::WindowMaximized);
+        else setWindowState(Qt::WindowMaximized);
+    }
 }
 
 void
