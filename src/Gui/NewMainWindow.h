@@ -2,9 +2,12 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QLineEdit>
+#include <QPushButton>
 
 class NewMainWindow : public QMainWindow
 {
+    Q_OBJECT
+
     public:
         NewMainWindow(QApplication *app);
 
@@ -24,6 +27,9 @@ class NewMainWindow : public QMainWindow
         // set initial geometry, screen etc
         void initialPosition();
 
+    public slots:
+        void minimizeWindow();
+
     private:
         QApplication *app;
 
@@ -31,6 +37,7 @@ class NewMainWindow : public QMainWindow
         QVBoxLayout *layout;
         QToolBar *toolbar;
         QLineEdit *searchbox;
+        QPushButton *quitbutton, *minimisebutton;
 
         QPoint clickPos;
 };

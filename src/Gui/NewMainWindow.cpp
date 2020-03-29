@@ -11,6 +11,8 @@ constexpr double gl_minheight = 700;
 constexpr double gl_toolbarheight = 46;
 constexpr double gl_searchwidth = 350;
 constexpr double gl_searchheight = 26;
+constexpr double gl_quitheight = 26;
+constexpr double gl_quitwidth = 26;
 
 NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), app(app)
 {
@@ -50,7 +52,13 @@ NewMainWindow::setupToolbar()
     searchbox->setFixedHeight(gl_searchheight * dpiXFactor);
     searchbox->setFrame(QFrame::NoFrame);
     searchbox->setStyleSheet("background: white; border-radius: 7px;");
-    searchbox->setPlaceholderText(tr("search or /expression... "));
+    searchbox->setPlaceholderText(tr("                    Search or type a command "));
+
+    // spacer to balance the minimize and close buttons
+    QWidget *balanceSpacer = new QWidget(this);
+    balanceSpacer->setFixedSize(gl_quitwidth*dpiXFactor * 2, gl_quitheight*dpiYFactor);
+    balanceSpacer->setVisible(true);
+    balanceSpacer->setAutoFillBackground(false);
 
     QWidget *leftSpacer = new QWidget(this);
     leftSpacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -62,9 +70,30 @@ NewMainWindow::setupToolbar()
     rightSpacer->setVisible(true);
     rightSpacer->setAutoFillBackground(false);
 
+    toolbar->addWidget(balanceSpacer);
     toolbar->addWidget(leftSpacer);
     toolbar->addWidget(searchbox);
     toolbar->addWidget(rightSpacer);
+
+    // and close push buttons on the right
+    minimisebutton = new QPushButton(this);
+    minimisebutton->setFlat(true);
+    minimisebutton->setFixedSize(gl_quitwidth * dpiXFactor, gl_quitheight *dpiXFactor);
+    minimisebutton->setStyleSheet("background: lightGray; color: white;");
+    minimisebutton->setText("_"); // fix with icon later
+    toolbar->addWidget(minimisebutton);
+
+    // and close push buttons on the right
+    quitbutton = new QPushButton(this);
+    quitbutton->setFlat(true);
+    quitbutton->setFixedSize(gl_quitwidth * dpiXFactor, gl_quitheight *dpiXFactor);
+    quitbutton->setStyleSheet("background: lightGray; color: white;");
+    quitbutton->setText("X"); // fix with icon later
+    toolbar->addWidget(quitbutton);
+
+    // connect up
+    connect(quitbutton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(minimisebutton, SIGNAL(clicked()), this, SLOT(minimizeWindow()));
 
     toolbar->show();
 }
@@ -112,4 +141,10 @@ NewMainWindow::mousePressEvent(QMouseEvent *event) {
 void
 NewMainWindow::mouseMoveEvent(QMouseEvent *event) {
     move(event->globalX()-clickPos.x(),event->globalY()-clickPos.y());
+}
+
+void
+NewMainWindow::minimizeWindow()
+{
+    setWindowState(Qt::WindowMinimized);
 }
