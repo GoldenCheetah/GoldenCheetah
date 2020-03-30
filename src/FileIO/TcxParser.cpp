@@ -39,13 +39,6 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
     first = true;
     creator = false;
 
-    // First initialisation for altitude (not initialised for each point)
-    alt= 0;
-    // length-by-length pool swimming XData
-    swimXdata = new XDataSeries();
-    swimXdata->name = "SWIM";
-    swimXdata->valuename << "TYPE";
-    swimXdata->valuename << "DURATION";
 }
 
 bool
@@ -54,6 +47,14 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
     buffer.clear();
 
     if (qName == "Activity") {
+
+        // First initialisation for altitude (not initialised for each point)
+        alt= 0;
+        // length-by-length pool swimming XData
+        swimXdata = new XDataSeries();
+        swimXdata->name = "SWIM";
+        swimXdata->valuename << "TYPE";
+        swimXdata->valuename << "DURATION";
 
         lap = 0;
         for (int i = 0; i < ltLast; ++i)
@@ -271,7 +272,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     p->km = last_distance;
                     p->number[0] = deltaDist > 0 ? 1 : 0;
                     p->number[1] = deltaSecs;
-                    swimXdata->datapoints.append(p);
+                    if (swimXdata) swimXdata->datapoints.append(p);
 
                     for (int i = rideFile->timeIndex(lastLength);
                          i>= 0 && i < rideFile->dataPoints().size() &&
@@ -296,7 +297,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     p->km = last_distance;
                     p->number[0] = deltaDist > 0 ? 1 : 0;
                     p->number[1] = deltaSecs;
-                    swimXdata->datapoints.append(p);
+                    if (swimXdata) swimXdata->datapoints.append(p);
                     lastLength = p->secs + deltaSecs;
                 }
                 // or it is pool swimming and we limit expansion for safety
@@ -360,7 +361,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             p->km = last_distance;
             p->number[0] = 0;
             p->number[1] = round(lapSecs);
-            swimXdata->datapoints.append(p);
+            if (swimXdata) swimXdata->datapoints.append(p);
             lastLength = secs + round(lapSecs);
         }
         // expand even if Smart Recording is not enabled
@@ -415,10 +416,12 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         rideFile->addInterval(RideFileInterval::DEVICE, start, start + lapSecs, name);
     } else if (qName == "Activity") {
         // Add length-by-length Swim XData, if present
-        if (swimXdata->datapoints.count()>0)
+        if (swimXdata && swimXdata->datapoints.count()>0) {
             rideFile->addXData("SWIM", swimXdata);
-        else
+        } else if (swimXdata) {
             delete swimXdata;
+            swimXdata = NULL;
+        }
     } else if (qName == "Creator") {
         creator = false;
     } else if (creator && qName == "Name") {
