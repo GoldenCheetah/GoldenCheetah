@@ -422,6 +422,9 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             delete swimXdata;
             swimXdata = NULL;
         }
+    } else if (qName == "Notes") {
+        // Add Notes to metadata
+        rideFile->setTag("Notes", buffer);
     } else if (qName == "Creator") {
         creator = false;
     } else if (creator && qName == "Name") {
