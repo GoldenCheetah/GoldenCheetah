@@ -11,6 +11,12 @@ class NewMainWindow : public QMainWindow
     public:
         NewMainWindow(QApplication *app);
 
+        // we are frameless, so we handle functions that
+        // would normally be performed by the window manager
+        // in exchange we get to handle all the aesthetics
+        enum { Inactive, Drag, EdgeHover, Resize } state;
+        enum ResizeType { None, Top, Left, Right, Bottom, TL, TR, BL, BR } resize;
+
         // initially lets just do this, the code will
         // get more complex over time, but lets start
         // with the simplest methods for dragging a
@@ -19,7 +25,9 @@ class NewMainWindow : public QMainWindow
         void mouseReleaseEvent(QMouseEvent *event);
         void mouseDoubleClickEvent(QMouseEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
-        bool isHotSpot(QPoint);
+        bool eventFilter(QObject *oj, QEvent *e);
+        bool isDragHotSpot(QPoint);
+        int isResizeHotSpot(QPoint);
 
     protected:
 
@@ -43,5 +51,5 @@ class NewMainWindow : public QMainWindow
         QPushButton *quitbutton, *minimisebutton;
 
         QPoint clickPos;
-        enum { None, Drag, Resize } state;
+        QRect clickGeom;
 };
