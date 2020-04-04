@@ -160,6 +160,9 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit
 
+    # mac native controls for new mainwindow
+    OBJECTIVE_SOURCES += Gui/NewMainWindowMac.mm
+
     # on mac we use QTKit or AV Foundation
     contains(DEFINES, "GC_VIDEO_AV") {
 

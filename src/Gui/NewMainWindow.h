@@ -1,5 +1,9 @@
 #include <QMainWindow>
+#ifdef Q_OS_MAC
+#include <QMacToolBar>
+#else
 #include <QToolBar>
+#endif
 #include <QVBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -35,6 +39,9 @@ class NewMainWindow : public QMainWindow
         // windows, mac and linux in a local manner
         void setupToolbar();
 
+#ifdef Q_OS_MAC
+        void macNativeSettings();
+#endif
         // set initial geometry, screen etc
         void initialPosition();
 
@@ -46,7 +53,11 @@ class NewMainWindow : public QMainWindow
 
         QWidget *main;
         QVBoxLayout *layout;
+#ifdef Q_OS_MAC
+        QMacToolBar *toolbar;
+#else
         QToolBar *toolbar;
+#endif
         QLineEdit *searchbox;
         QPushButton *quitbutton, *minimisebutton;
 

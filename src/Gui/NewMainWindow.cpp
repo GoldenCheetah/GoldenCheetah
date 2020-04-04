@@ -17,6 +17,15 @@ constexpr double gl_hoverzone = 10; // how many px to be hovering on an edge?
 
 NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), state(Inactive), resize(None), app(app)
 {
+    // We handle all the aesthetics
+#ifdef Q_OS_MAC
+    setWindowFlags(windowFlags() | Qt::Window | Qt::WindowSystemMenuHint);
+    macNativeSettings();
+#else
+    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
+#endif
+
+
     // setup
     main = new QWidget(this);
     main->setStyleSheet("background: white;");
@@ -29,7 +38,6 @@ NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), state(Inact
     // toolbar
     setupToolbar();
 
-
     // set geometry etc
     initialPosition();
 
@@ -41,8 +49,12 @@ NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), state(Inact
 void
 NewMainWindow::setupToolbar()
 {
-
     // toolbar
+#ifdef Q_OS_MAC
+    toolbar = new QMacToolBar(this);
+    this->window()->winId(); // this forces a windowhandle to be created
+    toolbar->attachToWindow(this->window()->windowHandle());
+#else
     toolbar = new QToolBar(this);
     toolbar->setFixedHeight(gl_toolbarheight * dpiYFactor);
     toolbar->setStyleSheet("background-color: lightGray;");
@@ -107,6 +119,7 @@ NewMainWindow::setupToolbar()
     setFocus();
 
     toolbar->show();
+#endif
 }
 
 void
@@ -127,8 +140,6 @@ NewMainWindow::initialPosition()
     // lets go
     show();
 
-    // no frame thanks
-    setWindowFlags(windowFlags() | Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
 
     // center on the biggest screen
     windowHandle()->setScreen(const_cast<QScreen*>(biggest));
@@ -145,6 +156,10 @@ NewMainWindow::initialPosition()
 bool
 NewMainWindow::isDragHotSpot(QPoint pos)
 {
+#ifdef Q_OS_MAC
+    // we don't handle resize on Mac
+    return false;
+#endif
     if (pos.y() > gl_hoverzone && pos.y() < gl_toolbarheight * dpiYFactor) return true;
     return false;
 
@@ -154,6 +169,11 @@ int
 NewMainWindow::isResizeHotSpot(QPoint pos)
 {
     int returning = None;
+
+#ifdef Q_OS_MAC
+    // we don't handle resize on Mac
+    return returning;
+#endif
 
     if (pos.y() < gl_hoverzone) {
         returning = Top;
