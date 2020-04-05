@@ -162,6 +162,8 @@ GenericChart::preprocessData()
     // will need to have the values scaled from
     // seconds to MSSinceEpoch
     QDateTime midnight(QDate::currentDate(), QTime(0,0,0), Qt::UTC);
+    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0));
+
     for(int ai=0; ai<newAxes.count(); ai++) {
         GenericAxisInfo &axis=newAxes[ai];
 
@@ -193,8 +195,38 @@ GenericChart::preprocessData()
                         series.yseries[i] = midnight.addSecs(series.yseries[i]).toMSecsSinceEpoch();
                 }
             }
+
+        } else if (axis.type == GenericAxisInfo::DATERANGE) {
+
+            // it's time based, so update series
+            // associated with this axies
+            bool usey = (axis.orientation == Qt::Vertical);
+
+            // adjust the min/max set by the user to MS since epoch
+            if (usey) {
+                if (axis.miny != -1) axis.miny=earliest.addDays(axis.miny).toMSecsSinceEpoch();
+                if (axis.maxy != -1) axis.maxy=earliest.addDays(axis.maxy).toMSecsSinceEpoch();
+            } else {
+                if (axis.minx != -1) axis.minx=earliest.addDays(axis.minx).toMSecsSinceEpoch();
+                if (axis.maxx != -1) axis.maxx=earliest.addDays(axis.maxx).toMSecsSinceEpoch();
+            }
+
+            for(int si=0; si<newSeries.count(); si++) {
+                GenericSeriesInfo &series=newSeries[si];
+                if (!usey && series.xname == axis.name) {
+                    // adjust x values
+                    for(int i=0; i<series.xseries.count(); i++)
+                        series.xseries[i] = earliest.addDays(series.xseries[i]).toMSecsSinceEpoch();
+                }
+                if (usey && series.yname == axis.name) {
+                    // adjust y values
+                    for(int i=0; i<series.yseries.count(); i++)
+                        series.yseries[i] = earliest.addDays(series.yseries[i]).toMSecsSinceEpoch();
+                }
+            }
+
         }
-    } // end TIME AXIS scaling
+    }
 
 }
 

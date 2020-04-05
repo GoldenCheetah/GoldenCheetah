@@ -300,7 +300,7 @@ DataFilter::builtins()
 
         } else if (i == 53) {
 
-            // get a vector of activity metrics - date is integer as days since epoch
+            // get a vector of activity metrics - date is integer days since 1900
             returning << "metrics(symbol|date)";
 
         } else if (i == 54) {
@@ -2823,7 +2823,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 count++;
 
                 double value=0;
-                if(wantdate) value= ride->dateTime.toMSecsSinceEpoch();
+                if(wantdate) value= QDate(1900,01,01).daysTo(ride->dateTime.date());
                 else value =  ride->getForSymbol(df->lookupMap.value(symbol,""), c);
 
                 returning.number += value;
@@ -3357,6 +3357,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             if (d.from==QDate() || d.to==QDate()) return Result(0);
 
             QString series = *(leaf->fparms[1]->lvalue.n);
+            QDateTime earliest(QDate(1900,01,01),QTime(0,0,0));
             PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df); // use default days
             Result returning(0);
             int  si=0;
@@ -3367,7 +3368,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     double value=0;
 
                     // lets copy into our array
-                    if (series == "date") value = QDateTime(date, QTime(0,0,0)).toMSecsSinceEpoch();
+                    if (series == "date") value = earliest.daysTo(QDateTime(date, QTime(0,0,0)));
                     if (series == "lts") value = pmcData->lts()[si];
                     if (series == "stress") value = pmcData->stress()[si];
                     if (series == "sts") value = pmcData->sts()[si];
@@ -3394,6 +3395,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             QString perf_metric = df->lookupMap.value(second->signature(), "");
             QString value = third->signature();
             Banister *banister = m->context->athlete->getBanisterFor(metric, perf_metric, 0,0);
+            QDateTime earliest(QDate(1900,01,01),QTime(0,0,0));
 
             // prepare result
             Result returning(0);
@@ -3409,7 +3411,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     if (value == "pte") x =banister->data[si].pte;
                     if (value == "perf") x =banister->data[si].perf;
                     if (value == "cp") x = banister->data[si].perf ? (banister->data[si].perf * 261.0 / 100.0) : 0;
-                    if (value == "date") x = QDateTime(date, QTime(0,0,0)).toMSecsSinceEpoch();
+                    if (value == "date") x = earliest.daysTo(QDateTime(date, QTime(0,0,0)));
 
                     returning.vector << x;
                     returning.number += x;
