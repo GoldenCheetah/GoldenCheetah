@@ -37,6 +37,11 @@
 void
 APIWebService::service(HttpRequest &request, HttpResponse &response)
 {
+    response.setHeader("Access-Control-Allow-Origin","*");
+    response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
+    response.setHeader("Access-Control-Allow-Methods", "GET");
+
+
     // remove trailing '/' from request, just to be consistent
     QString fullPath = request.getPath();
     while (fullPath.endsWith("/")) fullPath.chop(1);
