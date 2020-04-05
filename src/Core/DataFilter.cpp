@@ -152,7 +152,9 @@ static struct {
     { "mid", 3}, // subset of a vector mid(a,pos,count) -- returns a vector of size count from pos ion a
 
     { "samples", 1 }, // e.g. samples(POWER) - when on analysis view get vector of samples for the current activity
-    { "metrics", 1 }, // e.g. metrics(BikeStress) - when on trend view get vector of activity metrics for current daterange}
+    { "metrics", 0 }, // metrics(Metrics [,start [,stop]]) - returns a vector of values for the metric specified
+                      // if no start/stop is supplied it uses the currently selected date range, otherwise start thru today
+                      // or start - stop.
 
     { "argsort", 2 }, // argsort(ascend|descend, list) - return a sorting index (ala numpy.argsort).
 
@@ -301,7 +303,7 @@ DataFilter::builtins()
         } else if (i == 53) {
 
             // get a vector of activity metrics - date is integer days since 1900
-            returning << "metrics(symbol|date)";
+            returning << "metrics(symbol|date [,start [,stop]])";
 
         } else if (i == 54) {
 
@@ -1189,6 +1191,7 @@ static bool isCoggan(QString symbol)
 
 bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 {
+
     switch(leaf->type) {
     case Leaf::Script : return true;
     case Leaf::Compound : return true; // last statement is value of block
@@ -1202,9 +1205,8 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
             QString string = *(leaf->lvalue.s);
             if (QDate::fromString(string, "yyyy/MM/dd").isValid())
                 return true;
-            else {
+            else
                 return false;
-            }
         }
     case Leaf::Symbol :
         {
@@ -1527,13 +1529,27 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("metrics(symbol|date), symbol should be a metric name"));
 
-                    } else {
+                    } else if (leaf->fparms.count() >= 1) {
 
                         QString symbol=*(leaf->fparms[0]->lvalue.n);
                         if (symbol != "date" && df->lookupMap.value(symbol,"") == "") {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'date'").arg(symbol));
                         }
+                    } else if (leaf->fparms.count() >= 2) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[1]);
+
+                    } else if (leaf->fparms.count() == 3) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                    } else if (leaf->fparms.count() > 3) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("too many parameters: metrics(symbol|date, start, stop)"));
                     }
 
                 } else if (leaf->function == "sort") {
@@ -2801,6 +2817,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
         if (leaf->function == "metrics") {
 
+            QDate earliest(1900,01,01);
             bool wantdate=false;
             QString symbol = *(leaf->fparms[0]->lvalue.n);
             if (symbol == "date") wantdate=true;
@@ -2811,7 +2828,32 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
             Specification spec;
             spec.setFilterSet(fs);
-            spec.setDateRange(d);
+
+            // date range can be controlled, if no date range is set then we just
+            // use the currently selected date range, otherwise start - today or start - stop
+            if (leaf->fparms.count() == 3 && Leaf::isNumber(df, leaf->fparms[1]) && Leaf::isNumber(df, leaf->fparms[2])) {
+
+                // start to stop
+                Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number);
+
+                Result e = eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+                QDate stop = earliest.addDays(e.number);
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else if (leaf->fparms.count() == 2 && Leaf::isNumber(df, leaf->fparms[1])) {
+
+                // start to today
+                Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number);
+                QDate stop = QDate::currentDate();
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else {
+                spec.setDateRange(d); // fallback to daterange selected
+            }
 
             // loop through rides for daterange
             int count=0;
