@@ -39,6 +39,9 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
     connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    // Initil setup based on currently selected workout
+    ergFileSelected(context->currentErgFile());
 }
 
 void
