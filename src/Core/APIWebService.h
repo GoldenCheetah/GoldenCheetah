@@ -47,6 +47,7 @@ class APIWebService : public HttpRequestHandler
         void listAthletes(HttpRequest &request, HttpResponse &response);
         void listRides(QString athlete, HttpRequest &request, HttpResponse &response);
         void listActivity(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
+        void listActivityMetrics(QString athlete, HttpRequest &request, HttpResponse &response);        
         void listMMP(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
         void listZones(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);
         void listMeasures(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response);

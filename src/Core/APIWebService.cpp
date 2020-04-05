@@ -94,6 +94,9 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
 
         // GET ZONES
         // http://localhost:12021/athlete/zones
+        // parameters:
+        // format=json   <optional> <no format parameter will return csv format)
+        //
         if (paths[0] == "zones") {
             listZones(athlete, paths, request, response);
             return;
@@ -103,10 +106,24 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
         if (paths[0] == "measures") {
 
             // http://localhost:12021/athlete/measures
+            // parameters:
+            // format=json          <optional> <no format parameter will return csv format)
+            // since=yyyy/MM/dd     <optional>
+            // before=yyyy/MM/dd    <optional>
             paths.removeFirst();
             listMeasures(athlete, paths, request, response);
             return;
         }
+
+        if (paths[0] == "metrics"){
+            // http://localhost:12021/athlete/metrics
+            // parameters:
+            // since=yyyy/MM/dd
+            // before=yyyy/MM/dd
+            listActivityMetrics(athlete, request, response);
+            return;
+        }
+
 
     } else if (paths.count() == 3) {
 
@@ -160,16 +177,32 @@ APIWebService::athleteData(QStringList &paths, HttpRequest &request, HttpRespons
 }
 
 void
-APIWebService::listAthletes(HttpRequest &, HttpResponse &response)
+APIWebService::listAthletes(HttpRequest &request, HttpResponse &response)
 {
-    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    QString format(request.getParameter("format"));
+    if (format == "") {
+        response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    } else if (format == "json") {
+        response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+
+    } else {
+        response.setStatus(400);
+        response.write("wrong format parameter\n");
+        return;
+    }
+
 
     // This will read the user preferences and change the file list order as necessary:
     QFlags<QDir::Filter> spec = QDir::Dirs;
     QStringList names;
     names << "*"; // anything
 
-    response.write("name,dob,weight,height,sex\n");
+    if (format == ""){
+        //if not format write default header
+        response.write("name,dob,weight,height,sex\n");
+    }
+
+    QJsonArray jsonArray;
     foreach(QString name, home.entryList(names, spec, QDir::Name)) {
 
         // sure fire sign the athlete has been upgraded to post 3.2 and not some
@@ -184,9 +217,82 @@ APIWebService::listAthletes(HttpRequest &, HttpResponse &response)
             line += (appsettings->cvalue(name, GC_SEX).toInt() == 0) ? ", Male" : ", Female";
             line += "\n";
 
-            // out a line
-            response.write(line.toLocal8Bit());
+            QString dob = appsettings->cvalue(name, GC_DOB).toDate().toString("yyyy/MM/dd");
+            QString weight = QString("%1").arg(appsettings->cvalue(name, GC_WEIGHT).toDouble());
+            QString height = QString("%1").arg(appsettings->cvalue(name, GC_HEIGHT).toDouble());
+            QString sex = (appsettings->cvalue(name, GC_SEX).toInt() == 0) ? "Male" : "Female";
+
+            if (format == "json"){
+                QJsonObject responseObject;
+                responseObject.insert("name", name);
+                responseObject.insert("dob", dob);
+                responseObject.insert("weight", weight);
+                responseObject.insert("height", height);
+                responseObject.insert("sex", sex);
+                jsonArray.append(responseObject);
+            }else{
+                // out a line
+                QString line = name;
+                line += ", " + dob;
+                line += ", " + weight;
+                line += ", " + height;
+                line += ", " + sex;
+                line += "\n";
+                response.write(line.toLocal8Bit());
+            }
         }
+    }
+    if (format == "json") response.write(QJsonDocument(jsonArray).toJson());
+
+}
+
+void
+APIWebService::listActivityMetrics(QString athlete, HttpRequest &request, HttpResponse &response)
+{
+
+    // honour the since parameter
+    QString sincep(request.getParameter("since"));
+    QDateTime since(QDate(1900,01,01));
+    if (sincep != "") since.setDate(QDate::fromString(sincep,"yyyy/MM/dd"));
+
+    // before parameter
+    QString beforep(request.getParameter("before"));
+    QDateTime before(QDate(3000,01,01));
+    if (beforep != "") before.setDate(QDate::fromString(beforep,"yyyy/MM/dd"));
+
+    // list activities and associated metrics
+    response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+
+    QString ridedb = QString("%1/%2/cache/rideDB.json").arg(home.absolutePath()).arg(athlete);
+    QFile file(ridedb);
+    if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+        QString val = file.readAll();
+        file.close();
+
+        QJsonDocument doc = QJsonDocument::fromJson(val.toUtf8());
+        QJsonObject rideDB = doc.object();
+
+        QJsonArray responseRideArray = QJsonArray();
+        QVariantMap rootMap = rideDB.toVariantMap();
+        QVariantList rides = rootMap["RIDES"].toList();
+        int counter = 0;
+        for(QVariantList::const_iterator it = rides.begin(); it!=rides.end(); ++it) {
+           QJsonObject ride = it->toJsonObject();
+           QDateTime dt = QDateTime::fromString (ride.value("date").toString(), "yyyy/MM/dd HH:mm:ss UTC");
+            // in range?
+            if (dt > since && dt < before) {
+                responseRideArray.insert(counter++, ride);
+            }
+        }
+
+        QJsonObject responseJSON = QJsonObject();
+        responseJSON.insert(QStringLiteral("RIDES"), responseRideArray);
+        responseJSON.insert(QStringLiteral("VERSION"), rideDB.value("VERSION").toString());
+        response.write(QJsonDocument(responseJSON).toJson());
+    } else {
+       response.setStatus(404);
+       response.write("file not found");
+       return;
     }
 }
 
@@ -220,7 +326,7 @@ APIWebService::writeRideLine(RideItem &item, HttpRequest *request, HttpResponse 
             // date, time, filename
             response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
             response->bwrite(", ");
-            response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+            response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());
             response->bwrite(", ");
             response->bwrite(item.fileName.toLocal8Bit());
 
@@ -254,7 +360,7 @@ APIWebService::writeRideLine(RideItem &item, HttpRequest *request, HttpResponse 
         // date, time, filename
         response->bwrite(item.dateTime.date().toString("yyyy/MM/dd").toLocal8Bit());
         response->bwrite(",");
-        response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());;
+        response->bwrite(item.dateTime.time().toString("hh:mm:ss").toLocal8Bit());
         response->bwrite(",");
         response->bwrite(item.fileName.toLocal8Bit());
 
@@ -490,8 +596,16 @@ APIWebService::listMMP(QString athlete, QStringList paths, HttpRequest &request,
 void
 APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, HttpResponse &response)
 {
-    // list activities and associated metrics
-    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    QString format(request.getParameter("format"));
+    if (format == "") {
+        response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    } else if (format == "json") {
+        response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+    } else {
+        response.setStatus(400);
+        response.write("wrong format parameter\n");
+        return;
+    }
 
     // what zones we support
     QStringList zonelist;
@@ -516,17 +630,32 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, cp, w', pmax\n");
+                if (format == "") response.write("date, cp, w', pmax\n");
+                QJsonArray jsonArray;
                 for(int i=0; i<zones->getRangeSize(); i++) {
-                    response.write(
-                    QString("%1, %2, %3, %4\n")
-                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
-                           .arg(zones->getCP(i))
-                           .arg(zones->getWprime(i))
-                           .arg(zones->getPmax(i))
-                           .toLocal8Bit()
-                    );
+                    QString date = zones->getStartDate(i).toString("yyyy/MM/dd");
+                    QString cp = QString::number(zones->getCP(i));
+                    QString w = QString::number(zones->getWprime(i));
+                    QString pmax = QString::number(zones->getPmax(i));
+                    if (format == ""){
+                        response.write(
+                        QString("%1, %2, %3, %4\n")
+                               .arg(date)
+                               .arg(cp)
+                               .arg(w)
+                               .arg(pmax)
+                               .toLocal8Bit()
+                        );
+                     } else{
+                        QJsonObject responseObject;
+                        responseObject.insert("date", date);
+                        responseObject.insert("cp", cp);
+                        responseObject.insert("w'", w);
+                        responseObject.insert("pmax", pmax);
+                        jsonArray.append(responseObject);
+                     }
                 }
+                if (format == "json") response.write(QJsonDocument(jsonArray).toJson());
                 return;
             }
         }
@@ -547,17 +676,32 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, lthr, maxhr, rhr\n");
+                if (format == "") response.write("date, lthr, maxhr, rhr\n");
+                QJsonArray jsonArray;
                 for(int i=0; i<zones->getRangeSize(); i++) {
-                    response.write(
-                    QString("%1, %2, %3, %4\n")
-                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
-                           .arg(zones->getLT(i))
-                           .arg(zones->getMaxHr(i))
-                           .arg(zones->getRestHr(i))
-                           .toLocal8Bit()
-                    );
+                    QString date = zones->getStartDate(i).toString("yyyy/MM/dd");
+                    QString lthr = QString::number(zones->getLT(i));
+                    QString maxhr = QString::number(zones->getMaxHr(i));
+                    QString rhr = QString::number(zones->getRestHr(i));
+                    if (format == ""){
+                        response.write(
+                        QString("%1, %2, %3, %4\n")
+                               .arg(date)
+                               .arg(lthr)
+                               .arg(maxhr)
+                               .arg(rhr)
+                               .toLocal8Bit()
+                        );
+                     } else{
+                        QJsonObject responseObject;
+                        responseObject.insert("date", date);
+                        responseObject.insert("cp", lthr);
+                        responseObject.insert("w'", maxhr);
+                        responseObject.insert("pmax", rhr);
+                        jsonArray.append(responseObject);
+                     }
                 }
+                if (format == "json") response.write(QJsonDocument(jsonArray).toJson());
                 return;
             }
         }
@@ -578,15 +722,26 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, CV\n");
+                if (format == "") response.write("date, CV\n");
+                QJsonArray jsonArray;
                 for(int i=0; i<zones->getRangeSize(); i++) {
-                    response.write(
-                    QString("%1, %2\n")
-                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
-                           .arg(zones->getCV(i))
-                           .toLocal8Bit()
-                    );
+                    QString date = zones->getStartDate(i).toString("yyyy/MM/dd");
+                    QString cv = QString::number(zones->getCV(i));
+                    if (format == ""){
+                        response.write(
+                        QString("%1, %2\n")
+                               .arg(date)
+                               .arg(cv)
+                               .toLocal8Bit()
+                        );
+                     } else{
+                        QJsonObject responseObject;
+                        responseObject.insert("date", date);
+                        responseObject.insert("cv", cv);
+                        jsonArray.append(responseObject);
+                     }
                 }
+                if (format == "json") response.write(QJsonDocument(jsonArray).toJson());
                 return;
             }
         }
@@ -607,15 +762,26 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, CV\n");
+                if (format == "") response.write("date, CV\n");
+                QJsonArray jsonArray;
                 for(int i=0; i<zones->getRangeSize(); i++) {
-                    response.write(
-                    QString("%1, %2\n")
-                           .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
-                           .arg(zones->getCV(i))
-                           .toLocal8Bit()
-                    );
+                    QString date = zones->getStartDate(i).toString("yyyy/MM/dd");
+                    QString cv = QString::number(zones->getCV(i));
+                    if (format == ""){
+                        response.write(
+                        QString("%1, %2\n")
+                               .arg(date)
+                               .arg(cv)
+                               .toLocal8Bit()
+                        );
+                     } else{
+                        QJsonObject responseObject;
+                        responseObject.insert("date", date);
+                        responseObject.insert("cv", cv);
+                        jsonArray.append(responseObject);
+                     }
                 }
+                if (format == "json") response.write(QJsonDocument(jsonArray).toJson());
                 return;
             }
         }
@@ -630,11 +796,22 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
 void
 APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
 {
-    // list activities and associated metrics
-    response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    QString format(request.getParameter("format"));
+    if (format == "") {
+        response.setHeader("Content-Type", "text; charset=ISO-8859-1");
+    } else if (format == "json") {
+        response.setHeader("Content-Type", "application/json; charset=ISO-8859-1");
+    } else {
+        response.setStatus(400);
+        response.write("wrong format parameter\n");
+        return;
+    }
 
     if (paths.isEmpty()) {
-
+        // No group given return possible groups
+        response.setStatus(400);
+        response.write("Missing group identification add one of the groups to the URL.\n");
+        response.write("Possible Groups:\n");
         foreach (QString group, Measures().getGroupSymbols()) {
             response.write(group.toLocal8Bit());
             response.write("\n");
@@ -645,7 +822,7 @@ APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &req
     Measures measures = Measures(QDir(home.absolutePath() + "/" + athlete + "/config"), true);
     int group_index = measures.getGroupSymbols().indexOf(paths[0]);
     MeasuresGroup* measuresGroup = measures.getGroup(group_index);
-    if (group_index < 0 || measuresGroup == NULL) {
+    if (group_index < 0 || measuresGroup) {
 
         // unknown group
         response.setStatus(500);
@@ -653,11 +830,13 @@ APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &req
         return;
     }
 
-    response.write("Date");
     QStringList field_symbols = measuresGroup->getFieldSymbols();
-    for (int i=0; i<field_symbols.count(); i++) {
-        response.write(", ");
-        response.write(field_symbols[i].toLocal8Bit());
+    if (format == ""){
+        response.write("Date");
+        for (int i=0; i<field_symbols.count(); i++) {
+            response.write(", ");
+            response.write(field_symbols[i].toLocal8Bit());
+        }
     }
 
     // honour the since parameter
@@ -674,15 +853,33 @@ APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &req
     QDate endDate = measuresGroup->getEndDate();
     if (before < endDate) endDate = before;
 
+    QJsonArray jsonArray;
     while (date <= endDate) {
-        response.write("\n");
-        response.write(date.toString("yyyy/MM/dd").toLocal8Bit());
+        if (format == "") response.write("\n");
 
-        for (int i=0; i<field_symbols.count(); i++)
-            response.write(QString(", %1").arg(measuresGroup->getFieldValue(date, i)).toLocal8Bit());
+        QJsonObject responseObject;
+        QString datestr = date.toString("yyyy/MM/dd");
+        if (format == "" ) {
+            response.write(datestr.toLocal8Bit());
+        } else{
+            responseObject.insert("date", datestr);
+        }
 
+        for (int i=0; i<field_symbols.count(); i++){
+            QString field = field_symbols[i];
+            QString value = QString::number(measuresGroup->getFieldValue(date, i));
+            if (format == "" ) {
+                response.write(QString(", %1").arg(value).toLocal8Bit());
+            } else{
+                responseObject.insert(field, value);
+            }
+        }
+        jsonArray.append(responseObject);
         date = date.addDays(1);
     }
-    response.write("\n");
-
+    if (format == ""){
+        response.write("\n");
+    } else{
+        if (format == "json") response.write(QJsonDocument(jsonArray).toJson());
+    }
 }
