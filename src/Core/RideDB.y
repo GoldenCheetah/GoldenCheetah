@@ -155,8 +155,14 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
                                                                      else if ($1 == "udbversion") jc->item.udbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
-                                                                     else if ($1 == "isRun") jc->item.isRun = $3.toInt();
-                                                                     else if ($1 == "isSwim") jc->item.isSwim = $3.toInt();
+                                                                     else if ($1 == "sport") {
+                                                                         jc->item.sport = ($3);
+                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=false;
+                                                                         if ($3 == "Bike") jc->item.isBike = true;
+                                                                         else if ($3 == "Run") jc->item.isRun = true;
+                                                                         else if ($3 == "Swim") jc->item.isSwim = true;
+                                                                         else jc->item.isXtrain = true;
+                                                                     }
                                                                      else if ($1 == "present") jc->item.present = $3;
                                                                      else if ($1 == "overrides") jc->item.overrides_ = $3.split(",");
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
@@ -546,8 +552,7 @@ void RideCache::save(bool opendata, QString filename)
                 stream << "\t\t\"udbversion\":\"" <<item->udbversion <<"\",\n";
                 stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
                 stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
-                stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
-                stream << "\t\t\"isSwim\":\"" <<item->isSwim <<"\",\n";
+                stream << "\t\t\"sport\":\"" <<item->sport <<"\",\n";
                 stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
                 if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";

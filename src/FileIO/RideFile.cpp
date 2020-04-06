@@ -212,6 +212,25 @@ RideFile::wprimeData()
     return wprime_;
 }
 
+QString
+RideFile::sport() const
+{
+    // Run, Bike and Swim are standarized, all others are up to the user
+    if (isBike()) return "Bike";
+    if (isRun()) return "Run";
+    if (isSwim()) return "Swim";
+    return getTag("Sport","");
+}
+
+bool
+RideFile::isBike() const
+{
+    // for now we just look at Sport and default to Bike when Sport is not
+    // set and isRun and isSwim are false
+    return (getTag("Sport", "") == "Bike" || getTag("Sport", "") == tr("Bike")) ||
+           (getTag("Sport","") == "" && !isRun() && !isSwim());
+}
+
 bool
 RideFile::isRun() const
 {
@@ -227,6 +246,12 @@ RideFile::isSwim() const
     // for now we just look at Sport or presence of length data for lap swims
     return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim")) ||
            (getTag("Sport","") == "" && xdata_.value("SWIM", NULL) != NULL);
+}
+
+bool
+RideFile::isXtrain() const
+{
+    return !isBike() && !isRun() && !isSwim();
 }
 
 // compatibility means used in e.g. R so no spaces in names,

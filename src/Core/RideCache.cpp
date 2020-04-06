@@ -759,7 +759,7 @@ RideCache::getRideTypeCounts(Specification specification, int& nActivities,
         nActivities++;
         if (ride->isSwim) nSwims++;
         else if (ride->isRun) nRuns++;
-        else nRides++;
+        else if (ride->isBike) nRides++;
     }
 }
 
@@ -775,9 +775,10 @@ RideCache::isMetricRelevantForRides(Specification specification,
         if (!specification.pass(ride)) continue;
 
         // skip non selected sports when restriction supplied
-        if ((sport == OnlyRides) && (ride->isSwim || ride->isRun)) continue;
+        if ((sport == OnlyRides) && !ride->isBike) continue;
         if ((sport == OnlyRuns) && !ride->isRun) continue;
         if ((sport == OnlySwims) && !ride->isSwim) continue;
+        if ((sport == OnlyXtrains) && !ride->isXtrain) continue;
 
         if (metric->isRelevantForRide(ride)) return true;
     }

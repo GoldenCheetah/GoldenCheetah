@@ -141,7 +141,8 @@ class RideItem : public QObject
         QString present;
         QColor color;
         bool planned;
-        bool isRun,isSwim;
+        QString sport;
+        bool isBike,isRun,isSwim,isXtrain;
         bool samples; // has samples data
 
         // which range to use?

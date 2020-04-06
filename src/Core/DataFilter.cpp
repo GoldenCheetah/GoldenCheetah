@@ -238,6 +238,9 @@ DataFilter::builtins()
 {
     QStringList returning;
 
+    // add special functions
+    returning <<"isRide"<<"isSwim"<<"isXtrain"; // isRun is included in RideNavigator
+
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
 
         if (i == 30) { // special case 'estimate' we describe it
@@ -579,7 +582,8 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                     !sym.compare("Current", Qt::CaseInsensitive) ||
                     !sym.compare("RECINTSECS", Qt::CaseInsensitive) ||
                     !sym.compare("NA", Qt::CaseInsensitive) ||
-                    sym == "isSwim" || sym == "isRun") {
+                    sym == "isRide" || sym == "isSwim" ||
+                    sym == "isRun" || sym == "isXtrain") {
                     isfunction = found = true;
                 }
 
@@ -1212,9 +1216,9 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
         {
             QString symbol = *(leaf->lvalue.n);
             if (df->symbols.contains(symbol)) return true;
-            if (symbol == "isRun") return true;
+            if (symbol == "isRide" || symbol == "isSwim" ||
+                symbol == "isRun" || symbol == "isXtrain") return true;
             if (symbol == "x" || symbol == "i") return true;
-            else if (symbol == "isSwim") return true;
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
@@ -1296,7 +1300,9 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     symbol.compare("RECINTSECS", Qt::CaseInsensitive) &&
                     symbol.compare("NA", Qt::CaseInsensitive) &&
                     !df->dataSeriesSymbols.contains(symbol) &&
-                    symbol != "isSwim" && symbol != "isRun" && !isCoggan(symbol)) {
+                    symbol != "isRide" && symbol != "isSwim" &&
+                    symbol != "isRun" && symbol != "isXtrain" &&
+                    !isCoggan(symbol)) {
 
                     // unknown, is it user defined ?
                     if (!df->symbols.contains(symbol)) {
@@ -1927,7 +1933,9 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 !symbol.compare("Device", Qt::CaseInsensitive) ||
                                 !symbol.compare("NA", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
-                                symbol == "isSwim" || symbol == "isRun" || isCoggan(symbol)) {
+                                symbol == "isRide" || symbol == "isSwim" ||
+                                symbol == "isRun" || symbol == "isXtrain" ||
+                                isCoggan(symbol)) {
                                 DataFiltererrors << QString(tr("%1 is not supported in isset/set/unset operations")).arg(symbol);
                                 leaf->inerror = true;
                             }
@@ -4182,12 +4190,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             lhsdouble = x;
             lhsisNumber = true;
 
+        } else if (symbol == "isRide") {
+            lhsdouble = m->isBike ? 1 : 0;
+            lhsisNumber = true;
+
         } else if (symbol == "isRun") {
             lhsdouble = m->isRun ? 1 : 0;
             lhsisNumber = true;
 
         } else if (symbol == "isSwim") {
             lhsdouble = m->isSwim ? 1 : 0;
+            lhsisNumber = true;
+
+        } else if (symbol == "isXtrain") {
+            lhsdouble = m->isXtrain ? 1 : 0;
             lhsisNumber = true;
 
         } else if (!symbol.compare("NA", Qt::CaseInsensitive)) {
