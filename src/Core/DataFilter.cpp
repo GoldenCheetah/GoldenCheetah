@@ -2874,8 +2874,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 double value=0;
                 if(wantdate) value= QDate(1900,01,01).daysTo(ride->dateTime.date());
-                else value =  ride->getForSymbol(df->lookupMap.value(symbol,""), c);
-
+                else value =  ride->getForSymbol(df->lookupMap.value(symbol,""));
                 returning.number += value;
                 returning.vector.append(value);
             }
