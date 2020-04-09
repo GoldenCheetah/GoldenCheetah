@@ -42,12 +42,10 @@ DeviceTypes::DeviceTypes()
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick") ,
         ":images/devices/garminusb.png" },
 #endif
-#ifndef WIN32
 #ifdef QT_BLUETOOTH_LIB
       { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
         tr("Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC"),
         ":images/devices/btle.png" },
-#endif
 #endif
       { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false,
         tr("Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "

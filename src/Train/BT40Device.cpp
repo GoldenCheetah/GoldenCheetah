@@ -39,11 +39,11 @@ QMap<QBluetoothUuid, btle_sensor_type_t> BT40Device::supportedServices = {
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
 {
     m_control = new QLowEnergyController(m_currentDevice, this);
-    connect(m_control, SIGNAL(connected()), this, SLOT(deviceConnected()));
+    connect(m_control, SIGNAL(connected()), this, SLOT(deviceConnected()), Qt::QueuedConnection);
     connect(m_control, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(controllerError(QLowEnergyController::Error)));
-    connect(m_control, SIGNAL(disconnected()), this, SLOT(deviceDisconnected()));
-    connect(m_control, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(serviceDiscovered(QBluetoothUuid)));
-    connect(m_control, SIGNAL(discoveryFinished()), this, SLOT(serviceScanDone()));
+    connect(m_control, SIGNAL(disconnected()), this, SLOT(deviceDisconnected()), Qt::QueuedConnection);
+    connect(m_control, SIGNAL(serviceDiscovered(QBluetoothUuid)), this, SLOT(serviceDiscovered(QBluetoothUuid)), Qt::QueuedConnection);
+    connect(m_control, SIGNAL(discoveryFinished()), this, SLOT(serviceScanDone()), Qt::QueuedConnection);
 
     connected = false;
     prevWheelTime = 0;
