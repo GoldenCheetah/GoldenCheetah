@@ -1500,9 +1500,6 @@ MainWindow::saveRide()
     if (currentTab->context->ride) {
         saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
     }
-
-    currentTab->context->athlete->rideCache->save();
-
 }
 
 void
@@ -1516,8 +1513,6 @@ MainWindow::saveAllUnsavedRides()
     if (currentTab->context->ride) {
         saveAllFilesSilent(currentTab->context); // will signal save to everyone
     }
-
-    currentTab->context->athlete->rideCache->save();
 }
 
 void
@@ -1580,8 +1575,6 @@ MainWindow::deleteRide()
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
         currentTab->context->athlete->removeCurrentRide();
-
-    currentTab->context->athlete->rideCache->save();
 }
 
 /*----------------------------------------------------------------------
