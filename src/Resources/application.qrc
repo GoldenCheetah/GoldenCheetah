@@ -1,6 +1,15 @@
 <RCC>
     <qresource prefix="/">
         <file>webservice/httpserver.ini</file>
+        <file>sidebar/apps.png</file>
+        <file>sidebar/assess.png</file>
+        <file>sidebar/athlete.png</file>
+        <file>sidebar/plan.png</file>
+        <file>sidebar/prefs.png</file>
+        <file>sidebar/reflect.png</file>
+        <file>sidebar/sync.png</file>
+        <file>sidebar/train.png</file>
+        <file>sidebar/trends.png</file>
         <file>images/devices/garminusb.png</file>
         <file>images/devices/computrainer.png</file>
         <file>images/devices/kickr.png</file>

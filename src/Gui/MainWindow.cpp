@@ -88,9 +88,9 @@
 // GUI Widgets
 #include "Tab.h"
 #include "GcToolBar.h"
+#include "NewSideBar.h"
 #include "HelpWindow.h"
 #include "HomeWindow.h"
-#include "GcScopeBar.h"
 #if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
 #endif
@@ -214,14 +214,38 @@ MainWindow::MainWindow(const QDir &home)
      appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home->root().dirName());
 
     /*----------------------------------------------------------------------
-     * ScopeBar
+     * ScopeBar as sidebar from v3.6
      *--------------------------------------------------------------------*/
-    scopebar = new GcScopeBar(context);
-    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
-    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
-    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
-    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
-    connect(scopebar, SIGNAL(selectInterval()), this, SLOT(selectInterval()));
+
+    sidebar = new NewSideBar(context, this);
+    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0);
+    sidebar->setItemEnabled(0, false);
+
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1);
+    sidebar->setItemEnabled(1, false);
+
+    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), 2);
+    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), 3);
+    sidebar->setItemSelected(3, true);
+
+    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), 4);
+    sidebar->setItemEnabled(4, false);
+
+    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5);
+
+    sidebar->addStretch();
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6);
+    sidebar->setItemEnabled(6, false);
+    sidebar->addStretch();
+
+    // we can click on the quick icons, but they aren't selectable views
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7);
+    sidebar->setItemSelectable(7, false);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("settings"), 8);
+    sidebar->setItemSelectable(8, false);
+
+    connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
+    connect(sidebar, SIGNAL(itemSelected(int)), this, SLOT(sidebarSelected(int)));
 
     /*----------------------------------------------------------------------
      * What's this Context Help
@@ -266,16 +290,16 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpLowBar = new HelpWhatsThis(lowbar);
     lowbar->setWhatsThis(helpLowBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleComparePane));
 
-    sidebar = new QPushButton(this);
-    sidebar->setIcon(sidebarIcon);
-    sidebar->setFixedHeight(24 * dpiYFactor);
-    sidebar->setIconSize(isize);
-    sidebar->setStyle(toolStyle);
-    sidebar->setToolTip(tr("Toggle Sidebar"));
-    sidebar->setPalette(metal);
-    connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
-    HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidebar);
-    sidebar->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
+    sidelist = new QPushButton(this);
+    sidelist->setIcon(sidebarIcon);
+    sidelist->setFixedHeight(24 * dpiYFactor);
+    sidelist->setIconSize(isize);
+    sidelist->setStyle(toolStyle);
+    sidelist->setToolTip(tr("Toggle Sidebar"));
+    sidelist->setPalette(metal);
+    connect(sidelist, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
+    HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidelist);
+    sidelist->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
 
     styleSelector = new QtSegmentControl(this);
     styleSelector->setStyle(toolStyle);
@@ -295,35 +319,33 @@ MainWindow::MainWindow(const QDir &home)
     if (dpiXFactor > 1) {
         QString nopad = QString("QPushButton { padding-left: 0px; padding-right: 0px; "
                                 "              padding-top:  0px; padding-bottom: 0px; }");
-        sidebar->setStyleSheet(nopad);
+        sidelist->setStyleSheet(nopad);
         lowbar->setStyleSheet(nopad);
     }
 #endif
 
-    head->addWidget(new Spacer(this));
-    head->addStretch();
-    head->addWidget(scopebar);
-    head->addStretch();
-    head->addWidget(sidebar);
-    head->addWidget(lowbar);
-    head->addWidget(styleSelector);
-    head->setFixedHeight(scopebar->height() + 7);
-
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
-    anim = new QPropertyAnimation(searchBox, "xwidth", this);
 
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(150 * dpiYFactor);
-    head->addWidget(searchBox);
+    searchBox->setFixedWidth(400 * dpiXFactor);
+    searchBox->setFixedHeight(28 * dpiYFactor);
+    head->addStretch();
+    head->addWidget(sidelist);
+    head->addWidget(lowbar);
+    head->addWidget(styleSelector);
+    head->setFixedHeight(searchBox->height() + (10 *dpiXFactor));
+
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
-    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
-    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
     Spacer *spacer = new Spacer(this);
+    spacer->setFixedWidth(5 *dpiYFactor);
+    head->addWidget(spacer);
+    head->addWidget(searchBox);
+    spacer = new Spacer(this);
     spacer->setFixedWidth(5 *dpiYFactor);
     head->addWidget(spacer);
 
@@ -364,8 +386,17 @@ MainWindow::MainWindow(const QDir &home)
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->addWidget(head);
-    mainLayout->addWidget(tabbar);
-    mainLayout->addWidget(tabStack);
+    QHBoxLayout *lrlayout = new QHBoxLayout();
+    mainLayout->addLayout(lrlayout);
+    lrlayout->setSpacing(0);
+    lrlayout->setContentsMargins(0,0,0,0);
+    lrlayout->addWidget(sidebar);
+    QVBoxLayout *tablayout = new QVBoxLayout();
+    tablayout->setSpacing(0);
+    tablayout->setContentsMargins(0,0,0,0);
+    lrlayout->addLayout(tablayout);
+    tablayout->addWidget(tabbar);
+    tablayout->addWidget(tabStack);
     setCentralWidget(central);
 
     /*----------------------------------------------------------------------
@@ -561,7 +592,6 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
-    viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
 #ifdef GC_HAVE_ICAL
     viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
 #endif
@@ -959,6 +989,7 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
+    fprintf(stderr,"window close started\n"); fflush(stderr);
     QList<Tab*> closing = tabList;
     bool needtosave = false;
     bool importrunning = false;
@@ -1008,6 +1039,8 @@ MainWindow::closeEvent(QCloseEvent* event)
     }
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
+
+    fprintf(stderr,"window close compeleted\n"); fflush(stderr);
 }
 
 MainWindow::~MainWindow()
@@ -1148,6 +1181,34 @@ MainWindow::support()
 }
 
 void
+MainWindow::sidebarClicked(int id)
+{
+    // sync quick link
+    if (id == 7) checkCloud();
+
+    // prefs
+    if (id == 8) showOptions();
+
+}
+
+void
+MainWindow::sidebarSelected(int id)
+{
+    switch (id) {
+    case 0: // athlete not written yet
+    case 1: // plan not written yet
+            break;
+    case 2: selectHome(); break;
+    case 3: selectAnalysis(); break;
+    case 4: // reflect not written yet
+            break;
+    case 5: selectTrain(); break;
+    case 6: // apps not written yet
+            break;
+    }
+}
+
+void
 MainWindow::selectAnalysis()
 {
     currentTab->selectView(1);
@@ -1223,12 +1284,9 @@ MainWindow::setToolButtons()
     }
 #endif
 #ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
-    anim->stop();
     searchBox->clearFocus();
     searchFocusOut();
-    scopebar->setFocus(Qt::TabFocusReason);
 #endif
-    scopebar->setSelected(index);
 }
 
 /*----------------------------------------------------------------------
@@ -1923,7 +1981,6 @@ MainWindow::saveGCState(Context *context)
     context->showToolbar = showhideToolbar->isChecked();
     context->searchText = searchBox->text();
     context->style = styleAction->isChecked();
-    context->setIndex(scopebar->selected());
 }
 
 void
@@ -1934,9 +1991,6 @@ MainWindow::restoreGCState(Context *context)
     showToolbar(context->showToolbar);
     //showTabbar(context->showTabbar);
     showLowbar(context->showLowbar);
-    scopebar->setSelected(context->viewIndex);
-    scopebar->setContext(context);
-    scopebar->setHighlighted(); // to reflect context
     searchBox->setContext(context);
     searchBox->setText(context->searchText);
 }
@@ -2265,26 +2319,6 @@ void MainWindow::showCreateFixPyScriptDlg() {
     dlg.exec();
 }
 #endif
-
-// grow/shrink searchbox if there is space...
-void
-MainWindow::searchFocusIn()
-{
-    if (searchBox->searchbox->hasFocus()) {
-        anim->setDuration(300);
-        anim->setEasingCurve(QEasingCurve::InOutQuad);
-        anim->setStartValue(searchBox->width());
-        anim->setEndValue(500 * dpiYFactor);
-        anim->start();
-    }
-}
-
-void
-MainWindow::searchFocusOut()
-{
-    anim->stop();
-    searchBox->setFixedWidth(150 *dpiYFactor);
-}
 
 #ifdef GC_HAS_CLOUD_DB
 void

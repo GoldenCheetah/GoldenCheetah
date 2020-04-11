@@ -24,7 +24,7 @@ GcToolBar::GcToolBar(QWidget *parent) : QWidget(parent)
     //Height will be set when widget is added in MainWindow
     setContentsMargins(0,0,0,0);
     layout = new QHBoxLayout(this);
-    layout->setSpacing(10 *dpiXFactor);
+    layout->setSpacing(5 *dpiXFactor);
     layout->setContentsMargins(0,0,0,0);
     installEventFilter(this);
 }

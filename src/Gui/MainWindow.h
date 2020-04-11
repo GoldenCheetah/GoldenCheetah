@@ -62,6 +62,7 @@ class QtSegmentControl;
 class SaveSingleDialogWidget;
 class ChooseCyclistDialog;
 class SearchFilterBox;
+class NewSideBar;
 
 
 class MainWindow;
@@ -128,10 +129,6 @@ class MainWindow : public QMainWindow
         // chart importing
         void importCharts(QStringList);
 
-        // search box gets and loses focus - make big/small
-        void searchFocusIn();
-        void searchFocusOut();
-
         // open and closing windows and tabs
         void closeAll();    // close all windows and tabs
 
@@ -148,6 +145,10 @@ class MainWindow : public QMainWindow
                                // changes mind if there are unsaved changes.
         void removeTab(Tab*);  // remove without question
         void switchTab(int index); // for switching between one tab and another
+
+        // sidebar selecting views and actions
+        void sidebarClicked(int id);
+        void sidebarSelected(int id);
 
         // Athlete Backup
         void setBackupAthleteMenu();
@@ -263,19 +264,18 @@ class MainWindow : public QMainWindow
 
     private:
 
-        GcScopeBar *scopebar;
+        NewSideBar *sidebar;
         Tab *currentTab;
         QList<Tab*> tabList;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
 #endif
-        QPropertyAnimation *anim;
 
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types
-        QPushButton *sidebar, *lowbar;
+        QPushButton *sidelist, *lowbar;
         QtSegmentControl *styleSelector;
         GcToolBar *head;
 

@@ -56,7 +56,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     mainLayout = new QVBoxLayout;
     setChartLayout(mainLayout);
     mainLayout->setSpacing(0);
-    if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
+    if (mainwindow) mainLayout->setContentsMargins(5*dpiXFactor,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
     searchFilter = new SearchFilter(this);

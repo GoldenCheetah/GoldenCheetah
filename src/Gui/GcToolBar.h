@@ -24,6 +24,7 @@
 #include <QAction>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include "Colors.h"
 
 class GcToolBar : public QWidget
 {
@@ -48,10 +49,10 @@ class Spacer : public QWidget
 {
 public:
     Spacer(QWidget *parent) : QWidget(parent) {
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         setSizePolicy(sizePolicy);
     }
-    QSize sizeHint() const { return QSize(10, 1); }
+    QSize sizeHint() const { return QSize(40*dpiXFactor, 1); }
 };
 
 #endif
