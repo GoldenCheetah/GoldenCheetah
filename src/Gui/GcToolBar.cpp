@@ -46,7 +46,7 @@ void
 GcToolBar::paintEvent (QPaintEvent *event)
 {
     // paint the darn thing!
-    paintBackground(event);
+    //paintBackground(event);
 }
 
 void

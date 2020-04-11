@@ -29,7 +29,7 @@
 #include <QEvent>
 
 class Context;
-class GcScopeButton;
+class ChartBarItem;
 class GcLabel;
 class ButtonBar;
 
@@ -75,7 +75,7 @@ private:
     QHBoxLayout *layout;
 
     QFont buttonFont;
-    QVector<GcScopeButton*> buttons;
+    QVector<ChartBarItem*> buttons;
     QSignalMapper *signalMapper;
 
     QMenu *barMenu, *chartMenu;
@@ -103,4 +103,31 @@ private:
 
 };
 
+class ChartBarItem : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        ChartBarItem(QWidget *parent);
+        void setText(QString _text) { text = _text; }
+        void setChecked(bool _checked) { checked = _checked; repaint(); }
+        bool isChecked() { return checked; }
+        void setWidth(int x) { setFixedWidth(x); }
+        void setHighlighted(bool x) { highlighted = x; }
+        bool ishighlighted() const { return highlighted; }
+        void setRed(bool x) { red = x; }
+
+        QString text;
+    signals:
+        void clicked(bool);
+
+    public slots:
+        void paintEvent(QPaintEvent *);
+        bool event(QEvent *e);
+
+    private:
+        bool checked;
+        bool highlighted;
+        bool red;
+};
 #endif

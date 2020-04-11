@@ -17,7 +17,6 @@
  */
 
 #include "ChartBar.h"
-#include "GcScopeBar.h"
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
@@ -36,6 +35,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
 
     setContentsMargins(0,0,0,0);
+
 
     // main layout
     QHBoxLayout *mlayout = new QHBoxLayout(this);
@@ -65,10 +65,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    scrollArea->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    buttonBar->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
 
     scrollArea->setWidget(buttonBar);
 
@@ -138,6 +134,8 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // appearance update
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    configChanged(0);
 }
 
 void
@@ -145,29 +143,35 @@ ChartBar::configChanged(qint32)
 {
     buttonFont = QFont();
     QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    scrollArea->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    buttonBar->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    foreach(GcScopeButton *b, buttons) {
-    	int width = fs.width(b->text);
+    int height = (fs.height()+(spacing_*dpiXFactor));
+
+    setFixedHeight(height);
+    scrollArea->setFixedHeight(height);
+    buttonBar->setFixedHeight(height);
+
+    foreach(ChartBarItem *b, buttons) {
+        int width = fs.width(b->text) + (30 * dpiXFactor);
+        if (width < (80*dpiXFactor)) width=80*dpiXFactor;
     	b->setFont(buttonFont);
-        b->setFixedWidth(width+(20*dpiXFactor));
-        b->setFixedHeight(fs.height()+(2*dpiYFactor));
+        b->setFixedWidth(width);
+        b->setFixedHeight(height);
     }
 }
 
 void
 ChartBar::addWidget(QString title)
 {
-    GcScopeButton *newbutton = new GcScopeButton(this);
+    ChartBarItem *newbutton = new ChartBarItem(this);
     newbutton->setText(title);
     newbutton->setFont(buttonFont);
 
     // make the right size
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(title);
-    newbutton->setFixedWidth(width+(20*dpiXFactor));
-    newbutton->setFixedHeight(fontMetric.height()+(2*dpiYFactor));
+    int width = fontMetric.width(title) + (30 * dpiXFactor);
+    int height = (fontMetric.height()+(spacing_*dpiXFactor));
+    if (width < (80*dpiXFactor)) width=80*dpiXFactor;
+    newbutton->setFixedWidth(width);
+    newbutton->setFixedHeight(height);
 
     // add to layout
     layout->addWidget(newbutton);
@@ -201,11 +205,12 @@ ChartBar::setText(int index, QString text)
 {
     buttons[index]->setText(text);
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(text);
-    buttons[index]->setWidth(width+(20*dpiXFactor));
+    int width = fontMetric.width(text) + (30*dpiXFactor);
+    buttons[index]->setWidth(width < (80*dpiXFactor) ? (80*dpiXFactor) : width);
 
     tidy(); // still fit ?
 }
+
 
 // tidy up the scrollers on first show...
 void
@@ -213,7 +218,7 @@ ChartBar::tidy()
 {
     // resize to button widths + 2px spacing
     int width = 2*dpiXFactor;
-    foreach (GcScopeButton *button, buttons) {
+    foreach (ChartBarItem *button, buttons) {
         width += button->geometry().width() + (2*dpiXFactor);
     }
     buttonBar->setMinimumWidth(width);
@@ -272,7 +277,7 @@ ChartBar::scrollLeft()
 void
 ChartBar::clear()
 {
-    foreach(GcScopeButton *button, buttons) {
+    foreach(ChartBarItem *button, buttons) {
         layout->removeWidget(button);
         delete button;
     }
@@ -311,36 +316,7 @@ ChartBar::clicked(int index)
 }
 
 
-#if 0
-ChartBar::setHighlighted()
-{
-    if (context->isfiltered) {
-        searchLabel->setHighlighted(true);
-        searchLabel->show();
-#ifndef Q_OS_MAC
-        home->setHighlighted(true);
-        anal->setHighlighted(true);
-#ifdef GC_HAVE_ICAL
-        diary->setHighlighted(true);
-#endif
-#endif
-    } else {
-        searchLabel->setHighlighted(false);
-        searchLabel->hide();
-#ifndef Q_OS_MAC
-        home->setHighlighted(false);
-        anal->setHighlighted(false);
-#ifdef GC_HAVE_ICAL
-        diary->setHighlighted(false);
-#endif
-#endif
-    }
-}
-#endif
-
-ChartBar::~ChartBar()
-{
-}
+ChartBar::~ChartBar() { }
 
 void
 ChartBar::paintEvent (QPaintEvent *event)
@@ -422,51 +398,48 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.restore();
 }
 
-#if 0
-int
-ChartBar::selected()
+ChartBarItem::ChartBarItem(QWidget *parent) : QWidget(parent)
 {
-    if (home->isChecked()) return 0;
-#ifdef GC_HAVE_ICAL
-    if (diary->isChecked()) return 1;
-    if (anal->isChecked()) return 2;
-    if (train->isChecked()) return 3;
-#else
-    if (anal->isChecked()) return 1;
-    if (train->isChecked()) return 2;
-#endif
-
-    // never gets here - shutup compiler
-    return 0;
+    red = highlighted = checked = false;
+    QFont font;
+    font.setPointSize(10);
+    //font.setWeight(QFont::Black);
+    setFont(font);
 }
 
 void
-ChartBar::setSelected(int index)
+ChartBarItem::paintEvent(QPaintEvent *)
 {
-    // we're already there
-    if (index == selected()) return;
+    QPainter painter(this);
+    painter.save();
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
 
-    // mainwindow wants to tell us to switch to a selection
-    home->setChecked(false);
-#ifdef GC_HAVE_ICAL
-    diary->setChecked(false);
-#endif
-    anal->setChecked(false);
-    train->setChecked(false);
+    // widget rectangle
+    QRectF body(0,0,width(), height());
 
-#ifdef GC_HAVE_ICAL
-    switch (index) {
-        case 0 : home->setChecked(true); break;
-        case 1 : diary->setChecked(true); break;
-        case 2 : anal->setChecked(true); break;
-        case 3 : train->setChecked(true); break;
-    }
-#else
-    switch (index) {
-        case 0 : home->setChecked(true); break;
-        case 1 : anal->setChecked(true); break;
-        case 2 : train->setChecked(true); break;
-    }
-#endif
+    painter.setClipRect(body);
+    painter.setPen(Qt::NoPen);
+
+    // background - chrome or slected colour
+    QBrush brush(GColor(CCHROME));
+    if (checked) brush = QBrush(GColor(CPLOTBACKGROUND));
+    painter.fillRect(body, brush);
+
+    // now paint the text
+    QPen pen(GCColor::invertColor(brush.color()));
+    painter.setPen(pen);
+    painter.drawText(body, text, Qt::AlignBottom | Qt::AlignCenter);
+
+    // draw the bar
+    if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+    painter.restore();
 }
-#endif
+
+bool
+ChartBarItem::event(QEvent *e)
+{
+    // entry / exit event repaint for hover color
+    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) repaint();
+    if (e->type() == QEvent::MouseButtonPress && underMouse()) emit clicked(checked);
+    return QWidget::event(e);
+}
