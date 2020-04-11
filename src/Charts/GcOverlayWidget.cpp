@@ -21,7 +21,6 @@
  */
 
 #include "GcOverlayWidget.h"
-#include "GcScopeBar.h"
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"

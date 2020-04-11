@@ -56,7 +56,6 @@
 
 class QTFullScreen;
 class GcToolBar;
-class GcScopeBar;
 class Library;
 class QtSegmentControl;
 class SaveSingleDialogWidget;
