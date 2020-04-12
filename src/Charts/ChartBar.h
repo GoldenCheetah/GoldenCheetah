@@ -27,6 +27,7 @@
 #include <QToolButton>
 #include <QObject>
 #include <QEvent>
+#include <QPropertyAnimation>
 
 class Context;
 class ChartBarItem;
@@ -80,6 +81,7 @@ private:
 
     ButtonBar *buttonBar;
     QToolButton *left, *right; // scrollers, hidden if menu fits
+    QPropertyAnimation *anim; // scroll left and right - animated to show whats happening
     QToolButton *menuButton;
 
     QFont buttonFont;

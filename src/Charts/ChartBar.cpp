@@ -36,7 +36,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     setContentsMargins(0,0,0,0);
 
-
     // main layout
     QHBoxLayout *mlayout = new QHBoxLayout(this);
     mlayout->setSpacing(0);
@@ -64,12 +63,13 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     scrollArea->setContentsMargins(0,0,0,0);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-
     scrollArea->setWidget(buttonBar);
 
     // scroll area turns it on .. we turn it off!
     buttonBar->setAutoFillBackground(false);
+
+    // for scrolling buttonbar
+    anim = new QPropertyAnimation(buttonBar, "pos", this);
 
     // scroller buttons
     left = new QToolButton(this);
@@ -255,6 +255,7 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
         //     we should try and be a little more fluid / animate ...
         //     which will probably mean using QScrollArea::ScrollContentsBy
     }
+    fprintf(stderr, "scrollbar width=%d, buttonbar pos=%d\n", scrollArea->geometry().width(), buttonBar->pos().x()); fflush(stderr);
 
     return false;
 }
@@ -262,16 +263,43 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
 void
 ChartBar::scrollRight()
 {
-    // scroll to the right...
-    int w = buttonBar->width();
-    scrollArea->ensureVisible(w-(10*dpiXFactor),0,10*dpiXFactor,10*dpiYFactor);
+
+    // old position and pos we want
+    QPoint opos = buttonBar->pos();
+    QPoint pos = opos;
+
+    // just do a 3rd at a time, so we can see it move
+    pos.setX(pos.x() - (scrollArea->geometry().width()/3));
+
+    // constrain to just fit
+    if (pos.x() + buttonBar->geometry().width() < scrollArea->geometry().width())
+        pos.setX(scrollArea->geometry().width() - buttonBar->geometry().width());
+
+    // animated scroll
+    anim->setDuration(400);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setStartValue(opos);
+    anim->setEndValue(pos);
+    anim->start();
 }
 
 void
 ChartBar::scrollLeft()
 {
-    // scroll to the left
-    scrollArea->ensureVisible(0,0,10*dpiXFactor,10*dpiYFactor);
+    // old and new position
+    QPoint opos = buttonBar->pos();
+    QPoint pos = opos;
+
+    // a 3rd at a time
+    pos.setX(pos.x() + (scrollArea->geometry().width()/3));
+    if (pos.x() > 0) pos.setX(0);
+
+    // animated scroll
+    anim->setDuration(400);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setStartValue(opos);
+    anim->setEndValue(pos);
+    anim->start();
 }
 
 void
