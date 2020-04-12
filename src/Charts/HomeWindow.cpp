@@ -431,13 +431,21 @@ HomeWindow::tabMoved(int to, int from)
      GcChartWindow *me = charts.takeAt(from);
      charts.insert(to, me);
 
-    // re-order the controls
+    // re-order the controls - to reflect new indexes
     controlStack->blockSignals(true);
     QWidget *w = controlStack->widget(from);
     controlStack->removeWidget(w);
     controlStack->insertWidget(to, w);
     controlStack->setCurrentIndex(to);
     controlStack->blockSignals(false);
+
+    // re-order the stack - to reflect new indexes
+    tabbed->blockSignals(true);
+    w = tabbed->widget(from);
+    tabbed->removeWidget(w);
+    tabbed->insertWidget(to, w);
+    tabbed->setCurrentIndex(to);
+    tabbed->blockSignals(false);
 }
 
 void

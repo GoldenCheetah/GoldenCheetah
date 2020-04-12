@@ -72,6 +72,7 @@ protected:
     // dragging needs to work with these
     QScrollArea *scrollArea;
     QHBoxLayout *layout;
+    QList<ChartBarItem*> buttons;
 
 private:
 
@@ -85,7 +86,6 @@ private:
     QToolButton *menuButton;
 
     QFont buttonFont;
-    QVector<ChartBarItem*> buttons;
     QSignalMapper *signalMapper;
 
     QMenu *barMenu, *chartMenu;

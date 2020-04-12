@@ -207,6 +207,7 @@ ChartBar::setText(int index, QString text)
     QFontMetrics fontMetric(buttonFont);
     int width = fontMetric.width(text) + (30*dpiXFactor);
     buttons[index]->setWidth(width < (80*dpiXFactor) ? (80*dpiXFactor) : width);
+    buttons[index]->update();
 
     tidy(); // still fit ?
 }
@@ -312,7 +313,7 @@ ChartBar::removeWidget(int index)
 {
     layout->removeWidget(buttons[index]);
     delete buttons[index];
-    buttons.remove(index);
+    buttons.takeAt(index);
 
     // reset mappings
     for (int i=0; i<buttons.count(); i++)
@@ -469,27 +470,46 @@ ChartBarItem::event(QEvent *e)
     if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
         repaint();
     }
+
     if (e->type() == QEvent::MouseButtonPress && underMouse()) {
+
+        // selected with a click (not release)
         state = Click;
         clickpos.setX(static_cast<QMouseEvent*>(e)->x());
         clickpos.setY(static_cast<QMouseEvent*>(e)->y());
         emit clicked(checked);
     }
+
     if (e->type() == QEvent::MouseButtonRelease) {
+
         if (state == Drag) {
+
+            // finish dragging, so drop into where we moved it
             delete dragging;
             state = Idle;
             int index =  chartbar->layout->indexOf(this);
-            if (index != originalindex)
+
+            if (index != originalindex) {
+
+                // even the button array is used to index by ChartBar::setText(..)
+                // and then signal mapped to the index being selected. oh my.
+                // bit naughty modding from child here, but no easy way around it.
+                ChartBarItem *me = chartbar->buttons.takeAt(originalindex);
+                chartbar->buttons.insert(index, me);
+                for (int i=0; i<chartbar->buttons.count(); i++) chartbar->signalMapper->setMapping(chartbar->buttons[i], i);
+
+                // tell homewindow
                 chartbar->itemMoved(index, originalindex);
+            }
             repaint();
         }
     }
+
     if (e->type() == QEvent::MouseMove) {
 
         if (state == Click) {
 
-            // enter drag state
+            // enter drag state - moved mouse before releasing the button click
             state = Drag;
             originalindex = chartbar->layout->indexOf(this);
             repaint();
