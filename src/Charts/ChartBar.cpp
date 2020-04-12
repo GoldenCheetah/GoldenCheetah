@@ -57,8 +57,8 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // scrollarea
     scrollArea = new QScrollArea(this);
-    scrollArea->setAutoFillBackground(false);
-    scrollArea->setWidgetResizable(true);
+    scrollArea->setAutoFillBackground(true);
+    scrollArea->setWidgetResizable(false);
     scrollArea->setFrameStyle(QFrame::NoFrame);
     scrollArea->setContentsMargins(0,0,0,0);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -149,6 +149,9 @@ ChartBar::configChanged(qint32)
     scrollArea->setFixedHeight(height);
     buttonBar->setFixedHeight(height);
 
+    QColor col=GColor(CCHROME);
+    scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
+
     foreach(ChartBarItem *b, buttons) {
         int width = fs.width(b->text) + (30 * dpiXFactor);
         if (width < (80*dpiXFactor)) width=80*dpiXFactor;
@@ -184,7 +187,7 @@ ChartBar::addWidget(QString title)
     newbutton->installEventFilter(this);
 
     // tidy up scrollers etc
-    tidy();
+    tidy(true);
 }
 
 void
@@ -209,20 +212,22 @@ ChartBar::setText(int index, QString text)
     buttons[index]->setWidth(width < (80*dpiXFactor) ? (80*dpiXFactor) : width);
     buttons[index]->update();
 
-    tidy(); // still fit ?
+    tidy(true); // still fit ?
 }
 
 
 // tidy up the scrollers on first show...
 void
-ChartBar::tidy()
+ChartBar::tidy(bool setwidth)
 {
     // resize to button widths + 2px spacing
-    int width = 2*dpiXFactor;
-    foreach (ChartBarItem *button, buttons) {
-        width += button->geometry().width() + (2*dpiXFactor);
+    if (setwidth) {
+        int width = 2*dpiXFactor;
+        foreach (ChartBarItem *button, buttons) {
+            width += button->geometry().width() + (2*dpiXFactor);
+        }
+        buttonBar->setFixedWidth(width);
     }
-    buttonBar->setMinimumWidth(width);
 
     if (buttonBar->width() > scrollArea->width()) {
         left->show(); right->show();
@@ -239,18 +244,18 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
 
         // we do NOT move the position, we just show/hide
         // the left and right scrollers
-        tidy();
+        tidy(false);
     }
 
     // showing us - tidy up
     if (object == this && e->type() == QEvent::Show) {
-        tidy();
+        tidy(false);
     }
 
     // enter/leave we can track approximate mouse position and decide 
     // if we want to 'autoscroll'
     if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
-        tidy(); // tidy up anyway
+        tidy(false); // tidy up anyway
     }
 
     return false;
@@ -319,6 +324,7 @@ ChartBar::removeWidget(int index)
     for (int i=0; i<buttons.count(); i++)
         signalMapper->setMapping(buttons[i], i);
 
+    tidy(true);
 }
 
 void

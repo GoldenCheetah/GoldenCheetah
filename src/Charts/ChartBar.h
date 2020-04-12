@@ -58,7 +58,7 @@ public slots:
     void setCurrentIndex(int index);
     void scrollLeft();
     void scrollRight();
-    void tidy();
+    void tidy(bool setwidth);
     void setChartMenu();
     void menuPopup();
     void configChanged(qint32); // appearance
