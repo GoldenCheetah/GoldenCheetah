@@ -37,6 +37,8 @@ class ChartBar : public QWidget
 {
     Q_OBJECT
 
+    friend class ::ChartBarItem;
+
 public:
 
     ChartBar(Context *context);
@@ -62,8 +64,16 @@ public slots:
 
 signals:
     void currentIndexChanged(int);
+    void itemMoved(int from, int to);
+
+protected:
+
+    // dragging needs to work with these
+    QScrollArea *scrollArea;
+    QHBoxLayout *layout;
 
 private:
+
     void paintBackground(QPaintEvent *);
 
     Context *context;
@@ -71,8 +81,6 @@ private:
     ButtonBar *buttonBar;
     QToolButton *left, *right; // scrollers, hidden if menu fits
     QToolButton *menuButton;
-    QScrollArea *scrollArea;
-    QHBoxLayout *layout;
 
     QFont buttonFont;
     QVector<ChartBarItem*> buttons;
@@ -108,7 +116,7 @@ class ChartBarItem : public QWidget
     Q_OBJECT
 
     public:
-        ChartBarItem(QWidget *parent);
+        ChartBarItem(ChartBar *parent);
         void setText(QString _text) { text = _text; }
         void setChecked(bool _checked) { checked = _checked; repaint(); }
         bool isChecked() { return checked; }
@@ -126,6 +134,15 @@ class ChartBarItem : public QWidget
         bool event(QEvent *e);
 
     private:
+        ChartBar *chartbar;
+
+        // managing dragging of tabs
+        enum { Idle, Click, Clone, Drag } state;
+        QPoint clickpos;
+        int originalindex;
+        int indexPos(int); // calculating drop position
+        ChartBarItem *dragging;
+
         bool checked;
         bool highlighted;
         bool red;

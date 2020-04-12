@@ -336,24 +336,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
-
-    // fill with a linear gradient
-    painter.setPen(Qt::NoPen);
-    painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, isActiveWindow() ? active : inactive);
-
-    if (!GCColor::isFlat()) {
-        QPen black(QColor(100,100,100,200));
-        painter.setPen(black);
-        painter.drawLine(0,height()-1, width()-1, height()-1);
-
-        QPen gray(QColor(230,230,230));
-        painter.setPen(gray);
-        painter.drawLine(0,0, width()-1, 0);
-    }
+    painter.fillRect(all, GColor(CCHROME));
 
     painter.restore();
 }
@@ -398,18 +381,20 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.restore();
 }
 
-ChartBarItem::ChartBarItem(QWidget *parent) : QWidget(parent)
+ChartBarItem::ChartBarItem(ChartBar *chartbar) : QWidget(chartbar), chartbar(chartbar)
 {
     red = highlighted = checked = false;
+    state = Idle;
     QFont font;
     font.setPointSize(10);
-    //font.setWeight(QFont::Black);
     setFont(font);
 }
 
 void
 ChartBarItem::paintEvent(QPaintEvent *)
 {
+    if (state == Drag) return; // invisible when dragging
+
     QPainter painter(this);
     painter.save();
     painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
@@ -422,6 +407,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
 
     // background - chrome or slected colour
     QBrush brush(GColor(CCHROME));
+    if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
     if (checked) brush = QBrush(GColor(CPLOTBACKGROUND));
     painter.fillRect(body, brush);
 
@@ -435,11 +421,92 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.restore();
 }
 
+int
+ChartBarItem::indexPos(int x)
+{
+    // map via global coord
+    QPoint global = mapToGlobal(QPoint(x,0));
+
+    // where in the scrollarea's widget are we now?
+    // this is equivalent to chartbar->buttonbar->mapFromGlobal(..)
+    int cpos = chartbar->scrollArea->widget()->mapFromGlobal(global).x();
+
+    // work through the layout items to find which widgets
+    for(int i=0; i<chartbar->layout->count(); i++) {
+        QPoint center = chartbar->layout->itemAt(i)->geometry().center();
+        if (center.x() > cpos) return i;
+    }
+    return -1;
+}
+
 bool
 ChartBarItem::event(QEvent *e)
 {
     // entry / exit event repaint for hover color
-    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) repaint();
-    if (e->type() == QEvent::MouseButtonPress && underMouse()) emit clicked(checked);
+    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
+        repaint();
+    }
+    if (e->type() == QEvent::MouseButtonPress && underMouse()) {
+        state = Click;
+        clickpos.setX(static_cast<QMouseEvent*>(e)->x());
+        clickpos.setY(static_cast<QMouseEvent*>(e)->y());
+        fprintf(stderr, "clickpos=%d,%d\n",clickpos.x(), clickpos.y()); fflush(stderr);
+        emit clicked(checked);
+    }
+    if (e->type() == QEvent::MouseButtonRelease) {
+        if (state == Drag) {
+            delete dragging;
+            state = Idle;
+            int index =  chartbar->layout->indexOf(this);
+            if (index != originalindex)
+                chartbar->itemMoved(index, originalindex);
+            repaint();
+        }
+    }
+    if (e->type() == QEvent::MouseMove) {
+
+        if (state == Click) {
+
+            // enter drag state
+            state = Drag;
+            originalindex = chartbar->layout->indexOf(this);
+            repaint();
+
+            dragging = new ChartBarItem(chartbar);
+            dragging->state = Clone;
+            dragging->text = text;
+            dragging->checked = checked;
+            dragging->setFixedWidth(geometry().width());
+            dragging->setFixedHeight(geometry().height());
+            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPos());
+            dragging->move(QPoint(newpos.x()-clickpos.x(),0));
+            dragging->show();
+
+        } else if (state == Drag) {
+
+            // move the clone tab for visual feedback
+            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPos());
+            dragging->move(QPoint(newpos.x()-clickpos.x(),0));
+
+            // where are we currently?
+            int cindex = chartbar->layout->indexOf(this);
+
+            // work out where we should have dragged to
+            int indexpos = indexPos(static_cast<QMouseEvent*>(e)->x());
+
+            // move position?
+            //fprintf(stderr, "from %d -> %d: dragging... %d,%d\n",  cindex, indexpos, static_cast<QMouseEvent*>(e)->x(), static_cast<QMouseEvent*>(e)->y());
+            //fflush(stderr);
+
+            // if moving left, just do it...
+            if (cindex > indexpos) {
+                QLayoutItem *me = chartbar->layout->takeAt(cindex);
+                chartbar->layout->insertItem(indexpos, me);
+            } else if (indexpos > (cindex+1)) {
+                QLayoutItem *me = chartbar->layout->takeAt(cindex);
+                chartbar->layout->insertItem(indexpos-1, me); // indexpos-1 because we just got removed
+            }
+        }
+    }
     return QWidget::event(e);
 }

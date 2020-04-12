@@ -160,7 +160,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     //connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     //connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
-    //connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
+    connect(chartbar, SIGNAL(itemMoved(int,int)), this, SLOT(tabMoved(int,int)));
     connect(chartbar, SIGNAL(currentIndexChanged(int)), this, SLOT(tabSelected(int)));
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
@@ -428,10 +428,8 @@ HomeWindow::tabSelected(int index, bool forride)
 void
 HomeWindow::tabMoved(int to, int from)
 {
-    // re-order the tabs
-    GcChartWindow *orig = charts[to];
-    charts[to] = charts[from];
-    charts[from] = orig;
+     GcChartWindow *me = charts.takeAt(from);
+     charts.insert(to, me);
 
     // re-order the controls
     controlStack->blockSignals(true);

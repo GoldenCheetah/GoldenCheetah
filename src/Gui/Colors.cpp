@@ -295,6 +295,7 @@ double GCColor::luminance(QColor color)
 
 QColor GCColor::invertColor(QColor bgColor)
 {
+    if (bgColor==QColor(Qt::darkGray)) return QColor(Qt::white); // darkGray is popular!
     return GCColor::luminance(bgColor) < 127 ? QColor(Qt::white) : QColor(Qt::black);
 }
 
