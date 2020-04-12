@@ -250,12 +250,7 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
     // if we want to 'autoscroll'
     if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
         tidy(); // tidy up anyway
-
-        // XXX for later, perhaps when drag/dropping
-        //     we should try and be a little more fluid / animate ...
-        //     which will probably mean using QScrollArea::ScrollContentsBy
     }
-    fprintf(stderr, "scrollbar width=%d, buttonbar pos=%d\n", scrollArea->geometry().width(), buttonBar->pos().x()); fflush(stderr);
 
     return false;
 }
