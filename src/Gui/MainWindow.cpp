@@ -989,7 +989,6 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
-    fprintf(stderr,"window close started\n"); fflush(stderr);
     QList<Tab*> closing = tabList;
     bool needtosave = false;
     bool importrunning = false;
@@ -1039,8 +1038,6 @@ MainWindow::closeEvent(QCloseEvent* event)
     }
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
-
-    fprintf(stderr,"window close compeleted\n"); fflush(stderr);
 }
 
 MainWindow::~MainWindow()

@@ -450,7 +450,6 @@ ChartBarItem::event(QEvent *e)
         state = Click;
         clickpos.setX(static_cast<QMouseEvent*>(e)->x());
         clickpos.setY(static_cast<QMouseEvent*>(e)->y());
-        fprintf(stderr, "clickpos=%d,%d\n",clickpos.x(), clickpos.y()); fflush(stderr);
         emit clicked(checked);
     }
     if (e->type() == QEvent::MouseButtonRelease) {
@@ -493,10 +492,6 @@ ChartBarItem::event(QEvent *e)
 
             // work out where we should have dragged to
             int indexpos = indexPos(static_cast<QMouseEvent*>(e)->x());
-
-            // move position?
-            //fprintf(stderr, "from %d -> %d: dragging... %d,%d\n",  cindex, indexpos, static_cast<QMouseEvent*>(e)->x(), static_cast<QMouseEvent*>(e)->y());
-            //fflush(stderr);
 
             // if moving left, just do it...
             if (cindex > indexpos) {
