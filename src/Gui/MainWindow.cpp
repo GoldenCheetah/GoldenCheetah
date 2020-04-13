@@ -588,13 +588,10 @@ MainWindow::MainWindow(const QDir &home)
     showhideTabbar->setCheckable(true);
     showhideTabbar->setChecked(true);
 
-    //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
-#ifdef GC_HAVE_ICAL
-    viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
-#endif
+    viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
     viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
@@ -1208,6 +1205,7 @@ MainWindow::sidebarSelected(int id)
 void
 MainWindow::selectAnalysis()
 {
+    sidebar->setItemSelected(3, true);
     currentTab->selectView(1);
     setToolButtons();
 }
@@ -1215,6 +1213,7 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
+    sidebar->setItemSelected(5, true);
     currentTab->selectView(3);
     setToolButtons();
 }
@@ -1229,6 +1228,7 @@ MainWindow::selectDiary()
 void
 MainWindow::selectHome()
 {
+    sidebar->setItemSelected(2, true);
     currentTab->selectView(0);
     setToolButtons();
 }

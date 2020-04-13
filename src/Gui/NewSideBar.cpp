@@ -105,6 +105,15 @@ NewSideBar::setItemSelected(int id, bool x)
 {
     NewSideBarItem *item = items.value(id, NULL);
     if (item) item->setSelected(x);
+
+    if (x) {
+        // unset all the others
+        foreach(NewSideBarItem*i, items) {
+            if (item != i) {
+                i->setSelected(false);
+            }
+        }
+    }
 }
 
 void
