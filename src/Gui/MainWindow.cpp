@@ -1282,7 +1282,6 @@ MainWindow::setToolButtons()
 #endif
 #ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
     searchBox->clearFocus();
-    searchFocusOut();
 #endif
 }
 
