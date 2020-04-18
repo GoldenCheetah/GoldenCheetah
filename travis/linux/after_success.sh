@@ -9,7 +9,7 @@ if [ ! -x ./GoldenCheetah ]
 then echo "Build GoldenCheetah and execute from distribution src"; exit 1
 fi
 echo "Checking GoldenCheetah.app can execute"
-./GoldenCheetah --help
+./GoldenCheetah --version
 
 ### Create AppDir and start populating
 mkdir -p appdir

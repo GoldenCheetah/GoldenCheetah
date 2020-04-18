@@ -27,6 +27,7 @@
 #include "GcUpgrade.h"
 #include "IdleTimer.h"
 #include "PowerProfile.h"
+#include "GcCrashDialog.h" // for versionHTML
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -207,12 +208,20 @@ main(int argc, char *argv[])
     // honour command line switches
     foreach (QString arg, sargs) {
 
-        // help or version requested
-        if (arg == "--help" || arg == "--version") {
+        // help, usage or version requested, basic information
+        if (arg == "--help" || arg == "--usage" || arg == "--version") {
 
             help = true;
-            fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
-            fprintf(stderr, "--help or --version to print this message and exit\n");
+            fprintf(stderr, "GoldenCheetah %s (%d)\n", VERSION_STRING, VERSION_LATEST);
+
+        }
+
+        // help or usage requrested, additional information
+        if (arg == "--help" || arg == "--usage") {
+
+            fprintf(stderr, "usage: GoldenCheetah [[directory] athlete]\n\n");
+            fprintf(stderr, "--help or --usage   to print this message and exit\n");
+            fprintf(stderr, "--version           to print detailed version information and exit\n");
             fprintf(stderr, "--newgui            to open the new gui (WIP)\n");
 #ifdef GC_WANT_HTTP
             fprintf(stderr, "--server            to run as an API server\n");
@@ -233,6 +242,16 @@ main(int argc, char *argv[])
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
+
+        // version requested, additional information
+        } else if (arg == "--version") {
+
+            QString html = GcCrashDialog::versionHTML();
+            html.replace("</td><td>", ": "); // to maintain colums in one line
+            QString text = QTextDocumentFragment::fromHtml(html).toPlainText();
+            QByteArray ba = text.toLocal8Bit();
+            const char *c_str = ba.data();
+            fprintf(stderr, "\n%s\n\n", c_str);
 
         } else if (arg == "--newgui") {
             newgui = true;

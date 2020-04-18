@@ -2,7 +2,7 @@
 set -ev
 cd src
 echo "Checking GoldenCheetah.app can execute"
-GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
+GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
 echo "About to create dmg file and fix up"
 # This is a hack to include libicudata.64.dylib, not handled by macdployqt[fix]
 mkdir GoldenCheetah.app/Contents/Frameworks
@@ -30,7 +30,7 @@ ls -l $FINAL_NAME
 echo "Mounting dmg file and testing it can execute"
 hdiutil mount $FINAL_NAME
 cd /Volumes/GoldenCheetah
-GoldenCheetah.app/Contents/MacOS/GoldenCheetah --help
+GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
 echo "Uploading for user tests"
 curl --upload-file $TRAVIS_BUILD_DIR/src/$FINAL_NAME https://transfer.sh/$FINAL_NAME
 echo "Make sure we are back in the Travis build directory"
