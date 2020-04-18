@@ -13,7 +13,7 @@ init:
 
 # Get the libraries
 
-- ps: Start-FileDownload 'https://github.com/Joern-R/gc-ci-libs/releases/download/0.0.2/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
+- ps: Start-FileDownload 'https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
 - 7z x c:/gc-ci-libs.zip -oC:\libs
 
 install:
@@ -24,6 +24,20 @@ install:
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
 - nmake
+- cd src\release
+# copy dependencies
+- windeployqt GoldenCheetah.exe
+- copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
+- copy c:\libs\30_MSVC\libsamplerate64\lib\libsamplerate-0.dll
+- copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
+# minimum test
+- GoldenCheetah --version
+# cleanup
+- del *.h *.cpp *.obj *.pdb *.res
+# pack and upload to transfer.sh
+- 7z a GoldenCheetah.zip *
+- curl --upload-file GoldenCheetah.zip https://transfer.sh/GoldenCheetah.zip
+- cd ..\..
 
 #notifications:
 #- provider: GitHubPullRequest
