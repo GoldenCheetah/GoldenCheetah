@@ -188,7 +188,7 @@ OverviewWindow::setConfiguration(QString config)
         newCard(tr("Heartrate Zones"), 1, 2, 11, Card::ZONE, RideFile::hr);
         newCard(tr("Climbing"), 1, 3, 5, Card::METRIC, "elevation_gain");
         newCard(tr("Cadence"), 1, 4, 5, Card::METRIC, "average_cad");
-        newCard(tr("Equivalent Power"), 1, 5, 5, Card::METRIC, "coggan_np");
+        newCard(tr("Work"), 1, 6, 5, Card::METRIC, "total_work");
 
         // column 2
         newCard(tr("RPE"), 2, 0, 9, Card::RPE);
@@ -200,7 +200,9 @@ OverviewWindow::setConfiguration(QString config)
         newCard(tr("Intensity"), 3, 0, 9, Card::METRIC, "coggan_if");
         newCard(tr("Power"), 3, 1, 5, Card::METRIC, "average_power");
         newCard(tr("Power Zones"), 3, 2, 11, Card::ZONE, RideFile::watts);
-        newCard(tr("Peak Power Index"), 3, 3, 17, Card::METRIC, "peak_power_index");
+        newCard(tr("Equivalent Power"), 3, 3, 5, Card::METRIC, "coggan_np");
+        newCard(tr("Peak Power Index"), 3, 4, 5, Card::METRIC, "peak_power_index");
+        newCard(tr("Variability"), 3, 5, 5, Card::METRIC, "coggam_variability_index");
 
         // column 4
         newCard(tr("Distance"), 4, 0, 9, Card::METRIC, "total_distance");

@@ -1168,10 +1168,10 @@ CPPlot::plotPowerProfile()
         if (percentile > 95 || percentile < 5) color = GColor(CPLOTGRID);
         else if (percentile < 51 && percentile > 49) {
             color = GColor(CPLOTGRID);
-            color.setRed(color.red() + 30);
+            color.setRed(150);
         } else {
             color = GColor(CPLOTGRID);
-            color.setBlue(color.blue() + 50);
+            color.setBlue(150);
         }
 
         QPen gridpen(color);
