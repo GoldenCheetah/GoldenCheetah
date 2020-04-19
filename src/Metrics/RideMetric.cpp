@@ -161,7 +161,8 @@
 // 151 14  May 2019 Ale Martinez       Added Time Recording and use it in Time in Zone Percentage
 // 152 20  May 2019 Ale Martinez       Fixed Time in Zone Percentages to aggregate properly
 // 153  8  Dec 2019 Mark Liversedge    Regenerate after v3.5 RC2/RC2X re-issue
-int DBSchemaVersion = 153;
+// 154 18  Apr 2020 Mark Liversedge    Added PeakPowerIndex (only for full rides)
+int DBSchemaVersion = 154;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

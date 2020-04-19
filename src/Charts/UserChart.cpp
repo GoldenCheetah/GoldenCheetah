@@ -153,7 +153,7 @@ UserChart::setRide(RideItem *item)
 
         // re-create program (may be edited)
         if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
-        series.user1 = new UserChartData(context, this, series.string1);
+        series.user1 = new UserChartData(context, this, series.string1, rangemode);
         connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
 
         // cast so we can work with it

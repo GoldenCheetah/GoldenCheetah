@@ -31,7 +31,7 @@ class UserChartData : public QObject {
 public:
 
     // new program
-    UserChartData(Context *context, UserChart *parent, QString script);
+    UserChartData(Context *context, UserChart *parent, QString script, bool rangemode);
     ~UserChartData();
 
     // Compute from samples
@@ -44,6 +44,7 @@ public:
 
     // script and "compiled" program
     QString script;
+    bool rangemode;
     DataFilter *program;
     Leaf *root;
 

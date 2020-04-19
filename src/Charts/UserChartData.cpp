@@ -19,8 +19,9 @@
 #include "RideMetric.h"
 #include "UserChartData.h"
 #include "DataFilter.h"
+#include "Athlete.h"
 
-UserChartData::UserChartData(Context *context, UserChart *parent, QString script) : context(context), script(script)
+UserChartData::UserChartData(Context *context, UserChart *parent, QString script, bool rangemode) : context(context), script(script), rangemode(rangemode)
 {
     // compile the program - built in a context that can close.
     program = new DataFilter(NULL, context, script);
@@ -70,13 +71,36 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
     }
 
     // process samples, if there are any and a function exists
-    if (!spec.isEmpty(item->ride()) && fsample) {
-        RideFileIterator it(item->ride(), spec);
+    if (rangemode) {
+        if (factivity) {
 
-        while(it.hasNext()) {
-            struct RideFilePoint *point = it.next();
-            root->eval(rt, fsample, 0, 0, const_cast<RideItem*>(item), point, NULL, spec, dr);
+            FilterSet fs;
+            fs.addFilter(context->isfiltered, context->filters);
+            fs.addFilter(context->ishomefiltered, context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+
+            // loop through rides for daterange
+            foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+
+                if (!dr.pass(ride->dateTime.date())) continue; // relies upon the daterange being passed to eval...
+                if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+
+                root->eval(rt, factivity, 0, 0, const_cast<RideItem*>(ride), NULL, NULL, spec, dr);
+            }
         }
+
+    } else {
+        if (!spec.isEmpty(item->ride()) && fsample) {
+            RideFileIterator it(item->ride(), spec);
+
+            while(it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                root->eval(rt, fsample, 0, 0, const_cast<RideItem*>(item), point, NULL, spec, dr);
+            }
+        }
+
     }
 
     // finalise computation

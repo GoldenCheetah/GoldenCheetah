@@ -200,7 +200,7 @@ OverviewWindow::setConfiguration(QString config)
         newCard(tr("Intensity"), 3, 0, 9, Card::METRIC, "coggan_if");
         newCard(tr("Power"), 3, 1, 5, Card::METRIC, "average_power");
         newCard(tr("Power Zones"), 3, 2, 11, Card::ZONE, RideFile::watts);
-        newCard(tr("Power Model"), 3, 3, 17);
+        newCard(tr("Peak Power Index"), 3, 3, 17, Card::METRIC, "peak_power_index");
 
         // column 4
         newCard(tr("Distance"), 4, 0, 9, Card::METRIC, "total_distance");

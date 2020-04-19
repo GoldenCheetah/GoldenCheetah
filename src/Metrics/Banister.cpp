@@ -33,6 +33,7 @@
 #include "Banister.h"
 
 #include "RideMetric.h"
+#include "RideFileCache.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -650,4 +651,62 @@ class PowerIndex : public RideMetric {
     RideMetric *clone() const { return new PowerIndex(*this); }
 };
 
-static bool countAdded = RideMetricFactory::instance().addMetric(PowerIndex());
+class PeakPowerIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PeakPowerIndex)
+    public:
+
+    PeakPowerIndex()
+    {
+        setSymbol("peak_power_index");
+        setInternalName("PeakPowerIndex");
+        setPrecision(1);
+        setType(Peak); // not even sure aggregation makes sense
+    }
+    void initialize() {
+        setName(tr("PeakPowerIndex"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setDescription(tr("Peak Power Index"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples or is interval (metric only valid for a ride)
+        if (spec.isEmpty(item->ride()) || spec.secsStart() != -1) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        // calculate for this interval/ride
+        double peakpix = 0;
+        if (item->ride()->areDataPresent()->watts) {
+
+            QVector<float>vector;
+            MeanMaxComputer thread1(item->ride(), vector, RideFile::watts);
+            thread1.run();
+            thread1.wait();
+
+            // calculate peak power index, starting from 3 mins, 0=out of bounds
+            for (int secs=180; secs<vector.count(); secs++) {
+                double pix = powerIndex(vector[secs], secs, item->isRun);
+                if (pix > peakpix) {
+                    peakpix=pix;
+                }
+            }
+
+        }
+
+        // we could convert to linear work time model before
+        // indexing, but they cancel out so no value in doing so
+        setValue(peakpix);
+        setCount(1);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PeakPowerIndex(*this); }
+};
+
+static bool countAdded = RideMetricFactory::instance().addMetric(PowerIndex()) &&
+                         RideMetricFactory::instance().addMetric(PeakPowerIndex());
