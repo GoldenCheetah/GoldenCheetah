@@ -38,6 +38,7 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
     first = true;
     creator = false;
+    training = false; // second training name
 
 }
 
@@ -120,6 +121,9 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
 
     } else if (qName == "Creator") {
         creator = true;
+    } else if (qName == "Training") {
+        // second training name
+        training = true;
     }
 
     return true;
@@ -430,6 +434,13 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     } else if (creator && qName == "Name") {
         if (!buffer.isEmpty())
             rideFile->setDeviceType(buffer);
+    } else if (qName == "Training") {
+        // second training name
+        training = false;
+    } else if (training && qName == "Name") {
+        // second training name
+        if (!buffer.isEmpty())
+            rideFile->setTag("Second Sports Name", buffer);
     }
     return true;
 }
