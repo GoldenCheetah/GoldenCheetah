@@ -215,6 +215,8 @@ static struct {
                          // that does not compare less than value, analogous to std::lower_bound
                          // will return -1 if no value found.
 
+    { "cumsum", 1 },  // cumsum(v) - returns a vector of cumulative sum for vector v
+
 
     // add new ones above this line
     { "", -1 }
@@ -369,6 +371,10 @@ DataFilter::builtins()
         } else if (i == 72) {
 
             returning << "lowerbound(list, value";
+
+        } else if (i == 73) {
+
+            returning << "cumsum(vector)";
 
         } else {
 
@@ -1455,6 +1461,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                     // still normal parm check !
                     foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
+
+                } else if (leaf->function == "cumsum") {
+
+                    if (leaf->fparms.count() != 1) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be cumsum(vector)"));
+                    }
 
                 } else if (leaf->function == "append") {
 
@@ -2698,6 +2711,22 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             double len = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).vector.count();
             //fprintf(stderr, "len: %f\n",len); fflush(stderr);
             return Result(len);
+        }
+
+        // cumsum
+        if (leaf->function == "cumsum") {
+            Result returning(0);
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            if (v.vector.count() == 0) return Result(v.number);
+
+            double cumsum = 0;
+            for(int it=0; it < v.vector.count(); it++) {
+                cumsum += v.vector[it];
+                returning.number += cumsum;
+                returning.vector << cumsum;
+            }
+            return returning;
         }
 
         // append
