@@ -28,7 +28,7 @@ build_script:
 # copy dependencies
 - windeployqt GoldenCheetah.exe
 - copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
-- copy c:\libs\30_MSVC\libsamplerate64\lib\libsamplerate-0.dll
+- copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
 - copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
 # minimum test
 - GoldenCheetah --version
