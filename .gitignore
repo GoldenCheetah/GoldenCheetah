@@ -53,3 +53,4 @@ build.pro.user
 build.pro.user.*
 doc/contrib/WASP Packet Protocol.pdf
 
+*.cmd
