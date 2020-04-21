@@ -690,7 +690,7 @@ GenericSelectTool::moved(QPointF pos)
                     vals.insert(series, QPointF(*i));
 
                     // nearest x?
-                    if (i->x() != 0 && (nearestx == -9999 || (i->x()-xvalue) < (nearestx-xvalue))) nearestx = i->x();
+                    if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
                 }
 
             }
