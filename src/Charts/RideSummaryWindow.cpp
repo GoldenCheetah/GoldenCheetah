@@ -1215,7 +1215,7 @@ RideSummaryWindow::htmlSummary()
         int rideCols = rideMetrics.count() > 7 ? 7 : rideMetrics.count();
         int runCols = runMetrics.count() > 7 ? 7 : runMetrics.count();
         int swimCols = swimMetrics.count() > 7 ? 7 : swimMetrics.count();
-        int xtrainCols = xtrainMetrics.count() > 7 ? 7 : xtrainMetrics.count();
+        int xtrainCols = xtrainMetrics.count() > 6 ? 6 : xtrainMetrics.count();
 
         //Rides first
         if (context->ishomefiltered || context->isfiltered || filtered) {
@@ -1537,6 +1537,7 @@ RideSummaryWindow::htmlSummary()
         // header row 1 - name
         summary += "<tr>";
         summary += tr("<td align=\"center\">Date</td>");
+        summary += tr("<td align=\"center\">Sport</td>");
         for (j = 0; j< totalCols; ++j) {
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
@@ -1554,6 +1555,7 @@ RideSummaryWindow::htmlSummary()
         // header row 2 - units
         summary += "<tr>";
         summary += tr("<td align=\"center\"></td>"); // date no units
+        summary += tr("<td align=\"center\"></td>"); // Sport no units
         for (j = 0; j< totalCols; ++j) {
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
@@ -1595,6 +1597,10 @@ RideSummaryWindow::htmlSummary()
             // date of xtrain
             summary += QString("<td align=\"center\">%1</td>")
                        .arg(ride->dateTime.date().toString(tr("dd MMM yyyy")));
+
+            // Sport of xtrain
+            summary += QString("<td align=\"center\">%1</td>")
+                       .arg(ride->getText("Sport", ""));
 
             for (j = 0; j< totalCols; ++j) {
                 QString symbol = rtotalColumn[j];
