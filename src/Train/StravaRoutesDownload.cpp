@@ -196,7 +196,6 @@ StravaRoutesDownload::downloadFiles()
     QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
 
     // for library updating, transactional for 10x performance
-/*
     trainDB->startLUW();
 
     // loop through the table and export all selected
@@ -231,13 +230,24 @@ StravaRoutesDownload::downloadFiles()
 
             }
 
-            QString filename;
-            ErgFile *p = ErgFile::fromContent(content, context);
-            if (p->Filename != "") {
-                filename = workoutDir + "/TP-" + p->Filename.replace("/", "-").simplified();
-            } else {
-                filename = workoutDir + "/TP-Workout-" + current->text(1).replace(" ", "_") + ".erg";
-            }
+            // Slightly involved filename
+            // - it is sourced from a Strava Route, hence the prefix
+            // - Strava allows multiple Routes to be identically named, hence inclusion of id for total unambiguity
+            QString file_basename = "Strava-Route-" + current->text(4) + "-" + current->text(1).replace(" ", "_") + ".gpx";
+            QString filename = workoutDir + "/" + file_basename;
+
+            // create a temporary file
+            QString tmp = context->athlete->home->temp().absolutePath() + "/" + file_basename;
+
+            QFile ufile(tmp); // look at uncompressed version mot the source
+            ufile.open(QFile::ReadWrite);
+            ufile.write(content);
+            ufile.close();
+
+            ErgFile *p = new ErgFile(tmp, CRS, context);
+
+            // now zap the temporary file
+            ufile.remove();
 
             // open success?
             if (p->isValid()) {
@@ -293,7 +303,6 @@ StravaRoutesDownload::downloadFiles()
     }
     // for library updating, transactional for 10x performance
     trainDB->endLUW();
-*/
 }
 
 QList<StravaRoutesListEntry*>
@@ -395,12 +404,12 @@ StravaRoutesDownload::readFile(QByteArray *data, int routeId)
     // do we have a token ?
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
     if (token == "") return false;
-/*
-    // lets connect and get basic info on the root directory
-    QString url = QString("%1/rest/workouts/download/power/erg/%2")
-          .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
-          .arg(workoutId);
 
+    // lets connect and get basic info on the root directory
+    QString url = QString("https://www.strava.com/api/v3/routes/%1/export_gpx")
+          .arg(routeId);
+
+    //printd("url:%s\n", url.toStdString().c_str());
 
     // request using the bearer token
     QNetworkRequest request(url);
@@ -415,11 +424,10 @@ StravaRoutesDownload::readFile(QByteArray *data, int routeId)
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
-       return false;
+        return false;
     };
     // did we get a good response ?
     *data = reply->readAll();
-    */
     return true;
 }
 
