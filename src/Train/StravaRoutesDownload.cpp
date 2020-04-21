@@ -313,61 +313,40 @@ StravaRoutesDownload::getFileList(QString &error) {
     int offset = 0;
     int resultCount = INT_MAX;
 
-/*
     while (offset < resultCount) {
+        QString urlstr = "https://www.strava.com/api/v3/athletes/3655121/routes?";
 
-        QString url;
-        QString searchCommand;
-        if (offset == 0) {
-            // fist call
-            searchCommand = "search";
-        } else {
-            // subsequent pages
-            searchCommand = "page";
-        }
+#if QT_VERSION > 0x050000
+        QUrlQuery params;
+#else
+        QUrl params;
+#endif
 
-        url = QString("%1/rest/users/activities/%2/%3/%4")
-                .arg(appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString())
-                .arg(searchCommand)
-                .arg(QString::number(offset))
-                .arg(QString::number(pageSize));;
+        params.addQueryItem("per_page", QString("%1").arg(pageSize));
+        params.addQueryItem("page",  QString("%1").arg(offset/pageSize+1));
+
+        QUrl url = QUrl( urlstr + params.toString() );
+        //printd("URL used: %s\n", url.url().toStdString().c_str());
 
         // request using the bearer token
         QNetworkRequest request(url);
-        QNetworkReply *reply;
         request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
-        if (offset == 0) {
 
-            // Prepare the Search Payload for First Call to Search
-            QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
-            // application/json
-            QByteArray jsonString;
-            jsonString += "{\"criteria\": {";
-            if (userId.length()>0)
-                jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
-            jsonString += "\"isNull\": [\"fileId\"]}, ";
-            jsonString += "\"order\": [ { \"field\" : \"startTs\",\"order\" : \"asc\" } ], ";
-            jsonString += "\"fields\": [\"startTs\", \"user.firstname\",\"name\",\"scheduled.workout\",\"scheduled.time\", \"scheduled.tscorepwr\", \"scheduled.durationSecs\" ], ";
-            jsonString += "\"opts\": 1 ";
-            jsonString += "}";
-
-            QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
-
-            request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
-            request.setRawHeader("Content-Length", jsonStringDataSize);
-            reply = nam->post(request, jsonString);
-        } else {
-            // get further pages of the Search
-            reply = nam->get(request);
-        }
+        QNetworkReply *reply = nam->get(request);
 
         // blocking request
         QEventLoop loop;
         connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
 
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << "error" << reply->errorString();
+            error = tr("Network Problem reading Strava data");
+            //return returning;
+        }
         // did we get a good response ?
         QByteArray r = reply->readAll();
+        //printd("response: %s\n", r.toStdString().c_str());
 
         QJsonParseError parseError;
         QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
@@ -375,41 +354,33 @@ StravaRoutesDownload::getFileList(QString &error) {
         // if path was returned all is good, lets set root
         if (parseError.error == QJsonParseError::NoError) {
 
-            // number of Result Items
-            if (offset == 0) {
-                resultCount = document.object()["cnt"].toInt();
-            }
-
             // results ?
-            QJsonObject result = document.object()["result"].toObject();
-            QJsonArray results = result["results"].toArray();
+            QJsonArray results = document.array();
 
             // lets look at that then
-            for(int i=0; i<results.size(); i++) {
-                QJsonObject each = results.at(i).toObject();
-                QJsonObject scheduled = each["scheduled"].toObject();
+            if (results.size()>0) {
+                for(int i=0; i<results.size(); i++) {
+                    QJsonObject each = results.at(i).toObject();
+                    StravaRoutesListEntry *add = new StravaRoutesListEntry();
 
-                // skip "Rest" days
-                if (scheduled["workout"].toString() == "rest" && scheduled["tscorepwr"].toDouble() == 0.0) continue;
+                    add->routeId = QString("%1").arg(each["id"].toVariant().toULongLong());
+                    add->name = each["name"].toString();
+                    add->description = each["description"].toString();
 
-                // workout details
-                StravaRoutesListEntry *add = new StravaRoutesListEntry();
-                add->workoutId = QString("%1").arg(each["workoutId"].toInt());
-                add->planDate = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).date();
-                add->duration = scheduled["durationSecs"].toDouble();
-                add->tScore = scheduled["tscorepwr"].toDouble();
-                add->description = scheduled["_workout-display"].toString() + " : " + each["name"].toString();
+                    //printd("direntry: %s %s\n", add->routeId.toStdString().c_str(), add->name.toStdString().c_str());
 
-                returning << add;
-            }
-            // next page
-            offset += pageSize;
+                    returning << add;
+                }
+                // next page
+                offset += pageSize;
+            } else
+                offset = INT_MAX;
+
         } else {
             // we had a parsing error - so something is wrong - stop requesting more data by ending the loop
             offset = INT_MAX;
         }
     }
-    */
 
     // all good ?
     return returning;
