@@ -1,15 +1,15 @@
 version: ci.{build}
-image: Visual Studio 2015
+image: Visual Studio 2017
 clone_depth: 1
 init:
-# Setup QT 5.9 - 64Bit
+# Setup QT 5.12 - 64Bit
 
-- set QTDIR=C:\Qt\5.9\msvc2015_64
+- set QTDIR=C:\Qt\5.12\msvc2017_64
 - set PATH=%QTDIR%\bin;%PATH%
 
-# Setup MSVC - VS 2015
+# Setup MSVC - VS 2017
 
-- CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+- call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2017\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 
 # Get the libraries
 
@@ -21,15 +21,22 @@ install:
 - copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
 - copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
 
+# Get jom
+- ps: Start-FileDownload 'https://download.qt.io/official_releases/jom/jom_1_1_3.zip'
+- 7z x jom_1_1_3.zip -oc:\jom\
+- set PATH=%PATH%;c:\jom\;
+
+
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
-- nmake
+- jom -j4
 - cd src\release
 # copy dependencies
-- windeployqt GoldenCheetah.exe
+- windeployqt --release GoldenCheetah.exe
 - copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
 - copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
+- copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 # minimum test
 - GoldenCheetah --version
 # cleanup
