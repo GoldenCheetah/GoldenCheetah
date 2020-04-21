@@ -217,6 +217,10 @@ static struct {
 
     { "cumsum", 1 },  // cumsum(v) - returns a vector of cumulative sum for vector v
 
+    { "measures", 2 }, // measures(group, field|date) - returns vector of measures; where group
+                       // is the class of measures e.g. "Hrv" or "Body", and field is the field
+                       // name you want to retrieve e.g. "WeightKg" for "Body" and "RMSSD" for "Hrv"
+
 
     // add new ones above this line
     { "", -1 }
@@ -375,6 +379,17 @@ DataFilter::builtins()
         } else if (i == 73) {
 
             returning << "cumsum(vector)";
+
+        } else if (i == 74) {
+
+            Measures measures = Measures();
+            QStringList groupSymbols = measures.getGroupSymbols();
+            for (int g=0; g<groupSymbols.count(); g++) {
+                QStringList fields = measures.getFieldSymbols(g);
+                fields.insert(0, "date");
+                foreach (QString fieldSymbol, fields)
+                    returning << QString("measures(\"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
+            }
 
         } else {
 
@@ -1569,6 +1584,43 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("too many parameters: metrics(symbol|date, start, stop)"));
+                    }
+
+                } else if (leaf->function == "measures") {
+
+                    if (leaf->fparms.count() != 2) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("measures(group, field) - must have group and field parameters."));
+
+                    } else {
+
+                        // check first field is group...
+                        int group=-1;
+                        QString group_symbol;
+                        if (leaf->fparms[0]->type != String) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("measures group must be a string."));
+                        } else {
+                            group_symbol = *(leaf->fparms[0]->lvalue.s);
+                            group = context->athlete->measures->getGroupSymbols().indexOf(group_symbol);
+                            if (group < 0) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("invalid measures group '%1'.").arg(group_symbol));
+                            }
+                        }
+
+                        // check second field is valid...
+                        if (leaf->fparms[1]->type != String) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("measures field must be a string."));
+                        } else if (group >=0) {
+                            QString field_symbol = *(leaf->fparms[1]->lvalue.s);
+                            int field = context->athlete->measures->getFieldSymbols(group).indexOf(field_symbol);
+                            if (field < 0 && field_symbol != "date") {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("invalid measures field '%1' for group '%2'.").arg(field_symbol).arg(group_symbol));
+                            }
+                        }
                     }
 
                 } else if (leaf->function == "sort") {
@@ -2906,6 +2958,50 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 else value =  ride->getForSymbol(df->lookupMap.value(symbol,""));
                 returning.number += value;
                 returning.vector.append(value);
+            }
+            return returning;
+        }
+
+        // measures
+        if (leaf->function == "measures") {
+
+            Result returning(0);
+            QDate earliest(1900,01,01);
+            bool wantdate=false;
+
+            FilterSet fs;
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+
+            spec.setDateRange(d); // fallback to daterange selected
+
+            // group number
+            QString group_symbol = *(leaf->fparms[0]->lvalue.s);
+            int group = m->context->athlete->measures->getGroupSymbols().indexOf(group_symbol);
+
+            // field number -- -1 means its date
+            QString field_symbol = *(leaf->fparms[1]->lvalue.s);
+            int field = m->context->athlete->measures->getFieldSymbols(group).indexOf(field_symbol);
+            if (field < 0) wantdate = true;
+
+            // what dates do we have measures for ?
+            QDate firstDate = m->context->athlete->measures->getStartDate(group);
+            QDate lastDate = m->context->athlete->measures->getEndDate(group);
+
+            // get measures
+            if (firstDate == QDate() || lastDate == QDate()) return returning;
+
+            for(QDate date=firstDate; date <= lastDate; date=date.addDays(1)) {
+
+                if (!spec.pass(date)) continue;
+                double value;
+                if (wantdate) value = earliest.daysTo(date);
+                else value = m->context->athlete->measures->getFieldValue(group,date,field);
+
+                returning.number += value;
+                returning.vector << value;
             }
             return returning;
         }

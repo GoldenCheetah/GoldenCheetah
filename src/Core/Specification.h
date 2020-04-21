@@ -83,6 +83,9 @@ class Specification
         Specification(IntervalItem *it, double recintsecs);
         Specification();
 
+        // does the date pass the specification ?
+        bool pass(QDate);
+
         // does the rideitem pass the specification ?
         bool pass(RideItem*);
 
