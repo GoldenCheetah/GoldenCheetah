@@ -65,8 +65,9 @@ StravaRoutesDownload::StravaRoutesDownload(Context *context) : QDialog(context->
     files->headerItem()->setText(0, tr(""));
     files->headerItem()->setText(1, tr("Name"));
     files->headerItem()->setText(2, tr("Description"));
+    files->headerItem()->setText(3, tr("Action"));
 
-    files->setColumnCount(6);
+    files->setColumnCount(4);
     files->setColumnWidth(0, 30*dpiXFactor); // selector
     files->setColumnWidth(1, 220*dpiXFactor); // name
     files->setColumnWidth(2, 240*dpiXFactor); // description
@@ -218,13 +219,13 @@ StravaRoutesDownload::downloadFiles()
             files->setCurrentItem(current); QApplication::processEvents();
 
             // this one then
-            current->setText(5, tr("Downloading...")); QApplication::processEvents();
+            current->setText(3, tr("Downloading...")); QApplication::processEvents();
 
             // get the id
-            int id = current->text(6).toInt();
+            int id = current->text(4).toInt();
             QByteArray content;
             if (!readFile(&content, id)) {
-                current->setText(5,tr("Error downloading")); QApplication::processEvents();
+                current->setText(3,tr("Error downloading")); QApplication::processEvents();
                 fails++;
                 continue;
 
@@ -246,7 +247,7 @@ StravaRoutesDownload::downloadFiles()
 
                    if (overwrite->isChecked() == false) {
                         // skip existing files
-                        current->setText(5,tr("Exists already")); QApplication::processEvents();
+                        current->setText(3,tr("Exists already")); QApplication::processEvents();
                         fails++;
                         delete p; // free memory!
                         continue;
@@ -255,7 +256,7 @@ StravaRoutesDownload::downloadFiles()
 
                         // remove existing
                         QFile(filename).remove();
-                        current->setText(5, tr("Removing...")); QApplication::processEvents();
+                        current->setText(3, tr("Removing...")); QApplication::processEvents();
                     }
 
                 }
@@ -268,13 +269,13 @@ StravaRoutesDownload::downloadFiles()
                     out.close();
 
                     downloads++;
-                    current->setText(5, tr("Saved")); QApplication::processEvents();
+                    current->setText(3, tr("Saved")); QApplication::processEvents();
                     trainDB->importWorkout(filename, p); // add to library
 
                 } else {
 
                     fails++;
-                    current->setText(5, tr("Write failed")); QApplication::processEvents();
+                    current->setText(3, tr("Write failed")); QApplication::processEvents();
                 }
 
                 delete p; // free memory!
@@ -284,7 +285,7 @@ StravaRoutesDownload::downloadFiles()
 
                 delete p; // free memory!
                 fails++;
-                current->setText(5, tr("Invalid File")); QApplication::processEvents();
+                current->setText(3, tr("Invalid File")); QApplication::processEvents();
 
             }
 
@@ -312,10 +313,10 @@ StravaRoutesDownload::getFileList(QString &error) {
     int offset = 0;
     int resultCount = INT_MAX;
 
+/*
     while (offset < resultCount) {
 
         QString url;
-/*
         QString searchCommand;
         if (offset == 0) {
             // fist call
@@ -407,15 +408,15 @@ StravaRoutesDownload::getFileList(QString &error) {
             // we had a parsing error - so something is wrong - stop requesting more data by ending the loop
             offset = INT_MAX;
         }
-    */
     }
+    */
 
     // all good ?
     return returning;
 }
 
 bool
-StravaRoutesDownload::readFile(QByteArray *data, int workoutId)
+StravaRoutesDownload::readFile(QByteArray *data, int routeId)
 {
     // this must be performed asyncronously and call made
     // to notifyReadComplete(QByteArray &data, QString remotename, QString message) when done
