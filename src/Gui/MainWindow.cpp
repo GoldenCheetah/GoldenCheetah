@@ -43,6 +43,7 @@
 #include "Settings.h"
 #include "ErgDB.h"
 #include "TodaysPlanWorkoutDownload.h"
+#include "StravaRoutesDownload.h"
 #include "Library.h"
 #include "LibraryParser.h"
 #include "TrainDB.h"
@@ -503,6 +504,7 @@ MainWindow::MainWindow(const QDir &home)
 #if QT_VERSION > 0x050000
     optionsMenu->addAction(tr("Download workouts from Today's Plan..."), this, SLOT(downloadTodaysPlanWorkouts()));
 #endif
+    optionsMenu->addAction(tr("Download workouts from Strava Routes..."), this, SLOT(downloadStravaRoutes()));
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
@@ -2117,6 +2119,27 @@ MainWindow::downloadTodaysPlanWorkouts()
     }
 }
 #endif
+
+/*----------------------------------------------------------------------
+ * Strava Routes as Workouts
+ *--------------------------------------------------------------------*/
+
+void
+MainWindow::downloadStravaRoutes()
+{
+    QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
+
+    QFileInfo fi(workoutDir);
+
+    if (fi.exists() && fi.isDir()) {
+        StravaRoutesDownload *d = new StravaRoutesDownload(currentTab->context);
+        d->exec();
+    } else{
+        QMessageBox::critical(this, tr("Workout Directory Invalid"),
+        tr("The workout directory is not configured, or the directory selected no longer exists.\n\n"
+        "Please check your preference settings."));
+    }
+}
 
 /*----------------------------------------------------------------------
  * Workout/Media Library
