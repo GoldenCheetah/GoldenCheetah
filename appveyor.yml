@@ -26,6 +26,13 @@ install:
 - 7z x jom_1_1_3.zip -oc:\jom\
 - set PATH=%PATH%;c:\jom\;
 
+# Get R and add to config
+- ps: $rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+- ps: Start-FileDownload $rurl "R-win.exe"
+- ps: Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
+- set PATH=%PATH%;c:\R\bin\;
+- R --version
+- echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
