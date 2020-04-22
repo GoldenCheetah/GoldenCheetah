@@ -305,9 +305,44 @@ StravaRoutesDownload::downloadFiles()
     trainDB->endLUW();
 }
 
-QList<StravaRoutesListEntry*>
-StravaRoutesDownload::getFileList(QString &error) {
+QString
+StravaRoutesDownload::getAthleteId(QString token)
+{
+    QString urlstr = "https://www.strava.com/api/v3/athlete";
+    QUrl url = QUrl( urlstr );
 
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "error" << reply->errorString();
+        return "";
+    }
+
+    // did we get a good response ?
+    QByteArray r = reply->readAll();
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    if (parseError.error != QJsonParseError::NoError) {
+        return "";
+    }
+
+    // result
+    return QString::number(document.object()["id"].toDouble(), 'f', 0);
+}
+
+QList<StravaRoutesListEntry*>
+StravaRoutesDownload::getFileList(QString &error)
+{
     QList<StravaRoutesListEntry*> returning;
 
     // do we have a token
@@ -317,13 +352,20 @@ StravaRoutesDownload::getFileList(QString &error) {
         return returning;
     }
 
+    // Get the authenticated athlete id
+    QString athleteId = getAthleteId(token);
+    if (athleteId.size() == 0) {
+        error = tr("Unable to determine authenticated user id");
+        return returning;
+    }
+
     // Do Paginated Access to the Routes List
     const int pageSize = 100;
     int offset = 0;
     int resultCount = INT_MAX;
 
     while (offset < resultCount) {
-        QString urlstr = "https://www.strava.com/api/v3/athletes/3655121/routes?";
+        QString urlstr = "https://www.strava.com/api/v3/athletes/" + athleteId + "/routes?";
 
 #if QT_VERSION > 0x050000
         QUrlQuery params;
