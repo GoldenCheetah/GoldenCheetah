@@ -294,3 +294,14 @@ QString VMProErrorToStringHelper::errorDescription(int errorCode)
         return tr("Error Code: %1").arg(errorCode);
     }
 }
+
+void VMProConfigurator::startCalibration()
+{
+    if (m_comInChar.isValid())
+    {
+        QByteArray cmd;
+        cmd.append(VM_BLE_SET_STATE);
+        cmd.append(VM_STATE_CALIB);
+        m_service->writeCharacteristic(m_comInChar, cmd);
+    }
+}

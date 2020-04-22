@@ -85,6 +85,9 @@ VMProWidget::VMProWidget(QLowEnergyService * service, QObject * parent)
     QGroupBox *calibrationProgressBox = new QGroupBox(tr("Calibration Status"));
     calibrationProgressBox->setLayout(calibrationProgressLayout);
 
+    // Manual calibration
+    QPushButton * startCalibration = new QPushButton(tr("Start Calibration"));
+
     // Settings Widget
     QVBoxLayout *settingsLayout = new QVBoxLayout();
     settingsLayout->addWidget(userPieceBox);
@@ -92,6 +95,7 @@ VMProWidget::VMProWidget(QLowEnergyService * service, QObject * parent)
     settingsLayout->addWidget(autocalibBox);
     settingsLayout->addWidget(idleTimeoutBox);
     settingsLayout->addWidget(calibrationProgressBox);
+    settingsLayout->addWidget(startCalibration);
     settingsWidget->setLayout(settingsLayout);
 
     QWidget * dbgWidget = new QWidget();
@@ -128,6 +132,7 @@ VMProWidget::VMProWidget(QLowEnergyService * service, QObject * parent)
     connect(m_vmProConfigurator, &VMProConfigurator::calibrationProgressChanged, this, &VMProWidget::onCalibrationProgressChanged);
     connect(m_vmProConfigurator, &VMProConfigurator::volumeCorrectionModeChanged, this, &VMProWidget::onVolumeCorrectionModeChanged);
     connect(saveButton, &QPushButton::clicked, this, &VMProWidget::onSaveClicked);
+    connect(startCalibration, &QPushButton::clicked, m_vmProConfigurator, &VMProConfigurator::startCalibration);
 
     connect(m_userPiecePicker, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, &VMProWidget::onUserPieceSizePickerChanged);
     connect(m_volumePicker, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, &VMProWidget::onVolumeCorrectionModePickerChanged);
