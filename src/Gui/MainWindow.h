@@ -200,7 +200,7 @@ class MainWindow : public QMainWindow
 #if QT_VERSION > 0x050000
         void downloadTodaysPlanWorkouts();
 #endif
-	void downloadStravaRoutes();
+        void downloadStravaRoutes();
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();
