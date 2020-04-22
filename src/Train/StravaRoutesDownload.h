@@ -66,6 +66,7 @@ private slots:
 private:
 
     void downloadFiles();
+    QString getAthleteId(QString token);
     QList<StravaRoutesListEntry*> getFileList(QString &error);
     bool readFile(QByteArray *data, int routeId);
 
