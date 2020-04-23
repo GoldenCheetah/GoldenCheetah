@@ -43,6 +43,7 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_Angle = 180.0;
     m_SubRange = 10;
     boundingRectVisibility = false;
+    forceSquareRatio = true;
 }
 
 void MeterWidget::SetRelativeSize(float RelativeWidth, float RelativeHeight)
@@ -75,7 +76,13 @@ void MeterWidget::AdjustSizePos()
 
 void MeterWidget::ComputeSize()
 {
-    m_Width = m_Height = (m_container->width() * m_RelativeWidth + m_container->height() * m_RelativeHeight) / 2;
+    if (forceSquareRatio)
+        m_Width = m_Height = (m_container->width() * m_RelativeWidth + m_container->height() * m_RelativeHeight) / 2;
+    else
+    {
+        m_Width = m_container->width() * m_RelativeWidth;
+        m_Height =  m_container->height() * m_RelativeHeight;
+    }
 }
 
 QSize MeterWidget::sizeHint() const
@@ -119,12 +126,7 @@ void MeterWidget::setBoundingRectVisibility(bool show, QColor  boundingRectColor
 
 TextMeterWidget::TextMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
-}
-
-void TextMeterWidget::ComputeSize()
-{
-    m_Width = m_container->width() * m_RelativeWidth;
-    m_Height =  m_container->height() * m_RelativeHeight;
+    forceSquareRatio = false;
 }
 
 void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
