@@ -34,6 +34,19 @@ install:
 - R --version
 - echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
+# Get SIP and add Python to config
+- c:\python36-x64\python --version
+- ps: Start-FileDownload https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip
+- 7z x sip-4.19.8.zip
+- ps: cd sip-4.19.8
+- c:\python36-x64\python configure.py
+- jom -j4
+- nmake install
+- ps: cd ..
+- echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
+- echo PYTHONINCLUDES=-I\"c:\python36-x64\include\" >> src\gcconfig.pri
+- echo PYTHONLIBS=-L\"c:\python36-x64\libs\" -lpython36 >> src\gcconfig.pri
+
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
 - jom -j4
@@ -44,6 +57,7 @@ build_script:
 - copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
 - copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
+- copy c:\python36-x64\python36.dll
 # minimum test
 - GoldenCheetah --version
 # cleanup
