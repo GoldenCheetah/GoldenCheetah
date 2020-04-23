@@ -318,7 +318,11 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         else if (p_meterWidget->Source() == QString("Gradient"))
         {
-            // TODO : do not show when not in slope simulation mode
+            // Do not show when not in ERG mode (mode=1)
+            if ( rtd.mode == 1)
+                {
+                    p_meterWidget->setWindowOpacity(0); // Hide the widget
+                }
             // int curLap;
             double slope = 0.0;
             if (context && context->currentErgFile() )
@@ -330,6 +334,11 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         else if (p_meterWidget->Source() == QString("Elevation"))
         {
+            // Do not show when not in ERG mode (mode=1)
+            if ( rtd.mode == 1)
+                {
+                    p_meterWidget->setWindowOpacity(0); // Hide the widget
+                }
             if (context && context->currentErgFile())
                 //p_meterWidget->Value = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
                 p_meterWidget->Value = rtd.getDistance();
@@ -347,6 +356,18 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                     slope = rtd.getSlope();
                 elevationMeterWidget->gradientValue = slope; 
             }
+        }
+        else if (p_meterWidget->Source() == QString("Duration"))
+        {
+            // TODO add fixed size property to TextWidget to avoid small movement of text
+            //     ... to be used when source is speed, duration & distance
+            p_meterWidget->Value = rtd.getMsecs();
+            int hours = p_meterWidget->Value / 3600000L;
+            int minutes = ((long)p_meterWidget->Value % 3600000L) / 60000L;
+            int seconds = ((long)p_meterWidget->Value % 60000L) / 1000L;
+            int dsecs = ((long)p_meterWidget->Value % 1000L) / 100L;
+            p_meterWidget->Text = QString("%1:%2").arg((int)hours,(int)1,(int)10,QLatin1Char('0')).arg((int)minutes,(int)2,(int)10,QLatin1Char('0'));
+            p_meterWidget->AltText = QString(":%1.%2").arg((int)seconds,(int)2,(int)10,QLatin1Char('0')).arg((int)dsecs,(int)1,(int)10,QLatin1Char('0'));
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
@@ -461,8 +482,12 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         if (curPosition > VideoSyncFiledataPoints.count() - 1 || curPosition < 1)
             curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
-        double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
-        context->currentVideoSyncFile()->km = CurrentDistance;
+        double CurrentDistance = 0.0;
+        if (context && context->currentVideoSyncFile())
+        {
+            CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
+            context->currentVideoSyncFile()->km = CurrentDistance;
+        }
 
         // make sure the current position is less than the new distance
         while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))
