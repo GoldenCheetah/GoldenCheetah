@@ -324,15 +324,11 @@ QString GcCrashDialog::versionHTML()
 #ifdef GC_WANT_R
             .arg(QString("%1 [%2.%3]").arg(rtool ? rtool->version : QString("none")).arg(R_MAJOR).arg(R_MINOR))
 #else
-#ifdef WIN32
-            .arg("unsupported")
-#else
             .arg("none")
-#endif
 #endif
             .arg(webkit)
 #ifdef GC_HAVE_PYTHON
-            .arg(python ? python->version.split(" ").at(0) : QString("disabled"))
+            .arg(QString("%1 [%2]").arg(python ? python->version.split(" ").at(0) : QString("none")).arg(PythonEmbed::buildVersion()))
 #else
             .arg("none")
 #endif

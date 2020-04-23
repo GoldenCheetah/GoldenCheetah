@@ -47,6 +47,12 @@ extern "C" {
 extern PyObject *PyInit_goldencheetah(void);
 };
 
+QString
+PythonEmbed::buildVersion()
+{
+    return QString("%1.%2.%3").arg(PY_MAJOR_VERSION).arg(PY_MINOR_VERSION).arg(PY_MICRO_VERSION);
+}
+
 PythonEmbed::~PythonEmbed()
 {
 }

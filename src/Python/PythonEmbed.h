@@ -70,6 +70,7 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
+    static QString buildVersion(); // Python version used at build time
     // find installed binary and check version and module path
     static bool pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME=QString(""));
     QString pybin, pypath;
