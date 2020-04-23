@@ -20,6 +20,7 @@
 #define _MeterWidget_h 1
 
 #include <QWidget>
+#include "Context.h"
 
 class MeterWidget : public QWidget
 {
@@ -109,5 +110,15 @@ class NeedleMeterWidget : public MeterWidget
     virtual void paintEvent(QPaintEvent* paintevent);
 };
 
+class ElevationMeterWidget : public MeterWidget
+{
+  public:
+    explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
+    virtual void paintEvent(QPaintEvent* paintevent);
+    float gradientValue;
+    void setContext(Context *context) { this->context = context; }
+  private:
+    Context *context;
+};
 
 #endif // _MeterWidget_h
