@@ -22,6 +22,7 @@
 #include <vector>
 #include <algorithm>
 #include <array>
+#include "BlinnSolver.h"
 #include "PolynomialRegression.h"
 
 template<typename T> struct XYPair {
@@ -227,10 +228,6 @@ class T_PolyRegressionizer : public T_RegressionizerBase<T> {
             coefs[i] /= B[i][i];
         }
 
-        coefs.clear();
-        for (size_t i = 0; i < a.size(); i++)
-            coefs.push_back(a[i]);
-
         return true;
     }
 
@@ -255,8 +252,8 @@ public:
 
             // Compute StdDev
             T_fptype sumSquares = s_zero;
-            for (auto i : xy) {
-                T_fptype delta = i.y - Fit(i.x);
+            for (auto elem : xy) {
+                T_fptype delta = elem.y - Fit(elem.x);
                 sumSquares += delta * delta;
             }
             T_fptype N = (unsigned)xy.size();
@@ -346,12 +343,12 @@ template <typename T> class T_FractionalPolyRegressionizer : public T_Regression
 
             T_fptype newSumSquares = 0;
             for (size_t i = 0; i <= e; i++) {
-                T_fptype xv = xy.X(i);
-                T_fptype yv = xy.Y(i);
+                xv = xy.X(i);
+                yv = xy.Y(i);
                 if (xv == s_zero) results[i] = s_zero;
                 else results[i] = pow(xv, m_X) * m_Y;
-                T_fptype delta = results[i] - yv;
-                newSumSquares += (delta * delta);
+                T_fptype deltat = results[i] - yv;
+                newSumSquares += (deltat * deltat);
             }
 
             // Its good if sum of squares decreases.
@@ -389,6 +386,7 @@ public:
     }
     
     bool Build(const XYVector<T_fptype>& xy, double epsilon) {
+        epsilon; // This function has no ability to honor epsilon
         m_stddev = ComputeCoefs(xy);
         return Valid();
     }
@@ -402,7 +400,7 @@ public:
         std::cout << "Fractional Poly Regression Curve, x^" << m_X << "*" << m_Y << "+" << m_Z << ", stddev: " << StdDev() << std::endl;
     }
     virtual PolyFit<T_fptype>* AsPolyFit() const {
-        return FitGenerator::GetFractionalPolynomialFitter({ m_X, m_Y, m_Z });
+        return PolyFitGenerator::GetFractionalPolyFit({ m_X, m_Y, m_Z });
     }
 };
 
@@ -421,6 +419,8 @@ class T_RationalPolyRegressionizer : public T_RegressionizerBase<T> {
 
     unsigned maxOrder;
 
+    // This is a quick power for simple integer exponent. This is much more
+    // efficient than standard pow, inlines into simple multiply.
     static T_fptype T_pow(T_fptype x, int iPow) {
         static const T_fptype s_one = 1.;
         if (iPow == 0)
@@ -540,11 +540,10 @@ class T_RationalPolyRegressionizer : public T_RegressionizerBase<T> {
                 if (i > 0 && j < orderN) {
                     X[aI][aJ] = X[aI - 1][aJ + 1];
                 } else {
-                    T_fptype iPow = (int)(i + j + 1);
-
                     T_fptype v = s_zero;
+                    int iPow = (int)(i + j + 1);
                     for (size_t n = 0; n < x.size(); n++) {
-                        v += T_fptype(y[n]) * T_pow(T_fptype(x[n]), (int)(i + j + 1));
+                        v += T_fptype(y[n]) * T_pow(T_fptype(x[n]), iPow);
                     }
 
                     X[aI][aJ] = v;
@@ -566,10 +565,10 @@ class T_RationalPolyRegressionizer : public T_RegressionizerBase<T> {
                 if (j > 0 && i < orderN) {
                     X[aI][aJ] = X[aI + 1][aJ - 1];
                 } else {
-                    int iPow = (int)(i + j + 1);
                     T_fptype v = s_zero;
+                    int iPow = (int)(i + j + 1);
                     for (size_t n = 0; n < x.size(); n++) {
-                        v += T_fptype(y[n]) * T_pow(T_fptype(x[n]), (int)(i + j + 1));
+                        v += T_fptype(y[n]) * T_pow(T_fptype(x[n]), iPow);
                     }
 
                     v = -v;
@@ -595,7 +594,7 @@ class T_RationalPolyRegressionizer : public T_RegressionizerBase<T> {
                     int iPow = (int)(i + j + 2);
                     T_fptype v = s_zero;
                     for (size_t n = 0; n < x.size(); n++) {
-                        v += T_pow(T_fptype(y[n]), 2) * T_pow(T_fptype(x[n]), (int)(i + j + 2));
+                        v += T_pow(T_fptype(y[n]), 2) * T_pow(T_fptype(x[n]), iPow);
                     }
 
                     v = -v;
@@ -999,7 +998,7 @@ public:
     PolyFit<T_fptype>* AsPolyFit() {
         if (!Build()) return NULL;
         
-        return m_multifit->AsPolyFit();
+        return m_multifit.AsPolyFit();
     }
 };
 #endif // _GC_MultiRegressionizer_h

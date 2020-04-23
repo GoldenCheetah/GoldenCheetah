@@ -66,6 +66,10 @@ bool IsZero(double value, Args...args) {
     return RangedZeroTest<s_MantissaBitsNeeded>(value, args...);
 }
 
+bool IsZero2(double value, double arg) {
+    return IsZero(value, arg);
+}
+
 // 0 == A*x + B
 Roots LinearSolver(double A, double B) {
     if (IsZero(A, B)) {
