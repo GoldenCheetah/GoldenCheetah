@@ -254,10 +254,10 @@ bool UnitCatmullRomInterpolator::Inverse(double r, double &u) const
     // for monotonic distance mapping.
     bool ret = false;    
     for (unsigned i = 0; i < roots.resultcount(); i++) {
-        double r = roots.result(i).x / roots.result(i).w;
+        double rt = roots.result(i).x / roots.result(i).w;
         // Take the first root we find in range 0..1.
-        if (r >= 0. && r <= 1.) {
-            u = r;
+        if (rt >= 0. && rt <= 1.) {
+            u = rt;
             ret = true;
             break;
         }

@@ -17,6 +17,7 @@
  */
 
 #include <array>
+#include <iostream>
 #include "PolynomialRegression.h"
 #include "MultiRegressionizer.h"
 
@@ -183,4 +184,75 @@ PolyFit<double>* PolyFitGenerator::GetPolyFit          (const std::vector<double
 
 PolyFit<double>* PolyFitGenerator::GetFractionalPolyFit(const std::vector<double>& coefs, const double& scale) {
     return s_PolyFitGenerator.GetFractionalPolyFit(coefs, scale);
+}
+
+void PolynomialRegressionTest(void) {
+
+    // Some struct that matches data layout. Main thing is that
+    // 'time' and 'speed' fields exist and line up with the data.
+    struct SpindownData {
+        double time, cad, hr, distance, speed, nm, watts;
+    };
+
+    static const SpindownData Kinetic0[] =
+    {
+        { 43    ,74, 124    ,0.218709   ,35.9748    ,0  ,322 },
+        { 44	,0	,126	,0.227924	,31.3092	,0	,0 },
+        { 45	,0	,127	,0.235807	,25.5384	,0	,136 },
+        { 46	,0	,127	,0.242162	,21.1068	,0	,84 },
+        { 47	,0	,128	,0.247444	,17.6184	,0	,52 },
+        { 48	,0	,129	,0.251868	,14.7996	,0	,30 },
+        { 49	,0	,129	,0.255584	,12.4308	,0	,15 },
+        { 50	,0	,129	,0.258855	,11.3364	,0	,4 },
+        { 51	,0	,129	,0.261546	,8.5896	    ,0	,0 },
+        { 52	,0	,129	,0.263682	,7.092	    ,0	,0 },
+        { 53	,0	,129	,0.265421	,5.706	    ,0	,0 },
+        { 54	,0	,129	,0.266055	,0	        ,0	,0 }
+    };
+
+    static const SpindownData Kinetic1[] =
+    {
+        { 96	,0	    ,141	,0.516778	,29.9448	,0	,123 },
+        { 97	,0	    ,142	,0.523957	,22.392	    ,0	,77 },
+        { 98	,0	    ,143	,0.52977	,18.7308	,0	,48 },
+        { 99	,0	    ,143	,0.534643	,15.7608	,0	,28 },
+        { 100	,0	    ,144	,0.538603	,13.2516	,0	,14 },
+        { 101	,0	    ,144	,0.541942	,11.1996	,0	,3 },
+        { 102	,0	    ,144	,0.544747	,9.3672	    ,0	,0 },
+        { 103	,0	    ,145	,0.547091	,7.8192	    ,0	,0 },
+        { 104	,0	    ,144	,0.549033	,6.4404	    ,0	,0 },
+        { 105	,0	    ,144	,0.550611	,5.1732	    ,0	,0 },
+        { 106	,0	    ,144	,0.551186	,0	        ,0	,0 }
+    };
+
+    // For convenience push references to above static data into arrays.
+    std::vector<const SpindownData*> msdata;
+    std::vector<size_t> msdatasize;
+
+    msdata.push_back(Kinetic0); msdatasize.push_back(sizeof(Kinetic0) / sizeof(Kinetic0[0]));
+    msdata.push_back(Kinetic1); msdatasize.push_back(sizeof(Kinetic1) / sizeof(Kinetic0[1]));
+
+    // Spindown fitter: desired fit epsilon is 1kph, max order for match is 6.
+    // 6 is almost certainly too high but this is for test so why not.
+    SpindownToPolyFit < SpindownData, XYVector<double>> ms_stp(1, 6);
+
+    // Array to hold fit variance (computed when each array is pushed.)
+    std::vector<double> ms_variances;
+
+    // Push data referenced by arrays into the spindown fitter.
+    for (size_t i = 0; i < msdata.size(); i++) {
+        ms_variances.push_back(
+            ms_stp.Push(msdata[i], (unsigned)msdatasize[i]));
+    }
+
+    std::cout << "------------- SpindownTest ------------" << std::endl;
+    std::cout << "Accumulated Power Fit" << std::endl;
+    PolyFit<double> *pf = ms_stp.AsPolyFit();
+    for (double d = 0.; d <= 55; d += 5) {
+        double bfd = d;
+        std::cout << d << "\t\t" << pf->Fit(bfd) << std::endl;
+    }
+
+    // Delete polyfit
+    delete pf;
 }
