@@ -26,6 +26,8 @@
 #define _GC_RealtimeController_h 1
 #include "GoldenCheetah.h"
 
+#include "PolynomialRegression.h"
+
 #define DEVICE_ERROR 1
 #define DEVICE_OK 0
 
@@ -37,7 +39,7 @@ public:
     TrainSidebar *parent;                     // for push devices
 
     RealtimeController (TrainSidebar *parent, DeviceConfiguration *dc = 0);
-    virtual ~RealtimeController() {}
+    virtual ~RealtimeController() { delete polyFit; }
 
     virtual int start();
     virtual int restart();                              // restart after paused
@@ -85,6 +87,12 @@ private:
     DeviceConfiguration *dc;
     DeviceConfiguration devConf;
     QTime lastCalTimestamp;
+
+    PolyFit<double>* polyFit; // Speed to power fit.
+    int iFitId;                 // For lazy re-init, record id of current fit.
+    bool fUseWheelRpm;          // If power is derived from wheelrpm instead of speed.
+
+    void SetupPolyFitFromPostprocessId(int postProcess);
 };
 
 #endif // _GC_RealtimeController_h
