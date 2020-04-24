@@ -360,24 +360,23 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     minY -= (maxY-minY) * 0.20f; // add 20% as bottom headroom (slope gradient will be shown there in a bubble)
 
     // this->Value should hold the current distance in meters. 
-     // need to change to context->currentErgFile()-> rtd.getDistance();
     cyclistX = (this->Value * 1000.0 - minX) * (double)m_Width / (maxX-minX);
 
     //Test variables
-    double ptx=0, pty=0, d_pts=0;
+    //double ptx=0, pty=0, d_pts=0;
 
     QPolygon polygon;
     polygon << QPoint(0.0, (double)m_Height);
     double x, y, pt=0;
     double nextX = 1;
-    d_pts = context->currentErgFile()->Points.size();
+    //d_pts = context->currentErgFile()->Points.size();
     for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
     {
         for ( ; x < nextX && pt < context->currentErgFile()->Points.size(); pt++)
         {
-            d_pts = context->currentErgFile()->Points.size();
-            ptx = (context->currentErgFile()->Points[pt].x - minX);
-            pty = (context->currentErgFile()->Points[pt].y - minY);
+            //d_pts = context->currentErgFile()->Points.size();
+            //ptx = (context->currentErgFile()->Points[pt].x - minX);
+            //pty = (context->currentErgFile()->Points[pt].y - minY);
             x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX-minX);
             y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY-minY);
         }

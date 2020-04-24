@@ -316,51 +316,26 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
             p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph"));
         }
-        else if (p_meterWidget->Source() == QString("Gradient"))
-        {
-            // Do not show when not in ERG mode (mode=1)
-            if ( rtd.mode == 1)
-                {
-                    p_meterWidget->setWindowOpacity(0); // Hide the widget
-                }
-            // int curLap;
-            double slope = 0.0;
-            if (context && context->currentErgFile() )
-            //     slope = context->currentErgFile()->gradientAt((context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset) * 1000.0, curLap);
-                slope = rtd.getSlope();
-            p_meterWidget->Value = slope; 
-            p_meterWidget->Text = ((-1.0 < slope && slope < 0.0)?QString("-"):QString("")) + QString::number((int) p_meterWidget->Value);
-            p_meterWidget->AltText = QString(".") + QString::number(abs((int)(p_meterWidget->Value * 10.0) % 10)) + QString("%");
-        }
         else if (p_meterWidget->Source() == QString("Elevation"))
         {
-            // Do not show when not in ERG mode (mode=1)
-            if ( rtd.mode == 1)
+            // Do not show in ERG mode
+            if (rtd.mode == ERG || rtd.mode == MRC)
                 {
                     p_meterWidget->setWindowOpacity(0); // Hide the widget
                 }
-            if (context && context->currentErgFile())
-                //p_meterWidget->Value = context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset;
-                p_meterWidget->Value = rtd.getDistance();
+            p_meterWidget->Value = rtd.getDistance();
             ElevationMeterWidget* elevationMeterWidget = dynamic_cast<ElevationMeterWidget*>(p_meterWidget);
             if (!elevationMeterWidget)
                 qDebug() << "Error: Elevation keyword used but widget is not elevation type";
             else
             {
                 elevationMeterWidget->setContext(context);
-                // TODO : do not use gradient when not in slope simulation mode
-                //int curLap;
-                double slope = 0.0;
-                if (context && context->currentErgFile())
-                    //slope = context->currentErgFile()->gradientAt((context->currentVideoSyncFile()->km + context->currentVideoSyncFile()->manualOffset) * 1000.0, curLap);
-                    slope = rtd.getSlope();
-                elevationMeterWidget->gradientValue = slope; 
+                elevationMeterWidget->gradientValue = rtd.getSlope();
             }
         }
         else if (p_meterWidget->Source() == QString("Duration"))
         {
-            // TODO add fixed size property to TextWidget to avoid small movement of text
-            //     ... to be used when source is speed, duration & distance
+            // Formated time dureation of ride
             p_meterWidget->Value = rtd.getMsecs();
             int hours = p_meterWidget->Value / 3600000L;
             int minutes = ((long)p_meterWidget->Value % 3600000L) / 60000L;
@@ -483,11 +458,11 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
         double CurrentDistance = 0.0;
-        if (context && context->currentVideoSyncFile())
-        {
+        //if (context && context->currentVideoSyncFile())
+        //{
             CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
             context->currentVideoSyncFile()->km = CurrentDistance;
-        }
+        //}
 
         // make sure the current position is less than the new distance
         while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))

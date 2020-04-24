@@ -90,19 +90,6 @@
 	    <MainColor R="255" G="255" B="255" A="255" />
         <BackgroundColor R="255" G="255" B="255" A="0" />		
 	</meter>
-    <meter name="distance" container="Video" source="Distance" type="Text">
-        <RelativeSize Width="10.0" Height="5.0" />
-        <RelativePosition X="18.0" Y="7.0" />
-	    <MainColor R="255" G="255" B="255" A="255" />
-        <BackgroundColor R="255" G="255" B="255" A="0" />	
-	</meter>
-<!-- Included in elevation for now
-    <meter name="gradient" container="Video" source="Gradient" type="Text">
-        <RelativeSize Width="10.0" Height="5.0" />
-        <RelativePosition X="15.0" Y="13.0" />
-		<BackgroundColor R="200" G="200" B="200" A="125" />
-	</meter>
--->
 	<meter name="elevation" container="Video" source="Elevation" type="Elevation">
 		<RelativeSize Width="40.0" Height="15.0" />
 		<RelativePosition X="20.0" Y="92.0" />
