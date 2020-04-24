@@ -242,7 +242,7 @@ QString GcCrashDialog::versionHTML()
     // -- VLC ----
     QString vlc = "none";
     #ifdef GC_HAVE_VLC
-    vlc = "yes";
+    vlc = libvlc_get_version();
     #endif
 
     // -- WEBKIT ---
