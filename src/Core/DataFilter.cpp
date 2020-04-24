@@ -221,6 +221,11 @@ static struct {
                        // is the class of measures e.g. "Hrv" or "Body", and field is the field
                        // name you want to retrieve e.g. "WeightKg" for "Body" and "RMSSD" for "Hrv"
 
+    { "week", 1 },      // some date arithmetic functions, week and month convert a date (days since 01/01/1970
+    { "month", 1 },     // to the week or month since 01/01/1970, and in reverse weekdate and monthdate
+    { "weekdate", 1 },  // convert the week or month number to a date (days since 01/01/1970).
+    { "monthdate", 1 },
+
 
     // add new ones above this line
     { "", -1 }
@@ -2494,6 +2499,21 @@ Result::vectorize(int count)
 // used by lowerbound
 struct comparedouble { bool operator()(const double p1, const double p2) { return p1 < p2; } };
 
+// date arithmetic, a bit of a brute force, but need to rely upon
+// QDate arithmetic for handling months (so we don't have to)
+static int monthsTo(QDate from, QDate to)
+{
+    int sign = from < to ? +1 : -1;
+    int months = 0;
+    for(QDate x=from; x.daysTo(to)* sign >=0; x=x.addMonths(sign)) {
+        if (months*sign > 40000) break;
+        months += sign;
+    }
+    months -= sign; // always goes past, so wind it back 1 step
+
+    return months;
+}
+
 Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
 {
     // if error state all bets are off
@@ -3014,11 +3034,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             QString symbol = *(leaf->fparms[0]->lvalue.n);
 
             // go get it for the current date range
-            bool rangemode = true;
             if (d.from==QDate() && d.to==QDate()) {
-
-                // not in rangemode
-                rangemode = false;
 
                 // the ride mean max
                 if (symbol == "efforts") {
@@ -3593,6 +3609,96 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 si++;
             }
+            return returning;
+        }
+
+        // date handling functions
+        if (leaf->function == "week") {
+
+            // convert number or vector of dates to weeks since 1900
+            QDate earliest(1900,01,01);
+            Result returning(0);
+
+            if (leaf->fparms.count() != 1) return returning;
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            if (v.vector.count()) {
+                for(int it=0; it<v.vector.count(); it++) {
+                    double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[it])) / 7.0);
+                    returning.number += value; // for sum
+                    returning.vector << value;
+                }
+            } else {
+                returning.number = std::floor(earliest.daysTo(earliest.addDays(v.number)) / 7.0);
+            }
+
+            return returning;
+        }
+
+        if (leaf->function == "weekdate") {
+
+            // convert number or vector of dates to weeks since 1900
+            QDate earliest(1900,01,01);
+            Result returning(0);
+
+            if (leaf->fparms.count() != 1) return returning;
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            if (v.vector.count()) {
+                for(int it=0; it<v.vector.count(); it++) {
+                    double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[it]* 7.0)));
+                    returning.number += value; // for sum
+                    returning.vector << value;
+                }
+            } else {
+                returning.number = std::floor(earliest.daysTo(earliest.addDays(v. number* 7.0)));
+            }
+
+            return returning;
+        }
+        if (leaf->function == "month") {
+
+            // convert number or vector of dates to weeks since 1900
+            QDate earliest(1900,01,01);
+            Result returning(0);
+
+            if (leaf->fparms.count() != 1) return returning;
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            if (v.vector.count()) {
+                for(int it=0; it<v.vector.count(); it++) {
+                    double value = std::floor(monthsTo(earliest, earliest.addDays(v.vector[it])));
+                    returning.number += value; // for sum
+                    returning.vector << value;
+                }
+            } else {
+                returning.number = std::floor(monthsTo(earliest, earliest.addDays(v.number)));
+            }
+
+            return returning;
+        }
+
+        if (leaf->function == "monthdate") {
+
+            // convert number or vector of dates to weeks since 1900
+            QDate earliest(1900,01,01);
+            Result returning(0);
+
+            if (leaf->fparms.count() != 1) return returning;
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            if (v.vector.count()) {
+                for(int it=0; it<v.vector.count(); it++) {
+                    QDate dd = earliest.addMonths(v.vector[it]);
+                    double value = earliest.daysTo(QDate(dd.year(), dd.month(), 1));
+                    returning.number += value; // for sum
+                    returning.vector << value;
+                }
+            } else {
+                QDate dd = earliest.addMonths(v.number);
+                returning.number = earliest.daysTo(QDate(dd.year(), dd.month(), 1));
+            }
+
             return returning;
         }
 
