@@ -888,7 +888,7 @@ void ErgFile::parseTTS()
         alt = ttsPoints[0].getElevation();
     }
 
-    for (int i = 0; i <= pointCount; i++) { // first data point is actually the last...
+    for (int i = 0; i < pointCount; i++) { // first data point is actually the last...
         ErgFilePoint add;
 
         prevPoint = point;
