@@ -1,18 +1,20 @@
 version: ci.{build}
 image: Visual Studio 2017
 clone_depth: 1
+
+#environment:
+#  GC_STRAVA_CLIENT_SECRET:
+#    secure: UfBCxny4/IzLxlUSArP7O8fVrM2DTjf4oq/ZW2xMgtt7jPaENCK0sK5nMn5Dl2AH
+
 init:
 # Setup QT 5.12 - 64Bit
-
 - set QTDIR=C:\Qt\5.12\msvc2017_64
 - set PATH=%QTDIR%\bin;%PATH%
 
 # Setup MSVC - VS 2017
-
 - call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2017\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 
 # Get the libraries
-
 - ps: Start-FileDownload 'https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
 - 7z x c:/gc-ci-libs.zip -oC:\libs
 
@@ -38,26 +40,39 @@ install:
 - c:\python36-x64\python --version
 - ps: Start-FileDownload https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip
 - 7z x sip-4.19.8.zip
-- ps: cd sip-4.19.8
+- cd sip-4.19.8
 - c:\python36-x64\python configure.py
 - jom -j4
 - nmake install
-- ps: cd ..
+- cd ..
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
 - echo PYTHONINCLUDES=-I\"c:\python36-x64\include\" >> src\gcconfig.pri
 - echo PYTHONLIBS=-L\"c:\python36-x64\libs\" -lpython36 >> src\gcconfig.pri
+
+before_build:
+# Add Train Robot
+- echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
+# Add debug console
+- echo CONFIG+=console >> src\gcconfig.pri
+
+# Patch Secrets.h
+#- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_STRAVA_CLIENT_SECRET__', $env:GC_STRAVA_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
 - jom -j4
 - cd src\release
+
 # copy dependencies
 - windeployqt --release GoldenCheetah.exe
 - copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
 - copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
+- xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - copy c:\python36-x64\python36.dll
+
 # minimum test
 - GoldenCheetah --version
 # cleanup
