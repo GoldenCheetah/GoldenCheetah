@@ -226,6 +226,10 @@ static struct {
     { "weekdate", 1 },  // convert the week or month number to a date (days since 01/01/1970).
     { "monthdate", 1 },
 
+    { "aggregate", 3 }, // aggregate(v, by, mean|sum|max|min|count) - returns an aggregate of vector
+                        // v using the values in by to group, applies the func mean, sum etc when
+                        // aggregating, by will not be sorted, so will aggregate as it is.
+
 
     // add new ones above this line
     { "", -1 }
@@ -395,6 +399,10 @@ DataFilter::builtins()
                 foreach (QString fieldSymbol, fields)
                     returning << QString("measures(\"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
             }
+
+        } else if (i == 79) {
+
+            returning << "aggregate(vector, by, mean|sum|max|min|count)";
 
         } else {
 
@@ -1375,6 +1383,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
             QRegExp annotateTypes("^(label)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
+            QRegExp aggregateFunc("^(mean|sum|max|min|count)$", Qt::CaseInsensitive);
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -1487,6 +1496,31 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() != 1) {
                         leaf->inerror = true;
                         DataFiltererrors << QString(tr("should be cumsum(vector)"));
+                    }
+
+                } else if (leaf->function == "aggregate") {
+
+                    if (leaf->fparms.count() != 3) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("should be aggregate(vector, byvector, mean|sum|max|min|count)"));
+
+                    } else {
+
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+
+                        // just check the 3rd param is a valid symbol
+                        if (leaf->fparms[2]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("aggregate(vector, by, func) func must be one of mean|sum|max|min|count."));
+                        } else {
+                            QString symbol = *(leaf->fparms[2]->lvalue.n);
+                            if (!aggregateFunc.exactMatch(symbol)) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("unknown function '%1', must be one of mean|sum|max|min|count.").arg(symbol));
+                            }
+                        }
                     }
 
                 } else if (leaf->function == "append") {
@@ -2798,6 +2832,81 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.number += cumsum;
                 returning.vector << cumsum;
             }
+            return returning;
+        }
+
+        // aggregate
+        if (leaf->function == "aggregate") {
+
+            // returns an aggregated vector, using by as the group by value
+            // and func defines how we aggregate
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result by = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            QString func = (*(leaf->fparms[2]->lvalue.n)).toLower();
+
+            Result returning(0);
+
+            // anything other than a vector makes no sense, so
+            // lets turn a number into a vector of 1 value
+            if (v.vector.count()==0) v.vector << v.number;
+            if (by.vector.count()==0) by.vector << by.number;
+
+            // state as we loop through a group
+            double last=by.vector[0]; // we setup for very first group
+            double count=0, value=0;
+            bool first=true;
+
+            for(int byit=0,it=0; it < v.vector.count(); byit++,it++) {
+
+                // repeat by, in cases where fewer entries than in
+                // the vector being aggregated
+                if (byit >= by.vector.count()) byit=0;
+
+                // add last and reset for next group
+                if (last != by.vector[byit]) {
+                    returning.number += value; // sum
+                    returning.vector << value;
+                    value=0;
+                    count=0;
+                    first=true; // first in group
+                }
+
+                // update the aggregate for this group
+                double xx = v.vector[it];
+                count++;
+
+                // mean
+                if (func == "mean")  value = ((value * (count-1)) + xx) / count;
+
+                // sum
+                if (func == "sum") value += xx;
+
+                // max
+                if (func == "max") {
+                    if (first) value = xx;
+                    else if (xx > value) value = xx;
+                }
+
+                // min
+                if (func == "min") {
+                    if (first) value = xx;
+                    else if (xx < value) value = xx;
+                }
+
+                // count
+                if (func == "count") {
+                    value++;
+                }
+
+                // on to the next
+                last = by.vector[byit];
+                first = false;
+            }
+
+            // the last
+            returning.number += value; // sum
+            returning.vector << value;
+
             return returning;
         }
 
