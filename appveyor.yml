@@ -104,8 +104,9 @@ before_build:
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
 - jom -j4
-- cd src\release
 
+after_build:
+- cd src\release
 # copy dependencies
 - windeployqt --release GoldenCheetah.exe
 - copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
@@ -114,18 +115,18 @@ build_script:
 - xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - copy c:\python36-x64\python36.dll
+# cleanup and pack
+- del *.h *.cpp *.obj *.pdb *.res
+- 7z a ..\..\GoldenCheetah_dev_64bit_Windows.zip *
 
+test_script:
 # minimum test
 - GoldenCheetah --version
-# cleanup
-- del *.h *.cpp *.obj *.pdb *.res
-# pack and upload to transfer.sh
-- 7z a GoldenCheetah.zip *
-- curl --upload-file GoldenCheetah.zip https://transfer.sh/GoldenCheetah.zip
 - cd ..\..
 
-#notifications:
-#- provider: GitHubPullRequest
-#  on_build_success: true
-#  on_build_failure: true
-#  on_build_status_changed: true
+artifacts:
+- path: GoldenCheetah_dev_64bit_Windows.zip
+
+deploy_script:
+# Upload to transfer.sh if possible, but don't fail
+- cmd /c "curl --upload-file GoldenCheetah_dev_64bit_Windows.zip https://transfer.sh/GoldenCheetah_dev_64bit_Windows.zip || exit 0"
