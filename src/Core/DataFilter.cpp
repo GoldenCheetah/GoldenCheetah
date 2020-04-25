@@ -3730,7 +3730,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             if (leaf->fparms.count() != 1) return returning;
 
-            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
                 for(int it=0; it<v.vector.count(); it++) {
                     double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[it])) / 7.0);
@@ -3752,7 +3752,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             if (leaf->fparms.count() != 1) return returning;
 
-            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
                 for(int it=0; it<v.vector.count(); it++) {
                     double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[it]* 7.0)));
@@ -3773,7 +3773,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             if (leaf->fparms.count() != 1) return returning;
 
-            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
                 for(int it=0; it<v.vector.count(); it++) {
                     double value = std::floor(monthsTo(earliest, earliest.addDays(v.vector[it])));
@@ -3795,7 +3795,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             if (leaf->fparms.count() != 1) return returning;
 
-            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
                 for(int it=0; it<v.vector.count(); it++) {
                     QDate dd = earliest.addMonths(v.vector[it]);
