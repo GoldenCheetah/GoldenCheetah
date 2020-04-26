@@ -78,6 +78,8 @@ install:
 - echo PYTHONLIBS=-L\"c:\python36-x64\libs\" -lpython36 >> src\gcconfig.pri
 
 before_build:
+# Enable CloudDB
+- echo CloudDB=active >> src\gcconfig.pri
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 # Add debug console
