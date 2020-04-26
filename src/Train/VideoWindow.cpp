@@ -335,7 +335,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         else if (p_meterWidget->Source() == QString("Duration"))
         {
-            // Formated time dureation of ride
+            // Formated time duration of ride
             p_meterWidget->Value = rtd.getMsecs();
             int hours = p_meterWidget->Value / 3600000L;
             int minutes = ((long)p_meterWidget->Value % 3600000L) / 60000L;

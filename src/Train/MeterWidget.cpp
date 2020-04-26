@@ -407,9 +407,9 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     if (cyclistX < m_Width*0.5) {
-        painter.drawText((double)cyclistX, ((double)m_Height * 0.95), s_grad);
+        painter.drawText((double)cyclistX+5, ((double)m_Height * 0.95), s_grad);
     } else {
-        painter.drawText((double)cyclistX-40, ((double)m_Height * 0.95), s_grad);
+        painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
     }
     //Debug
     //sGrad = s_grad.toStdString();
