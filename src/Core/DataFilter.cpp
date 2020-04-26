@@ -4880,7 +4880,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             {
                 // we bound while to make sure it doesn't consume all
                 // CPU and 'hang' for badly written code..
-                static int maxwhile = 10000;
+                static int maxwhile = 1000000;
                 int count=0;
                 QTime timer;
                 timer.start();

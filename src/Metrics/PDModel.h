@@ -237,8 +237,8 @@ class CP2Model : public PDModel
         double WPrime();
         double CP();
 
-        QString name()   { return "Classic 2 Parameter"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "2 Parm"; }        // short name used in metric names e.g. 2P model
+        QString name()   { return "Classic  Parameter"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "cp2"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
@@ -290,7 +290,7 @@ class CP3Model : public PDModel
         double PMax();
 
         QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
+        QString code()   { return "cp3"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
         void loadParameters(QList<double>&here);
@@ -471,7 +471,7 @@ class ExtendedModel : public PDModel
         double PMax();
 
         QString name()   { return "Extended CP"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "Ext"; }        // short name used in metric names e.g. 2P model
+        QString code()   { return "ext"; }        // short name used in metric names e.g. 2P model
 
         // Extended has multiple additional parameters
         double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del;
