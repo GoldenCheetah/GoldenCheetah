@@ -128,7 +128,3 @@ test_script:
 
 artifacts:
 - path: GoldenCheetah_dev_64bit_Windows.zip
-
-deploy_script:
-# Upload to transfer.sh if possible, but don't fail
-- cmd /c "curl --upload-file GoldenCheetah_dev_64bit_Windows.zip https://transfer.sh/GoldenCheetah_dev_64bit_Windows.zip || exit 0"
