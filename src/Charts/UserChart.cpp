@@ -888,9 +888,15 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     // set the dialog
     QVBoxLayout *main = new QVBoxLayout(this);
     main->setMargin(10*dpiXFactor);
+    QHBoxLayout *hf = new QHBoxLayout();
+    QVBoxLayout *pl = new QVBoxLayout();
     QFormLayout *cf = new QFormLayout();
-    main->addLayout(cf);
-    main->addStretch();
+    hf->addLayout(pl);
+    hf->addLayout(cf);
+    hf->setStretchFactor(pl, 2);
+    hf->setStretchFactor(cf, 1);
+    main->addLayout(hf);
+    //main->addStretch();
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     okButton = new QPushButton(tr("&OK"), this);
@@ -983,11 +989,10 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     program->setMinimumHeight(250 * dpiXFactor); // give me some space!
     DataFilterCompleter *completer = new DataFilterCompleter(list, this);
     program->setCompleter(completer);
-    cf->addRow(tr("Program"), (QWidget *)NULL);
-    cf->addRow(program);
+    pl->addWidget(program);
     errors = new QLabel(this);
     errors->setStyleSheet("color: red;");
-    cf->addRow(errors); //
+    pl->addWidget(errors); //
 
 
     yname = new QLineEdit(this);
@@ -1053,7 +1058,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     //QLineEdit *labels, *colors; XXX TODO
 
     // make it wide enough
-    setMinimumWidth(550 *dpiXFactor);
+    setMinimumWidth(850 *dpiXFactor);
     setMinimumHeight(600 *dpiXFactor);
 
     // update gui items from series info
