@@ -1,5 +1,5 @@
 version: ci.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019
 clone_depth: 1
 
 environment:
@@ -35,12 +35,12 @@ environment:
     secure: n6a8nJgqMyg+VsVeoIIR8TFzxyDFVi2w/ggetQk5agY=
 
 init:
-# Setup QT 5.12 - 64Bit
-- set QTDIR=C:\Qt\5.12\msvc2017_64
+# Setup QT 5.14 - 64Bit
+- set QTDIR=C:\Qt\5.14\msvc2017_64
 - set PATH=%QTDIR%\bin;%PATH%
 
-# Setup MSVC - VS 2017
-- call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2017\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
+# Setup MSVC - VS 2019
+- call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 
 # Get the libraries
 - ps: Start-FileDownload 'https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
