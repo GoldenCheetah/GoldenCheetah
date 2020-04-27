@@ -119,7 +119,15 @@ after_build:
 - copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
 - xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
+- copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
 - copy c:\python36-x64\python36.dll
+- copy c:\python36-x64\LICENSE.txt "PYTHON LICENSE.txt"
+# ReadMe, license and icon files
+- copy ..\Resources\win32\ReadMe.txt
+- echo GoldenCheetah is licensed under the GNU General Public License v2 > license.txt
+- echo. >> license.txt
+- type ..\..\COPYING >> license.txt
+- copy ..\Resources\win32\gc.ico
 # cleanup and pack
 - del *.h *.cpp *.obj *.pdb *.res
 - 7z a ..\..\GoldenCheetah_dev_64bit_Windows.zip *
