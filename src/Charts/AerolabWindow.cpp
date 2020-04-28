@@ -64,7 +64,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   crrSlider->setTickPosition(QSlider::TicksBelow);
   crrSlider->setTickInterval(1000);
   crrSlider->setMinimum(1000);
-  crrSlider->setMaximum(15000);
+  crrSlider->setMaximum(25000);
   crrSlider->setValue(aerolab->intCrr());
   crrLayout->addWidget( crrLabel );
   crrLayout->addWidget( crrLineEdit );
