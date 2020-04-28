@@ -836,7 +836,7 @@ bool TTSReader::loadHeaders() {
         if (basis != Slope && slopeCount) {
 
             while (si.WantsInput(p.getDistanceFromStart())) {
-                if (slopeIdx >= frameMapCount) {
+                if (slopeIdx >= slopeCount) {
                     si.NotifyInputComplete();
                     break;
                 }
