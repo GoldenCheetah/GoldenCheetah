@@ -38,35 +38,45 @@ init:
 # Setup QT 5.14 - 64Bit
 - set QTDIR=C:\Qt\5.14\msvc2017_64
 - set PATH=%QTDIR%\bin;%PATH%
+- qmake --version
 
 # Setup MSVC - VS 2019
 - call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 
-# Get the libraries
-- ps: Start-FileDownload 'https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
-- 7z x c:/gc-ci-libs.zip -oC:\libs
+cache:
+- gc-ci-libs.zip
+- jom_1_1_3.zip
+- sip-4.19.8.zip
+- C:\R
 
 install:
-# choco install winflexbison
+# Get the libraries
+- if not exist gc-ci-libs.zip appveyor DownloadFile "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
+- 7z x -y gc-ci-libs.zip -oC:\libs
+
+# Get config
 - copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
 - copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
 
 # Get jom
-- ps: Start-FileDownload 'https://download.qt.io/official_releases/jom/jom_1_1_3.zip'
-- 7z x jom_1_1_3.zip -oc:\jom\
+- if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
+- 7z x -y jom_1_1_3.zip -oc:\jom\
 - set PATH=%PATH%;c:\jom\;
 
 # Get R and add to config
-- ps: $rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
-- ps: Start-FileDownload $rurl "R-win.exe"
-- ps: Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
+- ps: >-
+    if (-not (Test-Path 'C:\R')) {
+      $rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+      Start-FileDownload $rurl "R-win.exe"
+      Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
+    }
 - set PATH=%PATH%;c:\R\bin\;
 - R --version
 - echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
 # Get SIP and add Python to config
 - c:\python36-x64\python --version
-- ps: Start-FileDownload https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip
+- if not exist sip-4.19.8.zip appveyor DownloadFile "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
 - 7z x sip-4.19.8.zip
 - cd sip-4.19.8
 - c:\python36-x64\python configure.py
