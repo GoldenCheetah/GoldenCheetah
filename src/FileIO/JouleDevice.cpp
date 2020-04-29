@@ -24,7 +24,7 @@
 #include <errno.h>
 //#include <termios.h>
 
-#define JOULE_DEBUG false // debug traces
+#define JOULE_DEBUG true // debug traces
 
 // Start pattern
 #define START_1            0x10
