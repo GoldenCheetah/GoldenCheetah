@@ -138,9 +138,13 @@ after_build:
 - echo. >> license.txt
 - type ..\..\COPYING >> license.txt
 - copy ..\Resources\win32\gc.ico
+# Installer script
+- copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.14.2.nsi
 # cleanup and pack
 - del *.h *.cpp *.obj *.pdb *.res
 - 7z a ..\..\GoldenCheetah_dev_64bit_Windows.zip *
+# Build the installer (disabled)
+#- C:\"Program Files (x86)"\NSIS\makensis /NOCONFIG GC3.6-Dev-Master-W64-QT5.14.2.nsi || exit 0
 
 test_script:
 # minimum test
@@ -149,3 +153,4 @@ test_script:
 
 artifacts:
 - path: GoldenCheetah_dev_64bit_Windows.zip
+#- path: GoldenCheetah_dev_64bit_Windows.exe
