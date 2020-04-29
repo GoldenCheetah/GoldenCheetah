@@ -589,16 +589,33 @@ void DialWindow::seriesChanged()
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
     case RealtimeData::Slope:
-    case RealtimeData::Rf:
-    case RealtimeData::RMV:
-    case RealtimeData::VO2:
-    case RealtimeData::VCO2:
-    case RealtimeData::RER:
-    case RealtimeData::TidalVolume:
     case RealtimeData::FeO2:
+        foreground = GColor(CFEO2);
+        break;
+    case RealtimeData::RER:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
             break;
+
+    case RealtimeData::Rf:
+        foreground = GColor(CRESPFREQUENCY);
+        break;
+
+    case RealtimeData::RMV:
+        foreground = GColor(CVENTILATION);
+        break;
+
+    case RealtimeData::VO2:
+        foreground = GColor(CVO2);
+        break;
+
+    case RealtimeData::VCO2:
+        foreground = GColor(CVCO2);
+        break;
+
+    case RealtimeData::TidalVolume:
+        foreground = GColor(CTIDALVOLUME);
+        break;
 
     case RealtimeData::Load:
             foreground = GColor(CLOAD);

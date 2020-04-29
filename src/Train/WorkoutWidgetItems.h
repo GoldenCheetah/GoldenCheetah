@@ -198,8 +198,26 @@ class WWTelemetry : public WorkoutWidgetItem {
         Context *context;
 
         template<typename T>
+        void updateAvg(const QList<T> &source, QList<double> &avg, int number)
+        {
+            // Calc moving average
+            if (source.count() > avg.count())
+            {
+                for (int j=avg.count(); j<source.count(); j++)
+                {
+                    double temp = 0;
+                    for (int i=0; i< qMin(number, j); i++)
+                    {
+                        temp += source.at(j-i);
+                    }
+                    avg.append(temp/qMin(number, j));
+                }
+            }
+        }
+
+        template<typename T>
         void paintSampleList(QPainter* painter, const QColor& color, const QList<T>& list,
-                             const RideFile::SeriesType& seriesType)
+                             const WorkoutWidget::WwSeriesType& seriesType)
         {
             QPen linePen(color);
             linePen.setWidth(1);

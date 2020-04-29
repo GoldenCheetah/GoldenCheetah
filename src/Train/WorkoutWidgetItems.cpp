@@ -371,60 +371,91 @@ WWTelemetry::paint(QPainter *painter)
     if (!workoutWidget()->recording()) return;
 
     // Draw POWER
-    paintSampleList(painter, GColor(CPOWER), workoutWidget()->watts, RideFile::watts);
+    if (workoutWidget()->shouldPlotPwr())
+    {
+        updateAvg(workoutWidget()->watts, workoutWidget()->pwrAvg, workoutWidget()->vo2PlotAvgLength());
+        paintSampleList(painter, GColor(CPOWER), workoutWidget()->pwrAvg, WorkoutWidget::POWER);
+    }
+
     // Draw HR
-    paintSampleList(painter, GColor(CHEARTRATE), workoutWidget()->hr, RideFile::hr);
+    if (workoutWidget()->shouldPlotHr())
+    {
+        updateAvg(workoutWidget()->hr, workoutWidget()->hrAvg, workoutWidget()->hrPlotAvgLength());
+        paintSampleList(painter, GColor(CHEARTRATE), workoutWidget()->hrAvg, WorkoutWidget::HEARTRATE);
+    }
     // Draw Speed
-    paintSampleList(painter, GColor(CSPEED), workoutWidget()->speed, RideFile::kph);
+    if (workoutWidget()->shouldPlotSpeed())
+    {
+        updateAvg(workoutWidget()->speed, workoutWidget()->speedAvg, workoutWidget()->speedPlotAvgLength());
+        paintSampleList(painter, GColor(CSPEED), workoutWidget()->speedAvg, WorkoutWidget::SPEED);
+    }
     // Draw Cadence
-    paintSampleList(painter, GColor(CCADENCE), workoutWidget()->cadence, RideFile::cad);
+    if (workoutWidget()->shouldPlotCadence())
+    {
+        updateAvg(workoutWidget()->cadence, workoutWidget()->cadenceAvg, workoutWidget()->cadencePlotAvgLength());
+        paintSampleList(painter, GColor(CCADENCE), workoutWidget()->cadenceAvg, WorkoutWidget::CADENCE);
+    }
+    // Draw VO2
+    if (workoutWidget()->shouldPlotVo2())
+    {
+        updateAvg(workoutWidget()->vo2, workoutWidget()->vo2Avg, workoutWidget()->vo2PlotAvgLength());
+        paintSampleList(painter, GColor(CVO2), workoutWidget()->vo2Avg, WorkoutWidget::VO2);
+    }
+    // Draw Ventilation
+    if (workoutWidget()->shouldPlotVentilation())
+    {
+        updateAvg(workoutWidget()->ventilation, workoutWidget()->ventilationAvg, workoutWidget()->ventilationPlotAvgLength());
+        paintSampleList(painter, GColor(CVENTILATION), workoutWidget()->ventilationAvg, WorkoutWidget::VENTILATION);
+    }
 
     //
     // W'bal last, if not zones return
     //
+    if (workoutWidget()->shouldPlotWbal())
+    {
+        // lets get the zones, CP and PMAX, if none we're done
+        int rnum = -1;
 
-    // lets get the zones, CP and PMAX, if none we're done
-    int rnum = -1;
+        // CP etc are not available so draw nothing
+        if (context->athlete->zones(false) == NULL ||
+           (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
 
-    // CP etc are not available so draw nothing
-    if (context->athlete->zones(false) == NULL || 
-       (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+        // lets get the zones, CP and PMAX
+        int WPRIME = context->athlete->zones(false)->getWprime(rnum);
 
-    // lets get the zones, CP and PMAX
-    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+        // full color
+        QColor color = GColor(CWBAL);
+        QPen wlinePen(color);
+        wlinePen.setWidth(1 *dpiXFactor);
+        painter->setPen(wlinePen);
 
-    // full color
-    QColor color = GColor(CWBAL);
-    QPen wlinePen(color);
-    wlinePen.setWidth(1 *dpiXFactor);
-    painter->setPen(wlinePen);
+        // top left origin
+        QPointF tl = workoutWidget()->canvas().topLeft();
 
-    // top left origin
-    QPointF tl = workoutWidget()->canvas().topLeft();
+        // pixels per WPRIME value
+        double ratio = workoutWidget()->canvas().height() / WPRIME;
 
-    // pixels per WPRIME value
-    double ratio = workoutWidget()->canvas().height() / WPRIME;
+        // join the dots
+        QPointF last = QPointF(tl.x(),tl.y());
 
-    // join the dots
-    QPointF last = QPointF(tl.x(),tl.y());
+        // run through the wpBal values...
+        int index = 0;
+        foreach(int b, workoutWidget()->wbal) {
+            // this dot...
+            if (b < 0) b=0;
 
-    // run through the wpBal values...
-    int index = 0;
-    foreach(int b, workoutWidget()->wbal) {
-        // this dot...
-        if (b < 0) b=0;
+            // x and y pixel location
+            double now = workoutWidget()->sampleTimes.at(index) / 1000.0f;
+            double px = workoutWidget()->transform(now, 0).x();
+            double py = tl.y() + ((WPRIME-b) * ratio);
 
-        // x and y pixel location
-        double now = workoutWidget()->sampleTimes.at(index) / 1000.0f;
-        double px = workoutWidget()->transform(now, 0).x();
-        double py = tl.y() + ((WPRIME-b) * ratio);
+            QPointF dot(px,py);
+            painter->drawLine(last, dot);
+            last = dot;
 
-        QPointF dot(px,py);
-        painter->drawLine(last, dot);
-        last = dot;
-
-        // next sample
-        index++;
+            // next sample
+            index++;
+        }
     }
 }
 

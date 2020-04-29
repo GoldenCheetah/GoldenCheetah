@@ -23,7 +23,6 @@
 
 #include "WPrime.h"
 #include "ErgFile.h"
-#include "RideFile.h"
 #include "RideFileCache.h"
 #include "RealtimeData.h"
 
@@ -96,6 +95,8 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     cadenceMax = 200; // make it line up between power and hr
     hrMax = 220;
     speedMax = 50;
+    vo2Max = 5000;
+    ventilationMax = 130;
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
     qwkactive = false;
@@ -150,14 +151,18 @@ WorkoutWidget::start()
     speed.clear();
     cadence.clear();
     sampleTimes.clear();
+    vo2.clear();
+    ventilation.clear();
 
     // and resampling data
-    count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
+    count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
 
     // set initial
     cadenceMax = 200;
     hrMax = 220;
     speedMax = 50;
+    vo2Max = 5000;
+    ventilationMax = 130;
 
     // replot
     update();
@@ -187,6 +192,8 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
     hrSum += rt.getHr();
     cadenceSum += rt.getCadence();
     speedSum += rt.getSpeed();
+    vo2Sum += rt.getVO2();
+    ventilationSum += rt.getRMV();
 
     count++;
 
@@ -202,15 +209,21 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         speed << s;
         int c = cadenceSum / 5.0f;
         cadence << c;
+        int v = vo2Sum / 5.0f;
+        vo2 << v;
+        int ve = ventilationSum / 5.0f;
+        ventilation << ve;
         sampleTimes << context->getNow();
 
         // clear for next time
-        count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
+        count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
 
         // do we need to increase maxes?
         if (c > cadenceMax) cadenceMax=c;
         if (s > speedMax) speedMax=s;
         if (h > hrMax) hrMax=h;
+        if (v > vo2Max) vo2Max=v;
+        if (ve > ventilationMax) ventilationMax=ve;
 
         // Do we need to increase plot x-axis max? (add 15 min at a time)
         if (cadence.size() > maxVX_) setMaxVX(maxVX_ + 900);
@@ -2445,7 +2458,7 @@ WorkoutWidget::logX(double t)
 
 // transform from plot to painter co-ordinate
 QPoint
-WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
+WorkoutWidget::transform(double seconds, double watts, WwSeriesType s)
 {
     // from plot coords to painter coords on the canvas
     QRectF c = canvas();
@@ -2456,31 +2469,45 @@ WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
     switch (s) {
 
     default:
-    case RideFile::watts:
+    case POWER:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / (maxY()-minY());
         }
         break;
 
-    case RideFile::hr:
+    case HEARTRATE:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(hrMax);
         }
         break;
 
-    case RideFile::cad:
+    case CADENCE:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(cadenceMax);
         }
         break;
 
-    case RideFile::kph:
+    case SPEED:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(speedMax);
+        }
+        break;
+
+    case VO2:
+        {
+        // ratio of pixels to plot units
+        yratio = double(c.height()) / double(vo2Max);
+        }
+        break;
+
+    case VENTILATION:
+        {
+        // ratio of pixels to plot units
+        yratio = double(c.height()) / double(ventilationMax);
         }
         break;
 
@@ -2937,4 +2964,82 @@ WorkoutWidget::paste()
 
     // update the display
     update();
+}
+
+bool
+WorkoutWidget::shouldPlotHr()
+{
+    return parent->shouldPlotHr();
+}
+
+bool
+WorkoutWidget::shouldPlotPwr()
+{
+    return parent->shouldPlotPwr();
+}
+
+bool
+WorkoutWidget::shouldPlotCadence()
+{
+    return parent->shouldPlotCadence();
+}
+
+bool
+WorkoutWidget::shouldPlotWbal()
+{
+    return parent->shouldPlotWbal();
+}
+
+bool
+WorkoutWidget::shouldPlotVo2()
+{
+    return parent->shouldPlotVo2();
+}
+
+bool
+WorkoutWidget::shouldPlotVentilation()
+{
+    return parent->shouldPlotVentilation();
+}
+
+bool
+WorkoutWidget::shouldPlotSpeed()
+{
+    return parent->shouldPlotSpeed();
+}
+
+int
+WorkoutWidget::hrPlotAvgLength()
+{
+    return parent->hrPlotAvgLength();
+}
+
+int
+WorkoutWidget::pwrPlotAvgLength()
+{
+    return parent->pwrPlotAvgLength();
+}
+
+int
+WorkoutWidget::cadencePlotAvgLength()
+{
+    return parent->cadencePlotAvgLength();
+}
+
+int
+WorkoutWidget::vo2PlotAvgLength()
+{
+    return parent->vo2PlotAvgLength();
+}
+
+int
+WorkoutWidget::ventilationPlotAvgLength()
+{
+    return parent->ventilationPlotAvgLength();
+}
+
+int
+WorkoutWidget::speedPlotAvgLength()
+{
+    return parent->speedPlotAvgLength();
 }
