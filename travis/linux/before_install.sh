@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
 # Add recent Qt dependency ppa, update on a newer qt version.
-sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.1-xenial
+sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-xenial
 sudo apt-get update -qq
 sudo apt-get install -qq qt5-default qt514base qt514tools qt514serialport\
  qt514svg qt514multimedia qt514connectivity qt514webengine qt514charts-no-lgpl\
@@ -12,7 +12,7 @@ sudo apt-get install -y --allow-downgrades libpulse0=1:8.0-0ubuntu3
 sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
 sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
 
-# Add OpenSSL 1.1.1 (required by Qt 5.14.1)
+# Add OpenSSL 1.1.1 (required by Qt 5.14)
 wget https://www.openssl.org/source/openssl-1.1.1d.tar.gz
 tar xf openssl-1.1.1d.tar.gz
 cd openssl-1.1.1d
