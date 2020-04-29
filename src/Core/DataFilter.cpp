@@ -230,6 +230,7 @@ static struct {
                         // v using the values in by to group, applies the func mean, sum etc when
                         // aggregating, by will not be sorted, so will aggregate as it is.
 
+    { "exists", 1 },    // check if function or variable exists. returns 1 if true 0 if false.}
 
     // add new ones above this line
     { "", -1 }
@@ -403,6 +404,10 @@ DataFilter::builtins()
         } else if (i == 79) {
 
             returning << "aggregate(vector, by, mean|sum|max|min|count)";
+
+        } else if (i == 80) {
+
+            returning << "exists(\"symbol\")";
 
         } else {
 
@@ -1444,7 +1449,18 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                 bool found=false;
 
                 // are the parameters well formed ?
-                if (leaf->function == "which") {
+                if (leaf->function == "exists") {
+
+                    // needs one parameter and must be a string constant
+                    if (leaf->fparms.count() != 1) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("exists(\"symbol\") supports only 1 parameter."));
+                    } else if (leaf->fparms[0]->type != Leaf::String) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("exists(\"symbol\") parameter must be a constant string."));
+                    }
+                } else if (leaf->function == "which") {
 
                     // 2 or more
                     if (leaf->fparms.count() < 2) {
@@ -2613,6 +2629,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             if (df->stack > 0) df->stack -= 1;
 
             return res;
+        }
+
+        if (leaf->function == "exists") {
+            // get symbol name
+            QString symbol =  *(leaf->fparms[0]->lvalue.s);
+
+            // does it exist - as a function or symbol?
+            return df->functions.contains(symbol) || df->symbols.contains(symbol);
         }
 
         if (leaf->function == "config") {
