@@ -991,6 +991,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     program->setCompleter(completer);
     pl->addWidget(program);
     errors = new QLabel(this);
+    errors->setWordWrap(true);
     errors->setStyleSheet("color: red;");
     pl->addWidget(errors); //
 
