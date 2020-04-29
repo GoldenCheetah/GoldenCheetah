@@ -43,6 +43,9 @@ init:
 # Setup MSVC - VS 2019
 - call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 
+# Setup NSIS
+- set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
+
 cache:
 - gc-ci-libs.zip
 - jom_1_1_3.zip
@@ -90,8 +93,10 @@ install:
 before_build:
 # Enable CloudDB
 - echo CloudDB=active >> src\gcconfig.pri
+
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
+
 # Add debug console
 - echo CONFIG+=console >> src\gcconfig.pri
 
@@ -122,6 +127,7 @@ build_script:
 
 after_build:
 - cd src\release
+
 # copy dependencies
 - windeployqt --release GoldenCheetah.exe
 - copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
@@ -132,19 +138,23 @@ after_build:
 - copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
 - copy c:\python36-x64\python36.dll
 - copy c:\python36-x64\LICENSE.txt "PYTHON LICENSE.txt"
+
 # ReadMe, license and icon files
 - copy ..\Resources\win32\ReadMe.txt
 - echo GoldenCheetah is licensed under the GNU General Public License v2 > license.txt
 - echo. >> license.txt
 - type ..\..\COPYING >> license.txt
 - copy ..\Resources\win32\gc.ico
+
 # Installer script
 - copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.14.2.nsi
+
 # cleanup and pack
 - del *.h *.cpp *.obj *.pdb *.res
 - 7z a ..\..\GoldenCheetah_dev_64bit_Windows.zip *
-# Build the installer (disabled)
-#- C:\"Program Files (x86)"\NSIS\makensis /NOCONFIG GC3.6-Dev-Master-W64-QT5.14.2.nsi || exit 0
+
+# Build the installer
+- makensis GC3.6-Dev-Master-W64-QT5.14.2.nsi
 
 test_script:
 # minimum test
@@ -153,4 +163,6 @@ test_script:
 
 artifacts:
 - path: GoldenCheetah_dev_64bit_Windows.zip
-#- path: GoldenCheetah_dev_64bit_Windows.exe
+
+- path: src\release\GoldenCheetah_v3.6-DEV_64bit_Windows.exe
+  name: GoldenCheetah_v3.6-DEV_64bit_Windows Installer
