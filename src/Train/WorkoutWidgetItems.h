@@ -217,7 +217,7 @@ class WWTelemetry : public WorkoutWidgetItem {
 
         template<typename T>
         void paintSampleList(QPainter* painter, const QColor& color, const QList<T>& list,
-                             const RideFile::SeriesType& seriesType)
+                             const WorkoutWidget::WwSeriesType& seriesType)
         {
             QPen linePen(color);
             linePen.setWidth(1);

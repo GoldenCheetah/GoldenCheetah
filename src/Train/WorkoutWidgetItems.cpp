@@ -374,38 +374,38 @@ WWTelemetry::paint(QPainter *painter)
     if (workoutWidget()->shouldPlotPwr())
     {
         updateAvg(workoutWidget()->watts, workoutWidget()->pwrAvg, workoutWidget()->vo2PlotAvgLength());
-        paintSampleList(painter, GColor(CPOWER), workoutWidget()->pwrAvg, RideFile::watts);
+        paintSampleList(painter, GColor(CPOWER), workoutWidget()->pwrAvg, WorkoutWidget::POWER);
     }
 
     // Draw HR
     if (workoutWidget()->shouldPlotHr())
     {
         updateAvg(workoutWidget()->hr, workoutWidget()->hrAvg, workoutWidget()->hrPlotAvgLength());
-        paintSampleList(painter, GColor(CHEARTRATE), workoutWidget()->hrAvg, RideFile::hr);
+        paintSampleList(painter, GColor(CHEARTRATE), workoutWidget()->hrAvg, WorkoutWidget::HEARTRATE);
     }
     // Draw Speed
     if (workoutWidget()->shouldPlotSpeed())
     {
         updateAvg(workoutWidget()->speed, workoutWidget()->speedAvg, workoutWidget()->speedPlotAvgLength());
-        paintSampleList(painter, GColor(CSPEED), workoutWidget()->speedAvg, RideFile::kph);
+        paintSampleList(painter, GColor(CSPEED), workoutWidget()->speedAvg, WorkoutWidget::SPEED);
     }
     // Draw Cadence
     if (workoutWidget()->shouldPlotCadence())
     {
         updateAvg(workoutWidget()->cadence, workoutWidget()->cadenceAvg, workoutWidget()->cadencePlotAvgLength());
-        paintSampleList(painter, GColor(CCADENCE), workoutWidget()->cadenceAvg, RideFile::cad);
+        paintSampleList(painter, GColor(CCADENCE), workoutWidget()->cadenceAvg, WorkoutWidget::CADENCE);
     }
     // Draw VO2
     if (workoutWidget()->shouldPlotVo2())
     {
         updateAvg(workoutWidget()->vo2, workoutWidget()->vo2Avg, workoutWidget()->vo2PlotAvgLength());
-        paintSampleList(painter, GColor(CVO2), workoutWidget()->vo2Avg, RideFile::vo2);
+        paintSampleList(painter, GColor(CVO2), workoutWidget()->vo2Avg, WorkoutWidget::VO2);
     }
     // Draw Ventilation
     if (workoutWidget()->shouldPlotVentilation())
     {
         updateAvg(workoutWidget()->ventilation, workoutWidget()->ventilationAvg, workoutWidget()->ventilationPlotAvgLength());
-        paintSampleList(painter, GColor(CVENTILATION), workoutWidget()->ventilationAvg, RideFile::ventilation);
+        paintSampleList(painter, GColor(CVENTILATION), workoutWidget()->ventilationAvg, WorkoutWidget::VENTILATION);
     }
 
     //

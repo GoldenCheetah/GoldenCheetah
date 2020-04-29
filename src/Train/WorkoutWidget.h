@@ -25,7 +25,6 @@
 
 #include "WPrime.h"
 
-#include "RideFile.h"
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
@@ -147,6 +146,9 @@ class WorkoutWidget : public QWidget
         // create - clicked to create
         enum { none, create, drag, dragblock, rect } state;
 
+        enum wwseriestype { CADENCE, HEARTRATE, POWER, SPEED, WBAL, VO2, VENTILATION };
+        typedef enum wwseriestype WwSeriesType;
+
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
         void addPoint(WWPoint*x) { points_.append(x); }
@@ -196,7 +198,7 @@ class WorkoutWidget : public QWidget
         }
 
         // transform from plot to painter co-ordinate
-        QPoint transform(double x, double y, RideFile::SeriesType s=RideFile::watts);
+        QPoint transform(double x, double y, WwSeriesType s=POWER);
 
         // for log(x) scale
         int logX(double t);

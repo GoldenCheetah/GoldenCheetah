@@ -23,7 +23,6 @@
 
 #include "WPrime.h"
 #include "ErgFile.h"
-#include "RideFile.h"
 #include "RideFileCache.h"
 #include "RealtimeData.h"
 
@@ -2459,7 +2458,7 @@ WorkoutWidget::logX(double t)
 
 // transform from plot to painter co-ordinate
 QPoint
-WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
+WorkoutWidget::transform(double seconds, double watts, WwSeriesType s)
 {
     // from plot coords to painter coords on the canvas
     QRectF c = canvas();
@@ -2470,42 +2469,42 @@ WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
     switch (s) {
 
     default:
-    case RideFile::watts:
+    case POWER:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / (maxY()-minY());
         }
         break;
 
-    case RideFile::hr:
+    case HEARTRATE:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(hrMax);
         }
         break;
 
-    case RideFile::cad:
+    case CADENCE:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(cadenceMax);
         }
         break;
 
-    case RideFile::kph:
+    case SPEED:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(speedMax);
         }
         break;
 
-    case RideFile::vo2:
+    case VO2:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(vo2Max);
         }
         break;
 
-    case RideFile::ventilation:
+    case VENTILATION:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(ventilationMax);
