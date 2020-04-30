@@ -20,6 +20,7 @@
 #define _MeterWidget_h 1
 
 #include <QWidget>
+#include "Context.h"
 
 class MeterWidget : public QWidget
 {
@@ -59,6 +60,7 @@ class MeterWidget : public QWidget
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
+    bool     forceSquareRatio;
 
     QColor  m_MainColor;
     QColor  m_ScaleColor;
@@ -83,7 +85,6 @@ class TextMeterWidget : public MeterWidget
 {
   public:
     explicit TextMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
-    virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
 };
 
@@ -109,5 +110,15 @@ class NeedleMeterWidget : public MeterWidget
     virtual void paintEvent(QPaintEvent* paintevent);
 };
 
+class ElevationMeterWidget : public MeterWidget
+{
+  public:
+    explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
+    virtual void paintEvent(QPaintEvent* paintevent);
+    float gradientValue;
+    void setContext(Context *context) { this->context = context; }
+  private:
+    Context *context;
+};
 
 #endif // _MeterWidget_h

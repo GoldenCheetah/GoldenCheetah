@@ -83,4 +83,13 @@
        <MainColor R="255" G="0" B="0" A="180" />
        <Text>load</Text>
    </meter>
+	<!-- START  Changes for elevation widget -->
+	<meter name="elevation" container="Video" source="Elevation" type="Elevation">
+		<RelativeSize Width="40.0" Height="15.0" />
+		<RelativePosition X="20.0" Y="92.0" />
+		<BackgroundColor R="200" G="200" B="200" A="125" />
+		<OutlineColor R="255" G="255" B="255" A="250" />
+        <MainColor R="255" G="0" B="0" A="250" />
+    </meter>
+	<!-- END Changes for elevation widget -->
 </layout>

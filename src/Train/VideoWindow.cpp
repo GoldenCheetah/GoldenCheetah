@@ -316,6 +316,23 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
             p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph"));
         }
+        else if (p_meterWidget->Source() == QString("Elevation"))
+        {
+            // Do not show in ERG mode
+            if (rtd.mode == ERG || rtd.mode == MRC)
+                {
+                    p_meterWidget->setWindowOpacity(0); // Hide the widget
+                }
+            p_meterWidget->Value = rtd.getDistance();
+            ElevationMeterWidget* elevationMeterWidget = dynamic_cast<ElevationMeterWidget*>(p_meterWidget);
+            if (!elevationMeterWidget)
+                qDebug() << "Error: Elevation keyword used but widget is not elevation type";
+            else
+            {
+                elevationMeterWidget->setContext(context);
+                elevationMeterWidget->gradientValue = rtd.getSlope();
+            }
+        }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();

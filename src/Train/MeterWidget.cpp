@@ -19,6 +19,8 @@
 #include <QtGui>
 #include <QGraphicsPathItem>
 #include "MeterWidget.h"
+#include "ErgFile.h"
+#include "Context.h"
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
@@ -37,12 +39,13 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_OutlineColor = QColor(128,128,128,180);
     m_MainFont = QFont(this->font().family(), 64);
     m_AltFont = QFont(this->font().family(), 48);
-    m_BackgroundColor = QColor(96, 96, 96, 200);
+    m_BackgroundColor = QColor(96, 96, 96, 0);
     m_RangeMin = 0;
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
     boundingRectVisibility = false;
+    forceSquareRatio = true;
 }
 
 void MeterWidget::SetRelativeSize(float RelativeWidth, float RelativeHeight)
@@ -75,7 +78,15 @@ void MeterWidget::AdjustSizePos()
 
 void MeterWidget::ComputeSize()
 {
-    m_Width = m_Height = (m_container->width() * m_RelativeWidth + m_container->height() * m_RelativeHeight) / 2;
+    if (forceSquareRatio)
+    {
+        m_Width = m_Height = (m_container->width() * m_RelativeWidth + m_container->height() * m_RelativeHeight) / 2;
+    }
+    else
+    {
+        m_Width = m_container->width() * m_RelativeWidth;
+        m_Height =  m_container->height() * m_RelativeHeight;
+    }
 }
 
 QSize MeterWidget::sizeHint() const
@@ -119,12 +130,7 @@ void MeterWidget::setBoundingRectVisibility(bool show, QColor  boundingRectColor
 
 TextMeterWidget::TextMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
-}
-
-void TextMeterWidget::ComputeSize()
-{
-    m_Width = m_container->width() * m_RelativeWidth;
-    m_Height =  m_container->height() * m_RelativeHeight;
+    forceSquareRatio = false;
 }
 
 void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
@@ -132,6 +138,7 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
+    m_BackgroundBrush = QBrush(m_BackgroundColor);
     m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
@@ -139,6 +146,12 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     //painter
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+
+    //draw background
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(m_BackgroundBrush);
+    if (Text!=QString(""))
+        painter.drawRect (0, 0, m_Width, m_Height);
 
     QPainterPath my_painterPath;
     my_painterPath.addText(QPointF(0,0),m_MainFont,Text);
@@ -297,3 +310,94 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawPath(my_painterPath);
     painter.restore();
 }
+
+ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context)
+{
+    forceSquareRatio = false;
+    gradientValue = 0.0;
+}
+
+void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
+{
+    // TODO : show Power when not in slope simulation mode
+    if (!context || !context->currentErgFile() || context->currentErgFile()->Points.size()<=1)
+        return;
+
+    MeterWidget::paintEvent(paintevent);
+
+    m_MainBrush = QBrush(m_MainColor);
+    m_BackgroundBrush = QBrush(m_BackgroundColor);
+    m_OutlinePen = QPen(m_OutlineColor);
+    m_OutlinePen.setWidth(1);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+
+    //painter
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Find min/max
+    double minX, minY, maxX, maxY, cyclistX=0.0;
+    // (based on ErgFilePlot.cpp)
+    minX=maxX=context->currentErgFile()->Points[0].x; // meters
+    minY=maxY=context->currentErgFile()->Points[0].y; // meters or altitude???
+    foreach(ErgFilePoint x, context->currentErgFile()->Points)
+    {
+        if (x.y > maxY) maxY = x.y;
+        if (x.x > maxX) maxX = x.x;
+        if (x.y < minY) minY = x.y;
+        if (x.x < minX) minX = x.x;
+    }
+    // check if slope shown will not be too inconsistent (based on widget's width/height ratio)
+    // we accept 20 times i.e. 5% gradient will be shown as 45°
+    if ( m_Width!=0 && (maxY-minY) / 0.05 < (double)m_Height * 0.80 * (maxX-minX) / (double)m_Width)
+        maxY = minY + (double)m_Height * 0.80 * (maxX-minX) / (double)m_Width * 0.05;
+    double bubbleSize = (double)m_Height*0.010f;
+    minY -= (maxY-minY) * 0.20f; // add 20% as bottom headroom (slope gradient will be shown there in a bubble)
+
+    // this->Value should hold the current distance in meters. 
+    cyclistX = (this->Value * 1000.0 - minX) * (double)m_Width / (maxX-minX);
+
+    //Get point to create the polygon
+    QPolygon polygon;
+    polygon << QPoint(0.0, (double)m_Height);
+    double x, y, pt=0;
+    double nextX = 1;
+    for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
+    {
+        for ( ; x < nextX && pt < context->currentErgFile()->Points.size(); pt++)
+        {
+            x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX-minX);
+            y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY-minY);
+        }
+        // Add points to polygon only once every time the x coordinate integer part changes.
+        polygon << QPoint(x, (double)m_Height - y);
+        nextX = floor(x) + 1.0;
+    }
+    polygon << QPoint((double) m_Width, (double)m_Height);
+    polygon << QPoint(fmin((double) m_Width,cyclistX+bubbleSize), (double)m_Height);
+    polygon << QPoint(cyclistX, (double)m_Height-bubbleSize);
+    polygon << QPoint(fmax(0.0, cyclistX-bubbleSize), (double)m_Height);
+
+    painter.setPen(m_OutlinePen);
+    painter.setBrush(m_BackgroundBrush);
+    painter.drawPolygon(polygon);
+
+    m_OutlinePen = QPen(m_MainColor);
+    m_OutlinePen.setWidth(1);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+    painter.setPen(m_OutlinePen);
+    painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
+
+    //Cosmetic enhancment: Display grade as #.#% 
+    std::string sGrad;
+    QString s_grad ="";
+    s_grad = ((-1.0 < this->gradientValue && this->gradientValue < 0.0)?QString("-"):QString("")) + QString::number((int) this->gradientValue);
+    s_grad += QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+
+    // Display gradient text to the right of the line until the middle, then display to the left of the line
+    if (cyclistX < m_Width*0.5) {
+        painter.drawText((double)cyclistX+5, ((double)m_Height * 0.95), s_grad);
+    } else {
+        painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
+    }
+} 
