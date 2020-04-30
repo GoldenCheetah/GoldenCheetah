@@ -79,7 +79,9 @@ void MeterWidget::AdjustSizePos()
 void MeterWidget::ComputeSize()
 {
     if (forceSquareRatio)
+    {
         m_Width = m_Height = (m_container->width() * m_RelativeWidth + m_container->height() * m_RelativeHeight) / 2;
+    }
     else
     {
         m_Width = m_container->width() * m_RelativeWidth;

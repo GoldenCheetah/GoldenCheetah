@@ -446,8 +446,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         if (curPosition > VideoSyncFiledataPoints.count() - 1 || curPosition < 1)
             curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
-        double CurrentDistance = 0.0;
-        CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
+        double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
         context->currentVideoSyncFile()->km = CurrentDistance;
 
         // make sure the current position is less than the new distance
