@@ -333,14 +333,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-//    at present no more background, maybe it will be restored in a future developpment
-//    //draw background
-//    painter.setPen(Qt::NoPen);
-//    painter.setBrush(m_BackgroundBrush);
-//    painter.drawRect (0, 0, m_Width, m_Height);
-
-    // TODO : do this only once for the same ergfile, make Min/Max and Polygon part of class members
-    //find min/max
+    // Find min/max
     double minX, minY, maxX, maxY, cyclistX=0.0;
     // (based on ErgFilePlot.cpp)
     minX=maxX=context->currentErgFile()->Points[0].x; // meters
@@ -362,21 +355,15 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     // this->Value should hold the current distance in meters. 
     cyclistX = (this->Value * 1000.0 - minX) * (double)m_Width / (maxX-minX);
 
-    //Test variables
-    //double ptx=0, pty=0, d_pts=0;
-
+    //Get point to create the polygon
     QPolygon polygon;
     polygon << QPoint(0.0, (double)m_Height);
     double x, y, pt=0;
     double nextX = 1;
-    //d_pts = context->currentErgFile()->Points.size();
     for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
     {
         for ( ; x < nextX && pt < context->currentErgFile()->Points.size(); pt++)
         {
-            //d_pts = context->currentErgFile()->Points.size();
-            //ptx = (context->currentErgFile()->Points[pt].x - minX);
-            //pty = (context->currentErgFile()->Points[pt].y - minY);
             x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX-minX);
             y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY-minY);
         }
@@ -411,7 +398,4 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     } else {
         painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
     }
-    //Debug
-    //sGrad = s_grad.toStdString();
-    //qDebug("==> cyclistx,gradient,s_grad,sGrad = %f, %f, %s, %s", cyclistX, this->gradientValue, s_grad, sGrad);
 } 

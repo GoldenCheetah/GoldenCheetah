@@ -333,17 +333,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 elevationMeterWidget->gradientValue = rtd.getSlope();
             }
         }
-        else if (p_meterWidget->Source() == QString("Duration"))
-        {
-            // Formated time duration of ride
-            p_meterWidget->Value = rtd.getMsecs();
-            int hours = p_meterWidget->Value / 3600000L;
-            int minutes = ((long)p_meterWidget->Value % 3600000L) / 60000L;
-            int seconds = ((long)p_meterWidget->Value % 60000L) / 1000L;
-            int dsecs = ((long)p_meterWidget->Value % 1000L) / 100L;
-            p_meterWidget->Text = QString("%1:%2").arg((int)hours,(int)1,(int)10,QLatin1Char('0')).arg((int)minutes,(int)2,(int)10,QLatin1Char('0'));
-            p_meterWidget->AltText = QString(":%1.%2").arg((int)seconds,(int)2,(int)10,QLatin1Char('0')).arg((int)dsecs,(int)1,(int)10,QLatin1Char('0'));
-        }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();
