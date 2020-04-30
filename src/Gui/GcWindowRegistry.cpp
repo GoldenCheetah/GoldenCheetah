@@ -48,10 +48,6 @@
 #include "SpinScanPlotWindow.h"
 #include "WorkoutPlotWindow.h"
 #include "WorkoutWindow.h"
-#ifndef NOWEBKIT
-#include "RideWindow.h"
-#endif
-#include "RideMapWindow.h"
 #include "WebPageWindow.h"
 #ifdef GC_WANT_R
 #include "RChart.h"
@@ -116,8 +112,6 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
     { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
-    // { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },               // DEPRECATED for now
-    // { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow }, // DEPRECATED for now, since it causes problems and memory leaks
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { VIEW_ANALYSIS|VIEW_HOME|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },

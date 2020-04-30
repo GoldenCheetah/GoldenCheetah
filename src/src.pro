@@ -244,7 +244,7 @@ QMAKE_EXTRA_COMPILERS += TSQM
 ### RESOURCES
 ###==========
 
-RESOURCES = $${PWD}/Resources/application.qrc $${PWD}/Resources/RideWindow.qrc
+RESOURCES = $${PWD}/Resources/application.qrc
 
 
 
@@ -713,11 +713,6 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
            Charts/ScatterPlot.h Charts/ScatterWindow.h Charts/SmallPlot.h Charts/SummaryWindow.h Charts/TreeMapPlot.h \
            Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h
 
-# RideWindow temporarily disabled if we don't have WebKit
-!contains(DEFINES, NOWEBKIT) {
-    HEADERS +=  Charts/RideWindow.h
-}
-
 # cloud services
 HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
@@ -806,11 +801,6 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
            Charts/PowerHist.cpp Charts/ReferenceLineDialog.cpp Charts/RideEditor.cpp Charts/RideMapWindow.cpp Charts/RideSummaryWindow.cpp \
            Charts/ScatterPlot.cpp Charts/ScatterWindow.cpp Charts/SmallPlot.cpp Charts/SummaryWindow.cpp Charts/TreeMapPlot.cpp \
            Charts/TreeMapWindow.cpp
-
-# RideWindow temporarily disabled if we don't have WebKit
-!contains(DEFINES, NOWEBKIT) {
-    SOURCES += Charts/RideWindow.cpp
-}
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
@@ -907,7 +897,5 @@ DEFERRES += Core/RouteWindow.h Core/RouteWindow.cpp Core/RouteItem.h Core/RouteI
 ### MISCELLANEOUS FILES
 ###====================
 
-OTHER_FILES += Resources/web/Rider.js Resources/web/ride.js Resources/web/jquery-1.6.4.min.js \
-               Resources/web/MapWindow.html Resources/web/StreetViewWindow.html Resources/web/Window.css \
-               Resources/python/library.py Python/SIP/goldencheetah.sip
+OTHER_FILES +=   Resources/python/library.py Python/SIP/goldencheetah.sip
 
