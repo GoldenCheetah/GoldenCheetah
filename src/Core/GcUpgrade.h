@@ -100,6 +100,7 @@
 // 3990 - V3.5 RELEASE (January 2020)
 // 3991 - V3.5 RELEASE RE-ISSUE STRAVA RATE LIMIT (January 2020)
 // 3992 - V3.6 DEVELOPMENT
+// 4000 - V3.6 DEVELOPMENT 2005
 
 
 #define VERSION3_BUILD    3010 // released
@@ -111,13 +112,14 @@
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
+#define VERSION36_BUILD   4000 // development build 2005
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3992
-#define VERSION_STRING "V3.6-DEV"
+#define VERSION_LATEST 4000
+#define VERSION_STRING "V3.6-DEV2005"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
