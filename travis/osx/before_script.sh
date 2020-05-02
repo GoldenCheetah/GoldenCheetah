@@ -23,9 +23,6 @@ cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Define GC version string, only for tagged builds
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
-# Temporary hack to have a non tag build with version string
-echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri
-
 echo DEFINES += NOWEBKIT >> src/gcconfig.pri
 sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
 sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/qt5/bin/lrelease|" src/gcconfig.pri
