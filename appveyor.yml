@@ -77,18 +77,20 @@ install:
 - R --version
 - echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
-# Get SIP and add Python to config
-- c:\python36-x64\python --version
+# Get SIP and and install on Python
+- c:\python37-x64\python --version
 - if not exist sip-4.19.8.zip appveyor DownloadFile "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
 - 7z x sip-4.19.8.zip
 - cd sip-4.19.8
-- c:\python36-x64\python configure.py
+- c:\python37-x64\python configure.py
 - jom -j4
 - nmake install
 - cd ..
+
+# Add Python (avoiding colision between GC Context.h and Python context.h)
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- echo PYTHONINCLUDES=-I\"c:\python36-x64\include\" >> src\gcconfig.pri
-- echo PYTHONLIBS=-L\"c:\python36-x64\libs\" -lpython36 >> src\gcconfig.pri
+- echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
+- echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
 
 before_build:
 # Enable CloudDB
@@ -98,7 +100,7 @@ before_build:
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 
 # Add debug console
-- echo CONFIG+=console >> src\gcconfig.pri
+#- echo CONFIG+=console >> src\gcconfig.pri
 
 # Patch Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_CALENDAR_CLIENT_SECRET__', $env:GC_GOOGLE_CALENDAR_CLIENT_SECRET | Set-Content src\Core\Secrets.h
@@ -136,8 +138,8 @@ after_build:
 - xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
-- copy c:\python36-x64\python36.dll
-- copy c:\python36-x64\LICENSE.txt "PYTHON LICENSE.txt"
+- copy c:\python37-x64\python37.dll
+- copy c:\python37-x64\LICENSE.txt "PYTHON LICENSE.txt"
 
 # ReadMe, license and icon files
 - copy ..\Resources\win32\ReadMe.txt
