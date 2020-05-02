@@ -8,13 +8,16 @@ cd src
 if [ ! -x ./GoldenCheetah ]
 then echo "Build GoldenCheetah and execute from distribution src"; exit 1
 fi
+
 echo "Checking GoldenCheetah.app can execute"
 ./GoldenCheetah --version
 
 ### Create AppDir and start populating
 mkdir -p appdir
+
 # Executable
 cp GoldenCheetah appdir
+
 # Desktop file
 cat >appdir/GoldenCheetah.desktop <<EOF
 [Desktop Entry]
@@ -26,6 +29,7 @@ Exec=GoldenCheetah
 Icon=gc
 Categories=Science;Sports;
 EOF
+
 # Icon
 cp Resources/images/gc.png appdir/
 
@@ -42,8 +46,6 @@ wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/downloa
 chmod a+x linuxdeployqt-6-x86_64.AppImage
 
 ### Deploy to appdir and generate AppImage
-# -qmake=path-to-qmake-used-for-build option is necessary if the right qmakei
-# version is not first in PATH, check using qmake --version
 ./linuxdeployqt-6-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -appimage
 
 ### Cleanup
@@ -53,12 +55,16 @@ rm -rf appdir
 if [ ! -x ./GoldenCheetah*.AppImage ]
 then echo "AppImage not generated, check the errors"; exit 1
 fi
+
 echo "Renaming AppImage file to branch and build number ready for deploy"
 mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
+
 ### Minimum Test
 ./$FINAL_NAME --version
+
 ### upload for testing
 curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+
 cd ${TRAVIS_BUILD_DIR}
 exit

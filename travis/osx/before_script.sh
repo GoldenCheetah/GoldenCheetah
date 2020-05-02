@@ -51,9 +51,9 @@ sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
 ##Issues with c++11 and stdlib on travis and dependencies
 sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
-# Python (avoid colision between GC Context.h and Python context.h)
+# Python (avoiding colision between GC Context.h and Python context.h)
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
-echo PYTHONINCLUDES = -I$TRAVIS_BUILD_DIR/src/Core `python3-config --includes` >> src/gcconfig.pri
+echo PYTHONINCLUDES = -ICore `python3-config --includes` >> src/gcconfig.pri
 echo PYTHONLIBS = `python3-config --ldflags` >> src/gcconfig.pri
 
 # Patch Secrets.h

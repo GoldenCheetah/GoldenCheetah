@@ -49,15 +49,15 @@ cd ${TRAVIS_BUILD_DIR}
 # LIBUSB
 sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
 
-# Add Python 3.6 and SIP
+# Add Python 3.7 and SIP
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
-sudo apt-get install -qq python3.6-dev
-python3.6 --version
+sudo apt-get install -qq python3.7-dev
+python3.7 --version
 wget https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
-python3.6 configure.py
+python3.7 configure.py
 make
 sudo make install
 cd ${TRAVIS_BUILD_DIR}
