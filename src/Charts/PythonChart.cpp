@@ -418,6 +418,9 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 void
 PythonChart::setWeb(bool x)
 {
+    // check python was loaded
+    if (python == NULL || python->loaded == false) return;
+
     // toggle the use of a web chart or a qt chart for rendering the data
     if (x && canvas==NULL) {
 
