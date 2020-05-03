@@ -40,6 +40,8 @@ public:
     static QMap<QBluetoothUuid, btle_sensor_type_t> supportedServices;
     QBluetoothDeviceInfo deviceInfo() const;
 
+    void setGradient(double Gradient);
+
 private slots:
     void deviceConnected();
     void deviceDisconnected();
@@ -65,6 +67,11 @@ private:
     quint16 prevCrankRevs;
     quint16 prevWheelTime;
     quint32 prevWheelRevs;
+
+    // Tacx ANT over UART specific service
+    QLowEnergyCharacteristic m_charTacxUART;
+    QLowEnergyService* m_servTacxUART = nullptr;
+
     bool connected;
     void getCadence(QDataStream& ds);
     void getWheelRpm(QDataStream& ds);

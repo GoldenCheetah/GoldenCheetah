@@ -164,3 +164,9 @@ BT40Controller::setWheelRpm(double wrpm) {
     else wheel = 2100;
     telemetry.setSpeed(wrpm * wheel / 1000 * 60 / 1000);
 }
+
+void BT40Controller::setGradient(double grad) {
+  for (auto* dev: devices) {
+    dev->setGradient(grad);
+  }
+}
