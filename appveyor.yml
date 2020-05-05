@@ -51,6 +51,7 @@ cache:
 - jom_1_1_3.zip
 - sip-4.19.8.zip
 - C:\R
+- qwt
 
 install:
 # Get the libraries

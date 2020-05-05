@@ -3,6 +3,9 @@ branches:
   - master
   - /^[vV]\d+\.\d+(\.\d+)?(-\S*)?$/
 language: cpp
+cache:
+  directories:
+  - qwt
 env:
   global:
   - BRANCH=master
