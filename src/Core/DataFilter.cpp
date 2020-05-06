@@ -43,6 +43,8 @@ QMutex pythonMutex;
 
 #ifdef GC_WANT_GSL
 #include <gsl/gsl_matrix.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_multifit.h>
 #endif
 
 #include "Zones.h"
@@ -236,6 +238,10 @@ static struct {
 
     { "exists", 1 },    // check if function or variable exists. returns 1 if true 0 if false.}
 
+    { "mlr", 0 },       // mlr(yvector, xvector1 .. xvectorn) - multiple linear regression returns
+                        // the beta (coefficients) for each x series 1-n, the covariance matrix
+                        // is discarded for now. we could look at that later
+
     // add new ones above this line
     { "", -1 }
 };
@@ -412,6 +418,10 @@ DataFilter::builtins()
         } else if (i == 80) {
 
             returning << "exists(\"symbol\")";
+
+        } else if (i == 81) {
+
+            returning << "mlr(yvector, xvector .. xvector)";
 
         } else {
 
@@ -1875,6 +1885,18 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else {
                         validateFilter(context, df, leaf->fparms[0]);
                         validateFilter(context, df, leaf->fparms[1]);
+                    }
+
+                } else if (leaf->function == "mlr") {
+
+                    if (leaf->fparms.count() < 2) {
+
+                        leaf->inerror =true;
+                        DataFiltererrors << QString(tr("mlr(yvector, xvector1 .. xvectorn), need at least 1 xvector and y vectors."));
+
+                    } else {
+                        for(int i=0; i<leaf->fparms.count(); i++)
+                            validateFilter(context, df, leaf->fparms[i]);
                     }
 
                 } else if (leaf->function == "lm") {
@@ -3660,6 +3682,60 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             returning.vector[3]=calc.see;
             returning.number = calc.m + calc.b + calc.r2 + calc.see; // sum
 
+            return returning;
+        }
+
+        if (leaf->function == "mlr") {
+
+            // return
+            Result returning(0);
+
+#ifdef GC_WANT_GSL // we need to gnu scientific library for this
+                   // it implements the Golub-Reinsch SVD algorithm
+                   // if not available we return 0
+
+            // get y vector
+            Result yv = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
+
+            int n = yv.vector.count();
+            int xn = leaf->fparms.count()-1; // first parm is yvector
+            gsl_matrix *X = gsl_matrix_calloc(n, xn);
+            gsl_vector *Y = gsl_vector_alloc(n);
+            gsl_vector *coeff = gsl_vector_alloc(xn); // the coefficients we want to return
+
+            // setup the y vector
+            for (int it = 0; it < n; it++) gsl_vector_set(Y, it, yv.vector[it]);
+
+            // populate the x matrix, 1 column per predictor, n rows of datavalues
+            // if xvector is too small, we pad with 0 values - no repeating here ?fix later?
+            for (int xi=1; xi<leaf->fparms.count(); xi++) {
+                Result xv = eval(df,leaf->fparms[xi],x, it, m, p, c, s, d);
+                for (int it=0; it < n; it++) {
+                    double value=0;
+                    if (it < xv.vector.count()) value= xv.vector[it];
+                    gsl_matrix_set(X, it, xi-1, value);
+                }
+            }
+
+            double chisq;
+            gsl_matrix *cov = gsl_matrix_alloc(xn, xn);
+            gsl_multifit_linear_workspace * wspc = gsl_multifit_linear_alloc(n, xn);
+            gsl_multifit_linear(X, Y, coeff, cov, &chisq, wspc);
+
+            // snaffle away the coeefficents, we discard chi-squared and the
+            // covariance matrix for now, may look to pass them back later
+            for (int it = 0; it < xn; it++) {
+                double value= gsl_vector_get(coeff, it);
+                returning.vector << value;
+                returning.number += value;
+            }
+
+            gsl_matrix_free(X);
+            gsl_matrix_free(cov);
+            gsl_vector_free(Y);
+            gsl_vector_free(coeff);
+            gsl_multifit_linear_free(wspc);
+#endif
             return returning;
         }
 
