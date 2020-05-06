@@ -68,6 +68,10 @@
 #include "PythonEmbed.h"
 #endif
 
+#ifdef GC_WANT_GSL
+#include <gsl/gsl_version.h>
+#endif
+
 #include "levmar.h"
 
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
@@ -256,6 +260,12 @@ QString GcCrashDialog::versionHTML()
     QString src = "none";
     #endif
 
+    // -- GSL --
+    QString gsl = "none";
+    #ifdef GC_WANT_GSL
+    gsl = GSL_VERSION;
+    #endif
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QString gc_version = tr(
             "<p>Build date: %1 %2"
@@ -297,6 +307,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">WEBKIT</td><td>%17</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
             "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
+            "<tr><td colspan=\"2\">GSL</td><td>%20</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -333,6 +344,7 @@ QString GcCrashDialog::versionHTML()
             .arg("none")
 #endif
             .arg(LM_VERSION)
+            .arg(gsl)
             ;
 
     QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");

@@ -41,6 +41,10 @@
 QMutex pythonMutex;
 #endif
 
+#ifdef GC_WANT_GSL
+#include <gsl/gsl_matrix.h>
+#endif
+
 #include "Zones.h"
 #include "PaceZones.h"
 #include "HrZones.h"

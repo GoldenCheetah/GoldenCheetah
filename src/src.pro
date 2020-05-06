@@ -255,6 +255,16 @@ RESOURCES = $${PWD}/Resources/application.qrc
 #                                                                             #
 ###############################################################################
 
+###===================================
+### OPTIONAL => GNU Scientific Library
+###===================================
+
+contains(DEFINES, "GC_WANT_GSL") {
+    INCLUDEPATH += $${GSL_INCLUDES}
+    LIBS += $${GSL_LIBS}
+}
+
+
 ###=========================
 ### OPTIONAL => Embed Python
 ###=========================

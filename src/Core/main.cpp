@@ -60,6 +60,10 @@
 #include <QStandardPaths>
 #endif
 
+#ifdef GC_WANT_GSL
+#include <gsl/gsl_errno.h>
+#endif
+
 //
 // bootstrap state
 //
@@ -349,6 +353,11 @@ main(int argc, char *argv[])
     unsetenv("QT_SCALE_FACTOR");
 #endif
 
+    // we don't want program aborts when maths routines don't know
+    // what to do. We may add our own error handler later.
+#ifdef GC_WANT_GSL
+    gsl_set_error_handler_off();
+#endif
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
     //XXXIdleEventFilter idleFilter;
