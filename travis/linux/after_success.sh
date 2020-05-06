@@ -57,6 +57,7 @@ then echo "AppImage not generated, check the errors"; exit 1
 fi
 
 echo "Renaming AppImage file to branch and build number ready for deploy"
+export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.AppImage
 mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
 
@@ -64,7 +65,12 @@ ls -l $FINAL_NAME
 ./$FINAL_NAME --version
 
 ### upload for testing
+if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
+aws s3 rm s3://goldencheetah-binaries/Linux --recursive # keep only the last one
+aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/Linux/$FINAL_NAME
+else
 curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+fi
 
 cd ${TRAVIS_BUILD_DIR}
 exit

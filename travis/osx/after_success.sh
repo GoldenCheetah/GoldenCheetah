@@ -35,6 +35,7 @@ popd
 python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/qt5
 
 echo "Renaming dmg file to branch and build number ready for deploy"
+export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
 
@@ -44,7 +45,14 @@ cd /Volumes/GoldenCheetah
 GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
 
 echo "Uploading for user tests"
-curl --upload-file $TRAVIS_BUILD_DIR/src/$FINAL_NAME https://transfer.sh/$FINAL_NAME
+### upload for testing
+cd $TRAVIS_BUILD_DIR/src
+if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
+aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
+aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
+else
+curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+fi
 
 echo "Make sure we are back in the Travis build directory"
 cd $TRAVIS_BUILD_DIR

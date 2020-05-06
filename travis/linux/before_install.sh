@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ev
+
 # Add recent Qt dependency ppa, update on a newer qt version.
 sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-xenial
 sudo apt-get update -qq
@@ -61,5 +62,11 @@ python3.7 configure.py
 make
 sudo make install
 cd ${TRAVIS_BUILD_DIR}
+
+# AWS S3 client to upload binaries
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+aws --version
 
 exit

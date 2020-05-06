@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ev
+
 ## try early just to check, can delete later
 date
 brew update
@@ -17,4 +18,9 @@ brew install r
 sudo chmod -R +w /usr/local
 curl -O https://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
 hdiutil mount D2XX1.2.2.dmg
+
+# AWS client to upload binaries to S3 bucket
+brew install awscli
+aws --version
+
 exit
