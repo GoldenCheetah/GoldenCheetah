@@ -51,12 +51,15 @@ cache:
 - jom_1_1_3.zip
 - sip-4.19.8.zip
 - C:\R
+- c:\tools\vcpkg\installed\
 - qwt
 
 install:
 # Get the libraries
 - if not exist gc-ci-libs.zip appveyor DownloadFile "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
 - 7z x -y gc-ci-libs.zip -oC:\libs
+# GSL
+- vcpkg install gsl:x64-windows
 
 # Get config
 - copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
@@ -92,6 +95,11 @@ install:
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
 - echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
 - echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
+
+# GSL
+- echo DEFINES+=GC_WANT_GSL >> src\gcconfig.pri
+- echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
+- echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
 before_build:
 # Define GC version string, only for tagged builds
@@ -144,6 +152,7 @@ after_build:
 - copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
 - copy c:\python37-x64\python37.dll
 - copy c:\python37-x64\LICENSE.txt "PYTHON LICENSE.txt"
+- copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
 
 # ReadMe, license and icon files
 - copy ..\Resources\win32\ReadMe.txt
@@ -158,7 +167,8 @@ after_build:
 # Build the installer
 - makensis GC3.6-Dev-Master-W64-QT5.14.2.nsi
 - move GoldenCheetah_v3.6-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.6-DEV_x64.exe
-- ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Like "*[publish binaries]*") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value 'true' }
+- ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
+- ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Like "*[publish binaries]*") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
 
 test_script:
 # minimum test
@@ -184,3 +194,4 @@ deploy:
     artifact: GCinstaller
     on:
       PUBLISH_BINARIES: true
+      APPVEYOR_REPO_NAME: "GoldenCheetah/GoldenCheetah"

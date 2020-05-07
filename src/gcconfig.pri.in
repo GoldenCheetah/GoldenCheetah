@@ -49,7 +49,7 @@
 # Windows - edit to your install location
 # us vcpkg install gsl
 #DEFINES += GC_WANT_GSL
-#GCL_INCLUDES = C:/gsl-1.11/include/
+#GSL_INCLUDES = C:/gsl-1.11/include/
 #GSL_LIBS = -LC:/gsl-1.11/bin -llibgsl-0 -llibgslcblas-0
 
 # put output into a separate dir

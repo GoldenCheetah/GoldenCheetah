@@ -7,6 +7,7 @@ brew update
 brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
 brew upgrade python3 # to get 3.7.7
 brew upgrade qt5 # to get 5.14.2
+brew install gsl
 brew install libical
 brew upgrade libusb
 brew install srmio

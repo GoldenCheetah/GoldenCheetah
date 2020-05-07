@@ -55,6 +55,9 @@ echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcc
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -ICore `python3-config --includes` >> src/gcconfig.pri
 echo PYTHONLIBS = `python3-config --ldflags` >> src/gcconfig.pri
+# GSL
+echo DEFINES += GC_WANT_GSL >> src/gcconfig.pri
+echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 
 # Patch Secrets.h
 sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h

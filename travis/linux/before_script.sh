@@ -46,6 +46,9 @@ sed -i "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri
 echo PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m >> src/gcconfig.pri
+# GSL
+echo DEFINES += GC_WANT_GSL >> src/gcconfig.pri
+echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 
 # Patch Secrets.h
 sed -i "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
