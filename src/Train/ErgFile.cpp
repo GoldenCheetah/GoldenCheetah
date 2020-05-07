@@ -620,7 +620,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 // distance guff
                 add.x = rdist;
-                int distance = absoluteSlope.cap(1).toDouble() * 1000; // convert to meters
+                double distance = absoluteSlope.cap(1).toDouble() * 1000.; // convert to meters
 
                 if (!bIsMetric) distance *= KM_PER_MILE;
                 rdist += distance;
@@ -628,7 +628,7 @@ void ErgFile::parseComputrainer(QString p)
                 // gradient and altitude
                 add.val = absoluteSlope.cap(2).toDouble();
                 add.y = ralt;
-                ralt += distance * add.val / 100; /* paused */
+                ralt += distance * add.val / 100.; /* paused */
 
                 Points.append(add);
                 if (add.y > MaxWatts) MaxWatts=add.y;
