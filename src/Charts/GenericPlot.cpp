@@ -631,7 +631,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 if (xseries.at(i) != 0 && yseries.at(i) != 0) // 0,0 is common and lets ignore (usually means no data)
                     tree->insert(QPointF(xseries.at(i), yseries.at(i)));
 
-            if (tree->nodes.count()) quadtrees.insert(add, tree);
+            if (tree->nodes.count() || tree->root->contents.count()) quadtrees.insert(add, tree);
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
