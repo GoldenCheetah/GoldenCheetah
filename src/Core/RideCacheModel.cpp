@@ -67,7 +67,7 @@ RideCacheModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0 || index.row() >= rideCache->count() ||
         index.column() < 0 || index.column() >= columns_) return QVariant();
 
-    const RideItem *item = rideCache->rides()[index.row()];
+    const RideItem *item = rideCache->rides().at(index.row());
 
     switch (index.column()) {
         case 0 : return item->path;
