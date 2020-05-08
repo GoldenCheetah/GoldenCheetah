@@ -902,7 +902,7 @@ RideItem::updateIntervals()
                                                 RideFileInterval::ALL);
 
         // same as the whole ride, not need to compute
-        entire->metrics() = metrics();
+        entire->refresh();
         entire->rideInterval = NULL;
         intervals_ << entire;
     }

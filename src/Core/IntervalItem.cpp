@@ -96,16 +96,17 @@ IntervalItem::setValues(QString name, double duration1, double duration2,
 void
 IntervalItem::refresh()
 {
-    // don't open on our account - we should be called with a ride available
-    RideFile *f = rideItem_->ride_;
-    if (!f) return;
-
     // metrics
     const RideMetricFactory &factory = RideMetricFactory::instance();
 
     // resize and set to zero
     metrics_.fill(0, factory.metricCount());
     count_.fill(0, factory.metricCount());
+
+    // don't open on our account - we should be called with a ride available
+    RideFile *f = rideItem_->ride_;
+    if (!f) return;
+
 
     // ok, lets collect the metrics
     QHash<QString,RideMetricPtr> computed=RideMetric::computeMetrics(rideItem_, Specification(this, f->recIntSecs()), factory.allMetrics());
