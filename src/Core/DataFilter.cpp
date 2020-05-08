@@ -242,6 +242,9 @@ static struct {
                         // the beta (coefficients) for each x series 1-n, the covariance matrix
                         // is discarded for now. we could look at that later
 
+    { "match", 2 },     // match(vector1, vector2) - returns a vector of indexes. For every element in vector1
+                        // that is in vector2, the index of the first occurrence is returned.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -422,6 +425,10 @@ DataFilter::builtins()
         } else if (i == 81) {
 
             returning << "mlr(yvector, xvector .. xvector)";
+
+        } else if (i == 82) {
+
+            returning << "match(vector1, vector2)";
 
         } else {
 
@@ -3552,6 +3559,31 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // we want it
                 returning.vector << r;
                 returning.number += r;
+            }
+            return returning;
+        }
+
+        // match
+        if (leaf->function == "match") {
+
+            // for every value in vector 1 return the index for it
+            // in vector 2, if it is not there then it will not be
+            // included in the returned index
+
+            Result returning(0);
+
+            Result v1 = eval(df,leaf->fparms[0],x, it, m, p, c, s, d); // lhs might also be a symbol
+            Result v2 = eval(df,leaf->fparms[1],x, it, m, p, c, s, d); // lhs might also be a symbol
+
+            // lets search
+            for(int it=0; it<v1.vector.count(); it++) {
+                double find = v1.vector[it];
+                for(int it2=0; it2<v2.vector.count(); it2++) {
+                    if (v2.vector[it2] == find) {
+                        returning.number += it2;
+                        returning.vector << it2;
+                    }
+                }
             }
             return returning;
         }
