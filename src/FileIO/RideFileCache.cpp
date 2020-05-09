@@ -35,6 +35,18 @@
 
 static const int maxcache = 25; // lets max out at 25 caches
 
+// predefined binsize for the dist arrays
+static const double wattsDelta = 1.0;
+static const double wattsKgDelta = 0.01;
+static const double nmDelta    = 0.1;
+static const double hrDelta    = 1.0;
+static const double kphDelta   = 0.1;
+static const double cadDelta   = 1.0;
+static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals section
+static const double smo2Delta  = 1;
+static const double wbalDelta  = 1;
+
+
 // cache from ride
 RideFileCache::RideFileCache(Context *context, QString fileName, double weight, RideFile *passedride, bool check, bool refresh) :
                incomplete(false), context(context), rideFileName(fileName), ride(passedride)
@@ -2351,4 +2363,23 @@ RideFileCache::bestTime(double km)
            double(kphMeanMax[secs] * secs) / divisor < km) secs++;
     if (secs < kphMeanMax.count()) return secs;
     return RideFile::NIL;
+}
+
+
+double
+RideFileCache::binsize(RideFile::SeriesType type)
+{
+
+    switch(type) {
+    default:
+    case RideFile::watts: return wattsDelta;
+    case RideFile::wattsKg: return wattsKgDelta;
+    case RideFile::nm: return nmDelta;
+    case RideFile::hr: return hrDelta;
+    case RideFile::kph: return kphDelta;
+    case RideFile::cad: return cadDelta;
+    case RideFile::gear: return gearDelta;
+    case RideFile::smo2: return smo2Delta;
+    case RideFile::wbal: return wbalDelta;
+    }
 }

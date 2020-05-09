@@ -218,8 +218,7 @@ class RideFileCache
         QVector<float> &heatMeanMaxArray();  // will compute if neccessary
 
         // explain the array binning / sampling
-        double &distBinSize(RideFile::SeriesType); // return distribution bin size
-        double &meanMaxBinSize(RideFile::SeriesType); // return distribution bin size
+        static double binsize(RideFile::SeriesType);
 
         // we need to return doubles not longs, we just use longs
         // to reduce disk storage

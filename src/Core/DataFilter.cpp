@@ -248,6 +248,10 @@ static struct {
     { "nonzero", 1 },   // nonzero(vector) - returns a vector of indexes to the zero values. this is a
                         // convenience function since it can be replicated using sapply, but this is much faster
 
+    { "dist", 2 },      // dist(SERIES, data|bins) - get a distribution of data for the specific series
+                        // e.g. HEARTRATE, SPEED et al, data returns the distribution data as a vector
+                        // whilst bins returns the start value used for each bin
+
     // add new ones above this line
     { "", -1 }
 };
@@ -436,6 +440,10 @@ DataFilter::builtins()
         } else if (i == 83) {
 
             returning << "nonzero(vector)";
+
+        } else if (i == 84) {
+
+            returning << "dist(POWER|WPK|HR|CADENCE|SPEED, data|bins)";
 
         } else {
 
@@ -1810,6 +1818,44 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         if (symbol != "efforts" && leaf->seriesType==RideFile::none) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        }
+                    }
+
+                } else if (leaf->function == "dist") {
+
+                    if (leaf->fparms.count() != 2) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("dist(series, data|bins), both parameters are required."));
+                    }
+
+                    // is the param 1 a valid data series?
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("dist(series, data|bins), series should be one ofPOWER, HEARTRATE etc."));
+
+                    } else {
+
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        leaf->seriesType = RideFile::seriesForSymbol(symbol); // set the series type, used on execute.
+                        if (leaf->seriesType==RideFile::none) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        }
+                    }
+
+                    if (leaf->fparms.count() == 2) {
+                        if (leaf->fparms[1]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("dist(series, data|bins), second parameter must be ether 'data' or 'bins'"));
+                        } else {
+                            // check the symbol
+                            QString symbol=*(leaf->fparms[1]->lvalue.n);
+                            if (symbol != "data" && symbol != "bins") {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("dist(series, data|bins), second parameter must be ether 'data' or 'bins'"));
+
+                            }
                         }
                     }
 
@@ -3356,6 +3402,55 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
 
             // return a vector
+            return returning;
+        }
+
+        // distribution
+        if (leaf->function == "dist") {
+
+            Result returning(0);
+
+            // get the two symbols
+            QString want = *(leaf->fparms[1]->lvalue.n);
+
+
+            // working with an activity
+            if (d.from==QDate() && d.to==QDate()) {
+
+                if (want == "bins") {
+
+                    int length = m->fileCache()->distributionArray(leaf->seriesType).count();
+                    double delta = RideFileCache::binsize(leaf->seriesType);
+                    for (double it=0; it <length; it++) {
+                        returning.vector << delta * it;
+                        returning.number += delta *it;
+                    }
+
+                } else {
+
+                    // the ride mean max
+                    returning.vector = m->fileCache()->distributionArray(leaf->seriesType);
+                    for(int it=0; it<returning.vector.count(); it++) returning.number += returning.vector.at(it);
+                }
+
+            } else {
+
+                RideFileCache bestsCache(m->context, d.from, d.to, false, QStringList(), true, NULL);
+                if (want == "bins") {
+
+                    int length = bestsCache.distributionArray(leaf->seriesType).count();
+                    double delta = RideFileCache::binsize(leaf->seriesType);
+                    for (double it=0; it <length; it++) {
+                        returning.vector << delta * it;
+                        returning.number += delta *it;
+                    }
+
+                } else {
+                    // working with a date range
+                    returning.vector = bestsCache.distributionArray(leaf->seriesType);
+                    for(int it=0; it<returning.vector.count(); it++) returning.number += returning.vector.at(it);
+                }
+            }
             return returning;
         }
 
