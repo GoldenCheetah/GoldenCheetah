@@ -22,6 +22,19 @@
 #include <QWidget>
 #include "Context.h"
 
+#ifdef NOWEBKIT
+  #include <QWebEnginePage>
+  #include <QWebEngineView>
+#else
+  #include <QtWebKit>
+  #include <QWebPage>
+  #include <QWebView>
+  #include <QWebFrame>
+#endif
+
+#include <QtWebEngineWidgets>
+
+
 class MeterWidget : public QWidget
 {
   public:
@@ -119,6 +132,72 @@ class ElevationMeterWidget : public MeterWidget
     void setContext(Context *context) { this->context = context; }
   private:
     Context *context;
+
 };
+class LiveMapWidget : public MeterWidget
+{
+  Q_OBJECT
+
+  public:
+    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
+    virtual void paintEvent(QPaintEvent* paintevent);
+    float gradientValue;
+    float curr_lon, curr_lat;
+    void setContext(Context *context) { this->context = context; }
+    virtual void createHtml(double sLon, double sLat, int mapZoom);
+    void plotNewLatLng (double newLat, double newLong);
+    void initLiveMap ();
+    bool liveMapInitialized;
+    std::string t1, t2, t3;
+    //QWebEngineView *liveMapView = new QWebEngineView();
+
+    
+  private:
+    Context *context;
+    QWebEngineView *liveMapView; 
+
+    // current HTML for the ride
+    QString currentPage;
+    //QWebEngineView *liveMapview;
+    
+    
+    
+    //QVBoxLayout *layout;
+    //QWebView *liveMapView;
+    //WebBridgeForRoute *webBridge;
+    // the web browser is loading a page, do NOT start another load
+    //bool loadingPage;
+};
+
+// class WebBridgeForLiveMap : public QObject
+// {
+//     Q_OBJECT;
+
+//     private:
+//         Context *context;
+//         LiveMapWidget *lvm;
+
+//     public:
+//         WebBridgeForLiveMap(Context *context, LiveMapWidget *lvm) : context(context), lvm(lvm) {}
+
+//     public slots:
+//         Q_INVOKABLE void call(int count);
+
+//         // drawing basic route, and interval polylines
+//         Q_INVOKABLE QVariantList getLatLons(int i); // get array of latitudes for highlighted n
+
+//         // once map and basic route is loaded
+//         // this slot is called to draw additional
+//         // overlays e.g. shaded route, markers
+//         //Q_INVOKABLE void drawOverlays();
+
+//         // display/toggle interval on map
+//         //Q_INVOKABLE void toggleInterval(int);
+//         //void intervalsChanged() { emit drawIntervals(); }
+
+//     signals:
+//         //void drawIntervals();
+//         void livemaploadStarted();
+// };
 
 #endif // _MeterWidget_h

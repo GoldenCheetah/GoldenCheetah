@@ -17,6 +17,8 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#pragma optimize("", off)
+
 #include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
@@ -306,6 +308,8 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
+        QString myQstr1 = p_meterWidget->Source();
+        std::string smyStr1 = myQstr1.toStdString();
         if (p_meterWidget->Source() == QString("None"))
         {
             //Nothing
@@ -332,6 +336,20 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 elevationMeterWidget->setContext(context);
                 elevationMeterWidget->gradientValue = rtd.getSlope();
             }
+        }
+        else if (p_meterWidget->Source() == QString("LiveMap"))
+        {
+            LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
+            liveMapWidget->setContext(context);
+            liveMapWidget->curr_lat = rtd.getLatitude();
+            liveMapWidget->curr_lon = rtd.getLongitude();
+            if (rtd.getLatitude() != 0 && rtd.getLongitude() !=0)
+                {
+                    liveMapWidget->initLiveMap();
+                    liveMapWidget->plotNewLatLng(rtd.getLatitude(), rtd.getLongitude());
+                }
+
+
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {

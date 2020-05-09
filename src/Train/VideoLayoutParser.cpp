@@ -138,6 +138,10 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new ElevationMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("LiveMap"))
+        {
+            meterWidget = new LiveMapWidget(meterName, containerWidget, source);
+        }
         else
         {
             qDebug() << QObject::tr("Error creating meter");
