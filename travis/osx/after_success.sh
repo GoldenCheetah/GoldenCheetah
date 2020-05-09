@@ -10,9 +10,19 @@ mkdir GoldenCheetah.app/Contents/Frameworks
 # This is a hack to include libicudata.*.dylib, not handled by macdployqt[fix]
 cp /usr/local/opt/icu4c/lib/libicudata.*.dylib GoldenCheetah.app/Contents/Frameworks
 
-# Copy python framework and change the path in binary
+# Copy python framework and change the path in binaries
 cp -R /usr/local/opt/python/Frameworks/Python.framework GoldenCheetah.app/Contents/Frameworks
-install_name_tool -change `otool -L GoldenCheetah.app/Contents/MacOS/GoldenCheetah | awk '/python/ {print $1; gsub("/usr/local/opt/python", "@executable_path/..", $1); print $1}'` GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+# Update deployed Python framework path
+install_name_tool -id @executable_path/../Frameworks/Python.framework/Versions/3.7/Python ./GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/Python
+# Update GoldenCheetah binary to reference deployed lib
+install_name_tool -change /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python @executable_path/../Frameworks/Python.framework/Versions/3.7/Python ./GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+# Update Python binary to reference deployed lib
+install_name_tool -change /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python "@executable_path/../Python" GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/bin/python3.7
+install_name_tool -change /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python "@executable_path/../../../../Python" GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python
+# Add mandatory Python dependencies to site-packages
+rm GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
+mkdir GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
+python3.7 -m pip install sip==4.19.8 -t GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
 
 # Initial deployment using macdeployqt
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
