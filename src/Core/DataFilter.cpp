@@ -5279,7 +5279,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             int boolresult = eval(df,leaf->fparms[0],x, i, m, p, c, s, d).number;
 
             // we want it
-            if (boolresult != 0) returning.vector << x;
+            if (boolresult != 0) {
+                returning.vector << x;
+                returning.number += x;
+            }
         }
 
         return returning;
