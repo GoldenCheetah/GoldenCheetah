@@ -26,7 +26,6 @@
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
 
-
 VideoWindow::VideoWindow(Context *context)  :
     GcChartWindow(context), context(context), m_MediaChanged(false)
 {
@@ -323,6 +322,8 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
+        QString myQstr1 = p_meterWidget->Source();
+        std::string smyStr1 = myQstr1.toStdString();
         if (p_meterWidget->Source() == QString("None"))
         {
             //Nothing
@@ -348,6 +349,20 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             {
                 elevationMeterWidget->setContext(context);
                 elevationMeterWidget->gradientValue = rtd.getSlope();
+            }
+        }
+        else if (p_meterWidget->Source() == QString("LiveMap"))
+        {
+            LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
+            if (!liveMapWidget)
+                qDebug() << "Error: LiveMap keyword used but widget is not LiveMap type";
+            else
+            {
+                double dLat = rtd.getLatitude();
+                double dLon = rtd.getLongitude();
+
+                if (dLat && dLon) liveMapWidget->plotNewLatLng(dLat, dLon);
+                else liveMapWidget->hide();
             }
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
