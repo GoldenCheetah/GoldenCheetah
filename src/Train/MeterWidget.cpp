@@ -16,12 +16,20 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#pragma optimize("", off)
+
 #include <QtGui>
 #include <QGraphicsPathItem>
 #include "MeterWidget.h"
 #include "ErgFile.h"
 #include "Context.h"
 #include "Units.h"
+
+
+#include <QtWebEngineWidgets/QWebEngineView>
+
+#define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
+
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
@@ -462,4 +470,153 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
         distanceDrawX -= 45;
 
     painter.drawText(distanceDrawX, distanceDrawY, distanceString);
+    if (cyclistX < m_Width*0.5) {
+        painter.drawText((double)cyclistX+5, ((double)m_Height * 0.95), s_grad);
+    } else {
+        painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
+    }
+} 
+
+
+LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context) 
+{
+    forceSquareRatio = false;
+    gradientValue = 0.0;
+    curr_lon = 0.0;
+    curr_lat = 0.0;
+    liveMapView = new QWebEngineView(this);
+    liveMapInitialized = false;
+ 
+
+}
+
+void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
+{
+    
+    MeterWidget::paintEvent(paintevent);
+
+    m_MainBrush = QBrush(m_MainColor);
+    m_BackgroundBrush = QBrush(m_BackgroundColor);
+    m_OutlinePen = QPen(m_OutlineColor);
+    m_OutlinePen.setWidth(1);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+
+    //painter
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    //draw background
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(m_BackgroundBrush);
+    painter.drawRect (0, 0, m_Width, m_Height);
+ 
+    //Set pen for text
+    m_OutlinePen = QPen(m_MainColor);
+    m_OutlinePen.setWidth(1);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+    painter.setPen(m_OutlinePen);
+
+    //Print Coordinates
+    // painter.drawText ((double)m_Width/2 ,((double)(m_Height/2)-20), QVariant(this->curr_lon).toString());
+    // painter.drawText ((double)m_Width/2 ,((double)m_Height/2), QVariant(this->curr_lat).toString());
+    // QWebEngineSettings::ShowScrollBars = false
+    // QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
+    // QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
+    // QWebEngineView *liveMapView = new QWebEngineView(this);
+    // //liveMapView->resize(m_Width,m_Height);
+
+
+    // liveMapView->resize(400,400);
+    // createHtml(QVariant(this->curr_lon).toString(),QVariant(this->curr_lat).toString() );
+    // liveMapView->page()->setHtml(currentPage);
+
+
+    // Qstring sLat = QVariant(this->curr_lat).toString();
+    // Qstring sLon = QVariant(this->curr_lon).toString();
+    // QString code;
+    // code = QStringLiteral("moveMarker(" + sLat + " , "  + sLon + ")");
+    // liveMapview->page()->runJavaScript(code);
+
+
+    // liveMapView->show();
+    // //liveMapView->setFocus();
+
+}
+
+//***************************************************************************************************************
+void LiveMapWidget::initLiveMap ()
+{
+    if ( ! this->liveMapInitialized ) {
+        liveMapView->resize(400,400);
+        createHtml(this->curr_lat, this->curr_lon, 17);
+        liveMapView->page()->setHtml(currentPage);
+        liveMapView->show();
+        this->liveMapInitialized = true;
+
+        t1 = currentPage.toStdString();
+    }
+}
+
+void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
+{
+    qDebug("==> Ready to receive new LatLng") ;
+    QString code;
+    QString sLat = QVariant(dLat).toString();
+    QString sLon = QVariant(dLon).toString();
+    code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
+    //liveMapView->page()->setHtml(currentPage);
+    liveMapView->page()->runJavaScript(code);
+    //liveMapView->show();
+
+    t2 = currentPage.toStdString();
+    t3 = code.toStdString();
+}
+
+void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
+{
+    QString sLat = QVariant(dLat).toString();
+    QString sLon = QVariant(dLon).toString();
+    QString sMapZoom = QVariant(iMapZoom).toString();
+    currentPage = "";
+
+    currentPage = QString("<html><head>\n"
+    "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
+    "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
+    "<title>Golden Cheetah Map</title>\n");
+    //Leaflet CSS and JS
+    currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css\"\n"
+    "integrity=\"sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==\" crossorigin=\"\"/>\n"
+	"<script src=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.js\"\n"
+    "integrity=\"sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==\" crossorigin=\"\"></script>\n"
+	"<style>#mapid {height:300px;}</style></head>\n");
+
+    // local functions
+    currentPage += QString("<body><div id=\"mapid\"></div>\n"
+    "<script type=\"text/javascript\">\n");
+    // mymap var
+    currentPage += QString("var mymap = L.map('mapid').setView([" + sLat + ", " + sLon +"], " + sMapZoom + ");\n");
+    
+    currentPage += QString("L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicGV0ZXJyYWJiaXQiLCJhIjoiY2s5d3h2dzJ0MDA5aDNlbzMwMDhkaWJ6dSJ9.5iREyVPWMiUFrWf0AhuVCQ', {\n"
+    "    attribution: 'Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>',\n"
+    "    maxZoom: 20,\n"
+    "    id: 'mapbox/streets-v11',\n"
+    "    tileSize: 512,\n"
+    "    zoomOffset: -1,\n"
+    "    accessToken: 'pk.eyJ1IjoicGV0ZXJyYWJiaXQiLCJhIjoiY2s5d3h2dzJ0MDA5aDNlbzMwMDhkaWJ6dSJ9.5iREyVPWMiUFrWf0AhuVCQ'}).addTo(mymap);\n");
+    // mymarker var
+    currentPage += QString("var mymarker = new L.marker([" + sLat + ", " + sLon + "], {\n"
+    "    draggable: false,\n"
+    "    title: \"GoldenCheetah - Workout LiveMap\",\n"
+    "    alt: \"GoldenCheetah - Workout LiveMap\",\n"
+    "    riseOnHover: true\n"
+    "}).addTo(mymap)\n");
+    // Move marker function
+    currentPage += QString(    "function moveMarker(myLat, myLon) { \n"
+    "   mymap.panTo(new L.LatLng(myLat, myLon));\n"
+    "    mymarker.setLatLng(new L.latLng(myLat, myLon));}\n"
+    "</script>\n"
+    "</body></html>\n");
+
+    std::string sMyStr;
+    sMyStr = currentPage.toStdString();
 }
