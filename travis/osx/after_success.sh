@@ -51,7 +51,7 @@ if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish bi
 aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
 else
-curl --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --max-time 300 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
 fi
 
 echo "Make sure we are back in the Travis build directory"
