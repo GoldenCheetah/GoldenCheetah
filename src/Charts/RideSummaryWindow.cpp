@@ -1669,7 +1669,7 @@ RideSummaryWindow::getPDEstimates(bool run)
             if (est.wpk != wpk) continue;
 
             // We only use the extended model for now
-            if (est.model != "Ext" ) continue;
+            if (est.model != "ext" ) continue;
 
             // summarising a season or date range
             if (!ridesummary && (est.from > myDateRange.to || est.to < myDateRange.from)) continue;
