@@ -245,6 +245,9 @@ static struct {
     { "match", 2 },     // match(vector1, vector2) - returns a vector of indexes. For every element in vector1
                         // that is in vector2, the index of the first occurrence is returned.
 
+    { "nonzero", 1 },   // nonzero(vector) - returns a vector of indexes to the zero values. this is a
+                        // convenience function since it can be replicated using sapply, but this is much faster
+
     // add new ones above this line
     { "", -1 }
 };
@@ -429,6 +432,10 @@ DataFilter::builtins()
         } else if (i == 82) {
 
             returning << "match(vector1, vector2)";
+
+        } else if (i == 83) {
+
+            returning << "nonzero(vector)";
 
         } else {
 
@@ -3585,6 +3592,24 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     }
                 }
             }
+            return returning;
+        }
+
+        // non-zero - return index to non-zero values
+        if (leaf->function == "nonzero") {
+
+            Result returning(0);
+            Result v = eval(df,leaf->fparms[0],x, it, m, p, c, s, d); // lhs might also be a symbol
+
+            if (v.vector.count() > 0) {
+                for (int it=0; it < v.vector.count(); it++) {
+                    if (v.vector[it] != 0) {
+                        returning.vector << it;
+                        returning.number += it;
+                    }
+                }
+            }
+
             return returning;
         }
 
