@@ -45,6 +45,7 @@ QMutex pythonMutex;
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multifit.h>
+#include <gsl/gsl_statistics.h>
 #endif
 
 #include "Zones.h"
@@ -252,6 +253,9 @@ static struct {
                         // e.g. HEARTRATE, SPEED et al, data returns the distribution data as a vector
                         // whilst bins returns the start value used for each bin
 
+    { "median", 0 },    // median(v ..) - get the median value using the quickselect algorithm
+    { "mode", 0 },      // mode(v ..) - get the mode average.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -445,6 +449,8 @@ DataFilter::builtins()
 
             returning << "dist(POWER|WPK|HR|CADENCE|SPEED, data|bins)";
 
+            // 85 - median
+            // 86 - mode
         } else {
 
             QString function;
@@ -4214,6 +4220,77 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                         else count++;
                     }
                     return count ? Result(sum/double(count)) : Result(0);
+                  }
+                  break;
+
+        case 85 : { /* MEDIAN */
+                        Result vector(0);
+
+                        // collect the values
+                        foreach(Leaf *l, leaf->fparms) {
+                            Result res = eval(df, l,x, it, m, p, c, s, d); // for vectors number is sum
+                            if (res.vector.count()) vector.vector.append(res.vector);
+                            else vector.vector << res.number;
+                        }
+
+                        if (vector.vector.count() < 1) return Result(0);
+                        if (vector.vector.count() == 1) return Result(vector.vector.at(0));
+
+                        // sort and find the one in the middle
+                        qSort(vector.vector);
+
+                        // let gsl do it
+#ifdef GC_WANT_GSL
+                        double median = gsl_stats_median_from_sorted_data(vector.vector.constData(), 1, vector.vector.count());
+#else
+                        double median = 0; // can't be bothered.
+#endif
+                        return Result(median);
+                  }
+                  break;
+
+        case 86 : { /* MODE */
+                        Result vector(0);
+
+                        // collect the values
+                        foreach(Leaf *l, leaf->fparms) {
+                            Result res = eval(df, l,x, it, m, p, c, s, d); // for vectors number is sum
+                            if (res.vector.count()) vector.vector.append(res.vector);
+                            else vector.vector << res.number;
+                        }
+
+                        // lets get a count going
+                        QMap<double, int> counter;
+                        foreach(double value, vector.vector){
+                            int now = counter.value(value, 0);
+                            now++;
+                            counter.insert(value, now);
+                        }
+
+                        // lets find the max
+                        QMapIterator<double, int>it(counter);
+                        int maxcount=0;
+                        double maxvalue=0;
+                        while (it.hasNext()) {
+                            it.next();
+                            if (it.value() > maxcount) {
+                                maxcount = it.value();
+                                maxvalue = it.key();
+                            }
+                        }
+
+                        // now lets average the results
+                        double sum = 0;
+                        double count = 0;
+                        it.toFront();
+                        while(it.hasNext()) {
+                            it.next();
+                            if (it.value() == maxcount) {
+                                sum += it.key();
+                                count++;
+                            }
+                        }
+                        return Result(sum / count);
                   }
                   break;
 
