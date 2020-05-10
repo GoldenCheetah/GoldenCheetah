@@ -2332,6 +2332,69 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, Spe
     return results;
 }
 
+QVector<double>
+RideFileCache::getAllBestsFor(Context *context, RideFile::SeriesType series, int duration, Specification specification)
+{
+    QDate earliest(1900,01,01);
+    QVector<double> results;
+
+    // get a list of rides & iterate over them
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+
+        if (!specification.pass(ride)) continue;
+
+        // get the ride cache name
+
+        // CPX ?
+        QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + ride->fileName);
+        QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFileName);
+
+        // open ok ?
+        if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == false) continue;
+
+        // get header
+        QDataStream inFile(&cacheFile);
+        inFile.readRawData((char *) &head, sizeof(head));
+
+        // out of date - just skip
+        if (head.version != RideFileCacheVersion) {
+            cacheFile.close();
+            continue;
+        }
+
+        if (series == RideFile::none) {
+
+            double date= earliest.daysTo(ride->dateTime.date());
+            results << date;
+
+        } else {
+
+            float value = 0.0;
+            if (duration <= countForMeanMax(head, series)) {
+
+                // get the values and place into the summarymetric map
+                long offset = offsetForMeanMax(head, series) + sizeof(head) + (sizeof(float) * duration);
+
+                cacheFile.seek(qint64(offset));
+                inFile.readRawData((char*)&value, sizeof(float));
+                double divisor = pow(10, decimalsFor(series));
+                value = value / divisor;
+
+            }
+            results << double(value);
+
+        }
+
+        // close CPX file
+        cacheFile.close();
+    }
+
+    // all done, return results
+    return results;
+}
+
 static
 const RideMetric *metricForSymbol(QString symbol)
 {

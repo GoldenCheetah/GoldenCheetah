@@ -256,6 +256,10 @@ static struct {
     { "median", 0 },    // median(v ..) - get the median value using the quickselect algorithm
     { "mode", 0 },      // mode(v ..) - get the mode average.
 
+    { "bests", 0 },     // bests(date [, start [, stop] ]) -or- bests(SERIES, duration [, start [, stop]])
+                        // this returns the peak values for the given duration across the currently selected
+                        // date range, or for the given date range.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -451,6 +455,10 @@ DataFilter::builtins()
 
             // 85 - median
             // 86 - mode
+        } else if (i == 87) { // gronk!
+
+            returning << "bests(POWER|WPK|HR|CADENCE|SPEED, duration [,start [,stop] ])";
+
         } else {
 
             QString function;
@@ -1681,6 +1689,57 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("too many parameters: metrics(symbol|date, start, stop)"));
+                    }
+
+                } else if (leaf->function == "bests") {
+
+                    int po=0;
+
+                    // is the param a symbol and either a series name or 'date'
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("bests() - first parameters is a symbol should be a series name or 'date'"));
+
+                    }
+
+                    if (leaf->fparms.count() >= 1) {
+
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (symbol == "date") {
+                            leaf->seriesType = RideFile::none; // ok, want date
+                        } else {
+                            po = 1;
+                            leaf->seriesType = RideFile::seriesForSymbol(symbol); // set the series type, used on execute.
+                            if (leaf->seriesType==RideFile::none) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                            }
+                        }
+                    }
+
+                    if (leaf->fparms.count() >= 2) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[1]);
+
+                    }
+                    if (leaf->fparms.count() >= 3) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                    }
+                    if (po && leaf->fparms.count() >= 4) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                    }
+
+                    if ((po == 0 && leaf->fparms.count() >= 4) || leaf->fparms.count() >= 5) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("too many parameters"));
                     }
 
                 } else if (leaf->function == "measures") {
@@ -3249,6 +3308,63 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.vector << value;
             }
             return returning;
+        }
+
+        // retrieve best meanmax effort for a given duration and daterange
+        if (leaf->function == "bests") {
+
+            // work out what the date range is...
+            QDate earliest(1900,01,01);
+            Result returning(0);
+            int duration = 0;
+            int po = 0;
+
+            // if want dates, the series and duration are not relevant
+            // otherwise we need to get duration and all parameters are
+            // offset by one in the parameters list
+            if (leaf->seriesType != RideFile::none) {
+                po=1;
+                duration = eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number;
+            }
+
+            FilterSet fs;
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+
+            // date range can be controlled, if no date range is set then we just
+            // use the currently selected date range, otherwise start - today or start - stop
+            if (leaf->fparms.count() == (3+po) && Leaf::isNumber(df, leaf->fparms[1+po]) && Leaf::isNumber(df, leaf->fparms[2+po])) {
+
+                // start to stop
+                Result b = eval(df, leaf->fparms[1+po],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number);
+
+                Result e = eval(df, leaf->fparms[2+po],x, it, m, p, c, s, d);
+                QDate stop = earliest.addDays(e.number);
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else if (leaf->fparms.count() == (2+po) && Leaf::isNumber(df, leaf->fparms[1+po])) {
+
+                // start to today
+                Result b = eval(df, leaf->fparms[1+po],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number);
+                QDate stop = QDate::currentDate();
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else {
+                spec.setDateRange(d); // fallback to daterange selected
+            }
+
+            // get the cache, for the selected date range
+            returning.vector =  RideFileCache::getAllBestsFor(m->context, leaf->seriesType, duration, spec);
+            for(int it=0; it<returning.vector.count(); it++) returning.number += returning.vector.at(it); // for sum
+
+            return returning;
+
         }
 
         // meanmax array
