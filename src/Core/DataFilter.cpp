@@ -264,6 +264,9 @@ static struct {
     { "bests", 0 },     // bests(date [, start [, stop] ]) -or- bests(SERIES, duration [, start [, stop]])
                         // this returns the peak values for the given duration across the currently selected
                         // date range, or for the given date range.
+    { "daterange", 0 }, // daterange(start|stop) or daterange(from,to,expression) - first form gets the
+                        // currently selected start/stop, second form sets from and to when executing the
+                        // expression.}
 
     // add new ones above this line
     { "", -1 }
@@ -671,7 +674,6 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
                     !sym.compare("ctl", Qt::CaseInsensitive) ||
                     !sym.compare("tsb", Qt::CaseInsensitive) ||
                     !sym.compare("atl", Qt::CaseInsensitive) ||
-                    !sym.compare("daterange", Qt::CaseInsensitive) ||
                     !sym.compare("Today", Qt::CaseInsensitive) ||
                     !sym.compare("Current", Qt::CaseInsensitive) ||
                     !sym.compare("RECINTSECS", Qt::CaseInsensitive) ||
@@ -1400,7 +1402,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                     // unknown, is it user defined ?
                     if (!df->symbols.contains(symbol)) {
-                        DataFiltererrors << QString(tr("%1 is unknown")).arg(symbol);
+                        DataFiltererrors << QString(tr("%1 is an unknown symbol")).arg(symbol);
                         leaf->inerror = true;
                     }
                 }
@@ -1459,22 +1461,6 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     leaf->inerror = true;
                 }
 
-                if (leaf->function == "daterange") {
-
-                    if (!dateRangeValidSymbols.exactMatch(symbol)) {
-                        DataFiltererrors << QString(tr("invalid literal for daterange(): %1")).arg(symbol);
-                        leaf->inerror = true;
-
-                    } else {
-                        // convert to int days since using current date range config
-                        // should be able to get from parent somehow
-                        leaf->type = Leaf::Integer;
-                        if (symbol == "start") leaf->lvalue.i = QDate(1900,01,01).daysTo(context->currentDateRange().from);
-                        else if (symbol == "stop") leaf->lvalue.i = QDate(1900,01,01).daysTo(context->currentDateRange().to);
-                        else leaf->lvalue.i = 0;
-                    }
-                }
-
                 if (leaf->function == "config" && !configValidSymbols.exactMatch(symbol)) {
                     DataFiltererrors << QString(tr("invalid literal for config(): %1")).arg(symbol);
                     leaf->inerror = true;
@@ -1503,8 +1489,32 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 bool found=false;
 
-                // are the parameters well formed ?
-                if (leaf->function == "exists") {
+                if (leaf->function == "daterange") {
+
+                    if (leaf->fparms.count()==1) {
+
+                        if (leaf->fparms[0]->type != Leaf::Symbol) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("daterange(start|stop)"));
+                        } else {
+                            QString symbol = *(leaf->fparms[0]->lvalue.n);
+                            if (!dateRangeValidSymbols.exactMatch(symbol)) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("daterange(start|stop) - unknown symbol '%1'")).arg(symbol);
+                            }
+                        }
+
+                    } else if (leaf->fparms.count() == 3) {
+
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                    } else {
+                        DataFiltererrors << QString(tr("daterange(start|stop) or daterange(datefrom, dateto, expression)"));
+                        leaf->inerror = true;
+                    }
+                } else if (leaf->function == "exists") {
 
                     // needs one parameter and must be a string constant
                     if (leaf->fparms.count() != 1) {
@@ -2812,6 +2822,35 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             // does it exist - as a function or symbol?
             return df->functions.contains(symbol) || df->symbols.contains(symbol);
+        }
+
+        if (leaf->function == "daterange") {
+
+            // sets the daterange for the expression, a bit like a closure
+            // so we don't have to add parameters to functions that do things
+            // differently when working in trends view. e.g. measures, metrics etc
+            if (leaf->fparms.count() == 1) {
+
+                QString symbol =  *(leaf->fparms[0]->lvalue.s);
+                if (symbol == "start") return Result(QDate(1900,01,01).daysTo(m->context->currentDateRange().from));
+                else if (symbol == "stop") return Result(QDate(1900,01,01).daysTo(m->context->currentDateRange().to));
+
+                return Result(0);
+
+            } else if (leaf->fparms.count() == 3) {
+
+                Result from =eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+                Result to =eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+                // so work out the date range
+                QDate earliest(1900,01,01);
+                DateRange ourdaterange(earliest.addDays(from.number), earliest.addDays(to.number));
+
+                // return the expression, evaluated using our daterange
+                return eval(df, leaf->fparms[2],x, it, m, p, c, s, ourdaterange);
+
+            }
+            return Result(0);
         }
 
         if (leaf->function == "config") {
