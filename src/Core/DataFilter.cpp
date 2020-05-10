@@ -175,7 +175,7 @@ static struct {
     { "head", 2 }, // head(list, n) - returns vector of first n elements of list (or fewer if not so big)
     { "tail", 2 }, // tail(list, n) - returns vector of last n elements of list (or fewer if not so big)
 
-    { "meanmax", 0 }, // meanmax(POWER|date) - when on trend view get a vector of meanmaximal data for the specific series
+    { "meanmax", 0 }, // meanmax(POWER|date [,start, stop]) - when on trend view get a vector of meanmaximal data for the specific series
                       // meanmax(x,y) - create a meanmaximal power curve from x/y data, x is seconds, y is value
                       // because the returned vector is at 1s resolution the data is interpolated using linear interpolation
                       // and resampled to 1s samples.
@@ -379,7 +379,7 @@ DataFilter::builtins()
 
         } else if (i== 58) {
             // meanmax
-            returning << "meanmax(POWER|WPK|HR|CADENCE|SPEED) or meanmax(xvector, yvector)";
+            returning << "meanmax(POWER|WPK|HR|CADENCE|SPEED [,start, stop]) or meanmax(xvector, yvector)";
 
         } else if (i == 59) {
 
@@ -1878,11 +1878,12 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 } else if (leaf->function == "meanmax") {
 
-                    if (leaf->fparms.count() == 0 || leaf->fparms.count() > 2) {
+                    if (leaf->fparms.count() == 0 || leaf->fparms.count() > 3) {
                         // no
                         leaf->inerror = true;
-                        DataFiltererrors << QString(tr("meanmax(SERIES) or meanmax(xvector,yvector)"));
-                    } else if (leaf->fparms.count() == 1) {
+                        DataFiltererrors << QString(tr("meanmax(SERIES|data [,start, stop]) or meanmax(xvector,yvector)"));
+
+                    } else if (leaf->fparms.count() == 1 || leaf->fparms.count()==3) {
 
                         // is the param 1 a valid data series?
                         if (leaf->fparms[0]->type != Leaf::Symbol) {
@@ -1896,11 +1897,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
                             }
                         }
+
+                        if (leaf->fparms.count() == 3) {
+
+                            validateFilter(context, df, leaf->fparms[1]);
+                            validateFilter(context, df, leaf->fparms[2]);
+                        }
                     } else if (leaf->fparms.count() == 2) {
 
                         // generate from raw x,y data
                         validateFilter(context, df, leaf->fparms[0]);
-                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
                     }
 
                 } else if (leaf->function == "dist") {
@@ -3389,12 +3396,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             Result returning(0);
 
-            if (leaf->fparms.count() == 1) { // retrieve from the ridefilecache, or aggregate across a date range
+            if (leaf->fparms.count() == 1 || leaf->fparms.count() == 3) { // retrieve from the ridefilecache, or aggregate across a date range
+                                                                          // where the data range can be provided
 
                 QString symbol = *(leaf->fparms[0]->lvalue.n);
 
                 // go get it for the current date range
-                if (d.from==QDate() && d.to==QDate()) {
+                if (leaf->fparms.count() == 1 && d.from==QDate() && d.to==QDate()) {
 
                     // the ride mean max
                     if (symbol == "efforts") {
@@ -3407,8 +3415,21 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 } else {
 
+                    // default date range
+                    QDate from=d.from, to=d.to;
+                    QDate earliest(1900,01,01);
+
+                    if (leaf->fparms.count() == 3) {
+                        // get the date range
+                        Result start =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                        Result stop =  eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+                        from = earliest.addDays(start.number);
+                        to = earliest.addDays(stop.number);
+                    }
+
                     // use a season meanmax
-                    RideFileCache bestsCache(m->context, d.from, d.to, false, QStringList(), true, NULL);
+                    RideFileCache bestsCache(m->context, from, to, false, QStringList(), true, NULL);
 
                     // get meanmax, unless its efforts, where we do rather more...
                     if (symbol != "efforts") returning.vector = bestsCache.meanMaxArray(leaf->seriesType);
@@ -3542,7 +3563,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // compute the sum, ugh.
                 for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector[i];
 
-            } else { // calculate a meanmax curve using the passed x and y values
+            } else if (leaf->fparms.count() == 2) { // calculate a meanmax curve using the passed x and y values
 
                 Result xvector =  eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
                 Result yvector =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
