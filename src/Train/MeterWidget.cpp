@@ -469,7 +469,6 @@ LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source, Cont
 
 void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 {
-    
     MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
@@ -494,30 +493,8 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
     painter.setPen(m_OutlinePen);
 
     //Print Coordinates
-    // painter.drawText ((double)m_Width/2 ,((double)(m_Height/2)-20), QVariant(this->curr_lon).toString());
-    // painter.drawText ((double)m_Width/2 ,((double)m_Height/2), QVariant(this->curr_lat).toString());
-    // QWebEngineSettings::ShowScrollBars = false
-    // QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
-    // QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
-    // QWebEngineView *liveMapView = new QWebEngineView(this);
-    // //liveMapView->resize(m_Width,m_Height);
-
-
-    // liveMapView->resize(400,400);
-    // createHtml(QVariant(this->curr_lon).toString(),QVariant(this->curr_lat).toString() );
-    // liveMapView->page()->setHtml(currentPage);
-
-
-    // Qstring sLat = QVariant(this->curr_lat).toString();
-    // Qstring sLon = QVariant(this->curr_lon).toString();
-    // QString code;
-    // code = QStringLiteral("moveMarker(" + sLat + " , "  + sLon + ")");
-    // liveMapview->page()->runJavaScript(code);
-
-
-    // liveMapView->show();
-    // //liveMapView->setFocus();
-
+    painter.drawText ((double)m_Width/2 ,((double)(m_Height/2)-20), QVariant(this->curr_lon).toString());
+    painter.drawText ((double)m_Width/2 ,((double)m_Height/2), QVariant(this->curr_lat).toString());
 }
 
 //***************************************************************************************************************
@@ -525,7 +502,7 @@ void LiveMapWidget::initLiveMap ()
 {
     if ( ! this->liveMapInitialized ) {
         liveMapView->resize(400,400);
-        createHtml(this->curr_lat, this->curr_lon, 17);
+        createHtml(this->curr_lat, this->curr_lon, 16);
         liveMapView->page()->setHtml(currentPage);
         liveMapView->show();
         this->liveMapInitialized = true;
@@ -543,7 +520,6 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
     code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
     //liveMapView->page()->setHtml(currentPage);
     liveMapView->page()->runJavaScript(code);
-    //liveMapView->show();
 
     t2 = currentPage.toStdString();
     t3 = code.toStdString();
