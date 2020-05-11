@@ -266,7 +266,9 @@ static struct {
                         // date range, or for the given date range.
     { "daterange", 0 }, // daterange(start|stop) or daterange(from,to,expression) - first form gets the
                         // currently selected start/stop, second form sets from and to when executing the
-                        // expression.}
+                        // expression.
+    { "quantile", 2 },  // quantile(vector, quantiles) - quantiles can be a number or a vector of numbers
+                        // the vector does not need to be sorted as it will be sorted internally.
 
     // add new ones above this line
     { "", -1 }
@@ -466,6 +468,11 @@ DataFilter::builtins()
         } else if (i == 87) { // gronk!
 
             returning << "bests(POWER|WPK|HR|CADENCE|SPEED, duration [,start [,stop] ])";
+
+            // 88 - daterange
+        } else if (i == 89) {
+
+            returning << "quantile(vector, quantiles)";
 
         } else {
 
@@ -3868,6 +3875,39 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             if (i == list.vector.end()) return Result(list.vector.size());
             return Result(i - list.vector.begin());
+        }
+
+        // quantile
+        if (leaf->function == "quantile") {
+
+            Result v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result quantiles= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            Result returning(0);
+
+#ifdef GC_WANT_GSL
+            if (v.vector.count() > 0) {
+                // sort the vector first
+                qSort(v.vector);
+
+                if (quantiles.vector.count() ==0) {
+                    if (quantiles.number < 0) quantiles.number=0;
+                    if (quantiles.number > 1) quantiles.number=1;
+
+                    returning.number = gsl_stats_quantile_from_sorted_data(v.vector.constData(), 1, v.vector.count(), quantiles.number);
+
+                } else {
+                    for (int it=0; it<quantiles.vector.count(); it++) {
+                        double quantile= quantiles.vector.at(it);
+                        if (quantile < 0) quantile=0;
+                        if (quantile > 1) quantile=1;
+                        double value = gsl_stats_quantile_from_sorted_data(v.vector.constData(), 1, v.vector.count(), quantile);
+                        returning.number += value;
+                        returning.vector << value;
+                    }
+                }
+            }
+#endif
+            return returning;
         }
 
         // sort
