@@ -496,11 +496,13 @@ WPrime::setErg(ErgFile *input)
         return; // needs to be a valid erg file...
     }
 
+    ErgFileQueryAdapter ergFileQueryAdapter(input);
+
     minY = maxY = WPRIME;
 
     if (integral) {
 
-        last = input->Duration / 1000; 
+        last = ergFileQueryAdapter.Duration() / 1000; 
         values.resize(last);
         xvalues.resize(last);
 
@@ -514,7 +516,7 @@ WPrime::setErg(ErgFile *input)
 
             // get watts at point in time
             int lap;
-            int value = input->wattsAt(i*1000, lap);
+            int value = ergFileQueryAdapter.wattsAt(i*1000, lap);
 
             powerValues[i] = value > CP ? value-CP : 0;
 
@@ -555,7 +557,7 @@ WPrime::setErg(ErgFile *input)
     } else {
 
         // how many points ?
-        last = input->Duration / 1000; 
+        last = ergFileQueryAdapter.Duration() / 1000; 
         values.resize(last);
         xvalues.resize(last);
 
@@ -563,10 +565,11 @@ WPrime::setErg(ErgFile *input)
         // and will also contain non-zero values
         double W = WPRIME;
         int lap; // passed by reference
+
         for (int i=0; i<last; i++) {
 
             // get watts at point in time
-            int value = input->wattsAt(i*1000, lap);
+            int value = ergFileQueryAdapter.wattsAt(i*1000, lap);
 
             if(value < CP) {
                 W  = W + (CP-value)*(WPRIME-W)/WPRIME;

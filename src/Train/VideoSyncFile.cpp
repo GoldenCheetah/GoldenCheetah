@@ -68,7 +68,6 @@ void VideoSyncFile::reload()
 void VideoSyncFile::parseTTS()
 {
     // Initialise
-    manualOffset = 0;
     Version = "";
     Units = "";
     Filename = "";
@@ -135,7 +134,6 @@ void VideoSyncFile::parseTTS()
 void VideoSyncFile::parseRLV()
 {
     // Initialise
-    manualOffset = 0;
     Version = "";
     Units = "";
     Filename = "";
@@ -349,7 +347,6 @@ void VideoSyncFile::parseRLV()
 void VideoSyncFile::parseFromRideFileFactory()
 {
     // Initialise
-    manualOffset = 0;
     Version = "";
     Units = "";
     Filename = "";
@@ -452,7 +449,7 @@ VideoSyncFile::~VideoSyncFile()
 
 
 bool
-VideoSyncFile::isValid()
+VideoSyncFile::isValid() const
 {
     return valid;
 }

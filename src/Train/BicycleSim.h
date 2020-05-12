@@ -19,9 +19,11 @@
 #if !defined(BICYCLESIM_H)
 #define BICYCLESIM_H
 
+#include <chrono>
+
 #include "RealtimeData.h"
 #include "PhysicsUtility.h"
-#include <chrono>
+#include "ErgFile.h"
 
 class BicycleWheel
 {
@@ -101,6 +103,14 @@ public:
         this->Altitude() = rtData.getAltitude();
         this->Slope()    = rtData.getSlope();
         this->Watts()    = rtData.getWatts();
+    }
+
+    BicycleSimState(double watts, double slope, double altitude)
+    {
+        Clear();
+        this->Altitude() = altitude;
+        this->Slope()    = slope;
+        this->Watts()    = watts;
     }
 
     // Linear interpolate all fields to new sim state.
@@ -184,5 +194,47 @@ public:
              double v) const;                        // current velocity
 
 };
+
+#if 0 // Simulated rider.
+// Class to wrap bicycle simulation and model its motion across a route.
+// This can be used to build simulated 'rabbits' to race along with an rlv rider.
+class SimulatedRider {
+    Bicycle                   m_bicycle;
+    ErgFileQueryAdapter       m_ergFileAdapter;
+
+    double                    m_watts;    // value set externally
+    double                    m_distance;
+    double                    m_speed;
+    double                    m_latitude;
+    double                    m_longitude;
+    double                    m_altitude;
+    double                    m_slope;    // value determined by ergfile, if present, otherwise set externally
+
+    bool                      m_hasLocation;
+
+public:
+
+    SimulatedRider(Context* context) :
+        m_bicycle(context), m_watts(0.), m_distance(0.), m_speed(0.), m_latitude(0.), m_longitude(0.), m_altitude(0.),
+        m_hasLocation(false) {}
+
+    // Update location on ergfile based on current state.
+    void    UpdateSelf(const ErgFile* ergFile);
+
+    // Setters
+    double& Watts()    { return m_watts; }
+    double& Distance() { return m_distance; }
+    double& Slope()    { return m_slope;}                 // to provide slope when ergfile not present
+
+    // Getters
+    bool    HasLocation() const { return m_hasLocation; } // true if there is lon and lat
+
+    double  Distance()    const { return m_distance; }    // always present
+    double  Latitude()    const { return m_latitude; }    // valid if hasLocation returns true
+    double  Longitude()   const { return m_longitude; }   // valid if hasLocation returns true.
+    double  Altitude()    const { return m_altitude; }    // always present
+    double  Slope()       const { return m_slope; }       // always present
+};
+#endif
 
 #endif // BICYCLESIM_H

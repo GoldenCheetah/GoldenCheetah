@@ -124,15 +124,16 @@ class ErgFile
         bool isValid() const;            // is the file valid or not?
 
         double Cp;
-        int format;                      // ERG, CRS, MRC, ERG2 currently supported
-        double wattsAt   (double, int&); // return the watts value for the passed msec
-        double gradientAt(double, int&); // return the gradient value for the passed meter
-        bool locationAt  (double x, int& lapnum, geolocation &geoLoc, double &slope100); // location at meter
+        int format;             // ERG, CRS, MRC, ERG2 currently supported
 
-        double nextLap(long);            // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
-        double currentLap(long);         // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+public:
+        bool hasGradient() const { return CRS == format; }
+        bool hasWatts()    const { return ERG == format || MRC == format; }
 
-        int nextText(long);     // return the index for the next text cue
+        double nextLap(long) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
+        double currentLap(long) const; // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+
+        int  nextText(long) const;   // return the index for the next text cue
 
         // turn the ergfile into a series of sections rather
         // than a list of points
@@ -151,12 +152,9 @@ class ErgFile
         long    Duration;       // Duration of this workout in msecs
         int     Ftp;            // FTP this file was targetted at
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
-        bool valid;             // did it parse ok?
-        int mode;
-        bool    StrictGradient;        // should gradient be strict or smoothed?
-
-        int leftPoint, rightPoint;     // current points we are between
-        int interpolatorReadIndex;     // next point to be fed to interpolator
+        bool    valid;          // did it parse ok?
+        int     mode;
+        bool    StrictGradient; // should gradient be strict or smoothed?
 
         QList<ErgFilePoint> Points;    // points in workout
         QList<ErgFileLap>   Laps;      // interval markers in the file
@@ -174,7 +172,65 @@ class ErgFile
         double ELE, ELEDIST, GRADE;    // crs
 
         Context *context;
+};
 
+// Store state used for location query external to ergfile. This permits sharing
+// to simulataniusly query multiple locations.
+class ErgFileQueryAdapter {
+
+    mutable struct ErgFileLocationQueryState
+    {
+        int leftPoint, rightPoint;     // current points we are between
+        int interpolatorReadIndex;     // next point to be fed to interpolator
+        GeoPointInterpolator gpi;      // Location interpolator
+
+        ErgFileLocationQueryState() {
+            Reset();
+        }
+
+        void Reset() {
+            leftPoint = 0;
+            rightPoint = 1;
+            interpolatorReadIndex = 0;
+            gpi.Reset();
+        }
+    } qs;
+
+    const ErgFile* ergFile;
+
+public:
+
+    ErgFileQueryAdapter(ErgFile* ef = NULL) : ergFile(ef) {}
+
+    const ErgFile* getErgFile() const     { return ergFile; }
+    void     setErgFile(const ErgFile* p) { ergFile = p; }
+    void     resetQueryState()            { qs.Reset(); }
+
+private:
+    const QList<ErgFilePoint>& Points() const { return ergFile->Points; }
+    const QList<ErgFileLap>  & Laps()   const { return ergFile->Laps; }
+    const QList<ErgFileText> & Texts()  const { return ergFile->Texts; }
+
+    // Common helper to setup query state for query. Returns false if bracket cannot be established.
+    bool   updateQueryStateFromDistance(double x, int& lapnum) const;
+
+public:
+    // Const getters
+    bool   hasGradient() const { return ergFile && ergFile->hasGradient(); }
+    bool   hasWatts()    const { return ergFile && ergFile->hasWatts();    }
+
+    int    nextLap   (long l) const { return !ergFile ? -1 : ergFile->nextLap(l);    }
+    int    currentLap(long l) const { return !ergFile ? -1 : ergFile->currentLap(l); }
+    int    nextText  (long l) const { return !ergFile ? -1 : ergFile->nextText(l);   }
+
+    double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
+
+    double Duration(void) const { return !ergFile ? 0. : ergFile->Duration; }
+
+    // State queries (maintain mutable state.)
+    double wattsAt(double msec, int& lapnum) const;
+    double gradientAt(double meters, int& lapnum) const;
+    bool   locationAt(double meters, int& lapnum, geolocation& geoLoc, double& slope100) const;
 };
 
 #endif
