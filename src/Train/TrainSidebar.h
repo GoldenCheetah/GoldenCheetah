@@ -185,6 +185,7 @@ class TrainSidebar : public GcWindow
         void FFwd();        // jump forward when in a workout
         void Rewind();      // jump backwards when in a workout
         void FFwdLap();     // jump forward to next Lap marker
+        void RewindLap();   // jump backwards to previous Lap marker
         void Higher();      // set load/gradient higher
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!
@@ -281,8 +282,11 @@ class TrainSidebar : public GcWindow
         int lastRecordSecs;     // to avoid duplicates
         QFile *rrFile;          // r-r records, if any received.
         QFile *vo2File;         // vo2 records, if any received.
-        ErgFile *ergFile;       // workout file
-        VideoSyncFile *videosyncFile;       // videosync file
+
+        // ErgFile wrapper to support stateful location queries.
+        ErgFileQueryAdapter        ergFileQueryAdapter;
+
+        VideoSyncFile             *videosyncFile;     // videosync file
 
         bool     startCalibration, restartCalibration, finishCalibration;
         int      calibrationDeviceIndex;

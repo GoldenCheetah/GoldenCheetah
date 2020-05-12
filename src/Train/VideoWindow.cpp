@@ -253,11 +253,6 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    if ((!context->isRunning) && context->currentVideoSyncFile()) {
-        context->currentVideoSyncFile()->manualOffset = 0.0;
-        context->currentVideoSyncFile()->km = 0.0;
-    }
-
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -290,9 +285,6 @@ void VideoWindow::startPlayback()
 
 void VideoWindow::stopPlayback()
 {
-    if ((!context->isRunning) && context->currentVideoSyncFile())
-        context->currentVideoSyncFile()->manualOffset = 0.0;
-
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -360,9 +352,9 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         {
             // Do not show in ERG mode
             if (rtd.mode == ERG || rtd.mode == MRC)
-                {
-                    p_meterWidget->setWindowOpacity(0); // Hide the widget
-                }
+            {
+                p_meterWidget->setWindowOpacity(0); // Hide the widget
+            }
             p_meterWidget->Value = rtd.getRouteDistance();
             ElevationMeterWidget* elevationMeterWidget = dynamic_cast<ElevationMeterWidget*>(p_meterWidget);
             if (!elevationMeterWidget)
@@ -382,12 +374,19 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             {
                 double dLat = rtd.getLatitude();
                 double dLon = rtd.getLongitude();
+                double dAlt = rtd.getAltitude();
 
-                if (dLat && dLon) liveMapWidget->plotNewLatLng(dLat, dLon);
-
-                // show/hide depending on Location data presence
-                if (context->currentErgFile() && context->currentErgFile()->gpi.HasLocation()) liveMapWidget->show();
-                else liveMapWidget->hide();
+                // show/plot or hide depending on existance of valid location data
+                geolocation geo(dLat, dLon, dAlt);
+                if (geo.IsReasonableGeoLocation()) 
+                {
+                    liveMapWidget->plotNewLatLng(dLat, dLon);
+                    liveMapWidget->show();
+                }
+                else
+                {
+                    liveMapWidget->hide();
+                }
             }
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
@@ -517,8 +516,8 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         if (curPosition > VideoSyncFiledataPoints.count() - 1 || curPosition < 1)
             curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
-        double CurrentDistance = qBound(0.0,  rtd.getDistance() + context->currentVideoSyncFile()->manualOffset, context->currentVideoSyncFile()->Distance);
-        context->currentVideoSyncFile()->km = CurrentDistance;
+        // Ensure distance is within bounds of the videosyncfile.
+        double CurrentDistance = qBound(0.0, rtd.getRouteDistance(), context->currentVideoSyncFile()->Distance);
 
         // make sure the current position is less than the new distance
         while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))
@@ -565,26 +564,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         rfp.km = CurrentDistance;
 
-        /*
-        //TODO : GPX file format
-            // otherwise we use the gpx from selected ride in analysis view:
-            QVector<RideFilePoint*> dataPoints =  myRideItem->ride()->dataPoints();
-            if (dataPoints.count()<2) return;
-
-            if(curPosition > dataPoints.count()-1 || curPosition < 1)
-                curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
-
-            // make sure the current position is less than the new distance
-            while ((dataPoints[curPosition]->km > rtd.getDistance()) && (curPosition > 1))
-                curPosition--;
-            while ((dataPoints[curPosition]->km <= rtd.getDistance()) && (curPosition < dataPoints.count()-1))
-                curPosition++;
-
-            // update the rfp
-            rfp = *dataPoints[curPosition];
-
-        }
-        */
         // set video rate ( theoretical : video rate = training speed / ghost speed)
         float rate;
         float video_time_shift_ms;
@@ -599,9 +578,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         {
             libvlc_media_player_set_time(mp, (libvlc_time_t) (rfp.secs*1000.0));
         }
-        else
-        // otherwise add "small" empiric corrective parameter to get video back to ghost position:
+        else {
+            // otherwise add "small" empiric corrective parameter to get video back to ghost position:
             rate *= 1.0 + (video_time_shift_ms / 10000.0);
+        }
 
         libvlc_media_player_set_pause(mp, (rate < 0.01));
 
@@ -633,7 +613,7 @@ void VideoWindow::seekPlayback(long ms)
     // when we selected a videosync file in training mode (rlv...)
     if (context->currentVideoSyncFile())
     {
-        context->currentVideoSyncFile()->manualOffset += (double) ms; //we consider +/- 1km
+        // Nothing to do here, videosync distance adjustments are handled elsewhere.
     }
     else
     {

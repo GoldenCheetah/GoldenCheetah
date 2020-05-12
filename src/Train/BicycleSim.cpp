@@ -19,6 +19,7 @@
 #include "BicycleSim.h"
 #include "Settings.h"
 #include "Pages.h"
+#include "ErgFile.h"
 
 BicycleWheel::BicycleWheel(double outerR,         // outer radius in meters (for circumference)
                            double innerR,         // inner rim radius
@@ -63,7 +64,7 @@ void Bicycle::Init(BicycleConstants constants, double riderMassKG, double bicycl
 
 Bicycle::Bicycle(Context *context, BicycleConstants constants, double riderMassKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel)
 {
-    context;
+    Q_UNUSED(context)
     Init(constants, riderMassKG, bicycleMassWithoutWheelsKG, frontWheel, rearWheel);
 }
 
