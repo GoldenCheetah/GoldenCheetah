@@ -322,7 +322,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 {
                     p_meterWidget->setWindowOpacity(0); // Hide the widget
                 }
-            p_meterWidget->Value = rtd.getDistance();
+            p_meterWidget->Value = rtd.getRouteDistance();
             ElevationMeterWidget* elevationMeterWidget = dynamic_cast<ElevationMeterWidget*>(p_meterWidget);
             if (!elevationMeterWidget)
                 qDebug() << "Error: Elevation keyword used but widget is not elevation type";

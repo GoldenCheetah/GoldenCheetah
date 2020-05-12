@@ -365,7 +365,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     //Get point to create the polygon
     QPolygon polygon;
     polygon << QPoint(0.0, (double)m_Height);
-    double x, y, pt=0;
+    double x = 0., y, pt=0;
     double nextX = 1;
     for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
     {
@@ -405,4 +405,20 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     } else {
         painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
     }
-} 
+
+    //Cosmetic enhancement: Display route distance in meters
+    double routeDistanceMeters = this->Value * 1000.;
+    QString s_dist = QString::number((int)routeDistanceMeters) + QString("m");
+
+    double paintX = (double)cyclistX;
+    double paintY = ((double)m_Height * 0.75);
+
+    // Display distance text to the right of the line until the middle, then display to the left of the line
+    if (cyclistX < m_Width * 0.5) {
+        paintX += 5;
+    } else {
+        paintX -= 45;
+    }
+
+    painter.drawText(paintX, paintY, s_dist);
+}
