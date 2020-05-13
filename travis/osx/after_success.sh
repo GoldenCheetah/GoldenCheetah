@@ -51,15 +51,16 @@ ls -l $FINAL_NAME
 
 echo "Mounting dmg file and testing it can execute"
 hdiutil mount $FINAL_NAME
-cd /Volumes/GoldenCheetah
-GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
+/Volumes/GoldenCheetah/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
+git log -1 >> GCversionMacOS.txt
+cat GCversionMacOS.txt
 
 echo "Uploading for user tests"
 ### upload for testing
-cd $TRAVIS_BUILD_DIR/src
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
 aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
+aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
 else
 curl --max-time 300 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
 fi

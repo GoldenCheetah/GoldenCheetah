@@ -62,12 +62,15 @@ mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
 
 ### Minimum Test
-./$FINAL_NAME --version
+./$FINAL_NAME --version 2>GCversionLinux.txt
+git log -1 >> GCversionLinux.txt
+cat GCversionLinux.txt
 
 ### upload for testing
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
 aws s3 rm s3://goldencheetah-binaries/Linux --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/Linux/$FINAL_NAME
+aws s3 cp --acl public-read GCversionLinux.txt s3://goldencheetah-binaries/Linux/GCversionLinux.txt
 else
 curl --max-time 300 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
 fi

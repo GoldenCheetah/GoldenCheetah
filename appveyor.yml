@@ -167,17 +167,21 @@ after_build:
 # Build the installer
 - makensis GC3.6-Dev-Master-W64-QT5.14.2.nsi
 - move GoldenCheetah_v3.6-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.6-DEV_x64.exe
+- cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Like "*[publish binaries]*") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
 
 test_script:
 # minimum test
-- GoldenCheetah --version
-- cd ..\..
+- src\release\GoldenCheetah --version 2>GCversionWindows.txt
+- git log -1 >> GCversionWindows.txt
+- type GCversionWindows.txt
 
 artifacts:
 - path: GoldenCheetah_v3.6-DEV_x64.exe
   name: GCinstaller
+- path: GCversionWindows.txt
+  name: GCversionWindows
 
 deploy:
 # deploy continuous builds to s3
@@ -191,7 +195,7 @@ deploy:
     remove_files: true
     set_public: true
     folder: Windows
-    artifact: GCinstaller
+    artifact: GCinstaller, GCversionWindows
     on:
       PUBLISH_BINARIES: true
       APPVEYOR_REPO_NAME: "GoldenCheetah/GoldenCheetah"
