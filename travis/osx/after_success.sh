@@ -53,6 +53,8 @@ echo "Mounting dmg file and testing it can execute"
 hdiutil mount $FINAL_NAME
 /Volumes/GoldenCheetah/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
 git log -1 >> GCversionMacOS.txt
+echo "SHA256 hash of $FINAL_NAME:" >> GCversionMacOS.txt
+shasum -a 256 $FINAL_NAME | cut -f 1 -d ' ' >> GCversionMacOS.txt
 cat GCversionMacOS.txt
 
 echo "Uploading for user tests"

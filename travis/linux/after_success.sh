@@ -64,6 +64,8 @@ ls -l $FINAL_NAME
 ### Minimum Test
 ./$FINAL_NAME --version 2>GCversionLinux.txt
 git log -1 >> GCversionLinux.txt
+echo "SHA256 hash of $FINAL_NAME:" >> GCversionLinux.txt
+shasum -a 256 $FINAL_NAME | cut -f 1 -d ' '  >> GCversionLinux.txt
 cat GCversionLinux.txt
 
 ### upload for testing
