@@ -1801,6 +1801,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "quantile") {
+
+                    if (leaf->fparms.count() != 2) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("quantil(vector, quantiles)"));
+                    } else {
+                        validateFilter(context, df, leaf->fparms[0]);
+                        validateFilter(context, df, leaf->fparms[1]);
+                    }
+
                 } else if (leaf->function == "sort") {
 
                     if (leaf->fparms.count() < 2) {
@@ -1978,6 +1989,8 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         if (!annotateTypes.exactMatch(type)) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("annotation type '%1' not available").arg(type));
+                        } else {
+                            for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
                         }
                     }
 
@@ -3072,8 +3085,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             if (v.vector.count() == 0) return Result(v.number);
 
             double cumsum = 0;
-            for(int it=0; it < v.vector.count(); it++) {
-                cumsum += v.vector[it];
+            for(int i=0; i < v.vector.count(); i++) {
+                cumsum += v.vector[i];
                 returning.number += cumsum;
                 returning.vector << cumsum;
             }
@@ -3431,7 +3444,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             // get the cache, for the selected date range
             returning.vector =  RideFileCache::getAllBestsFor(m->context, leaf->seriesType, duration, spec);
-            for(int it=0; it<returning.vector.count(); it++) returning.number += returning.vector.at(it); // for sum
+            for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector.at(i); // for sum
 
             return returning;
 
@@ -3626,15 +3639,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 double offset=0;
                 double maxx=0, lastx=0;
                 bool interpolate=false;
-                for(int it=0; it < xvector.vector.count(); it++) {
+                for(int i=0; i < xvector.vector.count(); i++) {
 
                     // truncate y values if x values are missing
-                    if (it >= yvector.vector.count()) break;
+                    if (i >= yvector.vector.count()) break;
 
                     // set the offset
-                    if (it==0 && xvector.vector.at(0) > 0) offset=xvector.vector.at(0);
+                    if (i==0 && xvector.vector.at(0) > 0) offset=xvector.vector.at(0);
 
-                    double xv = xvector.vector.at(it) - offset;
+                    double xv = xvector.vector.at(i) - offset;
                     if (xv >= 24*3600) break; // thats enough 24hr activity is long enough
 
                     if (xv >=0) {
@@ -3643,7 +3656,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                         if (xv-lastx > 0) interpolate = true;
 
                         // we discard negative values of x
-                        double yv = yvector.vector.at(it);
+                        double yv = yvector.vector.at(i);
                         if (yv <0) yv=0;
 
                         // add into x and y
@@ -3678,9 +3691,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                     // truncate ydata as we will refill them
                     ydata.resize(0);
-                    for(int it=0; it<=maxx; it++) {
+                    for(int i=0; i<=maxx; i++) {
                         // snaffle away- can place into input when GSL is no longer optional
-                        ydata << gsl_interp_eval(interpolation, xdata.constData(), yp.constData(), it, accelerator);
+                        ydata << gsl_interp_eval(interpolation, xdata.constData(), yp.constData(), i, accelerator);
                     }
 
                     // free the GSL interpolator
@@ -3692,7 +3705,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // finally, we can call the meanmax computer - but need to use ints.. so
                 // lets scale up by 1000 to save 3 decimal places, then scale down at the end
                 QVector<int> input, bests, offsets; // offsets are discarded
-                for(int it=0; it<ydata.count(); it++) input <<ydata[it]*double(1000);
+                for(int i=0; i<ydata.count(); i++) input <<ydata[i]*double(1000);
 
                 // lets do it...
                 RideFileCache::fastSearch(input, bests, offsets);
@@ -3701,8 +3714,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // we start at pos 1 (1s value) a really old bug in the way mmp data is
                 // stored and shared (0th element in arrayis for 0s) that is baked in to
                 // lots of other charts, and now here too :)
-                for(int it=1; it<bests.count()-1; it++) {
-                    double value = double(bests[it])/double(1000);
+                for(int i=1; i<bests.count()-1; i++) {
+                    double value = double(bests[i])/double(1000);
                     if (value >0) {
                         returning.vector << value;
                         returning.number += value;
@@ -3739,7 +3752,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                     // the ride mean max
                     returning.vector = m->fileCache()->distributionArray(leaf->seriesType);
-                    for(int it=0; it<returning.vector.count(); it++) returning.number += returning.vector.at(it);
+                    for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector.at(i);
                 }
 
             } else {
@@ -3757,7 +3770,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 } else {
                     // working with a date range
                     returning.vector = bestsCache.distributionArray(leaf->seriesType);
-                    for(int it=0; it<returning.vector.count(); it++) returning.number += returning.vector.at(it);
+                    for(int i=0; i<returning.vector.count(); i++) returning.number += returning.vector.at(i);
                 }
             }
             return returning;
@@ -3880,7 +3893,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         // quantile
         if (leaf->function == "quantile") {
 
-            Result v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result         v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             Result quantiles= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
             Result returning(0);
 
@@ -3890,14 +3903,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 qSort(v.vector);
 
                 if (quantiles.vector.count() ==0) {
-                    if (quantiles.number < 0) quantiles.number=0;
-                    if (quantiles.number > 1) quantiles.number=1;
+                    double quantile = quantiles.number;
+                    if (quantile < 0) quantile=0;
+                    if (quantile > 1) quantile=1;
 
-                    returning.number = gsl_stats_quantile_from_sorted_data(v.vector.constData(), 1, v.vector.count(), quantiles.number);
+                    double value = gsl_stats_quantile_from_sorted_data(v.vector.constData(), 1, v.vector.count(), quantile);
+                    returning.number = value;
 
                 } else {
-                    for (int it=0; it<quantiles.vector.count(); it++) {
-                        double quantile= quantiles.vector.at(it);
+                    for (int i=0; i<quantiles.vector.count(); i++) {
+                        double quantile= quantiles.vector.at(i);
                         if (quantile < 0) quantile=0;
                         if (quantile > 1) quantile=1;
                         double value = gsl_stats_quantile_from_sorted_data(v.vector.constData(), 1, v.vector.count(), quantile);
@@ -4020,12 +4035,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             Result v2 = eval(df,leaf->fparms[1],x, it, m, p, c, s, d); // lhs might also be a symbol
 
             // lets search
-            for(int it=0; it<v1.vector.count(); it++) {
-                double find = v1.vector[it];
-                for(int it2=0; it2<v2.vector.count(); it2++) {
-                    if (v2.vector[it2] == find) {
-                        returning.number += it2;
-                        returning.vector << it2;
+            for(int i=0; i<v1.vector.count(); i++) {
+                double find = v1.vector[i];
+                for(int i2=0; i2<v2.vector.count(); i2++) {
+                    if (v2.vector[i2] == find) {
+                        returning.number += i2;
+                        returning.vector << i2;
                     }
                 }
             }
@@ -4039,10 +4054,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             Result v = eval(df,leaf->fparms[0],x, it, m, p, c, s, d); // lhs might also be a symbol
 
             if (v.vector.count() > 0) {
-                for (int it=0; it < v.vector.count(); it++) {
-                    if (v.vector[it] != 0) {
-                        returning.vector << it;
-                        returning.number += it;
+                for (int i=0; i < v.vector.count(); i++) {
+                    if (v.vector[i] != 0) {
+                        returning.vector << i;
+                        returning.number += i;
                     }
                 }
             }
@@ -4061,11 +4076,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // loop through parameters
                 for(int i=1; i<leaf->fparms.count(); i++) {
 
-                    if (leaf->fparms[i]->type == Leaf::String)
+                    if (leaf->fparms[i]->type == Leaf::String) {
+
+                        // a string
                         list << *(leaf->fparms[i]->lvalue.s);
-                    else {
-                        double value =  eval(df,leaf->fparms[i],x, i, m, p, c, s, d).number;
-                        list << Utils::removeDP(QString("%1").arg(value));
+                    } else {
+
+                        // evaluate expression to get value/vector
+                        Result value = eval(df,leaf->fparms[i],x, it, m, p, c, s, d);
+                        if (value.vector.count() > 0) {
+                            for(int ii=0; ii<value.vector.count(); ii++)
+                                list << Utils::removeDP(QString("%1").arg(value.vector.at(ii)));
+                        } else {
+                            list << Utils::removeDP(QString("%1").arg(value.number));
+                        }
                     }
                 }
 
@@ -4198,16 +4222,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             gsl_vector *coeff = gsl_vector_alloc(xn); // the coefficients we want to return
 
             // setup the y vector
-            for (int it = 0; it < n; it++) gsl_vector_set(Y, it, yv.vector[it]);
+            for (int i = 0; i < n; i++) gsl_vector_set(Y, i, yv.vector[i]);
 
             // populate the x matrix, 1 column per predictor, n rows of datavalues
             // if xvector is too small, we pad with 0 values - no repeating here ?fix later?
             for (int xi=1; xi<leaf->fparms.count(); xi++) {
                 Result xv = eval(df,leaf->fparms[xi],x, it, m, p, c, s, d);
-                for (int it=0; it < n; it++) {
+                for (int i=0; i < n; i++) {
                     double value=0;
-                    if (it < xv.vector.count()) value= xv.vector[it];
-                    gsl_matrix_set(X, it, xi-1, value);
+                    if (i < xv.vector.count()) value= xv.vector[i];
+                    gsl_matrix_set(X, i, xi-1, value);
                 }
             }
 
@@ -4218,8 +4242,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             // snaffle away the coeefficents, we discard chi-squared and the
             // covariance matrix for now, may look to pass them back later
-            for (int it = 0; it < xn; it++) {
-                double value= gsl_vector_get(coeff, it);
+            for (int i = 0; i < xn; i++) {
+                double value= gsl_vector_get(coeff, i);
                 returning.vector << value;
                 returning.number += value;
             }
@@ -4330,8 +4354,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
-                for(int it=0; it<v.vector.count(); it++) {
-                    double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[it])) / 7.0);
+                for(int i=0; i<v.vector.count(); i++) {
+                    double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[i])) / 7.0);
                     returning.number += value; // for sum
                     returning.vector << value;
                 }
@@ -4352,8 +4376,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
-                for(int it=0; it<v.vector.count(); it++) {
-                    double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[it]* 7.0)));
+                for(int i=0; i<v.vector.count(); i++) {
+                    double value = std::floor(earliest.daysTo(earliest.addDays(v.vector[i]* 7.0)));
                     returning.number += value; // for sum
                     returning.vector << value;
                 }
@@ -4373,8 +4397,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
-                for(int it=0; it<v.vector.count(); it++) {
-                    double value = std::floor(monthsTo(earliest, earliest.addDays(v.vector[it])));
+                for(int i=0; i<v.vector.count(); i++) {
+                    double value = std::floor(monthsTo(earliest, earliest.addDays(v.vector[i])));
                     returning.number += value; // for sum
                     returning.vector << value;
                 }
@@ -4395,8 +4419,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (v.vector.count()) {
-                for(int it=0; it<v.vector.count(); it++) {
-                    QDate dd = earliest.addMonths(v.vector[it]);
+                for(int i=0; i<v.vector.count(); i++) {
+                    QDate dd = earliest.addMonths(v.vector[i]);
                     double value = earliest.daysTo(QDate(dd.year(), dd.month(), 1));
                     returning.number += value; // for sum
                     returning.vector << value;
@@ -5581,10 +5605,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             // a range
             for(int i=0; i<index.vector.count(); i++) {
-                int it=index.vector[i];
-                if (it < 0 || it >= value.vector.count()) continue; // ignore out of bounds
-                returning.vector << value.vector[it];
-                returning.number += value.vector[it];
+                int ii=index.vector[i];
+                if (ii < 0 || ii >= value.vector.count()) continue; // ignore out of bounds
+                returning.vector << value.vector[ii];
+                returning.number += value.vector[ii];
             }
 
             return returning;
