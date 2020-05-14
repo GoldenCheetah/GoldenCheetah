@@ -105,6 +105,8 @@
 #include <stdlib.h>
 #ifndef Q_CC_MSVC
 #include <unistd.h>
+#else
+#define ssize_t SSIZE_T
 #endif
 
 extern "C" {
