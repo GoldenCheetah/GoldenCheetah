@@ -66,6 +66,9 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
         // where to check
         QString path = QProcessEnvironment::systemEnvironment().value("PATH", "");
+#ifdef Q_OS_MAC // Look also for our deployed copy
+        path.append(PATHSEP + QCoreApplication::applicationDirPath() + "/../Frameworks/Python.framework/Versions/Current");
+#endif
         printd("PATH=%s\n", path.toStdString().c_str());
 
         // what we found
