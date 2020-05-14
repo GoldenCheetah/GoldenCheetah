@@ -270,6 +270,11 @@ static struct {
     { "quantile", 2 },  // quantile(vector, quantiles) - quantiles can be a number or a vector of numbers
                         // the vector does not need to be sorted as it will be sorted internally.
 
+    { "bin", 2 },       // bin(values, bins) - returns a binned vector with values binned into bins passed
+                        // each bin represents the lower value in the range, so a first bin of 0 will mean
+                        // and values less than zero will be discarded, for the last bin any value greater
+                        // than the value will be included. It is up to the user to manage this.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -3089,6 +3094,40 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 cumsum += v.vector[i];
                 returning.number += cumsum;
                 returning.vector << cumsum;
+            }
+            return returning;
+        }
+
+        // bin
+        if (leaf->function == "bin") {
+            // parm 1 - values
+            // parm 2 - bins
+            // values and bins must contain > 1 entry ! (returns 0 otherwise)
+            // any value < bins[0] is discarded
+            // any value > bins[last] is included in bins[last]
+
+            Result values = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result bins = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            Result returning(0);
+
+            // lets bin
+            if (bins.vector.count() > 1 && values.vector.count() > 1) {
+
+                // returns a vector with same number of bins as the bins vector
+                returning.vector.fill(0, bins.vector.size());
+
+                // loop across the values updating the count for the relevant bin
+                for(int i=0; i<values.vector.count(); i++) {
+                    double value=values.vector.at(i);
+
+                    // must be greater, values less than first bin are discarded
+                    for(int bin=bins.vector.count()-1; bin>=0; bin--) {
+                        if (value > bins.vector.at(bin)) {
+                            returning.vector[bin]++;
+                            break;
+                        }
+                    }
+                }
             }
             return returning;
         }
