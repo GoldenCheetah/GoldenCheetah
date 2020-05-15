@@ -275,6 +275,8 @@ static struct {
                         // and values less than zero will be discarded, for the last bin any value greater
                         // than the value will be included. It is up to the user to manage this.
 
+    { "rev", 1 },       // rev(vector) - returns vector with sequence reversed
+
     // add new ones above this line
     { "", -1 }
 };
@@ -3071,6 +3073,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.vector.append(value);
                 returning.number += value;
                 count--;
+            }
+            return returning;
+        }
+
+        // rev - reverse the vector
+        if (leaf->function == "rev") {
+            Result returning(0);
+            Result value= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            if (value.vector.count() > 0){
+                for(int i=value.vector.count()-1; i>=0; i--) {
+                    double v = value.vector.at(i);
+                    returning.vector << v;
+                    returning.number += v;
+                }
             }
             return returning;
         }
