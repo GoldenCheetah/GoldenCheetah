@@ -45,11 +45,29 @@ cp -r /usr/lib/vlc appdir/lib/vlc
 wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
 chmod a+x linuxdeployqt-6-x86_64.AppImage
 
-### Deploy to appdir and generate AppImage
-./linuxdeployqt-6-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -appimage
+### Deploy to appdir
+./linuxdeployqt-6-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0
+
+# Add Python and core modules
+wget https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.7-cp37-cp37m-manylinux1_x86_64.AppImage
+chmod +x python3.7.7-cp37-cp37m-manylinux1_x86_64.AppImage
+./python3.7.7-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
+rm -f python3.7.7-cp37-cp37m-manylinux1_x86_64.AppImage
+export PATH="$(pwd)/squashfs-root/usr/bin:$PATH"
+pip install --upgrade pip
+pip install -r Python/requirements.txt
+mv squashfs-root/usr appdir/usr
+mv squashfs-root/opt appdir/opt
+rm -rf squashfs-root
+
+# Generate AppImage
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+chmod a+x appimagetool-x86_64.AppImage
+./appimagetool-x86_64.AppImage appdir
 
 ### Cleanup
 rm linuxdeployqt-6-x86_64.AppImage
+rm appimagetool-x86_64.AppImage
 rm -rf appdir
 
 if [ ! -x ./GoldenCheetah*.AppImage ]
