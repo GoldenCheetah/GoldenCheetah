@@ -35,6 +35,7 @@
 #include <QMutex>
 #include "lmcurve.h"
 #include "LTMTrend.h" // for LR when copying CP chart filtering mechanism
+#include "WPrime.h" // for LR when copying CP chart filtering mechanism
 
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
@@ -1683,10 +1684,14 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                        DataFiltererrors << QString(tr("samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc."));
                     } else {
                         QString symbol=*(leaf->fparms[0]->lvalue.n);
-                        leaf->seriesType = RideFile::seriesForSymbol(symbol);
-                        if (leaf->seriesType==RideFile::none) {
-                            leaf->inerror = true;
-                            DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                        if (symbol == "WBAL")  leaf->seriesType=RideFile::wbal; // special case
+                        else if (symbol == "WBALSECS")  leaf->seriesType=RideFile::none; // extra special case ;)
+                        else {
+                            leaf->seriesType = RideFile::seriesForSymbol(symbol);
+                            if (leaf->seriesType==RideFile::none) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                            }
                         }
                     }
 
@@ -3337,10 +3342,26 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // the usefulness of getting the entire data series
                 // in one hit for those that want to work with vectors
                 Result returning(0);
-                foreach(RideFilePoint *p, m->ride()->dataPoints()) {
-                    double value=p->value(leaf->seriesType);
-                    returning.number += value;
-                    returning.vector.append(value);
+
+                if (leaf->seriesType == RideFile::wbal || leaf->seriesType == RideFile::none) {
+
+                    // W'Bal and W'Bal time
+                    returning.vector = leaf->seriesType == RideFile::wbal ? m->ride()->wprimeData()->ydata() : m->ride()->wprimeData()->xdata(false);
+                    for(int i=0; i<returning.vector.count(); i++) {
+                        // convert x values from minutes to seconds
+                        if (leaf->seriesType == RideFile::none)  returning.vector[i] = returning.vector.at(i) * 60.0;
+                        // calculate sum for both
+                        returning.number += returning.vector.at(i); // sum
+                    }
+
+                } else {
+
+                    // usual activity samples; HR, Power etc
+                    foreach(RideFilePoint *p, m->ride()->dataPoints()) {
+                        double value=p->value(leaf->seriesType);
+                        returning.number += value;
+                        returning.vector.append(value);
+                    }
                 }
                 return returning;
             }
