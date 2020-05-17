@@ -48,6 +48,7 @@ QMutex pythonMutex;
 #include <gsl/gsl_multifit.h>
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_interp.h>
+#include <gsl/gsl_randist.h>
 #endif
 
 #include "Zones.h"
@@ -277,6 +278,7 @@ static struct {
                         // than the value will be included. It is up to the user to manage this.
 
     { "rev", 1 },       // rev(vector) - returns vector with sequence reversed
+    { "random", 1 },    // random(n) - generate a vector of random values (between 0 and 1) of size n
 
     // add new ones above this line
     { "", -1 }
@@ -2505,6 +2507,15 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     rt.models << new ExtendedModel(context);
     rt.models << new WSModel(context);
 
+    // random number generator
+#ifdef GC_WANT_GSL
+    gsl_rng_env_setup();
+    unsigned long mySeed = QDateTime::currentMSecsSinceEpoch();
+    T = gsl_rng_default; // Generator setup
+    r = gsl_rng_alloc (T);
+    gsl_rng_set(r, mySeed);
+#endif
+
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
@@ -2526,6 +2537,13 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     rt.models << new ExtendedModel(context);
     rt.models << new WSModel(context);
 
+#ifdef GC_WANT_GSL
+    gsl_rng_env_setup();
+    unsigned long mySeed = QDateTime::currentMSecsSinceEpoch();
+    T = gsl_rng_default; // Generator setup
+    r = gsl_rng_alloc (T);
+    gsl_rng_set(r, mySeed);
+#endif
     configChanged(CONFIG_FIELDS);
 
     // regardless of success or failure set signature
@@ -3964,6 +3982,25 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
             if (i == list.vector.end()) return Result(list.vector.size());
             return Result(i - list.vector.begin());
+        }
+
+        // random
+        if (leaf->function == "random") {
+
+            int n= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number; // how many ?
+            Result returning(0);
+
+#if GC_WANT_GSL
+            // Random number function based on the GNU Scientific Library
+            while(n>0) {
+                double random = gsl_rng_uniform(df->owner->r); // Generate it!
+                returning.number += random;
+                returning.vector << random;
+                n--;
+            }
+#endif
+            return returning;
+
         }
 
         // quantile
