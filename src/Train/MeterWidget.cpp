@@ -451,9 +451,12 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 void LiveMapWidget::initLiveMap ()
 {
     if ( ! this->liveMapInitialized ) {
-        //liveMapView->resize(400,400);
+        
+        QString code = "";
+        int mapZoom = 16;
+        
         liveMapView->resize(m_Width, m_Height);
-        createHtml(this->curr_lat, this->curr_lon, 16);
+        createHtml(this->curr_lat, this->curr_lon, mapZoom);
         liveMapView->page()->setHtml(currentPage);
         liveMapView->show();
         this->liveMapInitialized = true;
