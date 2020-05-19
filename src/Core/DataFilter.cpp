@@ -280,6 +280,11 @@ static struct {
     { "rev", 1 },       // rev(vector) - returns vector with sequence reversed
     { "random", 1 },    // random(n) - generate a vector of random values (between 0 and 1) of size n
 
+    { "interpolate", 4 }, // interpolate(algorithm, xvector, yvector, xvalues) - returns interpolated vector
+                          // of yvalues for every value in xvalues by applying the algorithm for the data
+                          // passed in xvector,yvector. The algorithm can be one of:
+                          // linear, akima, steffen, more may be added later.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -483,6 +488,13 @@ DataFilter::builtins()
         } else if (i == 89) {
 
             returning << "quantile(vector, quantiles)";
+
+            // 90 - bin
+            // 91 - rev
+            // 92 - random
+        } else if (i == 93) {
+
+            returning << "interpolate(linear|cubic|akima|steffen, xvector, yvector, xvalues)";
 
         } else {
 
@@ -1463,6 +1475,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp annotateTypes("^(label)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
             QRegExp aggregateFunc("^(mean|sum|max|min|count)$", Qt::CaseInsensitive);
+            QRegExp interpolateAlgorithms("^(linear|cubic|akima|steffen)$", Qt::CaseInsensitive);
 
             if (leaf->series) { // old way of hand crafting each function in the lexer including support for literal parameter e.g. (power, 1)
 
@@ -1621,6 +1634,34 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "interpolate") {
+
+                    if (leaf->fparms.count() != 4) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("interpolate(algorithm, xvector, yvector, xvalues)"));
+
+                    } else if (leaf->fparms[0]->type != Leaf::Symbol) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("interpolate(algorithm, xvector, yvector, xvalues) - must specify and algorithm"));
+
+                    } else {
+
+                        // 4 parameters and first is a symbol, lets check we know it
+                        QString symbol = *(leaf->fparms[0]->lvalue.n);
+                        if (!interpolateAlgorithms.exactMatch(symbol)) {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("unknown algorithm '%1', must be one of linear, cubic, akima or steffen.").arg(symbol));
+                        } else {
+
+                            validateFilter(context, df, leaf->fparms[1]);
+                            validateFilter(context, df, leaf->fparms[2]);
+                            validateFilter(context, df, leaf->fparms[3]);
+
+                        }
+
+                    }
                 } else if (leaf->function == "append") {
 
                     if (leaf->fparms.count() != 2 && leaf->fparms.count() != 3) {
@@ -3821,6 +3862,50 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             return returning;
         }
 
+        // interpolation
+        if (leaf->function == "interpolate") {
+
+            // interpolate(algo, xvector, yvector, xvalues) - returns yvalues for each xvalue
+            Result returning(0);
+
+#ifdef GC_WANT_GSL
+            // unpack parameters
+            QString algo= *(leaf->fparms[0]->lvalue.n);
+            Result xvector =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            Result yvector =  eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+            Result xvalues =  eval(df, leaf->fparms[3],x, it, m, p, c, s, d);
+
+            int n = yvector.vector.count() < xvector.vector.count() ? yvector.vector.count() : xvector.vector.count();
+
+            if (n >2) {
+
+                // ok, so now lets setup
+                gsl_interp *interpolation = NULL;
+                if (algo == "akima") interpolation = gsl_interp_alloc (gsl_interp_akima,n);
+                if (algo == "cubic") interpolation = gsl_interp_alloc (gsl_interp_cspline,n);
+                else if (algo == "steffen") interpolation = gsl_interp_alloc (gsl_interp_akima,n);
+                else interpolation = gsl_interp_alloc (gsl_interp_linear,n); // linear is the fallback, always
+
+                gsl_interp_init(interpolation, xvector.vector.constData(), yvector.vector.constData(), n);
+                gsl_interp_accel *accelerator =  gsl_interp_accel_alloc();
+
+                // truncate ydata as we will refill them
+                for(int i=0; i<xvalues.vector.count(); i++) {
+
+                    // snaffle away- can place into input when GSL is no longer optional
+                    double value = gsl_interp_eval(interpolation, xvector.vector.constData(),
+                                                   yvector.vector.constData(), xvalues.vector.at(i), accelerator);
+                    returning.vector << value;
+                    returning.number += value;
+                }
+
+                // free the GSL interpolator
+                gsl_interp_free(interpolation);
+                gsl_interp_accel_free(accelerator);
+            }
+#endif
+            return returning;
+        }
         // distribution
         if (leaf->function == "dist") {
 
