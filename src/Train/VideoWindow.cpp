@@ -99,6 +99,12 @@ VideoWindow::VideoWindow(Context *context)  :
         libvlc_media_player_set_xwindow (mp, x11Container->winId());
 #endif
 
+#ifdef Q_OS_MAC
+        container = new QWidget(this);
+        layout->addWidget(container);
+        libvlc_media_player_set_nsobject (mp, (void*)(container->winId()));
+#endif
+
 #ifdef WIN32
         container = new QWidget(this);
         layout->addWidget(container);

@@ -173,10 +173,11 @@ macx {
 
     } else {
 
-        contains(DEFINES, "GC_VIDEO_NONE")|contains(DEFINES, "GC_VIDEO_QT5") {
+        !contains(DEFINES, "GC_VIDEO_QUICKTIME") {
 
-            # GC_VIDEO_QT5 will enable Qt5 video support, otherwise
-            # we have a blank videowindow, it will do nothing
+            # GC_VIDEO_QT5 will enable Qt5 video support,
+            # GC_VIDEO_VLC will enable VLC video support,
+            # otherwise we have a blank videowindow, it will do nothing
             HEADERS += Train/VideoWindow.h
             SOURCES += Train/VideoWindow.cpp
 
@@ -500,22 +501,18 @@ contains(DEFINES, "GC_WANT_R") {
 
 
 ###=============================================================
-### OPTIONAL => VLC [Windows and Unix. OSX uses QuickTime Video]
+### OPTIONAL => VLC [Windows, Unix and OSX]
 ###=============================================================
 
 !isEmpty(VLC_INSTALL) {
 
-    # not on a mac as they use quicktime video
-    !macx {
+    # we will work out the rest if you tell use where it is installed
+    isEmpty(VLC_INCLUDE) { VLC_INCLUDE = $${VLC_INSTALL}/include }
+    isEmpty(VLC_LIBS)    { VLC_LIBS    = -L$${VLC_INSTALL}/lib -lvlc }
 
-        # we will work out the rest if you tell use where it is installed
-        isEmpty(VLC_INCLUDE) { VLC_INCLUDE = $${VLC_INSTALL}/include }
-        isEmpty(VLC_LIBS)    { VLC_LIBS    = -L$${VLC_INSTALL}/lib -lvlc }
-
-        DEFINES     += GC_HAVE_VLC
-        INCLUDEPATH += $${VLC_INCLUDE}
-        LIBS        += $${VLC_LIBS}
-    }
+    DEFINES     += GC_HAVE_VLC
+    INCLUDEPATH += $${VLC_INCLUDE}
+    LIBS        += $${VLC_LIBS}
 }
 
 

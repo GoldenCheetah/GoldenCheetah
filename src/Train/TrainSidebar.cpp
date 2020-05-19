@@ -60,17 +60,16 @@
 #endif
 
 // Media selection helper
-#ifndef Q_OS_MAC
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
+#include "QtMacVideoWindow.h"
+#else
 #include "VideoWindow.h"
 #endif
-
 #ifdef Q_OS_MAC
-#include "QtMacVideoWindow.h"
 #include <CoreServices/CoreServices.h>
 #include <QStyle>
 #include <QStyleFactory>
 #import <IOKit/pwr_mgt/IOPMLib.h>
-
 #endif
 
 #ifdef WIN32
