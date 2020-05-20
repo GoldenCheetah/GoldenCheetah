@@ -33,10 +33,11 @@ sudo apt-get update -qq
 sudo apt-get install r-base-dev
 R --version
 
-# D2XX
-wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
-mkdir D2XX
-tar xf libftd2xx-x86_64-1.3.6.tgz -C D2XX
+# D2XX - refresh cache if folder is empty
+if [ -z "$(ls -A D2XX)" ]; then
+    wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
+    tar xf libftd2xx-x86_64-1.3.6.tgz -C D2XX
+fi
 
 # SRMIO
 wget http://www.zuto.de/project/files/srmio/srmio-0.1.1~git1.tar.gz

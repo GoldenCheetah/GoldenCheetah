@@ -8,6 +8,7 @@ language: cpp
 cache:
   directories:
   - qwt
+  - D2XX
 
 env:
   global:

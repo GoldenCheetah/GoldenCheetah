@@ -17,8 +17,16 @@ brew install r
 ## Disable KML for now
 ## brew install --HEAD travis/libkml.rb
 sudo chmod -R +w /usr/local
-curl -O https://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
-hdiutil mount D2XX1.2.2.dmg
+
+# D2XX - refresh cache if folder is empty
+if [ -z "$(ls -A D2XX)" ]; then
+    curl -O https://www.ftdichip.com/Drivers/D2XX/MacOSX/D2XX1.2.2.dmg
+    hdiutil mount D2XX1.2.2.dmg
+    cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
+    cp /Volumes/release/D2XX/bin/*.h D2XX
+fi
+sudo cp D2XX/libftd2xx.1.2.2.dylib /usr/local/lib
+
 
 # AWS client to upload binaries to S3 bucket
 brew install awscli
