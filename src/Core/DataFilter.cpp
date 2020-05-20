@@ -37,6 +37,10 @@
 #include "LTMTrend.h" // for LR when copying CP chart filtering mechanism
 #include "WPrime.h" // for LR when copying CP chart filtering mechanism
 
+#ifdef GC_HAVE_SAMPLERATE
+// we have libsamplerate
+#include <samplerate.h>
+#endif
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 QMutex pythonMutex;
@@ -284,6 +288,8 @@ static struct {
                           // of yvalues for every value in xvalues by applying the algorithm for the data
                           // passed in xvector,yvector. The algorithm can be one of:
                           // linear, akima, steffen, more may be added later.
+    { "resample", 3 },     // resample(old, new, vector) returns the vector resampled from old sample durations
+                          // to new sample durations.
 
     // add new ones above this line
     { "", -1 }
@@ -3906,6 +3912,74 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 #endif
             return returning;
         }
+
+
+        if (leaf->function == "resample") {
+#ifdef GC_HAVE_SAMPLERATE
+
+            Result returning(0);
+
+            // resample(from, to, yvector)
+            // we return yvector resampled
+            double from =  eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number;
+            double to =   eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number;
+            Result y =eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            // if in doubt just return it unchanged.
+            if (y.vector.count() < 3 || from <= 0 || to <= 0 || from == to) return y;
+
+            // lets prepare data for libsamplerate
+            SRC_DATA data;
+
+            float *input, *output, *source, *target;
+            float insamples = y.vector.count();
+            float outsamples = 1+ ((y.vector.count() * from) / to); // 1+ for rounding up
+
+            // allocate memory
+            source = input = (float*)malloc(sizeof(float) * insamples);
+            target = output = (float*)malloc(sizeof(float) * outsamples);
+
+            // create the input array (float not double)
+            for(int i=0; i<y.vector.count(); i++)  *source++ = float(y.vector.at(i));
+
+            //
+            // THE MAGIC HAPPENS HERE ... resample to new recording interval
+            //
+            data.src_ratio = from / to;
+            data.data_in = input;
+            data.input_frames = y.vector.count();
+            data.data_out = output;
+            data.output_frames = outsamples;
+            data.input_frames_used = 0;
+            data.output_frames_gen = 0;
+            int ret = src_simple(&data, SRC_LINEAR, 1);
+
+            if (ret) { // failed
+
+                free(input);
+                free(output);
+                return y; // return unchanged
+
+            } else { // success, lets unpack
+
+                // unpack the data series
+                for(int frame=0; frame < data.output_frames_gen; frame++) {
+
+                    double value = *target++;
+                    returning.vector << value;
+                    returning.number += value;
+                }
+            }
+
+            // free memory
+            free(input);
+            free(output);
+            return returning; // resampled !
+#else
+            return Result(-1); // nothing resampled
+#endif
+        }
+
         // distribution
         if (leaf->function == "dist") {
 
