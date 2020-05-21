@@ -7,6 +7,10 @@ GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
 echo "About to create dmg file and fix up"
 mkdir GoldenCheetah.app/Contents/Frameworks
 
+# Add VLC dylibs and plugins
+cp ../VLC/lib/libvlc.dylib ../VLC/lib/libvlccore.dylib GoldenCheetah.app/Contents/Frameworks
+cp -R ../VLC/plugins GoldenCheetah.app/Contents/Frameworks
+
 # This is a hack to include libicudata.*.dylib, not handled by macdployqt[fix]
 cp /usr/local/opt/icu4c/lib/libicudata.*.dylib GoldenCheetah.app/Contents/Frameworks
 

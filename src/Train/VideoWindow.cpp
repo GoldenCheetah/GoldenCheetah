@@ -18,6 +18,7 @@
 */
 
 #include <QGraphicsPathItem>
+#include <QtGlobal>
 #include "VideoWindow.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -43,6 +44,11 @@ VideoWindow::VideoWindow(Context *context)  :
     //
     // USE VLC VIDEOPLAYER
     //
+
+#ifdef Q_OS_MAC
+    QString VLC_PLUGIN_PATH = QProcessEnvironment::systemEnvironment().value("VLC_PLUGIN_PATH", "");
+    if (VLC_PLUGIN_PATH.isEmpty()) qputenv("VLC_PLUGIN_PATH", QString(QCoreApplication::applicationDirPath() + "/../Frameworks/plugins").toUtf8());
+#endif
 
     // config parameters to libvlc
     const char * const vlc_args[] = {

@@ -11,6 +11,7 @@ cache:
   - qwt
   - D2XX
   - site-packages
+  - VLC
 
 env:
   global:
