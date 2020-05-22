@@ -63,6 +63,7 @@ private:
     int prevCrankStaleness;
     quint16 prevCrankTime;
     quint16 prevCrankRevs;
+    bool prevWheelStaleness;
     quint16 prevWheelTime;
     quint32 prevWheelRevs;
     bool connected;
