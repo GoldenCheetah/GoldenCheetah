@@ -36,7 +36,7 @@ struct FractionalPolynomialFitter : public T {
         for (size_t i = 0; i < n.size(); i++) arr[i] = n[i];
     }
 
-    T_fptype Fit(T_fptype v) {
+    T_fptype Fit(T_fptype v) const {
         // Scale v, for example mph -> kph
         v = v * scale;
 
@@ -72,7 +72,7 @@ struct RationalFitter : public T {
     // Because fitter has templated size the compiler is able to fully unroll the fit
     // calculation. This function also serves all polynomial evaluation since denominator
     // has implicit 1 which allows zero sized denominator evaluation to be optimized away.
-    T_fptype Fit(T_fptype v) {
+    T_fptype Fit(T_fptype v) const {
 
         // Scale v, for example mph -> kph
         v = v * scale;
@@ -170,7 +170,7 @@ struct T_PolyFitGenerator {
 
 // File static global. Compiler optimizes it so array of maker methods can live entirely in image memory -
 // populated by the loader.
-static const T_PolyFitGenerator<6, 6, PolyFit<double>, std::vector<double>> s_PolyFitGenerator;
+static const T_PolyFitGenerator<7, 7, PolyFit<double>, std::vector<double>> s_PolyFitGenerator;
 
 // Factory accessed via static methods to avoid exposing templates into tender world...
 
@@ -228,14 +228,14 @@ void PolynomialRegressionTest(void) {
     // For convenience push references to above static data into arrays.
     std::vector<const SpindownData*> msdata;
     std::vector<size_t> msdatasize;
-
+    
     msdata.push_back(Kinetic0); msdatasize.push_back(sizeof(Kinetic0) / sizeof(Kinetic0[0]));
     msdata.push_back(Kinetic1); msdatasize.push_back(sizeof(Kinetic1) / sizeof(Kinetic0[1]));
 
     // Spindown fitter: desired fit epsilon is 1kph, max order for match is 6.
     // 6 is almost certainly too high but this is for test so why not.
     SpindownToPolyFit < SpindownData, XYVector<double>> ms_stp(1, 6);
-
+    
     // Array to hold fit variance (computed when each array is pushed.)
     std::vector<double> ms_variances;
 

@@ -24,7 +24,7 @@
 template <typename T_fptype>
 struct PolyFit {
     typedef T_fptype value_type;
-    virtual value_type Fit(value_type v) = 0;
+    virtual value_type Fit(value_type v) const = 0;
 };
 
 struct PolyFitGenerator {

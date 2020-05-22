@@ -16,20 +16,45 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef _GC_RealtimeController_h
+#define _GC_RealtimeController_h 1
 
 // Abstract base class for Realtime device controllers
 #include "RealtimeData.h"
 #include "CalibrationData.h"
 #include "TrainSidebar.h"
-
-#ifndef _GC_RealtimeController_h
-#define _GC_RealtimeController_h 1
-#include "GoldenCheetah.h"
-
 #include "PolynomialRegression.h"
+
+#include "GoldenCheetah.h"
 
 #define DEVICE_ERROR 1
 #define DEVICE_OK 0
+
+struct VirtualPowerTrainer {
+    const char*            m_pName;
+    const PolyFit<double>* m_pf;
+    bool                   m_fUseWheelRpm;
+};
+
+extern const VirtualPowerTrainer s_VirtualPowerTrainerArray[];
+extern const size_t              s_VirtualPowerTrainerArraySize;
+
+class VirtualPowerTrainerManager {
+    // Custom are dynamic and managed by class instance.
+    std::vector<const VirtualPowerTrainer*> customVirtualPowerTrainers;
+
+    const VirtualPowerTrainer* GetCustomVirtualPowerTrainer(int id) const;
+
+public:
+    size_t GetPredefinedVirtualPowerTrainerCount() const;
+    size_t GetCustomVirtualPowerTrainerCount() const;
+    size_t GetVirtualPowerTrainerCount() const;
+    const VirtualPowerTrainer* GetVirtualPowerTrainer(int idx) const;
+
+    size_t PushCustomVirtualPowerTrainer(const VirtualPowerTrainer* vpt);
+
+    ~VirtualPowerTrainerManager();
+};
 
 class RealtimeController : public QObject
 {
@@ -39,7 +64,7 @@ public:
     TrainSidebar *parent;                     // for push devices
 
     RealtimeController (TrainSidebar *parent, DeviceConfiguration *dc = 0);
-    virtual ~RealtimeController() { delete polyFit; }
+    virtual ~RealtimeController() { }
 
     virtual int start();
     virtual int restart();                              // restart after paused
@@ -88,11 +113,20 @@ private:
     DeviceConfiguration devConf;
     QTime lastCalTimestamp;
 
-    PolyFit<double>* polyFit; // Speed to power fit.
-    int iFitId;                 // For lazy re-init, record id of current fit.
-    bool fUseWheelRpm;          // If power is derived from wheelrpm instead of speed.
+    const PolyFit<double>* polyFit; // Speed to power fit.
+    bool fUseWheelRpm;              // If power is derived from wheelrpm instead of speed.
+    int iFitId;                     // For lazy re-init, record id of current fit.
 
-    void SetupPolyFitFromPostprocessId(int postProcess);
+    // Virtual Power Trainer Curve Management
+
+public:
+    VirtualPowerTrainerManager virtualPowerTrainerManager;
+
+    // Predefined are static so not part of instance.
+    static size_t GetPredefinedVirtualPowerTrainerCount();
+    static const VirtualPowerTrainer* GetPredefinedVirtualPowerTrainer(int id);
+
+    bool SetupPolyFitFromPostprocessId(int postProcess);
 };
 
 #endif // _GC_RealtimeController_h

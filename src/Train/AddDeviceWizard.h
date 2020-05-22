@@ -51,6 +51,7 @@
 #include <QFileDialog>
 #include <QCommandLinkButton>
 #include <QScrollArea>
+#include <QtCharts>
 
 class DeviceScanner;
 
@@ -75,6 +76,11 @@ public:
     QString profile;
 
     DeviceScanner *scanner;
+
+    // Device Data
+    int virtualPowerIndex;      // index of selected virtual power function
+    int wheelSize;
+    int strideLength;
 
 public slots:
 
@@ -223,6 +229,54 @@ class AddPairBTLE : public QWizardPage
 
 };
 
+class AddVirtualPower : public QWizardPage
+{
+    Q_OBJECT
+
+public:
+    AddVirtualPower(AddDeviceWizard*);
+    void initializePage();
+
+private:
+    AddDeviceWizard* wizard;
+    RealtimeController* controller; // copy of controller, for lazy re-init
+
+    QLineEdit* name;
+    QComboBox* virtualPower;
+    QComboBox* rimSizeCombo;
+    QComboBox* tireSizeCombo;
+    QLineEdit* wheelSizeEdit;
+    QLineEdit* stridelengthEdit;
+
+    QLabel*         virtualPowerNameLabel;
+    QLineEdit*      virtualPowerNameEdit;
+    QPushButton*    virtualPowerCreateButton;
+
+    QTableWidget*   virtualPowerTableWidget;
+    QChart*         virtualPowerScatterChart;
+    QChartView*     virtualPowerScatterChartView;
+
+    QLabel*         fitOrderSpinBoxLabel;
+    QSpinBox*       fitOrderSpinBox;
+    QLabel*         fitEpsilonSpinBoxLabel;
+    QDoubleSpinBox* fitEpsilonSpinBox;
+    QLabel*         fitStdDevLabel;
+    QLabel*         fitOrderLabel;
+
+    void drawConfig();
+
+private slots:
+    void calcWheelSize();
+    void resetWheelSize();
+    void myCellChanged(int row, int col);
+    void mySpinBoxChanged(int i);
+    void myDoubleSpinBoxChanged(double d);
+    void mySortTable(int i);
+    void mySetTableFromComboBox(int i);
+    void myCreateCustomPowerCurve();
+};
+
+
 class AddFinal : public QWizardPage
 {
     Q_OBJECT
@@ -237,20 +291,10 @@ class AddFinal : public QWizardPage
         AddDeviceWizard *wizard;
 
         QLineEdit *name;
-        QComboBox *virtualPower;
-        QComboBox *rimSizeCombo;
-        QComboBox *tireSizeCombo;
-        QLineEdit *wheelSizeEdit;
-        QLineEdit *stridelengthEdit;
         QLineEdit *port;
         QLineEdit *profile;
         QGroupBox *selectDefault;
         QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
-
-    private slots:
-        void calcWheelSize();
-        void resetWheelSize();
-
 };
 
 class DeviceScanner : public QThread

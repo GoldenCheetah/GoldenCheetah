@@ -23,7 +23,10 @@
 #include "Colors.h"
 #include "ConfigDialog.h"
 
-// WIZARD FLOW
+#include "RealtimeController.h" // for power trainer definitions
+#include "MultiRegressionizer.h"
+
+ // WIZARD FLOW
 //
 // 10. Select Device Type
 // 20. Scan for Device / select Serial
@@ -31,15 +34,20 @@
 // 35. Firmware for Imagic
 // 50. Pair for ANT
 // 55. Pair for BTLE
-// 60. Finalise
+// 60. Virtual Power
+// 70. Finalise
 //
 
 // Main wizard
-AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow), context(context)
+AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow), context(context), controller(NULL)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
 #endif
+
+    virtualPowerIndex = 0;           // index of selected virtual power function
+    wheelSize = 0;
+    strideLength = 0;
 
     // delete when done
     setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
@@ -57,14 +65,13 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
     setPage(35, new AddImagic(this)); // done
     setPage(50, new AddPair(this));     // done
     setPage(55, new AddPairBTLE(this));     // done
-    setPage(60, new AddFinal(this));    // todo -- including virtual power
+    setPage(60, new AddVirtualPower(this));
+    setPage(70, new AddFinal(this));    // todo -- including virtual power
 
     done = false;
 
     type = -1;
     current = 0;
-    controller = NULL;
-
 }
 
 /*----------------------------------------------------------------------
@@ -223,7 +230,6 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 #endif
 
     default: wizard->controller = NULL; break;
-
     }
 
     //----------------------------------------------------------------------
@@ -286,9 +292,8 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
     isSearching = false;
     active = false;
 
-
     label = new QLabel(tr("Please make sure your device is connected, switched on and working. "
-                               "We will scan for the device type you have selected at known ports.\n\n"));
+                          "We will scan for the device type you have selected at known ports.\n\n"));
     label->setWordWrap(true);
     layout->addWidget(label);
 
@@ -326,7 +331,6 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
     connect(stop, SIGNAL(clicked()), this, SLOT(doScan()));
     connect(manual, SIGNAL(currentIndexChanged(int)), this, SLOT(chooseCOMPort()));
     connect(wizard->scanner, SIGNAL(finished(bool)), this, SLOT(scanFinished(bool)));
-
 }
 
 void
@@ -1014,7 +1018,6 @@ AddPairBTLE::initializePage()
         QLabel *status = new QLabel(this);
         status->setText(tr("Auto detect on device StartUp"));
         channelWidget->setItemWidget(add, 1, status);
-
     }
 }
 
@@ -1025,6 +1028,425 @@ AddPairBTLE::validatePage()
     // This means devices will be automatically paired at runtime
     wizard->profile="";
     return true;
+}
+
+void
+AddVirtualPower::mySpinBoxChanged(int i)
+{
+    drawConfig();
+}
+
+void
+AddVirtualPower::myDoubleSpinBoxChanged(double d)
+{
+    drawConfig();
+}
+
+void
+AddVirtualPower::myCellChanged(int nRow, int nCol) 
+{
+    bool state = this->blockSignals(true);
+    if (state) return;
+
+    // If clicked row is last row
+    if ((nRow + 1) == virtualPowerTableWidget->rowCount()) {
+        // If last row isn't zeros...
+        if (virtualPowerTableWidget->item(nRow, 0)->text().toDouble() != 0. ||
+            virtualPowerTableWidget->item(nRow, 1)->text().toDouble() != 0.) {
+            // Make a new row and put zeros there.
+            virtualPowerTableWidget->setRowCount(nRow + 2);
+            virtualPowerTableWidget->setItem(nRow + 1, 0, new QTableWidgetItem("0."));
+            virtualPowerTableWidget->setItem(nRow + 1, 1, new QTableWidgetItem("0."));
+        }
+    }
+
+    // A table cell is changed... If selected virtual trainer isn't custom then swap index
+    // to None.
+    if (virtualPower->currentIndex() < controller->virtualPowerTrainerManager.GetPredefinedVirtualPowerTrainerCount()) {
+        virtualPower->setCurrentIndex(0);
+        wizard->virtualPowerIndex = 0;
+    } else {
+        // Otherwise copy current custom name to edit save box.
+        virtualPowerNameEdit->insert(virtualPower->currentText());
+        wizard->virtualPowerIndex = virtualPower->currentIndex();
+    }
+
+    drawConfig();
+
+    this->blockSignals(state);
+}
+
+// Sort the virtualPowerTableWidget
+void AddVirtualPower::mySortTable(int i) {
+
+    bool state = this->blockSignals(true);
+    if (state) return;
+
+    struct pair { double x, y; };
+    std::vector<pair> elements;
+
+    for (int i = 0; i < virtualPowerTableWidget->rowCount(); i++) {
+        elements.push_back({ virtualPowerTableWidget->item(i, 0)->text().toDouble(), virtualPowerTableWidget->item(i, 1)->text().toDouble() });
+    }
+
+    std::sort(elements.begin(), elements.end(),
+        [](const pair& a, const pair& b) {
+            if (a.x == 0.) return false;
+            return a.x < b.x; 
+        }
+    );
+
+    for (int i = 0; i < elements.size(); i++) {
+        virtualPowerTableWidget->item(i, 0)->setData(Qt::EditRole, QString::number(elements[i].x));
+        virtualPowerTableWidget->item(i, 1)->setData(Qt::EditRole, QString::number(elements[i].y));
+    }
+
+    drawConfig();
+
+    this->blockSignals(state);
+}
+
+// Clear table widget and set it to values from selected interpolator.
+void
+AddVirtualPower::mySetTableFromComboBox(int i) {
+
+    bool state = this->blockSignals(true);
+    if (state) return;
+
+    const int rows = 11;
+    virtualPowerTableWidget->setRowCount(rows+1);
+
+    const VirtualPowerTrainer * pFit = controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i);
+
+    // First element is power at 1kph
+    virtualPowerTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(1.)));
+    virtualPowerTableWidget->setItem(0, 1, new QTableWidgetItem(QString::number(pFit->m_pf->Fit(1.))));
+
+    // Convention, every additional row is +10kph.
+    double vFactor = 10.;
+
+    // Some trainers are too good for velocity and use wheel rpm.
+    // Convert velocity to wheel rpm
+    double vToRpm = 1.;
+    if (pFit->m_fUseWheelRpm) {
+        // Read wheel circumference. Is in mm.
+        double circumferenceMM = wheelSizeEdit->text().toDouble();
+
+        // v to rpm
+        vToRpm = ((1. * 1000 * 1000) / 60) / circumferenceMM;
+    }
+
+    // Body of elements is power every 10kph
+    for (int row = 1; row < rows; row ++) {
+        double v = row * vFactor;
+        virtualPowerTableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(v)));
+        virtualPowerTableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(pFit->m_pf->Fit(vToRpm * v))));
+    }
+
+    // End of table are the zeros...
+    virtualPowerTableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(0.)));
+    virtualPowerTableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(0.)));
+
+    // Clear epsilon so fitters fit.
+    fitEpsilonSpinBox->setValue(0.);
+
+    drawConfig();
+
+    this->blockSignals(state);
+}
+
+void
+AddVirtualPower::myCreateCustomPowerCurve() {
+
+    T_MultiRegressionizer<XYVector<double>> fit(fitEpsilonSpinBox->value(), fitOrderSpinBox->value());
+
+    for (int i = 0; i < virtualPowerTableWidget->rowCount(); i++) {
+        double x = virtualPowerTableWidget->item(i, 0)->text().toDouble();
+        double y = virtualPowerTableWidget->item(i, 1)->text().toDouble();
+
+        if (x > 0) {
+            fit.Push({ x, y });
+        }
+    }
+
+    PolyFit<double>* pf = fit.AsPolyFit();
+
+    VirtualPowerTrainer* p = new VirtualPowerTrainer;
+
+    std::string name = virtualPowerNameEdit->text().toStdString();
+    char* pNameCopy = new char[name.size() + 1];
+    strcpy(pNameCopy, name.c_str());
+
+    p->m_pName = pNameCopy; // freed by manager when manager is destroyed.
+    p->m_pf = pf;
+    p->m_fUseWheelRpm = false;
+
+    controller->virtualPowerTrainerManager.PushCustomVirtualPowerTrainer(p);
+
+    int idx = (int)controller->virtualPowerTrainerManager.GetVirtualPowerTrainerCount() - 1;
+    const VirtualPowerTrainer* p2 = controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(idx);
+
+    virtualPower->addItem(tr(p2->m_pName));
+
+    virtualPower->setCurrentIndex(virtualPower->count() - 1);
+
+    wizard->virtualPowerIndex = virtualPower->currentIndex();
+}
+
+void
+AddVirtualPower::drawConfig() {
+    virtualPowerTableWidget->resizeColumnsToContents();
+    virtualPowerTableWidget->resizeRowsToContents();
+    virtualPowerTableWidget->verticalHeader()->hide();
+
+    QScatterSeries* series0 = new QScatterSeries();
+    series0->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    series0->setMarkerSize(15.0);
+    series0->setColor(QColor("blue"));
+
+    double minX = 0., minY = 0., maxX = 1, maxY = 1.;
+
+    T_MultiRegressionizer<XYVector<double>> fit(fitEpsilonSpinBox->value(), fitOrderSpinBox->value());
+
+    for (int i = 0; i < virtualPowerTableWidget->rowCount(); i++) {
+        double x = virtualPowerTableWidget->item(i, 0)->text().toDouble();
+        double y = virtualPowerTableWidget->item(i, 1)->text().toDouble();
+
+        if (x > 0) {
+            series0->append(x, y);
+            fit.Push({ x, y });
+            minX = std::min<double>(minX, x);
+            minY = std::min<double>(minY, y);
+            maxX = std::max<double>(maxX, x);
+            maxY = std::max<double>(maxY, y);
+        }
+    }
+
+    // Add display point for fit's zero intercept.
+    series0->append(0., fit.Fit(0.));
+    
+    QScatterSeries* series1 = new QScatterSeries();
+    series1->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    series1->setMarkerSize(15.0);
+    series1->setColor(QColor("red"));
+
+    double delta = maxX / 200;
+    for (double v = 0; v < maxX; v += delta) {
+        double fitV = fit.Fit(v);
+        minY = std::min<double>(minY, fitV);
+        maxY = std::max<double>(maxY, fitV);
+        series1->append(v, fit.Fit(v));
+    }
+    minY = std::max<double>(minY, -10.);
+
+    virtualPowerScatterChart->removeAllSeries();
+    virtualPowerScatterChart->addSeries(series1);
+    virtualPowerScatterChart->addSeries(series0); // draw second so points overlay interpolation
+    virtualPowerScatterChart->createDefaultAxes();
+    virtualPowerScatterChart->axes(Qt::Horizontal, series0).first()->setRange(0., maxX * 1.10);
+    virtualPowerScatterChart->axes(Qt::Vertical,   series0).first()->setRange(minY, maxY * 1.10);
+    
+    fitStdDevLabel->setText(QString(tr("Fit StdDev: %1")).arg(fit.StdDev()));
+    fitOrderLabel->setText(QString(tr("Max Order: %1")).arg(fit.Order()));
+}
+
+//void
+//AddVirtualPower::lazyControllerInit() {
+//    if (wizard->controller != controller) {
+//        // controller change. Re-init virtualPower combo box.
+//        controller = wizard->controller;
+//
+//        virtualPower->clear();
+//
+//        for (int i = 0; i < controller->virtualPowerTrainerManager.GetVirtualPowerTrainerCount(); i++) {
+//            virtualPower->addItem(tr(controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i)->m_pName));
+//        }
+//    }
+//}
+//
+AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent), wizard(parent), controller(parent->controller)
+{
+    QVBoxLayout* layout = new QVBoxLayout;
+    setLayout(layout);
+
+    // Title
+    setTitle(tr("Setup Virtual Power"));
+
+    QLabel* label = new QLabel(tr("Use this page to setup virtual power for dumb trainers.\n\n"));
+    label->setWordWrap(true);
+    layout->addWidget(label);
+
+    // Virtual Power Curve Choices
+    QHBoxLayout* hlayout = new QHBoxLayout;
+    layout->addLayout(hlayout);
+
+    QFormLayout* form2layout = new QFormLayout;
+    form2layout->addRow(new QLabel(tr("Virtual Power Curve"), this), (virtualPower = new QComboBox(this)));
+
+    // Wheel size
+    int wheelSize = appsettings->cvalue(parent->context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
+
+    rimSizeCombo = new QComboBox();
+    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
+
+    tireSizeCombo = new QComboBox();
+    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
+
+    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize), this);
+    wheelSizeEdit->setInputMask("0000");
+    //wheelSizeEdit->setFixedWidth(40);
+
+    QLabel* wheelSizeUnitLabel = new QLabel(tr("mm"), this);
+
+    QHBoxLayout* wheelSizeLayout = new QHBoxLayout();
+    wheelSizeLayout->addWidget(rimSizeCombo);
+    wheelSizeLayout->addWidget(tireSizeCombo);
+    wheelSizeLayout->addWidget(wheelSizeEdit);
+    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
+
+    stridelengthEdit = new QLineEdit(this);
+    stridelengthEdit->setText("115");
+    QHBoxLayout* stridelengthLayout = new QHBoxLayout;
+    stridelengthLayout->addWidget(stridelengthEdit);
+    stridelengthLayout->addStretch();
+
+    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
+
+    form2layout->addRow(new QLabel(tr("Wheel Size"), this), wheelSizeLayout);
+    form2layout->addRow(new QLabel(tr("Stride Length (cm)"), this), stridelengthLayout);
+
+    hlayout->addLayout(form2layout);
+
+    // ---------------------------------------------
+    // Virtual Power
+    QHBoxLayout* virtualPowerLayout = new QHBoxLayout;
+
+    QHBoxLayout* virtualPowerNameLayout = new QHBoxLayout;
+    virtualPowerNameLabel = new QLabel(tr("Custom Virtual Power Curve Name:"));
+    virtualPowerNameEdit = new QLineEdit(this);
+    virtualPowerCreateButton = new QPushButton(tr("Create"), this);
+    virtualPowerNameLayout->addWidget(virtualPowerNameLabel);
+    virtualPowerNameLayout->addWidget(virtualPowerNameEdit);
+    virtualPowerNameLayout->addWidget(virtualPowerCreateButton);
+
+    connect(virtualPowerCreateButton, SIGNAL(clicked()),
+        this, SLOT(myCreateCustomPowerCurve()));
+
+    layout->addLayout(virtualPowerNameLayout);
+
+    // Virtual Power Input Table
+    virtualPowerTableWidget = new QTableWidget(1, 2, this);
+    virtualPowerTableWidget->setHorizontalHeaderLabels({ "Kph", "Watts" });
+    virtualPowerTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    virtualPowerTableWidget->resize(0, 0);
+    virtualPowerTableWidget->setItem(0, 0, new QTableWidgetItem("0."));
+    virtualPowerTableWidget->setItem(0, 1, new QTableWidgetItem("0."));
+    virtualPowerTableWidget->setItem(1, 0, new QTableWidgetItem("0."));
+    virtualPowerTableWidget->setItem(1, 1, new QTableWidgetItem("0."));
+    virtualPowerLayout->addWidget(virtualPowerTableWidget);
+    virtualPowerTableWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    connect(virtualPowerTableWidget, SIGNAL(cellChanged(int, int)),
+        this, SLOT(myCellChanged(int, int)));
+
+    // Virtual Power Graph
+    virtualPowerScatterChart = new QChart();
+    virtualPowerScatterChart->setAnimationOptions(QChart::AllAnimations);
+    virtualPowerScatterChart->createDefaultAxes();
+    virtualPowerScatterChart->layout()->setContentsMargins(0, 0, 0, 0);
+    virtualPowerScatterChart->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    virtualPowerScatterChart->legend()->hide();
+
+    virtualPowerScatterChartView = new QChartView(virtualPowerScatterChart);
+
+    virtualPowerLayout->addWidget(virtualPowerScatterChartView);
+
+    layout->addLayout(virtualPowerLayout);
+
+    QString fitOrderSpinBoxText = tr("Max Polynomial Order:");
+    fitOrderSpinBoxLabel = new QLabel(fitOrderSpinBoxText);
+
+    fitOrderSpinBox = new QSpinBox();
+    fitOrderSpinBox->setRange(1, 6);
+    fitOrderSpinBox->setSingleStep(1);
+    fitOrderSpinBox->setValue(3);
+    fitOrderSpinBox->setToolTip(tr("Max Order for polynomial fit"));
+    fitOrderSpinBox->setFixedWidth(50);
+
+    QString fitEpsilonSpinBoxText = tr("Polynomial Epsilon:");
+    fitEpsilonSpinBoxLabel = new QLabel(fitEpsilonSpinBoxText);
+
+    fitEpsilonSpinBox = new QDoubleSpinBox();
+    fitEpsilonSpinBox->setRange(0., 100.);
+    fitEpsilonSpinBox->setSingleStep(0.5);
+    fitEpsilonSpinBox->setValue(3);
+    fitEpsilonSpinBox->setToolTip(tr("Polynomial fit criteria. Larger value permits looser fit to data."));
+    fitEpsilonSpinBox->setFixedWidth(150);
+
+    fitStdDevLabel = new QLabel();
+    fitStdDevLabel->setText(QString(tr("Fit StdDev: %1")).arg(0.));
+
+    fitOrderLabel = new QLabel();
+    fitOrderLabel->setText(QString(tr("Max Order: %1")).arg(1.));
+
+    QHBoxLayout* virtualPowerSpinBoxLayout = new QHBoxLayout;
+
+    virtualPowerSpinBoxLayout->addWidget(fitOrderSpinBoxLabel);
+    virtualPowerSpinBoxLayout->addWidget(fitOrderSpinBox);
+    virtualPowerSpinBoxLayout->addWidget(fitEpsilonSpinBoxLabel);
+    virtualPowerSpinBoxLayout->addWidget(fitEpsilonSpinBox);
+    virtualPowerSpinBoxLayout->addWidget(fitOrderLabel);
+    virtualPowerSpinBoxLayout->addWidget(fitStdDevLabel);
+
+    layout->addLayout(virtualPowerSpinBoxLayout);
+
+    connect(fitOrderSpinBox,   SIGNAL(valueChanged(int)), this, SLOT(mySpinBoxChanged(int)));
+    connect(fitEpsilonSpinBox, SIGNAL(valueChanged(double)), this, SLOT(myDoubleSpinBoxChanged(double)));
+
+    QHeaderView* header = virtualPowerTableWidget->horizontalHeader();
+    connect (header,           SIGNAL(sectionClicked(int)), this, SLOT(mySortTable(int)));
+
+    connect (virtualPower,     SIGNAL(currentIndexChanged(int)), this, SLOT(mySetTableFromComboBox(int)));
+
+    drawConfig();
+}
+
+void
+AddVirtualPower::initializePage()
+{
+    bool state = this->blockSignals(true);
+
+    wizard->virtualPowerIndex = 0;
+
+    virtualPower->setCurrentIndex(0);
+    for (int i = 0; i < wizard->controller->virtualPowerTrainerManager.GetVirtualPowerTrainerCount(); i++) {
+        virtualPower->addItem(tr(wizard->controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i)->m_pName));
+    }
+    controller = wizard->controller;
+
+    resetWheelSize();
+
+    this->blockSignals(state);
+}
+
+void
+AddVirtualPower::calcWheelSize()
+{
+    int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
+    if (diameter > 0)
+        wheelSizeEdit->setText(QString("%1").arg(diameter));
+    wizard->wheelSize = diameter;
+}
+
+void
+AddVirtualPower::resetWheelSize()
+{
+    rimSizeCombo->setCurrentIndex(0);
+    tireSizeCombo->setCurrentIndex(0);
+    wizard->virtualPowerIndex = 0;
+    calcWheelSize();
 }
 
 // Final confirmation
@@ -1057,124 +1479,6 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     //name->setFixedWidth(230);
     hlayout->addLayout(formlayout);
 
-    QFormLayout *form2layout = new QFormLayout;
-    form2layout->addRow(new QLabel(tr("Virtual"), this), (virtualPower=new QComboBox(this)));
-
-    // NOTE: These must correspond to the code in RealtimeController.cpp that
-    //       post-processes inbound telemetry.
-    virtualPower->addItem(tr("None"));
-    virtualPower->addItem(tr("Power - Kurt Kinetic Cyclone"));                              // 1
-    virtualPower->addItem(tr("Power - Kurt Kinetic Road Machine"));                         // 2
-    virtualPower->addItem(tr("Power - Cyclops Fluid 2"));                                   // 3
-    virtualPower->addItem(tr("Power - BT Advanced Training System"));                       // 4
-    virtualPower->addItem(tr("Power - LeMond Revolution"));                                 // 5
-    virtualPower->addItem(tr("Power - 1UP USA Trainer"));                                   // 6
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (H)"));                          // 7
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (5)"));                          // 8
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (4)"));                          // 9
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (3)"));                          // 10
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (2)"));                          // 11
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (1)"));                          // 12
-    virtualPower->addItem(tr("Power - Minoura V100 Trainer (L)"));                          // 13
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (H)"));    // 14
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (5)"));    // 15
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (4)"));    // 16
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (3)"));    // 17
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (2)"));    // 18
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (1)"));    // 19
-    virtualPower->addItem(tr("Power - Minoura V270/V150/V130/LR340/LR540 Trainer (L)"));    // 20
-    virtualPower->addItem(tr("Power - Saris Powerbeam Pro"));                               // 21
-    virtualPower->addItem(tr("Power - Tacx Satori (2)"));                                   // 22
-    virtualPower->addItem(tr("Power - Tacx Satori (4)"));                                   // 23
-    virtualPower->addItem(tr("Power - Tacx Satori (6)"));                                   // 24
-    virtualPower->addItem(tr("Power - Tacx Satori (8)"));                                   // 25
-    virtualPower->addItem(tr("Power - Tacx Satori (10)"));                                  // 26
-    virtualPower->addItem(tr("Power - Tacx Flow (0)"));                                     // 27
-    virtualPower->addItem(tr("Power - Tacx Flow (2)"));                                     // 28
-    virtualPower->addItem(tr("Power - Tacx Flow (4)"));                                     // 29
-    virtualPower->addItem(tr("Power - Tacx Flow (6)"));                                     // 30
-    virtualPower->addItem(tr("Power - Tacx Flow (8)"));                                     // 31
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (1)"));                               // 32
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (3)"));                               // 33
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (5)"));                               // 34
-    virtualPower->addItem(tr("Power - Tacx Blue Twist (7)"));                               // 35
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (2)"));                              // 36
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (4)"));                              // 37
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (6)"));                              // 38
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (8)"));                              // 39
-    virtualPower->addItem(tr("Power - Tacx Blue Motion (10)"));                             // 40
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (1)"));                     // 41
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (2)"));                     // 42
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (3)"));                     // 43
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (4)"));                     // 44
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (5)"));                     // 45
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (6)"));                     // 46
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (7)"));                     // 47
-    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));                     // 48
-    virtualPower->addItem(tr("Power - Elite Turbo Muin (2013)"));                           // 49
-    virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));                            // 50
-    virtualPower->addItem(tr("Power - Cyclops Magneto Pro (Road)"));                        // 51
-    virtualPower->addItem(tr("Power - Elite Arion Mag (0)"));                               // 52
-    virtualPower->addItem(tr("Power - Elite Arion Mag (1)"));                               // 53
-    virtualPower->addItem(tr("Power - Elite Arion Mag (2)"));                               // 54
-    virtualPower->addItem(tr("Power - Blackburn Tech Fluid"));                              // 55
-    virtualPower->addItem(tr("Power - Tacx Sirius (1)"));                                   // 56
-    virtualPower->addItem(tr("Power - Tacx Sirius (2)"));                                   // 57
-    virtualPower->addItem(tr("Power - Tacx Sirius (3)"));                                   // 58
-    virtualPower->addItem(tr("Power - Tacx Sirius (4)"));                                   // 59    
-    virtualPower->addItem(tr("Power - Tacx Sirius (5)"));                                   // 60
-    virtualPower->addItem(tr("Power - Tacx Sirius (6)"));                                   // 61
-    virtualPower->addItem(tr("Power - Tacx Sirius (7)"));                                   // 62
-    virtualPower->addItem(tr("Power - Tacx Sirius (8)"));                                   // 63
-    virtualPower->addItem(tr("Power - Tacx Sirius (9)"));                                   // 64
-    virtualPower->addItem(tr("Power - Tacx Sirius (10)"));                                  // 65
-    virtualPower->addItem(tr("Power - Elite Crono Fluid ElastoGel"));                       // 66
-    virtualPower->addItem(tr("Power - Elite Turbo Muin (2015)"));                           // 67
-    virtualPower->addItem(tr("Power - CycleOps JetFluid Pro"));                             // 68
-    virtualPower->addItem(tr("Power - Elite Crono Mag Elastogel (3/5)"));                   // 69
-    virtualPower->addItem(tr("Power - Tacx Magnetic T1820 (4/7)"));                         // 70
-    virtualPower->addItem(tr("Power - Tacx Magnetic T1820 (7/7)"));                         // 71
-
-    //
-    // Wheel size
-    //
-    int wheelSize = appsettings->cvalue(parent->context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
-
-    rimSizeCombo = new QComboBox();
-    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
-
-    tireSizeCombo = new QComboBox();
-    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
-
-
-    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
-    wheelSizeEdit->setInputMask("0000");
-    wheelSizeEdit->setFixedWidth(40);
-
-    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
-
-    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
-    wheelSizeLayout->addWidget(rimSizeCombo);
-    wheelSizeLayout->addWidget(tireSizeCombo);
-    wheelSizeLayout->addWidget(wheelSizeEdit);
-    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
-
-    stridelengthEdit = new QLineEdit(this);
-    stridelengthEdit->setText("115");
-    QHBoxLayout *stridelengthLayout = new QHBoxLayout;
-    stridelengthLayout->addWidget(stridelengthEdit);
-    stridelengthLayout->addStretch();
-
-    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
-
-    form2layout->addRow(new QLabel(tr("Wheel Size"), this), wheelSizeLayout);
-    form2layout->addRow(new QLabel(tr("Stride Length (cm)"), this), stridelengthLayout);
-
-    hlayout->addLayout(form2layout);
-    layout->addStretch();
-
     selectDefault = new QGroupBox(tr("Selected by default"), this);
     selectDefault->setCheckable(true);
     selectDefault->setChecked(false);
@@ -1194,23 +1498,6 @@ AddFinal::initializePage()
 {
     port->setText(wizard->portSpec);
     profile->setText(wizard->profile);
-    virtualPower->setCurrentIndex(0);
-}
-
-void
-AddFinal::calcWheelSize()
-{
-   int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
-   if (diameter>0)
-       wheelSizeEdit->setText(QString("%1").arg(diameter));
-
-}
-
-void
-AddFinal::resetWheelSize()
-{
-   rimSizeCombo->setCurrentIndex(0);
-   tireSizeCombo->setCurrentIndex(0);
 }
 
 bool
@@ -1221,19 +1508,20 @@ AddFinal::validatePage()
         DeviceConfigurations all;
         DeviceConfiguration add;
 
-
         // lets update 'here' with what we did then...
         add.type = wizard->type;
         add.name = name->text();
         add.portSpec = port->text();
         add.deviceProfile = profile->text();
         add.defaultString = QString(defWatts->isChecked() ? "P" : "") +
-                                     QString(defBPM->isChecked() ? "H" : "") +
-                                     QString(defRPM->isChecked() ? "C" : "") +
-                                     QString(defKPH->isChecked() ? "S" : "");
-        add.postProcess = virtualPower->currentIndex();
-        add.wheelSize = wheelSizeEdit->text().toInt();
-        add.stridelength = stridelengthEdit->text().toInt();
+                            QString(defBPM->isChecked() ? "H" : "") +
+                            QString(defRPM->isChecked() ? "C" : "") +
+                            QString(defKPH->isChecked() ? "S" : "");
+
+        add.postProcess = wizard->virtualPowerIndex;
+        add.wheelSize = wizard->wheelSize;
+        add.stridelength = wizard->strideLength;
+        add.controller = wizard->controller;
 
         QList<DeviceConfiguration> list = all.getList();
         list.insert(0, add);

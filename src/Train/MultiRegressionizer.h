@@ -25,6 +25,8 @@
 #include "BlinnSolver.h"
 #include "PolynomialRegression.h"
 
+//#define CONFIG_PRINTING
+
 template<typename T> struct XYPair {
     typedef typename T value_type;
 
@@ -65,12 +67,14 @@ struct T_Matrix
     }
 
     void print(void) {
+#if defined(CONFIG_PRINTING)
         for (size_t i = 0; i < data.size(); i++) {
             for (size_t j = 0; j < data[i].size(); j++) {
                 std::cout << data[i][j] << "\t";
             }
             std::cout << std::endl;
         }
+#endif
     }
 };
 
@@ -272,10 +276,12 @@ public:
     virtual T_fptype Fit(T_fptype kph)   const { return coefs.Fit(kph); }
     virtual T_fptype Slope(T_fptype kph) const { return coefs.Slope(kph); }
     virtual T_fptype StdDev()            const { return stddev; }
-    virtual T_fptype Order()             const { return (T_fptype)(int)coefs.size(); }
+    virtual T_fptype Order()             const { return (T_fptype)(int)coefs.size() - 1; }
     virtual bool     Valid()             const { static const T_fptype s_zero = 0.; return stddev >= s_zero; }
     virtual void     PrintConfig()       const {
+#if defined(CONFIG_PRINTING)
         std::cout << "Poly Regression Curve, order<" << coefs.size() << ">, stddev: " << StdDev() << std::endl;
+#endif
     }
     virtual PolyFit<T_fptype>* AsPolyFit() const {
         return PolyFitGenerator::GetPolyFit(coefs);
@@ -359,7 +365,7 @@ template <typename T> class T_FractionalPolyRegressionizer : public T_Regression
                 delta /= s_minusTwo;
 
             // Stop when step gets real small.
-            if (fabs(delta) < m_epsilon)
+            if (fabs(delta) <= m_epsilon)
                 break;
 
             m_X += delta;
@@ -397,7 +403,9 @@ public:
     virtual T_fptype Order()             const { return m_X; }
     virtual bool     Valid()             const { static const T_fptype s_zero = 0.; return StdDev() >= s_zero; }
     virtual void     PrintConfig()       const {
+#if defined(CONFIG_PRINTING)
         std::cout << "Fractional Poly Regression Curve, x^" << m_X << "*" << m_Y << "+" << m_Z << ", stddev: " << StdDev() << std::endl;
+#endif
     }
     virtual PolyFit<T_fptype>* AsPolyFit() const {
         return PolyFitGenerator::GetFractionalPolyFit({ m_X, m_Y, m_Z });
@@ -668,13 +676,46 @@ public:
                 }
 
                 T_fptype sumSquares = s_zero;
+                T_fptype maxY = 0.;
+                T_fptype minY = 0.;
+                T_fptype minX = 0.;
+                T_fptype maxX = 0.;
                 for (auto i : xy) {
-                    T_fptype delta = i.y - Fit(i.x);
+                    T_fptype fitVal = Fit(i.x);
+
+                    minX = std::min<T_fptype>(minX, i.x);
+                    maxX = std::max<T_fptype>(maxX, i.x);
+                    minY = std::min<T_fptype>(minY, fitVal);
+                    maxY = std::max<T_fptype>(maxY, fitVal);
+
+                    T_fptype delta = i.y - fitVal;
                     sumSquares += delta * delta;
                 }
-                T_fptype N = (unsigned)xy.size();
-                T_fptype variance = sumSquares / N;
-                stddev = sqrt(variance);
+
+                // Now test for asymptotes across finer range of x.
+                // If we find asymptotes then this is not a good candidate,
+                // set stddev artificially high and move on.
+                static bool fail = false;
+                fail = false;
+                static const T_fptype s_hundo = 100.;
+                T_fptype rangeY = (maxY - minY);
+                T_fptype delta = (maxX - minX) / s_hundo;
+                for (T_fptype i = minX; i < (maxX + maxX); i+= delta) {
+                    T_fptype fitVal = Fit(i);
+                    if (fitVal > (maxY + rangeY) ||
+                        fitVal < (minY - rangeY)) {
+                        fail = true;
+                        break;
+                    }
+                }
+
+                if (fail) {
+                    stddev = s_hundo * s_hundo;
+                } else {
+                    T_fptype N = (unsigned)xy.size();
+                    T_fptype variance = sumSquares / N;
+                    stddev = sqrt(variance);
+                }
 
                 // Now to determine 'best'.
                 // If both are already below epsilon then take the one with lower order.
@@ -731,10 +772,12 @@ public:
     }
 
     virtual T_fptype StdDev()      const { return stddev; }
-    virtual T_fptype Order()       const { return (T_fptype)std::max<int>((int)m_num.size(), (int)m_den.size()); }
+    virtual T_fptype Order()       const { return (T_fptype)std::max<int>((int)m_num.size() - 1, (int)m_den.size() - 1); }
     virtual bool     Valid()       const { static const T_fptype s_zero = 0.; return stddev >= s_zero; }
     virtual void     PrintConfig() const {
+#if defined(CONFIG_PRINTING)
         std::cout << "Rational Poly Regression Curve, order<" << m_num.size() << "," << m_den.size() << ">, stddev: " << StdDev() << std::endl;
+#endif
     }
 
     virtual PolyFit<T_fptype>* AsPolyFit() const {
@@ -854,17 +897,21 @@ public:
     }
 
     void PrintConfig() {
+#if defined(CONFIG_PRINTING)
         if (!Build()) std::cout << "Failed!" << std::endl;
         else m_best->PrintConfig();
+#endif
     }
 
     void Print() {
+#if defined(CONFIG_PRINTING)
         if (!Build()) std::cout << "Print() failed." << std::endl;
         else {
             for (int i = 0; i < m_xy.size(); i++) {
                 std::cout << m_xy.X(i) << "\t\t" << m_xy.Y(i) << std::endl;
             }
         }
+#endif
     }
 
     bool Valid() {
@@ -1001,4 +1048,8 @@ public:
         return m_multifit.AsPolyFit();
     }
 };
+
+#pragma optimize("", on)
+
+
 #endif // _GC_MultiRegressionizer_h
