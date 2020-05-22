@@ -86,9 +86,6 @@ VideoWindow::VideoWindow(Context *context)  :
 
         //vlc_exceptions(&exceptions);
 
-
-#if defined(WIN32) || defined (Q_OS_MAC) || defined(Q_OS_LINUX)
-
 #if (defined Q_OS_LINUX) && QT_VERSION <= 0x50000
         container = new QX11EmbedContainer(this);
 #else
@@ -103,7 +100,6 @@ VideoWindow::VideoWindow(Context *context)  :
         libvlc_media_player_set_nsobject (mp, (void*)(container->winId()));
 #elif defined(Q_OS_LINUX)
         libvlc_media_player_set_xwindow (mp, container->winId());
-#endif
 #endif
 
 #if defined(WIN32) || defined(Q_OS_LINUX)
