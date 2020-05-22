@@ -104,6 +104,7 @@ VideoWindow::VideoWindow(Context *context)  :
 #elif defined(Q_OS_LINUX)
         libvlc_media_player_set_xwindow (mp, container->winId());
 #endif
+#endif
 
 #if defined(WIN32) || defined(Q_OS_LINUX)
         // Video Overlays Initialization: if video config file is not present
