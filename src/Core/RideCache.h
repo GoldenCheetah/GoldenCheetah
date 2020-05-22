@@ -138,6 +138,7 @@ class RideCache : public QObject
         friend class ::RideCacheBackgroundRefresh;
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
+        friend class ::Leaf; // get weekly performances
 
         Context *context;
         QDir directory, plannedDirectory;

@@ -1,13 +1,6 @@
 #!/bin/bash
 set -ev
 
-# D2XX
-mkdir D2XX
-cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib D2XX
-sudo cp /Volumes/release/D2XX/Object/10.5-10.7/x86_64/libftd2xx.1.2.2.dylib /usr/local/lib
-cp /Volumes/release/D2XX/bin/*.h D2XX
-sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|" src/FileIO/D2XX.cpp
-
 # Python SIP
 python3 --version
 python3-config --prefix
@@ -30,6 +23,8 @@ sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch
 sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
 sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+# D2XX
+sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|" src/FileIO/D2XX.cpp
 sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri
 sed -i "" "s|#\(D2XX_LIBS    =.*\)|\1 -L../D2XX -lftd2xx.1.2.2|" src/gcconfig.pri
 ## Disable KML for now

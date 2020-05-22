@@ -44,9 +44,9 @@
 #define GC_VIDEO_QUICKTIME
 #endif
 
-// but qt5 and vlc are not valid options !
+// but qt5 and vlc are not experimental options !
 #if defined GC_VIDEO_VLC
-#error "VLC is not a support on Mac OS X builds of GoldenCheetah"
+#warning "VLC is supported experimentally on Mac OS X builds of GoldenCheetah"
 #endif
 
 // but qt5 *is* supported, but use at your own risk!
@@ -209,16 +209,10 @@ class VideoWindow : public GcChartWindow
         QMediaPlayer *mp;
 #endif
 
-#ifdef Q_OS_LINUX
-#if QT_VERSION > 0x050000
+#if defined(WIN32) || defined (Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION > 0x050000)
         QWidget *container;
-#else
+#elif defined(Q_OS_LINUX)
         QX11EmbedContainer *container;
-#endif
-#endif
-
-#ifdef WIN32
-        QWidget *container;
 #endif
 
         bool init; // we initialised ok ?

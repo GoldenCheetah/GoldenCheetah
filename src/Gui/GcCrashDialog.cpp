@@ -37,10 +37,10 @@
 #define COMPILER_VERSION QString("%1").arg(_MSC_VER)
 #endif
 
-#ifndef Q_OS_MAC
-#include "VideoWindow.h"
-#else
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
 #include "QtMacVideoWindow.h"
+#else
+#include "VideoWindow.h"
 #endif
 
 #ifdef GC_HAVE_ICAL

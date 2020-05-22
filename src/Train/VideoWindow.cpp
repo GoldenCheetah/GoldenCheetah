@@ -87,20 +87,25 @@ VideoWindow::VideoWindow(Context *context)  :
         //vlc_exceptions(&exceptions);
 
 
-#if (defined WIN32) || (defined Q_OS_LINUX)
+#if defined(WIN32) || defined (Q_OS_MAC) || defined(Q_OS_LINUX)
+
 #if (defined Q_OS_LINUX) && QT_VERSION <= 0x50000
         container = new QX11EmbedContainer(this);
 #else
-        container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
+        container = new QWidget(this);
 #endif
+
         layout->addWidget(container);
 
-#if (defined Q_OS_LINUX)
-        libvlc_media_player_set_xwindow (mp, container->winId());
-#else
+#if defined(WIN32)
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
+#elif defined(Q_OS_MAC)
+        libvlc_media_player_set_nsobject (mp, (void*)(container->winId()));
+#elif defined(Q_OS_LINUX)
+        libvlc_media_player_set_xwindow (mp, container->winId());
 #endif
 
+#if defined(WIN32) || defined(Q_OS_LINUX)
         // Video Overlays Initialization: if video config file is not present
         // copy a default one to be used as a model by the user.
         // An empty video-layout.xml file disables video overlays

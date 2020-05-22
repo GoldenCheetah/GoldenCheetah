@@ -149,7 +149,10 @@ static struct {
     { "measure", 3 },   // measure(DATE, "Hrv", "RMSSD")
 
     // how many performance tests in the ride?
-    { "tests", 0 },
+    { "tests", 0 },     // tests() -or- tests(user|bests, duration|power) - with no parameters will
+                        // just return the number of tests in a ride/date range, or with 2
+                        // parameters will retrieve user defined or bests found by algorithm
+                        // the last parameter defines if duration (secs) or power (watts) values are returned
 
     // banister function
     { "banister", 3 }, // banister(load_metric, perf_metric, nte|pte|perf|cp)
@@ -337,6 +340,11 @@ DataFilter::builtins()
             for (int g=0; g<groupSymbols.count(); g++)
                 foreach (QString fieldSymbol, measures.getFieldSymbols(g))
                     returning << QString("measure(Date, \"%1\", \"%2\")").arg(groupSymbols[g]).arg(fieldSymbol);
+
+        } else if (i == 43) {
+            // tests
+            returning << "tests(user|bests, duration|power)";
+
         } else if (i == 44) {
             // banister
             returning << "banister(load_metric, perf_metric, nte|pte|perf|cp|date)";
@@ -1740,6 +1748,42 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             if (leaf->seriesType==RideFile::none) {
                                 leaf->inerror = true;
                                 DataFiltererrors << QString(tr("invalid series name '%1'").arg(symbol));
+                            }
+                        }
+                    }
+
+                } else if (leaf->function == "tests") {
+
+                    if (leaf->fparms.count() != 0 && leaf->fparms.count() != 2) {
+                        leaf->inerror=true;
+                        DataFiltererrors << QString(tr("tests(user|bests, duration|power)"));
+                    } else if (leaf->fparms.count() == 2) {
+
+                        // user or best?
+                        if (leaf->fparms[0]->type != Leaf::Symbol) {
+                            leaf->inerror=true;
+                            DataFiltererrors << QString(tr("tests() first parameter must be 'user' or 'bests'."));
+                        } else {
+                            // check its a match
+                            QString symbol=*(leaf->fparms[0]->lvalue.n);
+                            if (symbol != "user" && symbol != "bests") {
+                                // not known
+                                leaf->inerror=true;
+                                DataFiltererrors << QString(tr("tests() first parameter must be 'user' or 'bests'."));
+                            }
+                        }
+
+                        // date or power
+                        if (leaf->fparms[1]->type != Leaf::Symbol) {
+                            leaf->inerror=true;
+                            DataFiltererrors << QString(tr("tests() second parameter must be 'duration' or 'power'."));
+                        } else {
+                            // check its a match
+                            QString symbol=*(leaf->fparms[1]->lvalue.n);
+                            if (symbol != "duration" && symbol != "power") {
+                                // not known
+                                leaf->inerror=true;
+                                DataFiltererrors << QString(tr("tests() second parameter must be 'duration' or 'power'."));
                             }
                         }
                     }
@@ -5427,13 +5471,117 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 break;
 
         case 43 :
-                {   // TESTS() for now just return a count of performance test intervals in the rideitem
-                    if (m == NULL) return 0;
-                    else {
-                        int count=0;
-                        foreach(IntervalItem *i, m->intervals())
-                            if (i->istest()) count++;
-                        return Result(count);
+                {
+                    // if no parameters just return the number of tests either in the current
+                    // date range -or- for the current ride
+                    if (leaf->fparms.count() == 0) {
+
+                        // activity
+                        if (d.from == QDate() && d.to == QDate()) {
+                            int count=0;
+                            foreach(IntervalItem *i, m->intervals())
+                                if (i->istest()) count++;
+                            return Result(count);
+
+                        } else {
+
+                            // date range
+                            FilterSet fs;
+                            fs.addFilter(m->context->isfiltered, m->context->filters);
+                            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+                            Specification spec;
+                            spec.setFilterSet(fs);
+
+                            spec.setDateRange(d); // fallback to daterange selected
+
+                            // loop through rides for daterange
+                            int count=0;
+                            foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                                if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                                if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+                                foreach(IntervalItem *i, ride->intervals())
+                                    if (i->istest()) count++;
+                            }
+                            return Result(count);
+                        }
+
+                    } else {
+
+                        // want to return a vector of dates or powers
+                        // for tests that are available
+                        QString symbol1 = *(leaf->fparms[0]->lvalue.s);
+                        QString symbol2 = *(leaf->fparms[1]->lvalue.s);
+                        bool wantuser = symbol1 == "user" ? true : false; // user | best
+                        bool wantduration = symbol2 == "duration" ? true : false; // date | power
+                        Result returning(0);
+
+                        if (d.from == QDate() && d.to == QDate()) {
+
+                            // for the date of an activity
+                            if (wantuser) {
+                                // look for tests
+                                foreach(IntervalItem *i, m->intervals()) {
+                                    if (i->istest()) {
+                                        double value= wantduration ? i->getForSymbol("workout_time") : i->getForSymbol("average_power");
+                                        returning.number += value;
+                                        returning.vector << value;
+                                    }
+                                }
+                            } else {
+                                // look for bests on the same day
+                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), false); //XXX fixme for runs
+                                if (onday.duration >0) {
+                                    double value = wantduration ? onday.duration : onday.power;
+                                    returning.number += value;
+                                    returning.vector << value;
+                                }
+                            }
+
+                        } else {
+
+                            FilterSet fs;
+                            fs.addFilter(m->context->isfiltered, m->context->filters);
+                            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+                            Specification spec;
+                            spec.setFilterSet(fs);
+                            spec.setDateRange(d); // fallback to daterange selected
+
+                            // for a date range
+                            if (wantuser) {
+
+                                // user marked intervals
+
+                                // loop through rides for daterange
+                                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                                    if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                                    if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+                                    foreach(IntervalItem *i, ride->intervals()) {
+                                        if (i->istest()) {
+                                            double value= wantduration ? i->getForSymbol("workout_time") : i->getForSymbol("average_power");
+                                            returning.number += value;
+                                            returning.vector << value;
+                                        }
+                                    }
+                                }
+
+                            } else {
+
+                                // weekly best performances
+                                QList<Performance> perfs = m->context->athlete->rideCache->estimator->allPerformances();
+                                foreach(Performance p, perfs) {
+                                    if (p.run == false && p.when >= d.from && p.when <= d.to) { // XXX fixme p.run == false
+                                        double value = wantduration ? p.duration : p.power;
+                                        returning.number += value;
+                                        returning.vector << value;
+                                    }
+                                }
+                            }
+                        }
+                        return returning;
                     }
                 }
                 break;

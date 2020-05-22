@@ -31,7 +31,7 @@
 #include <QFileInfo>
 
 // helpers
-#ifdef Q_OS_MAC
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
 #include "QtMacVideoWindow.h"
 #else
 #include "VideoWindow.h"
