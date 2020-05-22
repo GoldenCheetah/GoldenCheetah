@@ -209,16 +209,10 @@ class VideoWindow : public GcChartWindow
         QMediaPlayer *mp;
 #endif
 
-#ifdef Q_OS_LINUX
-#if QT_VERSION > 0x050000
-        QWidget *x11Container;
-#else
-        QX11EmbedContainer *x11Container;
-#endif
-#endif
-
-#if defined(WIN32) || defined (Q_OS_MAC)
+#if defined(WIN32) || defined (Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION > 0x050000)
         QWidget *container;
+#elif defined(Q_OS_LINUX)
+        QX11EmbedContainer *container;
 #endif
 
         bool init; // we initialised ok ?

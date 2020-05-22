@@ -25,11 +25,16 @@
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+#ifdef Q_OS_LINUX
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+#else
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_PaintOnScreen);
+#endif
 
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
