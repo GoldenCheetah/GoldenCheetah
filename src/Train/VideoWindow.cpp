@@ -87,22 +87,19 @@ VideoWindow::VideoWindow(Context *context)  :
         //vlc_exceptions(&exceptions);
 
 
-    /* This is a non working code that show how to hooks into a window,
-     * if we have a window around */
-#ifdef Q_OS_LINUX
-#if QT_VERSION > 0x50000
-        x11Container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
+#if (defined WIN32) || (defined Q_OS_LINUX)
+#if (defined Q_OS_LINUX) && QT_VERSION <= 0x50000
+        container = new QX11EmbedContainer(this);
 #else
-        x11Container = new QX11EmbedContainer(this);
+        container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
 #endif
-        layout->addWidget(x11Container);
-        libvlc_media_player_set_xwindow (mp, x11Container->winId());
-#endif
-
-#ifdef WIN32
-        container = new QWidget(this);
         layout->addWidget(container);
+
+#if (defined Q_OS_LINUX)
+        libvlc_media_player_set_xwindow (mp, container->winId());
+#else
         libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
+#endif
 
         // Video Overlays Initialization: if video config file is not present
         // copy a default one to be used as a model by the user.
@@ -173,7 +170,7 @@ VideoWindow::~VideoWindow()
 
 #if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC)
     // unembed vlc backend first
-    x11Container->discardClient();
+    container->discardClient();
 #endif
 
     stopPlayback();

@@ -211,9 +211,9 @@ class VideoWindow : public GcChartWindow
 
 #ifdef Q_OS_LINUX
 #if QT_VERSION > 0x050000
-        QWidget *x11Container;
+        QWidget *container;
 #else
-        QX11EmbedContainer *x11Container;
+        QX11EmbedContainer *container;
 #endif
 #endif
 
