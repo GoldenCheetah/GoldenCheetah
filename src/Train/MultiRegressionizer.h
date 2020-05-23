@@ -22,6 +22,7 @@
 #include <vector>
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include "BlinnSolver.h"
 #include "PolynomialRegression.h"
 
