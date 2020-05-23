@@ -47,7 +47,7 @@ void T_AppendVirtualPowerDescriptionString(T_String &s, const char* tla, size_t 
 
 template <typename T, typename T_inittype>
 struct FractionalPolynomialFitter : public T {
-    typename typedef T::value_type T_fptype;
+    typedef typename T::value_type T_fptype;
 
     std::array<T_fptype, 3> arr;
     T_fptype scale;
@@ -75,7 +75,7 @@ struct FractionalPolynomialFitter : public T {
 
 template <size_t T_size, size_t T_num, typename T, typename T_inittype>
 struct RationalFitter : public T {
-    typename typedef T::value_type T_fptype;
+    typedef typename T::value_type T_fptype;
 
     std::array<T_fptype, T_size> arr;
     T_fptype scale;
