@@ -21,6 +21,7 @@
 #include "MeterWidget.h"
 #include "ErgFile.h"
 #include "Context.h"
+#include "Units.h"
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
@@ -393,32 +394,38 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setPen(m_OutlinePen);
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
-    //Cosmetic enhancment: Display grade as #.#% 
-    std::string sGrad;
-    QString s_grad ="";
-    s_grad = ((-1.0 < this->gradientValue && this->gradientValue < 0.0)?QString("-"):QString("")) + QString::number((int) this->gradientValue);
-    s_grad += QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+    // Display grade as #.#% 
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0)?QString("-"):QString("")) + QString::number((int) this->gradientValue) +
+                                QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
-    if (cyclistX < m_Width*0.5) {
-        painter.drawText((double)cyclistX+5, ((double)m_Height * 0.95), s_grad);
-    } else {
-        painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
-    }
+    double gradientDrawX = cyclistX;
+    double gradientDrawY = m_Height * 0.95;
 
-    //Cosmetic enhancement: Display route distance in meters
+    if (cyclistX < m_Width * 0.5)
+        gradientDrawX += 5.;
+    else
+        gradientDrawX =- 45.;
+
+    painter.drawText(gradientDrawX, gradientDrawY, gradientString);
+
+    // Display route distance in meters (or pistol shots)
     double routeDistanceMeters = this->Value * 1000.;
-    QString s_dist = QString::number((int)routeDistanceMeters) + QString("m");
 
-    double paintX = (double)cyclistX;
-    double paintY = ((double)m_Height * 0.75);
+    QString distanceString;
+    if (context->athlete->useMetricUnits)
+        distanceString = QString::number((int)routeDistanceMeters) + QString("m");
+    else
+        distanceString = QString::number((int)(routeDistanceMeters*FEET_PER_METER)) + QString("ft");
+
+    double distanceDrawX = (double)cyclistX;
+    double distanceDrawY = ((double)m_Height * 0.75);
 
     // Display distance text to the right of the line until the middle, then display to the left of the line
-    if (cyclistX < m_Width * 0.5) {
-        paintX += 5;
-    } else {
-        paintX -= 45;
-    }
+    if (cyclistX < m_Width * 0.5)
+        distanceDrawX += 5;
+    else
+        distanceDrawX -= 45;
 
-    painter.drawText(paintX, paintY, s_dist);
+    painter.drawText(distanceDrawX, distanceDrawY, distanceString);
 }
