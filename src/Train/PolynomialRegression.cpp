@@ -36,9 +36,9 @@ void T_AppendVirtualPowerDescriptionString(T_String &s, const char* tla, size_t 
     // tla,arrSize,numSize|coefs,...|scale
 
     accum << tla << ", " << arrSize << "," << numSize << "|";
-    for (int i = 0; i <= (arrSize - 1); i++) {
+    for (int i = 0; i <= (int)(arrSize - 1); i++) {
         accum << arr[i];
-        if (i != (arrSize - 1)) accum << ",";
+        if (i != (int)(arrSize - 1)) accum << ",";
     }
     accum << "|" << scale;
 
@@ -52,11 +52,11 @@ struct FractionalPolynomialFitter : public T {
     std::array<T_fptype, 3> arr;
     T_fptype scale;
 
-    static T* Make(const T_inittype& v, typename const T_inittype::value_type& scale) {
+    static T* Make(const T_inittype& v, const typename T_inittype::value_type& scale) {
         return new FractionalPolynomialFitter(v, scale);
     }
 
-    FractionalPolynomialFitter(const T_inittype& n, typename const T_inittype::value_type& s) : arr(), scale(s) {
+    FractionalPolynomialFitter(const T_inittype& n, const typename T_inittype::value_type& s) : arr(), scale(s) {
         for (size_t i = 0; i < n.size(); i++) arr[i] = n[i];
     }
 
@@ -80,11 +80,11 @@ struct RationalFitter : public T {
     std::array<T_fptype, T_size> arr;
     T_fptype scale;
 
-    static T* Make(const T_inittype& v, const T_inittype& v2, typename const T_inittype::value_type& scale) {
+    static T* Make(const T_inittype& v, const T_inittype& v2, const typename T_inittype::value_type& scale) {
         return new RationalFitter(v, v2, scale);
     }
 
-    RationalFitter(const T_inittype& n, const T_inittype& d, typename const T_inittype::value_type& s) : arr(), scale(s) {
+    RationalFitter(const T_inittype& n, const T_inittype& d, const typename T_inittype::value_type& s) : arr(), scale(s) {
         // Populate numerator coefficients.
         for (size_t i = 0; i < T_num; i++) arr[i] = n[i];
 
@@ -146,7 +146,7 @@ struct RationalFitter : public T {
 
 template <size_t T_maxSize, size_t T_maxDen, typename T, typename T_inittype, size_t T_valueNumber>
 struct RationalFitterGenerator {
-    static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, typename const T_inittype::value_type&), T_maxSize>& p) {
+    static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) {
         static const size_t s_num = (T_valueNumber % T_maxDen) + 1;
         static const size_t s_den = T_valueNumber / T_maxDen;
         p[T_valueNumber] = RationalFitter<s_num + s_den, s_num, T, T_inittype>::Make;
@@ -156,7 +156,7 @@ struct RationalFitterGenerator {
 
 template <size_t T_maxSize, size_t T_maxDen, typename T, typename T_inittype>
 struct RationalFitterGenerator<T_maxSize, T_maxDen, T, T_inittype, T_maxSize> {
-    static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, typename const T_inittype::value_type&), T_maxSize>& p) { p; }
+    static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) { p; }
 };
 
 template <size_t T_maxNum, size_t T_maxDen, typename T, typename T_inittype>
@@ -177,25 +177,25 @@ struct T_PolyFitGenerator {
     //
     // The implicit 1 is there so the linear system to solve for rational polynomial least squares doesnt need to worry about divide by zero.
 
-    std::array<T * (*)(const T_inittype&, const T_inittype&, typename const T_inittype::value_type&), T_maxNum * (T_maxDen + 1)> arr;
+    std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxNum * (T_maxDen + 1)> arr;
 
     T_PolyFitGenerator() : arr() {
         RationalFitterGenerator<T_maxNum * (T_maxDen + 1), T_maxDen, T, T_inittype, 0>::setMaker(arr);
     }
 
     // Generate Rational Polynomial Fitter
-    T* GetRationalPolyFit(const T_inittype& n, const T_inittype& d, typename const T_inittype::value_type& scale = 1.) const {
+    T* GetRationalPolyFit(const T_inittype& n, const T_inittype& d, const typename T_inittype::value_type& scale = 1.) const {
         return arr[(n.size() - 1) + (T_maxDen * (d.size()))](n, d, scale);
     }
 
     // Generate Polynomial Fitter
-    T* GetPolyFit(const T_inittype& n, typename const T_inittype::value_type& scale = 1.) const {
+    T* GetPolyFit(const T_inittype& n, const typename T_inittype::value_type& scale = 1.) const {
         static const T_inittype z;
         return arr[n.size() - 1](n, z, scale);
     }
 
     // Generate Fractional Polynomial Fitter (v^X*Y)+Z
-    T* GetFractionalPolyFit(const T_inittype& v, typename const T_inittype::value_type& scale = 1.) const {
+    T* GetFractionalPolyFit(const T_inittype& v, const typename T_inittype::value_type& scale = 1.) const {
         return FractionalPolynomialFitter<T, T_inittype>::Make(v, scale);
     }
 };
