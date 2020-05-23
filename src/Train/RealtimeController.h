@@ -27,6 +27,8 @@
 
 #include "GoldenCheetah.h"
 
+#include <string>
+
 #define DEVICE_ERROR 1
 #define DEVICE_OK 0
 
@@ -34,10 +36,12 @@ struct VirtualPowerTrainer {
     const char*            m_pName;
     const PolyFit<double>* m_pf;
     bool                   m_fUseWheelRpm;
+
+    void to_string(std::string& s) const;
 };
 
 extern const VirtualPowerTrainer s_VirtualPowerTrainerArray[];
-extern const size_t              s_VirtualPowerTrainerArraySize;
+extern const int                 s_VirtualPowerTrainerArraySize;
 
 class VirtualPowerTrainerManager {
     // Custom are dynamic and managed by class instance.
@@ -45,13 +49,18 @@ class VirtualPowerTrainerManager {
 
     const VirtualPowerTrainer* GetCustomVirtualPowerTrainer(int id) const;
 
+    int  GetPredefinedVirtualPowerTrainerCount() const;
+    int  GetCustomVirtualPowerTrainerCount() const;
+
 public:
-    size_t GetPredefinedVirtualPowerTrainerCount() const;
-    size_t GetCustomVirtualPowerTrainerCount() const;
-    size_t GetVirtualPowerTrainerCount() const;
+    static bool IsPredefinedVirtualPowerTrainerIndex(int id);
+    int  GetVirtualPowerTrainerCount() const;
     const VirtualPowerTrainer* GetVirtualPowerTrainer(int idx) const;
 
-    size_t PushCustomVirtualPowerTrainer(const VirtualPowerTrainer* vpt);
+    int  PushCustomVirtualPowerTrainer(const VirtualPowerTrainer* vpt);
+
+    void GetVirtualPowerTrainerAsString(int idx, QString& string);
+    int  PushCustomVirtualPowerTrainer(const QString& string);
 
     ~VirtualPowerTrainerManager();
 };
@@ -115,15 +124,12 @@ private:
 
     const PolyFit<double>* polyFit; // Speed to power fit.
     bool fUseWheelRpm;              // If power is derived from wheelrpm instead of speed.
-    int iFitId;                     // For lazy re-init, record id of current fit.
-
-    // Virtual Power Trainer Curve Management
 
 public:
     VirtualPowerTrainerManager virtualPowerTrainerManager;
 
     // Predefined are static so not part of instance.
-    static size_t GetPredefinedVirtualPowerTrainerCount();
+    static int GetPredefinedVirtualPowerTrainerCount();
     static const VirtualPowerTrainer* GetPredefinedVirtualPowerTrainer(int id);
 
     bool SetupPolyFitFromPostprocessId(int postProcess);

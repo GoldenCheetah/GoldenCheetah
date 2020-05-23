@@ -21,9 +21,18 @@
 #include "RealtimeData.h"
 #include "Units.h"
 
+void VirtualPowerTrainer::to_string(std::string& s) const {
+    // poly|wheelrpm|name
+    s.clear();
+    m_pf->append(s);
+    s.append("|");
+    s.append(m_fUseWheelRpm ? "1|" : "0|");
+    s.append(m_pName); // name hangs off the end
+}
+
 // Abstract base class for Realtime device controllers
 
-RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) : parent(parent), dc(dc), polyFit(NULL), iFitId(0), fUseWheelRpm(false)
+RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) : parent(parent), dc(dc), polyFit(NULL), fUseWheelRpm(false)
 {
     if (dc != NULL)
     {
@@ -52,12 +61,8 @@ void RealtimeController::pushRealtimeData(RealtimeData &) { } // update realtime
 
 void RealtimeController::processRealtimeData(RealtimeData &rtData)
 {
-    if (!dc) return; // no config
-
-    // Lazy init. Perhaps not needed?
-    if (dc->postProcess != iFitId)
-        processSetup();
-
+    // Compute speed from power if a post-process is defined. At this point the postprocess id
+    // has been instantiated into polyfit.
     if (polyFit) {
         double v = (fUseWheelRpm) ? rtData.getWheelRpm() : rtData.getSpeed();
         rtData.setWatts(polyFit->Fit(v));
@@ -459,16 +464,20 @@ const VirtualPowerTrainer s_VirtualPowerTrainerArray[] =
     }
 };
 
-const size_t s_VirtualPowerTrainerArraySize = sizeof(s_VirtualPowerTrainerArray) / sizeof(s_VirtualPowerTrainerArray[0]);
+const int s_VirtualPowerTrainerArraySize = (int)(sizeof(s_VirtualPowerTrainerArray) / sizeof(s_VirtualPowerTrainerArray[0]));
 
 // Virtual Power Trainer Manager
 
-size_t VirtualPowerTrainerManager::GetPredefinedVirtualPowerTrainerCount() const {
+int VirtualPowerTrainerManager::GetPredefinedVirtualPowerTrainerCount() const {
     return RealtimeController::GetPredefinedVirtualPowerTrainerCount();
 }
 
-size_t VirtualPowerTrainerManager::GetCustomVirtualPowerTrainerCount() const {
-    return customVirtualPowerTrainers.size();
+bool VirtualPowerTrainerManager::IsPredefinedVirtualPowerTrainerIndex(int idx) {
+    return idx < RealtimeController::GetPredefinedVirtualPowerTrainerCount();
+}
+
+int VirtualPowerTrainerManager::GetCustomVirtualPowerTrainerCount() const {
+    return (int)customVirtualPowerTrainers.size();
 }
 
 const VirtualPowerTrainer* VirtualPowerTrainerManager::GetCustomVirtualPowerTrainer(int id) const {
@@ -478,14 +487,14 @@ const VirtualPowerTrainer* VirtualPowerTrainerManager::GetCustomVirtualPowerTrai
     return customVirtualPowerTrainers[id];
 }
 
-size_t VirtualPowerTrainerManager::GetVirtualPowerTrainerCount() const {
+int VirtualPowerTrainerManager::GetVirtualPowerTrainerCount() const {
     return
         GetPredefinedVirtualPowerTrainerCount() +
         GetCustomVirtualPowerTrainerCount();
 }
 
 const VirtualPowerTrainer* VirtualPowerTrainerManager::GetVirtualPowerTrainer(int id) const {
-    if (id < 0 || id > GetVirtualPowerTrainerCount())
+    if (id <= 0 || id > GetVirtualPowerTrainerCount())
         return NULL;
 
     int predefinedCount = (int)RealtimeController::GetPredefinedVirtualPowerTrainerCount();
@@ -495,9 +504,116 @@ const VirtualPowerTrainer* VirtualPowerTrainerManager::GetVirtualPowerTrainer(in
     return GetCustomVirtualPowerTrainer(id - predefinedCount);
 }
 
-size_t VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const VirtualPowerTrainer* vpt) {
+int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const VirtualPowerTrainer* vpt) {
     customVirtualPowerTrainers.push_back(vpt);
-    return customVirtualPowerTrainers.size();
+    return (int)customVirtualPowerTrainers.size();
+}
+
+void VirtualPowerTrainerManager::GetVirtualPowerTrainerAsString(int idx, QString& s) {
+    s.clear();
+
+    const VirtualPowerTrainer* p = GetVirtualPowerTrainer(idx);
+    if (p) {
+        // Stringify virtual trainer and store...
+        std::string string;
+        p->to_string(string);
+        s = string.c_str();
+    } else {
+        s = "";
+    }
+}
+
+// Synthesize a new custom power curve from string description.
+// Returns index of new virtualpowertrainer
+int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& string) {
+
+    // parse string back into virtualtrainer.
+    //
+    // type,coefcount,numeratorcount|coefs,...|scale|usewheelrpm|name
+    // DEF,COEFS,SCALE,RPM,NAME
+
+    // DEF:   tla,coefcount,numeratorcount
+    // COEFS:|coefs,...
+    // SCALE:|scale}
+    // RPM:  |wheelrpm
+    // NAME: |name
+
+    do {
+        QStringList pieces = string.split("|");
+
+        size_t size = pieces.size();
+        if (size != 5) break;
+
+        // section 0 DEF
+        QStringList defPieces = pieces.at(0).split(QRegExp(QRegExp::escape(",")));
+        size = defPieces.size();
+        if (size != 3) break; // bad prefix section count...
+
+        // 0,0 DEF:TLA
+        bool isFractional = false;
+        if (!defPieces.at(0).compare("FPR")) isFractional = true;
+        else if (!defPieces.at(0).compare("RPR")) isFractional = false;
+        else break; // bad tla...
+
+        // 0,1 DEF:COEFCOUNT
+        int coefCount = defPieces.at(1).toInt();
+        if (coefCount <= 0 || coefCount > 14) break; // bad coef count
+
+        // 0,2 DEF:NUMERATORCOUNT
+        int numeratorCount = defPieces.at(2).toInt();
+        if (numeratorCount <= 0 || numeratorCount > 14) break; // bad numerator coef count
+
+        // section 1 COEFS
+        QStringList coefs = pieces.at(1).split(QRegExp(QRegExp::escape(",")));
+        size = coefs.size();
+        if (size != coefCount) break; // wrong number of coefs in string
+
+        // Distribute coefs to numerator and denominator coefficient arrays.
+        // Denominator always has an implict constant 1. If denominator array
+        // is empty then fit is simple polynomial, otherwise it is rational.
+        std::vector<double> num, den;
+
+        int i = 0;
+        for (; i < numeratorCount; i++) num.push_back(coefs.at(i).toDouble());
+        for (; i < coefCount; i++) den.push_back(coefs.at(i).toDouble());
+
+        // section 2 SCALE
+        double scale = pieces.at(2).toDouble();
+
+        // section 3 RPM
+        bool fUseWheelRpm = pieces.at(3).compare("0") != 0;
+
+        // section 4 Name
+        QString namePiece = pieces.at(4);
+
+        // Finished with parse errors. All memory allocated is held by new
+        // VirtualPowerTrainer and freed by manager when manager is destroyed.
+
+
+        std::string name = namePiece.toStdString();
+        char* pNameCopy = new char[name.size() + 1];
+        strcpy(pNameCopy, name.c_str());
+
+        VirtualPowerTrainer* p = new VirtualPowerTrainer;
+
+        p->m_pName = pNameCopy;
+
+        if (isFractional) 
+            p->m_pf = PolyFitGenerator::GetFractionalPolyFit(num, scale);
+        else if (numeratorCount == coefCount)
+            p->m_pf = PolyFitGenerator::GetPolyFit(num, scale);
+        else
+            p->m_pf = PolyFitGenerator::GetRationalPolyFit(num, den, scale);
+
+        p->m_fUseWheelRpm = fUseWheelRpm;
+
+        PushCustomVirtualPowerTrainer(p);
+
+        return GetVirtualPowerTrainerCount() - 1;
+
+    } while (false);
+
+    return 0;
 }
 
 VirtualPowerTrainerManager::~VirtualPowerTrainerManager() {
@@ -508,42 +624,38 @@ VirtualPowerTrainerManager::~VirtualPowerTrainerManager() {
     customVirtualPowerTrainers.clear();
 }
 
-size_t RealtimeController::GetPredefinedVirtualPowerTrainerCount() {
+int RealtimeController::GetPredefinedVirtualPowerTrainerCount() {
     return s_VirtualPowerTrainerArraySize;
 }
 
 const VirtualPowerTrainer* RealtimeController::GetPredefinedVirtualPowerTrainer(int id) {
-    if (id < 0 || id >= GetPredefinedVirtualPowerTrainerCount()) {
+    if (id < 0 || id >= GetPredefinedVirtualPowerTrainerCount()) 
         return NULL;
-    }
 
     return &s_VirtualPowerTrainerArray[id];
 }
 
-bool RealtimeController::SetupPolyFitFromPostprocessId(int postProcess)
-{
-    // Clear and reconstruct new fit state.
-    polyFit = NULL;
-    iFitId = 0;
-    fUseWheelRpm = false;
-
-    if (postProcess < 0 || postProcess >= virtualPowerTrainerManager.GetVirtualPowerTrainerCount()) return false;
-
-    const VirtualPowerTrainer* pTrainer = virtualPowerTrainerManager.GetVirtualPowerTrainer(postProcess);
-    polyFit = pTrainer->m_pf;
-    fUseWheelRpm = pTrainer->m_fUseWheelRpm;
-    iFitId = postProcess;
-
-    return polyFit != NULL;
-}
-
-// for future devices, we may need to setup algorithmic tables etc
 void
 RealtimeController::processSetup()
 {
     if (!dc) return; // no config
 
-    SetupPolyFitFromPostprocessId(dc->postProcess);
+    // Custom postprocess are stored with postprocess 0 AND a definition string.
+    int postProcess = dc->postProcess;
+    if (!postProcess && dc->virtualPowerDefinitionString.size() > 1) {
+        // Instantiate custom postprocess from device configuration.
+        postProcess = virtualPowerTrainerManager.PushCustomVirtualPowerTrainer(dc->virtualPowerDefinitionString);
+    }
+
+    // Setup polyfit and rpm settings from postprocess id.
+    const VirtualPowerTrainer* pTrainer = virtualPowerTrainerManager.GetVirtualPowerTrainer(postProcess);
+    if (pTrainer) {
+        polyFit = pTrainer->m_pf;
+        fUseWheelRpm = pTrainer->m_fUseWheelRpm;
+    } else {
+        polyFit = NULL;
+        fUseWheelRpm = false;
+    }
 }
 
 void

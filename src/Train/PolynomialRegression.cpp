@@ -18,8 +18,32 @@
 
 #include <array>
 #include <iostream>
+#include <string>
+#include <sstream>
+
 #include "PolynomialRegression.h"
 #include "MultiRegressionizer.h"
+
+// Utility to emit polynomial as string. This layout is tied to the parsing in
+// realtimecontroller.cpp:void VirtualPowerTrainerManager::GetVirtualPowerTrainerAsString(int idx, QString& s)
+
+template <typename T_String, typename T_fptype>
+void T_AppendVirtualPowerDescriptionString(T_String &s, const char* tla, size_t arrSize, size_t numSize, const T_fptype *arr, T_fptype scale) {
+
+    std::ostringstream accum;
+    accum.precision(12);
+
+    // tla,arrSize,numSize|coefs,...|scale
+
+    accum << tla << ", " << arrSize << "," << numSize << "|";
+    for (int i = 0; i <= (arrSize - 1); i++) {
+        accum << arr[i];
+        if (i != (arrSize - 1)) accum << ",";
+    }
+    accum << "|" << scale;
+
+    s.append(accum.str());
+}
 
 template <typename T, typename T_inittype>
 struct FractionalPolynomialFitter : public T {
@@ -42,6 +66,10 @@ struct FractionalPolynomialFitter : public T {
 
         // v^X * Y + Z
         return (pow(v, arr[0]) * arr[1]) + arr[2];
+    }
+
+    void append(std::string& s) const {
+        T_AppendVirtualPowerDescriptionString(s, "FPR", 3, 0, &(arr[0]), scale);
     }
 };
 
@@ -110,6 +138,10 @@ struct RationalFitter : public T {
 
         return r;
     }
+
+    void append(std::string& s) const {
+        T_AppendVirtualPowerDescriptionString(s, "RPR", T_size, T_num, &(arr[0]), scale);
+    }
 };
 
 template <size_t T_maxSize, size_t T_maxDen, typename T, typename T_inittype, size_t T_valueNumber>
@@ -133,7 +165,7 @@ struct T_PolyFitGenerator {
     // Value number from <numeratorCount, denominatorCount> to a unique combination of the two,
     // for example:
     //
-    // num,den max both 6...
+    // if num,den max both 6...
     //
     // 1,0 = 0
     // 2,0 = 1

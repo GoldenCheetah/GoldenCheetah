@@ -700,10 +700,12 @@ public:
                 static const T_fptype s_hundo = 100.;
                 T_fptype rangeY = (maxY - minY);
                 T_fptype delta = (maxX - minX) / s_hundo;
+                T_fptype tripleRangeY = rangeY + rangeY + rangeY;
+                T_fptype upperLimitY = maxY + (tripleRangeY);
+                T_fptype lowerLimitY = minY - (tripleRangeY);
                 for (T_fptype i = minX; i < (maxX + maxX); i+= delta) {
                     T_fptype fitVal = Fit(i);
-                    if (fitVal > (maxY + rangeY) ||
-                        fitVal < (minY - rangeY)) {
+                    if (fitVal > upperLimitY || fitVal < lowerLimitY) {
                         fail = true;
                         break;
                     }
@@ -1048,8 +1050,5 @@ public:
         return m_multifit.AsPolyFit();
     }
 };
-
-#pragma optimize("", on)
-
 
 #endif // _GC_MultiRegressionizer_h

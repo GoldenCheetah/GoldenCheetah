@@ -1062,7 +1062,7 @@ AddVirtualPower::myCellChanged(int nRow, int nCol)
 
     // A table cell is changed... If selected virtual trainer isn't custom then swap index
     // to None.
-    if (virtualPower->currentIndex() < controller->virtualPowerTrainerManager.GetPredefinedVirtualPowerTrainerCount()) {
+    if (controller->virtualPowerTrainerManager.IsPredefinedVirtualPowerTrainerIndex(virtualPower->currentIndex())) {
         virtualPower->setCurrentIndex(0);
         wizard->virtualPowerIndex = 0;
     } else {
@@ -1113,34 +1113,41 @@ AddVirtualPower::mySetTableFromComboBox(int i) {
     bool state = this->blockSignals(true);
     if (state) return;
 
-    const int rows = 11;
-    virtualPowerTableWidget->setRowCount(rows+1);
+    const VirtualPowerTrainer* pFit = controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i);
 
-    const VirtualPowerTrainer * pFit = controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i);
+    int rows = 0;
+    if (pFit) {
 
-    // First element is power at 1kph
-    virtualPowerTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(1.)));
-    virtualPowerTableWidget->setItem(0, 1, new QTableWidgetItem(QString::number(pFit->m_pf->Fit(1.))));
+        rows = 11;
+        virtualPowerTableWidget->setRowCount(rows + 1);
 
-    // Convention, every additional row is +10kph.
-    double vFactor = 10.;
+        // First element is power at 1kph
+        virtualPowerTableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(1.)));
+        virtualPowerTableWidget->setItem(0, 1, new QTableWidgetItem(QString::number(pFit->m_pf->Fit(1.))));
 
-    // Some trainers are too good for velocity and use wheel rpm.
-    // Convert velocity to wheel rpm
-    double vToRpm = 1.;
-    if (pFit->m_fUseWheelRpm) {
-        // Read wheel circumference. Is in mm.
-        double circumferenceMM = wheelSizeEdit->text().toDouble();
+        // Convention, every additional row is +10kph.
+        double vFactor = 10.;
 
-        // v to rpm
-        vToRpm = ((1. * 1000 * 1000) / 60) / circumferenceMM;
-    }
+        // Some trainers are too good for velocity and use wheel rpm.
+        // Convert velocity to wheel rpm
+        double vToRpm = 1.;
+        if (pFit->m_fUseWheelRpm) {
+            // Read wheel circumference. Is in mm.
+            double circumferenceMM = wheelSizeEdit->text().toDouble();
 
-    // Body of elements is power every 10kph
-    for (int row = 1; row < rows; row ++) {
-        double v = row * vFactor;
-        virtualPowerTableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(v)));
-        virtualPowerTableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(pFit->m_pf->Fit(vToRpm * v))));
+            // v to rpm
+            vToRpm = ((1. * 1000 * 1000) / 60) / circumferenceMM;
+        }
+
+        // Body of elements is power every 10kph
+        for (int row = 1; row < rows; row++) {
+            double v = row * vFactor;
+            virtualPowerTableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(v)));
+            virtualPowerTableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(pFit->m_pf->Fit(vToRpm * v))));
+        }
+    } else {
+        rows = 0;
+        virtualPowerTableWidget->setRowCount(rows + 1);
     }
 
     // End of table are the zeros...
@@ -1157,6 +1164,9 @@ AddVirtualPower::mySetTableFromComboBox(int i) {
 
 void
 AddVirtualPower::myCreateCustomPowerCurve() {
+
+    bool state = this->blockSignals(true);
+    if (state) return;
 
     T_MultiRegressionizer<XYVector<double>> fit(fitEpsilonSpinBox->value(), fitOrderSpinBox->value());
 
@@ -1191,6 +1201,8 @@ AddVirtualPower::myCreateCustomPowerCurve() {
     virtualPower->setCurrentIndex(virtualPower->count() - 1);
 
     wizard->virtualPowerIndex = virtualPower->currentIndex();
+
+    this->blockSignals(state);
 }
 
 void
@@ -1250,20 +1262,6 @@ AddVirtualPower::drawConfig() {
     fitOrderLabel->setText(QString(tr("Max Order: %1")).arg(fit.Order()));
 }
 
-//void
-//AddVirtualPower::lazyControllerInit() {
-//    if (wizard->controller != controller) {
-//        // controller change. Re-init virtualPower combo box.
-//        controller = wizard->controller;
-//
-//        virtualPower->clear();
-//
-//        for (int i = 0; i < controller->virtualPowerTrainerManager.GetVirtualPowerTrainerCount(); i++) {
-//            virtualPower->addItem(tr(controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i)->m_pName));
-//        }
-//    }
-//}
-//
 AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent), wizard(parent), controller(parent->controller)
 {
     QVBoxLayout* layout = new QVBoxLayout;
@@ -1272,8 +1270,9 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
     // Title
     setTitle(tr("Setup Virtual Power"));
 
-    QLabel* label = new QLabel(tr("Use this page to setup virtual power for dumb trainers.\n\n"));
+    QLabel* label = new QLabel(tr("Use this page to setup virtual power for trainers that can only report speed or rpm. It is probably a bad idea to derive power from speed when also receiving power data from the trainer.\n\n"));
     label->setWordWrap(true);
+
     layout->addWidget(label);
 
     // Virtual Power Curve Choices
@@ -1294,7 +1293,6 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
 
     wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize), this);
     wheelSizeEdit->setInputMask("0000");
-    //wheelSizeEdit->setFixedWidth(40);
 
     QLabel* wheelSizeUnitLabel = new QLabel(tr("mm"), this);
 
@@ -1327,6 +1325,8 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
     virtualPowerNameLabel = new QLabel(tr("Custom Virtual Power Curve Name:"));
     virtualPowerNameEdit = new QLineEdit(this);
     virtualPowerCreateButton = new QPushButton(tr("Create"), this);
+    virtualPowerCreateButton->setToolTip(tr("Give the current fit a name that this device can use."));
+
     virtualPowerNameLayout->addWidget(virtualPowerNameLabel);
     virtualPowerNameLayout->addWidget(virtualPowerNameEdit);
     virtualPowerNameLayout->addWidget(virtualPowerCreateButton);
@@ -1382,14 +1382,14 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
     fitEpsilonSpinBox->setRange(0., 100.);
     fitEpsilonSpinBox->setSingleStep(0.5);
     fitEpsilonSpinBox->setValue(3);
-    fitEpsilonSpinBox->setToolTip(tr("Polynomial fit criteria. Larger value permits looser fit to data."));
+    fitEpsilonSpinBox->setToolTip(tr("Polynomial fit criteria, in watts. Larger value permits looser fit."));
     fitEpsilonSpinBox->setFixedWidth(150);
 
     fitStdDevLabel = new QLabel();
-    fitStdDevLabel->setText(QString(tr("Fit StdDev: %1")).arg(0.));
+    fitStdDevLabel->setText(QString(tr("StdDev of fit to data: %1 ")).arg(0.));
 
     fitOrderLabel = new QLabel();
-    fitOrderLabel->setText(QString(tr("Max Order: %1")).arg(1.));
+    fitOrderLabel->setText(QString(tr("Order of fit: %1")).arg(1.));
 
     QHBoxLayout* virtualPowerSpinBoxLayout = new QHBoxLayout;
 
@@ -1420,10 +1420,12 @@ AddVirtualPower::initializePage()
 
     wizard->virtualPowerIndex = 0;
 
-    virtualPower->setCurrentIndex(0);
-    for (int i = 0; i < wizard->controller->virtualPowerTrainerManager.GetVirtualPowerTrainerCount(); i++) {
+    virtualPower->addItem(tr("None"));
+    for (int i = 1; i < wizard->controller->virtualPowerTrainerManager.GetVirtualPowerTrainerCount(); i++) {
         virtualPower->addItem(tr(wizard->controller->virtualPowerTrainerManager.GetVirtualPowerTrainer(i)->m_pName));
     }
+    virtualPower->setCurrentIndex(0);
+
     controller = wizard->controller;
 
     resetWheelSize();
