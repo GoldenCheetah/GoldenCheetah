@@ -28,21 +28,21 @@
 //#define CONFIG_PRINTING
 
 template<typename T> struct XYPair {
-    typedef typename T value_type;
+    typedef T value_type;
 
     T x, y;
 };
 
 template <typename T>
 struct XYGetter {
-    typedef typename T value_type;
+    typedef T value_type;
 
     virtual T X(size_t) const = 0;
     virtual T Y(size_t) const = 0;
 };
 
 template<typename T> struct XYVector : public XYGetter<T>, public std::vector<XYPair<T>> {
-    typedef typename XYPair<T> value_type;
+    typedef struct XYPair<T> value_type;
 
     T X(size_t idx) const { return this->operator[](idx).x; }
     T Y(size_t idx) const { return this->operator[](idx).y; }
@@ -81,7 +81,7 @@ struct T_Matrix
 // Generic Polynomial Based on Vector.
 template <typename T>
 struct T_Polynomial : public std::vector<T> {
-    typedef typename T T_fptype;
+    typedef T T_fptype;
 
     T_fptype Fit(T_fptype v) const {
         static const T_fptype s_zero = 0.;
@@ -139,13 +139,13 @@ class T_PolyRegressionizer : public T_RegressionizerBase<T> {
     // row reduction. By magic the coefficients
     bool ComputeCoefs(
         const T& xy,
-        const int& order)
+        const unsigned& order)
     {
         static const T_fptype s_one = 1.;
 
         if (xy.size() <= 0) return false;
 
-        size_t N = xy.size();
+        int N = (int)xy.size();
         int n = order;
         int np1 = n + 1;
         int np2 = n + 2;
@@ -155,14 +155,14 @@ class T_PolyRegressionizer : public T_RegressionizerBase<T> {
         std::vector<T_fptype> M(tnp1 + N);
 
         // Avoid pow, extra space in array holds accumulated powers of x[j]
-        for (size_t j = 0; j < N; j++) {
+        for (int j = 0; j < N; j++) {
             M[tnp1 + j] = s_one;
         }
 
         M[0] = (T_fptype)(int)N;
         for (int i = 1; i < tnp1; ++i) {
             T_fptype sum = 0;
-            for (size_t j = 0; j < N; j++) {
+            for (int j = 0; j < N; j++) {
                 T_fptype v = M[tnp1 + j] * xy.X(j);
                 M[tnp1 + j] = v;
                 sum += v;
@@ -173,20 +173,20 @@ class T_PolyRegressionizer : public T_RegressionizerBase<T> {
         // Matrix B: populated then row reduced.
         std::vector<std::vector<T_fptype> > B(np1, std::vector<T_fptype>(np2, 0));
 
-        for (size_t i = 0; i <= n; ++i)
-            for (size_t j = 0; j <= n; ++j)
+        for (int i = 0; i <= n; ++i)
+            for (int j = 0; j <= n; ++j)
                 B[i][j] = M[i + j];
 
         std::vector<T_fptype> Y(np1 + N);
 
-        for (size_t j = 0; j < N; j++) {
+        for (int j = 0; j < N; j++) {
             Y[0] += xy[j].y;
             Y[np1 + j] = s_one;
         }
 
         for (int i = 1; i < np1; ++i) {
             T_fptype sum = 0;
-            for (size_t j = 0; j < N; j++) {
+            for (int j = 0; j < N; j++) {
                 XYPair<T_fptype> t = xy[j];
                 T_fptype v = Y[np1 + j] * t.x;
                 Y[np1 + j] = v;
@@ -245,8 +245,8 @@ public:
 
         // Build integer poly regression. Use whichever is best.
         // Iterate over orders, find first order that has great fit
-        for (size_t i = 0; i <= maxOrder; i++) {
-            order = (int)i;
+        for (unsigned i = 0; i <= maxOrder; i++) {
+            order = i;
 
             // If fit cannot be found then fail.
             if (!ComputeCoefs(xy, order)) {
@@ -307,7 +307,6 @@ template <typename T> class T_FractionalPolyRegressionizer : public T_Regression
         static const T_fptype s_minusOne = -1.;
         static const T_fptype s_minusTwo = -2.;
         static const T_fptype s_half = 0.5;
-        static const T_fptype s_pointOne = 0.1;
 
         if (xy.size() == 0) {
             T_fptype  ret = -1;
