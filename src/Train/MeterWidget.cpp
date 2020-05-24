@@ -409,14 +409,13 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 
-    // Display route distance in meters (or pistol shots)
-    double routeDistanceMeters = this->Value * 1000.;
+    double routeDistance = this->Value;
+    if (!context->athlete->useMetricUnits) routeDistance *= MILES_PER_KM;
 
-    QString distanceString;
-    if (context->athlete->useMetricUnits)
-        distanceString = QString::number((int)routeDistanceMeters) + QString("m");
-    else
-        distanceString = QString::number((int)(routeDistanceMeters*FEET_PER_METER)) + QString("ft");
+    routeDistance = ((int)(routeDistance * 1000.)) / 1000.;
+
+    QString distanceString = QString::number(routeDistance, 'f', 3) +
+        ((context->athlete->useMetricUnits) ? QString("km") : QString("mi"));
 
     double distanceDrawX = (double)cyclistX;
     double distanceDrawY = ((double)m_Height * 0.75);
