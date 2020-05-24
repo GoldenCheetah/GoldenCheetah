@@ -24,6 +24,17 @@
 #include "PolynomialRegression.h"
 #include "MultiRegressionizer.h"
 
+// In the future all toolchains will support constexpr and we can turn this on...
+// Benefit is the entire init of maker method array is constructed at compile time
+// and can be constructed into the image as readonly.
+#if defined(USING_CXX_17_OR_HIGHER)
+#define CONSTEXPR constexpr
+#define CONSTEXPR_VAR constexpr
+#else
+#define CONSTEXPR
+#define CONSTEXPR_VAR static const
+#endif
+
 // Utility to emit polynomial as string. This layout is tied to the parsing in
 // realtimecontroller.cpp:void VirtualPowerTrainerManager::GetVirtualPowerTrainerAsString(int idx, QString& s)
 
@@ -59,7 +70,7 @@ struct FractionalPolynomialFitter : public T {
     FractionalPolynomialFitter(const T_inittype& n, const typename T_inittype::value_type& s) : arr(), scale(s) {
         for (size_t i = 0; i < n.size(); i++) arr[i] = n[i];
     }
-
+    
     T_fptype Fit(T_fptype v) const {
         // Scale v, for example mph -> kph
         v = v * scale;
@@ -146,9 +157,9 @@ struct RationalFitter : public T {
 
 template <size_t T_maxSize, size_t T_maxDen, typename T, typename T_inittype, size_t T_valueNumber>
 struct RationalFitterGenerator {
-    static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) {
-        static const size_t s_num = (T_valueNumber % T_maxDen) + 1;
-        static const size_t s_den = T_valueNumber / T_maxDen;
+    CONSTEXPR static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) {
+        CONSTEXPR_VAR size_t s_num = (T_valueNumber % T_maxDen) + 1;
+        CONSTEXPR_VAR size_t s_den = T_valueNumber / T_maxDen;
         p[T_valueNumber] = RationalFitter<s_num + s_den, s_num, T, T_inittype>::Make;
         RationalFitterGenerator<T_maxSize, T_maxDen, T, T_inittype, T_valueNumber + 1>::setMaker(p);
     }
@@ -156,7 +167,7 @@ struct RationalFitterGenerator {
 
 template <size_t T_maxSize, size_t T_maxDen, typename T, typename T_inittype>
 struct RationalFitterGenerator<T_maxSize, T_maxDen, T, T_inittype, T_maxSize> {
-    static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) { p; }
+    CONSTEXPR static void setMaker(std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxSize>& p) { p; }
 };
 
 template <size_t T_maxNum, size_t T_maxDen, typename T, typename T_inittype>
@@ -179,30 +190,30 @@ struct T_PolyFitGenerator {
 
     std::array<T * (*)(const T_inittype&, const T_inittype&, const typename T_inittype::value_type&), T_maxNum * (T_maxDen + 1)> arr;
 
-    T_PolyFitGenerator() : arr() {
+    CONSTEXPR T_PolyFitGenerator() : arr() {
         RationalFitterGenerator<T_maxNum * (T_maxDen + 1), T_maxDen, T, T_inittype, 0>::setMaker(arr);
     }
 
     // Generate Rational Polynomial Fitter
-    T* GetRationalPolyFit(const T_inittype& n, const T_inittype& d, const typename T_inittype::value_type& scale = 1.) const {
+    CONSTEXPR T* GetRationalPolyFit(const T_inittype& n, const T_inittype& d, const typename T_inittype::value_type& scale = 1.) const {
         return arr[(n.size() - 1) + (T_maxDen * (d.size()))](n, d, scale);
     }
 
     // Generate Polynomial Fitter
-    T* GetPolyFit(const T_inittype& n, const typename T_inittype::value_type& scale = 1.) const {
+    CONSTEXPR T* GetPolyFit(const T_inittype& n, const typename T_inittype::value_type& scale = 1.) const {
         static const T_inittype z;
         return arr[n.size() - 1](n, z, scale);
     }
 
     // Generate Fractional Polynomial Fitter (v^X*Y)+Z
-    T* GetFractionalPolyFit(const T_inittype& v, const typename T_inittype::value_type& scale = 1.) const {
+    CONSTEXPR T* GetFractionalPolyFit(const T_inittype& v, const typename T_inittype::value_type& scale = 1.) const {
         return FractionalPolynomialFitter<T, T_inittype>::Make(v, scale);
     }
 };
 
 // File static global. Compiler optimizes it so array of maker methods can live entirely in image memory -
 // populated by the loader.
-static const T_PolyFitGenerator<7, 7, PolyFit<double>, std::vector<double>> s_PolyFitGenerator;
+CONSTEXPR static const T_PolyFitGenerator<7, 7, PolyFit<double>, std::vector<double>> s_PolyFitGenerator;
 
 // Factory accessed via static methods to avoid exposing templates into tender world...
 
