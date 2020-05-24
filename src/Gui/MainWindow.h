@@ -94,6 +94,10 @@ class MainWindow : public QMainWindow
         // currently selected tab
         Tab *athleteTab() { return currentTab; }
 
+    signals:
+        void mainWindowMoved();
+        void mainWindowStateChanged(bool minimized, bool visible);
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
@@ -104,6 +108,7 @@ class MainWindow : public QMainWindow
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
         virtual void closeEvent(QCloseEvent*);
+        virtual void changeEvent(QEvent *);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
 

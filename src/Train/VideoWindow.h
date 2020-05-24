@@ -176,6 +176,8 @@ class VideoWindow : public GcChartWindow
         void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
+        void mainWindowMoved();
+        void mainWindowStateChanged(bool minimized, bool visible);
 
     protected:
 
