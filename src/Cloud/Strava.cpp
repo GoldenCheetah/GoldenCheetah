@@ -31,7 +31,7 @@
 #include <QJsonValue>
 
 #ifndef STRAVA_DEBUG
-#define STRAVA_DEBUG false
+#define STRAVA_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
