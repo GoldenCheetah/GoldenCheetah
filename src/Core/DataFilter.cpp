@@ -5632,7 +5632,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                                 // weekly best performances
                                 QList<Performance> perfs = m->context->athlete->rideCache->estimator->allPerformances();
                                 foreach(Performance p, perfs) {
-                                    if (p.run == false && p.when >= d.from && p.when <= d.to) { // XXX fixme p.run == false
+                                    if (p.submaximal == false && p.run == false && p.when >= d.from && p.when <= d.to) { // XXX fixme p.run == false
                                         double value = wantduration ? p.duration : p.power;
                                         returning.number += value;
                                         returning.vector << value;
