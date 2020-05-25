@@ -113,7 +113,7 @@ class FixGPSConfig : public DataProcessorConfig
 
         // Altitude Outlier Criteria
         QLabel      *outlierLabel;
-        QSpinBox    *outlierSpinBox;
+        QDoubleSpinBox *outlierSpinBox;
 
         // Altitude Stats
         QLabel      *minSlopeLabel;
@@ -132,7 +132,7 @@ class FixGPSConfig : public DataProcessorConfig
 
         // Route Outlier Criteria
         QLabel      *outlierLabelRoute;
-        QSpinBox    *outlierSpinBoxRoute;
+        QDoubleSpinBox *outlierSpinBoxRoute;
 
         // Route Stats
         QLabel      *variance0LabelRoute;
@@ -367,9 +367,10 @@ class FixGPSConfig : public DataProcessorConfig
             // Altitude Outlier Criteria
 
             outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier criteria %:"));
-            outlierSpinBox = new QSpinBox();
-            outlierSpinBox->setRange(1, 10000);
+            outlierSpinBox = new QDoubleSpinBox();
+            outlierSpinBox->setRange(0.001, 10000);
             outlierSpinBox->setSingleStep(10);
+            outlierSpinBox->setDecimals(3);
             outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
             outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA (%)\n"
                                           "Outlier percent is used to decide outlier points that will be discarded after\n"
@@ -413,9 +414,10 @@ class FixGPSConfig : public DataProcessorConfig
                                                "used for the second pass spline made after outliers are removed.\n"));
 
             outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria %:"));
-            outlierSpinBoxRoute = new QSpinBox();
-            outlierSpinBoxRoute->setRange(1, 10000);
+            outlierSpinBoxRoute = new QDoubleSpinBox();
+            outlierSpinBoxRoute->setRange(0.001, 10000);
             outlierSpinBoxRoute->setSingleStep(10);
+            outlierSpinBoxRoute->setDecimals(3);
             outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
             outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA (%)"
                                                "Outlier percent is used to decide outlier points that will be discarded after\n"
@@ -1096,55 +1098,61 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
     Q_UNUSED(config)
     Q_UNUSED(op)
 
-    // ignore null or files without GPS data
-    if (!ride || ride->areDataPresent()->lat == false || ride->areDataPresent()->lon == false)
-        return false;
+    if (!ride) return false;
 
-    // Interpolate altitude if its available.
     bool fHasAlt = ride->areDataPresent()->alt;
+    bool fHasLoc = ride->areDataPresent()->lat && ride->areDataPresent()->lon;
+
+    // We can operate on alt and/or loc, but cannot operate if there are neither.
+    if (!fHasAlt && !fHasLoc)
+        return false;
 
     int errors=0;
 
     ride->command->startLUW("Fix GPS Errors");
 
-    GeoPointInterpolator gpi;
-    int ii = 0; // interpolation input index
+    // Default behavior: Interpolate missing points.
+    if (fHasLoc) {
 
-    for (int i=0; i<ride->dataPoints().count(); i++) {
-        const RideFilePoint * pi = (ride->dataPoints()[i]);
-        geolocation curLoc(pi->lat, pi->lon, fHasAlt ? pi->alt : 0.0);
+        GeoPointInterpolator gpi;
+        int ii = 0; // interpolation input index
 
-        // Activate interpolation if this sample isn't reasonable.
-        if (!IsReasonableGeoLocation(&curLoc)) {
-            double km = pi->km;
+        for (int i = 0; i < ride->dataPoints().count(); i++) {
+            const RideFilePoint* pi = (ride->dataPoints()[i]);
+            geolocation curLoc(pi->lat, pi->lon, fHasAlt ? pi->alt : 0.0);
 
-            // Feed interpolator until it has samples that span current distance.
-            while (gpi.WantsInput(km)) {
-                if (ii < ride->dataPoints().count()) {
-                    const RideFilePoint * pii = (ride->dataPoints()[ii]);
-                    geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
+            // Activate interpolation if this sample isn't reasonable.
+            if (!IsReasonableGeoLocation(&curLoc)) {
+                double km = pi->km;
 
-                    // Only feed reasonable locations to interpolator
-                    if (IsReasonableGeoLocation(&geo)) {
-                        gpi.Push(pii->km, geo);
+                // Feed interpolator until it has samples that span current distance.
+                while (gpi.WantsInput(km)) {
+                    if (ii < ride->dataPoints().count()) {
+                        const RideFilePoint* pii = (ride->dataPoints()[ii]);
+                        geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
+
+                        // Only feed reasonable locations to interpolator
+                        if (IsReasonableGeoLocation(&geo)) {
+                            gpi.Push(pii->km, geo);
+                        }
+                        ii++;
+                    } else {
+                        gpi.NotifyInputComplete();
+                        break;
                     }
-                    ii++;
-                } else {
-                    gpi.NotifyInputComplete();
-                    break;
                 }
+
+                geolocation interpLoc = gpi.Location(km);
+
+                ride->command->setPointValue(i, RideFile::lat, interpLoc.Lat());
+                ride->command->setPointValue(i, RideFile::lon, interpLoc.Long());
+
+                if (fHasAlt) {
+                    ride->command->setPointValue(i, RideFile::alt, interpLoc.Alt());
+                }
+
+                errors++;
             }
-
-            geolocation interpLoc = gpi.Location(km);
-
-            ride->command->setPointValue(i, RideFile::lat, interpLoc.Lat());
-            ride->command->setPointValue(i, RideFile::lon, interpLoc.Long());
-
-            if (fHasAlt) {
-                ride->command->setPointValue(i, RideFile::alt, interpLoc.Alt());
-            }
-
-            errors++;
         }
     }
 
@@ -1175,6 +1183,16 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
         degree0Route          = appsettings->value(NULL, GC_FIXGPS_ROUTE_FIX_DEGREE, 200).toUInt();
         degree1Route          = appsettings->value(NULL, GC_FIXGPS_ROUTE_FIX_DEGREE1, 200).toUInt();
         outlierCriteriaRoute  = appsettings->value(NULL, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, 100).toInt();
+    }
+
+    // If no alt then dont try to smooth it.
+    if (!fHasAlt) {
+        fDoSmoothAltitude = false;
+    }
+
+    // If no loc then dont try to smooth it.
+    if (!fHasLoc) {
+        fDoSmoothRoute = false;
     }
 
     std::vector<Vector2<double>> inControls2, outControls2;
