@@ -193,7 +193,7 @@ class DataFilter : public QObject
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
-        static QStringList builtins(); // return list of functions supported
+        static QStringList builtins(Context *); // return list of functions supported
 
         int refcount; // used by user metrics
 

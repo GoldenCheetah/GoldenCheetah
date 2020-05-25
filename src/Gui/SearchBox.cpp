@@ -153,7 +153,7 @@ SearchBox::configChanged(qint32)
     SpecialFields sp;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";

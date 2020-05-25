@@ -294,25 +294,27 @@ static struct {
     { "resample", 3 },     // resample(old, new, vector) returns the vector resampled from old sample durations
                           // to new sample durations.
 
+    { "estimates", 2 }, // estimates(model, (cp|ftp|w'|pmax|date)) - as per estimate above but returns a
+                        // vector for all estimates for the curently selected date range.
+
     // add new ones above this line
     { "", -1 }
 };
 
-static QStringList pdmodels()
+static QStringList pdmodels(Context *context)
 {
     QStringList returning;
 
-    returning << "2p";
-    returning << "3p";
-    returning << "ext";
-    returning << "ws";
-    returning << "velo";
-
+    returning << CP2Model(context).code();
+    returning << CP3Model(context).code();
+    returning << MultiModel(context).code();
+    returning << ExtendedModel(context).code();
+    returning << WSModel(context).code();
     return returning;
 }
 
 QStringList
-DataFilter::builtins()
+DataFilter::builtins(Context *context)
 {
     QStringList returning;
 
@@ -321,10 +323,11 @@ DataFilter::builtins()
 
     for(int i=0; DataFilterFunctions[i].parameters != -1; i++) {
 
-        if (i == 30) { // special case 'estimate' we describe it
+        if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
 
-            foreach(QString model, pdmodels())
-                returning << "estimate(" + model + ", x)";
+            if (i==30) { foreach(QString model, pdmodels(context)) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
+            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
+
         } else if (i == 31) { // which example
             returning << "which(x>0, ...)";
 
@@ -494,7 +497,7 @@ DataFilter::builtins()
 
             // 85 - median
             // 86 - mode
-        } else if (i == 87) { // gronk!
+        } else if (i == 87) { // Gronk!
 
             returning << "bests(POWER|WPK|HR|CADENCE|SPEED, duration [,start [,stop] ])";
 
@@ -509,6 +512,9 @@ DataFilter::builtins()
         } else if (i == 93) {
 
             returning << "interpolate(linear|cubic|akima|steffen, xvector, yvector, xvalues)";
+
+            // 94 resample
+            // 95 estimates (see above) - also Kyle !!!!
 
         } else {
 
@@ -2392,23 +2398,24 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         foreach(Leaf *p, leaf->fparms) validateFilter(context, df, p);
                     }
 
-                } else if (leaf->function == "estimate") {
+                } else if (leaf->function == "estimate" || leaf->function == "estimates") {
 
                     // we only want two parameters and they must be
                     // a model name and then either ftp, cp, pmax, w'
                     // or a duration
+                    QString name=leaf->function;
                     if (leaf->fparms.count() > 0) {
                         // check the model name
                         if (leaf->fparms[0]->type != Leaf::Symbol) {
 
                             leaf->fparms[0]->inerror = true;
-                            DataFiltererrors << QString(tr("estimate function expects model name as first parameter."));
+                            DataFiltererrors << QString(tr("%1 function expects model name as first parameter.")).arg(name);
 
                         } else {
 
-                            if (!pdmodels().contains(*(leaf->fparms[0]->lvalue.n))) {
+                            if (!pdmodels(context).contains(*(leaf->fparms[0]->lvalue.n))) {
                                 leaf->inerror = leaf->fparms[0]->inerror = true;
-                                DataFiltererrors << QString(tr("estimate function expects model name as first parameter"));
+                                DataFiltererrors << QString(tr("%1 function expects model name as first parameter")).arg(name);
                             }
                         }
 
@@ -2416,10 +2423,10 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                             // check symbol name if it is a symbol
                             if (leaf->fparms[1]->type == Leaf::Symbol) {
-                                QRegExp estimateValidSymbols("^(cp|ftp|pmax|w')$", Qt::CaseInsensitive);
+                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date)", Qt::CaseInsensitive);
                                 if (!estimateValidSymbols.exactMatch(*(leaf->fparms[1]->lvalue.n))) {
                                     leaf->inerror = leaf->fparms[1]->inerror = true;
-                                    DataFiltererrors << QString(tr("estimate function expects parameter or duration as second parameter"));
+                                    DataFiltererrors << QString(tr("%1 function expects parameter or duration as second parameter")).arg(name);
                                 }
                             } else {
                                 validateFilter(context, df, leaf->fparms[1]);
@@ -5047,61 +5054,113 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                   break;
 
         case 30 :
+        case 95 :
                 { /* ESTIMATE( model, CP | FTP | W' | PMAX | duration ) */
+                  /* ESTIMATES( model, CP | FTP | W' | PMAX | duration | date) */
 
                     // which model ?
                     QString model = *leaf->fparms[0]->lvalue.n;
-                    if (model == "2p") model = "2 Parm";
-                    if (model == "3p") model = "3 Parm";
-                    if (model == "ws") model = "WS";
-                    if (model == "velo") model = "Velo";
-                    if (model == "ext") model = "Ext";
 
                     // what we looking for ?
                     QString parm = leaf->fparms[1]->type == Leaf::Symbol ? *leaf->fparms[1]->lvalue.n : "";
                     bool toDuration = parm == "" ? true : false;
                     double duration = toDuration ? eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number : 0;
 
-                    // get the PD Estimate for this date - note we always work with the absolulte
-                    // power estimates in formulas, since the user can just divide by config(weight)
-                    // or Athlete_Weight (which takes into account values stored in ride files.
-                    // Bike or Run models are used according to activity type
-                    PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->isRun);
+                    if (fnum == 30) {
 
-                    // no model estimate for this date
-                    if (pde.parameters.count() == 0) return Result(0);
+                        // get the PD Estimate for this date - note we always work with the absolulte
+                        // power estimates in formulas, since the user can just divide by config(weight)
+                        // or Athlete_Weight (which takes into account values stored in ride files.
+                        // Bike or Run models are used according to activity type
+                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->isRun);
 
-                    // get a duration
-                    if (toDuration == true) {
+                        // no model estimate for this date
+                        if (pde.parameters.count() == 0) return Result(0);
 
-                        double value = 0;
+                        // get a duration
+                        if (toDuration == true) {
 
-                        // we need to find the model
-                        foreach(PDModel *pdm, df->models) {
+                            double value = 0;
 
-                            // not the one we want
-                            if (pdm->code() != model) continue;
+                            // we need to find the model
+                            foreach(PDModel *pdm, df->models) {
 
-                            // set the parameters previously derived
-                            pdm->loadParameters(pde.parameters);
+                                // not the one we want
+                                if (pdm->code() != model) continue;
 
-                            // use seconds
-                            pdm->setMinutes(false);
+                                // set the parameters previously derived
+                                pdm->loadParameters(pde.parameters);
 
-                            // get the model estimate for our duration
-                            value = pdm->y(duration);
+                                // use seconds
+                                pdm->setMinutes(false);
 
-                            // our work here is done
-                            return Result(value);
+                                // get the model estimate for our duration
+                                value = pdm->y(duration);
+
+                                // our work here is done
+                                return Result(value);
+                            }
+
+                        } else {
+
+                            if (parm == "cp") return Result(pde.CP);
+                            if (parm == "w'") return Result(pde.WPrime);
+                            if (parm == "ftp") return Result(pde.FTP);
+                            if (parm == "pmax") return Result(pde.PMax);
                         }
 
                     } else {
-                        if (parm == "cp") return Result(pde.CP);
-                        if (parm == "w'") return Result(pde.WPrime);
-                        if (parm == "ftp") return Result(pde.FTP);
-                        if (parm == "pmax") return Result(pde.PMax);
+
+                        Result returning(0);
+
+                        // date range, returning a vector
+                        foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {
+
+                            // does it match our criteria?
+                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.run==false && pde.wpk==false) {
+
+                                // overlaps, but truncate the dates we return
+                                int dfrom, dto;
+                                QDate earliest(1900,01,01);
+                                dfrom = earliest.daysTo(pde.from < d.from ? d.from : pde.from);
+                                dto = earliest.daysTo(pde.to > d.to ? d.to : pde.to);
+
+                                double v1, v2;
+
+                                // get a duration
+                                if (toDuration == true) {
+
+                                    // we need to find the model
+                                    foreach(PDModel *pdm, df->models) {
+
+                                        // not the one we want
+                                        if (pdm->code() != model) continue;
+
+                                        // set the parameters previously derived
+                                        pdm->loadParameters(pde.parameters);
+
+                                        // use seconds
+                                        pdm->setMinutes(false);
+
+                                        // get the model estimate for our duration
+                                        v1=v2 = pdm->y(duration);
+                                    }
+
+                                } else {
+
+                                    if (parm == "cp") v1=v2=pde.CP;
+                                    if (parm == "w'") v1=v2=pde.WPrime;
+                                    if (parm == "ftp") v1=v2=pde.FTP;
+                                    if (parm == "pmax") v1=v2=pde.PMax;
+                                    if (parm == "date") { v1=dfrom; v2=dto; }
+                                }
+
+                                returning.number += v1+v2;
+                                returning.vector << v1 << v2;
+                            }
+                        }
+                        return returning;
                     }
-                    return Result(0);
                 }
                 break;
 
