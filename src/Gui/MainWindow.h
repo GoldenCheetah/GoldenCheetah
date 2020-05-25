@@ -95,7 +95,6 @@ class MainWindow : public QMainWindow
         Tab *athleteTab() { return currentTab; }
 
     signals:
-        void mainWindowMoved();
         void mainWindowStateChanged(bool minimized, bool visible);
 
     protected:

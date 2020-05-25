@@ -176,7 +176,6 @@ class VideoWindow : public GcChartWindow
         void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
-        void mainWindowMoved();
         void mainWindowStateChanged(bool minimized, bool visible);
 
     protected:
@@ -194,6 +193,7 @@ class VideoWindow : public GcChartWindow
         bool m_MediaChanged;
 
         QList<MeterWidget*> m_metersWidget;
+        QPoint prevPosition;
 
 #ifdef GC_VIDEO_VLC
 

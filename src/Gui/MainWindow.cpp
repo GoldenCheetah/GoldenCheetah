@@ -981,7 +981,6 @@ void
 MainWindow::moveEvent(QMoveEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
-    emit mainWindowMoved();
 }
 
 void
