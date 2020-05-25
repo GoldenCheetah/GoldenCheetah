@@ -1037,6 +1037,17 @@ MainWindow::closeEvent(QCloseEvent* event)
     appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
 }
 
+void
+MainWindow::changeEvent(QEvent *event)
+{
+    if(event->type() != QEvent::WindowStateChange) return;
+
+    // Some overlay Widgets (Meter) are top level windows 
+    // and need to follow the MainWindow state
+    Qt::WindowStates states = windowState();
+    emit mainWindowStateChanged(states &  Qt::WindowMinimized, isVisible());
+}
+
 MainWindow::~MainWindow()
 {
     // aside from the tabs, we may need to clean
