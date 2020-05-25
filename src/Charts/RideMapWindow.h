@@ -35,15 +35,8 @@
 
 #include <QDialog>
 
-#ifdef NOWEBKIT
 #include <QWebEnginePage>
 #include <QWebEngineView>
-#else
-#include <QtWebKit>
-#include <QWebPage>
-#include <QWebView>
-#include <QWebFrame>
-#endif
 
 class QMouseEvent;
 class RideItem;
@@ -57,20 +50,9 @@ class SmallPlot;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
-#ifdef NOWEBKIT
 class mapWebPage : public QWebEnginePage
 {
 };
-#else
-class mapWebPage : public QWebPage
-{
-#if 0
-    virtual QString userAgentForUrl(const QUrl&) const {
-        return "Mozilla/5.0";
-    }
-#endif
-};
-#endif
 
 class MapWebBridge : public QObject
 {
@@ -140,10 +122,7 @@ class RideMapWindow : public GcChartWindow
         RideMapWindow(Context *, int mapType);
         virtual ~RideMapWindow();
 
-#ifdef NOWEBKIT
         QWebEngineView *browser() { return view; }
-#endif
-
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
@@ -206,12 +185,7 @@ class RideMapWindow : public GcChartWindow
         Context *context;
         QVBoxLayout *layout;
 
-#ifdef NOWEBKIT
         QWebEngineView *view;
-#else
-        QWebView *view;
-#endif
-
         MapWebBridge *webBridge;
 
         RideMapWindow();  // default ctor

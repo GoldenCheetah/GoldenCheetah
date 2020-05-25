@@ -30,53 +30,15 @@ TARGET = GoldenCheetah
 CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 
-###======================================================
-### QT MODULES [we officially support QT4.8.6+ or QT5.8+]
-###======================================================
+###========================================================================
+### QT5.14.2 officially supported which mandates c++11 support in toolchain
+###========================================================================
 
 # always
-QT += xml sql network svg
+QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
+      webengine webenginecore webenginewidgets webchannel positioning
+CONFIG += c++11
 
-lessThan(QT_MAJOR_VERSION, 5) {
-
-    ## QT4 specific modules
-    QT += webkit
-
-    ## NOWEBKIT is only supported in QT5
-    contains(DEFINES, NOWEBKIT) {
-        message("Info: NOWEBKIT is only supported on QT > 5")
-        DEFINES -= NOWEBKIT
-    }
-
-} else {
-
-    ## QT5 modules we use
-    QT += widgets concurrent serialport multimedia multimediawidgets
-
-    ## Always add debug information for Windows, MSVC
-    win32-msvc* { CONFIG += force_debug_info }
-
-    ## If building with QT5 there is experimental suport for building
-    ## with WebEngine now that WebKit is deprecated in QT 5.6
-    ## It brings in a LOT of dependencies !
-    contains(DEFINES, NOWEBKIT) {
-        QT += webengine webenginecore webenginewidgets webchannel positioning
-        CONFIG += c++11
-
-    } else {
-
-        # On 5.5 or earlier we can still use WebKit
-        QT += webkitwidgets
-    }
-    macx {
-
-        ## need mac extras and clang++ needs to know which stdlib to link with
-        QT += macextras webengine webenginecore webenginewidgets positioning
-
-    } else {
-
-    }
-}
 
 ###=======================================================================
 ### Directory Structure - Split into subdirs to be more manageable
@@ -125,8 +87,11 @@ win32-msvc* {
     # we need windows kit 8.2 or higher with MSVC, offer default location
     isEmpty(WINKIT_INSTALL) WINKIT_INSTALL= "C:/Program Files (x86)/Windows Kits/8.1/Lib/winv6.3/um/x64"
     LIBS += -L$${WINKIT_INSTALL} -lGdi32 -lUser32
+    CONFIG += force_debug_info
+
 
 } else {
+
     # gnu toolchain wants math libs
     LIBS += -lm
 
@@ -153,6 +118,8 @@ win32 {
 }
 
 macx {
+    # Mac native widget support
+    QT += macextras
 
     # we have our own plist
     QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app

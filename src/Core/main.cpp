@@ -33,9 +33,6 @@
 #include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
-#ifndef NOWEBKIT
-#include <QWebSettings>
-#endif
 #include <QMessageBox>
 #include "ChooseCyclistDialog.h"
 #ifdef GC_WANT_HTTP
@@ -759,11 +756,6 @@ main(int argc, char *argv[])
 
         // reset QSettings (global & Athlete)
         appsettings->clearGlobalAndAthletes();
-
-#ifndef NOWEBKIT
-        // clear web caches (stop warning of WebKit leaks)
-        QWebSettings::clearMemoryCaches();
-#endif
 
     } while (restarting);
 

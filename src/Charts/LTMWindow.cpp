@@ -35,10 +35,8 @@
 #include "HelpWhatsThis.h"
 #include "GcOverlayWidget.h"
 
-#ifdef NOWEBKIT
 #include <QWebEngineSettings>
 #include <QDesktopWidget>
-#endif
 
 #include <QtGlobal>
 #include <QtGui>
@@ -144,7 +142,6 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the data table
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-#ifdef NOWEBKIT
     dataSummary = new QWebEngineView(this);
 #if QT_VERSION >= 0x050800
     // stop stealing focus!
@@ -159,11 +156,6 @@ LTMWindow::LTMWindow(Context *context) :
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-    dataSummary = new QWebView(this);
-    dataSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    dataSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
     dataSummary->setContentsMargins(0,0,0,0);
     dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1267,20 +1259,11 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
-#ifndef NOWEBKIT
-    // clear to force refresh
-    dataSummary->page()->mainFrame()->setHtml("");
-#endif
-
     // get string
     QString summary = dataTable(true);
 
     // now set it
-#ifdef NOWEBKIT
     dataSummary->page()->setHtml(summary);
-#else
-    dataSummary->page()->mainFrame()->setHtml(summary);
-#endif
 }
 
 // for storing curve data without using a curve

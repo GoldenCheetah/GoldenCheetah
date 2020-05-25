@@ -130,7 +130,6 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
 
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
 
-#ifdef NOWEBKIT
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
     report->page()->view()->setContentsMargins(0,0,0,0);
@@ -138,15 +137,6 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     report->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-    report = new QWebView(this);
-    report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
-    report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    report->setAcceptDrops(false);
-    report->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    report->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
 
     layout->addWidget(report);
 
@@ -249,11 +239,6 @@ QString GcCrashDialog::versionHTML()
     vlc = libvlc_get_version();
     #endif
 
-    // -- WEBKIT ---
-    QString webkit = "yes";
-    #ifdef NOWEBKIT
-    webkit = "none";
-    #endif
     #ifdef GC_HAVE_SAMPLERATE
     QString src = QString(src_get_version()).mid(14,6);
     #else
@@ -304,7 +289,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">SSL</td><td>%15</td></tr>"
             "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
-            "<tr><td colspan=\"2\">WEBKIT</td><td>%17</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
             "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
             "<tr><td colspan=\"2\">GSL</td><td>%20</td></tr>"
@@ -337,7 +321,6 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-            .arg(webkit)
 #ifdef GC_HAVE_PYTHON
             .arg(QString("%1 [%2]").arg(python ? python->version.split(" ").at(0) : QString("none")).arg(PythonEmbed::buildVersion()))
 #else
@@ -492,11 +475,7 @@ GcCrashDialog::setHTML()
     }
     text += "</table></center>";
 
-#ifdef NOWEBKIT
     report->page()->setHtml(text);
-#else
-    report->page()->mainFrame()->setHtml(text);
-#endif
 }
 
 void
@@ -511,14 +490,7 @@ GcCrashDialog::saveAs()
     out.setCodec("UTF-8");
 
     if (file.open(QIODevice::WriteOnly)) {
-
         // write the texts
-#ifdef NOWEBKIT
-        //TODO WEBENGINE out << report->page()->mainFrame()->toPlainText();
-#else
-        out << report->page()->mainFrame()->toPlainText();
-#endif
-
         file.close();
     }
 }

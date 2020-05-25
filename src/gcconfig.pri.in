@@ -8,9 +8,6 @@
 #CONFIG += debug
 #CONFIG += release
 
-# Uncomment when WebKit is not available (e.g. QT >= 5.6)
-#DEFINES += NOWEBKIT
-
 # Uncomment below if you want an R chart
 # You will need R installed along with the Rcpp and RInside
 # packages. There is an R script in the `util' directory that
