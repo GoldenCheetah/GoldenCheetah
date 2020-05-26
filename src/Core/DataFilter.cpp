@@ -297,6 +297,8 @@ static struct {
     { "estimates", 2 }, // estimates(model, (cp|ftp|w'|pmax|date)) - as per estimate above but returns a
                         // vector for all estimates for the curently selected date range.
 
+    { "rank", 2 }, // rank(ascend|descend, list) - returns ranks for the list
+
     // add new ones above this line
     { "", -1 }
 };
@@ -515,6 +517,11 @@ DataFilter::builtins(Context *context)
 
             // 94 resample
             // 95 estimates (see above) - also Kyle !!!!
+
+        } else if (i == 96) {
+
+            // rank
+            returning << "rank(ascend|descend, list)";
 
         } else {
 
@@ -1953,12 +1960,30 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "rank") {
+
+                    // need ascend|descend then a list
+                    if (leaf->fparms.count() != 2 || leaf->fparms[0]->type != Leaf::Symbol) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("rank(ascend|descend, list), need to specify ascend or descend"));
+
+                    }  else {
+
+                       validateFilter(context, df, leaf->fparms[1]);
+                    }
+
                 } else if (leaf->function == "argsort") {
 
                     // need ascend|descend then a list
-                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+                    if (leaf->fparms.count() != 2 || leaf->fparms[0]->type != Leaf::Symbol) {
+
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("argsort(ascend|descend, list), need to specify ascend or descend"));
+
+                    }  else {
+
+                       validateFilter(context, df, leaf->fparms[1]);
                     }
 
                 } else if (leaf->function == "uniq") {
@@ -4096,6 +4121,27 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             foreach(int x, r) {
                 returning.vector << static_cast<double>(x);
                 returning.number += x;
+            }
+
+            return returning;
+        }
+
+        // rank
+        if (leaf->function == "rank") {
+            Result returning(0);
+
+            // ascending or descending?
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            bool ascending= (symbol=="ascend") ? true : false;
+
+            // use the utils function to actually do it
+            Result v = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            QVector<int> r = Utils::rank(v.vector, ascending);
+
+            // put the index into the result we are returning.
+            foreach(int x, r) {
+                returning.number += x;
+                returning.vector << static_cast<double>(x);
             }
 
             return returning;
