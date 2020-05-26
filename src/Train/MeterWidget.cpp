@@ -70,6 +70,7 @@ void MeterWidget::SetRelativePos(float RelativePosX, float RelativePosY)
 
 void MeterWidget::AdjustSizePos()
 {
+    // Compute the size and position relative to its parent
     QPoint p;
     if (m_container->windowFlags() & Qt::Window)
         p = m_container->pos();
@@ -80,6 +81,11 @@ void MeterWidget::AdjustSizePos()
     m_PosY = p.y() + m_container->height() * m_RelativePosY - m_Height/2;
     move(m_PosX, m_PosY);
     adjustSize();
+
+    // Translate the Video Container visible region to our coordinate for clipping
+    QPoint vp = m_VideoContainer->pos();
+    videoContainerRegion = m_VideoContainer->visibleRegion();
+    videoContainerRegion.translate(mapFromGlobal(m_VideoContainer->mapToGlobal(vp)) - vp);
 }
 
 void MeterWidget::ComputeSize()
@@ -116,6 +122,7 @@ void MeterWidget::paintEvent(QPaintEvent* paintevent)
 
         //painter
         QPainter painter(this);
+        painter.setClipRegion(videoContainerRegion);
         painter.setRenderHint(QPainter::Antialiasing);
 
         painter.setPen(m_OutlinePen);
@@ -151,6 +158,7 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw background
@@ -196,6 +204,7 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
     // define scale and location
     painter.translate(m_Width / 2, m_Height / 2);
@@ -242,6 +251,7 @@ void CircularBargraphMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw bargraph
@@ -277,6 +287,7 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw background
@@ -339,6 +350,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Find min/max

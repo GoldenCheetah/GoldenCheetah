@@ -50,6 +50,7 @@ void VideoLayoutParser::SetDefaultValues()
         meterWidget->m_BackgroundColor = QColor(100,100,100,0);
         meterWidget->m_MainFont = QFont(meterWidget->font().family(), 64);
         meterWidget->m_AltFont = QFont(meterWidget->font().family(), 48);
+        meterWidget->m_VideoContainer = VideoContainer;
     }
 }
 
