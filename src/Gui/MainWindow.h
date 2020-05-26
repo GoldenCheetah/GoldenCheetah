@@ -41,7 +41,7 @@
 #include <AvailabilityMacros.h>
 #endif
 
-#if defined(NOWEBKIT) && defined(WIN32)
+#if defined(WIN32)
 // Macro to avoid Code Duplication in multiple files
 // QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
 # define SKIP_QTWE_CACHE \

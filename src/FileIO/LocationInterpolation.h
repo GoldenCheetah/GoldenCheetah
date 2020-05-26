@@ -752,7 +752,7 @@ public:
         // Remove frame speed from tangent vector.
         double frameSpeed = m_DistanceWindow.FrameSpeed(bracketRatio);
         double tangentSpeed = tangentVector.magnitude();
-        double correctionScale = frameSpeed / (tangentSpeed * tangentSpeed);
+        double correctionScale = tangentSpeed ? (frameSpeed / (tangentSpeed * tangentSpeed)) : 1.;
 
         // This rescale converts tangent vector into a unit vector
         // WRT parametric route velocity.

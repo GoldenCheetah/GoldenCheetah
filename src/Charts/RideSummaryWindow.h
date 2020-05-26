@@ -24,13 +24,8 @@
 
 #include <QWidget>
 
-#ifdef NOWEBKIT
 #include <QWebEngineView>
 #include <QWebEngineSettings>
-#else
-#include <QWebView>
-#include <QWebFrame>
-#endif
 
 #include <QFormLayout>
 #if QT_VERSION >= 0x050000
@@ -124,11 +119,7 @@ class RideSummaryWindow : public GcChartWindow
 	static QString addTooltip(QString name, QString tooltip); // adds html tooltip
 
         Context *context;
-#ifdef NOWEBKIT
         QWebEngineView *rideSummary;
-#else
-        QWebView *rideSummary;
-#endif
 
         RideItem *_connected;
         bool justloaded;

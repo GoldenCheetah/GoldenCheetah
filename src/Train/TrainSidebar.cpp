@@ -1674,6 +1674,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (dev == kphTelemetry) {
                     rtData.setSpeed(local.getSpeed());
                     rtData.setDistance(local.getDistance());
+                    rtData.setRouteDistance(local.getRouteDistance());
                     rtData.setLapDistance(local.getLapDistance());
                     rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
                     fReceivedKphTelemetry = true;
@@ -1739,6 +1740,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
 
                 rtData.setDistance(displayDistance);
+                rtData.setRouteDistance(displayWorkoutDistance);
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
@@ -1831,6 +1833,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setErgMsecsRemaining(ergTimeRemaining);
             } else {
                 rtData.setDistance(displayDistance);
+                rtData.setRouteDistance(displayWorkoutDistance);
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
                 rtData.setMsecs(session_elapsed_msec);

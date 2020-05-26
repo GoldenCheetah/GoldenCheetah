@@ -36,11 +36,9 @@
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
 
-#ifdef NOWEBKIT
 #include <QtWebChannel>
 #include <QWebEngineView>
 #include <QWebEngineSettings>
-#endif
 
 // overlay helper
 #include "TabView.h"
@@ -122,14 +120,10 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     layout->setContentsMargins(2,0,2,2);
     setChartLayout(layout);
 
-#ifdef NOWEBKIT
     view = new QWebEngineView(this);
 #if QT_VERSION >= 0x050800
     // stop stealing focus!
     view->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
-#else
-    view = new QWebView();
 #endif
     view->setPage(new mapWebPage());
     view->setContentsMargins(0,0,0,0);
@@ -142,7 +136,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
 
     webBridge = new MapWebBridge(context, this);
-#ifdef NOWEBKIT
     // file: MyWebEngineView.cpp, MyWebEngineView extends QWebEngineView
     QWebChannel *channel = new QWebChannel(view->page());
 
@@ -152,7 +145,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     // register QObjects to be exposed to JavaScript
     channel->registerObject(QStringLiteral("webBridge"), webBridge);
-#endif
 
     // put a helper on the screen for mouse over intervals...
     overlayIntervals = new IntervalSummaryWindow(context);
@@ -162,9 +154,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     // connects
     //
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-#ifndef NOWEBKIT
-    connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
-#endif
 
     connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
@@ -347,11 +336,7 @@ void RideMapWindow::loadRide()
 {
     createHtml();
 
-#ifdef NOWEBKIT
     view->page()->setHtml(currentPage);
-#else
-    view->page()->mainFrame()->setHtml(currentPage);
-#endif
 }
 
 void RideMapWindow::updateFrame()
@@ -362,11 +347,6 @@ void RideMapWindow::updateFrame()
     webBridge = new MapWebBridge(context, this);
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
-
-#ifndef NOWEBKIT
-    view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
-#endif
-
 }
 
 void RideMapWindow::createHtml()
@@ -421,22 +401,16 @@ void RideMapWindow::createHtml()
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(gkey->text());
     }
 
-#ifdef NOWEBKIT
     currentPage += QString("<script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n");
-#endif
 
     currentPage += QString("<script type=\"text/javascript\"> \n"
     "var webBridge; \n"
     "window.onload = function () { \n"
-#ifdef NOWEBKIT
     "<!-- it's a good idea to initialize webchannel after DOM ready, if the code is going to manipulate the DOM -->\n"
     "   new QWebChannel(qt.webChannelTransport, function (channel) { \n"
     "       webBridge = channel.objects.webBridge; \n"
     "       initialize(); \n"
     "   }); \n"
-#else
-    "   initialize(); \n"
-#endif
     "}; \n"
     "</script>");
 
@@ -461,14 +435,8 @@ void RideMapWindow::createHtml()
     // b) allow local manipulation. This makes the UI
     // considerably more 'snappy'
     "function drawRoute() {\n"
-#ifdef NOWEBKIT
     // load the GPS co-ordinates
     "   webBridge.getLatLons(0, drawRouteForLatLons);\n"
-#else
-    // load the GPS co-ordinates
-    "    var latlons = webBridge.getLatLons(0);\n" // interval "0" is the entire route
-    "   drawRouteForLatLons(latlons);\n"
-#endif
     "}\n"
     "\n");
 
@@ -545,11 +513,7 @@ void RideMapWindow::createHtml()
 
     currentPage += QString("function drawIntervals() { \n"
     // how many to draw?
-#ifdef NOWEBKIT
     "   webBridge.intervalCount(drawIntervalsCount);\n"
-#else
-    "   drawIntervalsCount(webBridge.intervalCount());\n"
-#endif
     "}\n"
 
     "function drawIntervalsCount(intervals) { \n"
@@ -572,11 +536,7 @@ void RideMapWindow::createHtml()
     "    }\n"
 
     "   while (intervals > 0) {\n"
-#ifdef NOWEBKIT
     "       webBridge.getLatLons(intervals, drawInterval);\n"
-#else
-    "       drawInterval(webBridge.getLatLons(intervals));\n"
-#endif
     "       intervals--;\n"
     "   }\n"
     "}\n");
@@ -869,11 +829,7 @@ RideMapWindow::drawShadedRoute()
                                       .arg(styleoptions == "" ? 0.5f : 1.0f);
 
             }
-#ifdef NOWEBKIT
             view->page()->runJavaScript(code);
-#else
-            view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
         }
     }
 
@@ -893,11 +849,7 @@ RideMapWindow::clearTempInterval() {
                             "}\n" );
     }
 
-#ifdef NOWEBKIT
     view->page()->runJavaScript(code);
-#else
-    view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
 }
 
 void
@@ -967,12 +919,7 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
     } else if (mapCombo->currentIndex() == GOOGLE) {
         code += QString("}\n" );
     }
-#ifdef NOWEBKIT
     view->page()->runJavaScript(code);
-#else
-    view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
-
     overlayIntervals->intervalSelected();
 }
 
@@ -1029,11 +976,7 @@ RideMapWindow::createMarkers()
                            "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                            "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
     } else {
         // start / finish markers
         QString marker = "qrc:images/maps/cycling.png";
@@ -1051,11 +994,7 @@ RideMapWindow::createMarkers()
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
                            "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png'});"
@@ -1067,11 +1006,7 @@ RideMapWindow::createMarkers()
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
     }
 
     //
@@ -1129,12 +1064,7 @@ RideMapWindow::createMarkers()
                         "marker.setMap(map);"
                     "}").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 }
-            #ifdef NOWEBKIT
                 view->page()->runJavaScript(code);
-            #else
-                view->page()->mainFrame()->evaluateJavaScript(code);
-            #endif
-
             }
             stoplat=stoplon=stoptime=0;
         }
@@ -1181,12 +1111,7 @@ RideMapWindow::createMarkers()
                                         .arg(interval)
                                         ;
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
-
         interval++;
     }
 
@@ -1237,11 +1162,7 @@ void RideMapWindow::zoomInterval(IntervalItem *which)
                         .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
     }
 
-#ifdef NOWEBKIT
     view->page()->runJavaScript(code);
-#else
-    view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
 }
 
 // quick diag, used to debug code only
