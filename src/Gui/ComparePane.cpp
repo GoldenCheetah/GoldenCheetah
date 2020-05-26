@@ -324,7 +324,6 @@ ComparePane::refreshTable()
         table->resizeColumnsToContents(); // set columns to fit
         table->setVisible(true);
 
-#if QT_VERSION > 0x050000 // fix the first two if we can
         for (int i=0; i<list.count(); i++) {
             if (i < 2) {
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
@@ -332,9 +331,6 @@ ComparePane::refreshTable()
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             }
         }
-#else
-        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-#endif
         table->horizontalHeader()->setStretchLastSection(true);
 
     } else { //SEASONS
@@ -480,7 +476,6 @@ ComparePane::refreshTable()
         table->setVisible(false);
         table->resizeColumnsToContents(); // set columns to fit
         table->setVisible(true);
-#if QT_VERSION > 0x050000 // fix the first two if we can
         for (int i=0; i<list.count(); i++) {
             if (i < 2) {
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
@@ -488,9 +483,6 @@ ComparePane::refreshTable()
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             }
         }
-#else
-        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-#endif
         table->horizontalHeader()->setStretchLastSection(true);
     }
     // sorting has to be disabled as long as table content is updated

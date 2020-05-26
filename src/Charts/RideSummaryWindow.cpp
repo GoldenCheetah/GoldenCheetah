@@ -92,10 +92,8 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     vlayout->setContentsMargins(10,10,10,10);
 
     rideSummary = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     rideSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
 
     rideSummary->setContentsMargins(0,0,0,0);
     rideSummary->page()->view()->setContentsMargins(0,0,0,0);

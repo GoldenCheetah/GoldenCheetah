@@ -76,11 +76,7 @@ WorkoutEditorBase::WorkoutEditorBase(QStringList &colms, QWidget *parent) :QFram
 
     table->setColumnCount(colms.count());
     table->setHorizontalHeaderLabels(colms);
-#if QT_VERSION > 0x050000
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-    table->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
     table->setShowGrid(true);
     table->setAlternatingRowColors(true);
     table->resizeColumnsToContents();

@@ -114,9 +114,7 @@ class GeneralPage : public QWidget
 #ifdef GC_WANT_PYTHON
         QCheckBox *embedPython;
 #endif
-#if QT_VERSION >= 0x050000
         QCheckBox *opendata;
-#endif
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;

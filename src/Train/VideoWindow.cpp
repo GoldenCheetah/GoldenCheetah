@@ -44,14 +44,6 @@ VideoWindow::VideoWindow(Context *context)  :
     //
     // USE VLC VIDEOPLAYER
     //
-#ifndef Q_CC_MSVC
-#if QT_VERSION >= 0x050000
-// we no longer warn here since it is a runtime issue, on some Ubuntu platforms
-// the VLC plugin cache is out of date and needs refreshing with the command:
-// $ sudo /usr/lib/vlc/vlc-cache-gen -f /usr/lib/vlc/plugins/
-// #warning "WARNING: Please ensure the VLC QT4 plugin (gui/libqt4_plugin) is NOT available as it will cause GC to crash."
-#endif
-#endif
 
     // config parameters to libvlc
     const char * const vlc_args[] = {
@@ -65,33 +57,18 @@ VideoWindow::VideoWindow(Context *context)  :
                     //"--quiet"
                 };
 
-    /* create an exception handler */
-    //libvlc_exception_init(&exceptions);
-    //vlc_exceptions(&exceptions);
-
     /* Load the VLC engine */
     inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
-    //vlc_exceptions(&exceptions);
 
     /* Create a new item */
-
     if (inst) { // if vlc doesn't initialise don't even try!
 
         m = NULL;
-        //vlc_exceptions(&exceptions);
 
         /* Create a media player playing environement */
         mp = libvlc_media_player_new (inst);
-        //vlc_exceptions(&exceptions);
 
-        //vlc_exceptions(&exceptions);
-
-#if (defined Q_OS_LINUX) && QT_VERSION <= 0x50000
-        container = new QX11EmbedContainer(this);
-#else
         container = new QWidget(this);
-#endif
-
         layout->addWidget(container);
 
 #if defined(WIN32)
@@ -170,11 +147,6 @@ VideoWindow::VideoWindow(Context *context)  :
 VideoWindow::~VideoWindow()
 {
     if (!init) return; // we didn't initialise properly so all bets are off
-
-#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC)
-    // unembed vlc backend first
-    container->discardClient();
-#endif
 
     stopPlayback();
 
@@ -439,13 +411,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 #ifdef GC_VIDEO_VLC
     if (!m || !context->isRunning || context->isPaused)
         return;
-
-    QList<ErgFilePoint> *ErgFilePoints = NULL;
-    if (context->currentErgFile()) {
-        if (context->currentErgFile()->format == CRS) {
-            ErgFilePoints = &(context->currentErgFile()->Points);
-        }
-    }
 
     // find the curPosition
     if (context->currentVideoSyncFile())

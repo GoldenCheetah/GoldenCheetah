@@ -566,11 +566,7 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
         // STATE: NONE
         if (state == none) {
             QWheelEvent *w = static_cast<QWheelEvent*>(event);
-#if QT_VERSION >= 0x050000
             updateNeeded = scale(w->angleDelta());
-#else
-            updateNeeded = scale(QPoint(0,w->delta()));
-#endif
             filterNeeded = true;
         }
 
