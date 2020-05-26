@@ -54,6 +54,8 @@ class MeterWidget : public QWidget
     QString  m_Name;
     QWidget* m_container;
     QString  m_Source;
+    QWidget* m_VideoContainer;
+    QRegion  videoContainerRegion;
     float    m_RelativeWidth, m_RelativeHeight;
     float    m_RelativePosX, m_RelativePosY;
     int      m_PosX, m_PosY, m_Width, m_Height;
