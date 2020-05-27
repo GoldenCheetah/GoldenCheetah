@@ -140,7 +140,6 @@ VideoWindow::VideoWindow(Context *context)  :
         connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
         connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
         connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
-        connect(this->window(), SIGNAL(mainWindowStateChanged(bool, bool)), this, SLOT(mainWindowStateChanged(bool, bool)));
     }
 }
 
@@ -175,12 +174,6 @@ void VideoWindow::resizeEvent(QResizeEvent * )
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->AdjustSizePos();
     prevPosition = mapToGlobal(pos());
-}
-
-void VideoWindow::mainWindowStateChanged(bool minimized, bool visible)
-{
-    if(minimized) foreach(MeterWidget* p, m_metersWidget) p->hide();
-    else if(visible && isVisible()) foreach(MeterWidget* p, m_metersWidget) p->show();
 }
 
 void VideoWindow::startPlayback()
