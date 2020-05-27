@@ -475,6 +475,7 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw background
@@ -516,6 +517,7 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
     QString sLat = QVariant(dLat).toString();
     QString sLon = QVariant(dLon).toString();
     code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
+    liveMapView->resize(m_Width, m_Height);
     liveMapView->page()->runJavaScript(code);
 }
 
