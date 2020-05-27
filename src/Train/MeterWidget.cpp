@@ -28,11 +28,16 @@
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+#ifdef Q_OS_LINUX
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+#else
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_PaintOnScreen);
+#endif
 
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
@@ -67,6 +72,7 @@ void MeterWidget::SetRelativePos(float RelativePosX, float RelativePosY)
 
 void MeterWidget::AdjustSizePos()
 {
+    // Compute the size and position relative to its parent
     QPoint p;
     if (m_container->windowFlags() & Qt::Window)
         p = m_container->pos();
@@ -77,6 +83,11 @@ void MeterWidget::AdjustSizePos()
     m_PosY = p.y() + m_container->height() * m_RelativePosY - m_Height/2;
     move(m_PosX, m_PosY);
     adjustSize();
+
+    // Translate the Video Container visible region to our coordinate for clipping
+    QPoint vp = m_VideoContainer->pos();
+    videoContainerRegion = m_VideoContainer->visibleRegion();
+    videoContainerRegion.translate(mapFromGlobal(m_VideoContainer->mapToGlobal(vp)) - vp);
 }
 
 void MeterWidget::ComputeSize()
@@ -113,6 +124,7 @@ void MeterWidget::paintEvent(QPaintEvent* paintevent)
 
         //painter
         QPainter painter(this);
+        painter.setClipRegion(videoContainerRegion);
         painter.setRenderHint(QPainter::Antialiasing);
 
         painter.setPen(m_OutlinePen);
@@ -148,6 +160,7 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw background
@@ -193,6 +206,7 @@ void CircularIndicatorMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
     // define scale and location
     painter.translate(m_Width / 2, m_Height / 2);
@@ -239,6 +253,7 @@ void CircularBargraphMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw bargraph
@@ -274,6 +289,7 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     //draw background
@@ -336,6 +352,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     //painter
     QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
     // Find min/max
@@ -363,7 +380,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     //Get point to create the polygon
     QPolygon polygon;
     polygon << QPoint(0.0, (double)m_Height);
-    double x, y, pt=0;
+    double x = 0., y, pt=0;
     double nextX = 1;
     for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
     {

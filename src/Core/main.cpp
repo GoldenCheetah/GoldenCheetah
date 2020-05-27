@@ -33,9 +33,6 @@
 #include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
-#ifndef NOWEBKIT
-#include <QWebSettings>
-#endif
 #include <QMessageBox>
 #include "ChooseCyclistDialog.h"
 #ifdef GC_WANT_HTTP
@@ -56,8 +53,10 @@
 #include <X11/Xlib.h>
 #endif
 
-#if QT_VERSION > 0x050000
 #include <QStandardPaths>
+
+#ifdef GC_WANT_GSL
+#include <gsl/gsl_errno.h>
 #endif
 
 //
@@ -115,14 +114,9 @@ void terminate(int code)
 // redirect logging
 //
 #ifdef GC_WANT_HTTP
-#if QT_VERSION > 0x50000
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &string)
  {
     const char *msg = string.toLocal8Bit().constData();
-#else
-void myMessageOutput(QtMsgType type, const char *msg)
- {
-#endif
      //in this function, you can write the message to any stream!
      switch (type) {
      default: // QtInfoMsg from 5.5 would arrive here
@@ -349,6 +343,11 @@ main(int argc, char *argv[])
     unsetenv("QT_SCALE_FACTOR");
 #endif
 
+    // we don't want program aborts when maths routines don't know
+    // what to do. We may add our own error handler later.
+#ifdef GC_WANT_GSL
+    gsl_set_error_handler_off();
+#endif
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
     //XXXIdleEventFilter idleFilter;
@@ -382,7 +381,6 @@ main(int argc, char *argv[])
     dpiXFactor = 1.0;
     dpiYFactor = 1.0;
 
-#if QT_VERSION_MAJOR >= 5
 #ifndef Q_OS_MAC // not needed on a Mac
 
     // We will set screen ratio factor for sizing when a screen
@@ -427,9 +425,6 @@ main(int argc, char *argv[])
     } else {
        //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
     }
-#endif
-#else
-       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no hidpi support available";
 #endif
 
     // scale up to user scale factor
@@ -490,12 +485,8 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-#if QT_VERSION > 0x050000 // windows and qt5
         QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
         QString libraryPath = paths.at(0); 
-#else // windows not qt5
-        QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
-#endif // qt5
 #else // not windows or osx (must be Linux or OpenBSD)
         // Q_OS_LINUX et al
         QString libraryPath=".goldencheetah";
@@ -619,11 +610,7 @@ main(int argc, char *argv[])
             } else {
                 // switch off warnings if in gui mode
 #ifndef GC_WANT_ALLDEBUG
-#if QT_VERSION > 0x50000
                 qInstallMessageHandler(myMessageOutput);
-#else
-                qInstallMsgHandler(myMessageOutput);
-#endif
 #endif
             }
 
@@ -750,11 +737,6 @@ main(int argc, char *argv[])
 
         // reset QSettings (global & Athlete)
         appsettings->clearGlobalAndAthletes();
-
-#ifndef NOWEBKIT
-        // clear web caches (stop warning of WebKit leaks)
-        QWebSettings::clearMemoryCaches();
-#endif
 
     } while (restarting);
 

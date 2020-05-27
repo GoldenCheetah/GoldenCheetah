@@ -606,6 +606,9 @@ RideItem::refresh()
         if (context->athlete->paceZones(isSwim)) paceZoneRange = context->athlete->paceZones(isSwim)->whichRange(dateTime.date());
         else paceZoneRange = -1;
 
+        // RideFile cache refresh before metrics, as meanmax may be used in user formulas
+        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, getWeight(), ride_, true);
+
         // refresh metrics etc
         const RideMetricFactory &factory = RideMetricFactory::instance();
 
@@ -654,9 +657,6 @@ RideItem::refresh()
         dbversion = DBSchemaVersion;
         udbversion = UserMetricSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
-
-        // RideFile cache needs refreshing possibly
-        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, getWeight(), ride_, true);
 
         // we now match
         metacrc = metaCRC();
@@ -902,7 +902,7 @@ RideItem::updateIntervals()
                                                 RideFileInterval::ALL);
 
         // same as the whole ride, not need to compute
-        entire->metrics() = metrics();
+        entire->refresh();
         entire->rideInterval = NULL;
         intervals_ << entire;
     }

@@ -46,14 +46,6 @@ VideoWindow::VideoWindow(Context *context)  :
     //
     // USE VLC VIDEOPLAYER
     //
-#ifndef Q_CC_MSVC
-#if QT_VERSION >= 0x050000
-// we no longer warn here since it is a runtime issue, on some Ubuntu platforms
-// the VLC plugin cache is out of date and needs refreshing with the command:
-// $ sudo /usr/lib/vlc/vlc-cache-gen -f /usr/lib/vlc/plugins/
-// #warning "WARNING: Please ensure the VLC QT4 plugin (gui/libqt4_plugin) is NOT available as it will cause GC to crash."
-#endif
-#endif
 
     // config parameters to libvlc
     const char * const vlc_args[] = {
@@ -67,45 +59,29 @@ VideoWindow::VideoWindow(Context *context)  :
                     //"--quiet"
                 };
 
-    /* create an exception handler */
-    //libvlc_exception_init(&exceptions);
-    //vlc_exceptions(&exceptions);
-
     /* Load the VLC engine */
     inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
-    //vlc_exceptions(&exceptions);
 
     /* Create a new item */
-
     if (inst) { // if vlc doesn't initialise don't even try!
 
         m = NULL;
-        //vlc_exceptions(&exceptions);
 
         /* Create a media player playing environement */
         mp = libvlc_media_player_new (inst);
-        //vlc_exceptions(&exceptions);
 
-        //vlc_exceptions(&exceptions);
-
-
-    /* This is a non working code that show how to hooks into a window,
-     * if we have a window around */
-#ifdef Q_OS_LINUX
-#if QT_VERSION > 0x50000
-        x11Container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
-#else
-        x11Container = new QX11EmbedContainer(this);
-#endif
-        layout->addWidget(x11Container);
-        libvlc_media_player_set_xwindow (mp, x11Container->winId());
-#endif
-
-#ifdef WIN32
         container = new QWidget(this);
         layout->addWidget(container);
-        libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
 
+#if defined(WIN32)
+        libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
+#elif defined(Q_OS_MAC)
+        libvlc_media_player_set_nsobject (mp, (void*)(container->winId()));
+#elif defined(Q_OS_LINUX)
+        libvlc_media_player_set_xwindow (mp, container->winId());
+#endif
+
+#if defined(WIN32) || defined(Q_OS_LINUX)
         // Video Overlays Initialization: if video config file is not present
         // copy a default one to be used as a model by the user.
         // An empty video-layout.xml file disables video overlays
@@ -166,17 +142,13 @@ VideoWindow::VideoWindow(Context *context)  :
         connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
         connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
         connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
+        connect(this->window(), SIGNAL(mainWindowStateChanged(bool, bool)), this, SLOT(mainWindowStateChanged(bool, bool)));
     }
 }
 
 VideoWindow::~VideoWindow()
 {
     if (!init) return; // we didn't initialise properly so all bets are off
-
-#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) && (defined GC_VIDEO_VLC)
-    // unembed vlc backend first
-    x11Container->discardClient();
-#endif
 
     stopPlayback();
 
@@ -204,6 +176,13 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 {
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->AdjustSizePos();
+    prevPosition = mapToGlobal(pos());
+}
+
+void VideoWindow::mainWindowStateChanged(bool minimized, bool visible)
+{
+    if(minimized) foreach(MeterWidget* p, m_metersWidget) p->hide();
+    else if(visible && isVisible()) foreach(MeterWidget* p, m_metersWidget) p->show();
 }
 
 void VideoWindow::startPlayback()
@@ -249,6 +228,7 @@ void VideoWindow::startPlayback()
         p_meterWidget->raise();
         p_meterWidget->show();
     }
+    prevPosition = mapToGlobal(pos());
 }
 
 void VideoWindow::stopPlayback()
@@ -327,7 +307,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 {
                     p_meterWidget->setWindowOpacity(0); // Hide the widget
                 }
-            p_meterWidget->Value = rtd.getDistance();
+            p_meterWidget->Value = rtd.getRouteDistance();
             ElevationMeterWidget* elevationMeterWidget = dynamic_cast<ElevationMeterWidget*>(p_meterWidget);
             if (!elevationMeterWidget)
                 qDebug() << "Error: Elevation keyword used but widget is not elevation type";
@@ -433,6 +413,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
     }
 
+    // The Meter Widgets need to follow the Video Window when it moves
+    // (main window moves, scrolling...), we check the position at every update
+    if(mapToGlobal(pos()) != prevPosition) resizeEvent(NULL);
+
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->update();
 
@@ -443,13 +427,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 #ifdef GC_VIDEO_VLC
     if (!m || !context->isRunning || context->isPaused)
         return;
-
-    QList<ErgFilePoint> *ErgFilePoints = NULL;
-    if (context->currentErgFile()) {
-        if (context->currentErgFile()->format == CRS) {
-            ErgFilePoints = &(context->currentErgFile()->Points);
-        }
-    }
 
     // find the curPosition
     if (context->currentVideoSyncFile())

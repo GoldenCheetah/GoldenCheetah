@@ -626,7 +626,7 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     active = true;
 
-#if !defined (Q_OS_MAC) || (defined (Q_OS_MAC) && (QT_VERSION < 0x050000)) // on QT5 the scrollbars have no width
+#if !defined (Q_OS_MAC) // on QT5 the scrollbars have no width
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
                 + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
@@ -1236,7 +1236,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
 
-#if (defined (Q_OS_MAC) && (QT_VERSION >= 0x050000)) // on QT5 the scrollbars have no width
+#if defined (Q_OS_MAC) // on QT5 the scrollbars have no width
             if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
 #else
             if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
@@ -1373,14 +1373,10 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
-#if (defined WIN32) && (QT_VERSION > 0x050000) && (QT_VERSION < 0x050301) 
-    // don't allow ride drop on Windows with QT5 until 5.3.1 when they fixed the bug
-#else
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
-#endif
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif

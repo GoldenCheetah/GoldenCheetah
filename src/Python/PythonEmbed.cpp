@@ -97,6 +97,8 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
             QString filename = PYTHONHOME + QDir::separator() + name + ext;
             if (QFileInfo(filename).exists() && QFileInfo(filename).isExecutable()) {
                 pythonbinary=filename;
+                pybin=pythonbinary;
+                printd("Binary found");
                 break;
             }
         }
@@ -168,6 +170,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 #else
         pypath = path;
 #endif
+        printd("Python path: %s\n", pypath.toStdString().c_str());
         return true;
 
     } else {
@@ -190,10 +193,25 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
     qRegisterMetaType<QVector<double> >();
     qRegisterMetaType<QStringList>();
 
-    // config or environment variable
+
+    // Deployed Python location
+    QString deployedPython = QCoreApplication::applicationDirPath();
+#if defined(Q_OS_MAC)
+    deployedPython += "/../Frameworks/Python.framework/Versions/Current";
+#elif defined(Q_OS_LINUX)
+    deployedPython += QString("/opt/python3.%1").arg(PYTHON3_VERSION);
+#endif
+
+    // config, deployed or environment variable
     QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
-    if (PYTHONHOME == "") PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
-    else {
+    if (PYTHONHOME == "") {
+        if (pythonInstalled(pybin, pypath, deployedPython)) {
+            PYTHONHOME = deployedPython;
+            qputenv("PYTHONHOME",PYTHONHOME.toUtf8());
+        } else {
+            PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
+        }
+    } else {
         qputenv("PYTHONHOME",PYTHONHOME.toUtf8());
     }
     if (PYTHONHOME !="") printd("PYTHONHOME setting used: %s\n", PYTHONHOME.toStdString().c_str());

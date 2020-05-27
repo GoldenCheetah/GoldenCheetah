@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ev
+
 # Add recent Qt dependency ppa, update on a newer qt version.
 sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-xenial
 sudo apt-get update -qq
@@ -32,10 +33,11 @@ sudo apt-get update -qq
 sudo apt-get install r-base-dev
 R --version
 
-# D2XX
-wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
-mkdir D2XX
-tar xf libftd2xx-x86_64-1.3.6.tgz -C D2XX
+# D2XX - refresh cache if folder is empty
+if [ -z "$(ls -A D2XX)" ]; then
+    wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
+    tar xf libftd2xx-x86_64-1.3.6.tgz -C D2XX
+fi
 
 # SRMIO
 wget http://www.zuto.de/project/files/srmio/srmio-0.1.1~git1.tar.gz
@@ -49,17 +51,26 @@ cd ${TRAVIS_BUILD_DIR}
 # LIBUSB
 sudo apt-get install -qq libusb-1.0-0-dev libudev-dev
 
-# Add Python 3.6 and SIP
+# Add Python 3.7 and SIP
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
-sudo apt-get install -qq python3.6-dev
-python3.6 --version
+sudo apt-get install -qq python3.7-dev
+python3.7 --version
 wget https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
-python3.6 configure.py
+python3.7 configure.py
 make
 sudo make install
 cd ${TRAVIS_BUILD_DIR}
+
+# GSL
+sudo apt-get -qq install libgsl-dev
+
+# AWS S3 client to upload binaries
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+aws --version
 
 exit

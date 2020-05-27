@@ -81,11 +81,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     if(!strNokiaRefreshToken.isEmpty()) {
         printd("OAuth 2.0 API\n");
 
-#if QT_VERSION > 0x050000
         QUrlQuery postData;
-#else
-        QUrl postData;
-#endif
 
         QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
 
@@ -124,11 +120,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                 if (userid != "") appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, userid);
 
 
-            #if QT_VERSION > 0x050000
                 QUrlQuery params;
-            #else
-                QUrl params;
-            #endif
 
                 emit downloadStarted(100);
 

@@ -42,6 +42,7 @@ namespace Utils
     QString jsonunprotect(const QString &buffer);
     QStringList searchPath(QString path, QString binary, bool isexec=true);
     QString removeDP(QString);
+    QVector<int> rank(QVector<double>&, bool ascending=false);
     QVector<int> argsort(QVector<double>&, bool ascending=false);
     QVector<int> arguniq(QVector<double> &v);
     QVector<double> smooth_sma(QVector<double>&, int pos, int window);

@@ -650,11 +650,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
     scrollLeft->setStyle(style);
     scrollRight->setStyle(style);

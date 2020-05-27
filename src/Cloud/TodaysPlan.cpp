@@ -528,7 +528,6 @@ TodaysPlan::listAthletes()
     // did we get a good response ?
     QByteArray r = reply->readAll();
 
-#if QT_VERSION > 0x050000
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
@@ -553,7 +552,6 @@ TodaysPlan::listAthletes()
             }
         }
     }
- #endif
     return returning;
 }
 

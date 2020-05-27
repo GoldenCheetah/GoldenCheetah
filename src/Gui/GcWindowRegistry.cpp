@@ -29,7 +29,7 @@
 #endif
 #include "HistogramWindow.h"
 #include "LTMWindow.h"
-#ifdef Q_OS_MAC
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
 #include "QtMacVideoWindow.h"
 #else
 #include "VideoWindow.h"
@@ -223,14 +223,9 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(context); break;
     case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(context); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(context); break;
-#ifdef NOWEBKIT
     case GcWindowTypes::MapWindow:
     case GcWindowTypes::StreetViewWindow:
         returning = new GcChartWindow(context); break;
-#else
-    case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
-    case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
-#endif
     // old maps (GoogleMap and BingMap) replaced by RideMapWindow
     case GcWindowTypes::GoogleMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::GOOGLE); break; // new GoogleMapControl(context);
     case GcWindowTypes::BingMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::OSM); break; //returning = new BingMap(context);

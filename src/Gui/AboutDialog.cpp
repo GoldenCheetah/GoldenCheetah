@@ -172,6 +172,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Mark Liversedge");
     contributors.append("Mark Rages");
     contributors.append("Michael Puchowicz");
+    contributors.append("Michel Dagenais");
     contributors.append("Mitsukuni Sato");
     contributors.append("Ned Harding");
     contributors.append("Nicholas Feng");
@@ -179,6 +180,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Okano Takayoshi");
     contributors.append("Omar Torres");
     contributors.append("Patrick McNerthney");
+    contributors.append("Peter Kanatselis");
     contributors.append("Dr Phil Skiba");
     contributors.append("Philip Willoughby");
     contributors.append("Rainer Clasen");

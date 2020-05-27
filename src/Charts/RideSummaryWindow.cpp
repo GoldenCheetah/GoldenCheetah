@@ -91,15 +91,9 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(10,10,10,10);
 
-#ifdef NOWEBKIT
     rideSummary = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     rideSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
-#else
-    rideSummary = new QWebView(this);
-#endif
 
     rideSummary->setContentsMargins(0,0,0,0);
     rideSummary->page()->view()->setContentsMargins(0,0,0,0);
@@ -164,7 +158,6 @@ RideSummaryWindow::configChanged(qint32)
     defaultFont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     defaultFont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
 
-#ifdef NOWEBKIT
 #ifdef Q_OS_MAC
     rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
 #else
@@ -180,14 +173,6 @@ RideSummaryWindow::configChanged(qint32)
     }
 #endif
     rideSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-#ifdef Q_OS_MAC
-    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-#else
-    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+2);
-#endif
-    rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
 
     force = true;
     refresh();
@@ -348,22 +333,14 @@ RideSummaryWindow::refresh()
             }
         }
 
-#ifdef NOWEBKIT
         rideSummary->page()->setHtml(htmlCompareSummary());
-#else
-        rideSummary->page()->mainFrame()->setHtml(htmlCompareSummary());
-#endif
 
     } else { // NOT COMPARE MODE - NORMAL MODE
 
         // if we're summarising a ride but have no ride to summarise
         if (ridesummary && !myRideItem) {
             setSubTitle(tr("Summary"));
-#ifdef NOWEBKIT
             rideSummary->page()->setHtml(GCColor::css(ridesummary));
-#else
-            rideSummary->page()->mainFrame()->setHtml(GCColor::css(ridesummary));
-#endif
             return;
         }
 
@@ -388,12 +365,7 @@ RideSummaryWindow::refresh()
             specification.setFilterSet(fs);
         }
 
-#ifdef NOWEBKIT
         rideSummary->page()->setHtml(htmlSummary());
-#else
-        rideSummary->page()->mainFrame()->setHtml(htmlSummary());
-#endif
-
         setUpdatesEnabled(true); // ready to update now
     }
 }
@@ -1669,7 +1641,7 @@ RideSummaryWindow::getPDEstimates(bool run)
             if (est.wpk != wpk) continue;
 
             // We only use the extended model for now
-            if (est.model != "Ext" ) continue;
+            if (est.model != "ext" ) continue;
 
             // summarising a season or date range
             if (!ridesummary && (est.from > myDateRange.to || est.to < myDateRange.from)) continue;

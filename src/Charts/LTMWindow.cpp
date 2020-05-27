@@ -35,10 +35,8 @@
 #include "HelpWhatsThis.h"
 #include "GcOverlayWidget.h"
 
-#ifdef NOWEBKIT
 #include <QWebEngineSettings>
 #include <QDesktopWidget>
-#endif
 
 #include <QtGlobal>
 #include <QtGui>
@@ -113,11 +111,7 @@ LTMWindow::LTMWindow(Context *context) :
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
     scrollLeft->setStyle(style);
     scrollRight->setStyle(style);
@@ -144,12 +138,9 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the data table
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-#ifdef NOWEBKIT
     dataSummary = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     dataSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
     if (dpiXFactor > 1) {
     // 80 lines per page on hidpi screens (?)
@@ -159,11 +150,6 @@ LTMWindow::LTMWindow(Context *context) :
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-    dataSummary = new QWebView(this);
-    dataSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    dataSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
     dataSummary->setContentsMargins(0,0,0,0);
     dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1267,20 +1253,11 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
-#ifndef NOWEBKIT
-    // clear to force refresh
-    dataSummary->page()->mainFrame()->setHtml("");
-#endif
-
     // get string
     QString summary = dataTable(true);
 
     // now set it
-#ifdef NOWEBKIT
     dataSummary->page()->setHtml(summary);
-#else
-    dataSummary->page()->mainFrame()->setHtml(summary);
-#endif
 }
 
 // for storing curve data without using a curve

@@ -31,6 +31,7 @@ RealtimeData::RealtimeData()
     lrbalance = rte = lte = lps = rps = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
+    routeDistance = 0.0;
     trainerStatusAvailable = false;
     trainerReady = true;
     trainerRunning = true;
@@ -114,6 +115,11 @@ void RealtimeData::setErgMsecsRemaining(long x)
 void RealtimeData::setDistance(double x)
 {
     this->distance = x;
+}
+
+void RealtimeData::setRouteDistance(double x)
+{
+    this->routeDistance = x;
 }
 
 void RealtimeData::setLapDistance(double x)
@@ -213,6 +219,10 @@ long RealtimeData::getLapMsecs() const
 double RealtimeData::getDistance() const
 {
     return distance;
+}
+double RealtimeData::getRouteDistance() const
+{
+    return routeDistance;
 }
 double RealtimeData::getLapDistance() const
 {
@@ -327,6 +337,9 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case Distance: return distance;
+        break;
+
+    case RouteDistance: return routeDistance;
         break;
 
     case LapDistance: return lapDistance;
@@ -486,6 +499,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Latitude;
         seriesList << Longitude;
         seriesList << Altitude;
+        seriesList << RouteDistance;
     }
     return seriesList;
 }
@@ -544,6 +558,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Distance: return tr("Distance");
+        break;
+
+    case RouteDistance: return tr("RouteDistance");
         break;
 
     case AltWatts: return tr("Alternate Power");

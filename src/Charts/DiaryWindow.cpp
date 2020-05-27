@@ -72,13 +72,8 @@ DiaryWindow::DiaryWindow(Context *context) :
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);
     monthlyView->setModel(calendarModel);
-#if QT_VERSION > 0x050000
     monthlyView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     monthlyView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    monthlyView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-    monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     monthlyView->verticalHeader()->hide();
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);

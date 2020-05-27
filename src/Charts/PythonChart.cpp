@@ -26,9 +26,7 @@
 
 #include <QtConcurrent>
 
-#if QT_VERSION >= 0x050800
 #include <QWebEngineSettings>
-#endif
 
 // always pull in after all QT headers
 #ifdef slots
@@ -418,6 +416,9 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 void
 PythonChart::setWeb(bool x)
 {
+    // check python was loaded
+    if (python == NULL || python->loaded == false) return;
+
     // toggle the use of a web chart or a qt chart for rendering the data
     if (x && canvas==NULL) {
 
@@ -434,10 +435,8 @@ PythonChart::setWeb(bool x)
         canvas->page()->view()->setContentsMargins(0,0,0,0);
         canvas->setZoomFactor(dpiXFactor);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-#if QT_VERSION >= 0x050800
         // stop stealing focus!
         canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
         renderlayout->insertWidget(0, canvas);
     }
 

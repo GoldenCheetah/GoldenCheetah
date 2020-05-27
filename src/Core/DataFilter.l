@@ -78,7 +78,6 @@ int DataFiltercolumn = 1;
 [Bb][Ee][Ss][Tt]                            strcpy(DataFilterlval.function, "best"); return BEST;
 [Tt][Ii][Zz]                                strcpy(DataFilterlval.function, "tiz"); return TIZ;
 [Cc][Oo][Nn][Ff][Ii][Gg]                    strcpy(DataFilterlval.function, "config"); return CONFIG;
-[Dd][Aa][Tt][Ee][Rr][Aa][Nn][Gg][Ee]        strcpy(DataFilterlval.function, "daterange"); return DATERANGE;
 [Cc][Oo][Nn][Ss][Tt]                        strcpy(DataFilterlval.function, "const"); return CONST_;
 
 "&&"                                        DataFilterlval.op = AND; return AND;

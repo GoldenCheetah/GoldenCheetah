@@ -42,13 +42,11 @@
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
-#if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
 #include "ErgofitController.h"
 #include "DaumController.h"
-#endif
 #include "ANTlocalController.h"
 #include "NullController.h"
 #ifdef QT_BLUETOOTH_LIB
@@ -60,17 +58,16 @@
 #endif
 
 // Media selection helper
-#ifndef Q_OS_MAC
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
+#include "QtMacVideoWindow.h"
+#else
 #include "VideoWindow.h"
 #endif
-
 #ifdef Q_OS_MAC
-#include "QtMacVideoWindow.h"
 #include <CoreServices/CoreServices.h>
 #include <QStyle>
 #include <QStyleFactory>
 #import <IOKit/pwr_mgt/IOPMLib.h>
-
 #endif
 
 #ifdef WIN32
@@ -646,7 +643,6 @@ TrainSidebar::configChanged(qint32)
         // to interact with the device
         if (Devices.at(i).type == DEV_CT) {
             Devices[i].controller = new ComputrainerController(this, &Devices[i]);
-#if QT_VERSION >= 0x050000
         } else if (Devices.at(i).type == DEV_MONARK) {
             Devices[i].controller = new MonarkController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_KETTLER) {
@@ -657,7 +653,6 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new ErgofitController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_DAUM) {
             Devices[i].controller = new DaumController(this, &Devices[i]);
-#endif
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
             Devices[i].controller = new FortiusController(this, &Devices[i]);
@@ -1675,6 +1670,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (dev == kphTelemetry) {
                     rtData.setSpeed(local.getSpeed());
                     rtData.setDistance(local.getDistance());
+                    rtData.setRouteDistance(local.getRouteDistance());
                     rtData.setLapDistance(local.getLapDistance());
                     rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
                     fReceivedKphTelemetry = true;
@@ -1740,6 +1736,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
 
                 rtData.setDistance(displayDistance);
+                rtData.setRouteDistance(displayWorkoutDistance);
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
@@ -1795,10 +1792,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) ergTimeRemaining = ergFile->Points.at(ergFile->rightPoint).x - load_msecs;
                 else ergTimeRemaining = 0;
 
-#if defined Q_OS_LINUX && QT_VERSION < 0x050600
-                // Sorry, lap alerts are only enabled for for Qt version 5.6 onwards on Linux
-                // see https://bugreports.qt.io/browse/QTBUG-40823
-#else
                 // alert when approaching end of lap
                 if (lapAudioEnabled && lapAudioThisLap) {
 
@@ -1815,7 +1808,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                         QSound::play(":audio/lap.wav");
                     }
                 }
-#endif
 
                 if(lapTimeRemaining < 0) {
                         if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
@@ -1832,6 +1824,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setErgMsecsRemaining(ergTimeRemaining);
             } else {
                 rtData.setDistance(displayDistance);
+                rtData.setRouteDistance(displayWorkoutDistance);
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
                 rtData.setMsecs(session_elapsed_msec);

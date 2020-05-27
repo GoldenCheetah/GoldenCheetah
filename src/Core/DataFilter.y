@@ -54,7 +54,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
-%token <function> BEST TIZ CONFIG CONST_ DATERANGE
+%token <function> BEST TIZ CONFIG CONST_
 
 // comparative operators
 %token <op> IF_ ELSE_ WHILE
@@ -437,11 +437,6 @@ expr:
                                                   $$->lvalue.l = NULL;
                                                 }
         | CONST_ '(' symbol ')'                 { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
-                                                  $$->function = QString($1);
-                                                  $$->series = $3;
-                                                  $$->lvalue.l = NULL;
-                                                }
-        | DATERANGE '(' symbol ')'              { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
                                                   $$->function = QString($1);
                                                   $$->series = $3;
                                                   $$->lvalue.l = NULL;

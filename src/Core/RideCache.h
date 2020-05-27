@@ -30,11 +30,7 @@
 
 #include <QFuture>
 #include <QFutureWatcher>
-#if QT_VERSION > 0x050000
 # include <QtConcurrent>
-#else
-# include <QtConcurrentRun>
-#endif
 
 class Context;
 class LTMPlot;
@@ -138,6 +134,7 @@ class RideCache : public QObject
         friend class ::RideCacheBackgroundRefresh;
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
+        friend class ::Leaf; // get weekly performances
 
         Context *context;
         QDir directory, plannedDirectory;

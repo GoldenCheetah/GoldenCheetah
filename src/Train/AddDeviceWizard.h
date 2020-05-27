@@ -32,13 +32,11 @@
 #include "ImagicController.h"
 #endif
 #include "ComputrainerController.h"
-#if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
 #include "ErgofitController.h"
 #include "DaumController.h"
-#endif
 #include "ANTlocalController.h"
 #include "ANTChannel.h"
 #include "NullController.h"

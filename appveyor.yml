@@ -51,11 +51,16 @@ cache:
 - jom_1_1_3.zip
 - sip-4.19.8.zip
 - C:\R
+- C:\Python -> src\Python\requirements.txt
+- c:\tools\vcpkg\installed\
+- qwt
 
 install:
 # Get the libraries
 - if not exist gc-ci-libs.zip appveyor DownloadFile "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
 - 7z x -y gc-ci-libs.zip -oC:\libs
+# GSL
+- vcpkg install gsl:x64-windows
 
 # Get config
 - copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
@@ -77,20 +82,41 @@ install:
 - R --version
 - echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
-# Get SIP and add Python to config
-- c:\python36-x64\python --version
+# Get Python embeddable and install packages
+- ps: >-
+    if (-not (Test-Path 'C:\Python')) {
+      Start-FileDownload "https://www.python.org/ftp/python/3.7.7/python-3.7.7-embed-amd64.zip" Python.zip
+      7z x Python.zip -oC:\Python\
+      echo Lib/site-packages python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding utf8
+      mkdir C:\Python\Lib\site-packages
+      c:\python37-x64\python -m pip install --upgrade pip
+      c:\python37-x64\python -m pip install -r src\Python\requirements.txt -t C:\Python\Lib\site-packages
+    }
+
+# Get SIP and and install on Python
+- c:\python37-x64\python --version
 - if not exist sip-4.19.8.zip appveyor DownloadFile "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
 - 7z x sip-4.19.8.zip
 - cd sip-4.19.8
-- c:\python36-x64\python configure.py
+- c:\python37-x64\python configure.py
 - jom -j4
 - nmake install
 - cd ..
+
+# Add Python (avoiding colision between GC Context.h and Python context.h)
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- echo PYTHONINCLUDES=-I\"c:\python36-x64\include\" >> src\gcconfig.pri
-- echo PYTHONLIBS=-L\"c:\python36-x64\libs\" -lpython36 >> src\gcconfig.pri
+- echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
+- echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
+
+# GSL
+- echo DEFINES+=GC_WANT_GSL >> src\gcconfig.pri
+- echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
+- echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
 before_build:
+# Define GC version string, only for tagged builds
+- if %APPVEYOR_REPO_TAG% == "true" (echo DEFINES+=GC_VERSION=VERSION_STRING >> src/gcconfig.pri)
+
 # Enable CloudDB
 - echo CloudDB=active >> src\gcconfig.pri
 
@@ -98,7 +124,7 @@ before_build:
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 
 # Add debug console
-- echo CONFIG+=console >> src\gcconfig.pri
+#- echo CONFIG+=console >> src\gcconfig.pri
 
 # Patch Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_CALENDAR_CLIENT_SECRET__', $env:GC_GOOGLE_CALENDAR_CLIENT_SECRET | Set-Content src\Core\Secrets.h
@@ -136,8 +162,9 @@ after_build:
 - xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
-- copy c:\python36-x64\python36.dll
-- copy c:\python36-x64\LICENSE.txt "PYTHON LICENSE.txt"
+- xcopy /s /i /e /q C:\Python .
+- copy C:\Python\LICENSE.txt "PYTHON LICENSE.txt"
+- copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
 
 # ReadMe, license and icon files
 - copy ..\Resources\win32\ReadMe.txt
@@ -149,20 +176,39 @@ after_build:
 # Installer script
 - copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.14.2.nsi
 
-# cleanup and pack
-- del *.h *.cpp *.obj *.pdb *.res
-- 7z a ..\..\GoldenCheetah_dev_64bit_Windows.zip *
-
 # Build the installer
 - makensis GC3.6-Dev-Master-W64-QT5.14.2.nsi
+- move GoldenCheetah_v3.6-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.6-DEV_x64.exe
+- cd ..\..
+- ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
+- ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Like "*[publish binaries]*") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
 
 test_script:
 # minimum test
-- GoldenCheetah --version
-- cd ..\..
+- src\release\GoldenCheetah --version 2>GCversionWindows.txt
+- git log -1 >> GCversionWindows.txt
+- ps: CertUtil -hashfile GoldenCheetah_v3.6-DEV_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
+- type GCversionWindows.txt
 
 artifacts:
-- path: GoldenCheetah_dev_64bit_Windows.zip
+- path: GoldenCheetah_v3.6-DEV_x64.exe
+  name: GCinstaller
+- path: GCversionWindows.txt
+  name: GCversionWindows
 
-- path: src\release\GoldenCheetah_v3.6-DEV_64bit_Windows.exe
-  name: GoldenCheetah_v3.6-DEV_64bit_Windows Installer
+deploy:
+# deploy continuous builds to s3
+  - provider: S3
+    access_key_id:
+      secure: RoEkfKfOnF7JHOiLZX5qfZM08X+bu4oaDzzSKgdooNM=
+    secret_access_key:
+      secure: GPAArawatirYwgpHJBthdrbvyFU5bBzPOdK7VYYPiG2YHYi/DNJZ5Q5qGK1A440p
+    bucket: goldencheetah-binaries
+    region: us-east-1
+    remove_files: true
+    set_public: true
+    folder: Windows
+    artifact: GCinstaller, GCversionWindows
+    on:
+      PUBLISH_BINARIES: true
+      APPVEYOR_REPO_NAME: "GoldenCheetah/GoldenCheetah"

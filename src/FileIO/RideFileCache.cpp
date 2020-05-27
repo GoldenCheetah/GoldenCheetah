@@ -35,6 +35,18 @@
 
 static const int maxcache = 25; // lets max out at 25 caches
 
+// predefined binsize for the dist arrays
+static const double wattsDelta = 1.0;
+static const double wattsKgDelta = 0.01;
+static const double nmDelta    = 0.1;
+static const double hrDelta    = 1.0;
+static const double kphDelta   = 0.1;
+static const double cadDelta   = 1.0;
+static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals section
+static const double smo2Delta  = 1;
+static const double wbalDelta  = 1;
+
+
 // cache from ride
 RideFileCache::RideFileCache(Context *context, QString fileName, double weight, RideFile *passedride, bool check, bool refresh) :
                incomplete(false), context(context), rideFileName(fileName), ride(passedride)
@@ -2320,6 +2332,69 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, Spe
     return results;
 }
 
+QVector<double>
+RideFileCache::getAllBestsFor(Context *context, RideFile::SeriesType series, int duration, Specification specification)
+{
+    QDate earliest(1900,01,01);
+    QVector<double> results;
+
+    // get a list of rides & iterate over them
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+
+        if (!specification.pass(ride)) continue;
+
+        // get the ride cache name
+
+        // CPX ?
+        QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + ride->fileName);
+        QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFileName);
+
+        // open ok ?
+        if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == false) continue;
+
+        // get header
+        QDataStream inFile(&cacheFile);
+        inFile.readRawData((char *) &head, sizeof(head));
+
+        // out of date - just skip
+        if (head.version != RideFileCacheVersion) {
+            cacheFile.close();
+            continue;
+        }
+
+        if (series == RideFile::none) {
+
+            double date= earliest.daysTo(ride->dateTime.date());
+            results << date;
+
+        } else {
+
+            float value = 0.0;
+            if (duration <= countForMeanMax(head, series)) {
+
+                // get the values and place into the summarymetric map
+                long offset = offsetForMeanMax(head, series) + sizeof(head) + (sizeof(float) * duration);
+
+                cacheFile.seek(qint64(offset));
+                inFile.readRawData((char*)&value, sizeof(float));
+                double divisor = pow(10, decimalsFor(series));
+                value = value / divisor;
+
+            }
+            results << double(value);
+
+        }
+
+        // close CPX file
+        cacheFile.close();
+    }
+
+    // all done, return results
+    return results;
+}
+
 static
 const RideMetric *metricForSymbol(QString symbol)
 {
@@ -2351,4 +2426,23 @@ RideFileCache::bestTime(double km)
            double(kphMeanMax[secs] * secs) / divisor < km) secs++;
     if (secs < kphMeanMax.count()) return secs;
     return RideFile::NIL;
+}
+
+
+double
+RideFileCache::binsize(RideFile::SeriesType type)
+{
+
+    switch(type) {
+    default:
+    case RideFile::watts: return wattsDelta;
+    case RideFile::wattsKg: return wattsKgDelta;
+    case RideFile::nm: return nmDelta;
+    case RideFile::hr: return hrDelta;
+    case RideFile::kph: return kphDelta;
+    case RideFile::cad: return cadDelta;
+    case RideFile::gear: return gearDelta;
+    case RideFile::smo2: return smo2Delta;
+    case RideFile::wbal: return wbalDelta;
+    }
 }

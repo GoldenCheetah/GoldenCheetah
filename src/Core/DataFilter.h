@@ -30,6 +30,10 @@
 #include "RideCache.h"
 #include "RideFile.h" //for SeriesType
 
+#ifdef GC_WANT_GSL
+#include <gsl/gsl_randist.h>
+#endif
+
 class Context;
 class RideItem;
 class RideMetric;
@@ -155,7 +159,6 @@ public:
 #endif
 
     DataFilter *owner;
-
 };
 
 class DataFilter : public QObject
@@ -180,12 +183,17 @@ class DataFilter : public QObject
         QString signature() { return sig; }
         Leaf *root() { return treeRoot; }
 
+        // for random number generation
+#ifdef GC_WANT_GSL
+        const gsl_rng_type *T;
+        gsl_rng *r;
+#endif
         // RideItem always available and supplies th context
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
-        static QStringList builtins(); // return list of functions supported
+        static QStringList builtins(Context *); // return list of functions supported
 
         int refcount; // used by user metrics
 

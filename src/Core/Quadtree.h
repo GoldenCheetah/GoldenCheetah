@@ -23,6 +23,7 @@
 #include <QRectF>
 #include <QList>
 
+class GenericPlot;
 class Quadtree;
 class QuadtreeNode
 {
@@ -30,6 +31,7 @@ class QuadtreeNode
     static const int maxentries=25;
 
     friend class ::Quadtree;
+    friend class ::GenericPlot;
 
     public:
 
@@ -58,7 +60,6 @@ class QuadtreeNode
         // geom of quadrant
         QPointF topleft, bottomright, mid;
 
-    private:
         // AABB children (also in a freelist in Quadtree)
         QuadtreeNode *aabb[4];
 
@@ -71,6 +72,8 @@ class QuadtreeNode
 
 class Quadtree
 {
+    friend class ::GenericPlot;
+
     public:
         Quadtree (QPointF topleft, QPointF bottomright);
         ~Quadtree();
