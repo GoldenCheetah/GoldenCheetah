@@ -28,9 +28,7 @@
 #include <QWebEngineSettings>
 
 #include <QFormLayout>
-#if QT_VERSION >= 0x050000
 #include <QtConcurrent>
-#endif
 
 #include <QPointer>
 #include "RideFileCache.h"

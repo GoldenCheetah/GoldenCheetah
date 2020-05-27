@@ -177,11 +177,7 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 
     QString urlstr("https://www.xertonline.com/oauth/activity?");
 
-#if QT_VERSION > 0x050000
     QUrlQuery params;
-#else
-    QUrl params;
-#endif
 
     // use toMSecsSinceEpoch for compatibility with QT4
     params.addQueryItem("to", QString::number(to.addDays(1).toMSecsSinceEpoch()/1000.0f, 'f', 0));

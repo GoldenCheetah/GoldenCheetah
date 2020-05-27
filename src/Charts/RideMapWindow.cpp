@@ -121,10 +121,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     setChartLayout(layout);
 
     view = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     view->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
     view->setPage(new mapWebPage());
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);

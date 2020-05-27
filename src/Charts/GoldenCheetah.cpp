@@ -452,11 +452,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
 
     default:
     case Move :
-#if QT_VERSION < 0x040700
-        setCursor(Qt::ClosedHandCursor);
-#else
         setCursor(Qt::DragMoveCursor);
-#endif
         emit moving(this);
         break;
 
@@ -895,11 +891,7 @@ void GcChartWindow:: saveImage()
 
         QPixmap picture;
         menuButton->hide();
-#if QT_VERSION > 0x050000
         picture = grab(rect());
-#else
-        picture = QPixmap::grabWidget (this);
-#endif
         picture.save(fileName);
 
     }

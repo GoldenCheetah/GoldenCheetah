@@ -201,9 +201,7 @@ class MainWindow : public QMainWindow
         // Training View
         void addDevice();
         void downloadErgDB();
-#if QT_VERSION > 0x050000
         void downloadTodaysPlanWorkouts();
-#endif
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();

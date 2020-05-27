@@ -40,7 +40,7 @@
 #ifdef Q_OS_MAC
 
 // if we aint chosen one or the other then use quicktime
-#if !defined GC_VIDEO_QUICKTIME && !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5
+#if !defined GC_VIDEO_QUICKTIME && !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_VLC
 #define GC_VIDEO_QUICKTIME
 #endif
 
@@ -51,12 +51,8 @@
 
 // but qt5 *is* supported, but use at your own risk!
 #if defined GC_VIDEO_QT5
-#if QT_VERSION >= 0x050201
 #warning "QT 5 video is supported experimentally in this version"
-#else
-#error "QT5 video is only supported with QT 5.2.1 or higher"
 #endif
-#endif // GC_VIDEO_QT5
 
 #endif //Q_OS_MAC
 
@@ -73,24 +69,15 @@
 #endif
 #endif
 
-// if we aint chosen one or the other then use VLC QT < 5.2.1 or QT5 >= 5.2.1
+// if we aint chosen one or the other then use QT5
 #if !defined GC_VIDEO_NONE && !defined GC_VIDEO_QT5 && !defined GC_VIDEO_VLC
-#if QT_VERSION < 0x50201
-#define GC_VIDEO_VLC
-#else
 #define GC_VIDEO_QT5
 #endif
-#endif // !defined NONE,QT5,VLC
 
 // now check for stupid settings
 #if defined GC_VIDEO_QUICKTIME
 #error "QuickTime is only supported on Mac OS X"
 #endif
-
-// but qt5 *is* supported, but use at your own risk!
-#if defined GC_VIDEO_QT5 && QT_VERSION < 0x050201
-#error "QT5 video is only supported with QT 5.2.1 or higher"
-#endif // GC_VIDEO_QT5
 
 #endif // Q_OS_LINUX || Q_OS_WIN
 
@@ -130,11 +117,6 @@ extern "C" {
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
 #include "TrainSidebar.h"
-
-// Linux container changed in QT5
-#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000)
-#include <QX11EmbedContainer>
-#endif
 
 // regardless we always have a media helper
 class MediaHelper
@@ -211,11 +193,7 @@ class VideoWindow : public GcChartWindow
         QMediaPlayer *mp;
 #endif
 
-#if defined(WIN32) || defined (Q_OS_MAC) || (defined(Q_OS_LINUX) && QT_VERSION > 0x050000)
         QWidget *container;
-#elif defined(Q_OS_LINUX)
-        QX11EmbedContainer *container;
-#endif
 
         bool init; // we initialised ok ?
 };

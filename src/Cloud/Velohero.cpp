@@ -87,22 +87,14 @@ Velohero::open(QStringList &errors)
     QString username = getSetting(GC_VELOHEROUSER).toString();
     QString password = getSetting(GC_VELOHEROPASS).toString();
 
-#if QT_VERSION > 0x050000
     QUrlQuery urlquery;
-#else
-    QUrl urlquery( VELOHERO_URL + "/sso" );
-#endif
     urlquery.addQueryItem("view", "xml");
     urlquery.addQueryItem("user", username);
     urlquery.addQueryItem("pass", password);
 
-#if QT_VERSION > 0x050000
     QUrl url (VELOHERO_URL + "/sso");
     url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
-#else
-    QNetworkRequest request = QNetworkRequest(urlquery);
-#endif
 
     request.setRawHeader("Accept-Encoding", "identity");
     request.setRawHeader("Accept", "application/xml");
@@ -176,21 +168,13 @@ Velohero::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     filePart.setBody(data);
     body->append(filePart);
 
-#if QT_VERSION > 0x050000
     QUrlQuery urlquery;
-#else
-    QUrl urlquery( VELOHERO_URL + "/upload/file" );
-#endif
     urlquery.addQueryItem( "view", "xml" );
     urlquery.addQueryItem( "sso", sessionId );
 
-#if QT_VERSION > 0x050000
     QUrl url (VELOHERO_URL + "/upload/file");
     url.setQuery(urlquery.query());
     QNetworkRequest request = QNetworkRequest(url);
-#else
-    QNetworkRequest request = QNetworkRequest(urlquery);
-#endif
 
     request.setRawHeader( "Accept-Encoding", "identity" );
     request.setRawHeader( "Accept", "application/xml" );

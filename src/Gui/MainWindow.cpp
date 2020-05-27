@@ -71,13 +71,11 @@
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
-#if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
 #include "KentUniversity.h"
 #include "SixCycle.h"
 #include "OpenData.h"
-#endif
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
@@ -264,11 +262,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     head = new GcToolBar(this);
 
-#if QT_VERSION > 0x50000
     QStyle *toolStyle = QStyleFactory::create("fusion");
-#else
-    QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
-#endif
     QPalette metal;
     metal.setColor(QPalette::Button, QColor(215,215,215));
 
@@ -500,9 +494,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
-#if QT_VERSION > 0x050000
     optionsMenu->addAction(tr("Download workouts from Today's Plan..."), this, SLOT(downloadTodaysPlanWorkouts()));
-#endif
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
@@ -653,7 +645,7 @@ MainWindow::MainWindow(const QDir &home)
      * Lets ask for telemetry and check for updates
      *--------------------------------------------------------------------*/
 
-#if QT_VERSION > 0x050000 && !defined(OPENDATA_DISABLE)
+#if !defined(OPENDATA_DISABLE)
     OpenData::check(currentTab->context);
 #else
     fprintf(stderr, "OpenData disabled, secret not defined.\n"); fflush(stderr);
@@ -1026,12 +1018,10 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // save global mainwindow settings
         appsettings->setValue(GC_TABBAR, showhideTabbar->isChecked());
-#if QT_VERSION > 0x050200
         // wait for threads.. max of 10 seconds before just exiting anyway
         for (int i=0; i<10 && QThreadPool::globalInstance()->activeThreadCount(); i++) {
             QThread::sleep(1);
         }
-#endif
     }
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
@@ -2110,7 +2100,6 @@ MainWindow::downloadErgDB()
  * TodaysPlan Workouts
  *--------------------------------------------------------------------*/
 
-#if QT_VERSION > 0x050000
 void
 MainWindow::downloadTodaysPlanWorkouts()
 {
@@ -2127,7 +2116,6 @@ MainWindow::downloadTodaysPlanWorkouts()
         "Please check your preference settings."));
     }
 }
-#endif
 
 /*----------------------------------------------------------------------
  * Workout/Media Library
@@ -2178,11 +2166,9 @@ MainWindow::uploadCloud(QAction *action)
         QString actionText = QString(action->text()).replace("&", "");
 
         if (actionText == "University of Kent") {
-#if QT_VERSION > 0x50000
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
             KentUniversityUploadDialog uploader(this, db, currentTab->context->ride);
             int ret = uploader.exec();
- #endif
         } else {
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
             CloudService::upload(this, currentTab->context, db, currentTab->context->ride);

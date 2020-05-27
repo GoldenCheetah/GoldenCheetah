@@ -42,13 +42,11 @@
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
-#if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
 #include "ErgofitController.h"
 #include "DaumController.h"
-#endif
 #include "ANTlocalController.h"
 #include "NullController.h"
 #ifdef QT_BLUETOOTH_LIB
@@ -645,7 +643,6 @@ TrainSidebar::configChanged(qint32)
         // to interact with the device
         if (Devices.at(i).type == DEV_CT) {
             Devices[i].controller = new ComputrainerController(this, &Devices[i]);
-#if QT_VERSION >= 0x050000
         } else if (Devices.at(i).type == DEV_MONARK) {
             Devices[i].controller = new MonarkController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_KETTLER) {
@@ -656,7 +653,6 @@ TrainSidebar::configChanged(qint32)
             Devices[i].controller = new ErgofitController(this, &Devices[i]);
         } else if (Devices.at(i).type == DEV_DAUM) {
             Devices[i].controller = new DaumController(this, &Devices[i]);
-#endif
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {
             Devices[i].controller = new FortiusController(this, &Devices[i]);
@@ -1796,10 +1792,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) ergTimeRemaining = ergFile->Points.at(ergFile->rightPoint).x - load_msecs;
                 else ergTimeRemaining = 0;
 
-#if defined Q_OS_LINUX && QT_VERSION < 0x050600
-                // Sorry, lap alerts are only enabled for for Qt version 5.6 onwards on Linux
-                // see https://bugreports.qt.io/browse/QTBUG-40823
-#else
                 // alert when approaching end of lap
                 if (lapAudioEnabled && lapAudioThisLap) {
 
@@ -1816,7 +1808,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                         QSound::play(":audio/lap.wav");
                     }
                 }
-#endif
 
                 if(lapTimeRemaining < 0) {
                         if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
