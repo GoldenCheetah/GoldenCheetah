@@ -63,7 +63,7 @@
    </meter>
    <meter name="status" container="Video" source="TrainerStatus" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
-       <RelativePosition X="10.0" Y="10.0" />
+       <RelativePosition X="10.0" Y="50.0" />
    </meter>
    <meter name="elapsed" container="Video" source="Time" type="Text">
        <RelativeSize Width="10.0" Height="5.0" />
