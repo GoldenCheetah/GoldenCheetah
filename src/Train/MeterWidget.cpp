@@ -25,8 +25,6 @@
 
 #include <QtWebEngineWidgets/QWebEngineView>
 
-#define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
-
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -411,8 +409,13 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
     // Display grade as #.#% 
+<<<<<<< HEAD
     QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0)?QString("-"):QString("")) + QString::number((int) this->gradientValue) +
                                 QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+=======
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-") : QString("")) + QString::number((int)this->gradientValue) +
+        QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+>>>>>>> c7eda60ad... Removed GOOGLE_KEY, moved Trainer Status to top center.
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     double gradientDrawX = cyclistX;
@@ -421,7 +424,11 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     if (cyclistX < m_Width * 0.5)
         gradientDrawX += 5.;
     else
+<<<<<<< HEAD
         gradientDrawX =- 45.;
+=======
+        gradientDrawX = -45.;
+>>>>>>> c7eda60ad... Removed GOOGLE_KEY, moved Trainer Status to top center.
 
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 
@@ -443,11 +450,6 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
         distanceDrawX -= 45;
 
     painter.drawText(distanceDrawX, distanceDrawY, distanceString);
-    if (cyclistX < m_Width*0.5) {
-        painter.drawText((double)cyclistX+5, ((double)m_Height * 0.95), s_grad);
-    } else {
-        painter.drawText((double)cyclistX-45, ((double)m_Height * 0.95), s_grad);
-    }
 } 
 
 
@@ -544,7 +546,7 @@ void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
     currentPage += QString("var mapOptions = {\n"
         "    center: [" + sLat + ", " + sLon + "] ,\n"
         "    zoom : " + sMapZoom + ",\n"
-        "    zoomControl : false,\n"
+        "    zoomControl : true,\n"
         "    scrollWheelZoom : false,\n"
         "    dragging : false,\n"
         "    doubleClickZoom : false}\n");
