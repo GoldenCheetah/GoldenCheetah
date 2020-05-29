@@ -30,9 +30,7 @@
 #include "RideCache.h"
 #include "RideFile.h" //for SeriesType
 
-#ifdef GC_WANT_GSL
 #include <gsl/gsl_randist.h>
-#endif
 
 class Context;
 class RideItem;
@@ -184,10 +182,9 @@ class DataFilter : public QObject
         Leaf *root() { return treeRoot; }
 
         // for random number generation
-#ifdef GC_WANT_GSL
         const gsl_rng_type *T;
         gsl_rng *r;
-#endif
+
         // RideItem always available and supplies th context
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
         QStringList getErrors() { return errors; };

@@ -77,6 +77,10 @@ win32 {
 INCLUDEPATH += $${LIBZ_INCLUDE}
 LIBS += $${LIBZ_LIBS}
 
+# GNU Scientific Library
+INCLUDEPATH += $${GSL_INCLUDES}
+LIBS += $${GSL_LIBS}
+
 ###===============================
 ### PLATFORM SPECIFIC DEPENDENCIES
 ###===============================
@@ -222,15 +226,6 @@ RESOURCES = $${PWD}/Resources/application.qrc
 #                                                                             #
 #                                                                             #
 ###############################################################################
-
-###===================================
-### OPTIONAL => GNU Scientific Library
-###===================================
-
-contains(DEFINES, "GC_WANT_GSL") {
-    INCLUDEPATH += $${GSL_INCLUDES}
-    LIBS += $${GSL_LIBS}
-}
 
 
 ###=========================

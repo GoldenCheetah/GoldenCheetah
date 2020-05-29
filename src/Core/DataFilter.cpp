@@ -46,14 +46,12 @@
 QMutex pythonMutex;
 #endif
 
-#ifdef GC_WANT_GSL
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multifit.h>
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_randist.h>
-#endif
 
 #include "Zones.h"
 #include "PaceZones.h"
@@ -2631,13 +2629,11 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     rt.models << new WSModel(context);
 
     // random number generator
-#ifdef GC_WANT_GSL
     gsl_rng_env_setup();
     unsigned long mySeed = QDateTime::currentMSecsSinceEpoch();
     T = gsl_rng_default; // Generator setup
     r = gsl_rng_alloc (T);
     gsl_rng_set(r, mySeed);
-#endif
 
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -2660,13 +2656,12 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     rt.models << new ExtendedModel(context);
     rt.models << new WSModel(context);
 
-#ifdef GC_WANT_GSL
     gsl_rng_env_setup();
     unsigned long mySeed = QDateTime::currentMSecsSinceEpoch();
     T = gsl_rng_default; // Generator setup
     r = gsl_rng_alloc (T);
     gsl_rng_set(r, mySeed);
-#endif
+
     configChanged(CONFIG_FIELDS);
 
     // regardless of success or failure set signature
@@ -3890,7 +3885,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 // with no value longer than 24 hours and all y values removed
                 // the data ranges from 0s to maxx seconds
                 // time to interpolate (just in case)
- #ifdef GC_WANT_GSL
                 if (interpolate) {
 
                     // take a copy of the data since we will use it as
@@ -3917,7 +3911,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     gsl_interp_free(interpolation);
                     gsl_interp_accel_free(accelerator);
                 }
- #endif
 
                 // finally, we can call the meanmax computer - but need to use ints.. so
                 // lets scale up by 1000 to save 3 decimal places, then scale down at the end
@@ -3950,7 +3943,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             // interpolate(algo, xvector, yvector, xvalues) - returns yvalues for each xvalue
             Result returning(0);
 
-#ifdef GC_WANT_GSL
             // unpack parameters
             QString algo= *(leaf->fparms[0]->lvalue.n);
             Result xvector =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
@@ -3985,7 +3977,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 gsl_interp_free(interpolation);
                 gsl_interp_accel_free(accelerator);
             }
-#endif
             return returning;
         }
 
@@ -4246,7 +4237,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             int n= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number; // how many ?
             Result returning(0);
 
-#if GC_WANT_GSL
             // Random number function based on the GNU Scientific Library
             while(n>0) {
                 double random = gsl_rng_uniform(df->owner->r); // Generate it!
@@ -4254,7 +4244,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 returning.vector << random;
                 n--;
             }
-#endif
             return returning;
 
         }
@@ -4266,7 +4255,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             Result quantiles= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
             Result returning(0);
 
-#ifdef GC_WANT_GSL
             if (v.vector.count() > 0) {
                 // sort the vector first
                 qSort(v.vector);
@@ -4290,7 +4278,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     }
                 }
             }
-#endif
             return returning;
         }
 
@@ -4577,10 +4564,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             // return
             Result returning(0);
 
-#ifdef GC_WANT_GSL // we need to gnu scientific library for this
-                   // it implements the Golub-Reinsch SVD algorithm
-                   // if not available we return 0
-
             // get y vector
             Result yv = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
 
@@ -4622,7 +4605,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             gsl_vector_free(Y);
             gsl_vector_free(coeff);
             gsl_multifit_linear_free(wspc);
-#endif
+
             return returning;
         }
 
@@ -4969,11 +4952,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                         qSort(vector.vector);
 
                         // let gsl do it
-#ifdef GC_WANT_GSL
                         double median = gsl_stats_median_from_sorted_data(vector.vector.constData(), 1, vector.vector.count());
-#else
-                        double median = 0; // can't be bothered.
-#endif
                         return Result(median);
                   }
                   break;

@@ -33,13 +33,10 @@
 #PYTHONINCLUDES = -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m
 #PYTHONLIBS = -L/Library/Frameworks/Python.framework/Versions/3.6/lib -lpython3.6m
 
-# uncomment below and configure if you want
-# the GNU scientific library. At present it
-# will only be optional, whilst we update
-# the CI build systems, but will become mandatory
+# uncomment below and configure the location of
+# the GNU scientific library. 
 #
 # Linux/Mac
-#DEFINES += GC_WANT_GSL
 #GSL_INCLUDES = /usr/include
 #GSL_LIBS = -lgsl -lgslcblas -lm
 #

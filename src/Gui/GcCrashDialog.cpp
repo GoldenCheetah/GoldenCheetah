@@ -68,9 +68,7 @@
 #include "PythonEmbed.h"
 #endif
 
-#ifdef GC_WANT_GSL
 #include <gsl/gsl_version.h>
-#endif
 
 #include "levmar.h"
 
@@ -247,9 +245,7 @@ QString GcCrashDialog::versionHTML()
 
     // -- GSL --
     QString gsl = "none";
-    #ifdef GC_WANT_GSL
     gsl = GSL_VERSION;
-    #endif
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QString gc_version = tr(
