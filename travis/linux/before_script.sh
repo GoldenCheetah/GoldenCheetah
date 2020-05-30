@@ -6,14 +6,9 @@ cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Define GC version string, only for tagged builds
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
-# user WEBENGINE
-echo DEFINES += NOWEBKIT >> src/gcconfig.pri
-# Trusty needs C99 mode to enable declarations in for loops
-echo QMAKE_CFLAGS += -std=gnu99 >> src/gcconfig.pri
-# make a relese build
+# make a release build
 sed -i "s|#\(CONFIG += release.*\)|\1 static|" src/gcconfig.pri
 # lrelease command
-sed -i "s|#\(QMAKE_LRELEASE = \).*|\1 lrelease|" src/gcconfig.pri
 sed -i "s|^#QMAKE_CXXFLAGS|QMAKE_CXXFLAGS|" src/gcconfig.pri
 # Enable -lz
 sed -i "s|^#LIBZ_LIBS|LIBZ_LIBS|" src/gcconfig.pri
@@ -47,7 +42,6 @@ echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -I/usr/include/python3.7 >> src/gcconfig.pri
 echo PYTHONLIBS = -L/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu -lpython3.7m >> src/gcconfig.pri
 # GSL
-echo DEFINES += GC_WANT_GSL >> src/gcconfig.pri
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 
 # Patch Secrets.h

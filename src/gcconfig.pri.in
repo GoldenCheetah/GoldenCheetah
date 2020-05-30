@@ -40,11 +40,9 @@
 #GSL_INCLUDES = /usr/include
 #GSL_LIBS = -lgsl -lgslcblas -lm
 #
-# Windows - edit to your install location
-# us vcpkg install gsl
-#DEFINES += GC_WANT_GSL
-#GSL_INCLUDES = C:/gsl-1.11/include/
-#GSL_LIBS = -LC:/gsl-1.11/bin -llibgsl-0 -llibgslcblas-0
+# Windows - use vcpkg to install gsl and edit to your install location
+#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
+#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
 
 # put output into a separate dir
 # to keep main directory clear

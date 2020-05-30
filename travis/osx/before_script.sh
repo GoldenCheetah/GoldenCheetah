@@ -16,9 +16,7 @@ cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Define GC version string, only for tagged builds
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
-echo DEFINES += NOWEBKIT >> src/gcconfig.pri
 sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
-sed -i "" "s|#\(QMAKE_LRELEASE\).*|\1 += /usr/local/opt/qt5/bin/lrelease|" src/gcconfig.pri
 sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch x86_64|" src/gcconfig.pri
 sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
@@ -51,7 +49,6 @@ echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -ICore `python3-config --includes` >> src/gcconfig.pri
 echo PYTHONLIBS = `python3-config --ldflags` >> src/gcconfig.pri
 # GSL
-echo DEFINES += GC_WANT_GSL >> src/gcconfig.pri
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 
 # Patch Secrets.h

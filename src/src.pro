@@ -199,7 +199,6 @@ TRANSLATIONS = Resources/translations/gc_fr.ts \
 # need lrelease to generate qm files
 isEmpty(QMAKE_LRELEASE) {
     win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
-    unix:!macx {QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease }
     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 
