@@ -688,12 +688,8 @@ Strava::addSamples(RideFile* ret, QString remoteid)
 void
 Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
 {
-    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
-
     // Lap Swim & SmartRecording enabled: use distance from laps to fix samples
-    if (isGarminSmartRecording.toInt() != 0 && ret->isSwim() &&
-        ret->isDataPresent(RideFile::km) &&
-        !ret->isDataPresent(RideFile::lat)) {
+    if (ret->isSwim() && ret->isDataPresent(RideFile::km) && !ret->isDataPresent(RideFile::lat)) {
 
         int lastSecs = 0;
         double lastDist = 0.0;
@@ -708,7 +704,7 @@ Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
             double deltaDist = (start>lastSecs && km>lastDist+0.001) ? (km-lastDist)/(start-lastSecs) : 0;
             double kph = 3600.0*deltaDist;
             for (int secs=lastSecs; secs<start; secs++) {
-                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist,
+                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist+deltaDist,
                         kph, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0,
                         RideFile::NA, 0.0,
@@ -729,7 +725,7 @@ Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
             deltaDist = 0.001*lap["distance"].toDouble()/(end-start);
             kph = 3600.0*deltaDist;
             for (int secs=start; secs<end; secs++) {
-                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist,
+                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist+deltaDist,
                         kph, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0,
                         RideFile::NA, 0.0,
@@ -953,12 +949,9 @@ Strava::prepareResponse(QByteArray* data)
                 foreach (QJsonValue value, laps) {
                     QJsonObject lap = value.toObject();
 
-                    int lap_start = lap["start_index"].toInt();  
-
-                    double start = ride->getPoint(lap_start, RideFile::secs).toDouble();
-                    if (last_lap == 0)
-                        last_lap = start;
-                    double end = start + lap["elapsed_time"].toDouble();
+                    double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));
+                    if (start < last_lap) start = last_lap + 1; // Don't overlap
+                    double end = start + lap["elapsed_time"].toDouble() - 1;
 
                     last_lap = end;
 
