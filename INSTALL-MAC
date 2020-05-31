@@ -1,8 +1,9 @@
 Update Note: to build GoldenCheetah v3.6 we are using the Homebrew Package
-Manager to install dependencies, including Qt 5.14.2, on Travis CI macOS High
-Sierra build environment.
+Manager to install dependencies, including Qt 5.14.2 and GSL, on Travis-ci
+macOS High Sierra build environment.
 You can check the travis/osx folder for the complete and updated build scripts,
 the minimum Qt version known to work is 5.9 with Qt WebEngine and Qt Charts.
+GSL - GNU Scientific Library is a mandatory dependency starting with v3.6
 
 Ale Martinez - May, 2020
 

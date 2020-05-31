@@ -8,14 +8,12 @@ cp src/gcconfig.pri.in src/gcconfig.pri
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
 # make a release build
 sed -i "s|#\(CONFIG += release.*\)|\1 static|" src/gcconfig.pri
-# lrelease command
 sed -i "s|^#QMAKE_CXXFLAGS|QMAKE_CXXFLAGS|" src/gcconfig.pri
 # Enable -lz
 sed -i "s|^#LIBZ_LIBS|LIBZ_LIBS|" src/gcconfig.pri
 # ICAL
 sed -i "s|#\(ICAL_INSTALL =.*\)|\1 /usr|" src/gcconfig.pri
 # LIBUSB
-#sed -i "s|#\(LIBUSB_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
 sed -i "s|#\(LIBUSB_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
 sed -i "s|#\(LIBUSB_LIBS    =.*\)|\1 -lusb-1.0 -ldl -ludev|" src/gcconfig.pri
 sed -i "s|#\(LIBUSB_USE_V_1 = true.*\)|\1|" src/gcconfig.pri

@@ -8,6 +8,17 @@
 #CONFIG += debug
 #CONFIG += release
 
+# uncomment below and configure the location of the GNU scientific library,
+# this is a mandatory dependency.
+#
+# Linux/Mac - use apt/homebrew to install and edit to your install location
+#GSL_INCLUDES = /usr/include
+#GSL_LIBS = -lgsl -lgslcblas -lm
+#
+# Windows - use vcpkg to install and edit to your install location
+#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
+#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
+
 # Uncomment below if you want an R chart
 # You will need R installed along with the Rcpp and RInside
 # packages. There is an R script in the `util' directory that
@@ -32,17 +43,6 @@
 #DEFINES += GC_WANT_PYTHON
 #PYTHONINCLUDES = -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m
 #PYTHONLIBS = -L/Library/Frameworks/Python.framework/Versions/3.6/lib -lpython3.6m
-
-# uncomment below and configure the location of
-# the GNU scientific library. 
-#
-# Linux/Mac
-#GSL_INCLUDES = /usr/include
-#GSL_LIBS = -lgsl -lgslcblas -lm
-#
-# Windows - use vcpkg to install gsl and edit to your install location
-#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
-#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
 
 # put output into a separate dir
 # to keep main directory clear
