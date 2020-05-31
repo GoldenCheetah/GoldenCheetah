@@ -2502,14 +2502,15 @@ RideFile::recalculateDerivedSeries(bool force)
             p->antiss = anTISS;
         }
 
-        if (dataPresent.alt && dataPresent.km) {
+        if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
             if (lastP) {
-                double deltaDistance = (p->km - lastP->km) * 1000;
+                double deltaDistance = p->km - lastP->km;
                 double deltaAltitude = p->alt - lastP->alt;
                 if (deltaDistance>0) {
-                    p->slope = (deltaAltitude / deltaDistance) * 100;
+                    p->slope = deltaAltitude / (deltaDistance * 10); // * 100 for gradient, / 1000 to convert to meters
                 } else {
-                    p->slope = 0;
+                    // Repeat previous slope if distance hasn't changed.
+                    p->slope = lastP->slope;
                 }
                 if (p->slope > 40 || p->slope < -40) {
                     p->slope = lastP->slope;
