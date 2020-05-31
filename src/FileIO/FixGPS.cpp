@@ -1326,10 +1326,11 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
 
     if (smoothingSuccess) {
         // Invalidate slope data to be recomputed based on new altitude data
-        if (fHasSlope && fInvalidateSlope)
+        if (fHasSlope && fInvalidateSlope) {
+            ride->command->startLUW("Invalidate Slope");
             ride->command->setDataPresent(RideFile::slope, false);
-
-        ride->recalculateDerivedSeries(true);
+            ride->command->endLUW();
+        }
     }
 
     if (errors) {
