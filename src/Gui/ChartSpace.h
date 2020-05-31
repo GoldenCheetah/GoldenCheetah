@@ -135,6 +135,9 @@ class ChartSpace : public QWidget
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont;
 
+        // the item we are currently showing
+        RideItem *current;
+
         // to get paint device
         QGraphicsView *device() { return view; }
         const QList<ChartSpaceItem*> allItems() { return items; }
@@ -231,7 +234,6 @@ class ChartSpace : public QWidget
 
         bool stale;
         bool configured;
-        RideItem *current;
 };
 
 #endif // _GC_ChartSpace_h

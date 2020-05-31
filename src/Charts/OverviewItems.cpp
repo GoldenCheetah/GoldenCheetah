@@ -1334,7 +1334,7 @@ void
 RPErating::applyEdit()
 {
     // update the item - if we have one
-    RideItem *item = parent->parent->property("ride").value<RideItem*>();
+    RideItem *item = parent->parent->current;
 
     // did it change?
     if (item && item->ride() && item->getText("RPE","") != value) {
