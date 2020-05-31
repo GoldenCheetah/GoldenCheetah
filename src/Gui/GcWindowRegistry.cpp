@@ -39,6 +39,7 @@
 #include "RideEditor.h"
 #include "RideNavigator.h"
 #include "RideSummaryWindow.h"
+#include "RideMapWindow.h"
 #include "ScatterWindow.h"
 #include "SummaryWindow.h"
 #include "MetadataWindow.h"
@@ -57,7 +58,7 @@
 #endif
 #include "PlanningWindow.h"
 #ifdef GC_HAVE_OVERVIEW
-#include "OverviewWindow.h"
+#include "Overview.h"
 #endif
 #include "UserChart.h"
 // Not until v4.0
