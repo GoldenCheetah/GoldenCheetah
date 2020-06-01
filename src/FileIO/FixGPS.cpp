@@ -31,12 +31,20 @@ using namespace gte;
 
 struct AltitudeSmoothingStats
 {
-    double minSlope;
-    double maxSlope;
-    double avgSlope;
-    double outlierCount;
+    double   minSlope;
+    double   maxSlope;
+    double   avgSlope;
+    double   sampleDistanceStdDev;
+    unsigned outlierCount;
 
-    AltitudeSmoothingStats() : minSlope(0.), maxSlope(0.), outlierCount(0) {}
+    AltitudeSmoothingStats() : minSlope(0.), maxSlope(0.), sampleDistanceStdDev(0.), outlierCount(0) {}
+    void reset() {
+        minSlope = 0.;
+        maxSlope = 0.;
+        avgSlope = 0.;
+        sampleDistanceStdDev = 0.;
+        outlierCount = 0;
+    }
 };
 
 bool GatherForAltitudeSmoothing(const RideFile *ride, std::vector <Vector2<double>> &controls);
@@ -44,24 +52,30 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
 
 struct RouteSmoothingStats
 {
-    double   pass1Variance;
-    double   pass2Variance;
+    double   pass1StdDev;
+    double   pass2StdDev;
     unsigned outlierCount;
 
-    RouteSmoothingStats() : pass1Variance(0.), pass2Variance(0.), outlierCount(0) {}
+    RouteSmoothingStats() : pass1StdDev(0.), pass2StdDev(0.), outlierCount(0) {}
+    void reset() {
+        pass1StdDev = 0.;
+        pass2StdDev = 0.;
+        outlierCount = 0;
+    }
 };
 
 bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>> &controls, const std::vector<Vector2<double>> smoothedAltitudes);
 bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree0, double outlierCriteria, unsigned degree1, std::vector<Vector4<double>> & out, RouteSmoothingStats &stats);
 
-void ComputeRideFileStats(const RideFile * ride, AltitudeSmoothingStats & stats, double &sampleDistanceVariance)
+void ComputeRideFileStats(const RideFile * ride, AltitudeSmoothingStats & stats)
 {
-    sampleDistanceVariance = 0;
+    stats.reset();
 
     double slopeDistance = 0;
 
     const RideFilePoint * prevPi = NULL;
-    double prevKM = 0;
+    double prevKM = 0.;
+    double prevSlope = 0.;
     for (int i = 0; i < ride->dataPoints().count(); i++) {
         const RideFilePoint * pi = (ride->dataPoints()[i]);
 
@@ -70,7 +84,7 @@ void ComputeRideFileStats(const RideFile * ride, AltitudeSmoothingStats & stats,
         if (i > 0) {
             double rise = pi->alt - prevPi->alt;
             double run = 10. * (pi->km - prevPi->km);
-            slope = run ? (rise / run) : 0;
+            slope = run ? (rise / run) : prevSlope;
             slopeDistance += slope * run;
 
             stats.minSlope = std::min(slope, stats.minSlope);
@@ -80,15 +94,16 @@ void ComputeRideFileStats(const RideFile * ride, AltitudeSmoothingStats & stats,
         double kmDelta = pi->km - prevKM;
         prevKM = pi->km;
 
-        sampleDistanceVariance += (1000 * kmDelta * 1000 * kmDelta);
+        stats.sampleDistanceStdDev += (1000 * kmDelta * 1000 * kmDelta);
 
         prevPi = pi;
+        prevSlope = slope;
     }
+
+    stats.sampleDistanceStdDev = sqrt(stats.sampleDistanceStdDev / ride->dataPoints().count());
 
     double routeLength = 10. * ride->dataPoints()[ride->dataPoints().count() - 1]->km;
     stats.avgSlope = routeLength ? slopeDistance / routeLength : stats.avgSlope;
-
-    sampleDistanceVariance /= ride->dataPoints().count();
 }
 
 // Config widget used by the Preferences/Options config panes
@@ -135,12 +150,12 @@ class FixGPSConfig : public DataProcessorConfig
         QDoubleSpinBox *outlierSpinBoxRoute;
 
         // Route Stats
-        QLabel      *variance0LabelRoute;
-        QLabel      *variance1LabelRoute;
+        QLabel      *stdDev0LabelRoute;
+        QLabel      *stdDev1LabelRoute;
         QLabel      *outlierCountLabelRoute;
 
         QPushButton *testButton;
-        QLabel      *varianceLabel;
+        QLabel      *stdDevLabel;
         const RideFile *ride;
 
         // Defaults:
@@ -164,7 +179,6 @@ class FixGPSConfig : public DataProcessorConfig
 
                 AltitudeSmoothingStats altitudeSmoothingStats;
                 unsigned outlierCount = 0;
-                double sampleDistanceVariance = 0;
 
                 std::vector<Vector2<double>> inControls2, outControls2;
                 bool fAltitudeSmoothingSuccess = false;
@@ -185,7 +199,7 @@ class FixGPSConfig : public DataProcessorConfig
                 } else {
                     // Otherwise no smoothing, simply compute the ride stats.
                     outlierCount = 0;
-                    ComputeRideFileStats(ride, altitudeSmoothingStats, sampleDistanceVariance);
+                    ComputeRideFileStats(ride, altitudeSmoothingStats);
                 }
 
                 // PASS 1: ROUTE SMOOTHING
@@ -204,42 +218,49 @@ class FixGPSConfig : public DataProcessorConfig
 
                     bool fGathered = GatherForRouteSmoothing(ride, inControls4, outControls2);
                     if (fGathered) {
-                        smoothRoute(inControls4, degree0Route, outlierCriteriaRoute, degree1Route, outControls4, routeSmoothingStats);
+                        bool fRouteSmoothingSuccess = smoothRoute(inControls4, degree0Route, outlierCriteriaRoute, degree1Route, outControls4, routeSmoothingStats);
+                        if (fRouteSmoothingSuccess) {
 
-                        // Regenerate min and max slope from route smoothing output
-                        altitudeSmoothingStats.minSlope = 0;
-                        altitudeSmoothingStats.maxSlope = 0;
-                        double slopeDistance = 0;
-                        geolocation prevGeo;
-                        for (int i = 0; i < outControls4.size(); i++) {
-                            xyz loc(outControls4[i][1], outControls4[i][2], outControls4[i][3]);
-                            geolocation geo = loc.togeolocation();
+                            // Regenerate min and max slope from route smoothing output
+                            altitudeSmoothingStats.minSlope = 0.;
+                            altitudeSmoothingStats.maxSlope = 0.;
+                            double slopeDistance = 0.;
+                            double prevSlope = 0.;
+                            geolocation prevGeo;
 
-                            if (i > 0) {
-                                double rise = geo.Alt() - prevGeo.Alt();
-                                double run = 10 * (outControls4[i][0] - outControls4[i - 1][0]);
-                                double slope = run ? (rise / run) : 0;
+                            for (int i = 0; i < outControls4.size(); i++) {
+                                xyz loc(outControls4[i][1], outControls4[i][2], outControls4[i][3]);
+                                geolocation geo = loc.togeolocation();
 
-                                altitudeSmoothingStats.minSlope = std::min(slope, altitudeSmoothingStats.minSlope);
-                                altitudeSmoothingStats.maxSlope = std::max(slope, altitudeSmoothingStats.maxSlope);
-                                slopeDistance += (slope * run);
+                                if (i > 0) {
+                                    double rise = geo.Alt() - prevGeo.Alt();
+                                    double run = 10 * (outControls4[i][0] - outControls4[i - 1][0]);
+                                    double slope = run ? (rise / run) : prevSlope;
+
+                                    altitudeSmoothingStats.minSlope = std::min(slope, altitudeSmoothingStats.minSlope);
+                                    altitudeSmoothingStats.maxSlope = std::max(slope, altitudeSmoothingStats.maxSlope);
+                                    slopeDistance += (slope * run);
+                                    prevSlope = slope;
+                                }
+                                prevGeo = geo;
                             }
-                            prevGeo = geo;
+                            double routeDistance = 10. * outControls4[outControls4.size() - 1][0];
+                            altitudeSmoothingStats.avgSlope = routeDistance ? slopeDistance / routeDistance : altitudeSmoothingStats.avgSlope;
+                        } else {
+                            altitudeSmoothingStats.reset();
                         }
-                        double routeDistance = 10. * outControls4[outControls4.size() - 1][0];
-                        altitudeSmoothingStats.avgSlope = routeDistance ? slopeDistance / routeDistance : altitudeSmoothingStats.avgSlope;
                     }
                 }
 
-                QString minLabel(tr("Min Slope"));
-                QString maxLabel(tr("Max Slope"));
-                QString avgLabel(tr("Avg Slope"));
-                QString outlierLabel(tr("OutlierCount"));
+                QString minLabel(tr("Min Slope:"));
+                QString maxLabel(tr("Max Slope:"));
+                QString avgLabel(tr("Avg Slope:"));
+                QString outlierLabel(tr("Outliers:"));
 
-                minLabel.append(QString(": %1").arg(altitudeSmoothingStats.minSlope));
-                maxLabel.append(QString(": %1").arg(altitudeSmoothingStats.maxSlope));
-                avgLabel.append(QString(": %1").arg(altitudeSmoothingStats.avgSlope));
-                outlierLabel.append(QString(": %1").arg(altitudeSmoothingStats.outlierCount));
+                minLabel.append(QString::number(altitudeSmoothingStats.minSlope, 'f', 1));
+                maxLabel.append(QString::number(altitudeSmoothingStats.maxSlope, 'f', 1));
+                avgLabel.append(QString::number(altitudeSmoothingStats.avgSlope, 'f', 1));
+                outlierLabel.append(QString::number(altitudeSmoothingStats.outlierCount));
 
                 minSlopeLabel->setText(minLabel);
                 minSlopeLabel->setToolTip(tr("Min slope after smoothing applied."));
@@ -253,17 +274,21 @@ class FixGPSConfig : public DataProcessorConfig
                 outlierCountLabel->setText(outlierLabel);
                 outlierCountLabel->setToolTip(tr("Count of outliers found during altitude smoothing."));
 
-                QString pass1VarianceLabelString(tr("Route Smoothing Pass1 Variance"));
-                QString pass2VarianceLabelString(tr("Route Smoothing Pass2 Variance"));
-                QString outlierRouteLabelString (tr("Route Smoothing Outlier Count"));
+                QString pass1StdDevLabelString(tr("P1 Route Deviation:"));
+                QString pass2StdDevLabelString(tr("P2 Route Deviation:"));
+                QString outlierRouteLabelString (tr("Outliers:"));
 
-                pass1VarianceLabelString.append(QString(": %1").arg(routeSmoothingStats.pass1Variance));
-                pass2VarianceLabelString.append(QString(": %1").arg(routeSmoothingStats.pass2Variance));
-                outlierRouteLabelString.append (QString(": %1").arg(routeSmoothingStats.outlierCount));
+                pass1StdDevLabelString.append(QString::number(routeSmoothingStats.pass1StdDev, 'f', 2));
+                pass2StdDevLabelString.append(QString::number(routeSmoothingStats.pass2StdDev, 'f', 2));
+                outlierRouteLabelString.append(QString::number(routeSmoothingStats.outlierCount));
 
-                variance0LabelRoute->setText(pass1VarianceLabelString);
-                variance1LabelRoute->setText(pass2VarianceLabelString);
+                stdDev0LabelRoute->setText(pass1StdDevLabelString);
+                stdDev1LabelRoute->setText(pass2StdDevLabelString);
                 outlierCountLabelRoute->setText(outlierRouteLabelString);
+
+                stdDev0LabelRoute->setToolTip(tr("StdDev between original samples and pass 1 spine."));
+                stdDev1LabelRoute->setToolTip(tr("StdDev between non-outlier samples and pass 2 spline."));
+                outlierCountLabelRoute->setToolTip(tr("Count of outliers discarded prior to pass 2."));
 
                 testButton->setEnabled(true);
                 QApplication::restoreOverrideCursor();
@@ -310,12 +335,12 @@ class FixGPSConfig : public DataProcessorConfig
             outlierSpinBoxRoute = NULL;
 
             // Route Stats
-            variance0LabelRoute = NULL;
-            variance1LabelRoute = NULL;
+            stdDev0LabelRoute = NULL;
+            stdDev1LabelRoute = NULL;
             outlierCountLabelRoute = NULL;
 
             testButton = NULL;
-            varianceLabel = NULL;
+            stdDevLabel = NULL;
 
             ride = rideFile;
 
@@ -373,9 +398,11 @@ class FixGPSConfig : public DataProcessorConfig
             outlierSpinBox->setDecimals(3);
             outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
             outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA (%)\n"
-                                          "Outlier percent is used to decide outlier points that will be discarded after\n"
-                                          "initial bspline is constructed. This value is the percent of variance between\n"
-                                          "original and bspline where a value will be considered an outlier.\n"));
+                                          "An outlier point is one so eggregiously out of range that it should not be used to\n"
+                                          "build the smoothing spline. A clear example consider a point at the north pole that\n"
+                                          "is part of a route in Seattle. This outlier criteria is the multiple of the data to\n"
+                                          "spline stddev past which a value will be considered an outlier and not used to compute\n"
+                                          "the final smoothing spline.\n"));
 
             // ROUTE SMOOTHING CONTROLS
 
@@ -420,9 +447,11 @@ class FixGPSConfig : public DataProcessorConfig
             outlierSpinBoxRoute->setDecimals(3);
             outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
             outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA (%)"
-                                               "Outlier percent is used to decide outlier points that will be discarded after\n"
-                                               "initial bspline is constructed. This value is the percent of variance between\n"
-                                               "original and bspline where a value will be considered an outlier.\n"));
+                                               "An outlier point is one so eggregiously out of range that it should not be used to\n"
+                                               "build the smoothing spline. A clear example consider a point at the north pole that\n"
+                                               "is part of a route in Seattle. This outlier criteria is the multiple of the data to\n"
+                                               "spline stddev past which a value will be considered an outlier and not used to compute\n"
+                                               "the final smoothing spline.\n"));
 
             // If no ridefile is provided then present simple dialog
             if (rideFile == NULL)
@@ -454,13 +483,12 @@ class FixGPSConfig : public DataProcessorConfig
             {
                 // Determine min and max slope of original ride file.
                 AltitudeSmoothingStats altitudeSmoothingStats;
-                double routePass1Variance = 0;
-                double routePass2Variance = 0;
+                double routePass1StdDev = 0;
+                double routePass2StdDev = 0;
                 double routeOutlierCount = 0;
-                double sampleDistanceVariance = 0;
                 bool fHasAlt = ride && ride->areDataPresent()->alt;
                 if (fHasAlt) {
-                    ComputeRideFileStats(ride, altitudeSmoothingStats, sampleDistanceVariance);
+                    ComputeRideFileStats(ride, altitudeSmoothingStats);
                 }
 
                 mainLayout = new QVBoxLayout(this);
@@ -472,19 +500,19 @@ class FixGPSConfig : public DataProcessorConfig
 
                 // Create widgets
 
-                // Min/Max Slope and distance variance Labels
+                // Min/Max Slope and distance StdDev Labels
 
-                QString minSlopeLabelString(tr("Min Slope"));
-                QString maxSlopeLabelString(tr("Max Slope"));
-                QString avgSlopeLabelString(tr("Avg Slope"));
-                QString outlierLabelString(tr("Outlier Count"));
-                QString varianceLabelString(tr("Distance Variance"));
+                QString minSlopeLabelString(tr("Min Slope:"));
+                QString maxSlopeLabelString(tr("Max Slope:"));
+                QString avgSlopeLabelString(tr("Avg Slope:"));
+                QString outlierLabelString(tr("Outliers:"));
+                QString stdDevLabelString(tr("Step Deviation:"));
 
-                minSlopeLabelString.append(QString(": %1").arg(altitudeSmoothingStats.minSlope));
-                maxSlopeLabelString.append(QString(": %1").arg(altitudeSmoothingStats.maxSlope));
-                avgSlopeLabelString.append(QString(": %1").arg(altitudeSmoothingStats.avgSlope));
-                outlierLabelString. append(QString(": %1").arg(altitudeSmoothingStats.outlierCount));
-                varianceLabelString.append(QString(": %1").arg(sampleDistanceVariance));
+                minSlopeLabelString.append(QString::number(altitudeSmoothingStats.minSlope, 'f', 1));
+                maxSlopeLabelString.append(QString::number(altitudeSmoothingStats.maxSlope, 'f', 1));
+                avgSlopeLabelString.append(QString::number(altitudeSmoothingStats.avgSlope, 'f', 1));
+                outlierLabelString. append(QString::number(altitudeSmoothingStats.outlierCount));
+                stdDevLabelString.append(QString::number(altitudeSmoothingStats.sampleDistanceStdDev, 'f', 2));
 
                 minSlopeLabel = new QLabel(minSlopeLabelString);
                 minSlopeLabel->setToolTip(tr("Min slope computed from ride file altitude and distance information."));
@@ -494,25 +522,25 @@ class FixGPSConfig : public DataProcessorConfig
                 avgSlopeLabel->setToolTip(tr("Avg slope computed from ride file altitude and distance information."));
                 outlierCountLabel = new QLabel(outlierLabelString);
                 outlierCountLabel->setToolTip(tr("Count of outliers found."));
-                varianceLabel = new QLabel(varianceLabelString);
-                varianceLabel->setToolTip(tr("Variance of distance between ride file samples."));
+                stdDevLabel = new QLabel(stdDevLabelString);
+                stdDevLabel->setToolTip(tr("StdDev of distance between ride file samples, in meters."));
 
                 // Route Stats
 
-                QString pass1VarianceLabelString(tr("Route Smoothing Pass1 Variance"));
-                QString pass2VarianceLabelString(tr("Route Smoothing Pass2 Variance"));
-                QString outlierRouteLabelString (tr("Route SmoothingOutlier Count"));
+                QString pass1StdDevLabelString(tr("P1 Route Deviation:"));
+                QString pass2StdDevLabelString(tr("P2 Route Deviation:"));
+                QString outlierRouteLabelString(tr("Route Outliers:"));
 
-                pass1VarianceLabelString.append(QString(": %1").arg(routePass1Variance));
-                pass2VarianceLabelString.append(QString(": %1").arg(routePass2Variance));
-                outlierRouteLabelString. append(QString(": %1").arg(routeOutlierCount));
+                pass1StdDevLabelString.append(QString::number(routePass1StdDev, 'f', 2));
+                pass2StdDevLabelString.append(QString::number(routePass2StdDev, 'f', 2));
+                outlierRouteLabelString. append(QString::number(routeOutlierCount));
 
-                variance0LabelRoute = new QLabel(pass1VarianceLabelString);
-                variance0LabelRoute->setToolTip(tr("Variance between original samples and pass 1 output."));
-                variance1LabelRoute = new QLabel(pass2VarianceLabelString);
-                variance1LabelRoute->setToolTip(tr("Variance between pass 1 output and pass 2 output."));
+                stdDev0LabelRoute = new QLabel(pass1StdDevLabelString);
+                stdDev0LabelRoute->setToolTip(tr("StdDev between original samples and pass 1 spine, in meters."));
+                stdDev1LabelRoute = new QLabel(pass2StdDevLabelString);
+                stdDev1LabelRoute->setToolTip(tr("StdDev between non-outlier samples and pass 2 spline, in meters."));
                 outlierCountLabelRoute = new QLabel(outlierRouteLabelString);
-                outlierCountLabelRoute->setToolTip(tr("Count of outliers discarded prior to pass 2."));
+                outlierCountLabelRoute->setToolTip(tr("Count of route outlier points discarded prior to pass 2."));
 
                 // Test Smoothing Button
 
@@ -574,14 +602,14 @@ class FixGPSConfig : public DataProcessorConfig
                 row->addWidget(maxSlopeLabel);
                 row->addWidget(avgSlopeLabel);
                 row->addWidget(outlierCountLabel);
-                row->addWidget(varianceLabel);
+                row->addWidget(stdDevLabel);
                 rows.push_back(row);
 
                 // Route Stats
 
                 row = new QHBoxLayout();
-                row->addWidget(variance0LabelRoute);
-                row->addWidget(variance1LabelRoute);
+                row->addWidget(stdDev0LabelRoute);
+                row->addWidget(stdDev1LabelRoute);
                 row->addWidget(outlierCountLabelRoute);
                 rows.push_back(row);
 
@@ -607,9 +635,9 @@ class FixGPSConfig : public DataProcessorConfig
                               "    smoothing is run with Pass 2 degree.\n"
                               "2 - Optional: Route B-Spline smoothing will be applied\n"
                               "    if checkbox is set. Again this is two pass smoothing where\n"
-                              "    outliers are determined by euclidean distance variance from\n"
-                              "    smoothing spline. Again a final pass is run without outliers\n"
-                              "    using Pass 2 degree.\n\n"
+                              "    outliers are determined by euclidean distance's stddev relative\n"
+                              "    to the smoothing spline. Again a final pass is run without\n"
+                              "    outliers using Pass 2 degree.\n\n"
                               "Generally altitude data is noisiest and requires highest degree for\n"
                               "reasonable smoothness. Route gps data gnerally requires a much\n"
                               "lighter touch.\n")));
@@ -668,10 +696,14 @@ class FixGPS : public DataProcessor {
 
 static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix GPS errors"), new FixGPS());
 
-bool IsReasonableGeoLocation(geolocation *ploc) {
+bool IsReasonableAltitude(double alt) {
+    return (alt >= -1000 && alt < 10000);
+}
+
+bool IsReasonableGeoLocation(const geolocation *ploc) {
     return  (ploc->Lat()  && ploc->Lat()  >= double(-90)  && ploc->Lat()  <= double(90) &&
              ploc->Long() && ploc->Long() >= double(-180) && ploc->Long() <= double(180) &&
-             ploc->Alt() >= -1000 && ploc->Alt() < 10000);
+             IsReasonableAltitude(ploc->Alt()));
 }
 
 class SaveState
@@ -891,9 +923,21 @@ bool GatherForAltitudeSmoothing(const RideFile *ride, std::vector < Vector2<doub
     if (!fHasAlt)
         return false;
 
+    // If there is location info then avoid using altitude from invalid locations.
+    bool fRequireReasonableGeoloc = ride->areDataPresent()->lat && ride->areDataPresent()->lon;
+
     // Gather distance/altitude pairs
     for (int i = 0; i < ride->dataPoints().count(); i++) {
         const RideFilePoint * pi = (ride->dataPoints()[i]);
+
+        if (fRequireReasonableGeoloc) {
+            geolocation geoloc(pi->lat, pi->lon, pi->alt);
+            if (!IsReasonableGeoLocation(&geoloc))
+                continue;
+        } else {
+            if (!IsReasonableAltitude(pi->alt))
+                continue;
+        }
 
         controls.push_back({ pi->km, pi->alt });
     }
@@ -904,9 +948,7 @@ bool GatherForAltitudeSmoothing(const RideFile *ride, std::vector < Vector2<doub
 // Smooth ridefile altitude. Return true if outControls populated, otherwise false.
 bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned degree0, double outlierCriteria, unsigned degree1, std::vector<Vector2<double>> & outControls, AltitudeSmoothingStats &stats)
 {
-    stats.minSlope = 0;
-    stats.maxSlope = 0;
-    stats.outlierCount = 0;
+    stats.reset();
 
     outControls.resize(0);
 
@@ -946,7 +988,7 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
         std::vector <Vector2<double>> inControls2;
         for (int i = 0; i < outControls.size(); i++) {
             double d = inControls[i][1] - outControls[i][1];
-            if (outlierCriteria > (d*d)) {
+            if (outlierCriteria > sqrt(d*d)) {
                 inControls2.push_back(inControls[i]);
             }
         }
@@ -973,16 +1015,23 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
 
     // Determine min, max, avg slope of smoothed distance/altitude pairs.
     double slopeDistance = 0;
+    double prevSlope = 0;
     for (int i = 1; i < outControls.size(); i++) {
         double run = 10*(outControls[i][0] - outControls[i-1][0]);
         double rise = outControls[i][1] - outControls[i-1][1];
-        double slope = run ? (rise / run) : 0;
+        double slope = run ? (rise / run) : prevSlope;
 
         stats.minSlope = std::min(stats.minSlope, slope);
         stats.maxSlope = std::max(stats.maxSlope, slope);
 
         slopeDistance += slope * run;
+
+        stats.sampleDistanceStdDev += (1000 * run * 1000 * run);
+
+        prevSlope = slope;
     }
+
+    stats.sampleDistanceStdDev = sqrt(stats.sampleDistanceStdDev / outControls.size());
 
     double routeLength = 10. * outControls[outControls.size() - 1][0];
     stats.avgSlope = routeLength ? slopeDistance / routeLength : stats.avgSlope;
@@ -990,7 +1039,7 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     return true;
 }
 
-double ComputeLocationResultVariance(std::vector<Vector4<double>> inControls, std::vector<Vector4<double>> outControls)
+double ComputeLocationResultStdDev(std::vector<Vector4<double>> inControls, std::vector<Vector4<double>> outControls)
 {
     double var = 0;
     for (int i = 0; i < outControls.size(); i++) {
@@ -1002,7 +1051,7 @@ double ComputeLocationResultVariance(std::vector<Vector4<double>> inControls, st
     }
     var /= outControls.size();
 
-    return var;
+    return sqrt(var);
 }
 
 bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>> &controls, const std::vector<Vector2<double>> smoothedAltitudes)
@@ -1011,7 +1060,11 @@ bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>>
     if (!fHasLoc)
         return false;
 
-    bool fUseSmoothedAltitudes = (ride->dataPoints().count() == smoothedAltitudes.size());
+    // The control index for altitude and route may not be the ride point index because ride
+    // contains invalid locations.  Smoothed altitude and smoothed route have synchronized point
+    // indicies because they only access reasonable geolocations. 
+    bool fUseSmoothedAltitudes = smoothedAltitudes.size() > 0;
+    int gatherIndex = 0; // gatherIndex for indexing into array of smoothed altitudes
 
     // Convert geo to xyz and gather {distance,x,y,z} quads
     for (int i = 0; i < ride->dataPoints().count(); i++) {
@@ -1019,12 +1072,18 @@ bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>>
 
         double lat = pi->lat;
         double lon = pi->lon;
-        double alt = (fUseSmoothedAltitudes) ? smoothedAltitudes[i][1] : pi->alt;
+        double alt = (fUseSmoothedAltitudes) ? smoothedAltitudes[gatherIndex][1] : pi->alt;
 
         geolocation geoloc(lat, lon, alt);
+
+        if (!IsReasonableGeoLocation(&geoloc))
+            continue;
+
         xyz c = geoloc.toxyz();
 
         controls.push_back({ pi->km, c.x(), c.y(), c.z() });
+
+        gatherIndex++;
     }
     return true;
 }
@@ -1032,8 +1091,8 @@ bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>>
 // Smooth ridefile location data. Return true if outControls populated, otherwise false.
 bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree0, double outlierCriteria, unsigned degree1, std::vector<Vector4<double>> & outControls, RouteSmoothingStats &routeSmoothingStats)
 {
-    routeSmoothingStats.pass1Variance = 0;
-    routeSmoothingStats.pass2Variance = 0;
+    routeSmoothingStats.pass1StdDev = 0;
+    routeSmoothingStats.pass2StdDev = 0;
     routeSmoothingStats.outlierCount = 0;
 
     outControls.resize(0);
@@ -1054,7 +1113,7 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
         return false;
     }
 
-    routeSmoothingStats.pass1Variance = ComputeLocationResultVariance(inControls, outControls);
+    routeSmoothingStats.pass1StdDev = ComputeLocationResultStdDev(inControls, outControls);
 
     // No second pass if its smoothing degree too small.
     if (degree1 >= 3) {
@@ -1065,7 +1124,7 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
             xyz out(outControls[i][1], outControls[i][2], outControls[i][3]);
 
             double d = out.subtract(in).magnitude();
-            if (outlierCriteria > (d*d)) {
+            if (outlierCriteria > sqrt(d*d)) {
                 inControls2.push_back(inControls[i]);
             }
         }
@@ -1086,7 +1145,7 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
                 // Translation failed to converge.
                 return false;
             }
-            routeSmoothingStats.pass2Variance = ComputeLocationResultVariance(inControls, outControls);
+            routeSmoothingStats.pass2StdDev = ComputeLocationResultStdDev(inControls, outControls);
         }
     }
 
@@ -1102,6 +1161,8 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
 
     bool fHasAlt = ride->areDataPresent()->alt;
     bool fHasLoc = ride->areDataPresent()->lat && ride->areDataPresent()->lon;
+    bool fHasSlope = ride->areDataPresent()->slope;
+    bool fInvalidateSlope = false;
 
     // We can operate on alt and/or loc, but cannot operate if there are neither.
     if (!fHasAlt && !fHasLoc)
@@ -1117,6 +1178,7 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
         GeoPointInterpolator gpi;
         int ii = 0; // interpolation input index
 
+        const RideFilePoint* prevPi = NULL;
         for (int i = 0; i < ride->dataPoints().count(); i++) {
             const RideFilePoint* pi = (ride->dataPoints()[i]);
             geolocation curLoc(pi->lat, pi->lon, fHasAlt ? pi->alt : 0.0);
@@ -1149,10 +1211,30 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
 
                 if (fHasAlt) {
                     ride->command->setPointValue(i, RideFile::alt, interpLoc.Alt());
+
+                    // Compute new slope for this single previously invalid location.
+                    if (fHasSlope && prevPi) {
+                        double deltaDistance = pi->km - prevPi->km;
+                        double deltaAltitude = pi->alt - prevPi->alt;
+                        double newSlope = 0.;
+                        if (deltaDistance > 0) {
+                            newSlope = deltaAltitude / (deltaDistance * 10); // * 100 for gradient, / 1000 to convert to meters
+                        }
+                        else {
+                            // Repeat previous slope if distance hasn't changed.
+                            newSlope = prevPi->slope;
+                        }
+                        if (newSlope > 40 || newSlope < -40) {
+                            newSlope = prevPi->slope;
+                        }
+
+                        ride->command->setPointValue(i, RideFile::slope, newSlope);
+                    }
                 }
 
                 errors++;
             }
+            prevPi = pi;
         }
     }
 
@@ -1208,6 +1290,8 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
                 for (int i = 0; i < ride->dataPoints().count(); i++) {
                     ride->command->setPointValue(i, RideFile::alt, outControls2[i][1]);
                 }
+                // Altitude has been stomped - recompute slope.
+                fInvalidateSlope = true;
             }
         }
 
@@ -1232,7 +1316,8 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
                     ride->command->setPointValue(i, RideFile::lon, geo.Long());
                     ride->command->setPointValue(i, RideFile::alt, geo.Alt());
                 }
-                smoothingSuccess = true;
+                // Altitude has been stomped - recompute slope
+                fInvalidateSlope = true;
             }
         }
 
@@ -1240,11 +1325,16 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
     }
 
     if (smoothingSuccess) {
-        ride->recalculateDerivedSeries(true);
+        // Invalidate slope data to be recomputed based on new altitude data
+        if (fHasSlope && fInvalidateSlope) {
+            ride->command->startLUW("Invalidate Slope");
+            ride->command->setDataPresent(RideFile::slope, false);
+            ride->command->endLUW();
+        }
     }
 
     if (errors) {
-        ride->setTag("GPS errors", QString("%1").arg(errors));
+        ride->setTag("GPS errors", QString::number(errors));
     }
 
     return errors || smoothingSuccess;
