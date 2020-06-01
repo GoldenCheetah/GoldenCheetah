@@ -1157,6 +1157,9 @@ AddVirtualPower::mySetTableFromComboBox(int i) {
     // Clear epsilon so fitters fit.
     fitEpsilonSpinBox->setValue(0.);
 
+    // Set new index in wizard.
+    wizard->virtualPowerIndex = virtualPower->currentIndex();
+
     drawConfig();
 
     this->blockSignals(state);
