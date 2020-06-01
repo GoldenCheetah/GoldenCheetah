@@ -46,6 +46,8 @@ public:
     bool discover(QString name);
     void setDevice(QString);
 
+    void setGradient(double) override;
+
     // telemetry push pull
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);

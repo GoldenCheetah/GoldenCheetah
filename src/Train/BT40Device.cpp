@@ -21,6 +21,8 @@
 #include "BT40Controller.h"
 #include "VMProWidget.h"
 
+#include "ANTMessage.h"
+
 #define VO2MASTERPRO_SERVICE_UUID "{00001523-1212-EFDE-1523-785FEABCD123}"
 #define VO2MASTERPRO_VENTILATORY_CHAR_UUID "{00001527-1212-EFDE-1523-785FEABCD123}"
 #define VO2MASTERPRO_GASEXCHANGE_CHAR_UUID "{00001528-1212-EFDE-1523-785FEABCD123}"
@@ -29,11 +31,16 @@
 #define VO2MASTERPRO_COMOUT_CHAR_UUID "{00001526-1212-EFDE-1523-785FEABCD123}"
 #define VO2MASTERPRO_DATA_CHAR_UUID "{00001524-1212-EFDE-1523-785FEABCD123}"
 
+// Tacx specific UART intefrace to do ANT over BLE
+#define BLE_TACX_UART_UUID "{6e40fec1-b5a3-f393-e0a9-e50e24dcca9e}"
+#define BLE_TACX_UART_CHAR_WRITE "{6E40FEC3-B5A3-F393-E0A9-E50E24DCCA9E}"
+
 QMap<QBluetoothUuid, btle_sensor_type_t> BT40Device::supportedServices = {
     { QBluetoothUuid(QBluetoothUuid::HeartRate), { "Heartrate", ":images/IconHR.png" }},
     { QBluetoothUuid(QBluetoothUuid::CyclingPower), { "Power", ":images/IconPower.png" }},
     { QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence), { "Speed + Cadence", ":images/IconCadence.png" }},
     { QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID)), { "VM Pro", ":images/IconCadence.png" }},
+    { QBluetoothUuid(QString(BLE_TACX_UART_UUID)), { "Tacx FE-C over BLE", ":images/IconPower.png" }},
 };
 
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
@@ -218,6 +225,9 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     } else {
                         vmProWidget->onReconnected(service);
                     }
+                } else if (service->serviceUuid() == QBluetoothUuid(QString(BLE_TACX_UART_UUID))) {
+                  m_charTacxUART = service->characteristic(QBluetoothUuid(QString(BLE_TACX_UART_CHAR_WRITE)));
+                  m_servTacxUART = service;
                 }
 
                 foreach(QLowEnergyCharacteristic characteristic, characteristics)
@@ -464,4 +474,20 @@ QBluetoothDeviceInfo
 BT40Device::deviceInfo() const
 {
     return m_currentDevice;
+}
+
+void BT40Device::setGradient(double gradient)
+{
+  // Only supported for Tacx devices
+  if (!m_servTacxUART || !m_charTacxUART.isValid()) {
+    return;
+  }
+
+  qDebug() << "[+] Tacx: write gradient" << gradient;
+
+  // Based on https://github.com/abellono/tacx-ios-bluetooth-example/blob/master/How-to%20FE-C%20over%20BLE%20v1_0_0.pdf, channel must be 5.
+  const auto Msg = ANTMessage::fecSetTrackResistance(5, gradient, 0);
+  m_servTacxUART->writeCharacteristic(m_charTacxUART,
+    QByteArray{(const char*) &Msg.data[0], Msg.length},
+    QLowEnergyService::WriteWithoutResponse);
 }
