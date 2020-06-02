@@ -26,11 +26,16 @@ OverviewWindow::OverviewWindow(Context *context) : GcChartWindow(context), conte
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
-    //setProperty("nomenu", true);
     setShowTitle(false);
+
+    // actions...
+    QAction *addTile= new QAction(tr("Add Tile..."));
+    addAction(addTile);
     setControls(NULL);
 
     QHBoxLayout *main = new QHBoxLayout;
+    main->setSpacing(0);
+    main->setContentsMargins(0,0,0,0);
 
     space = new ChartSpace(context);
     main->addWidget(space);

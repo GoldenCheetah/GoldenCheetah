@@ -62,7 +62,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     // Activity History
     rideNavigator = new RideNavigator(context, true);
-    rideNavigator->setProperty("nomenu", true);
+    rideNavigator->showMore(false);
     groupByMapper = NULL;
 
     // retrieve settings (properties are saved when we close the window)

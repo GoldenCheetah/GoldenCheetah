@@ -40,13 +40,9 @@ ChartSpace::ChartSpace(Context *context) :
 {
     setContentsMargins(0,0,0,0);
 
-    // no longer a gc chart ...
-    //setProperty("color", GColor(COVERVIEWBACKGROUND)); XXX??
-    //setProperty("nomenu", true);
-    //setShowTitle(false);
-    //setControls(NULL);
-
     QHBoxLayout *main = new QHBoxLayout;
+    main->setSpacing(0);
+    main->setContentsMargins(0,0,0,0);
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);

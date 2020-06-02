@@ -56,8 +56,6 @@ void GcWindow::setControls(QWidget *x)
     emit controlsChanged(_controls);
 
     if (x != NULL) {
-        menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
-        menu->addSeparator();
 
         // add any other actions
         if (actions.count()) {
@@ -67,7 +65,13 @@ void GcWindow::setControls(QWidget *x)
                 menu->addAction(act->text(), act, SIGNAL(triggered()));
             }
 
-            if (actions.count() > 1) menu->addSeparator();
+            menu->addSeparator();
+
+        } else {
+
+            menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
+            menu->addSeparator();
+
         }
 
         menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
@@ -802,19 +806,23 @@ GcChartWindow::setControls(QWidget *x)
     GcWindow::setControls(x);
 
     menu->clear();
-    // if x == NULL only edit the name
-    menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
-    menu->addSeparator();
 
-    // add any other actions
+    // add actions, these replace chart settings
     if (actions.count()) {
+
         if (actions.count() > 1) menu->addSeparator();
 
         foreach(QAction *act, actions) {
             menu->addAction(act->text(), act, SIGNAL(triggered()));
         }
 
-        if (actions.count() > 1) menu->addSeparator();
+        menu->addSeparator();
+
+    } else {
+
+        // if no actions, then just add chart settings dialog
+        menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
+        menu->addSeparator();
     }
 
     menu->addAction(tr("Export Chart ..."), this, SLOT(saveChart()));
