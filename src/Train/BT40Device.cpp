@@ -55,6 +55,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
     connected = false;
     prevWheelTime = 0;
     prevWheelRevs = 0;
+    prevWheelStaleness = true;
     prevCrankTime = 0;
     prevCrankRevs = 0;
     prevCrankStaleness = -1; // indicates prev crank data values aren't measured values
@@ -461,9 +462,13 @@ BT40Device::getWheelRpm(QDataStream& ds)
     ds >> wheeltime;
 
     double rpm = 0.0;
-    quint16 time = wheeltime - prevWheelTime;
-    quint32 revs = wheelrevs - prevWheelRevs;
-    if (time) rpm = 1024*60*revs / time;
+
+    if(!prevWheelStaleness) {
+        quint16 time = wheeltime - prevWheelTime;
+        quint32 revs = wheelrevs - prevWheelRevs;
+        if (time) rpm = 2048*60*revs / time;
+    }
+    else prevWheelStaleness = false;
 
     prevWheelRevs = wheelrevs;
     prevWheelTime = wheeltime;
