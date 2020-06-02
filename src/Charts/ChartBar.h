@@ -53,6 +53,7 @@ public slots:
     void addWidget(QString);
     void clear();
     void clicked(int);
+    void triggerContextMenu(int);
     void removeWidget(int);
     void setText(int index, QString);
     void setCurrentIndex(int index);
@@ -64,6 +65,7 @@ public slots:
     void configChanged(qint32); // appearance
 
 signals:
+    void contextMenu(int,int);
     void currentIndexChanged(int);
     void itemMoved(int from, int to);
 
@@ -86,7 +88,7 @@ private:
     QToolButton *menuButton;
 
     QFont buttonFont;
-    QSignalMapper *signalMapper;
+    QSignalMapper *signalMapper, *menuMapper;
 
     QMenu *barMenu, *chartMenu;
 
@@ -120,7 +122,7 @@ class ChartBarItem : public QWidget
     public:
         ChartBarItem(ChartBar *parent);
         void setText(QString _text) { text = _text; }
-        void setChecked(bool _checked) { checked = _checked; repaint(); }
+        void setChecked(bool _checked) { checked = _checked; update(); }
         bool isChecked() { return checked; }
         void setWidth(int x) { setFixedWidth(x); }
         void setHighlighted(bool x) { highlighted = x; }
@@ -130,6 +132,7 @@ class ChartBarItem : public QWidget
         QString text;
     signals:
         void clicked(bool);
+        void contextMenu();
 
     public slots:
         void paintEvent(QPaintEvent *);
@@ -148,5 +151,7 @@ class ChartBarItem : public QWidget
         bool checked;
         bool highlighted;
         bool red;
+
+        QPainterPath triangle, hotspot;
 };
 #endif

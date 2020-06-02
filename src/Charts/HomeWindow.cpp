@@ -76,6 +76,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     setControls(cw);
 
     setProperty("isManager", true);
+    nomenu=true;
     setAcceptDrops(true);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -162,6 +163,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     //connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
     connect(chartbar, SIGNAL(itemMoved(int,int)), this, SLOT(tabMoved(int,int)));
     connect(chartbar, SIGNAL(currentIndexChanged(int)), this, SLOT(tabSelected(int)));
+    connect(chartbar, SIGNAL(contextMenu(int,int)), this, SLOT(tabMenu(int,int)));
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
     // trends view we should select a library chart when a chart is selected.
@@ -355,6 +357,14 @@ HomeWindow::rideSelected()
 }
 
 void
+HomeWindow::tabMenu(int index, int x)
+{
+    // activate this tab's menu
+    QPoint pos = QPoint(x, mapToGlobal(chartbar->geometry().bottomLeft()).y()+(2*dpiXFactor));
+    charts[index]->menu->exec(pos);
+}
+
+void
 HomeWindow::dateRangeChanged(DateRange dr)
 { Q_UNUSED( dr )
     if (isVisible()) {
@@ -492,6 +502,8 @@ HomeWindow::styleChanged(int id)
             chartbar->addWidget(charts[i]->property("title").toString());
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->setProperty("dateRange", property("dateRange"));
+            charts[i]->showMore(false);
+            charts[i]->menuButton->hide(); // we use tab button
             charts[i]->hide(); // we need to show on tab selection!
             // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
             if(charts[i]->showTitle() == true) charts[i]->setContentsMargins(0,25*dpiYFactor,0,0);
@@ -502,6 +514,7 @@ HomeWindow::styleChanged(int id)
             charts[i]->setContentsMargins(0,25*dpiYFactor,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->show();
+            charts[i]->showMore(true);
             charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->setProperty("ride", property("ride"));
             break;
@@ -510,6 +523,7 @@ HomeWindow::styleChanged(int id)
             charts[i]->setContentsMargins(0,15*dpiYFactor,0,0);
             charts[i]->setResizable(true); // we need to show on tab selection!
             charts[i]->show();
+            charts[i]->showMore(true);
             charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->setProperty("ride", property("ride"));
         default:
@@ -643,6 +657,7 @@ HomeWindow::addChart(GcChartWindow* newone)
 
         case 0 :
             newone->setResizable(false); // we need to show on tab selection!
+            newone->showMore(false);
             //tabbed->addTab(newone, newone->property("title").toString());
             tabbed->addWidget(newone);
             chartbar->addWidget(newone->property("title").toString());
@@ -658,6 +673,7 @@ HomeWindow::addChart(GcChartWindow* newone)
             newone->setFixedWidth((tileArea->width()-50));
             newone->setFixedHeight(newone->width() * 0.7);
             newone->setResizable(false); // we need to show on tab selection!
+            newone->showMore(true);
             int row = chartnum; // / 2;
             int column = 0; //chartnum % 2;
             newone->setContentsMargins(0,25*dpiYFactor,0,0);
@@ -690,6 +706,7 @@ HomeWindow::addChart(GcChartWindow* newone)
                 newone->setFixedHeight(newheight);
                 newone->setContentsMargins(0,15*dpiYFactor,0,0);
                 newone->setResizable(true); // we need to show on tab selection!
+                newone->showMore(true);
 
                 if (currentStyle == 2 && chartCursor >= 0) winFlow->insert(chartCursor, newone);
                 else winFlow->addWidget(newone);

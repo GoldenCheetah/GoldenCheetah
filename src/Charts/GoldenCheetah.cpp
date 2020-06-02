@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -191,7 +191,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
-    qRegisterMetaType<bool>("nomenu");
+    nomenu = false;
     revealed = false;
     setParent(context->mainWindow);
     setControls(NULL);
@@ -202,7 +202,6 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setResizable(false);
     setMouseTracking(true);
     setProperty("color", GColor(CPLOTBACKGROUND));
-    setProperty("nomenu", false);
     menu = NULL;
 
     // make sure its underneath the toggle button
@@ -645,7 +644,7 @@ GcWindow::enterEvent(QEvent *)
 {
     if (_noevents) return;
 
-    if (property("nomenu") == false && property("isManager").toBool() == false) {
+    if (nomenu == false) {
         if (contentsMargins().top() > (20*dpiYFactor)) menuButton->setFixedSize(80*dpiXFactor,30*dpiYFactor);
         else menuButton->setFixedSize(80*dpiXFactor, 15*dpiYFactor);
         menuButton->raise();

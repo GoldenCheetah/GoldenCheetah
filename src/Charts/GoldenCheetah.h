@@ -181,6 +181,7 @@ public:
     GcWinID type() const { return _type; }
     void setType(GcWinID x) { _type = x; } // only really used by the window registry
 
+    void showMore(bool x) { nomenu=!x; }
     virtual bool amVisible();
 
     // popover controls
@@ -216,6 +217,7 @@ public:
     QPushButton *settingsButton, *closeButton;
     QPushButton *menuButton;
     QMenu *menu;
+    bool nomenu;
     QList<QAction*>actions;
 };
 
