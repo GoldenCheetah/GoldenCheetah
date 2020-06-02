@@ -203,7 +203,7 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
 #endif
 
     // config, deployed or environment variable
-    QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
+    QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString().trimmed();
     if (PYTHONHOME == "") {
         if (pythonInstalled(pybin, pypath, deployedPython)) {
             PYTHONHOME = deployedPython;
