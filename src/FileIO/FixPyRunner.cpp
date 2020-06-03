@@ -73,6 +73,8 @@ int FixPyRunner::run(QString source, QString scriptKey, QString &errText)
 void FixPyRunner::execScript(FixPyRunParams *params)
 {
     QList<RideFile *> editedRideFiles;
+    python->canvas = NULL;
+    python->chart = NULL;
     python->runline(ScriptContext(params->context, params->rideFile, false,
                                   false, &editedRideFiles), params->script);
 
