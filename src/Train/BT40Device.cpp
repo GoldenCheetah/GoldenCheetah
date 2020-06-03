@@ -170,16 +170,18 @@ BT40Device::serviceScanDone()
         }
     }
 
-    if (csc_service && has_csc && !has_power) {
+    if (csc_service && has_csc) {
+        if (!has_power) {
 
-        // Only connect to CSC service if the same device doesn't provide a power service
-        // since the power service also provides the same readings.
-        qDebug() << "Connecting to the CSC service for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
-        csc_service->discoverDetails();
+            // Only connect to CSC service if the same device doesn't provide a power service
+            // since the power service also provides the same readings.
+            qDebug() << "Connecting to the CSC service for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
+            csc_service->discoverDetails();
 
-    } else {
+        } else {
 
-        qDebug() << "Ignoring the CSC service for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
+            qDebug() << "Ignoring the CSC service for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
+        }
     }
 }
 
