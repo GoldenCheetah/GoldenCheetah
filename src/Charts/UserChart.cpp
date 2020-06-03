@@ -615,6 +615,22 @@ UserChartSettings::addSeries()
 
     if (dialog.exec()) {
 
+        // check it isn't a duplicate
+        bool duplicate = false;
+        QString name = add.name;
+        int dup=1;
+        do {
+            duplicate = false;
+            foreach(GenericSeriesInfo info, seriesinfo) {
+                if (info.name == add.name) {
+                    duplicate=true;
+                    add.name= name + QString("_%1").arg(dup);
+                    dup++;
+                    break;
+                }
+            }
+        } while (duplicate);
+
         // apply
         seriesinfo.append(add);
 
@@ -632,6 +648,22 @@ UserChartSettings::seriesClicked(int row,int)
     EditUserSeriesDialog dialog(context, rangemode, edit);
 
     if (dialog.exec()) {
+
+        // check it isn't a duplicate
+        bool duplicate = false;
+        QString name = edit.name;
+        int dup=1;
+        do {
+            duplicate = false;
+            foreach(GenericSeriesInfo info, seriesinfo) {
+                if (info.name == edit.name) {
+                    duplicate=true;
+                    edit.name= name + QString("_%1").arg(dup);
+                    dup++;
+                    break;
+                }
+            }
+        } while (duplicate);
 
         // apply!
         seriesinfo[row] = edit;
@@ -654,6 +686,22 @@ UserChartSettings::editSeries()
     EditUserSeriesDialog dialog(context, rangemode, edit);
 
     if (dialog.exec()) {
+
+        // check it isn't a duplicate
+        bool duplicate = false;
+        QString name = edit.name;
+        int dup=1;
+        do {
+            duplicate = false;
+            foreach(GenericSeriesInfo info, seriesinfo) {
+                if (info.name == edit.name) {
+                    duplicate=true;
+                    edit.name= name + QString("_%1").arg(dup);
+                    dup++;
+                    break;
+                }
+            }
+        } while (duplicate);
 
         // apply!
         seriesinfo[index] = edit;
