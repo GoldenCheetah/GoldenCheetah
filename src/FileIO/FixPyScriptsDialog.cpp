@@ -104,7 +104,7 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     : QDialog(parent), context(context), pyFixScript(fix)
 {
     setWindowTitle(tr("Edit Python Fix"));
-    setMinimumSize(QSize(1200 * dpiXFactor, 1000 * dpiYFactor));
+    setMinimumSize(QSize(1200 * dpiXFactor, 650 * dpiYFactor));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
