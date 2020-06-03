@@ -156,6 +156,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     // add additional menu items before setting
     // controls since the menu is SET from setControls
+    QAction *showsettings = new QAction(tr("Chart Settings..."));
+    addAction(showsettings);
     QAction *exportData = new QAction(tr("Export Chart Data..."), this);
     addAction(exportData);
 
@@ -528,6 +530,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged(qint32)), cpPlot, SLOT(configChanged(qint32)));
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
+    connect(showsettings, SIGNAL(triggered()), this, SIGNAL(showControls()));
 
     // model updated?
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
