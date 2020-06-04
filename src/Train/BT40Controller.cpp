@@ -26,6 +26,9 @@ BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : 
     localDevice = new QBluetoothLocalDevice(this);
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
     localDc = dc;
+    if (localDc) wheelSize = localDc->wheelSize;
+    else wheelSize = 2100;
+
     connect(discoveryAgent, SIGNAL(deviceDiscovered(const QBluetoothDeviceInfo&)),
 	    this, SLOT(addDevice(const QBluetoothDeviceInfo&)));
     connect(discoveryAgent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
@@ -138,6 +141,7 @@ BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
         devices.append(dev);
         dev->connectDevice();
         connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
+        dev->setWheelCircumference(wheelSize);
     }
 }
 
@@ -159,14 +163,62 @@ BT40Controller::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error)
 void
 BT40Controller::setWheelRpm(double wrpm) {
     telemetry.setWheelRpm(wrpm);
-    int wheel;
-    if (localDc) wheel = localDc->wheelSize;
-    else wheel = 2100;
-    telemetry.setSpeed(wrpm * wheel / 1000 * 60 / 1000);
+    telemetry.setSpeed(wrpm * wheelSize / 1000 * 60 / 1000);
 }
 
-void BT40Controller::setGradient(double grad) {
+void BT40Controller::setLoad(double l)
+{
   for (auto* dev: devices) {
-    dev->setGradient(grad);
+    dev->setLoad(l);
   }
 }
+
+void BT40Controller::setGradient(double g) {
+  for (auto* dev: devices) {
+    dev->setGradient(g);
+  }
+}
+
+void BT40Controller::setMode(int m)
+{
+  for (auto* dev: devices) {
+    dev->setMode(m);
+  }
+}
+
+void BT40Controller::setWindSpeed(double s)
+{
+  for (auto* dev: devices) {
+    dev->setWindSpeed(s);
+  }
+}
+
+void BT40Controller::setWeight(double w)
+{
+  for (auto* dev: devices) {
+    dev->setWeight(w);
+  }
+}
+
+void BT40Controller::setRollingResistance(double rr)
+{
+  for (auto* dev: devices) {
+    dev->setRollingResistance(rr);
+  }
+}
+
+void BT40Controller::setWindResistance(double wr)
+{
+  for (auto* dev: devices) {
+    dev->setWindResistance(wr);
+  }
+}
+
+void BT40Controller::setWheelCircumference(double wc)
+{
+  wheelSize = wc;
+  for (auto* dev: devices) {
+    dev->setWheelCircumference(wc);
+  }
+}
+

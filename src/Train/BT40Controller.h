@@ -46,7 +46,14 @@ public:
     bool discover(QString name);
     void setDevice(QString);
 
-    void setGradient(double) override;
+    void setLoad(double);
+    void setGradient(double);
+    void setMode(int);
+    void setWindSpeed(double);
+    void setWeight(double);
+    void setRollingResistance(double);
+    void setWindResistance(double);
+    void setWheelCircumference(double);
 
     // telemetry push pull
     bool doesPush(), doesPull(), doesLoad();
@@ -96,6 +103,7 @@ private:
     RealtimeData telemetry;
     QList<BT40Device*> devices;
     DeviceConfiguration* localDc;
+    double wheelSize;
 };
 
 #endif // _GC_BT40Controller_h
