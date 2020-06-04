@@ -1,5 +1,5 @@
 #
-# Core tools
+# Core Tools
 #
 sip == 4.19.8
 numpy

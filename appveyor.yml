@@ -87,10 +87,10 @@ install:
     if (-not (Test-Path 'C:\Python')) {
       Start-FileDownload "https://www.python.org/ftp/python/3.7.7/python-3.7.7-embed-amd64.zip" Python.zip
       7z x Python.zip -oC:\Python\
-      echo Lib/site-packages python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding utf8
-      mkdir C:\Python\Lib\site-packages
+      echo python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding ascii
+      mkdir C:\Python\lib\site-packages
       c:\python37-x64\python -m pip install --upgrade pip
-      c:\python37-x64\python -m pip install -r src\Python\requirements.txt -t C:\Python\Lib\site-packages
+      c:\python37-x64\python -m pip install -r src\Python\requirements.txt -t C:\Python\lib\site-packages
     }
 
 # Get SIP and and install on Python
