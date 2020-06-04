@@ -655,8 +655,12 @@ UserChartSettings::seriesClicked(int row,int)
         int dup=1;
         do {
             duplicate = false;
-            foreach(GenericSeriesInfo info, seriesinfo) {
-                if (info.name == edit.name) {
+            for(int i=0; i<seriesinfo.count(); i++) {
+
+                // don't check against the one we are editing!
+                if (i == row) continue;
+
+                if (seriesinfo.at(i).name == edit.name) {
                     duplicate=true;
                     edit.name= name + QString("_%1").arg(dup);
                     dup++;
@@ -693,8 +697,12 @@ UserChartSettings::editSeries()
         int dup=1;
         do {
             duplicate = false;
-            foreach(GenericSeriesInfo info, seriesinfo) {
-                if (info.name == edit.name) {
+            for(int i=0; i<seriesinfo.count(); i++) {
+
+                // don't check against the one we are editing!
+                if (i == index) continue;
+
+                if (seriesinfo.at(i).name == edit.name) {
                     duplicate=true;
                     edit.name= name + QString("_%1").arg(dup);
                     dup++;
