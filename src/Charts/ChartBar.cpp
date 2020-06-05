@@ -534,6 +534,7 @@ ChartBarItem::event(QEvent *e)
             // menu activated
             state = Idle;
             emit contextMenu();
+            return true; // no more processing of this event please - lots of stuff happens off that menu !
 
         } else {
 
