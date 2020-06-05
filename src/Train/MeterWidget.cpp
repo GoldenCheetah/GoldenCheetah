@@ -409,8 +409,13 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
     // Display grade as #.#% 
+<<<<<<< HEAD
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0)?QString("-"):QString("")) + QString::number((int) this->gradientValue) +
+                                QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+=======
     QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-") : QString("")) + QString::number((int)this->gradientValue) +
         QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+>>>>>>> c7eda60ad... Removed GOOGLE_KEY, moved Trainer Status to top center.
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     double gradientDrawX = cyclistX;
@@ -419,7 +424,11 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     if (cyclistX < m_Width * 0.5)
         gradientDrawX += 5.;
     else
+<<<<<<< HEAD
+        gradientDrawX =- 45.;
+=======
         gradientDrawX = -45.;
+>>>>>>> c7eda60ad... Removed GOOGLE_KEY, moved Trainer Status to top center.
 
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 
