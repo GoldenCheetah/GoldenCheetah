@@ -173,6 +173,16 @@ main(int argc, char *argv[])
 {
     int ret=2; // return code from qapplication, default to error
 
+#ifdef Q_OS_WIN
+    // On Windows without console, we try to attach to the parent's console
+    // and redirect stderr and stdout on success, to have a more Unix-like
+    // behavior when launched from cmd or PowerShell.
+    if (_fileno(stderr) == -2 && AttachConsole(ATTACH_PARENT_PROCESS )) {
+        freopen("CONOUT$", "w", stderr);
+        freopen("CONOUT$", "w", stdout);
+    }
+#endif
+
     //
     // PROCESS COMMAND LINE SWITCHES
     //
