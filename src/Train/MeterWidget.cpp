@@ -329,7 +329,7 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
 }
 
 ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context),
-    m_minX(0.), m_maxX(0.), m_gradientValue(0.), m_savedWidth(0), m_savedHeight(0)
+    m_minX(0.), m_maxX(0.), gradientValue(0.), m_savedWidth(0), m_savedHeight(0)
 {
     forceSquareRatio = false;
 }
@@ -430,8 +430,8 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
     // Display grade as #.#% 
-    QString gradientString = ((-1.0 < this->m_gradientValue && this->m_gradientValue < 0.0) ? QString("-"):QString("")) +
-        QString::number((int) this->m_gradientValue) + QString(".") + QString::number(abs((int)(this->m_gradientValue * 10.0) % 10)) + QString("%");
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-"):QString("")) +
+        QString::number((int) this->gradientValue) + QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     double gradientDrawX = cyclistX;
