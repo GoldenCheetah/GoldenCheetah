@@ -21,19 +21,9 @@
 
 #include <QWidget>
 #include "Context.h"
-
-#ifdef NOWEBKIT
-  #include <QWebEnginePage>
-  #include <QWebEngineView>
-#else
-  #include <QtWebKit>
-  #include <QWebPage>
-  #include <QWebView>
-  #include <QWebFrame>
-#endif
-
+#include <QWebEnginePage>
+#include <QWebEngineView>
 #include <QtWebEngineWidgets>
-
 
 class MeterWidget : public QWidget
 {

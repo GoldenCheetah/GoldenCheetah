@@ -17,8 +17,6 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma optimize("", off)
-
 #include <QGraphicsPathItem>
 #include "VideoWindow.h"
 #include "Context.h"
@@ -27,7 +25,6 @@
 #include "RideFile.h"
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
-
 
 VideoWindow::VideoWindow(Context *context)  :
     GcChartWindow(context), context(context), m_MediaChanged(false)
