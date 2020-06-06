@@ -27,6 +27,7 @@
 #include "Settings.h"
 #include "GcUpgrade.h" // for VERSION_CONFIG_PREFIX url to -layout.xml
 #include "LTMSettings.h" // for special case of edit LTM settings
+#include "Overview.h" // for special case of Overview defaults
 #include "ChartBar.h"
 #include "Utils.h"
 
@@ -1202,6 +1203,11 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
         static_cast<LTMWindow*>(win)->applySettings(*use);
         win->setProperty("title", use->name);
         title->setText(use->name);
+    }
+
+    // special case
+    if (type == GcWindowTypes::Overview) {
+        static_cast<OverviewWindow*>(win)->setConfiguration("");
     }
 
     RideItem *notconst = (RideItem*)context->currentRideItem();
