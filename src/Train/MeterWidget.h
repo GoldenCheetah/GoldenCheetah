@@ -114,13 +114,21 @@ class NeedleMeterWidget : public MeterWidget
 
 class ElevationMeterWidget : public MeterWidget
 {
+    Context* context;
+    QPolygon m_elevationPolygon;
+    double m_minX, m_maxX;
+    int m_savedWidth, m_savedHeight;
+
+  protected:
+    virtual void paintEvent(QPaintEvent* paintevent);
+
+    void lazyDimensionCompute(void);
+
   public:
     explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
-    virtual void paintEvent(QPaintEvent* paintevent);
+    void setContext(Context* context) { this->context = context; }
+
     float gradientValue;
-    void setContext(Context *context) { this->context = context; }
-  private:
-    Context *context;
 };
 
 #endif // _MeterWidget_h
