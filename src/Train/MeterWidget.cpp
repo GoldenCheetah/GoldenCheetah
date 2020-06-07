@@ -328,10 +328,61 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.restore();
 }
 
-ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context)
+ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context),
+    m_minX(0.), m_maxX(0.), m_savedWidth(0), m_savedHeight(0), gradientValue(0.)
 {
     forceSquareRatio = false;
-    gradientValue = 0.0;
+}
+
+// Compute polygon for elevation graph based on widget size.
+// This is two full scans of the ergfile point array.
+void ElevationMeterWidget::lazyDimensionCompute(void)
+{
+    // Nothing to compute unless there is an erg file.
+    if (!context || !context->currentErgFile())
+        return;
+
+    // Compute if size has changed
+    if (m_savedWidth != m_Width || m_savedHeight != m_Height) {
+
+        // Determine extents of route
+        double minX, minY, maxX, maxY;
+        minX = maxX = context->currentErgFile()->Points[0].x; // meters
+        minY = maxY = context->currentErgFile()->Points[0].y; // meters or altitude???
+        foreach(ErgFilePoint x, context->currentErgFile()->Points) {
+            minX = std::min(minX, x.x);
+            minY = std::min(minY, x.y);
+            maxX = std::max(maxX, x.x);
+            maxY = std::max(maxY, x.y);
+        }
+
+        if (m_Width != 0 && (maxY - minY) / 0.05 < (double)m_Height * 0.80 * (maxX - minX) / (double)m_Width)
+            maxY = minY + (double)m_Height * 0.80 * (maxX - minX) / (double)m_Width * 0.05;
+        minY -= (maxY - minY) * 0.20f; // add 20% as bottom headroom (slope gradient will be shown there in a bubble)
+
+        // Populate elevation route polygon
+        m_elevationPolygon.clear();
+        m_elevationPolygon << QPoint(0.0, (double)m_Height);
+        double x = 0, y = 0;
+        double nextX = 1;
+        for (double pt=0; pt < context->currentErgFile()->Points.size(); pt++) {
+            for (; x < nextX && pt < context->currentErgFile()->Points.size(); pt++) {
+                x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX - minX);
+                y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY - minY);
+            }
+            // Add points to polygon only once every time the x coordinate integer part changes.
+            m_elevationPolygon << QPoint(x, (double)m_Height - y);
+            nextX = floor(x) + 1.0;
+        }
+        m_elevationPolygon << QPoint((double)m_Width, (double)m_Height);
+
+        // Save distance extent, used to situate rider location within widget display.
+        m_minX = minX;
+        m_maxX = maxX;
+
+        m_savedWidth = m_Width;
+        m_savedHeight = m_Height;
+    }
 }
 
 void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
@@ -353,51 +404,23 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // Find min/max
-    double minX, minY, maxX, maxY, cyclistX=0.0;
-    // (based on ErgFilePlot.cpp)
-    minX=maxX=context->currentErgFile()->Points[0].x; // meters
-    minY=maxY=context->currentErgFile()->Points[0].y; // meters or altitude???
-    foreach(ErgFilePoint x, context->currentErgFile()->Points)
-    {
-        if (x.y > maxY) maxY = x.y;
-        if (x.x > maxX) maxX = x.x;
-        if (x.y < minY) minY = x.y;
-        if (x.x < minX) minX = x.x;
-    }
-    // check if slope shown will not be too inconsistent (based on widget's width/height ratio)
-    // we accept 20 times i.e. 5% gradient will be shown as 45°
-    if ( m_Width!=0 && (maxY-minY) / 0.05 < (double)m_Height * 0.80 * (maxX-minX) / (double)m_Width)
-        maxY = minY + (double)m_Height * 0.80 * (maxX-minX) / (double)m_Width * 0.05;
-    double bubbleSize = (double)m_Height*0.010f;
-    minY -= (maxY-minY) * 0.20f; // add 20% as bottom headroom (slope gradient will be shown there in a bubble)
+    // Lazy compute of min, max and route elevation polygon on init or if dimensions
+    // change. Ideally we'd use the resize event but we are computing from ergfile
+    // which isnt available when initial resize occurs.
+    lazyDimensionCompute();
 
-    // this->Value should hold the current distance in meters. 
-    cyclistX = (this->Value * 1000.0 - minX) * (double)m_Width / (maxX-minX);
+    double bubbleSize = (double)m_Height * 0.010f;
 
-    //Get point to create the polygon
     QPolygon polygon;
-    polygon << QPoint(0.0, (double)m_Height);
-    double x = 0., y, pt=0;
-    double nextX = 1;
-    for( pt=0; pt < context->currentErgFile()->Points.size(); pt++)
-    {
-        for ( ; x < nextX && pt < context->currentErgFile()->Points.size(); pt++)
-        {
-            x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX-minX);
-            y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY-minY);
-        }
-        // Add points to polygon only once every time the x coordinate integer part changes.
-        polygon << QPoint(x, (double)m_Height - y);
-        nextX = floor(x) + 1.0;
-    }
-    polygon << QPoint((double) m_Width, (double)m_Height);
-    polygon << QPoint(fmin((double) m_Width,cyclistX+bubbleSize), (double)m_Height);
+    polygon << QPoint(fmin((double) m_Width, bubbleSize), (double)m_Height);
+
+    double cyclistX = (this->Value * 1000.0 - m_minX) * (double)m_Width / (m_maxX - m_minX);
     polygon << QPoint(cyclistX, (double)m_Height-bubbleSize);
     polygon << QPoint(fmax(0.0, cyclistX-bubbleSize), (double)m_Height);
 
     painter.setPen(m_OutlinePen);
     painter.setBrush(m_BackgroundBrush);
+    painter.drawPolygon(m_elevationPolygon);
     painter.drawPolygon(polygon);
 
     m_OutlinePen = QPen(m_MainColor);
@@ -407,8 +430,8 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
     // Display grade as #.#% 
-    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0)?QString("-"):QString("")) + QString::number((int) this->gradientValue) +
-                                QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-"):QString("")) +
+        QString::number((int) this->gradientValue) + QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     double gradientDrawX = cyclistX;
