@@ -329,7 +329,7 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
 }
 
 ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context),
-    m_minX(0.), m_maxX(0.), gradientValue(0.), m_savedWidth(0), m_savedHeight(0)
+    m_minX(0.), m_maxX(0.), m_savedWidth(0), m_savedHeight(0), gradientValue(0.)
 {
     forceSquareRatio = false;
 }
@@ -363,9 +363,9 @@ void ElevationMeterWidget::lazyDimensionCompute(void)
         // Populate elevation route polygon
         m_elevationPolygon.clear();
         m_elevationPolygon << QPoint(0.0, (double)m_Height);
-        double x = 0., y, pt = 0;
+        double x = 0, y = 0;
         double nextX = 1;
-        for (pt = 0; pt < context->currentErgFile()->Points.size(); pt++) {
+        for (double pt=0; pt < context->currentErgFile()->Points.size(); pt++) {
             for (; x < nextX && pt < context->currentErgFile()->Points.size(); pt++) {
                 x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX - minX);
                 y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY - minY);
