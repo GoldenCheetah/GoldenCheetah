@@ -1938,11 +1938,6 @@ void TrainSidebar::steerScroll(int scrollAmount)
         context->notifySteerScroll(scrollAmount);
 }
 
-// can be called from the controller
-void TrainSidebar::nextDisplayMode()
-{
-}
-
 void TrainSidebar::warnnoConfig()
 {
     QMessageBox::warning(this, tr("No Devices Configured"), tr("Please configure a device in Preferences."));

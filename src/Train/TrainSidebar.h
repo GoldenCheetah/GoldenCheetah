@@ -113,7 +113,6 @@ class TrainSidebar : public GcWindow
         // was realtimewindow,merged into tool
         // update charts/dials and manage controller
         void updateData(RealtimeData &);      // to update telemetry by push devices
-        void nextDisplayMode();     // show next display mode
         void setStreamController();     // based upon selected device
 
         // this
