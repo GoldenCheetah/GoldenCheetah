@@ -393,6 +393,7 @@ struct FitFileReaderState
                 case 3122: return "Garmin Edge 830";
                 case 3126: return "Garmin Instinct";
                 case 3291: return "Garmin Fenix 6x";
+                case 3299: return "Garmin HRM-Dual";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
