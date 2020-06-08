@@ -159,6 +159,7 @@ void LiveMapWebPageWindow::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+
 }
 
 // Update position on the map when telemetry changes.
