@@ -45,6 +45,7 @@
 #define ROWHEIGHT 80
 
 class ChartSpace;
+class ChartSpaceItemFactory;
 
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
@@ -57,6 +58,7 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) =0;
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
+        virtual QWidget *config()=0; // must supply a widget to configure
 
         // what type am I- managed by user
         int type;
@@ -142,6 +144,9 @@ class ChartSpace : public QWidget
         QGraphicsView *device() { return view; }
         const QList<ChartSpaceItem*> allItems() { return items; }
 
+
+    signals:
+        void itemConfigRequested(ChartSpaceItem*);
 
     public slots:
 
@@ -236,4 +241,49 @@ class ChartSpace : public QWidget
         bool configured;
 };
 
+// each chart has an entry like this in the registry
+struct ChartSpaceItemDetail {
+
+    ChartSpaceItemDetail() : ChartSpaceItemDetail(0,"","",0,NULL) {}
+    ChartSpaceItemDetail(int type, QString quick, QString description, int scope, ChartSpaceItem* (*create)(ChartSpace *))
+        : type(type), scope(scope), quick(quick), description(description), create(create) {}
+
+    int type, scope; // scope needs enums at some point
+    QString quick, description;
+    ChartSpaceItem* (*create)(ChartSpace *);
+};
+
+// registry of items and their details
+class ChartSpaceItemRegistry {
+
+    public:
+
+        // singleton instance
+        static ChartSpaceItemRegistry &instance() {
+            if (!_instance) _instance = new ChartSpaceItemRegistry();
+            return *_instance;
+        }
+
+        // register chartspace items
+        bool addItem(int type, QString quick, QString description, int scope, ChartSpaceItem* (*create)(ChartSpace *)) {
+
+            // add to registry
+            _items.append(ChartSpaceItemDetail(type, quick, description, scope, create));
+            return true;
+        }
+
+        // get the detail spec for type requested
+        ChartSpaceItemDetail detailForType(int type);
+
+        // get the registry
+        QList<ChartSpaceItemDetail> &items() { return _items; }
+
+    private:
+
+        static ChartSpaceItemRegistry *_instance;
+        QList<ChartSpaceItemDetail> _items;
+
+        // constructors
+        ChartSpaceItemRegistry() {}
+};
 #endif // _GC_ChartSpace_h

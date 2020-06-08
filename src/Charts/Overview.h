@@ -51,6 +51,12 @@ class OverviewWindow : public GcChartWindow
         QString getConfiguration() const;
         void setConfiguration(QString x);
 
+        // add a tile to the window
+        void addTile();
+
+        // config item requested
+        void configItem(ChartSpaceItem *);
+
     private:
 
         // gui setup

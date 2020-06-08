@@ -21,6 +21,7 @@
 
 // basics
 #include "ChartSpace.h"
+#include "MetricSelect.h"
 #include <QGraphicsItem>
 
 // qt charts for zone chart
@@ -42,8 +43,39 @@ class Routeline;
 // number of points in a route viz - trial and error gets 250 being reasonable
 #define ROUTEPOINTS 250
 
-// types we use
-enum OverviewItemType { RPE, METRIC, META, ZONE, INTERVAL, PMC, ROUTE };
+// types we use start from 100 to avoid clashing with main chart types
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE };
+
+//
+// Configuration widget for ALL Overview Items
+//
+class OverviewItemConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        OverviewItemConfig(ChartSpaceItem *);
+
+    public slots:
+
+        // retrieve values when user edits them (if they're valid)
+        void dataChanged();
+
+        // set the config widgets to reflect current config
+        void setWidgets();
+
+    private:
+
+        // the widget we are configuring
+        ChartSpaceItem *item;
+
+        QLineEdit *name; // all of them
+        MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
+        MetricSelect *meta1; // Meta
+        SeriesSelect *series1; // Zone Histogram
+
+};
 
 class RPEOverviewItem : public ChartSpaceItem
 {
@@ -56,6 +88,10 @@ class RPEOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        QWidget *config() { _config->setWidgets(); return _config; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new RPEOverviewItem(parent, "RPE"); }
 
         // RPE meta field
         Sparkline *sparkline;
@@ -64,6 +100,9 @@ class RPEOverviewItem : public ChartSpaceItem
         // for setting sparkline & painting
         bool up, showrange;
         QString value, upper, lower, mean;
+
+        // config
+        OverviewItemConfig *_config;
 };
 
 class MetricOverviewItem : public ChartSpaceItem
@@ -77,6 +116,10 @@ class MetricOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        QWidget *config() { _config->setWidgets(); return _config; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new MetricOverviewItem(parent, "PowerIndex", "power_index"); }
 
         QString symbol;
         RideMetric *metric;
@@ -86,6 +129,9 @@ class MetricOverviewItem : public ChartSpaceItem
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
+
+        // config
+        OverviewItemConfig *_config;
 };
 
 class MetaOverviewItem : public ChartSpaceItem
@@ -99,6 +145,10 @@ class MetaOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        QWidget *config() { _config->setWidgets(); return _config; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
 
         QString symbol;
         int fieldtype;
@@ -108,6 +158,9 @@ class MetaOverviewItem : public ChartSpaceItem
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
+
+        // config
+        OverviewItemConfig *_config;
 };
 
 class PMCOverviewItem : public ChartSpaceItem
@@ -121,10 +174,17 @@ class PMCOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        QWidget *config() { _config->setWidgets(); return _config; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new PMCOverviewItem(parent, "coggan_tss"); }
 
         QString symbol;
 
         double sts, lts, sb, rr, stress;
+
+        // config
+        OverviewItemConfig *_config;
 };
 
 class ZoneOverviewItem : public ChartSpaceItem
@@ -139,6 +199,10 @@ class ZoneOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void dragChanged(bool x);
+        QWidget *config() { _config->setWidgets(); return _config; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new ZoneOverviewItem(parent, tr("Power Zones"), RideFile::watts); }
 
         RideFile::seriestype series;
 
@@ -147,6 +211,9 @@ class ZoneOverviewItem : public ChartSpaceItem
         QBarSeries *barseries;
         QStringList categories;
         QBarCategoryAxis *barcategoryaxis;
+
+        // config
+        OverviewItemConfig *_config;
 };
 
 class RouteOverviewItem : public ChartSpaceItem
@@ -160,8 +227,15 @@ class RouteOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        QWidget *config() { _config->setWidgets(); return _config; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new RouteOverviewItem(parent, tr("Route")); }
 
         Routeline *routeline;
+
+        // config
+        OverviewItemConfig *_config;
 };
 
 class IntervalOverviewItem : public ChartSpaceItem
@@ -175,10 +249,17 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        QWidget *config() { _config->setWidgets(); return _config; }// todo
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
 
         QString xsymbol, ysymbol, zsymbol;
         BubbleViz *bubble;
+        OverviewItemConfig *_config;
+
 };
+
 
 //
 // below are theviz widgets used by the overview items

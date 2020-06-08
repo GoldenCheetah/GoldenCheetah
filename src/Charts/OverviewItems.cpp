@@ -39,6 +39,25 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+static bool _registerItems()
+{
+    // get the factory
+    ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
+
+    // Register      TYPE                        SHORT                      DESCRIPTION                            SCOPE    CREATOR
+    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),   0,       MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"), 0,       MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),         0,       ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),             0,       RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),  0,       IntervalOverviewItem::create);
+    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),     0,       PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),          0,       RouteOverviewItem::create);
+
+    return true;
+}
+static bool registered = _registerItems();
+
+
 RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
 
@@ -47,12 +66,14 @@ RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceI
 
     sparkline = new Sparkline(this, SPARKDAYS+1, name);
     rperating = new RPErating(this, name);
+    _config = new OverviewItemConfig(this);
 }
 
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
     this->type = OverviewItemType::ROUTE;
     routeline = new Routeline(this, name);
+    _config = new OverviewItemConfig(this);
 }
 
 static const QStringList timeInZones = QStringList()
@@ -102,6 +123,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
 
     this->type = OverviewItemType::ZONE;
     this->series = series;
+    _config = new OverviewItemConfig(this);
 
     // basic chart setup
     chart = new QChart(this);
@@ -212,6 +234,7 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     // metric
     this->type = OverviewItemType::METRIC;
     this->symbol = symbol;
+    _config = new OverviewItemConfig(this);
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
@@ -228,6 +251,7 @@ PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpac
     // metric
     this->type = OverviewItemType::PMC;
     this->symbol = symbol;
+    _config = new OverviewItemConfig(this);
 
 }
 
@@ -237,6 +261,7 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
     // metric or meta or pmc
     this->type = OverviewItemType::META;
     this->symbol = symbol;
+    _config = new OverviewItemConfig(this);
 
     //  Get the field type
     fieldtype = -1;
@@ -264,6 +289,7 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
 
     // we may plot the metric sparkline if the tile is big enough
     bubble = new BubbleViz(this, "intervals");
+    _config = new OverviewItemConfig(this);
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
@@ -1192,6 +1218,186 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 void RouteOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 void IntervalOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 void ZoneOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
+
+//
+// OverviewItem Configuration Widget
+//
+OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item)
+{
+    QFormLayout *layout = new QFormLayout(this);
+
+    // everyone except PMC
+    if (item->type != OverviewItemType::PMC) {
+        name = new QLineEdit(this);
+        connect(name, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+        layout->addRow(tr("Name"), name);
+    }
+
+    // single metric names
+    if (item->type == OverviewItemType::METRIC || item->type == OverviewItemType::PMC) {
+        metric1 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
+        layout->addRow(tr("Metric"), metric1);
+        connect(metric1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+    }
+
+    // metric1, metric2 and metric3
+    if (item->type == OverviewItemType::INTERVAL) {
+        metric1 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
+        connect(metric1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+        layout->addRow(tr("X Axis Metric"), metric1);
+
+        metric2 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
+        connect(metric2, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+        layout->addRow(tr("Y Axis Metric"), metric2);
+
+        metric3 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
+        connect(metric3, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+        layout->addRow(tr("Bubble Size Metric"), metric3);
+    }
+
+    if (item->type == OverviewItemType::META) {
+        meta1 = new MetricSelect(this, item->parent->context, MetricSelect::Meta);
+        connect(meta1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+        layout->addRow(tr("Field Name"), meta1);
+    }
+
+    if (item->type == OverviewItemType::ZONE) {
+        series1 = new SeriesSelect(this, SeriesSelect::Zones);
+        connect(series1, SIGNAL(currentIndexChanged(int)), this, SLOT(dataChanged()));
+        layout->addRow(tr("Zone Series"), series1);
+    }
+}
+
+void
+OverviewItemConfig::setWidgets()
+{
+    // set the widget values from the item
+    switch(item->type) {
+    case OverviewItemType::RPE:
+        {
+            RPEOverviewItem *mi = reinterpret_cast<RPEOverviewItem*>(item);
+            name->setText(mi->name);
+        }
+        break;
+
+    case OverviewItemType::METRIC:
+        {
+            MetricOverviewItem *mi = reinterpret_cast<MetricOverviewItem*>(item);
+            name->setText(mi->name);
+            metric1->setSymbol(mi->symbol);
+        }
+        break;
+
+    case OverviewItemType::META:
+        {
+            MetaOverviewItem *mi = reinterpret_cast<MetaOverviewItem*>(item);
+            name->setText(mi->name);
+            meta1->setText(mi->symbol);
+        }
+        break;
+
+    case OverviewItemType::ZONE:
+        {
+            ZoneOverviewItem *mi = reinterpret_cast<ZoneOverviewItem*>(item);
+            name->setText(mi->name);
+            series1->setSeries(mi->series);
+        }
+        break;
+
+    case OverviewItemType::INTERVAL:
+        {
+            IntervalOverviewItem *mi = reinterpret_cast<IntervalOverviewItem*>(item);
+            name->setText(mi->name);
+            metric1->setSymbol(mi->xsymbol);
+            metric2->setSymbol(mi->ysymbol);
+            metric3->setSymbol(mi->zsymbol);
+        }
+        break;
+
+    case OverviewItemType::ROUTE:
+        {
+            RouteOverviewItem *mi = reinterpret_cast<RouteOverviewItem*>(item);
+            name->setText(mi->name);
+        }
+        break;
+
+    case OverviewItemType::PMC:
+        {
+            PMCOverviewItem *mi = reinterpret_cast<PMCOverviewItem*>(item);
+            metric1->setSymbol(mi->symbol);
+        }
+        break;
+    }
+}
+
+void
+OverviewItemConfig::dataChanged()
+{
+    // user edited or programmatically the data was changed
+    // so lets update the item to reflect those changes
+    // if they are valid.......
+
+    // set the widget values from the item
+    switch(item->type) {
+    case OverviewItemType::RPE:
+        {
+            RPEOverviewItem *mi = reinterpret_cast<RPEOverviewItem*>(item);
+            mi->name = name->text();
+        }
+        break;
+
+    case OverviewItemType::METRIC:
+        {
+            MetricOverviewItem *mi = reinterpret_cast<MetricOverviewItem*>(item);
+            mi->name = name->text();
+            if (metric1->isValid()) {
+                mi->symbol = metric1->rideMetric()->symbol();
+                mi->units = metric1->rideMetric()->units(mi->parent->context->athlete->useMetricUnits);
+            }
+        }
+        break;
+
+    case OverviewItemType::META:
+        {
+            MetaOverviewItem *mi = reinterpret_cast<MetaOverviewItem*>(item);
+            mi->name = name->text();
+            if (meta1->isValid()) mi->symbol = meta1->text();
+        }
+        break;
+
+    case OverviewItemType::ZONE:
+        {
+            ZoneOverviewItem *mi = reinterpret_cast<ZoneOverviewItem*>(item);
+            mi->name = name->text();
+            if (series1->currentIndex() >= 0) mi->series = static_cast<RideFile::SeriesType>(series1->itemData(series1->currentIndex(), Qt::UserRole).toInt());
+        }
+        break;
+
+    case OverviewItemType::INTERVAL:
+        {
+            IntervalOverviewItem *mi = reinterpret_cast<IntervalOverviewItem*>(item);
+            mi->name = name->text();
+            if (metric1->isValid()) mi->xsymbol = metric1->rideMetric()->symbol();
+            if (metric2->isValid()) mi->ysymbol = metric2->rideMetric()->symbol();
+            if (metric3->isValid()) mi->zsymbol = metric3->rideMetric()->symbol();
+        }
+        break;
+
+    case OverviewItemType::ROUTE:
+        {
+            RouteOverviewItem *mi = reinterpret_cast<RouteOverviewItem*>(item);
+            mi->name = name->text();
+        }
+        break;
+
+    case OverviewItemType::PMC:
+        {
+            PMCOverviewItem *mi = reinterpret_cast<PMCOverviewItem*>(item);
+            if (metric1->isValid()) mi->symbol = metric1->rideMetric()->symbol();
+        }
+        break;
+    }
+}
 
 //
 // Below here are all the overviewitem viz

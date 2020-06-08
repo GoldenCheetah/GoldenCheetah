@@ -32,6 +32,7 @@
 #include <QJsonValue>
 
 static QIcon grayConfig, whiteConfig, accentConfig;
+ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
 ChartSpace::ChartSpace(Context *context) :
     state(NONE), context(context), group(NULL), _viewY(0),
@@ -102,6 +103,7 @@ ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
     item->column = column;
     item->deep = deep;
     items.append(item);
+    if (current) item->setData(current);
 }
 
 // when a ride is selected we need to notify all the ChartSpaceItems
@@ -637,6 +639,16 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // ignore other scene elements (e.g. charts)
             if (!items.contains(item)) item=NULL;
 
+            // trigger config. so drop out completely as
+            // we may end up deleting the item etc
+            // so we explicity unblock too
+            if (item && item->inCorner()) {
+
+                block = false; // reeentry is allowed
+                emit itemConfigRequested(item);
+                return true;
+            }
+
             // only respond to clicks not in config corner button
             if (item && ! item->inCorner()) {
 
@@ -939,4 +951,15 @@ ChartSpaceItem::clicked()
     //else brush.setColor(GColor(CChartSpaceItemBACKGROUND));
 
     update(geometry());
+}
+
+ChartSpaceItemDetail
+ChartSpaceItemRegistry::detailForType(int type)
+{
+    for(int i=0; i<_items.count(); i++) {
+        if (_items.at(i).type == type) return _items.at(i);
+    }
+
+    // not found :(
+    return ChartSpaceItemDetail();
 }

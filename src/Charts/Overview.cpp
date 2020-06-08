@@ -19,6 +19,7 @@
 #include "Overview.h"
 #include "ChartSpace.h"
 #include "OverviewItems.h"
+#include "AddChartWizard.h"
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
@@ -45,6 +46,22 @@ OverviewWindow::OverviewWindow(Context *context) : GcChartWindow(context), conte
 
     // tell space when a ride is selected
     connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
+    connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
+    connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
+}
+
+void
+OverviewWindow::addTile()
+{
+    AddChartWizard *p = new AddChartWizard(context, space);
+    p->exec(); // no mem leak delete on close dialog
+}
+
+void
+OverviewWindow::configItem(ChartSpaceItem *)
+{
+    //fprintf(stderr, "config item...\n"); fflush(stderr);
+    //XXX TODO
 }
 
 QString

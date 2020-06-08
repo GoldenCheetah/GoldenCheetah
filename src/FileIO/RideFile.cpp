@@ -3254,7 +3254,8 @@ static struct {
 	{ "LEFTPPPB", RideFile::lpppb },
 	{ "RIGHTPPPB", RideFile::rpppb },
 	{ "LEFTPPPE", RideFile::lpppe },
-	{ "RIGHTPPPE", RideFile::rpppe },
+    { "RIGHTPPPE", RideFile::rpppe },
+    { "WBAL", RideFile::wbal },
 	{ "", RideFile::none  },
 };
 
