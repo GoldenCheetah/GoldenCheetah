@@ -494,6 +494,7 @@ struct FitFileReaderState
             // Tacx
             switch (prod) {
                 case 2800: return "Tacx Neo";
+                case 2850: return "Tacx Neo 2 Smart";
                 default: return QString("Tacx %1").arg(prod);
             }
         } else if (manu == 95) {
