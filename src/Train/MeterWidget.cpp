@@ -526,7 +526,6 @@ void LiveMapWidget::initLiveMap ()
 
 void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
-    qDebug("==> Ready to receive new LatLng") ;
     QString code;
     QString sLat = QVariant(dLat).toString();
     QString sLon = QVariant(dLon).toString();

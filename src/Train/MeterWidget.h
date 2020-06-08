@@ -130,13 +130,9 @@ class ElevationMeterWidget : public MeterWidget
   public:
     explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
     void setContext(Context* context) { this->context = context; }
-
     float gradientValue;
-    void setContext(Context *context) { this->context = context; }
-  private:
-    Context *context;
-
 };
+
 class LiveMapWidget : public MeterWidget
 {
   Q_OBJECT
