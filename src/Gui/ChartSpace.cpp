@@ -106,6 +106,20 @@ ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
     if (current) item->setData(current);
 }
 
+void
+ChartSpace::removeItem(ChartSpaceItem *item)
+{
+    for(int i=0; i<items.count(); i++) {
+        ChartSpaceItem *p = items.at(i);
+        if (p == item) {
+            scene->removeItem(p);
+            items.removeAt(i);
+            delete p;
+            return;
+        }
+    }
+}
+
 // when a ride is selected we need to notify all the ChartSpaceItems
 void
 ChartSpace::rideSelected(RideItem *item)
@@ -278,6 +292,8 @@ static bool ChartSpaceItemSort(const ChartSpaceItem* left, const ChartSpaceItem*
 void
 ChartSpace::updateGeometry()
 {
+    // can't update geom if nothing to see.
+    if (items.count() == 0) return;
 
     bool animated=false;
 
@@ -422,6 +438,11 @@ ChartSpace::updateView()
 {
     scene->setSceneRect(sceneRect);
     scene->update();
+
+    if (items.count() == 0) {
+        scrollbar->setEnabled(false);
+        return;
+    }
 
     // don'r scale whilst resizing on x?
     if (scrolling || (state != YRESIZE && state != XRESIZE && state != DRAG)) {

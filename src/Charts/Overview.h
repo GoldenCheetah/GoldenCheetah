@@ -64,4 +64,23 @@ class OverviewWindow : public GcChartWindow
         bool configured;
 };
 
+class OverviewConfigDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        OverviewConfigDialog(ChartSpaceItem*);
+
+
+    public slots:
+
+        void removeItem();
+        void close();
+
+    private:
+        ChartSpaceItem *item;
+        QVBoxLayout *main;
+        QPushButton *remove, *ok;
+};
+
 #endif // _GC_OverviewWindow_h

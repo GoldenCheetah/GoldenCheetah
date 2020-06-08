@@ -58,10 +58,10 @@ OverviewWindow::addTile()
 }
 
 void
-OverviewWindow::configItem(ChartSpaceItem *)
+OverviewWindow::configItem(ChartSpaceItem *item)
 {
-    //fprintf(stderr, "config item...\n"); fflush(stderr);
-    //XXX TODO
+    OverviewConfigDialog *p = new OverviewConfigDialog(item);
+    p->exec(); // no mem leak as delete on close
 }
 
 QString
@@ -344,4 +344,63 @@ OverviewWindow::setConfiguration(QString config)
 
     // put in place
     space->updateGeometry();
+}
+
+//
+// Config dialog that pops up when you click on the config button
+//
+OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL), item(item)
+{
+    setWindowTitle(tr("Chart Settings"));
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowCloseButtonHint);
+    setModal(true);
+
+    main = new QVBoxLayout(this);
+    main->addWidget(item->config());
+
+    // buttons
+    QHBoxLayout *buttons = new QHBoxLayout();
+    remove = new QPushButton("Remove", this);
+    ok = new QPushButton("Close", this);
+    ok->setDefault(true);
+
+    buttons->addWidget(remove);
+    buttons->addStretch();
+    buttons->addWidget(ok);
+
+    main->addLayout(buttons);
+
+    connect(ok, SIGNAL(clicked()), this, SLOT(close()));
+    connect(remove, SIGNAL(clicked()), this, SLOT(removeItem()));
+}
+
+void
+OverviewConfigDialog::close()
+{
+    // remove from the layout- unless we just deleted it !
+    if (item) main->removeWidget(item->config());
+    accept();
+}
+
+void
+OverviewConfigDialog::removeItem()
+{
+    hide(); // don't show the ugliness
+
+    // remove config from our layout as about to be deleted
+    main->takeAt(0);
+
+    // remove from the space
+    ChartSpace *space = item->parent;
+    space->removeItem(item);
+
+    // update geometry
+    space->updateGeometry();
+    space->updateView();
+
+    item=NULL;
+
+    // and we're done
+    close();
 }

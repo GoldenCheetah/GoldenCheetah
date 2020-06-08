@@ -183,6 +183,9 @@ class ChartSpace : public QWidget
         // add a ChartSpaceItem to the view
         void addItem(int row, int column, int deep, ChartSpaceItem *item);
 
+        // remove an item
+        void removeItem(ChartSpaceItem *item);
+
     protected:
 
         // process events

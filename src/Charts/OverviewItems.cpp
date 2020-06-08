@@ -66,14 +66,23 @@ RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceI
 
     sparkline = new Sparkline(this, SPARKDAYS+1, name);
     rperating = new RPErating(this, name);
-    _config = new OverviewItemConfig(this);
+}
+
+RPEOverviewItem::~RPEOverviewItem()
+{
+    delete rperating;
+    delete sparkline;
 }
 
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
     this->type = OverviewItemType::ROUTE;
     routeline = new Routeline(this, name);
-    _config = new OverviewItemConfig(this);
+}
+
+RouteOverviewItem::~RouteOverviewItem()
+{
+    delete routeline;
 }
 
 static const QStringList timeInZones = QStringList()
@@ -123,7 +132,6 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
 
     this->type = OverviewItemType::ZONE;
     this->series = series;
-    _config = new OverviewItemConfig(this);
 
     // basic chart setup
     chart = new QChart(this);
@@ -229,12 +237,16 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     chart->axisY(barseries)->setGridLineVisible(false);
 }
 
+ZoneOverviewItem::~ZoneOverviewItem()
+{
+    delete chart;
+}
+
 MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
 {
     // metric
     this->type = OverviewItemType::METRIC;
     this->symbol = symbol;
-    _config = new OverviewItemConfig(this);
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
@@ -245,14 +257,22 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
 
 }
 
+MetricOverviewItem::~MetricOverviewItem()
+{
+    delete sparkline;
+}
+
 PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpaceItem(parent, "")
 {
     // PMC doesn't have a title as we show multiple things
     // metric
     this->type = OverviewItemType::PMC;
     this->symbol = symbol;
-    _config = new OverviewItemConfig(this);
 
+}
+
+PMCOverviewItem::~PMCOverviewItem()
+{
 }
 
 MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
@@ -261,7 +281,6 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
     // metric or meta or pmc
     this->type = OverviewItemType::META;
     this->symbol = symbol;
-    _config = new OverviewItemConfig(this);
 
     //  Get the field type
     fieldtype = -1;
@@ -280,6 +299,11 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
     }
 }
 
+MetaOverviewItem::~MetaOverviewItem()
+{
+    if (sparkline) delete sparkline;
+}
+
 IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QString xsymbol, QString ysymbol, QString zsymbol) : ChartSpaceItem(parent, name)
 {
     this->type = OverviewItemType::INTERVAL;
@@ -289,7 +313,6 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
 
     // we may plot the metric sparkline if the tile is big enough
     bubble = new BubbleViz(this, "intervals");
-    _config = new OverviewItemConfig(this);
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
@@ -297,6 +320,10 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
 }
 
+IntervalOverviewItem::~IntervalOverviewItem()
+{
+    delete bubble;
+}
 
 void
 RPEOverviewItem::setData(RideItem *item)
@@ -1266,7 +1293,12 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         connect(series1, SIGNAL(currentIndexChanged(int)), this, SLOT(dataChanged()));
         layout->addRow(tr("Zone Series"), series1);
     }
+
+    // reflect current config
+    setWidgets();
 }
+
+OverviewItemConfig::~OverviewItemConfig() {}
 
 void
 OverviewItemConfig::setWidgets()
@@ -1630,6 +1662,12 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
     setZValue(11);
     setAcceptHoverEvents(true);
     animator=new QPropertyAnimation(this, "transition");
+}
+
+BubbleViz::~BubbleViz()
+{
+    animator->stop();
+    delete animator;
 }
 
 QVariant BubbleViz::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -2083,6 +2121,12 @@ Routeline::Routeline(QGraphicsWidget *parent, QString name) : QGraphicsItem(NULL
     setGeometry(20,20,100,100);
     setZValue(11);
     animator=new QPropertyAnimation(this, "transition");
+}
+
+Routeline::~Routeline()
+{
+    animator->stop();
+    delete animator;
 }
 
 void

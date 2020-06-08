@@ -135,7 +135,7 @@ AddChartConfig::initializePage()
 
     if (wizard->config) {
         wizard->config->hide();
-        main->takeAt(0);
+        main->removeWidget(wizard->config);
         wizard->config = NULL;
         delete wizard->item;
     }
