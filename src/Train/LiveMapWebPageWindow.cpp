@@ -67,27 +67,32 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
-    HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
-    settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
+    //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
     setControls(settingsWidget);
 
     setContentsMargins(0,0,0,0);
+
     layout = new QVBoxLayout();
     layout->setSpacing(0);
     layout->setContentsMargins(2,0,2,2);
+
+    //layout->setStyleSheet("QLabel { background-color : white; color : blue; }");
+
     setChartLayout(layout);
 
     // set view
     view = new QWebEngineView(this);
     view->setPage(new LiveMapsimpleWebPage());
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
+    view->page()->view()->setContentsMargins(0,10,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
 
-    configChanged(CONFIG_APPEARANCE);
+   configChanged(CONFIG_APPEARANCE);
 
     //Show marker on map
     markerIsVisible = false;
@@ -126,6 +131,7 @@ void LiveMapWebPageWindow::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+
 }
 
 // Update position on the map when telemetry changes.
