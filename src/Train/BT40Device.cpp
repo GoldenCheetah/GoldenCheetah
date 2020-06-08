@@ -123,6 +123,7 @@ BT40Device::deviceDisconnected()
             dynamic_cast<BT40Controller*>(parent)->setBPM(0.0);
         } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
             dynamic_cast<BT40Controller*>(parent)->setWatts(0.0);
+            dynamic_cast<BT40Controller*>(parent)->setWheelRpm(0.0);
         } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
             dynamic_cast<BT40Controller*>(parent)->setWheelRpm(0.0);
         } else if (service->serviceUuid() == QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID))) {
@@ -496,7 +497,7 @@ BT40Device::getCadence(QDataStream& ds)
 
             const int time = cur_time + (cur_time < prevCrankTime ? 0x10000:0) - prevCrankTime;
             const int revs = cur_revs + (cur_revs < prevCrankRevs ? 0x10000:0) - prevCrankRevs;
-            const double rpm = 1024*60*revs / time;
+            const double rpm = 1024*60*revs / double(time);
             dynamic_cast<BT40Controller*>(parent)->setCadence(rpm);
         }
 
@@ -530,7 +531,7 @@ BT40Device::getWheelRpm(QDataStream& ds)
     if(!prevWheelStaleness) {
         quint16 time = wheeltime - prevWheelTime;
         quint32 revs = wheelrevs - prevWheelRevs;
-        if (time) rpm = 2048*60*revs / time;
+        if (time) rpm = 2048*60*revs / double(time);
     }
     else prevWheelStaleness = false;
 
