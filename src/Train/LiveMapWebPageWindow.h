@@ -79,9 +79,6 @@ class LiveMapWebPageWindow : public GcChartWindow
 
         QWebEngineView *view;
         QWebEnginePage* webPage;
-        LiveMapWebPageWindow();  // default ctor
-
-    private slots:
         void telemetryUpdate(RealtimeData rtd);
         void start();
         void stop();

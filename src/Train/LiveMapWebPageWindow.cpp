@@ -46,7 +46,6 @@
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 
-
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
 
@@ -160,7 +159,6 @@ void LiveMapWebPageWindow::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
-
 }
 
 // Update position on the map when telemetry changes.
@@ -169,10 +167,8 @@ void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
     QString code = "";
     geolocation geoloc(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
     if (geoloc.IsReasonableGeoLocation()) {
-        QString sLat = QVariant(rtd.getLatitude()).toString();
-        QString sLon = QVariant(rtd.getLongitude()).toString();
-        QString sZoom = "16";
-        code = "";
+    if (rtd.getLatitude() != 0 && rtd.getLongitude() != 0)
+    {
         if (!markerIsVisible) 
         {
             code = QString("centerMap (" + sLat + ", " + sLon + ", " + sZoom + ");");
