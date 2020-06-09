@@ -366,7 +366,7 @@ KPIOverviewItem::setData(RideItem *item)
     value=Utils::removeDP(value);
 
     // now set the progressbar
-    if (start == 0 and stop == 0) progressbar->hide();
+    if (start == 0 && stop == 0) progressbar->hide();
     else {
         progressbar->show();
         progressbar->setValue(start, stop, value.toDouble());

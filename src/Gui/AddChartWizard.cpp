@@ -160,6 +160,8 @@ AddChartFinal::AddChartFinal(AddChartWizard *parent) : QWizardPage(parent), wiza
 {
     setTitle(tr("Done"));
     setSubTitle(tr("Add Chart"));
+    QVBoxLayout *blank = new QVBoxLayout(this); // just blank .. for now
+    blank->addWidget(new QWidget(this));
 }
 
 void

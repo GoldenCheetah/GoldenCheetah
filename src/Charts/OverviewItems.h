@@ -106,7 +106,7 @@ class KPIOverviewItem : public ChartSpaceItem
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP", 0, 261, "{ 200; }", "watts"); }
+        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts"); }
 
         // settings
         double start, stop;
