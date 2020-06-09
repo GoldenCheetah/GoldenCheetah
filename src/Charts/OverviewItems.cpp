@@ -30,6 +30,12 @@
 #include "PMCData.h"
 #include "RideMetadata.h"
 
+#include "DataFilter.h"
+#include "Utils.h"
+#include "Tab.h"
+#include "LTMTool.h"
+#include "RideNavigator.h"
+
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
 #include <QGLWidget>
@@ -44,14 +50,15 @@ static bool _registerItems()
     // get the factory
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
-    // Register      TYPE                        SHORT                      DESCRIPTION                            SCOPE    CREATOR
-    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),   0,       MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"), 0,       MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),         0,       ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),             0,       RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),  0,       IntervalOverviewItem::create);
-    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),     0,       PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),          0,       RouteOverviewItem::create);
+    // Register      TYPE                        SHORT                      DESCRIPTION                                        SCOPE    CREATOR
+    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               0,       MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   0,       KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             0,       MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     0,       ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         0,       RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              0,       IntervalOverviewItem::create);
+    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 0,       PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      0,       RouteOverviewItem::create);
 
     return true;
 }
@@ -72,6 +79,25 @@ RPEOverviewItem::~RPEOverviewItem()
 {
     delete rperating;
     delete sparkline;
+}
+
+KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units) : ChartSpaceItem(parent, name)
+{
+
+    this->type = OverviewItemType::KPI;
+    this->start = start;
+    this->stop = stop;
+    this->program = program;
+    this->units = units;
+
+    value ="0";
+    progressbar = new ProgressBar(this, start, stop, value.toDouble());
+}
+
+KPIOverviewItem::~KPIOverviewItem()
+{
+    // delete progress bar; //XXX todo
+    delete progressbar;
 }
 
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
@@ -323,6 +349,28 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
 IntervalOverviewItem::~IntervalOverviewItem()
 {
     delete bubble;
+}
+
+void
+KPIOverviewItem::setData(RideItem *item)
+{
+    if (item == NULL || item->ride() == NULL) return;
+
+    // calculate the value...
+    DataFilter parser(this, item->context, program);
+    Result res = parser.evaluate(item, NULL);
+
+    // set to zero for daft values
+    value = QString("%1").arg(res.number);
+    if (value == "nan") value ="";
+    value=Utils::removeDP(value);
+
+    // now set the progressbar
+    if (start == 0 and stop == 0) progressbar->hide();
+    else {
+        progressbar->show();
+        progressbar->setValue(start, stop, value.toDouble());
+    }
 }
 
 void
@@ -813,6 +861,26 @@ RPEOverviewItem::itemGeometryChanged() {
 }
 
 void
+KPIOverviewItem::itemGeometryChanged() {
+
+    QRectF geom = geometry();
+
+    if (progressbar) {
+
+        // make space for the progress bar
+        int minh=6;
+
+        // space enough?
+        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
+            if (start != 0 || stop != 0)  progressbar->show();
+            progressbar->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+        } else {
+            progressbar->hide();
+        }
+    }
+}
+
+void
 MetricOverviewItem::itemGeometryChanged() {
 
     QRectF geom = geometry();
@@ -899,6 +967,76 @@ ZoneOverviewItem::itemGeometryChanged() {
     // disable animation when changing geometry
     chart->setAnimationOptions(QChart::NoAnimation);
     chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+}
+
+void
+KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    double addy = 0;
+    if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
+
+    // mid is slightly higher to account for space around title, move mid up
+    double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
+
+    // if we're deep enough to show the sparkline then stop
+    if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
+
+    // we align centre and mid
+    QFontMetrics fm(parent->bigfont);
+    QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
+
+    painter->setPen(GColor(CPLOTMARKER));
+    painter->setFont(parent->bigfont);
+    painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
+                              mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
+
+    // now units
+    if (units != "" && addy > 0) {
+        painter->setPen(QColor(100,100,100));
+        painter->setFont(parent->smallfont);
+
+        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).width(units)) / 2.0f,
+                              mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
+    }
+
+
+    // paint the range and mean if the chart is shown
+    if (progressbar->isVisible()) {
+        //sparkline->paint(painter, option, widget);
+
+        // in small font max min at top bottom right of chart
+        double bottom = progressbar->geometry().top() + (ROWHEIGHT*2.5);
+        double left = ROWHEIGHT*2;
+        double right = geometry().width()-(ROWHEIGHT*2);
+
+        painter->setPen(QColor(100,100,100));
+        painter->setFont(parent->smallfont);
+
+        QString stoptext = Utils::removeDP(QString("%1").arg(stop));
+        QString starttext = Utils::removeDP(QString("%1").arg(start));
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(stoptext), bottom), stoptext);
+        painter->drawText(QPointF(left, bottom), starttext);
+
+        // percentage in mid font...
+        if (geometry().height() >= (ROWHEIGHT*8)) {
+
+            double percent = round((value.toDouble()-start)/(stop-start) * 100.0);
+            QString percenttext = Utils::removeDP(QString("%1%").arg(percent));
+
+            QFontMetrics mfm(parent->midfont);
+            QRectF mrect = QFontMetrics(parent->midfont, parent->device()).boundingRect(percenttext);
+
+            if (!percenttext.startsWith("nan") && !percenttext.startsWith("inf") && percenttext != "0%") {
+
+                // title color, copied code from chartspace.cpp, should really be a cleaner way to get these
+                if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+                else painter->setPen(QColor(70,70,70));
+
+                painter->setFont(parent->midfont);
+                painter->drawText(QPointF((geometry().width() - mrect.width()) / 2.0f, (ROWHEIGHT * 4.5) + mid + (mfm.ascent() / 3.0f)), percenttext); // divided by 3 to account for "gap" at top of font
+            }
+        }
+    }
 }
 
 void
@@ -1249,6 +1387,10 @@ void ZoneOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, Q
 //
 // OverviewItem Configuration Widget
 //
+static bool insensitiveLessThan(const QString &a, const QString &b)
+{
+    return a.toLower() < b.toLower();
+}
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item), block(false)
 {
     QFormLayout *layout = new QFormLayout(this);
@@ -1294,8 +1436,123 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         layout->addRow(tr("Zone Series"), series1);
     }
 
+    if (item->type == OverviewItemType::KPI) {
+
+        double1 = new QDoubleSpinBox(this);
+        double2 = new QDoubleSpinBox(this);
+        double1->setMinimum(-9999999);
+        double1->setMaximum(9999999);
+        double2->setMinimum(-9999999);
+        double2->setMaximum(9999999);
+        layout->addRow(tr("Start"), double1);
+        layout->addRow(tr("Stop"), double2);
+        connect(double1, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
+        connect(double2, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
+
+        //
+        // Program editor... bit of a faff needs refactoring!!
+        //
+        QList<QString> list;
+        QString last;
+        SpecialFields sp;
+
+        // get sorted list
+        QStringList names = item->parent->context->tab->rideNavigator()->logicalHeadings;
+
+        // start with just a list of functions
+        list = DataFilter::builtins(item->parent->context);
+
+        // ridefile data series symbols
+        list += RideFile::symbols();
+
+        // add special functions (older code needs fixing !)
+        list << "config(cranklength)";
+        list << "config(cp)";
+        list << "config(ftp)";
+        list << "config(w')";
+        list << "config(pmax)";
+        list << "config(cv)";
+        list << "config(scv)";
+        list << "config(height)";
+        list << "config(weight)";
+        list << "config(lthr)";
+        list << "config(maxhr)";
+        list << "config(rhr)";
+        list << "config(units)";
+        list << "const(e)";
+        list << "const(pi)";
+        list << "daterange(start)";
+        list << "daterange(stop)";
+        list << "ctl";
+        list << "tsb";
+        list << "atl";
+        list << "sb(BikeStress)";
+        list << "lts(BikeStress)";
+        list << "sts(BikeStress)";
+        list << "rr(BikeStress)";
+        list << "tiz(power, 1)";
+        list << "tiz(hr, 1)";
+        list << "best(power, 3600)";
+        list << "best(hr, 3600)";
+        list << "best(cadence, 3600)";
+        list << "best(speed, 3600)";
+        list << "best(torque, 3600)";
+        list << "best(isopower, 3600)";
+        list << "best(xpower, 3600)";
+        list << "best(vam, 3600)";
+        list << "best(wpk, 3600)";
+
+        qSort(names.begin(), names.end(), insensitiveLessThan);
+
+        foreach(QString name, names) {
+
+            // handle dups
+            if (last == name) continue;
+            last = name;
+
+            // Handle bikescore tm
+            if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
+            //  Always use the "internalNames" in Filter expressions
+            name = sp.internalName(name);
+
+            // we do very little to the name, just space to _ and lower case it for now...
+            name.replace(' ', '_');
+            list << name;
+        }
+
+        // program editor
+        QVBoxLayout *pl= new QVBoxLayout();
+        editor = new DataFilterEdit(this, item->parent->context);
+        editor->setMinimumHeight(50 * dpiXFactor); // give me some space!
+        DataFilterCompleter *completer = new DataFilterCompleter(list, this);
+        editor->setCompleter(completer);
+        errors = new QLabel(this);
+        errors->setWordWrap(true);
+        errors->setStyleSheet("color: red;");
+        pl->addWidget(editor);
+        pl->addWidget(errors);
+        layout->addRow(tr("Program"), (QWidget*)NULL);
+        layout->addRow(pl);
+
+        connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
+        connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
+
+        // units
+        string1 = new QLineEdit(this);
+        layout->addRow(tr("Units"), string1);
+        connect(string1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+
+    }
+
     // reflect current config
     setWidgets();
+}
+
+void
+OverviewItemConfig::setErrors(QStringList &list)
+{
+    errors->setText(list.join(";"));
 }
 
 OverviewItemConfig::~OverviewItemConfig() {}
@@ -1360,6 +1617,16 @@ OverviewItemConfig::setWidgets()
             metric1->setSymbol(mi->symbol);
         }
         break;
+
+    case OverviewItemType::KPI:
+        {
+            KPIOverviewItem *mi = reinterpret_cast<KPIOverviewItem*>(item);
+            name->setText(mi->name);
+            editor->setText(mi->program);
+            double1->setValue(mi->start);
+            double2->setValue(mi->stop);
+            string1->setText(mi->units);
+        }
     }
     block = false;
 }
@@ -1432,6 +1699,16 @@ OverviewItemConfig::dataChanged()
             if (metric1->isValid()) mi->symbol = metric1->rideMetric()->symbol();
         }
         break;
+
+    case OverviewItemType::KPI:
+        {
+            KPIOverviewItem *mi = reinterpret_cast<KPIOverviewItem*>(item);
+            mi->name = name->text();
+            mi->units = string1->text();
+            mi->program = editor->toPlainText();
+            mi->start = double1->value();
+            mi->stop = double2->value();
+        }
     }
 }
 
@@ -2305,4 +2582,69 @@ Routeline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     }
     painter->restore();
     return;
+}
+
+ProgressBar::ProgressBar(QGraphicsWidget *parent, double start, double stop, double value)
+    : QGraphicsItem(NULL), parent(parent), start(start), stop(stop), value(value)
+{
+    setGeometry(20,20,100,100);
+    setZValue(11);
+    animator=new QPropertyAnimation(this, "value");
+}
+
+ProgressBar::~ProgressBar()
+{
+    animator->stop();
+    delete animator;
+}
+
+void
+ProgressBar::setValue(double start, double stop, double newvalue)
+{
+    this->start=start;
+    this->stop = stop;
+
+    animator->stop();
+    animator->setStartValue(this->value);
+    animator->setEndValue(newvalue);
+    animator->setEasingCurve(QEasingCurve::OutQuad);
+    animator->setDuration(1000);
+    animator->start();
+}
+
+QVariant ProgressBar::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+     if (change == ItemPositionChange && parent->scene())  prepareGeometryChange();
+     return QGraphicsItem::itemChange(change, value);
+}
+
+void
+ProgressBar::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width,height);
+
+    // we need to go onto the scene !
+    if (scene() == NULL && parent->scene()) parent->scene()->addItem(this);
+
+    // set our geom
+    prepareGeometryChange();
+}
+
+void
+ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+
+    QRectF box(boundingRect().left() + (ROWHEIGHT*2), boundingRect().top() + ROWHEIGHT, geom.width()-(ROWHEIGHT*4), ROWHEIGHT/3.0);
+    painter->fillRect(box, QBrush(QColor(100,100,100,100)));
+
+    // width of bar
+    double factor = (value-start) / (stop-start);
+    QString percent = Utils::removeDP(QString("%1").arg(factor * 100.0));
+
+    if (factor > 1) factor = 1;
+    if (factor < 0) factor = 0;
+
+    QRectF bar(box.left(), box.top(), box.width() * factor, ROWHEIGHT/3.0);
+    painter->fillRect(bar, QBrush(GColor(CPLOTMARKER)));
+
 }

@@ -22,6 +22,7 @@
 // basics
 #include "ChartSpace.h"
 #include "MetricSelect.h"
+#include "DataFilter.h"
 #include <QGraphicsItem>
 
 // qt charts for zone chart
@@ -36,6 +37,7 @@ class BPointF;
 class Sparkline;
 class BubbleViz;
 class Routeline;
+class ProgressBar;
 
 // sparklines number of points - look back 6 weeks
 #define SPARKDAYS 42
@@ -44,7 +46,7 @@ class Routeline;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI };
 
 //
 // Configuration widget for ALL Overview Items
@@ -66,19 +68,55 @@ class OverviewItemConfig : public QWidget
         // set the config widgets to reflect current config
         void setWidgets();
 
+        // program editor
+        void setErrors(QStringList &errors);
+
     private:
 
         // the widget we are configuring
         ChartSpaceItem *item;
 
+        // editor for program
+        DataFilterEdit *editor;
+        QLabel *errors;
+
         // block updates during initialisation
         bool block;
 
-        QLineEdit *name; // all of them
+        QLineEdit *name, *string1; // all of them
+        QDoubleSpinBox *double1, *double2; // KPI
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
 
+};
+
+class KPIOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units);
+        ~KPIOverviewItem();
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *item);
+        QWidget *config() { return new OverviewItemConfig(this); }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP", 0, 261, "{ 200; }", "watts"); }
+
+        // settings
+        double start, stop;
+        QString program, units;
+
+        // computed and ready for painting
+        QString value;
+
+        // progress bar viz
+        ProgressBar *progressbar;
 };
 
 class RPEOverviewItem : public ChartSpaceItem
@@ -414,7 +452,6 @@ class Routeline : public QObject, public QGraphicsItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
-
     Q_PROPERTY(int transition READ getTransition WRITE setTransition)
 
     public:
@@ -452,4 +489,41 @@ class Routeline : public QObject, public QGraphicsItem
         double owidth, oheight; // size of painterpath, so we scale to fit on paint
 };
 
+// progress bar to show percentage progress from start to goal
+class ProgressBar : public QObject, public QGraphicsItem
+{
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+    Q_PROPERTY(double value READ getCurrentValue WRITE setCurrentValue)
+
+    public:
+        ProgressBar(QGraphicsWidget *parent, double start, double stop, double value);
+        ~ProgressBar();
+
+        void setValue(double start, double stop, double value);
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        // needed as pure virtual in QGraphicsItem
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+        QRectF boundingRect() const { return QRectF(parent->geometry().x() + geom.x(),
+                                                    parent->geometry().y() + geom.y(),
+                                                    geom.width(), geom.height());
+        }
+
+        // transition animation between old and new values
+        double getCurrentValue() const {return value;}
+        void setCurrentValue(double x) { if (value !=x) {value=x; update();}}
+
+    private:
+        QGraphicsWidget *parent;
+        QRectF geom;
+
+        double start, stop, value;
+
+        QPropertyAnimation *animator;
+};
 #endif // _GC_OverviewItem_h

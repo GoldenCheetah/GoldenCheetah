@@ -20,6 +20,7 @@
 #include "ChartSpace.h"
 #include "OverviewItems.h"
 #include "AddChartWizard.h"
+#include "Utils.h"
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
@@ -88,7 +89,7 @@ OverviewWindow::getConfiguration() const
         switch(item->type) {
         case OverviewItemType::RPE:
             {
-                RPEOverviewItem *rpe = reinterpret_cast<RPEOverviewItem*>(item);
+                //UNUSED RPEOverviewItem *rpe = reinterpret_cast<RPEOverviewItem*>(item);
             }
             break;
         case OverviewItemType::METRIC:
@@ -111,7 +112,7 @@ OverviewWindow::getConfiguration() const
             break;
         case OverviewItemType::ROUTE:
             {
-                RouteOverviewItem *route = reinterpret_cast<RouteOverviewItem*>(item);
+                // UNUSED RouteOverviewItem *route = reinterpret_cast<RouteOverviewItem*>(item);
             }
             break;
         case OverviewItemType::INTERVAL:
@@ -126,6 +127,15 @@ OverviewWindow::getConfiguration() const
             {
                 ZoneOverviewItem *zone = reinterpret_cast<ZoneOverviewItem*>(item);
                 config += "\"series\":" + QString("%1").arg(static_cast<int>(zone->series)) + ",";
+            }
+            break;
+        case OverviewItemType::KPI:
+            {
+                KPIOverviewItem *kpi = reinterpret_cast<KPIOverviewItem*>(item);
+                config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect(kpi->program)) + "\",";
+                config += "\"units\":\"" + QString("%1").arg(kpi->units) + "\",";
+                config += "\"start\":" + QString("%1").arg(kpi->start) + ",";
+                config += "\"stop\":" + QString("%1").arg(kpi->stop) + ",";
             }
             break;
         }
@@ -338,6 +348,18 @@ OverviewWindow::setConfiguration(QString config)
                     space->addItem(order,column,deep, add);
                 }
                 break;
+
+            case OverviewItemType::KPI :
+                {
+                    QString program=Utils::jsonunprotect(obj["program"].toString());
+                    double start=obj["start"].toDouble();
+                    double stop =obj["stop"].toDouble();
+                    QString units =obj["units"].toString();
+
+                    add = new KPIOverviewItem(space, name, start, stop, program, units);
+                    space->addItem(order,column,deep, add);
+                }
+                break;
             }
         }
     }
@@ -379,7 +401,15 @@ void
 OverviewConfigDialog::close()
 {
     // remove from the layout- unless we just deleted it !
-    if (item) main->removeWidget(item->config());
+    if (item) {
+
+        main->removeWidget(item->config()); // doesn't work xxx todo !
+
+        // update after config changed
+        if (item->parent->context->currentRideItem())
+            item->setData(const_cast<RideItem*>(item->parent->context->currentRideItem()));
+    }
+
     accept();
 }
 
