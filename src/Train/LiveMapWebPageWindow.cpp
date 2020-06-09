@@ -15,7 +15,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 #include "LiveMapWebPageWindow.h"
 
 #include "MainWindow.h"
@@ -68,18 +67,13 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
-    //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
-    //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
     setControls(settingsWidget);
-
     setContentsMargins(0,0,0,0);
 
     layout = new QVBoxLayout();
     layout->setSpacing(0);
     layout->setContentsMargins(2,0,2,2);
-
-    //layout->setStyleSheet("QLabel { background-color : white; color : blue; }");
 
     setChartLayout(layout);
 
@@ -94,6 +88,10 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
    configChanged(CONFIG_APPEARANCE);
 
+
+   // Create route latlons
+
+
     //Show marker on map
     markerIsVisible = false;
     createHtml();
@@ -106,6 +104,20 @@ LiveMapWebPageWindow::~LiveMapWebPageWindow()
 
 void LiveMapWebPageWindow::start()
 {
+    routeLatLngs = "[";
+    QString code = "";
+
+    for (int pt = 0; pt < context->currentErgFile()->Points.size()-1; pt++) {
+        if (pt == 0) {routeLatLngs += "["; }
+        else { routeLatLngs += ",["; }
+        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+        routeLatLngs += ",";
+        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+        routeLatLngs += "]";
+    }
+    routeLatLngs += "]";
+    code = QString("showRoute (" + routeLatLngs + ");");
+    view->page()->runJavaScript(code);
 }
 
 // Reset map to World View when the activity is stopped.
@@ -175,7 +187,7 @@ void LiveMapWebPageWindow::createHtml()
         "<style>#mapid {height:100%;width:100%}</style></head>\n"
         "<body><div id=\"mapid\"></div>\n"
         "<script type=\"text/javascript\">\n"
-        "var mapOptions, mymap, mylayer, mymarker, latlng, myscale\n"
+        "var mapOptions, mymap, mylayer, mymarker, latlng, myscale, routepolyline\n"
         "function moveMarker(myLat, myLon) {\n"
         "    mymap.panTo(new L.LatLng(myLat, myLon));\n"
         "    mymarker.setLatLng(new L.latLng(myLat, myLon));\n"
@@ -204,6 +216,10 @@ void LiveMapWebPageWindow::createHtml()
         "function centerMap(myLat, myLon, myZoom) {\n"
         "    latlng = L.latLng(myLat, myLon);\n"
         "    mymap.setView(latlng, myZoom)\n"
+        "}\n"
+        "function showRoute(myRouteLatlngs) {\n"
+        "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
+        "    mymap.fitBounds(routepolyline.getBounds());\n"
         "}\n"
         "</script>\n"
         "<div><script type=\"text/javascript\">initMap (0, 0, 0);</script></div>\n"
