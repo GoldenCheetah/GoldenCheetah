@@ -71,6 +71,9 @@ class OverviewItemConfig : public QWidget
         // the widget we are configuring
         ChartSpaceItem *item;
 
+        // block updates during initialisation
+        bool block;
+
         QLineEdit *name; // all of them
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta

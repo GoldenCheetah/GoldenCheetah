@@ -1249,7 +1249,7 @@ void ZoneOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, Q
 //
 // OverviewItem Configuration Widget
 //
-OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item)
+OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item), block(false)
 {
     QFormLayout *layout = new QFormLayout(this);
 
@@ -1303,6 +1303,7 @@ OverviewItemConfig::~OverviewItemConfig() {}
 void
 OverviewItemConfig::setWidgets()
 {
+    block = true;
     // set the widget values from the item
     switch(item->type) {
     case OverviewItemType::RPE:
@@ -1360,6 +1361,7 @@ OverviewItemConfig::setWidgets()
         }
         break;
     }
+    block = false;
 }
 
 void
@@ -1367,7 +1369,9 @@ OverviewItemConfig::dataChanged()
 {
     // user edited or programmatically the data was changed
     // so lets update the item to reflect those changes
-    // if they are valid.......
+    // if they are valid. But block set when the widgets
+    // are being initialised
+    if (block) return;
 
     // set the widget values from the item
     switch(item->type) {
