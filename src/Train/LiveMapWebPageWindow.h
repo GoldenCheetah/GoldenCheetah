@@ -65,6 +65,8 @@ class LiveMapWebPageWindow : public GcChartWindow
         double plotLon = 0;
         double plotLat = 0;
         QString currentPage;
+        //QVariantList latlons;
+        QString routeLatLngs;
         void createHtml();
 
     public slots:
