@@ -366,11 +366,10 @@ KPIOverviewItem::setData(RideItem *item)
     value=Utils::removeDP(value);
 
     // now set the progressbar
-    if (start == 0 && stop == 0) progressbar->hide();
-    else {
-        progressbar->show();
-        progressbar->setValue(start, stop, value.toDouble());
-    }
+    progressbar->setValue(start, stop, value.toDouble());
+
+    // show/hide widgets on the basis of geometry
+    itemGeometryChanged();
 }
 
 void
