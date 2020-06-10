@@ -143,15 +143,24 @@ class LiveMapWidget : public MeterWidget
     float curr_lon, curr_lat;
     void setContext(Context *context) { this->context = context; }
     virtual void createHtml(double sLon, double sLat, int mapZoom);
+    virtual void createHtml2();
     void plotNewLatLng (double newLat, double newLong);
     void initLiveMap ();
     bool liveMapInitialized;
+    bool routeInitialized;
    
   private:
     Context *context;
     QWebEngineView *liveMapView; 
+    QWebEnginePage* webPage;
+    QString routeLatLngs;
+
     QString currentPage;
 
+};
+
+class LiveMapsimpleWebPage : public QWebEnginePage
+{
 };
 
 #endif // _MeterWidget_h

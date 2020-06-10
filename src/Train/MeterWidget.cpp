@@ -15,15 +15,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
+#pragma optimize("", off)
 #include <QtGui>
 #include <QGraphicsPathItem>
 #include "MeterWidget.h"
 #include "ErgFile.h"
 #include "Context.h"
 #include "Units.h"
+#include <QDebug>
 
-#include <QtWebEngineWidgets/QWebEngineView>
+////#include <QtWebEngineWidgets/QWebEngineView>
+#include <QWebEnginePage>
+#include <QWebEngineView>
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
@@ -470,11 +473,13 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context) 
 {
     forceSquareRatio = false;
-    //gradientValue = 0.0;
     curr_lon = 0.0;
     curr_lat = 0.0;
     liveMapView = new QWebEngineView(this);
+    webPage = liveMapView->page();
+    liveMapView->setPage(webPage);
     liveMapInitialized = false;
+    routeInitialized = false;
  }
 
 void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
@@ -512,26 +517,80 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 void LiveMapWidget::initLiveMap ()
 {
     if ( ! this->liveMapInitialized ) {
-        
-        QString code = "";
+
         int mapZoom = 16;
-        
         liveMapView->resize(m_Width, m_Height);
         createHtml(this->curr_lat, this->curr_lon, mapZoom);
         liveMapView->page()->setHtml(currentPage);
         liveMapView->show();
-        this->liveMapInitialized = true;
+        ////this->liveMapInitialized = true;
+
+
+        ////// createHTML2 ---
+        //int mapZoom = 16;
+        //createHtml2();
+        //liveMapView->page()->setHtml(currentPage);
+        //liveMapView->show();
+        ////// createHTML2 ---
     }
 }
 
 void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
-    QString code;
+    QString code ="";
+    QString mycenterMap = "";
+    std::string sMyStr;
+
+    //createHtml2();
+    //liveMapView->page()->setHtml(currentPage);
+    //code = QString("initMap (" + sLat + ", " + sLon + ", " + sMapZoom + ");");
+    //liveMapView->page()->runJavaScript(code);
+
     QString sLat = QVariant(dLat).toString();
     QString sLon = QVariant(dLon).toString();
-    code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
-    liveMapView->resize(m_Width, m_Height);
+
+    //// createHTML2 ---
+    if (!this->liveMapInitialized) {
+        
+        routeLatLngs = "[";
+        for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
+            if (pt == 0) { routeLatLngs += "["; }
+            else { routeLatLngs += ",["; }
+            routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+            routeLatLngs += ",";
+            routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+            routeLatLngs += "]";
+        }
+        routeLatLngs += "]";
+        //code = QString("centerMap(" + sLat + ", " + sLon + ", 16);");
+        //code += QString("showMyMarker(" + sLat + ", " + sLon + ");");
+        //code += QString("moveMarker(" + sLat + " , " + sLon + ");");
+        code = QString("showRoute(" + routeLatLngs + ");");
+        //liveMapView->page()->runJavaScript(code);
+        this->liveMapInitialized = true;
+        //liveMapView->show();
+        //sMyStr = code.toStdString();
+        //qDebug("==> code @ 1 = %s", sMyStr);
+    }
+    else
+    {
+        code = "";
+        if (!this->routeInitialized) {
+            code += QString("showRoute(" + routeLatLngs + ");");
+            this->routeInitialized = true;
+        }
+        code += QString("moveMarker(" + sLat + " , " + sLon + ");");
+        
+        //sMyStr = code.toStdString();
+        //qDebug("==> Code @ 2 = %s", sMyStr);
+    }
+    
+    //view->page()->runJavaScript("function getelement(){return $('#elementid').val();} getelement();", [this](const QVariant& v) { qDebug() << v.toString(); });
+    //    view->page()->runJavaScript("jsfun();",[this](const QVariant &v) { qDebug()<<v.toString();});
+    //liveMapView->page()->runJavaScript(code, [this](const QVariant& v) { qDebug()<< v.toString(); });
     liveMapView->page()->runJavaScript(code);
+
+    //// createHTML2 ---
 }
 
 void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
@@ -557,6 +616,7 @@ void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
     // local functions
     currentPage += QString("<body><div id=\"mapid\"></div>\n"
     "<script type=\"text/javascript\">\n");
+    currentPage += QString("var routepolyline\n");
     // Create Map options
     currentPage += QString("var mapOptions = {\n"
         "    center: [" + sLat + ", " + sLon + "] ,\n"
@@ -577,11 +637,71 @@ void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
     "    title: \"GoldenCheetah - Workout LiveMap\",\n"
     "    alt: \"GoldenCheetah - Workout LiveMap\",\n"
     "    riseOnHover: true\n"
-    "}).addTo(mymap)\n");
+    "}).addTo(mymap);\n"
+    "function showRoute(myRouteLatlngs) {\n"
+        "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
+        "    mymap.fitBounds(routepolyline.getBounds());\n"
+        "};\n");
     // Move marker function
     currentPage += QString(    "function moveMarker(myLat, myLon) { \n"
     "   mymap.panTo(new L.LatLng(myLat, myLon));\n"
     "    mymarker.setLatLng(new L.latLng(myLat, myLon));}\n"
     "</script>\n"
     "</body></html>\n");
+}
+
+void LiveMapWidget::createHtml2()
+{
+
+    currentPage = "";
+
+    currentPage = QString("<html><head>\n"
+        "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
+        "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
+        "<title>GoldenCheetah LiveMap - TrainView</title>\n"
+        "<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css\"\n"
+        "integrity=\"sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==\" crossorigin=\"\"/>\n"
+        "<script src=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.js\"\n"
+        "integrity=\"sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==\" crossorigin=\"\"></script>\n"
+        "<style>#mapid {height:100%;width:100%}</style></head>\n"
+        "<body><div id=\"mapid\"></div>\n"
+        "<script type=\"text/javascript\">\n"
+        "var mapOptions, mymap, mylayer, mymarker, latlng, myscale, routepolyline;\n"
+        "function moveMarker(myLat, myLon) {\n"
+        "    mymap.panTo(new L.LatLng(myLat, myLon));\n"
+        "    mymarker.setLatLng(new L.latLng(myLat, myLon));\n"
+        "}\n"
+        "function initMap(myLat, myLon, myZoom) {\n"
+        "    mapOptions = {\n"
+        "    center: [myLat, myLon],\n"
+        "    zoom : myZoom,\n"
+        "    zoomControl : true,\n"
+        "    scrollWheelZoom : false,\n"
+        "    dragging : false,\n"
+        "    doubleClickZoom : false }\n"
+        "    mymap = L.map('mapid', mapOptions);\n"
+        "    myscale = L.control.scale().addTo(mymap);\n"
+        "    mylayer = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');\n"
+        "    mymap.addLayer(mylayer);\n"
+        "}\n"
+        "function showMyMarker(myLat, myLon) {\n"
+        "    mymarker = new L.marker([myLat, myLon], {\n"
+        "    draggable: false,\n"
+        "    title : \"GoldenCheetah - Workout LiveMap\",\n"
+        "    alt : \"GoldenCheetah - Workout LiveMap\",\n"
+        "    riseOnHover : true\n"
+        "        }).addTo(mymap);\n"
+        "}\n"
+        "function centerMap(myLat, myLon, myZoom) {\n"
+        "    latlng = L.latLng(myLat, myLon);\n"
+        "    mymap.setView(latlng, myZoom)\n"
+        "}\n"
+        "function showRoute(myRouteLatlngs) {\n"
+        "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
+        "    mymap.fitBounds(routepolyline.getBounds());\n"
+        "}\n"
+        "</script>\n"
+        "<div><script type=\"text/javascript\">initMap (0, 0, 0);</script></div>\n"
+        "</body></html>\n"
+    );
 }
