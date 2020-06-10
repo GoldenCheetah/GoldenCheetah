@@ -195,7 +195,7 @@ class EditUserSeriesDialog : public QDialog
         QDoubleSpinBox *size;
         ColorButton *color;
         QSpinBox *opacity;
-        QCheckBox *opengl, *legend, *datalabels;
+        QCheckBox *fill, *opengl, *legend, *datalabels;
         QLineEdit *labels, *colors;
 
         QPushButton *okButton, *cancelButton;

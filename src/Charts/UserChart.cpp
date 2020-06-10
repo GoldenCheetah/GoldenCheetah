@@ -165,7 +165,7 @@ UserChart::setRide(RideItem *item)
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,
                         series.labels, series.colors,
-                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels);
+                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels, series.fill);
 
         // add series annotations
         foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
@@ -246,7 +246,8 @@ UserChart::settings() const
         out << "\"opacity\": "   << series.opacity << ", ";
         out << "\"legend\": "    << (series.legend ? "true" : "false") << ", ";
         out << "\"opengl\": "    << (series.opengl ? "true" : "false") << ", ";
-        out << "\"datalabels\": "    << (series.datalabels ? "true" : "false"); // noter no trailing comma
+        out << "\"datalabels\": "    << (series.datalabels ? "true" : "false") << ", ";
+        out << "\"fill\": "    << (series.fill ? "true" : "false"); // NOTE: no trailing comma- when adding something new
         out << "}"; // note no trailing comman
     }
     if (seriesinfo.count()) out << " ]\n"; // end of array
@@ -334,6 +335,8 @@ UserChart::applySettings(QString x)
         // added later, may be null, if so, unset
         if (!series["datalabels"].isNull())  add.datalabels = series["datalabels"].toBool();
         else add.datalabels = false;
+        if (!series["fill"].isNull())  add.fill = series["fill"].toBool();
+        else add.fill = false;
 
         seriesinfo.append(add);
     }
@@ -1098,6 +1101,9 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz->addWidget(datalabels);
     cf->addRow(tr("Color"), zz);
 
+    fill = new QCheckBox(this);
+    cf->addRow(tr("Fill curve"), fill);
+
     opacity = new QSpinBox(this);
     opacity->setRange(1,100);
     opacity->setValue(100);// default
@@ -1203,6 +1209,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     legend->setChecked(original.legend != 0);
     datalabels->setChecked(original.datalabels != 0);
     opacity->setValue(original.opacity);
+    fill->setChecked(original.fill);
     // update the source
 
     // connect up slots
@@ -1243,6 +1250,7 @@ EditUserSeriesDialog::okClicked()
     original.opacity = opacity->value();
     original.legend = legend->isChecked();
     original.datalabels = datalabels->isChecked();
+    original.fill = fill->isChecked();
     // update the source
 
     accept();

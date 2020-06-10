@@ -39,18 +39,18 @@ class GenericSeriesInfo {
 
         GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels) :
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill) :
                       user1(NULL), user2(NULL), user3(NULL), user4(NULL),
                       name(name), xseries(xseries), yseries(yseries), xname(xname), yname(yname),
                       labels(labels), colors(colors),
-                      line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl), legend(legend), datalabels(datalabels)
+                      line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl), legend(legend), datalabels(datalabels), fill(fill)
                       {}
 
         GenericSeriesInfo() :
             user1(NULL), user2(NULL), user3(NULL), user4(NULL),
             line(static_cast<int>(Qt::PenStyle::SolidLine)),
             symbol(0), //XXX todo
-            color("red"), opacity(1.0), opengl(true), legend(true), datalabels(false)
+            color("red"), opacity(1.0), opengl(true), legend(true), datalabels(false), fill(false)
         {}
 
         // available for use (e.g. UserChartSettings)
@@ -74,6 +74,7 @@ class GenericSeriesInfo {
         bool opengl;
         bool legend;
         bool datalabels;
+        bool fill;
 
         QList <QStringList> annotateLabels;
 };
@@ -261,7 +262,7 @@ class GenericChart : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels);
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,

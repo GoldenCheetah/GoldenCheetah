@@ -161,6 +161,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         if (yaxis) axisColor = yaxis->labelsColor();
                         else if (series->type() == QAbstractSeries::SeriesTypeScatter) axisColor = static_cast<QScatterSeries*>(series)->color();
                         else if (series->type() == QAbstractSeries::SeriesTypeLine) axisColor = static_cast<QLineSeries*>(series)->color();
+                        else if (series->type() == QAbstractSeries::SeriesTypeArea) axisColor = static_cast<QAreaSeries*>(series)->color();
                         painter->setPen(QPen(axisColor));
 
                         // y value
@@ -675,10 +676,11 @@ GenericSelectTool::moved(QPointF pos)
                 double xvalue=host->qchart->mapToValue(spos,series).x();
 
                 // pointsVector
-                if (series->type() == QAbstractSeries::SeriesTypeLine) {
+                if (series->type() == QAbstractSeries::SeriesTypeLine || series->type() == QAbstractSeries::SeriesTypeArea) {
 
                     // we take a copy, would love to avoid this.
-                    QVector<QPointF> p = static_cast<QLineSeries*>(series)->pointsVector();
+                    QVector<QPointF> p = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(series)->pointsVector() :
+                                                                              static_cast<QAreaSeries*>(series)->upperSeries()->pointsVector();
 
                     // value we want
                     QPointF x= QPointF(xvalue,0);
@@ -955,8 +957,8 @@ GenericSelectTool::updateScene()
 
                 switch(x->type()) {
                 case QAbstractSeries::SeriesTypeLine: {
-                    QLineSeries *line = static_cast<QLineSeries*>(x);
-
+                    QLineSeries *line = x->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(x) :
+                                                                                       static_cast<QAreaSeries*>(x)->upperSeries() ;
                     // ignore empty series
                     if (line->count() < 1) continue;
 
@@ -982,7 +984,8 @@ GenericSelectTool::updateScene()
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
                         else {
                             selection->setColor(line->color());
-                            static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                            if (x->type() == QAbstractSeries::SeriesTypeLine) static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                            else if (x->type() == QAbstractSeries::SeriesTypeArea) static_cast<QAreaSeries*>(x)->setColor(Qt::gray);
                         }
                         selections.insert(x, selection);
                         ignore.append(selection);
@@ -1145,8 +1148,10 @@ GenericSelectTool::updateScene()
                     // rememember when opengl is in use setColor is ignored
                     // so we didn't change it on selection, so no need to
                     // set it back to original in that case
-                    if (!selection->useOpenGL())
-                        static_cast<QLineSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+                    if (!selection->useOpenGL()) {
+                        if (x->type() == QAbstractSeries::SeriesTypeLine)  static_cast<QLineSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+                        else if (x->type() == QAbstractSeries::SeriesTypeArea)  static_cast<QAreaSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+                    }
 
                     // clear points, remove from axis and remove from chart
                     selection->clear();
