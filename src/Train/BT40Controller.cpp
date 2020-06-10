@@ -149,6 +149,7 @@ BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
 void
 BT40Controller::scanFinished()
 {
+    emit setNotification(tr("Bluetooth scan finished"), 2);
     qDebug() << "BT scan finished";
 }
 
