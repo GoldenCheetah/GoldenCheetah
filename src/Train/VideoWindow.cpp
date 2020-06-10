@@ -326,9 +326,11 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             if (rtd.mode == ERG || rtd.mode == MRC) {
                 p_meterWidget->Value = rtd.getLoad();
                 p_meterWidget->Text = QString("%1").arg(round(p_meterWidget->Value));
+                p_meterWidget->AltText = tr("w");
             } else {
                 p_meterWidget->Value = rtd.getSlope();
                 p_meterWidget->Text = QString("%1").arg(p_meterWidget->Value, 0, 'f', 1);
+                p_meterWidget->AltText = tr("%");
             }
         }
         else if (p_meterWidget->Source() == QString("Distance"))
