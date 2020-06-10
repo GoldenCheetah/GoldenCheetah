@@ -216,11 +216,15 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                 QList<QLowEnergyCharacteristic> characteristics;
                 if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::HeartRate)) {
 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                                " / HeartRate", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement)));
 
                 } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                                " / CyclingPower", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::CyclingPowerMeasurement)));
                     characteristics.append(service->characteristic(
@@ -228,10 +232,14 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 
                 } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                                " / CyclingSpeedAndCadence", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::CSCMeasurement)));
                 } else if (service->serviceUuid() == QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID))) {
 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                                " / VO2MASTERPRO", 4);
                     characteristics.append(service->characteristic(
                                 QBluetoothUuid(QString(VO2MASTERPRO_VENTILATORY_CHAR_UUID))));
                     characteristics.append(service->characteristic(
@@ -249,6 +257,8 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     }
                 } else if (service->serviceUuid() == QBluetoothUuid(QString(BLE_TACX_UART_UUID))) {
 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                                " / TACX_UART", 4);
                     characteristics.append(service->characteristic(
                                 QBluetoothUuid(QString(BLE_TACX_UART_CHAR_WRITE))));
 
