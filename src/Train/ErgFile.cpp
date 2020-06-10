@@ -192,7 +192,7 @@ void ErgFile::parseErg2(QString p)
     valid = false;             // did it parse ok?
     rightPoint = leftPoint = 0;
     interpolatorReadIndex = 0;
-    format = ERG; // default to couse until we know
+    mode = format = ERG; // default to couse until we know
     Points.clear();
     Laps.clear();
 
