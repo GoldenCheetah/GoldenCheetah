@@ -1742,7 +1742,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 // Trust ergFile for location data, if available.
                 bool fAltitudeSet = false;
-                if (ergFile) {
+                if (!(status&RT_MODE_ERGO) && ergFile) {
                     if (!ergFile->StrictGradient) {
                         // Attempt to obtain location and derived slope from altitude in ergfile.
                         geolocation geoloc;
