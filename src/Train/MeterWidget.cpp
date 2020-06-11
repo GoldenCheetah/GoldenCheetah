@@ -22,9 +22,8 @@
 #include "ErgFile.h"
 #include "Context.h"
 #include "Units.h"
-#include <QDebug>
+#include "LocationInterpolation.h"
 
-////#include <QtWebEngineWidgets/QWebEngineView>
 #include <QWebEnginePage>
 #include <QWebEngineView>
 
@@ -515,8 +514,10 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 }
 
 //***************************************************************************************************************
+
 void LiveMapWidget::initLiveMap ()
 {
+    //Check if workout has changed and reset the route
     if (liveMapworkoutname != "" && liveMapworkoutname != context->currentErgFile()->filename) {
         liveMapInitialized = false;
         routeInitialized = false;
@@ -532,37 +533,46 @@ void LiveMapWidget::initLiveMap ()
         liveMapView->show();
     }
 }
-
-void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
+//
+// Plot route and move marker if geolocation is reasonable
+void LiveMapWidget::plotNewLatLng(double dLat, double dLon, double dAlt)
 {
-    QString code ="";
-    QString sLat = QVariant(dLat).toString();
-    QString sLon = QVariant(dLon).toString();
+    geolocation geoloc(dLat, dLon, dAlt);
+    if (geoloc.IsReasonableGeoLocation()) {
 
-    if (!this->liveMapInitialized) {
-        
-        routeLatLngs = "[";
-        for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
-            if (pt == 0) { routeLatLngs += "["; }
-            else { routeLatLngs += ",["; }
-            routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
-            routeLatLngs += ",";
-            routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+        QString code = "";
+        QString sLat = QVariant(dLat).toString();
+        QString sLon = QVariant(dLon).toString();
+
+        if (!this->liveMapInitialized) {
+
+            routeLatLngs = "[";
+            for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
+                if (pt == 0) { routeLatLngs += "["; }
+                else { routeLatLngs += ",["; }
+                /////
+
+                routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+                routeLatLngs += ",";
+                routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+                routeLatLngs += "]";
+
+                /////
+            }
             routeLatLngs += "]";
+            this->liveMapInitialized = true;
         }
-        routeLatLngs += "]";
-        this->liveMapInitialized = true;
-    }
-    else
-    {
-        code = "";
-        if (!this->routeInitialized) {
-            code += QString("showRoute(" + routeLatLngs + ");");
-            this->routeInitialized = true;
+        else
+        {
+            code = "";
+            if (!this->routeInitialized) {
+                code += QString("showRoute(" + routeLatLngs + ");");
+                this->routeInitialized = true;
+            }
+            code += QString("moveMarker(" + sLat + " , " + sLon + ");");
         }
-        code += QString("moveMarker(" + sLat + " , " + sLon + ");");
+        liveMapView->page()->runJavaScript(code);
     }
-    liveMapView->page()->runJavaScript(code);
 }
 
 void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)

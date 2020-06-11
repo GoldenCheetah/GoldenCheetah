@@ -316,7 +316,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             if (rtd.getLatitude() != 0 && rtd.getLongitude() !=0)
                 {
                     liveMapWidget->initLiveMap();
-                    liveMapWidget->plotNewLatLng(rtd.getLatitude(), rtd.getLongitude());
+                    liveMapWidget->plotNewLatLng(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
                 }
         }
         else if (p_meterWidget->Source() == QString("Cadence"))

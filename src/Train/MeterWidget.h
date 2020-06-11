@@ -144,7 +144,7 @@ class LiveMapWidget : public MeterWidget
     void setContext(Context *context) { this->context = context; }
     virtual void createHtml(double sLon, double sLat, int mapZoom);
     virtual void createHtml2();
-    void plotNewLatLng (double newLat, double newLong);
+    void plotNewLatLng (double newLat, double newLong, double newAlt);
     void initLiveMap ();
     bool liveMapInitialized;
     bool routeInitialized;
