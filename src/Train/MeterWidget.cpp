@@ -23,6 +23,8 @@
 #include "Context.h"
 #include "Units.h"
 
+#include <QtWebEngineWidgets/QWebEngineView>
+
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -430,8 +432,8 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
     // Display grade as #.#% 
-    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-"):QString("")) +
-        QString::number((int) this->gradientValue) + QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-") : QString("")) + QString::number((int)this->gradientValue) +
+        QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     double gradientDrawX = cyclistX;
@@ -462,4 +464,124 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
         distanceDrawX -= 45;
 
     painter.drawText(distanceDrawX, distanceDrawY, distanceString);
+} 
+
+
+LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context) 
+{
+    forceSquareRatio = false;
+    //gradientValue = 0.0;
+    curr_lon = 0.0;
+    curr_lat = 0.0;
+    liveMapView = new QWebEngineView(this);
+    liveMapInitialized = false;
+ }
+
+void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
+{
+    MeterWidget::paintEvent(paintevent);
+
+    m_MainBrush = QBrush(m_MainColor);
+    m_BackgroundBrush = QBrush(m_BackgroundColor);
+    m_OutlinePen = QPen(m_OutlineColor);
+    m_OutlinePen.setWidth(1);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+
+    //painter
+    QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    //draw background
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(m_BackgroundBrush);
+    painter.drawRect (0, 0, m_Width, m_Height);
+ 
+    //Set pen for text
+    m_OutlinePen = QPen(m_MainColor);
+    m_OutlinePen.setWidth(1);
+    m_OutlinePen.setStyle(Qt::SolidLine);
+    painter.setPen(m_OutlinePen);
+
+    //Print Coordinates if map is not displayed
+    painter.drawText (20.0 ,((double)(m_Height/2)-20), QVariant(this->curr_lon).toString());
+    painter.drawText (20.0 ,((double)m_Height/2), QVariant(this->curr_lat).toString());
+}
+
+//***************************************************************************************************************
+void LiveMapWidget::initLiveMap ()
+{
+    if ( ! this->liveMapInitialized ) {
+        
+        QString code = "";
+        int mapZoom = 16;
+        
+        liveMapView->resize(m_Width, m_Height);
+        createHtml(this->curr_lat, this->curr_lon, mapZoom);
+        liveMapView->page()->setHtml(currentPage);
+        liveMapView->show();
+        this->liveMapInitialized = true;
+    }
+}
+
+void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
+{
+    QString code;
+    QString sLat = QVariant(dLat).toString();
+    QString sLon = QVariant(dLon).toString();
+    code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
+    liveMapView->resize(m_Width, m_Height);
+    liveMapView->page()->runJavaScript(code);
+}
+
+void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
+{
+    QString sLat = QVariant(dLat).toString();
+    QString sLon = QVariant(dLon).toString();
+    QString sWidth = QVariant(m_Width).toString();
+    QString sHeight = QVariant(m_Height).toString();
+    QString sMapZoom = QVariant(iMapZoom).toString();
+    currentPage = "";
+
+    currentPage = QString("<html><head>\n"
+    "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
+    "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
+    "<title>GoldenCheetah LiveMap - TrainView</title>\n");
+    //Leaflet CSS and JS
+    currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css\"\n"
+    "integrity=\"sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==\" crossorigin=\"\"/>\n"
+	"<script src=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.js\"\n"
+    "integrity=\"sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==\" crossorigin=\"\"></script>\n"
+	"<style>#mapid {height:100%; width:100%}</style></head>\n");
+
+    // local functions
+    currentPage += QString("<body><div id=\"mapid\"></div>\n"
+    "<script type=\"text/javascript\">\n");
+    // Create Map options
+    currentPage += QString("var mapOptions = {\n"
+        "    center: [" + sLat + ", " + sLon + "] ,\n"
+        "    zoom : " + sMapZoom + ",\n"
+        "    zoomControl : true,\n"
+        "    scrollWheelZoom : false,\n"
+        "    dragging : false,\n"
+        "    doubleClickZoom : false}\n");
+    // Create map object
+    currentPage += QString("var mymap = L.map('mapid', mapOptions);\n");
+    // Create layer object
+    currentPage += QString("var layer = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');\n");
+    // Add layer to the map
+    currentPage += QString("mymap.addLayer(layer);\n");
+    // mymarker var
+    currentPage += QString("var mymarker = new L.marker([" + sLat + ", " + sLon + "], {\n"
+    "    draggable: false,\n"
+    "    title: \"GoldenCheetah - Workout LiveMap\",\n"
+    "    alt: \"GoldenCheetah - Workout LiveMap\",\n"
+    "    riseOnHover: true\n"
+    "}).addTo(mymap)\n");
+    // Move marker function
+    currentPage += QString(    "function moveMarker(myLat, myLon) { \n"
+    "   mymap.panTo(new L.LatLng(myLat, myLon));\n"
+    "    mymarker.setLatLng(new L.latLng(myLat, myLon));}\n"
+    "</script>\n"
+    "</body></html>\n");
 }

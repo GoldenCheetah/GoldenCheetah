@@ -21,6 +21,9 @@
 
 #include <QWidget>
 #include "Context.h"
+#include <QWebEnginePage>
+#include <QWebEngineView>
+#include <QtWebEngineWidgets>
 
 class MeterWidget : public QWidget
 {
@@ -127,8 +130,28 @@ class ElevationMeterWidget : public MeterWidget
   public:
     explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
     void setContext(Context* context) { this->context = context; }
-
     float gradientValue;
+};
+
+class LiveMapWidget : public MeterWidget
+{
+  Q_OBJECT
+
+  public:
+    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
+    virtual void paintEvent(QPaintEvent* paintevent);
+    float curr_lon, curr_lat;
+    void setContext(Context *context) { this->context = context; }
+    virtual void createHtml(double sLon, double sLat, int mapZoom);
+    void plotNewLatLng (double newLat, double newLong);
+    void initLiveMap ();
+    bool liveMapInitialized;
+   
+  private:
+    Context *context;
+    QWebEngineView *liveMapView; 
+    QString currentPage;
+
 };
 
 #endif // _MeterWidget_h
