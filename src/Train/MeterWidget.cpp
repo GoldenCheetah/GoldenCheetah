@@ -15,7 +15,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#pragma optimize("", off)
+
 #include <QtGui>
 #include <QGraphicsPathItem>
 #include "MeterWidget.h"
@@ -480,6 +480,7 @@ LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source, Cont
     liveMapView->setPage(webPage);
     liveMapInitialized = false;
     routeInitialized = false;
+    liveMapworkoutname = "";
  }
 
 void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
@@ -516,6 +517,12 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 //***************************************************************************************************************
 void LiveMapWidget::initLiveMap ()
 {
+    if (liveMapworkoutname != "" && liveMapworkoutname != context->currentErgFile()->filename) {
+        liveMapInitialized = false;
+        routeInitialized = false;
+    }
+    liveMapworkoutname = context->currentErgFile()->filename;
+
     if ( ! this->liveMapInitialized ) {
 
         int mapZoom = 16;
@@ -523,33 +530,15 @@ void LiveMapWidget::initLiveMap ()
         createHtml(this->curr_lat, this->curr_lon, mapZoom);
         liveMapView->page()->setHtml(currentPage);
         liveMapView->show();
-        ////this->liveMapInitialized = true;
-
-
-        ////// createHTML2 ---
-        //int mapZoom = 16;
-        //createHtml2();
-        //liveMapView->page()->setHtml(currentPage);
-        //liveMapView->show();
-        ////// createHTML2 ---
     }
 }
 
 void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
     QString code ="";
-    QString mycenterMap = "";
-    std::string sMyStr;
-
-    //createHtml2();
-    //liveMapView->page()->setHtml(currentPage);
-    //code = QString("initMap (" + sLat + ", " + sLon + ", " + sMapZoom + ");");
-    //liveMapView->page()->runJavaScript(code);
-
     QString sLat = QVariant(dLat).toString();
     QString sLon = QVariant(dLon).toString();
 
-    //// createHTML2 ---
     if (!this->liveMapInitialized) {
         
         routeLatLngs = "[";
@@ -562,15 +551,7 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
             routeLatLngs += "]";
         }
         routeLatLngs += "]";
-        //code = QString("centerMap(" + sLat + ", " + sLon + ", 16);");
-        //code += QString("showMyMarker(" + sLat + ", " + sLon + ");");
-        //code += QString("moveMarker(" + sLat + " , " + sLon + ");");
-        code = QString("showRoute(" + routeLatLngs + ");");
-        //liveMapView->page()->runJavaScript(code);
         this->liveMapInitialized = true;
-        //liveMapView->show();
-        //sMyStr = code.toStdString();
-        //qDebug("==> code @ 1 = %s", sMyStr);
     }
     else
     {
@@ -580,17 +561,8 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
             this->routeInitialized = true;
         }
         code += QString("moveMarker(" + sLat + " , " + sLon + ");");
-        
-        //sMyStr = code.toStdString();
-        //qDebug("==> Code @ 2 = %s", sMyStr);
     }
-    
-    //view->page()->runJavaScript("function getelement(){return $('#elementid').val();} getelement();", [this](const QVariant& v) { qDebug() << v.toString(); });
-    //    view->page()->runJavaScript("jsfun();",[this](const QVariant &v) { qDebug()<<v.toString();});
-    //liveMapView->page()->runJavaScript(code, [this](const QVariant& v) { qDebug()<< v.toString(); });
     liveMapView->page()->runJavaScript(code);
-
-    //// createHTML2 ---
 }
 
 void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
@@ -640,7 +612,7 @@ void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
     "}).addTo(mymap);\n"
     "function showRoute(myRouteLatlngs) {\n"
         "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
-        "    mymap.fitBounds(routepolyline.getBounds());\n"
+ //       "    mymap.fitBounds(routepolyline.getBounds());\n"
         "};\n");
     // Move marker function
     currentPage += QString(    "function moveMarker(myLat, myLon) { \n"

@@ -148,6 +148,7 @@ class LiveMapWidget : public MeterWidget
     void initLiveMap ();
     bool liveMapInitialized;
     bool routeInitialized;
+    QString liveMapworkoutname;
    
   private:
     Context *context;
@@ -157,10 +158,6 @@ class LiveMapWidget : public MeterWidget
 
     QString currentPage;
 
-};
-
-class LiveMapsimpleWebPage : public QWebEnginePage
-{
 };
 
 #endif // _MeterWidget_h
