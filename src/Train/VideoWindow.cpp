@@ -310,14 +310,16 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("LiveMap"))
         {
             LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
-            liveMapWidget->setContext(context);
-            liveMapWidget->curr_lat = rtd.getLatitude();
-            liveMapWidget->curr_lon = rtd.getLongitude();
-            if (rtd.getLatitude() != 0 && rtd.getLongitude() !=0)
-                {
-                    liveMapWidget->initLiveMap();
-                    liveMapWidget->plotNewLatLng(rtd.getLatitude(), rtd.getLongitude());
-                }
+            if (!liveMapWidget)
+                qDebug() << "Error: LiveMap keyword used but widget is not LiveMap type";
+            else
+            {
+                double dLat = rtd.getLatitude();
+                double dLon = rtd.getLongitude();
+
+                if (dLat && dLon) liveMapWidget->plotNewLatLng(dLat, dLon);
+                else liveMapWidget->hide();
+            }
         }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {

@@ -52,6 +52,7 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
+    m_Zoom = 16;
     boundingRectVisibility = false;
     forceSquareRatio = true;
 }
@@ -467,80 +468,44 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 } 
 
 
-LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context) 
+LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
 {
     forceSquareRatio = false;
-    //gradientValue = 0.0;
-    curr_lon = 0.0;
-    curr_lat = 0.0;
     liveMapView = new QWebEngineView(this);
     liveMapInitialized = false;
- }
-
-void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
-{
-    MeterWidget::paintEvent(paintevent);
-
-    m_MainBrush = QBrush(m_MainColor);
-    m_BackgroundBrush = QBrush(m_BackgroundColor);
-    m_OutlinePen = QPen(m_OutlineColor);
-    m_OutlinePen.setWidth(1);
-    m_OutlinePen.setStyle(Qt::SolidLine);
-
-    //painter
-    QPainter painter(this);
-    painter.setClipRegion(videoContainerRegion);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    //draw background
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(m_BackgroundBrush);
-    painter.drawRect (0, 0, m_Width, m_Height);
- 
-    //Set pen for text
-    m_OutlinePen = QPen(m_MainColor);
-    m_OutlinePen.setWidth(1);
-    m_OutlinePen.setStyle(Qt::SolidLine);
-    painter.setPen(m_OutlinePen);
-
-    //Print Coordinates if map is not displayed
-    painter.drawText (20.0 ,((double)(m_Height/2)-20), QVariant(this->curr_lon).toString());
-    painter.drawText (20.0 ,((double)m_Height/2), QVariant(this->curr_lat).toString());
 }
 
-//***************************************************************************************************************
-void LiveMapWidget::initLiveMap ()
+void LiveMapWidget::resizeEvent(QResizeEvent *)
 {
-    if ( ! this->liveMapInitialized ) {
-        
-        QString code = "";
-        int mapZoom = 16;
-        
-        liveMapView->resize(m_Width, m_Height);
-        createHtml(this->curr_lat, this->curr_lon, mapZoom);
-        liveMapView->page()->setHtml(currentPage);
-        liveMapView->show();
-        this->liveMapInitialized = true;
-    }
+    liveMapView->resize(m_Width, m_Height);
 }
 
 void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
-    QString code;
-    QString sLat = QVariant(dLat).toString();
-    QString sLon = QVariant(dLon).toString();
-    code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
-    liveMapView->resize(m_Width, m_Height);
+    if ( ! liveMapInitialized ) initLiveMap(dLat, dLon);
+
+    QString sLat = QString::number(dLat);
+    QString sLon = QString::number(dLon);
+    QString code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
+
     liveMapView->page()->runJavaScript(code);
+}
+
+void LiveMapWidget::initLiveMap(double dLat, double dLon)
+{
+    createHtml(dLat, dLon, m_Zoom);
+    liveMapView->page()->setHtml(currentPage);
+    liveMapView->show();
+    liveMapInitialized = true;
 }
 
 void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
 {
-    QString sLat = QVariant(dLat).toString();
-    QString sLon = QVariant(dLon).toString();
-    QString sWidth = QVariant(m_Width).toString();
-    QString sHeight = QVariant(m_Height).toString();
-    QString sMapZoom = QVariant(iMapZoom).toString();
+    QString sLat = QString::number(dLat);
+    QString sLon = QString::number(dLon);
+    QString sWidth = QString::number(m_Width);
+    QString sHeight = QString::number(m_Height);
+    QString sMapZoom = QString::number(iMapZoom);
     currentPage = "";
 
     currentPage = QString("<html><head>\n"
