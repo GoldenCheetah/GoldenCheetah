@@ -5,6 +5,7 @@
 #                                                                             #
 ###############################################################################
 
+!versionAtLeast(QT_VERSION, 5.13):error("Use at least Qt version 5.13")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
