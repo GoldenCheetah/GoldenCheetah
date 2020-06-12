@@ -657,6 +657,12 @@ struct FitFileReaderState
             case 108: // to confirm : RESPIRATIONRATE
                 return "RESPIRATIONRATE"; // Performance Contition
 
+            case 114: // MTB Dynamics - Grit
+                return "GRIT";
+
+            case 115: // MTB Dynamics - Flow
+                return "FLOW";
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
