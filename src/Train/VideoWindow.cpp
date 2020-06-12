@@ -315,7 +315,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             liveMapWidget->curr_lon = rtd.getLongitude();
             if (rtd.getLatitude() != 0 && rtd.getLongitude() !=0)
                 {
-                    liveMapWidget->initLiveMap();
+                    //liveMapWidget->initLiveMap();
                     liveMapWidget->plotNewLatLng(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
                 }
         }

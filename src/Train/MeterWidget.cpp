@@ -515,28 +515,41 @@ void LiveMapWidget::paintEvent(QPaintEvent* paintevent)
 
 //***************************************************************************************************************
 
-void LiveMapWidget::initLiveMap ()
+// Show Live map zoomed in at the current location
+void LiveMapWidget::lazyInitLiveMap (double dLat1, double dLon1)
 {
-    //Check if workout has changed and reset the route
+    int mapZoom = 16;
+    liveMapView->resize(m_Width, m_Height);
+    createHtml(dLat1, dLon1, mapZoom);
+    liveMapView->page()->setHtml(currentPage);
+    liveMapView->show();
+}
+
+// Build LatLon array for selected workout
+void LiveMapWidget::buildRouteArrayLatLngs() {
+    routeLatLngs = "[";
+    for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
+        if (pt == 0) { routeLatLngs += "["; }
+        else { routeLatLngs += ",["; }
+        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+        routeLatLngs += ",";
+        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+        routeLatLngs += "]";
+    }
+    routeLatLngs += "]";
+}
+
+//
+// Plot route and move marker if geolocation is reasonable
+void LiveMapWidget::plotNewLatLng(double dLat, double dLon, double dAlt)
+{
+    //Check if workout has changed and reset flags.
+    //This will rebuild the route and center the map at the new location
     if (liveMapworkoutname != "" && liveMapworkoutname != context->currentErgFile()->filename) {
         liveMapInitialized = false;
         routeInitialized = false;
     }
     liveMapworkoutname = context->currentErgFile()->filename;
-
-    if ( ! this->liveMapInitialized ) {
-
-        int mapZoom = 16;
-        liveMapView->resize(m_Width, m_Height);
-        createHtml(this->curr_lat, this->curr_lon, mapZoom);
-        liveMapView->page()->setHtml(currentPage);
-        liveMapView->show();
-    }
-}
-//
-// Plot route and move marker if geolocation is reasonable
-void LiveMapWidget::plotNewLatLng(double dLat, double dLon, double dAlt)
-{
     geolocation geoloc(dLat, dLon, dAlt);
     if (geoloc.IsReasonableGeoLocation()) {
 
@@ -544,28 +557,16 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon, double dAlt)
         QString sLat = QVariant(dLat).toString();
         QString sLon = QVariant(dLon).toString();
 
-        if (!this->liveMapInitialized) {
-
-            routeLatLngs = "[";
-            for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
-                if (pt == 0) { routeLatLngs += "["; }
-                else { routeLatLngs += ",["; }
-                /////
-
-                routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
-                routeLatLngs += ",";
-                routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
-                routeLatLngs += "]";
-
-                /////
-            }
-            routeLatLngs += "]";
+        // First time through or workout changed 
+        if (!this->liveMapInitialized) { 
+            lazyInitLiveMap(dLat, dLon);
+            buildRouteArrayLatLngs();
             this->liveMapInitialized = true;
         }
-        else
+        else // if a new workout was selected change the rote before moving the marker
         {
             code = "";
-            if (!this->routeInitialized) {
+            if (!this->routeInitialized) { // New workout was selected, show new route
                 code += QString("showRoute(" + routeLatLngs + ");");
                 this->routeInitialized = true;
             }

@@ -145,7 +145,9 @@ class LiveMapWidget : public MeterWidget
     virtual void createHtml(double sLon, double sLat, int mapZoom);
     virtual void createHtml2();
     void plotNewLatLng (double newLat, double newLong, double newAlt);
-    void initLiveMap ();
+    void lazyInitLiveMap (double dLat1, double dLon1);
+    void buildRouteArrayLatLngs();
+
     bool liveMapInitialized;
     bool routeInitialized;
     QString liveMapworkoutname;
