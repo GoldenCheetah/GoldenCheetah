@@ -3487,7 +3487,8 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 {
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
     auto ret = state->run();
-    ret = state->splitSessions(rides);
+    // Split sessions if there are no errors, otherwise return what we have
+    if (errors.isEmpty()) ret = state->splitSessions(rides);
     return ret;
 }
 
