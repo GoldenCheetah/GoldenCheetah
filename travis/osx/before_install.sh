@@ -4,10 +4,13 @@ set -ev
 ## try early just to check, can delete later
 date
 brew update
+
 brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
-#brew upgrade python3 # to get 3.7.7, commented out to avoid Qt upgrade
-#brew upgrade qt5 # Qt 5.15.0 doesn't allow to build qwt
+brew upgrade python3 # to get 3.7.7
+
+brew upgrade qt5 # to get 5.15.0
 /usr/local/opt/qt5/bin/qmake --version
+
 brew install gsl
 brew install libical
 brew upgrade libusb

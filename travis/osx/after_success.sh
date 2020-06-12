@@ -31,7 +31,7 @@ python3.7 -m pip install -r Python/requirements.txt -t GoldenCheetah.app/Content
 
 # Fix QtWebEngineProcess due to bug in macdployqt from homebrew
 pushd GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS
-for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtNetwork QtPositioning #QtQmlModels QtQml required for 5.14.2
+for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtNetwork QtPositioning QtQmlModels QtQml
 do
     OLD_PATH=`otool -L QtWebEngineProcess | grep ${LIB}.framework | cut -f 1 -d ' '`
     NEW_PATH="@loader_path/../../../../../../../${LIB}.framework/${LIB}"
