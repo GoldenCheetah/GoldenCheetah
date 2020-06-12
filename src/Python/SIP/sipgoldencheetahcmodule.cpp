@@ -95,6 +95,7 @@ const char sipStrings_goldencheetah[] = {
     's', 'p', 'o', 'r', 't', 0,
     'v', 'a', 'l', 'u', 'e', 0,
     'b', 'u', 'i', 'l', 'd', 0,
+    'f', 'i', 'l', 'l', 0,
     'l', 'i', 'n', 'e', 0,
     'j', 'o', 'i', 'n', 0,
     't', 'y', 'p', 'e', 0,

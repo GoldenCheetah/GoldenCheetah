@@ -542,7 +542,7 @@ void DialWindow::resizeEvent(QResizeEvent * )
 
     } else {
         // set point size within reasonable limits for low dpi screens
-        int size = geometry().height()-24;
+        int size = (geometry().height() - 24) * 72 / logicalDpiY();
         if (size <= 0) size = 4;
         if (size >= 64) size = 64;
 

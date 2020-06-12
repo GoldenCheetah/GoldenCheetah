@@ -437,7 +437,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels)
+                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
 {
     // a curve can have a decoration associated with it
     // on a line chart the decoration is the symbols
@@ -535,15 +535,39 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                     add->setPointLabelsColor(QColor(color));
                     add->setPointLabelsFormat("@yPoint");
                 }
+                // fill curve?
             }
 
-            // chart
-            qchart->addSeries(add);
+            if (fill) {
 
-            // add to list of curves
-            curves.insert(name,add);
-            xaxis->series.append(add);
-            yaxis->series.append(add);
+                // for fill effect we create an area series
+                QAreaSeries *area = new QAreaSeries(add);
+                area->setName(name);
+
+                QPen pen(color);
+                pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
+                pen.setWidth(size);
+                area->setPen(pen);
+
+                QColor col(color);
+                col.setAlpha(64);
+                QBrush brush(col, Qt::SolidPattern);
+                area->setBrush(brush);
+
+                qchart->addSeries(area);
+                curves.insert(name,area);
+                xaxis->series.append(area);
+                yaxis->series.append(area);
+
+            } else {
+
+                // normal line series
+                qchart->addSeries(add);
+                curves.insert(name,add);
+                xaxis->series.append(add);
+                yaxis->series.append(add);
+            }
+
 
             // so do we need to decorate with a symbol?
             if (symbol > 0) {
@@ -1065,6 +1089,7 @@ GenericPlot::seriesColor(QAbstractSeries* series)
     switch (series->type()) {
     case QAbstractSeries::SeriesTypeScatter: return static_cast<QScatterSeries*>(series)->color(); break;
     case QAbstractSeries::SeriesTypeLine: return static_cast<QLineSeries*>(series)->color(); break;
+    case QAbstractSeries::SeriesTypeArea: return static_cast<QAreaSeries*>(series)->color(); break;
     default: return GColor(CPLOTMARKER);
     }
 }
