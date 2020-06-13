@@ -3486,9 +3486,9 @@ struct FitFileReaderState
 RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*> *rides) const
 {
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
-    auto ret = state->run();
+    RideFile* ret = state->run();
     // Split sessions if there are no errors, otherwise return what we have
-    if (errors.isEmpty()) ret = state->splitSessions(rides);
+    if (ret && errors.isEmpty()) ret = state->splitSessions(rides);
     return ret;
 }
 
