@@ -65,6 +65,7 @@ class MeterWidget : public QWidget
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
+    int      m_Zoom;
     bool     forceSquareRatio;
 
     QColor  m_MainColor;
@@ -135,31 +136,18 @@ class ElevationMeterWidget : public MeterWidget
 
 class LiveMapWidget : public MeterWidget
 {
-  Q_OBJECT
-
   public:
-    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
-    virtual void paintEvent(QPaintEvent* paintevent);
-    float curr_lon, curr_lat;
-    void setContext(Context *context) { this->context = context; }
-    virtual void createHtml(double sLon, double sLat, int mapZoom);
-    virtual void createHtml2();
-    void plotNewLatLng (double newLat, double newLong, double newAlt);
-    void lazyInitLiveMap (double dLat1, double dLon1);
-    void buildRouteArrayLatLngs();
+    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
+    void plotNewLatLng (double newLat, double newLong);
+   
+  protected:
+    void createHtml(double sLon, double sLat, int mapZoom);
+    void initLiveMap(double sLon, double sLat);
+    void resizeEvent(QResizeEvent *);
 
     bool liveMapInitialized;
-    bool routeInitialized;
-    QString liveMapworkoutname;
-   
-  private:
-    Context *context;
     QWebEngineView *liveMapView; 
-    QWebEnginePage* webPage;
-    QString routeLatLngs;
-
     QString currentPage;
-
 };
 
 #endif // _MeterWidget_h

@@ -63,7 +63,7 @@
    </meter>
    <meter name="status" container="Video" source="TrainerStatus" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
-       <RelativePosition X="10.0" Y="50.0" />
+       <RelativePosition X="50.0" Y="10.0" />
    </meter>
    <meter name="elapsed" container="Video" source="Time" type="Text">
        <RelativeSize Width="10.0" Height="5.0" />
@@ -90,13 +90,12 @@
 		<OutlineColor R="255" G="255" B="255" A="250" />
         <MainColor R="255" G="0" B="0" A="250" />
     </meter>
-    <!-- START  Changes for LiveMap widget -->
 	<meter name="livemap" container="Video" source="LiveMap" type="LiveMap">
 		<RelativeSize Width="25.0" Height="45.0" />
-		<RelativePosition X="10.0" Y="15.0" />
+		<RelativePosition X="12.0" Y="19.0" />
+		<Zoom>16</Zoom>
 		<BackgroundColor R="200" G="200" B="200" A="0" />
 		<OutlineColor R="255" G="255" B="255" A="250" />
         <MainColor R="255" G="0" B="0" A="250" />
     </meter>
-	<!-- END Changes for LiveMap widget -->
 </layout>
