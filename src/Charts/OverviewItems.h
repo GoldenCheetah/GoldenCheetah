@@ -46,7 +46,7 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN };
 
 //
 // Configuration widget for ALL Overview Items
@@ -103,6 +103,7 @@ class KPIOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -131,6 +132,7 @@ class RPEOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -157,6 +159,7 @@ class MetricOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -172,6 +175,61 @@ class MetricOverviewItem : public ChartSpaceItem
         Sparkline *sparkline;
 };
 
+// top N uses this to hold details for date range
+struct topnentry {
+
+public:
+
+    topnentry(QDate date, double v, QString value, QColor color, int tsb) : date(date), v(v), value(value), color(color), tsb(tsb) {}
+    inline bool operator<(const topnentry &other) const { return (v > other.v); }
+    inline bool operator>(const topnentry &other) const { return (v < other.v); }
+    QDate date;
+    double v; // for sorting
+    QString value; // as should be shown
+    QColor color; // ride color
+    int tsb; // on the day
+};
+
+class TopNOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    // want a meta property for property animation
+    Q_PROPERTY(int transition READ getTransition WRITE setTransition)
+
+    public:
+
+        TopNOverviewItem(ChartSpace *parent, QString name, QString symbol);
+        ~TopNOverviewItem();
+
+        // transition animation 0-100
+        int getTransition() const {return transition;}
+        void setTransition(int x) { if (transition !=x) {transition=x; update();}}
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *) {} // doesn't support analysis view
+        void setDateRange(DateRange);
+        QWidget *config() { return new OverviewItemConfig(this); }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new TopNOverviewItem(parent, "PowerIndex", "power_index"); }
+
+        QString symbol;
+        RideMetric *metric;
+        QString units;
+
+        QList<topnentry> ranked;
+
+        // maximums to index from
+        QString maxvalue;
+        double maxv,minv;
+
+        // animation
+        int transition;
+        QPropertyAnimation *animator;
+};
+
 class MetaOverviewItem : public ChartSpaceItem
 {
     Q_OBJECT
@@ -184,6 +242,7 @@ class MetaOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -211,6 +270,7 @@ class PMCOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -233,6 +293,7 @@ class ZoneOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         void dragChanged(bool x);
         QWidget *config() { return new OverviewItemConfig(this); }
 
@@ -260,6 +321,7 @@ class RouteOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -280,6 +342,7 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -422,12 +485,13 @@ class RPErating : public QGraphicsItem
 class Sparkline : public QGraphicsItem
 {
     public:
-        Sparkline(QGraphicsWidget *parent, int count,QString name=""); // create and say how many days
+        Sparkline(QGraphicsWidget *parent, QString name="", bool bigdot=true); // create and say how many days
 
         // we monkey around with this *A LOT*
         void setGeometry(double x, double y, double width, double height);
         QRectF geometry() { return geom; }
 
+        void setDays(int n) { sparkdays=n; } // defaults to SPARKDAYS
         void setPoints(QList<QPointF>);
         void setRange(double min, double max); // upper lower
 
@@ -444,6 +508,8 @@ class Sparkline : public QGraphicsItem
         QRectF geom;
         QString name;
         double min, max;
+        int sparkdays;
+        bool bigdot;
         QList<QPointF> points;
 };
 

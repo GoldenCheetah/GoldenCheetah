@@ -72,8 +72,8 @@ enum gcwinid {
         Python = 43,
         PythonSeason = 44,
         UserTrends=45,
-        UserAnalysis=46
-
+        UserAnalysis=46,
+        OverviewTrends=47
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

@@ -1206,7 +1206,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     }
 
     // special case
-    if (type == GcWindowTypes::Overview) {
+    if (type == GcWindowTypes::Overview || type == GcWindowTypes::OverviewTrends) {
         static_cast<OverviewWindow*>(win)->setConfiguration("");
     }
 

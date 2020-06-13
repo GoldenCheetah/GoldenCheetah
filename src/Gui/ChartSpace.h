@@ -47,6 +47,9 @@
 class ChartSpace;
 class ChartSpaceItemFactory;
 
+// we need a scope for a chart space, one or more of
+enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02 };
+
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
 {
@@ -58,6 +61,7 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) =0;
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
+        virtual void setDateRange(DateRange )=0;
         virtual QWidget *config()=0; // must supply a widget to configure
 
         // what type am I- managed by user
@@ -127,18 +131,20 @@ class ChartSpace : public QWidget
 
     public:
 
-        ChartSpace(Context *context);
+        ChartSpace(Context *context, int scope);
 
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
         // used by children
         Context *context;
+        int scope;
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont;
 
         // the item we are currently showing
-        RideItem *current;
+        RideItem *currentRideItem;
+        DateRange currentDateRange;
 
         // to get paint device
         QGraphicsView *device() { return view; }
@@ -150,8 +156,9 @@ class ChartSpace : public QWidget
 
     public slots:
 
-        // ride item changed
+        // user selection
         void rideSelected(RideItem *item);
+        void dateRangeChanged(DateRange);
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }

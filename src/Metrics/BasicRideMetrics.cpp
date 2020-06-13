@@ -929,6 +929,7 @@ class TotalWork : public RideMetric {
 
     void initialize() {
         setName(tr("Work"));
+        setType(RideMetric::Total);
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
         setDescription(tr("Total Work in kJ computed from power data"));

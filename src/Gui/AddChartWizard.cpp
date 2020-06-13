@@ -33,7 +33,7 @@
 //
 
 // Main wizard - if passed a service name we are in edit mode, not add mode.
-AddChartWizard::AddChartWizard(Context *context, ChartSpace *space) : QWizard(context->mainWindow), context(context), space(space)
+AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope) : QWizard(context->mainWindow), context(context), scope(scope), space(space)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
@@ -99,6 +99,9 @@ AddChartType::initializePage()
 
     // iterate over names, as they are sorted alphabetically
     foreach(ChartSpaceItemDetail detail, registry.items()) {
+
+        // limit the type of chart to add
+        if ((detail.scope&wizard->scope) == 0) continue;
 
         // get the service
         QCommandLinkButton *p = new QCommandLinkButton(detail.quick, detail.description, this);

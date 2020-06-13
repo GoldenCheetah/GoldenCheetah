@@ -31,7 +31,7 @@ class AddChartWizard : public QWizard
 
 public:
 
-    AddChartWizard(Context *context, ChartSpace *space);
+    AddChartWizard(Context *context, ChartSpace *space, int scope);
     QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;
@@ -39,6 +39,7 @@ public:
 
     // what type of chart
     int type;
+    int scope;
 
     // add here
     ChartSpace *space;

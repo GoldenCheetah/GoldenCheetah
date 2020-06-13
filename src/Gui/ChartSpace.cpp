@@ -34,8 +34,8 @@
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
-ChartSpace::ChartSpace(Context *context) :
-    state(NONE), context(context), group(NULL), _viewY(0),
+ChartSpace::ChartSpace(Context *context, int scope) :
+    state(NONE), context(context), scope(scope), group(NULL), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
 {
@@ -92,7 +92,7 @@ ChartSpace::ChartSpace(Context *context) :
     // we're ready to plot, but not configured
     configured=false;
     stale=true;
-    current=NULL;
+    currentRideItem=NULL;
 }
 
 // add the item
@@ -103,7 +103,8 @@ ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
     item->column = column;
     item->deep = deep;
     items.append(item);
-    if (current) item->setData(current);
+    if (scope&ANALYSIS && currentRideItem) item->setData(currentRideItem);
+    if (scope&TRENDS) item->setDateRange(currentDateRange);
 }
 
 void
@@ -125,31 +126,46 @@ void
 ChartSpace::rideSelected(RideItem *item)
 {
     // don't plot when we're not visible, unless we have nothing plotted yet
-    if (!isVisible() && current != NULL && item != NULL) {
+    if (!isVisible() && currentRideItem != NULL && item != NULL) {
         stale=true;
         return;
     }
 
     // don't replot .. we already did this one
-    if (current == item && stale == false) {
+    if (currentRideItem == item && stale == false) {
         return;
     }
 
-// profiling the code
-//QTime timer;
-//timer.start();
-
     // ride item changed
     foreach(ChartSpaceItem *ChartSpaceItem, items) ChartSpaceItem->setData(item);
-
-// profiling the code
-//qDebug()<<"took:"<<timer.elapsed();
 
     // update
     updateView();
 
     // ok, remember we did this one
-    current = item;
+    currentRideItem = item;
+    stale=false;
+}
+
+void
+ChartSpace::dateRangeChanged(DateRange dr)
+{
+    // remember
+    currentDateRange = dr;
+
+    // don't plot when we're not visible, unless we have nothing plotted yet
+    if (!isVisible()) {
+        stale=true;
+        return;
+    }
+
+    // ride item changed
+    foreach(ChartSpaceItem *ChartSpaceItem, items) ChartSpaceItem->setDateRange(dr);
+
+    // update
+    updateView();
+
+    // ok, remember we did this one
     stale=false;
 }
 

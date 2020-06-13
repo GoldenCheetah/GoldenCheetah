@@ -173,7 +173,7 @@ static struct {
 
     { "argsort", 2 }, // argsort(ascend|descend, list) - return a sorting index (ala numpy.argsort).
 
-    { "sort", 0 }, // sort(ascend|descend, list1 [, list2, listn]) - sorts each list together, based upon list1, no limit to the
+    { "multisort", 0 }, // multisort(ascend|descend, list1 [, list2, listn]) - sorts each list together, based upon list1, no limit to the
                    // number of lists but they must have the same length. the first list contains the values that define
                    // the sort order. since the sort is 'in-situ' the lists must all be user symbols. returns number of items
                    // sorted. this is impure from a functional programming perspective, but allows us to avoid using dataframes
@@ -297,6 +297,8 @@ static struct {
 
     { "rank", 2 }, // rank(ascend|descend, list) - returns ranks for the list
 
+    { "sort", 2 },     // sort(ascend|descend, list) - returns sorted list
+
     // add new ones above this line
     { "", -1 }
 };
@@ -401,8 +403,8 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 55) {
 
-            // argsort
-            returning << "sort(ascend|descend, list [, list2 .. ,listn])";
+            // multisort
+            returning << "multisort(ascend|descend, list [, list2 .. ,listn])";
 
         } else if (i == 56) {
 
@@ -520,6 +522,11 @@ DataFilter::builtins(Context *context)
 
             // rank
             returning << "rank(ascend|descend, list)";
+
+        } else if (i == 97) {
+
+            // sort
+            returning << "sort(ascend|descend, list)";
 
         } else {
 
@@ -1928,34 +1935,49 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         validateFilter(context, df, leaf->fparms[1]);
                     }
 
-                } else if (leaf->function == "sort") {
+                } else if (leaf->function == "multisort") {
 
                     if (leaf->fparms.count() < 2) {
                         leaf->inerror = true;
-                       DataFiltererrors << QString(tr("sort(ascend|descend, list [, .. list n])"));
+                       DataFiltererrors << QString(tr("multisort(ascend|descend, list [, .. list n])"));
                     }
 
                     // need ascend|descend then a list
                     if (leaf->fparms.count() > 0 && leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("sort(ascend|descend, list [, .. list n]), need to specify ascend or descend"));
+                       DataFiltererrors << QString(tr("multisort(ascend|descend, list [, .. list n]), need to specify ascend or descend"));
                     }
 
                     // need all remaining parameters to be symbols
-                    for(int i=1; i<fparms.count(); i++) {
+                    for(int i=1; i<leaf->fparms.count(); i++) {
+
+                        // make sure the parameter makes sense
+                        validateFilter(context, df, leaf->fparms[i]);
 
                         // check parameter is actually a symbol
                         if (leaf->fparms[i]->type != Leaf::Symbol) {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(tr("sort: list arguments must be a symbol"));
+                            DataFiltererrors << QString(tr("multisort: list arguments must be a symbol"));
                         } else {
                             QString symbol = *(leaf->fparms[i]->lvalue.n);
                             if (!df->symbols.contains(symbol)) {
                                 DataFiltererrors << QString(tr("'%1' is not a user symbol").arg(symbol));
                                 leaf->inerror = true;
                             }
-
                         }
+                    }
+
+                } else if (leaf->function == "sort") {
+
+                    // need ascend|descend then a list
+                    if (leaf->fparms.count() != 2 || leaf->fparms[0]->type != Leaf::Symbol) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("sort(ascend|descend, list), need to specify ascend or descend"));
+
+                    }  else {
+
+                       validateFilter(context, df, leaf->fparms[1]);
                     }
 
                 } else if (leaf->function == "rank") {
@@ -2710,6 +2732,34 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
     return res;
 }
 
+Result DataFilter::evaluate(DateRange dr)
+{
+    // if there is no current ride item then there is no data
+    // so it really is ok to baulk at no current ride item here
+    // we must always have a ride since context is used
+    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
+
+    // reset stack
+    rt.stack = 0;
+
+    Result res(0);
+
+    // if we are a set of functions..
+    if (rt.functions.count()) {
+
+        // ... start at main
+        if (rt.functions.contains("main"))
+            res = treeRoot->eval(&rt, rt.functions.value("main"), 0, 0, const_cast<RideItem*>(context->currentRideItem()), NULL, NULL, Specification(), dr);
+
+    } else {
+
+        // otherwise just evaluate the entire tree
+        res = treeRoot->eval(&rt, treeRoot, 0, 0, const_cast<RideItem*>(context->currentRideItem()), NULL, NULL, Specification(), dr);
+    }
+
+    return res;
+}
+
 QStringList DataFilter::check(QString query)
 {
     // since we may use it afterwards
@@ -2901,6 +2951,9 @@ Result::vectorize(int count)
 
 // used by lowerbound
 struct comparedouble { bool operator()(const double p1, const double p2) { return p1 < p2; } };
+
+// qsort descend
+static bool doubledescend(const double &s1, const double &s2) { return s1 > s2; }
 
 // date arithmetic, a bit of a brute force, but need to rely upon
 // QDate arithmetic for handling months (so we don't have to)
@@ -4138,6 +4191,29 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             return returning;
         }
 
+        // sort
+        if (leaf->function == "sort") {
+            Result returning(0);
+
+            // ascending or descending?
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            bool ascending= (symbol=="ascend") ? true : false;
+
+            // use the utils function to actually do it
+            Result v = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (ascending) qSort(v.vector);
+            else qSort(v.vector.begin(), v.vector.end(), doubledescend);
+
+            // put the index into the result we are returning.
+            foreach(double x, v.vector) {
+                returning.number += x;
+                returning.vector << x;
+            }
+
+            return returning;
+        }
+
         // arguniq
         if (leaf->function == "arguniq") {
             Result returning(0);
@@ -4282,7 +4358,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         }
 
         // sort
-        if (leaf->function == "sort") {
+        if (leaf->function == "multisort") {
 
             // ascend/descend?
             QString symbol = *(leaf->fparms[0]->lvalue.n);
@@ -4306,7 +4382,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 // diff length?
                 if (current.vector.count() != len) {
-                    fprintf(stderr, "sort list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
+                    fprintf(stderr, "multisort list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
                     continue;
                 }
 

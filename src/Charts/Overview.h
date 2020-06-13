@@ -31,6 +31,7 @@
 #include "HrZones.h"
 
 #include "ChartSpace.h"
+#include "OverviewItems.h"
 
 class OverviewWindow : public GcChartWindow
 {
@@ -40,7 +41,7 @@ class OverviewWindow : public GcChartWindow
 
     public:
 
-        OverviewWindow(Context *context);
+        OverviewWindow(Context *context, int scope=ANALYSIS);
 
         // used by children
         Context *context;
@@ -62,6 +63,7 @@ class OverviewWindow : public GcChartWindow
         // gui setup
         ChartSpace *space;
         bool configured;
+        int scope;
 };
 
 class OverviewConfigDialog : public QDialog

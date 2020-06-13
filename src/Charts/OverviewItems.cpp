@@ -50,15 +50,16 @@ static bool _registerItems()
     // get the factory
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
-    // Register      TYPE                        SHORT                      DESCRIPTION                                        SCOPE    CREATOR
-    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               0,       MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   0,       KPIOverviewItem::create);
-    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             0,       MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     0,       ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         0,       RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              0,       IntervalOverviewItem::create);
-    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 0,       PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      0,       RouteOverviewItem::create);
+    // Register      TYPE                        SHORT                      DESCRIPTION                                        SCOPE            CREATOR
+    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               ANALYSIS|TRENDS, MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   ANALYSIS|TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::TOPN,     QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               TRENDS,          TopNOverviewItem::create);
+    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             ANALYSIS,        MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     ANALYSIS|TRENDS, ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         ANALYSIS,        RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              ANALYSIS,        IntervalOverviewItem::create);
+    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 ANALYSIS,        PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      ANALYSIS,        RouteOverviewItem::create);
 
     return true;
 }
@@ -71,7 +72,7 @@ RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceI
     // a META widget, "RPE" using the FOSTER modified 0-10 scale
     this->type = OverviewItemType::RPE;
 
-    sparkline = new Sparkline(this, SPARKDAYS+1, name);
+    sparkline = new Sparkline(this, name);
     rperating = new RPErating(this, name);
 }
 
@@ -112,40 +113,40 @@ RouteOverviewItem::~RouteOverviewItem()
 }
 
 static const QStringList timeInZones = QStringList()
-        << "percent_in_zone_L1"
-        << "percent_in_zone_L2"
-        << "percent_in_zone_L3"
-        << "percent_in_zone_L4"
-        << "percent_in_zone_L5"
-        << "percent_in_zone_L6"
-        << "percent_in_zone_L7"
-        << "percent_in_zone_L8"
-        << "percent_in_zone_L9"
-        << "percent_in_zone_L10";
+        << "time_in_zone_L1"
+        << "time_in_zone_L2"
+        << "time_in_zone_L3"
+        << "time_in_zone_L4"
+        << "time_in_zone_L5"
+        << "time_in_zone_L6"
+        << "time_in_zone_L7"
+        << "time_in_zone_L8"
+        << "time_in_zone_L9"
+        << "time_in_zone_L10";
 
 static const QStringList paceTimeInZones = QStringList()
-        << "percent_in_zone_P1"
-        << "percent_in_zone_P2"
-        << "percent_in_zone_P3"
-        << "percent_in_zone_P4"
-        << "percent_in_zone_P5"
-        << "percent_in_zone_P6"
-        << "percent_in_zone_P7"
-        << "percent_in_zone_P8"
-        << "percent_in_zone_P9"
-        << "percent_in_zone_P10";
+        << "time_in_zone_P1"
+        << "time_in_zone_P2"
+        << "time_in_zone_P3"
+        << "time_in_zone_P4"
+        << "time_in_zone_P5"
+        << "time_in_zone_P6"
+        << "time_in_zone_P7"
+        << "time_in_zone_P8"
+        << "time_in_zone_P9"
+        << "time_in_zone_P10";
 
 static const QStringList timeInZonesHR = QStringList()
-        << "percent_in_zone_H1"
-        << "percent_in_zone_H2"
-        << "percent_in_zone_H3"
-        << "percent_in_zone_H4"
-        << "percent_in_zone_H5"
-        << "percent_in_zone_H6"
-        << "percent_in_zone_H7"
-        << "percent_in_zone_H8"
-        << "percent_in_zone_H9"
-        << "percent_in_zone_H10";
+        << "time_in_zone_H1"
+        << "time_in_zone_H2"
+        << "time_in_zone_H3"
+        << "time_in_zone_H4"
+        << "time_in_zone_H5"
+        << "time_in_zone_H6"
+        << "time_in_zone_H7"
+        << "time_in_zone_H8"
+        << "time_in_zone_H9"
+        << "time_in_zone_H10";
 
 static const QStringList timeInZonesWBAL = QStringList()
         << "wtime_in_zone_L1"
@@ -279,13 +280,33 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
 
     // we may plot the metric sparkline if the tile is big enough
-    sparkline = new Sparkline(this, SPARKDAYS+1, name);
+    bool bigdot = parent->scope == ANALYSIS ? true : false;
+    sparkline = new Sparkline(this, name, bigdot);
 
 }
 
 MetricOverviewItem::~MetricOverviewItem()
 {
     delete sparkline;
+}
+
+TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
+{
+    // metric
+    this->type = OverviewItemType::TOPN;
+    this->symbol = symbol;
+
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
+    if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
+
+    animator=new QPropertyAnimation(this, "transition");
+}
+
+TopNOverviewItem::~TopNOverviewItem()
+{
+    animator->stop();
+    delete animator;
 }
 
 PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpaceItem(parent, "")
@@ -319,7 +340,7 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 
     // sparkline if are we numeric?
     if (fieldtype == FIELD_INTEGER || fieldtype == FIELD_DOUBLE) {
-        sparkline = new Sparkline(this, SPARKDAYS+1, name);
+        sparkline = new Sparkline(this, name);
     } else {
         sparkline = NULL;
     }
@@ -359,6 +380,25 @@ KPIOverviewItem::setData(RideItem *item)
     // calculate the value...
     DataFilter parser(this, item->context, program);
     Result res = parser.evaluate(item, NULL);
+
+    // set to zero for daft values
+    value = QString("%1").arg(res.number);
+    if (value == "nan") value ="";
+    value=Utils::removeDP(value);
+
+    // now set the progressbar
+    progressbar->setValue(start, stop, value.toDouble());
+
+    // show/hide widgets on the basis of geometry
+    itemGeometryChanged();
+}
+
+void
+KPIOverviewItem::setDateRange(DateRange dr)
+{
+    // calculate the value...
+    DataFilter parser(this, parent->context, program);
+    Result res = parser.evaluate(dr);
 
     // set to zero for daft values
     value = QString("%1").arg(res.number);
@@ -543,6 +583,169 @@ MetricOverviewItem::setData(RideItem *item)
 }
 
 void
+MetricOverviewItem::setDateRange(DateRange dr)
+{
+    Specification spec;
+    spec.setDateRange(dr);
+
+    // aggregate sum and count etc
+    double v=0; // value
+    double c=0; // count
+    bool first=true;
+    foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue;
+
+        // get value and count
+        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double count = item->getCountForSymbol(symbol);
+        if (count <= 0) count = 1;
+
+        // ignore zeroes when aggregating?
+        if (metric->aggregateZero() == false && value == 0) continue;
+
+        // what we gonna do with this?
+        switch(metric->type()) {
+        case RideMetric::StdDev:
+        case RideMetric::MeanSquareRoot:
+        case RideMetric::Average:
+            v += value*count;
+            c += count;
+            break;
+        case RideMetric::Total:
+        case RideMetric::RunningTotal:
+            v += value;
+            break;
+        case RideMetric::Peak:
+            if (first || value > v) v = value;
+            break;
+        case RideMetric::Low:
+            if (first || value < v) v = value;
+            break;
+            break;
+        }
+        first = false;
+    }
+
+    // now apply averaging etc
+    switch(metric->type()) {
+    case RideMetric::StdDev:
+    case RideMetric::MeanSquareRoot:
+    case RideMetric::Average:
+        if (c) v  = v / c;
+        else v = 0;
+        break;
+    default: break;
+    }
+
+    // get the metric value
+    value = Utils::removeDP(QString("%1").arg(v,0,'f',metric->precision()));
+    if (value == "nan") value ="";
+    if (std::isinf(v) || std::isnan(v)) v=0;
+
+
+    // metric history
+    QList<QPointF> points;
+
+    // how many days
+    QDate earliest(1900,01,01);
+    sparkline->setDays(earliest.daysTo(dr.to) - earliest.daysTo(dr.from));
+
+    double min=0, max=0;
+    double sum=0;
+    first=true;
+    foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue;
+
+        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+
+        // no zero values
+        if (value == 0) continue;
+
+        // cum sum for Total and RunningTotals
+        if (metric->type() == RideMetric::Total || metric->type() == RideMetric::RunningTotal) {
+            sum += value;
+            value = sum;
+        }
+
+        points << QPointF(earliest.daysTo(item->dateTime.date()) - earliest.daysTo(dr.from), value);
+
+        if (value < min) min=value;
+        if (first || value > max) max=value;
+        first = false;
+    }
+
+    // update the sparkline
+    sparkline->setPoints(points);
+
+    // set range
+    sparkline->setRange(min*1.1,max*1.1); // add 10% to each direction
+
+}
+
+static bool entrylessthan(struct topnentry &a, const topnentry &b)
+{
+    return a.v < b.v;
+}
+
+void
+TopNOverviewItem::setDateRange(DateRange dr)
+{
+    // clear out the old values
+    ranked.clear();
+
+    // filtering
+    Specification spec;
+    spec.setDateRange(dr);
+
+    // pmc data
+    PMCData stressdata(parent->context, spec, "coggan_tss");
+    maxvalue="";
+    maxv=0; // must never have -ve max
+    minv=0; // always zero minimum
+    foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue;
+
+        // get value and count
+        double v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        QString value = item->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        int index = stressdata.indexOf(item->dateTime.date());
+        double tsb = 0;
+        if (index >= 0 && index < stressdata.sb().count()) tsb = stressdata.sb()[index];
+
+        // add to the list
+        QColor color = (item->color.red() == 1 && item->color.green() == 1 && item->color.blue() == 1) ? GColor(CPLOTMARKER) : item->color;
+        ranked << topnentry(item->dateTime.date(), v, value, color, tsb);
+
+        // biggest value?
+        if (v > maxv) {
+            maxvalue=value;
+            maxv = v;
+        }
+
+        // minv should be 0 unless it goes negative
+        if (v < minv) minv=v;
+    }
+
+    // sort the list
+    if (metric->type() == RideMetric::Low) qSort(ranked.begin(), ranked.end(), entrylessthan);
+    else qSort(ranked);
+
+    // change painting details
+    itemGeometryChanged();
+
+    // animate the transition
+    animator->stop();
+    animator->setStartValue(0);
+    animator->setEndValue(100);
+    animator->setEasingCurve(QEasingCurve::OutQuad);
+    animator->setDuration(400);
+    animator->start();
+}
+
+void
 MetaOverviewItem::setData(RideItem *item)
 {
     if (item == NULL || item->ride() == NULL) return;
@@ -650,6 +853,112 @@ PMCOverviewItem::setData(RideItem *item)
 }
 
 void
+ZoneOverviewItem::setDateRange(DateRange dr)
+{
+    QVector<double> vals(10); // max 10 seems ok
+    vals.fill(0);
+
+    // stop any animation before starting, just in case- stops a crash
+    // when we update a chart in the middle of its animation
+    if (chart) chart->setAnimationOptions(QChart::NoAnimation);;
+
+    // enable animation when setting values (disabled at all other times)
+    if (chart) chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    Specification spec;
+    spec.setDateRange(dr);
+
+    // aggregate sum and count etc
+    foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue;
+
+        switch(series) {
+
+            //
+            // HEARTRATE
+            //
+            case RideFile::hr:
+            {
+                if (parent->context->athlete->hrZones(item->isRun)) {
+
+                    int numhrzones;
+                    int hrrange = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
+
+                    if (hrrange > -1) {
+
+                        numhrzones = parent->context->athlete->hrZones(item->isRun)->numZones(hrrange);
+                        for(int i=0; i<categories.count() && i < numhrzones;i++) {
+                            vals[i] += item->getForSymbol(timeInZonesHR[i]);
+                        }
+                    }
+                }
+            }
+            break;
+
+            //
+            // POWER
+            //
+            default:
+            case RideFile::watts:
+            {
+                if (parent->context->athlete->zones(item->isRun)) {
+
+                    int numzones;
+                    int range = parent->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
+
+                    if (range > -1) {
+
+                        numzones = parent->context->athlete->zones(item->isRun)->numZones(range);
+                        for(int i=0; i<categories.count() && i < numzones;i++) {
+                            vals[i] += item->getForSymbol(timeInZones[i]);
+                        }
+                    }
+                }
+            }
+            break;
+
+            //
+            // PACE
+            //
+            case RideFile::kph:
+            {
+                if ((item->isRun || item->isSwim) && parent->context->athlete->paceZones(item->isSwim)) {
+
+                    int numzones;
+                    int range = parent->context->athlete->paceZones(item->isSwim)->whichRange(item->dateTime.date());
+
+                    if (range > -1) {
+
+                        numzones = parent->context->athlete->paceZones(item->isSwim)->numZones(range);
+                        for(int i=0; i<categories.count() && i < numzones;i++) {
+                            vals[i] += item->getForSymbol(paceTimeInZones[i]);
+                        }
+                    }
+                }
+            }
+            break;
+
+            case RideFile::wbal:
+            {
+                for(int i=0; i<4; i++) {
+                    vals[i] += item->getForSymbol(timeInZonesWBAL[i]);
+                }
+            }
+            break;
+        }
+    }
+
+    // now update the barset converting to percentages
+    double sum=0;
+    for(int i=0; i<categories.count();i++) sum += vals[i];
+    for(int i=0; i<categories.count();i++) {
+        if (sum) barset->replace(i, round(vals[i]/sum * 100));
+        else barset->replace(i, round(vals[i]/sum * 100));
+    }
+}
+
+void
 ZoneOverviewItem::setData(RideItem *item)
 {
     if (item == NULL || item->ride() == NULL) return;
@@ -676,9 +985,17 @@ ZoneOverviewItem::setData(RideItem *item)
 
             if (hrrange > -1) {
 
+                double sum=0;
                 numhrzones = parent->context->athlete->hrZones(item->isRun)->numZones(hrrange);
                 for(int i=0; i<categories.count() && i < numhrzones;i++) {
-                    barset->replace(i, round(item->getForSymbol(timeInZonesHR[i])));
+                    sum += item->getForSymbol(timeInZonesHR[i]);
+                }
+
+                // update as percent of total
+                for(int i=0; i<4; i++) {
+                    double time =round(item->getForSymbol(timeInZonesHR[i]));
+                    if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                    else barset->replace(i, 0);
                 }
 
             } else {
@@ -706,9 +1023,17 @@ ZoneOverviewItem::setData(RideItem *item)
 
             if (range > -1) {
 
+                double sum=0;
                 numzones = parent->context->athlete->zones(item->isRun)->numZones(range);
                 for(int i=0; i<categories.count() && i < numzones;i++) {
-                    barset->replace(i, round(item->getForSymbol(timeInZones[i])));
+                    sum += item->getForSymbol(timeInZones[i]);
+                }
+
+                // update as percent of total
+                for(int i=0; i<4; i++) {
+                    double time =round(item->getForSymbol(timeInZones[i]));
+                    if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                    else barset->replace(i, 0);
                 }
 
             } else {
@@ -735,9 +1060,17 @@ ZoneOverviewItem::setData(RideItem *item)
 
             if (range > -1) {
 
+                double sum=0;
                 numzones = parent->context->athlete->paceZones(item->isSwim)->numZones(range);
                 for(int i=0; i<categories.count() && i < numzones;i++) {
-                    barset->replace(i, round(item->getForSymbol(paceTimeInZones[i])));
+                    sum += item->getForSymbol(paceTimeInZones[i]);
+                }
+
+                // update as percent of total
+                for(int i=0; i<4; i++) {
+                    double time =round(item->getForSymbol(paceTimeInZones[i]));
+                    if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                    else barset->replace(i, 0);
                 }
 
             } else {
@@ -898,6 +1231,9 @@ MetricOverviewItem::itemGeometryChanged() {
         }
     }
 }
+
+// painter truncates the list depending upon the size of the widget
+void TopNOverviewItem::itemGeometryChanged() { }
 
 void
 MetaOverviewItem::itemGeometryChanged() {
@@ -1160,18 +1496,105 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     QRectF trirect(bl.x() + trect.width() + ROWHEIGHT,
                    bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
-    // trend triangle
-    QPainterPath triangle;
-    painter->setBrush(QBrush(QColor(up ? Qt::darkGreen : Qt::darkRed)));
-    painter->setPen(Qt::NoPen);
+    // activity show if current one is up or down on trend for last 30 days..
+    if (parent->scope == ANALYSIS) {
 
-    triangle.moveTo(trirect.left(), (trirect.top()+trirect.bottom())/2.0f);
-    triangle.lineTo((trirect.left() + trirect.right()) / 2.0f, up ? trirect.top() : trirect.bottom());
-    triangle.lineTo(trirect.right(), (trirect.top()+trirect.bottom())/2.0f);
-    triangle.lineTo(trirect.left(), (trirect.top()+trirect.bottom())/2.0f);
+        // trend triangle
+        QPainterPath triangle;
+        painter->setBrush(QBrush(QColor(up ? Qt::darkGreen : Qt::darkRed)));
+        painter->setPen(Qt::NoPen);
 
-    painter->drawPath(triangle);
+        triangle.moveTo(trirect.left(), (trirect.top()+trirect.bottom())/2.0f);
+        triangle.lineTo((trirect.left() + trirect.right()) / 2.0f, up ? trirect.top() : trirect.bottom());
+        triangle.lineTo(trirect.right(), (trirect.top()+trirect.bottom())/2.0f);
+        triangle.lineTo(trirect.left(), (trirect.top()+trirect.bottom())/2.0f);
 
+        painter->drawPath(triangle);
+    }
+
+}
+
+void
+TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    // CALC GEOM / OFFSETS
+    QFontMetrics fm(parent->smallfont);
+    painter->setFont(parent->smallfont);
+
+    // we paint the table, so lets work out the geometry and count etc
+    QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+    // max rows
+    double margins = 30;
+    double rowheight = fm.ascent() + margins;
+    int maxrows = (paintarea.height()-margins) / rowheight;
+
+    // min and max values for what is being painted
+    minv=0;
+    maxv=0;
+    for (int i=0; i<maxrows && i<ranked.count(); i++) {
+
+        double v = ranked[i].v;
+
+        // biggest value?
+        if (v > maxv)  maxv = v;
+
+        // strings for rect sizing (remember neg values are longer strings)
+        if (ranked[i].value.length() > maxvalue.length()) maxvalue = ranked[i].value;
+
+        // minv should be 0 unless it goes negative
+        if (v < minv) minv=v;
+    }
+
+    // number rect
+    QRectF numrect = QRectF(0,0, fm.boundingRect(QString(" %1.").arg(maxrows)).width(), fm.boundingRect(QString(" %1.").arg(maxrows)).height());
+
+    // date rect
+    QRectF daterect = QRectF(0,0, fm.boundingRect("31 May yy").width(), fm.boundingRect("31 May yy").height());
+
+    // value rect
+    QRectF valuerect = QRectF(0,0, fm.boundingRect(maxvalue).width(), fm.boundingRect(maxvalue).height());
+
+    // bar rect
+    int width = paintarea.width() - (numrect.width() + daterect.width() + valuerect.width() + (margins * 6));
+    QRectF barrect = QRectF(0,10, width, 30);
+
+
+    // PAINT
+    for (int i=0; i<maxrows && i<ranked.count(); i++) {
+
+        // rank
+        painter->setPen(QColor(100,100,100));
+        painter->drawText(paintarea.topLeft()+QPointF(margins, margins+(i*rowheight)+fm.ascent()), QString("%1.").arg(i+1));
+
+        // date
+        QString datestring = ranked[i].date.toString("d MMM yy");
+        painter->drawText(paintarea.topLeft()+numrect.topRight()+QPointF(margins*2, margins+(i*rowheight)+fm.ascent()), datestring);
+
+        // bar width bearing in mind range might start at -ve value
+        double width = (ranked[i].v / (maxv-minv)) * barrect.width() * (double(transition)/100.00);
+
+        // 0 width is invisible, always at least 5
+        if (width == 0) width = 5;
+
+        // push rect across to account for 0 being in middle of bar when -ve values
+        // NOTE: minv must NEV£R be > 0 !
+        double offset = (barrect.width() / (maxv-minv)) * fabs(minv);
+
+        // rectangles for full and this value
+        QRectF fullbar(paintarea.left()+numrect.width()+daterect.width()+(margins*3), paintarea.top()+margins+(i*rowheight)+fm.ascent()-35, barrect.width(), barrect.height());
+        QRectF bar(offset+paintarea.left()+numrect.width()+daterect.width()+(margins*3), paintarea.top()+margins+(i*rowheight)+fm.ascent()-35, width, barrect.height());
+
+        // draw rects
+        QBrush brush(QColor(100,100,100,100));
+        painter->fillRect(fullbar, brush);
+        QBrush markerbrush(ranked[i].color);
+        painter->fillRect(bar, markerbrush);
+
+        // value
+        painter->setPen(QColor(100,100,100));
+        painter->drawText(paintarea.topLeft()+QPointF(numrect.width()+daterect.width()+fullbar.width()+(margins*4),0)+QPointF(margins, margins+(i*rowheight)+fm.ascent()), ranked[i].value);
+    }
 }
 
 void
@@ -1402,7 +1825,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
     }
 
     // single metric names
-    if (item->type == OverviewItemType::METRIC || item->type == OverviewItemType::PMC) {
+    if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC || item->type == OverviewItemType::PMC) {
         metric1 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
         layout->addRow(tr("Metric"), metric1);
         connect(metric1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
@@ -1577,6 +2000,14 @@ OverviewItemConfig::setWidgets()
         }
         break;
 
+    case OverviewItemType::TOPN:
+        {
+            TopNOverviewItem *mi = reinterpret_cast<TopNOverviewItem*>(item);
+            name->setText(mi->name);
+            metric1->setSymbol(mi->symbol);
+        }
+        break;
+
     case OverviewItemType::META:
         {
             MetaOverviewItem *mi = reinterpret_cast<MetaOverviewItem*>(item);
@@ -1651,6 +2082,17 @@ OverviewItemConfig::dataChanged()
     case OverviewItemType::METRIC:
         {
             MetricOverviewItem *mi = reinterpret_cast<MetricOverviewItem*>(item);
+            mi->name = name->text();
+            if (metric1->isValid()) {
+                mi->symbol = metric1->rideMetric()->symbol();
+                mi->units = metric1->rideMetric()->units(mi->parent->context->athlete->useMetricUnits);
+            }
+        }
+        break;
+
+    case OverviewItemType::TOPN:
+        {
+            TopNOverviewItem *mi = reinterpret_cast<TopNOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
@@ -1852,7 +2294,7 @@ void
 RPErating::applyEdit()
 {
     // update the item - if we have one
-    RideItem *item = parent->parent->current;
+    RideItem *item = parent->parent->currentRideItem;
 
     // did it change?
     if (item && item->ride() && item->getText("RPE","") != value) {
@@ -2316,11 +2758,9 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->restore();
 }
 
-Sparkline::Sparkline(QGraphicsWidget *parent, int count, QString name)
-    : QGraphicsItem(NULL), parent(parent), name(name)
+Sparkline::Sparkline(QGraphicsWidget *parent, QString name, bool bigdot)
+    : QGraphicsItem(NULL), parent(parent), name(name), sparkdays(SPARKDAYS), bigdot(bigdot)
 {
-    Q_UNUSED(count)
-    
     min = max = 0.0f;
     setGeometry(20,20,100,100);
     setZValue(11);
@@ -2364,7 +2804,7 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     if (points.isEmpty() || (max-min)==0) return;
 
     // so draw a line connecting the points
-    double xfactor = (geom.width() - (ROWHEIGHT*6)) / SPARKDAYS;
+    double xfactor = (geom.width() - (ROWHEIGHT*6)) / sparkdays;
     double xoffset = boundingRect().left()+(ROWHEIGHT*2);
     double yfactor = (geom.height()-(ROWHEIGHT)) / (max-min);
     double bottom = boundingRect().bottom()-ROWHEIGHT/2;
@@ -2385,13 +2825,15 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->setPen(pen);
         painter->drawPath(path);
 
-        // and the last one is a dot for this value
-        double x = (points.first().x()*xfactor)+xoffset-25;
-        double y = bottom-((points.first().y()-min)*yfactor)-25;
-        if (std::isfinite(x) && std::isfinite(y)) {
-            painter->setBrush(QBrush(GColor(CPLOTMARKER).darker(150)));
-            painter->setPen(Qt::NoPen);
-            painter->drawEllipse(QRectF(x, y, 50, 50));
+        if (bigdot) {
+            // and the last one is a dot for this value
+            double x = (points.first().x()*xfactor)+xoffset-25;
+            double y = bottom-((points.first().y()-min)*yfactor)-25;
+            if (std::isfinite(x) && std::isfinite(y)) {
+                painter->setBrush(QBrush(GColor(CPLOTMARKER).darker(150)));
+                painter->setPen(Qt::NoPen);
+                painter->drawEllipse(QRectF(x, y, 50, 50));
+            }
         }
     }
 }

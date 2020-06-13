@@ -76,8 +76,9 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[35] = {
+  static GcWindowRegistry GcWindowsInit[36] = {
     // name                     GcWinID
+    { VIEW_HOME|VIEW_DIARY, tr("Overview "),GcWindowTypes::OverviewTrends },
     { VIEW_HOME|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
     { VIEW_HOME|VIEW_DIARY, tr("Trends"),GcWindowTypes::LTM },
     { VIEW_HOME|VIEW_DIARY, tr("TreeMap"),GcWindowTypes::TreeMap },
@@ -243,8 +244,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
 #endif
 #if GC_HAVE_OVERVIEW
-    case GcWindowTypes::Overview: returning = new OverviewWindow(context); break;
+    case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); break;
+    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); break;
 #else
+    case GcWindowTypes::OverviewTrends:
     case GcWindowTypes::Overview: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
