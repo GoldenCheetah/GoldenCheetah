@@ -15,6 +15,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
+#pragma optimize("", off)
 #include "LiveMapWebPageWindow.h"
 
 #include "MainWindow.h"
@@ -34,15 +36,16 @@
 #include "HelpWhatsThis.h"
 #include "Library.h"
 #include "ErgFile.h"
+#include "LocationInterpolation.h"
 
-#include <QtWebChannel>
-#include <QWebEngineProfile>
+//#include <QtWebChannel>
+//#include <QWebEngineProfile>
 
 // overlay helper
 #include "TabView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
-//#include <QDebug>
+
 
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
@@ -79,7 +82,11 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     // set view
     view = new QWebEngineView(this);
-    view->setPage(new LiveMapsimpleWebPage());
+    //view->setPage(new LiveMapsimpleWebPage());
+    webPage = view->page();
+    view->setPage(webPage);
+    ////
+
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,10,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -108,12 +115,17 @@ void LiveMapWebPageWindow::start()
     QString code = "";
 
     for (int pt = 0; pt < context->currentErgFile()->Points.size()-1; pt++) {
-        if (pt == 0) {routeLatLngs += "["; }
-        else { routeLatLngs += ",["; }
-        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
-        routeLatLngs += ",";
-        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
-        routeLatLngs += "]";
+
+        geolocation geoloc(context->currentErgFile()->Points[pt].lat, context->currentErgFile()->Points[pt].lon, context->currentErgFile()->Points[pt].y);
+        if (geoloc.IsReasonableGeoLocation()) {
+            if (pt == 0) { routeLatLngs += "["; }
+            else { routeLatLngs += ",["; }
+            routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+            routeLatLngs += ",";
+            routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+            routeLatLngs += "]";
+        }
+
     }
     routeLatLngs += "]";
     code = QString("showRoute (" + routeLatLngs + ");");
@@ -123,10 +135,15 @@ void LiveMapWebPageWindow::start()
 // Reset map to World View when the activity is stopped.
 void LiveMapWebPageWindow::stop()
 {
+    
+    QString code;
+    int t1 = context->currentErgFile()->Points.size() - 1;
+    code = QString("centerMap(0,0,0);");
+    view->page()->runJavaScript(code);
     // Reset to world map
     markerIsVisible = false;
-    createHtml();
-    view->page()->setHtml(currentPage);
+    //createHtml();
+    //view->page()->setHtml(currentPage);
 }
 
 void LiveMapWebPageWindow::pause()
@@ -150,9 +167,8 @@ void LiveMapWebPageWindow::configChanged(qint32)
 void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
 {
     QString code = "";
-
-    if (rtd.getLatitude() != 0 && rtd.getLongitude() != 0)
-    {
+    geolocation geoloc(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
+    if (geoloc.IsReasonableGeoLocation()) {
         QString sLat = QVariant(rtd.getLatitude()).toString();
         QString sLon = QVariant(rtd.getLongitude()).toString();
         QString sZoom = "16";
@@ -222,7 +238,7 @@ void LiveMapWebPageWindow::createHtml()
         "    mymap.fitBounds(routepolyline.getBounds());\n"
         "}\n"
         "</script>\n"
-        "<div><script type=\"text/javascript\">initMap (0, 0, 0);</script></div>\n"
+        "<div><script type=\"text/javascript\">initMap (43.827907, 7.814973, 16);</script></div>\n"
         "</body></html>\n"
      );
 }

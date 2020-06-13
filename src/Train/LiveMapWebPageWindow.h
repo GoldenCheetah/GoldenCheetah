@@ -78,7 +78,7 @@ class LiveMapWebPageWindow : public GcChartWindow
         QVBoxLayout *layout;
 
         QWebEngineView *view;
-
+        QWebEnginePage* webPage;
         LiveMapWebPageWindow();  // default ctor
 
     private slots:
