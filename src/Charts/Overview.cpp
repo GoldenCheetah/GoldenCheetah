@@ -281,7 +281,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetricOverviewItem(space, tr("Average Power"), "average_power");
             space->addItem(2,1,7, add);
 
-            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::hr);
+            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts);
             space->addItem(3,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Total TSS"), "coggan_tss");
