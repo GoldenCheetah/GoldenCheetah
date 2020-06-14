@@ -150,6 +150,9 @@ public:
     double MassKG() const;                   // Actual mass of bike and rider.
     double EquivalentMassKG() const;         // Additional mass due to rotational inertia
     double KEMass() const;                   // Total effective kinetic mass
+    double RollingResistance() const { return m_constants.m_crr; }
+    double WindResistance() const { return m_constants.m_Cd * m_constants.m_A; }
+
     const BicycleWheel &FrontWheel() const { return m_frontWheel; }
     const BicycleWheel &RearWheel() const { return m_rearWheel; }
 

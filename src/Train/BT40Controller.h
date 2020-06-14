@@ -103,6 +103,14 @@ private:
     RealtimeData telemetry;
     QList<BT40Device*> devices;
     DeviceConfiguration* localDc;
+
+    double load;
+    double gradient;
+    int mode;
+    double windSpeed;
+    double weight;
+    double rollingResistance;
+    double windResistance;
     double wheelSize;
 };
 

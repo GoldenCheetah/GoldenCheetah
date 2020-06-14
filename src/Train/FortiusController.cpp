@@ -156,3 +156,10 @@ FortiusController::setMode(int mode)
     
     myFortius->setMode(mode);
 }
+
+void
+FortiusController::setWeight(double weight)
+{
+    myFortius->setWeight(weight);
+}
+

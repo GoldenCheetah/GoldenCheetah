@@ -284,13 +284,16 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                                 loadType = Wahoo_Kickr;
                                 commandQueue.clear();
                                 commandRetry = 0;
-                                // The BTLE device scan can take tens of seconds.
-                                // Meanwhile GC thinks that the device is connected and sends parameters.
-                                // The parameters were stored and are now sent. 
+
+                                // When connect() is called, it returns immediately,
+                                // while service discovery happens asynchronously.
+                                // Then, commands like setWeight() may come before the service is discovered.
+                                // In that case, the weight is stored and is sent now once the service is found.
                                 setWheelCircumference(wheelSize);
                                 setRiderCharacteristics(weight, rollingResistance, windResistance);
                                 setWindSpeed(windSpeed);
-                                setGradient(gradient);
+                                if (mode == RT_MODE_ERGO) setLoad(load);
+                                else setGradient(gradient);
                             }
 
                         } else {

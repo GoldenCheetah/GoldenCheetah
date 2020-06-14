@@ -61,6 +61,11 @@ public:
     virtual void setLoad(double) { return; }
     virtual void setGradient(double) { return; }
     virtual void setMode(int) { return; }
+    virtual void setWindSpeed(double) { return; }
+    virtual void setWeight(double) { return; }
+    virtual void setRollingResistance(double) { return; }
+    virtual void setWindResistance(double) { return; }
+    virtual void setWheelCircumference(double) { return; }
 
     virtual uint8_t  getCalibrationType() { return CALIBRATION_TYPE_NOT_SUPPORTED; }
     virtual double   getCalibrationTargetSpeed() { return 0; }
