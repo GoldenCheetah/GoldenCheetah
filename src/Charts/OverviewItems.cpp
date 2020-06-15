@@ -585,6 +585,9 @@ MetricOverviewItem::setData(RideItem *item)
 void
 MetricOverviewItem::setDateRange(DateRange dr)
 {
+    // for metrics lets truncate to today
+    if (dr.to > QDate::currentDate()) dr.to = QDate::currentDate();
+
     Specification spec;
     spec.setDateRange(dr);
 
@@ -675,6 +678,9 @@ MetricOverviewItem::setDateRange(DateRange dr)
         if (first || value > max) max=value;
         first = false;
     }
+
+    // do we want fill?
+    sparkline->setFill(metric->type()== RideMetric::Total || metric->type()== RideMetric::RunningTotal);
 
     // update the sparkline
     sparkline->setPoints(points);
@@ -2759,7 +2765,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 }
 
 Sparkline::Sparkline(QGraphicsWidget *parent, QString name, bool bigdot)
-    : QGraphicsItem(NULL), parent(parent), name(name), sparkdays(SPARKDAYS), bigdot(bigdot)
+    : QGraphicsItem(NULL), parent(parent), name(name), sparkdays(SPARKDAYS), bigdot(bigdot), fill(false)
 {
     min = max = 0.0f;
     setGeometry(20,20,100,100);
@@ -2817,6 +2823,18 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         for(int i=1; i<points.count();i++) {
             path.lineTo((points[i].x()*xfactor)+xoffset, bottom-((points[i].y()-min)*yfactor));
         }
+
+        if (fill) {
+            QColor fillColor=GColor(CPLOTMARKER);
+            fillColor.setAlpha(64);
+            QPainterPath fillpath = path;
+            fillpath.lineTo((points.last().x()*xfactor)+xoffset,bottom);
+            fillpath.lineTo((points.first().x()*xfactor)+xoffset,bottom);
+            fillpath.lineTo((points.first().x()*xfactor)+xoffset,bottom);
+            fillpath.lineTo((points.first().x()*xfactor)+xoffset, bottom-((points.first().y()-min)*yfactor));
+            painter->fillPath(fillpath, QBrush(fillColor));
+        }
+
 
         QPen pen(QColor(150,150,150));
         pen.setWidth(8);

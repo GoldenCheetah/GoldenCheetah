@@ -492,6 +492,7 @@ class Sparkline : public QGraphicsItem
         QRectF geometry() { return geom; }
 
         void setDays(int n) { sparkdays=n; } // defaults to SPARKDAYS
+        void setFill(bool x) { fill = x; }
         void setPoints(QList<QPointF>);
         void setRange(double min, double max); // upper lower
 
@@ -510,6 +511,7 @@ class Sparkline : public QGraphicsItem
         double min, max;
         int sparkdays;
         bool bigdot;
+        bool fill;
         QList<QPointF> points;
 };
 
