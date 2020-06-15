@@ -328,7 +328,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("LiveMap"))
         {
             LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
-            //liveMapWidget->setContext(context);
             if (!liveMapWidget)
                 qDebug() << "Error: LiveMap keyword used but widget is not LiveMap type";
             else

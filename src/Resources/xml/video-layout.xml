@@ -99,6 +99,6 @@
 		<Zoom>16</Zoom>
 		<Lat>43.827907</Lat>
 		<Lon>7.814973</Lon>
-		<osmURL>"http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"</osmURL>
+		<osmURL>http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</osmURL>
     </meter>
 </layout>
