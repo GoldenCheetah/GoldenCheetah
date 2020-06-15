@@ -66,6 +66,8 @@ class MeterWidget : public QWidget
     float    m_Angle;
     int      m_SubRange;
     int      m_Zoom;
+    float    m_Lat, m_Lon;
+    QString  m_osmURL;
     bool     forceSquareRatio;
 
     QColor  m_MainColor;
@@ -136,17 +138,22 @@ class ElevationMeterWidget : public MeterWidget
 
 class LiveMapWidget : public MeterWidget
 {
+    Context* context;
+
   public:
-    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
+    explicit LiveMapWidget(QString name, QWidget* parent = 0, QString Source = QString("None"), Context* context = NULL);
+    void setContext(Context* context) { this->context = context; }
     void plotNewLatLng (double newLat, double newLong);
+    void initLiveMap();
+    bool routeInitialized;
    
   protected:
-    void createHtml(double sLon, double sLat, int mapZoom);
-    void initLiveMap(double sLon, double sLat);
+    void createHtml2(double sLon, double sLat, int mapZoom, QString osmURL);
+    void buildRouteArrayLatLngs();
     void resizeEvent(QResizeEvent *);
-
-    bool liveMapInitialized;
     QWebEngineView *liveMapView; 
+    QWebEnginePage* webPage;
+    QString routeLatLngs;
     QString currentPage;
 };
 

@@ -92,10 +92,13 @@
     </meter>
 	<meter name="livemap" container="Video" source="LiveMap" type="LiveMap">
 		<RelativeSize Width="25.0" Height="45.0" />
-		<RelativePosition X="12.0" Y="19.0" />
-		<Zoom>16</Zoom>
+		<RelativePosition X="10.0" Y="15.0" />
 		<BackgroundColor R="200" G="200" B="200" A="0" />
 		<OutlineColor R="255" G="255" B="255" A="250" />
         <MainColor R="255" G="0" B="0" A="250" />
+		<Zoom>16</Zoom>
+		<Lat>43.827907</Lat>
+		<Lon>7.814973</Lon>
+		<osmURL>"http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"</osmURL>
     </meter>
 </layout>
