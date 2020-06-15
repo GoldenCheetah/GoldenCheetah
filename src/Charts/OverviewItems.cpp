@@ -1203,9 +1203,9 @@ KPIOverviewItem::itemGeometryChanged() {
         int minh=6;
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
-            if (start != 0 || stop != 0)  progressbar->show();
+        if (!drag && geom.height() > (ROWHEIGHT*minh) && (start != 0 || stop != 0)) {
             progressbar->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+            progressbar->show();
         } else {
             progressbar->hide();
         }

@@ -489,9 +489,13 @@ OverviewConfigDialog::close()
 
         main->removeWidget(item->config()); // doesn't work xxx todo !
 
+        // update geometry to show hide elements
+        item->itemGeometryChanged();
+
         // update after config changed
         if (item->parent->scope & ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
         if (item->parent->scope & TRENDS ) item->setDateRange(item->parent->currentDateRange);
+
     }
 
     accept();
