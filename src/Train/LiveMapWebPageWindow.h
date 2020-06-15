@@ -76,9 +76,26 @@ class LiveMapWebPageWindow : public GcChartWindow
     private:
         Context *context;
         QVBoxLayout *layout;
+        QComboBox* mapCombo;
 
         QWebEngineView *view;
         QWebEnginePage* webPage;
+        LiveMapWebPageWindow();  // default ctor
+        // setting dialog
+        QLabel* customUrlLabel;
+        QLabel* customLonLabel;
+        QLabel* customLatLabel;
+        QLabel* customZoomLabel;
+        QLineEdit* customUrl;
+        // reveal controls
+        QLineEdit* rCustomUrl;
+        QLineEdit* customLat;
+        QLineEdit* customLon;
+        QLineEdit* customZoom;
+        QPushButton* rButton;
+        QPushButton* applyButton;
+
+    private slots:
         void telemetryUpdate(RealtimeData rtd);
         void start();
         void stop();
