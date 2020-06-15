@@ -60,29 +60,109 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
 
+    /////////////////////////////
+
+    rButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), "", this);
+    rCustomUrl = new QLineEdit(this);
+    revealLayout->addStretch();
+    revealLayout->addWidget(rButton);
+    revealLayout->addWidget(rCustomUrl);
+    revealLayout->addStretch();
+
+    //connect(rCustomUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
+    //connect(rButton, SIGNAL(clicked(bool)), this, SLOT(userUrl()));
+
+    setRevealLayout(revealLayout);
+    
+
+    /////////////////////////////
+
     //
     // Chart settings
     //
 
-    QWidget *settingsWidget = new QWidget(this);
+    QWidget * settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
-    setControls(settingsWidget);
-    setContentsMargins(0,0,0,0);
+    QFormLayout* commonLayout = new QFormLayout(settingsWidget);
 
+    customUrlLabel = new QLabel(tr("OSM Base URL"));
+    customUrl = new QLineEdit(this);
+    customUrl->setFixedWidth(250);
+    customUrl->setText("");
+    commonLayout->addRow(customUrlLabel, customUrl);
+
+    customLatLabel = new QLabel(tr("Initial Lat"));
+    customLat = new QLineEdit(this);
+    customLat->setFixedWidth(50);
+    customLat->setText("");
+    commonLayout->addRow(customLatLabel, customLat);
+
+    customLonLabel = new QLabel(tr("Initial Lon"));
+    customLon = new QLineEdit(this);
+    customLon->setFixedWidth(50);
+    customLon->setText("");
+    commonLayout->addRow(customLonLabel, customLon);
+
+    customZoomLabel = new QLabel(tr("Initial Zoom"));
+    customZoom = new QLineEdit(this);
+    customZoom->setFixedWidth(50);
+    customZoom->setText("");
+    commonLayout->addRow(customZoomLabel, customZoom);
+
+    applyButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), "Apply changes", this);
+    commonLayout->addRow(applyButton);
+
+    commonLayout->addRow(new QLabel("Hit return to apply URL"));
+
+    setControls(settingsWidget);
+
+    setContentsMargins(0, 0, 0, 0);
     layout = new QVBoxLayout();
     layout->setSpacing(0);
-    layout->setContentsMargins(2,0,2,2);
+    layout->setContentsMargins(2, 0, 2, 2);
+    setChartLayout(layout);
+
+    //////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+    //QWidget* settingsWidget = new QWidget(this);
+    //settingsWidget->setContentsMargins(0, 0, 0, 0);
+
+    //QFormLayout* commonLayout = new QFormLayout(settingsWidget);
+
+    //// map choice
+    //mapCombo = new QComboBox(this);
+    //mapCombo->addItem(tr("OpenStreetMap"));
+    //mapCombo->addItem(tr("Google"));
+
+    //commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
+
+    //layout->addWidget(mapCombo);
+
+
+
+
+
+
+
+
+
+    //////////////////////////////////////////////////
 
     setChartLayout(layout);
 
     // set view
     view = new QWebEngineView(this);
-    //view->setPage(new LiveMapsimpleWebPage());
     webPage = view->page();
     view->setPage(webPage);
-    ////
 
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,10,0,0);
@@ -92,11 +172,6 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
    configChanged(CONFIG_APPEARANCE);
 
-
-   // Create route latlons
-
-
-    //Show marker on map
     markerIsVisible = false;
     createHtml();
     view->page()->setHtml(currentPage);
@@ -135,12 +210,12 @@ void LiveMapWebPageWindow::stop()
     
     QString code;
     int t1 = context->currentErgFile()->Points.size() - 1;
-    code = QString("centerMap(0,0,0);");
-    view->page()->runJavaScript(code);
+    //code = QString("centerMap(0,0,0);");
+    //view->page()->runJavaScript(code);
     // Reset to world map
     markerIsVisible = false;
-    //createHtml();
-    //view->page()->setHtml(currentPage);
+    createHtml();
+    view->page()->setHtml(currentPage);
 }
 
 void LiveMapWebPageWindow::pause()
@@ -230,7 +305,7 @@ void LiveMapWebPageWindow::createHtml()
         "}\n"
         "function showRoute(myRouteLatlngs) {\n"
         "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
-        "    mymap.fitBounds(routepolyline.getBounds());\n"
+        //"    mymap.fitBounds(routepolyline.getBounds());\n"
         "}\n"
         "</script>\n"
         "<div><script type=\"text/javascript\">initMap (43.827907, 7.814973, 16);</script></div>\n"
