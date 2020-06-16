@@ -392,7 +392,9 @@ struct FitFileReaderState
                 case 3121: return "Garmin Edge 530";
                 case 3122: return "Garmin Edge 830";
                 case 3126: return "Garmin Instinct";
-                case 3291: return "Garmin Fenix 6x";
+                case 3287: case 3288: case 3512: case 3513: return "Garmin Fenix 6s";
+                case 3289: case 3290: case 3514: case 3515: return "Garmin Fenix 6";
+                case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
@@ -854,7 +856,6 @@ struct FitFileReaderState
         bool sport_found = false, subsport_found = false;
         QString prevSport = rideFile->getTag("Sport", "");
 
-
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
 
@@ -863,7 +864,8 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 5: // sport field
-                sport_found = true;
+                  if (sport_found == false) {
+                    sport_found = true;
                     switch (value) {
                         case 0: // Generic
                           sport = "";
@@ -927,11 +929,13 @@ struct FitFileReaderState
                             break;
                         default: // if we can't work it out, treat as Generic
                             sport = ""; break;
+                      }
                     }
                     break;
                 case 6: // sub sport (ignored at present)
-                    subsport_found = true;
-                    switch (value) {
+                    if (subsport_found == false) {
+                      subsport_found = true;
+                      switch (value) {
                         case 0:    // generic
                             subsport = "";
                             break;
@@ -1062,6 +1066,7 @@ struct FitFileReaderState
                       default:    // default, treat as Generic
                         subsport = "";
                         break;
+                      }
                     }
                     break;
                 case 44: // pool_length
@@ -1173,11 +1178,6 @@ struct FitFileReaderState
         active_session_.clear();
         session_device_info_.clear();
         session_data_info_.clear();
-
-        // If the Sport changed tag as a Multisport activity
-        QString newSport = rideFile->getTag("Sport", "");
-        if (prevSport != "" && newSport != "" && newSport != prevSport)
-            rideFile->setTag("Sport", "Multisport");
     }
 
     void decodeDeviceInfo(const FitDefinition &def, int,
