@@ -60,106 +60,70 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
 
-    /////////////////////////////
-
     rButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), "", this);
     rCustomUrl = new QLineEdit(this);
     revealLayout->addStretch();
     revealLayout->addWidget(rButton);
     revealLayout->addWidget(rCustomUrl);
     revealLayout->addStretch();
-
-    //connect(rCustomUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
-    //connect(rButton, SIGNAL(clicked(bool)), this, SLOT(userUrl()));
-
     setRevealLayout(revealLayout);
-    
-
-    /////////////////////////////
 
     //
     // Chart settings
-    //
-
     QWidget * settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QFormLayout* commonLayout = new QFormLayout(settingsWidget);
 
+    QString sValue = "";
     customUrlLabel = new QLabel(tr("OSM Base URL"));
     customUrl = new QLineEdit(this);
-    customUrl->setFixedWidth(250);
-    customUrl->setText("");
+    customUrl->setFixedWidth(300);
+    sValue = appsettings->cvalue(context->athlete->cyclist, GC_OSM_LM_BASEURL, "").toString();
+    if (sValue.isEmpty()) customUrl->setText("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+    else customUrl->setText(sValue);
     commonLayout->addRow(customUrlLabel, customUrl);
 
     customLatLabel = new QLabel(tr("Initial Lat"));
     customLat = new QLineEdit(this);
-    customLat->setFixedWidth(50);
-    customLat->setText("");
+    customLat->setFixedWidth(100);
+    sValue = appsettings->cvalue(context->athlete->cyclist, GC_OSM_LM_LAT, "").toString();
+    if (sValue.isEmpty()) customLat->setText("43.827907");
+    else customLat->setText(sValue);
     commonLayout->addRow(customLatLabel, customLat);
 
     customLonLabel = new QLabel(tr("Initial Lon"));
     customLon = new QLineEdit(this);
-    customLon->setFixedWidth(50);
-    customLon->setText("");
+    customLon->setFixedWidth(100);
+    sValue = appsettings->cvalue(context->athlete->cyclist, GC_OSM_LM_LON, "").toString();
+    if (sValue.isEmpty()) customLon->setText("7.814973");
+    else customLon->setText(sValue);
     commonLayout->addRow(customLonLabel, customLon);
 
     customZoomLabel = new QLabel(tr("Initial Zoom"));
     customZoom = new QLineEdit(this);
-    customZoom->setFixedWidth(50);
-    customZoom->setText("");
+    customZoom->setFixedWidth(100);
+    sValue = appsettings->cvalue(context->athlete->cyclist, GC_OSM_LM_ZOOM, "").toString();
+    if (sValue.isEmpty()) customZoom->setText("16");
+    else customZoom->setText(sValue);
     commonLayout->addRow(customZoomLabel, customZoom);
 
     applyButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), "Apply changes", this);
     commonLayout->addRow(applyButton);
 
-    commonLayout->addRow(new QLabel("Hit return to apply URL"));
-
+    // Connect signal to update map
+    connect(applyButton, SIGNAL(clicked(bool)), this, SLOT(setMapOptions()));
     setControls(settingsWidget);
-
     setContentsMargins(0, 0, 0, 0);
     layout = new QVBoxLayout();
     layout->setSpacing(0);
     layout->setContentsMargins(2, 0, 2, 2);
     setChartLayout(layout);
 
-    //////////////////////////////////////////////////
+    //setChartLayout(layout);
 
-
-
-
-
-
-
-
-    //QWidget* settingsWidget = new QWidget(this);
-    //settingsWidget->setContentsMargins(0, 0, 0, 0);
-
-    //QFormLayout* commonLayout = new QFormLayout(settingsWidget);
-
-    //// map choice
-    //mapCombo = new QComboBox(this);
-    //mapCombo->addItem(tr("OpenStreetMap"));
-    //mapCombo->addItem(tr("Google"));
-
-    //commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
-
-    //layout->addWidget(mapCombo);
-
-
-
-
-
-
-
-
-
-    //////////////////////////////////////////////////
-
-    setChartLayout(layout);
-
-    // set view
+    // set webview for map
     view = new QWebEngineView(this);
     webPage = view->page();
     view->setPage(webPage);
@@ -173,12 +137,22 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
    configChanged(CONFIG_APPEARANCE);
 
     markerIsVisible = false;
-    createHtml();
+    createHtml(customUrl->text(), customLat->text(), customLon->text(), customZoom->text());
     view->page()->setHtml(currentPage);
 }
 
 LiveMapWebPageWindow::~LiveMapWebPageWindow()
 {
+}
+
+//Set default map options from athlete
+void LiveMapWebPageWindow::setMapOptions()
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_OSM_LM_BASEURL, customUrl->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_OSM_LM_LAT, customLat->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_OSM_LM_LON, customLon->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_OSM_LM_ZOOM, customZoom->text());
+    redrawMap();
 }
 
 void LiveMapWebPageWindow::start()
@@ -204,27 +178,25 @@ void LiveMapWebPageWindow::start()
     view->page()->runJavaScript(code);
 }
 
-// Reset map to World View when the activity is stopped.
+// Reset map to preferred View when the activity is stopped.
 void LiveMapWebPageWindow::stop()
 {
-    
-    QString code;
-    int t1 = context->currentErgFile()->Points.size() - 1;
-    //code = QString("centerMap(0,0,0);");
-    //view->page()->runJavaScript(code);
-    // Reset to world map
     markerIsVisible = false;
-    createHtml();
-    view->page()->setHtml(currentPage);
+    redrawMap();
 }
 
 void LiveMapWebPageWindow::pause()
 {
 }
 
+void LiveMapWebPageWindow::redrawMap()
+{
+    createHtml(customUrl->text(), customLat->text(), customLon->text(), customZoom->text());
+    view->page()->setHtml(currentPage);
+}
+
 void LiveMapWebPageWindow::configChanged(qint32)
 {
-
     // tinted palette for headings etc
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
@@ -241,11 +213,12 @@ void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
     QString code = "";
     geolocation geoloc(rtd.getLatitude(), rtd.getLongitude(), rtd.getAltitude());
     if (geoloc.IsReasonableGeoLocation()) {
-    if (rtd.getLatitude() != 0 && rtd.getLongitude() != 0)
-    {
+        QString sLat = QVariant(rtd.getLatitude()).toString();
+        QString sLon = QVariant(rtd.getLongitude()).toString();
+        code = "";
         if (!markerIsVisible) 
         {
-            code = QString("centerMap (" + sLat + ", " + sLon + ", " + sZoom + ");");
+            code = QString("centerMap (" + sLat + ", " + sLon + ", " + customZoom->text() + ");");
             code += QString("showMyMarker (" + sLat + ", " + sLon + ");");
             markerIsVisible = true;
         }
@@ -258,7 +231,7 @@ void LiveMapWebPageWindow::telemetryUpdate(RealtimeData rtd)
 }
 // Build HTML code with all the javascript functions to be called later
 // to update the postion on the mapp
-void LiveMapWebPageWindow::createHtml()
+void LiveMapWebPageWindow::createHtml(QString sBaseUrl, QString sInitLat, QString sInitLon, QString sInitZoom)
 {
     currentPage = "";
 
@@ -288,7 +261,7 @@ void LiveMapWebPageWindow::createHtml()
         "    doubleClickZoom : false }\n"
         "    mymap = L.map('mapid', mapOptions);\n"
         "    myscale = L.control.scale().addTo(mymap);\n"
-        "    mylayer = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');\n"
+        "    mylayer = new L.tileLayer('" + sBaseUrl +"');\n"
         "    mymap.addLayer(mylayer);\n"
         "}\n"
         "function showMyMarker(myLat, myLon) {\n"
@@ -308,7 +281,7 @@ void LiveMapWebPageWindow::createHtml()
         //"    mymap.fitBounds(routepolyline.getBounds());\n"
         "}\n"
         "</script>\n"
-        "<div><script type=\"text/javascript\">initMap (43.827907, 7.814973, 16);</script></div>\n"
+        "<div><script type=\"text/javascript\">initMap (" + sInitLat + ", " + sInitLon +", " + sInitZoom + ");</script></div>\n"
         "</body></html>\n"
      );
 }

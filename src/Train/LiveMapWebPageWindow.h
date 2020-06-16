@@ -60,17 +60,13 @@ class LiveMapWebPageWindow : public GcChartWindow
     public:
         LiveMapWebPageWindow(Context *);
         ~LiveMapWebPageWindow();
-
         bool markerIsVisible;
         double plotLon = 0;
         double plotLat = 0;
         QString currentPage;
-        //QVariantList latlons;
         QString routeLatLngs;
-        void createHtml();
 
     public slots:
-
         void configChanged(qint32);
 
     private:
@@ -95,11 +91,15 @@ class LiveMapWebPageWindow : public GcChartWindow
         QPushButton* rButton;
         QPushButton* applyButton;
 
+        void createHtml(QString sBaseUrl, QString sInitLat, QString sInitLon, QString sInitZoom);
+        void redrawMap();
+
     private slots:
         void telemetryUpdate(RealtimeData rtd);
         void start();
         void stop();
         void pause();
+        void setMapOptions();
 
     protected:
 
