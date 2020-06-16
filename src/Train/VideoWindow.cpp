@@ -221,9 +221,9 @@ void VideoWindow::startPlayback()
         if (p_meterWidget->Source() == QString("LiveMap"))
         {
             LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
-            liveMapWidget->setContext(context);
-            liveMapWidget->initLiveMap();
+            liveMapWidget->startPlayback(context);
         }
+        
     }
     prevPosition = mapToGlobal(pos());
 }
@@ -248,9 +248,7 @@ void VideoWindow::stopPlayback()
         if (p_meterWidget->Source() == QString("LiveMap"))
         {
             LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
-            liveMapWidget->setContext(context);
-            liveMapWidget->initLiveMap();
-            liveMapWidget->routeInitialized = false;
+            liveMapWidget->stopPlayback();
         }
 
         p_meterWidget->hide();

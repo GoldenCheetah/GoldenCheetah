@@ -45,6 +45,8 @@ class MeterWidget : public QWidget
     virtual void AdjustSizePos();
     virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
+    virtual void startPlayback(Context* context);
+    virtual void stopPlayback();
     virtual QSize sizeHint() const;
     virtual QSize minimumSize() const;
     void    setColor(QColor  mainColor);
@@ -66,7 +68,6 @@ class MeterWidget : public QWidget
     float    m_Angle;
     int      m_SubRange;
     int      m_Zoom;
-    float    m_Lat, m_Lon;
     QString  m_osmURL;
     bool     forceSquareRatio;
 
@@ -142,19 +143,22 @@ class LiveMapWidget : public MeterWidget
 
   public:
     explicit LiveMapWidget(QString name, QWidget* parent = 0, QString Source = QString("None"), Context* context = NULL);
+    virtual void startPlayback(Context* context);
+    virtual void stopPlayback();
     void setContext(Context* context) { this->context = context; }
     void plotNewLatLng (double newLat, double newLong);
     void initLiveMap();
-    bool routeInitialized;
    
   protected:
-    void createHtml2(double sLon, double sLat, int mapZoom, QString osmURL);
-    void buildRouteArrayLatLngs();
+    void createHtml(int mapZoom, QString osmURL);
+    void buildRouteArrayLatLngs(Context* context);
     void resizeEvent(QResizeEvent *);
     QWebEngineView *liveMapView; 
     QWebEnginePage* webPage;
     QString routeLatLngs;
     QString currentPage;
+    bool routeInitialized;
+
 };
 
 #endif // _MeterWidget_h

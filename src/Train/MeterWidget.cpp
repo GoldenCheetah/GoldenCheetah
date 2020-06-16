@@ -56,8 +56,6 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_Angle = 180.0;
     m_SubRange = 10;
     m_Zoom = 16;
-    m_Lat = 0;
-    m_Lon = 0;
     m_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     boundingRectVisibility = false;
     forceSquareRatio = true;
@@ -118,6 +116,16 @@ QSize MeterWidget::sizeHint() const
 QSize MeterWidget::minimumSize() const
 {
     return QSize(m_Width, m_Height);
+}
+
+void MeterWidget::startPlayback(Context* context)
+{
+    
+}
+
+void MeterWidget::stopPlayback()
+{
+
 }
 
 void MeterWidget::paintEvent(QPaintEvent* paintevent)
@@ -481,6 +489,31 @@ LiveMapWidget::LiveMapWidget(QString Name, QWidget* parent, QString Source, Cont
     liveMapView->setPage(webPage);
     //liveMapInitialized = false;
     routeInitialized = false;
+    
+}
+
+void LiveMapWidget::startPlayback(Context* context)
+{
+    MeterWidget::startPlayback(context);
+    //this->context = context;
+    initLiveMap();
+    if ( context->currentErgFile() )
+    {
+        buildRouteArrayLatLngs(context);
+    }
+    else
+    {
+        qDebug() << "Error: LiveMap cannot file Ergfile";
+    }
+
+}
+
+void LiveMapWidget::stopPlayback()
+{
+    MeterWidget::stopPlayback();
+    
+    initLiveMap();
+    routeInitialized = false;
 }
 
 void LiveMapWidget::resizeEvent(QResizeEvent *)
@@ -489,12 +522,13 @@ void LiveMapWidget::resizeEvent(QResizeEvent *)
 }
 
 // Initialize OSM with settings from video-layout.xml settings
-// for lat, lon, zoom and OSM URL
+// for OSM URL and zoom
 void LiveMapWidget::initLiveMap()
 {
-    createHtml2(m_Lat, m_Lon, m_Zoom, m_osmURL);
+    createHtml(m_Zoom, m_osmURL);
     liveMapView->page()->setHtml(currentPage);
     liveMapView->show();
+    
 }
 
 // Show route and/or move the marker at the next location
@@ -508,7 +542,6 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
     {
         code += QString("showMyMarker(" + sLat + " , " + sLon + ");");
         code += QString("centerMap(" + sLat + ", " + sLon + ", " + sMapZoom + ");");
-        buildRouteArrayLatLngs();
         code += QString("showRoute(" + routeLatLngs + ");");
         routeInitialized = true;
     }
@@ -517,7 +550,7 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 }
 
 // Build LatLon array for selected workout
-void LiveMapWidget::buildRouteArrayLatLngs() 
+void LiveMapWidget::buildRouteArrayLatLngs(Context* context)
 {
     routeLatLngs = "[";
     for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
@@ -532,10 +565,8 @@ void LiveMapWidget::buildRouteArrayLatLngs()
 }
 
 // Build HTML page using defaults and initialize the map
-void LiveMapWidget::createHtml2(double dLat, double dLon, int iMapZoom, QString sOsmURL)
+void LiveMapWidget::createHtml(int iMapZoom, QString sOsmURL)
 {
-    QString sLat = QString::number(dLat);
-    QString sLon = QString::number(dLon);
     QString sMapZoom = QString::number(iMapZoom);
 
     currentPage = "";
@@ -584,7 +615,7 @@ void LiveMapWidget::createHtml2(double dLat, double dLon, int iMapZoom, QString 
         "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
         "}\n"
         "</script>\n"
-        "<div><script type=\"text/javascript\">initMap (" + sLat + ", " + sLon + ", " + sMapZoom + ");</script></div>\n"
+        "<div><script type=\"text/javascript\">initMap (0, 0" + sMapZoom + ");</script></div>\n"
         "</body></html>\n"
     );
 }

@@ -97,8 +97,6 @@
 		<OutlineColor R="255" G="255" B="255" A="250" />
         <MainColor R="255" G="0" B="0" A="250" />
 		<Zoom>16</Zoom>
-		<Lat>43.827907</Lat>
-		<Lon>7.814973</Lon>
 		<osmURL>http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</osmURL>
     </meter>
 </layout>

@@ -219,10 +219,6 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
             meterWidget->m_SubRange = buffer.toInt();
         else if (qName == "Zoom")
             meterWidget->m_Zoom = buffer.toInt();
-        else if (qName == "Lat")
-            meterWidget->m_Lat = buffer.toFloat();
-        else if (qName == "Lon")
-            meterWidget->m_Lon = buffer.toFloat();
         else if (qName == "osmURL")
             meterWidget->m_osmURL = QString(buffer);
         else if (qName == "Text")
