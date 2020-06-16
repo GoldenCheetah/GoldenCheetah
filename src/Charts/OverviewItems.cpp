@@ -2811,12 +2811,13 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     // so draw a line connecting the points
     double xfactor = (geom.width() - (ROWHEIGHT*6)) / sparkdays;
-    double xoffset = boundingRect().left()+(ROWHEIGHT*2);
+    double xoffset = boundingRect().left()+(ROWHEIGHT*3);
     double yfactor = (geom.height()-(ROWHEIGHT)) / (max-min);
     double bottom = boundingRect().bottom()-ROWHEIGHT/2;
 
     // draw a sparkline -- need more than 1 point !
     if (points.count() > 1) {
+
 
         QPainterPath path;
         path.moveTo((points[0].x()*xfactor)+xoffset, bottom-((points[0].y()-min)*yfactor));
@@ -2835,6 +2836,14 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
             painter->fillPath(fillpath, QBrush(fillColor));
         }
 
+        // xaxis
+        QPainterPath line;
+        line.moveTo(xoffset, bottom);
+        line.lineTo(xoffset+geom.width()-(ROWHEIGHT*6), bottom);
+        QPen lpen(QColor(100,100,100,75));
+        lpen.setWidth(4);
+        painter->setPen(lpen);
+        painter->drawPath(line);
 
         QPen pen(QColor(150,150,150));
         pen.setWidth(8);

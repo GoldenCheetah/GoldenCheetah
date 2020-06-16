@@ -26,7 +26,7 @@
 #ifdef Q_OS_MAC
 static int spacing_=4;
 #else
-static int spacing_=4;
+static int spacing_=8;
 #endif
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -459,7 +459,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
     // now paint the text
     QPen pen(GCColor::invertColor(brush.color()));
     painter.setPen(pen);
-    painter.drawText(body, text, Qt::AlignBottom | Qt::AlignCenter);
+    painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
     if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
