@@ -45,14 +45,7 @@ private:
     QWidget*    VideoContainer;
 
     QString     buffer;
-
     int         nonameindex;
-
-    QString     source;
-    QString     meterName;
-    QString     meterType;
-    QString     container; // will be "Video" when not defined otherwise another meter name (allows positioning of one meter inside another one)
-
     MeterWidget* meterWidget;
 };
 
