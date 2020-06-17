@@ -121,8 +121,8 @@ NewSideBar::configChanged(qint32)
 {
     QFont font;
     QFontMetrics fm(font);
-    top->setFixedHeight(fm.height() + 8); // no scaling...
-    bottom->setFixedHeight(fm.height() + 4); // no scaling...
+    top->setFixedHeight(fm.height() + 16); // no scaling...
+    bottom->setFixedHeight(22 * dpiXFactor);
     QColor col=GColor(CCHROME);
     QString style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
     top->setStyleSheet(style);
