@@ -217,10 +217,6 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
             meterWidget->m_Angle = buffer.toFloat();
         else if (qName == "SubRange")
             meterWidget->m_SubRange = buffer.toInt();
-        else if (qName == "Zoom")
-            meterWidget->m_Zoom = buffer.toInt();
-        else if (qName == "osmURL")
-            meterWidget->m_osmURL = QString(buffer);
         else if (qName == "Text")
             meterWidget->Text = QString(buffer);
 
@@ -229,6 +225,15 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
             if (metersWidget)
                 metersWidget->append(meterWidget);
             meterWidget = NULL;
+        }
+
+        LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(meterWidget);
+        if (liveMapWidget != NULL)
+        {
+            if (qName == "Zoom")
+                meterWidget->LiveMap_Zoom = buffer.toInt();
+            else if (qName == "osmURL")
+            meterWidget->LiveMap_osmURL = QString(buffer);
         }
 
         return true;

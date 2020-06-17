@@ -217,12 +217,7 @@ void VideoWindow::startPlayback()
 
         p_meterWidget->raise();
         p_meterWidget->show();
-
-        if (p_meterWidget->Source() == QString("LiveMap"))
-        {
-            LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
-            liveMapWidget->startPlayback(context);
-        }
+        p_meterWidget->startPlayback(context);
         
     }
     prevPosition = mapToGlobal(pos());
@@ -245,16 +240,9 @@ void VideoWindow::stopPlayback()
 #endif
     foreach(MeterWidget * p_meterWidget, m_metersWidget)
     {
-        if (p_meterWidget->Source() == QString("LiveMap"))
-        {
-            LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
-            liveMapWidget->stopPlayback();
-        }
-
+        p_meterWidget->stopPlayback();
         p_meterWidget->hide();
     }
-        
-
 }
 
 void VideoWindow::pausePlayback()

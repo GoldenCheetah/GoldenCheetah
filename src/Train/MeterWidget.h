@@ -67,8 +67,8 @@ class MeterWidget : public QWidget
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
-    int      m_Zoom;
-    QString  m_osmURL;
+    int      LiveMap_Zoom;
+    QString  LiveMap_osmURL;
     bool     forceSquareRatio;
 
     QColor  m_MainColor;

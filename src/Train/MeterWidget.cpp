@@ -55,8 +55,8 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
-    m_Zoom = 16;
-    m_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    LiveMap_Zoom = 16;
+    LiveMap_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     boundingRectVisibility = false;
     forceSquareRatio = true;
 }
@@ -497,14 +497,8 @@ void LiveMapWidget::startPlayback(Context* context)
     MeterWidget::startPlayback(context);
     //this->context = context;
     initLiveMap();
-    if ( context->currentErgFile() )
-    {
-        buildRouteArrayLatLngs(context);
-    }
-    else
-    {
-        qDebug() << "Error: LiveMap cannot file Ergfile";
-    }
+    if ( context->currentErgFile() ) buildRouteArrayLatLngs(context);
+    else qDebug() << "Error: LiveMap cannot file Ergfile";
 
 }
 
@@ -525,7 +519,7 @@ void LiveMapWidget::resizeEvent(QResizeEvent *)
 // for OSM URL and zoom
 void LiveMapWidget::initLiveMap()
 {
-    createHtml(m_Zoom, m_osmURL);
+    createHtml(LiveMap_Zoom, LiveMap_osmURL);
     liveMapView->page()->setHtml(currentPage);
     liveMapView->show();
     
@@ -536,7 +530,7 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
     QString sLat = QString::number(dLat);
     QString sLon = QString::number(dLon);
-    QString sMapZoom = QString::number(m_Zoom);
+    QString sMapZoom = QString::number(LiveMap_Zoom);
     QString code = "";
     if ( ! routeInitialized )
     {
