@@ -55,8 +55,6 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
-    LiveMap_Zoom = 16;
-    LiveMap_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     boundingRectVisibility = false;
     forceSquareRatio = true;
 }
@@ -404,11 +402,11 @@ void ElevationMeterWidget::lazyDimensionCompute(void)
 
 void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 {
+    MeterWidget::paintEvent(paintevent);
+    
     // TODO : show Power when not in slope simulation mode
     if (!context || !context->currentErgFile() || context->currentErgFile()->Points.size()<=1)
         return;
-
-    MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
     m_BackgroundBrush = QBrush(m_BackgroundColor);
@@ -489,6 +487,8 @@ LiveMapWidget::LiveMapWidget(QString Name, QWidget* parent, QString Source, Cont
     liveMapView->setPage(webPage);
     //liveMapInitialized = false;
     routeInitialized = false;
+    m_Zoom = 16;
+    m_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     
 }
 
@@ -519,7 +519,7 @@ void LiveMapWidget::resizeEvent(QResizeEvent *)
 // for OSM URL and zoom
 void LiveMapWidget::initLiveMap()
 {
-    createHtml(LiveMap_Zoom, LiveMap_osmURL);
+    createHtml(m_Zoom, m_osmURL);
     liveMapView->page()->setHtml(currentPage);
     liveMapView->show();
     
@@ -530,7 +530,7 @@ void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
     QString sLat = QString::number(dLat);
     QString sLon = QString::number(dLon);
-    QString sMapZoom = QString::number(LiveMap_Zoom);
+    QString sMapZoom = QString::number(m_Zoom);
     QString code = "";
     if ( ! routeInitialized )
     {

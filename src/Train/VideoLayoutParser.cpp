@@ -231,9 +231,9 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
         if (liveMapWidget != NULL)
         {
             if (qName == "Zoom")
-                meterWidget->LiveMap_Zoom = buffer.toInt();
+                liveMapWidget->m_Zoom = buffer.toInt();
             else if (qName == "osmURL")
-            meterWidget->LiveMap_osmURL = QString(buffer);
+                liveMapWidget->m_osmURL = QString(buffer);
         }
 
         return true;

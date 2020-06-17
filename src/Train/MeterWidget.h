@@ -67,8 +67,6 @@ class MeterWidget : public QWidget
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
-    int      LiveMap_Zoom;
-    QString  LiveMap_osmURL;
     bool     forceSquareRatio;
 
     QColor  m_MainColor;
@@ -148,6 +146,8 @@ class LiveMapWidget : public MeterWidget
     void setContext(Context* context) { this->context = context; }
     void plotNewLatLng (double newLat, double newLong);
     void initLiveMap();
+    int  m_Zoom;
+    QString  m_osmURL;
    
   protected:
     void createHtml(int mapZoom, QString osmURL);
@@ -158,7 +158,8 @@ class LiveMapWidget : public MeterWidget
     QString routeLatLngs;
     QString currentPage;
     bool routeInitialized;
-
+    //int  m_Zoom;
+    //QString  m_osmURL;
 };
 
 #endif // _MeterWidget_h
