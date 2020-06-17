@@ -282,8 +282,6 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
-        QString myQstr1 = p_meterWidget->Source();
-        std::string smyStr1 = myQstr1.toStdString();
         if (p_meterWidget->Source() == QString("None"))
         {
             //Nothing
@@ -321,7 +319,11 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 double dLat = rtd.getLatitude();
                 double dLon = rtd.getLongitude();
 
-                if (dLat && dLon) liveMapWidget->plotNewLatLng(dLat, dLon);
+                if (dLat && dLon)
+                {
+                    liveMapWidget->show();
+                    liveMapWidget->plotNewLatLng(dLat, dLon);
+                } 
                 else liveMapWidget->hide();
             }
         }
