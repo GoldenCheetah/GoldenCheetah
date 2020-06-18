@@ -77,7 +77,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[36] = {
+  static GcWindowRegistry GcWindowsInit[37] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Overview "),GcWindowTypes::OverviewTrends },
     { VIEW_HOME|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
