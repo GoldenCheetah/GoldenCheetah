@@ -332,6 +332,7 @@ struct FitFileReaderState
             // Multiple product IDs refer to different regions e.g. China, Japan etc. 
             switch (prod) {
                 case -1: return "Garmin";
+                case 16: case 20: return "Garmin Cadence Sensor 2";
                 case 473: case 474: case 475: case 494: return "Garmin FR301";
                 case 717: case 987: return "Garmin FR405";
                 case 782: return "Garmin FR50";
@@ -354,6 +355,7 @@ struct FitFileReaderState
                 case 1623: case 2173: return "Garmin FR620";
                 case 1632: case 2174: return "Garmin FR220";
                 case 1743: return "Garmin HRM-Tri";
+                case 1752: return "Garmin HRM-Run";
                 case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
@@ -368,6 +370,7 @@ struct FitFileReaderState
                 case 2157: return "Garmin FR230";
                 case 2158: return "Garmin FR735XT";
                 case 2204: return "Garmin Edge 1000 Explore";
+                case 2327: return "Garmin HRM4 Run";
                 case 2238: return "Garmin Edge 20";
                 case 2337: return "Garmin Vivoactive HR";
                 case 2347: return "Garmin Vivosmart HR+";
@@ -392,10 +395,12 @@ struct FitFileReaderState
                 case 3121: return "Garmin Edge 530";
                 case 3122: return "Garmin Edge 830";
                 case 3126: return "Garmin Instinct";
+                case 3192: return "Garmin Speed Sensor 2";
                 case 3287: case 3288: case 3512: case 3513: return "Garmin Fenix 6s";
                 case 3289: case 3290: case 3514: case 3515: return "Garmin Fenix 6";
                 case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
+                case 3405: case 3639: return "Garmin Swim 2";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -539,6 +544,7 @@ struct FitFileReaderState
             // Favero
             switch (prod) {
                 case -1: return "Favero";
+                case 12: return "Favero Assioma Duo";
                 default: return QString("Favero %1").arg(prod);
             }
         } else if (manu == 267) {
