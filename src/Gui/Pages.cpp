@@ -2224,33 +2224,33 @@ const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
 
     static const SimBicyclePartEntry arr[] = {
           // SpinBox Title                          Path to athlete value                Default Value      Decimal      Tooltip                                                                              enum
-        { "Bicycle Mass Without Wheels (g)"       , GC_SIM_BICYCLE_MASSWITHOUTWHEELSG,   4000,              0,           "Mass of everything that isn't wheels, tires, skewers..."},                       // BicycleWithoutWheelsG
-        { "Front Wheel Mass (g)"                  , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0,           "Mass of front wheel including tires and skewers..."},                            // FrontWheelG
-        { "Front Spoke Count"                     , GC_SIM_BICYCLE_FRONTSPOKECOUNT,      24,                0,           ""},                                                                              // FrontSpokeCount
-        { "Front Spoke & Nipple Mass - Each (g)"  , GC_SIM_BICYCLE_FRONTSPOKENIPPLEG,    5.6,               1,           "Mass of a single spoke and nipple, washers, etc."},                              // FrontSpokeNippleG
-        { "Front Rim Mass (g)"                    , GC_SIM_BICYCLE_FRONTRIMG,            330,               0,           ""},                                                                              // FrontRimG
-        { "Front Rotor Mass (g)"                  , GC_SIM_BICYCLE_FRONTROTORG,          120,               0,           "Mass of rotor including bolts"},                                                 // FrontRotorG
-        { "Front Skewer Mass (g)"                 , GC_SIM_BICYCLE_FRONTSKEWERG,         40,                0,           ""},                                                                              // FrontSkewerG
-        { "Front Tire Mass (g)"                   , GC_SIM_BICYCLE_FRONTTIREG,           220,               0,           ""},                                                                              // FrontTireG
-        { "Front Tube or Sealant Mass (g)"        , GC_SIM_BICYCLE_FRONTTUBESEALANTG,    26,                0,           "Mass of anything inside the tire: sealant, tube..."},                            // FrontTubeSealantG
-        { "Front Rim Outer Radius (m)"            , GC_SIM_BICYCLE_FRONTOUTERRADIUSM,    .35,               3,           "Functional outer radius of wheel, used for computing wheel circumference"},      // FrontOuterRadiusM
-        { "Front Rim Inner Radius (m)"            , GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM, .3,                3,           "Inner radius of rim, for computing wheel inertia"},                              // FrontRimInnerRadiusM
-        { "Rear Wheel Mass (g)"                   , GC_SIM_BICYCLE_REARWHEELG,           739,               0,           "Mass of front wheel including tires and skewers..."},                            // RearWheelG
-        { "Rear Spoke Count"                      , GC_SIM_BICYCLE_REARSPOKECOUNT,       24,                0,           ""},                                                                              // RearSpokeCount
-        { "Rear Spoke & Nipple Mass - Each (g)"   , GC_SIM_BICYCLE_REARSPOKENIPPLEG,     5.6,               1,           "Mass of a single spoke and nipple, washers, etc."},                              // RearSpokeNippleG
-        { "Rear Rim Mass (g)"                     , GC_SIM_BICYCLE_REARRIMG,             330,               0,           ""},                                                                              // RearRimG
-        { "Rear Rotor Mass (g)"                   , GC_SIM_BICYCLE_REARROTORG,           120,               0,           "Mass of rotor including bolts"},                                                 // RearRotorG
-        { "Rear Skewer Mass (g)"                  , GC_SIM_BICYCLE_REARSKEWERG,           40,               0,           "Mass of skewer/axle/funbolts, etc..."},                                          // RearSkewerG
-        { "Rear Tire Mass (g)"                    , GC_SIM_BICYCLE_REARTIREG,            220,               0,           "Mass of tire not including tube or sealant"},                                    // RearTireG
-        { "Rear Tube or Sealant Mass (g)"         , GC_SIM_BICYCLE_REARTUBESEALANTG,      26,               0,           "Mass of anything inside the tire: sealant, tube..."},                            // RearTubeSealantG
-        { "Rear Rim Outer Radius (m)"             , GC_SIM_BICYCLE_REAROUTERRADIUSM,     .35,               3,           "Functional outer radius of wheel, used for computing wheel circumference"},      // RearOuterRadiusM
-        { "Rear Rim Inner Radius (m)"             , GC_SIM_BICYCLE_REARRIMINNERRADIUSM,  .3,                3,           "Inner radius of rim, for computing wheel inertia"},                              // RearRimInnerRadiusM
-        { "Rear Cassette Mass(g)"                 , GC_SIM_BICYCLE_CASSETTEG,            190,               0,           "Mass of rear cassette, including lockring"},                                     // CassetteG
-        { "Coefficient of rolling resistance"     , GC_SIM_BICYCLE_CRR,                  0.004,             4,           "Total coefficient of rolling resistance for bicycle"},                           // CRR
-        { "Coefficient of power train loss"       , GC_SIM_BICYCLE_Cm,                   1.0,               3,           "Power train loss between reported watts and wheel. For direct drive trainer like kickr there is no relevant loss and value shold be 1.0."},      // Cm
-        { "Coefficient of drag"                   , GC_SIM_BICYCLE_Cd,        (1.0 - 0.0045),               5,           "Coefficient of drag of rider and bicycle"},                                      // Cd
-        { "Frontal Area (m^2)"                    , GC_SIM_BICYCLE_Am2,                  0.5,               2,           "Effective frontal area of rider and bicycle"},                                   // Am2
-        { "Temperature (K)"                       , GC_SIM_BICYCLE_Tk,                 293.15,              2,           "Temperature in kelvin, used with altitude to compute air density"}               // Tk
+        { tr("Bicycle Mass Without Wheels (g)")     , GC_SIM_BICYCLE_MASSWITHOUTWHEELSG,   4000,              0,        tr("Mass of everything that isn't wheels, tires, skewers...")},                       // BicycleWithoutWheelsG
+        { tr("Front Wheel Mass (g)")                , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0,        tr("Mass of front wheel including tires and skewers...")},                            // FrontWheelG
+        { tr("Front Spoke Count")                   , GC_SIM_BICYCLE_FRONTSPOKECOUNT,      24,                0,        ""},                                                                                  // FrontSpokeCount
+        { tr("Front Spoke & Nipple Mass - Each (g)"), GC_SIM_BICYCLE_FRONTSPOKENIPPLEG,    5.6,               1,        tr("Mass of a single spoke and nipple, washers, etc.")},                              // FrontSpokeNippleG
+        { tr("Front Rim Mass (g)")                  , GC_SIM_BICYCLE_FRONTRIMG,            330,               0,        ""},                                                                                  // FrontRimG
+        { tr("Front Rotor Mass (g)")                , GC_SIM_BICYCLE_FRONTROTORG,          120,               0,        tr("Mass of rotor including bolts")},                                                 // FrontRotorG
+        { tr("Front Skewer Mass (g)")               , GC_SIM_BICYCLE_FRONTSKEWERG,         40,                0,        ""},                                                                                  // FrontSkewerG
+        { tr("Front Tire Mass (g)")                 , GC_SIM_BICYCLE_FRONTTIREG,           220,               0,        ""},                                                                                  // FrontTireG
+        { tr("Front Tube or Sealant Mass (g)")      , GC_SIM_BICYCLE_FRONTTUBESEALANTG,    26,                0,        tr("Mass of anything inside the tire: sealant, tube...")},                            // FrontTubeSealantG
+        { tr("Front Rim Outer Radius (m)")          , GC_SIM_BICYCLE_FRONTOUTERRADIUSM,    .35,               3,        tr("Functional outer radius of wheel, used for computing wheel circumference")},      // FrontOuterRadiusM
+        { tr("Front Rim Inner Radius (m)")          , GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM, .3,                3,        tr("Inner radius of rim, for computing wheel inertia")},                              // FrontRimInnerRadiusM
+        { tr("Rear Wheel Mass (g)")                 , GC_SIM_BICYCLE_REARWHEELG,           739,               0,        tr("Mass of front wheel including tires and skewers...")},                            // RearWheelG
+        { tr("Rear Spoke Count")                    , GC_SIM_BICYCLE_REARSPOKECOUNT,       24,                0,        ""},                                                                                  // RearSpokeCount
+        { tr("Rear Spoke & Nipple Mass - Each (g)") , GC_SIM_BICYCLE_REARSPOKENIPPLEG,     5.6,               1,        tr("Mass of a single spoke and nipple, washers, etc.")},                              // RearSpokeNippleG
+        { tr("Rear Rim Mass (g)")                   , GC_SIM_BICYCLE_REARRIMG,             330,               0,        ""},                                                                                  // RearRimG
+        { tr("Rear Rotor Mass (g)")                 , GC_SIM_BICYCLE_REARROTORG,           120,               0,        tr("Mass of rotor including bolts")},                                                 // RearRotorG
+        { tr("Rear Skewer Mass (g)")                , GC_SIM_BICYCLE_REARSKEWERG,           40,               0,        tr("Mass of skewer/axle/funbolts, etc...")},                                          // RearSkewerG
+        { tr("Rear Tire Mass (g)")                  , GC_SIM_BICYCLE_REARTIREG,            220,               0,        tr("Mass of tire not including tube or sealant")},                                    // RearTireG
+        { tr("Rear Tube or Sealant Mass (g)")       , GC_SIM_BICYCLE_REARTUBESEALANTG,      26,               0,        tr("Mass of anything inside the tire: sealant, tube...")},                            // RearTubeSealantG
+        { tr("Rear Rim Outer Radius (m)")           , GC_SIM_BICYCLE_REAROUTERRADIUSM,     .35,               3,        tr("Functional outer radius of wheel, used for computing wheel circumference")},      // RearOuterRadiusM
+        { tr("Rear Rim Inner Radius (m)")           , GC_SIM_BICYCLE_REARRIMINNERRADIUSM,  .3,                3,        tr("Inner radius of rim, for computing wheel inertia")},                              // RearRimInnerRadiusM
+        { tr("Rear Cassette Mass(g)")               , GC_SIM_BICYCLE_CASSETTEG,            190,               0,        tr("Mass of rear cassette, including lockring")},                                     // CassetteG
+        { tr("Coefficient of rolling resistance")   , GC_SIM_BICYCLE_CRR,                  0.004,             4,        tr("Total coefficient of rolling resistance for bicycle")},                           // CRR
+        { tr("Coefficient of power train loss")     , GC_SIM_BICYCLE_Cm,                   1.0,               3,        tr("Power train loss between reported watts and wheel. For direct drive trainer like kickr there is no relevant loss and value shold be 1.0.")},      // Cm
+        { tr("Coefficient of drag")                 , GC_SIM_BICYCLE_Cd,        (1.0 - 0.0045),               5,        tr("Coefficient of drag of rider and bicycle")},                                      // Cd
+        { tr("Frontal Area (m^2)")                  , GC_SIM_BICYCLE_Am2,                  0.5,               2,        tr("Effective frontal area of rider and bicycle")},                                   // Am2
+        { tr("Temperature (K)")                     , GC_SIM_BICYCLE_Tk,                 293.15,              2,        tr("Temperature in kelvin, used with altitude to compute air density")}               // Tk
     };
 
     if (e < 0 || e >= LastPart) e = 0;
@@ -2402,11 +2402,11 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
     // Column 2
     column = 2;
     row = 0;
-    grid->addWidget(new QLabel("These values are used to compute correct inertia\n"
+    grid->addWidget(new QLabel(tr("These values are used to compute correct inertia\n"
                                "for simulated speed in trainer mode.These values\n"
                                "only have effect when the 'Use simulated speed in\n"
                                "slope mode' option is set on the training preferences\n"
-                               " tab."), row, column, alignment);
+                               " tab.")), row, column, alignment);
 
     int section2FirstRow = row + 1;
 
@@ -2547,7 +2547,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFont font=baseFont;
     font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
-    fonttext->setText("The quick brown fox jumped over the lazy dog");
+    fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
     fonttext->setFixedHeight(30 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
