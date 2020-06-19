@@ -149,6 +149,7 @@ AddChartConfig::initializePage()
     // add config screen for this item
     wizard->config = wizard->item->config();
     main->addWidget(wizard->config);
+    main->addStretch();
     wizard->config->show();
 }
 

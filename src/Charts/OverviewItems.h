@@ -46,7 +46,7 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, CAT };
 
 //
 // Configuration widget for ALL Overview Items

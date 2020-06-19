@@ -46,8 +46,8 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     setChartLayout(main);
 
     // tell space when a ride is selected
-    if (scope & ANALYSIS) connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
-    if (scope & TRENDS) {
+    if (scope & OverviewScope::ANALYSIS) connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
+    if (scope & OverviewScope::TRENDS) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
         connect(context, SIGNAL(filterChanged()), space, SLOT(filterChanged()));
         connect(context, SIGNAL(homeFilterChanged()), space, SLOT(filterChanged()));
@@ -182,7 +182,7 @@ OverviewWindow::setConfiguration(QString config)
 
     if (config == "") {
 
-        if (scope == ANALYSIS) {
+        if (scope == OverviewScope::ANALYSIS) {
 
             // column 0
             ChartSpaceItem *add;
@@ -264,7 +264,7 @@ OverviewWindow::setConfiguration(QString config)
 
         }
 
-        if (scope == TRENDS) {
+        if (scope == OverviewScope::TRENDS) {
 
             ChartSpaceItem *add;
 
@@ -510,8 +510,8 @@ OverviewConfigDialog::close()
         item->itemGeometryChanged();
 
         // update after config changed
-        if (item->parent->scope & ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
-        if (item->parent->scope & TRENDS ) item->setDateRange(item->parent->currentDateRange);
+        if (item->parent->scope & OverviewScope::ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
+        if (item->parent->scope & OverviewScope::TRENDS ) item->setDateRange(item->parent->currentDateRange);
 
     }
 

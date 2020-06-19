@@ -103,8 +103,8 @@ ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
     item->column = column;
     item->deep = deep;
     items.append(item);
-    if (scope&ANALYSIS && currentRideItem) item->setData(currentRideItem);
-    if (scope&TRENDS) item->setDateRange(currentDateRange);
+    if (scope&OverviewScope::ANALYSIS && currentRideItem) item->setData(currentRideItem);
+    if (scope&OverviewScope::TRENDS) item->setDateRange(currentDateRange);
 }
 
 void

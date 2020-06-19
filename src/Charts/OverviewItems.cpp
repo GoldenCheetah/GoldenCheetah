@@ -51,15 +51,15 @@ static bool _registerItems()
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
     // Register      TYPE                        SHORT                      DESCRIPTION                                        SCOPE            CREATOR
-    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               ANALYSIS|TRENDS, MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   ANALYSIS|TRENDS, KPIOverviewItem::create);
-    registry.addItem(OverviewItemType::TOPN,     QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               TRENDS,          TopNOverviewItem::create);
-    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             ANALYSIS,        MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     ANALYSIS|TRENDS, ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         ANALYSIS,        RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              ANALYSIS,        IntervalOverviewItem::create);
-    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 ANALYSIS,        PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      ANALYSIS,        RouteOverviewItem::create);
+    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::TOPN,     QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
+    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::create);
+    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
 
     return true;
 }
@@ -68,7 +68,7 @@ static bool registered = _registerItems();
 static void setFilter(ChartSpaceItem *item, Specification &spec)
 {
     // trends view filter
-    if (item->parent->scope & TRENDS) {
+    if (item->parent->scope & OverviewScope::TRENDS) {
 
         // general filters
         FilterSet fs;
@@ -76,7 +76,7 @@ static void setFilter(ChartSpaceItem *item, Specification &spec)
         fs.addFilter(item->parent->context->ishomefiltered, item->parent->context->homeFilters);
 
         // local filter
-        spec.addMatches(SearchFilterBox::matches(item->parent->context, item->datafilter));
+        fs.addFilter(item->datafilter != "", SearchFilterBox::matches(item->parent->context, item->datafilter));
         spec.setFilterSet(fs);
     }
     return;
@@ -1840,7 +1840,10 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 }
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item), block(false)
 {
-    QFormLayout *layout = new QFormLayout(this);
+    QVBoxLayout *main = new QVBoxLayout(this);
+    QFormLayout *layout = new QFormLayout();
+    main->addLayout(layout);
+    main->addStretch();
 
     // everyone except PMC
     if (item->type != OverviewItemType::PMC) {
@@ -1850,7 +1853,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
     }
 
     // trends view always has a filter
-    if (item->parent->scope & TRENDS) {
+    if (item->parent->scope & OverviewScope::TRENDS) {
         filterEditor = new SearchFilterBox(this, item->parent->context);
         layout->addRow(tr("Filter"), filterEditor);
         connect(filterEditor->searchbox, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
@@ -2017,7 +2020,7 @@ OverviewItemConfig::setWidgets()
     block = true;
 
     // always have a filter on trends view
-    if (item->parent->scope & TRENDS)  filterEditor->setFilter(item->datafilter);
+    if (item->parent->scope & OverviewScope::TRENDS)  filterEditor->setFilter(item->datafilter);
 
     // set the widget values from the item
     switch(item->type) {
@@ -2107,7 +2110,7 @@ OverviewItemConfig::dataChanged()
     if (block) return;
 
     // get filter
-    if (item->parent->scope & TRENDS)  item->datafilter = filterEditor->filter();
+    if (item->parent->scope & OverviewScope::TRENDS)  item->datafilter = filterEditor->filter();
 
     // set the widget values from the item
     switch(item->type) {
