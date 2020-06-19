@@ -26,10 +26,12 @@
 #include "VideoLayoutParser.h"
 #include "MeterWidget.h"
 
-VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QWidget* VideoContainer)
-    : metersWidget(metersWidget), VideoContainer(VideoContainer)
+VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer)
+    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
 {
     nonameindex = 0;
+    skipLayout = false;
+    layoutPosition = 0;
     meterWidget = NULL;
 }
 
@@ -75,9 +77,18 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
     const QString& qName,
     const QXmlAttributes& qAttributes)
 {
+    if(skipLayout) return true;
+
     buffer.clear();
 
-    if(qName == "meter")
+    if(qName == "layout")
+    {
+        int i = qAttributes.index("name");
+        layoutNames->append(i >= 0 ? qAttributes.value(i) : QString("noname_") + QString::number(layoutPosition));
+
+        if(layoutPositionSelected != layoutPosition) skipLayout = true;
+    }
+    else if(qName == "meter")
     {
         int i = qAttributes.index("name"); // To be used to enclose another sub meter (typ. text within NeedleMeter)
         if(i >= 0)
@@ -207,6 +218,15 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
 
 bool VideoLayoutParser::endElement( const QString&, const QString&, const QString& qName)
 {
+    if(qName == "layout")
+    {
+        layoutPosition++;
+        skipLayout = false;
+        return true;
+    }
+
+    if(skipLayout) return true;
+
     if (meterWidget)
     {
         if (qName == "Angle")
@@ -231,6 +251,8 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
 
 bool VideoLayoutParser::characters( const QString& str )
 {
+    if(skipLayout) return true;
+
     buffer += str;
     return true;
 }
