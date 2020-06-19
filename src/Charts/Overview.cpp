@@ -364,7 +364,7 @@ OverviewWindow::setConfiguration(QString config)
 
             // get the basics
             QString name = obj["name"].toString();
-            QString datafilter = obj["datafilter"].toString();
+            QString datafilter = Utils::jsonunprotect(obj["datafilter"].toString());
             int column = obj["column"].toInt();
             int order = obj["order"].toInt();
             int deep = obj["deep"].toInt();
