@@ -65,6 +65,22 @@ static bool _registerItems()
 }
 static bool registered = _registerItems();
 
+static void setFilter(ChartSpaceItem *item, Specification &spec)
+{
+    // trends view filter
+    if (item->parent->scope & TRENDS) {
+
+        // general filters
+        FilterSet fs;
+        fs.addFilter(item->parent->context->isfiltered, item->parent->context->filters);
+        fs.addFilter(item->parent->context->ishomefiltered, item->parent->context->homeFilters);
+
+        // local filter
+        spec.addMatches(SearchFilterBox::matches(item->parent->context, item->datafilter));
+        spec.setFilterSet(fs);
+    }
+    return;
+}
 
 RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
@@ -398,7 +414,7 @@ KPIOverviewItem::setDateRange(DateRange dr)
 {
     // calculate the value...
     DataFilter parser(this, parent->context, program);
-    Result res = parser.evaluate(dr);
+    Result res = parser.evaluate(dr, datafilter);
 
     // set to zero for daft values
     value = QString("%1").arg(res.number);
@@ -590,6 +606,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
 
     Specification spec;
     spec.setDateRange(dr);
+    setFilter(this, spec);
 
     // aggregate sum and count etc
     double v=0; // value
@@ -704,6 +721,7 @@ TopNOverviewItem::setDateRange(DateRange dr)
     // filtering
     Specification spec;
     spec.setDateRange(dr);
+    setFilter(this, spec);
 
     // pmc data
     PMCData stressdata(parent->context, spec, "coggan_tss");
@@ -873,6 +891,7 @@ ZoneOverviewItem::setDateRange(DateRange dr)
 
     Specification spec;
     spec.setDateRange(dr);
+    setFilter(this, spec);
 
     // aggregate sum and count etc
     foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
@@ -1830,6 +1849,13 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         layout->addRow(tr("Name"), name);
     }
 
+    // trends view always has a filter
+    if (item->parent->scope & TRENDS) {
+        filterEditor = new SearchFilterBox(this, item->parent->context);
+        layout->addRow(tr("Filter"), filterEditor);
+        connect(filterEditor->searchbox, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+    }
+
     // single metric names
     if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC || item->type == OverviewItemType::PMC) {
         metric1 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
@@ -1989,6 +2015,10 @@ void
 OverviewItemConfig::setWidgets()
 {
     block = true;
+
+    // always have a filter on trends view
+    if (item->parent->scope & TRENDS)  filterEditor->setFilter(item->datafilter);
+
     // set the widget values from the item
     switch(item->type) {
     case OverviewItemType::RPE:
@@ -2075,6 +2105,9 @@ OverviewItemConfig::dataChanged()
     // if they are valid. But block set when the widgets
     // are being initialised
     if (block) return;
+
+    // get filter
+    if (item->parent->scope & TRENDS)  item->datafilter = filterEditor->filter();
 
     // set the widget values from the item
     switch(item->type) {

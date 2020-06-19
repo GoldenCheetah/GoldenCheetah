@@ -148,6 +148,13 @@ ChartSpace::rideSelected(RideItem *item)
 }
 
 void
+ChartSpace::filterChanged()
+{
+    // redo trends
+    dateRangeChanged(currentDateRange);
+}
+
+void
 ChartSpace::dateRangeChanged(DateRange dr)
 {
     // remember

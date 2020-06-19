@@ -78,6 +78,7 @@ class OverviewItemConfig : public QWidget
 
         // editor for program
         DataFilterEdit *editor;
+        SearchFilterBox *filterEditor;
         QLabel *errors;
 
         // block updates during initialisation

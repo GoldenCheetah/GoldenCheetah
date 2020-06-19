@@ -47,7 +47,13 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
 
     // tell space when a ride is selected
     if (scope & ANALYSIS) connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
-    if (scope & TRENDS) connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
+    if (scope & TRENDS) {
+        connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
+        connect(context, SIGNAL(filterChanged()), space, SLOT(filterChanged()));
+        connect(context, SIGNAL(homeFilterChanged()), space, SLOT(filterChanged()));
+    }
+
+    // menu items
     connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
@@ -143,6 +149,7 @@ OverviewWindow::getConfiguration() const
             break;
         }
 
+        config += "\"datafilter\":\"" + Utils::jsonprotect(item->datafilter) + "\",";
         config += "\"name\":\"" + item->name + "\"";
 
         config += " }";
@@ -357,6 +364,7 @@ OverviewWindow::setConfiguration(QString config)
 
             // get the basics
             QString name = obj["name"].toString();
+            QString datafilter = obj["datafilter"].toString();
             int column = obj["column"].toInt();
             int order = obj["order"].toInt();
             int deep = obj["deep"].toInt();
@@ -370,6 +378,7 @@ OverviewWindow::setConfiguration(QString config)
             case OverviewItemType::RPE :
                 {
                     add = new RPEOverviewItem(space, name);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -378,6 +387,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new TopNOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -386,6 +396,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new MetricOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -394,6 +405,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new MetaOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -402,6 +414,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new PMCOverviewItem(space, symbol); // doesn't have a title
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -410,6 +423,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
                     add = new ZoneOverviewItem(space, name, series);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
 
                 }
@@ -418,6 +432,7 @@ OverviewWindow::setConfiguration(QString config)
             case OverviewItemType::ROUTE :
                 {
                     add = new RouteOverviewItem(space, name); // doesn't have a title
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -429,6 +444,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString zsymbol=obj["zsymbol"].toString();
 
                     add = new IntervalOverviewItem(space, name, xsymbol, ysymbol, zsymbol); // doesn't have a title
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -441,6 +457,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString units =obj["units"].toString();
 
                     add = new KPIOverviewItem(space, name, start, stop, program, units);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;

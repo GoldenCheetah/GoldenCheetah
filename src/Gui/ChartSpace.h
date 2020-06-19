@@ -108,6 +108,9 @@ class ChartSpaceItem : public QGraphicsWidget
         // name
         QString name;
 
+        // datafilter - only relevant on trends view
+        QString datafilter;
+
         // which column, sequence and size in rows
         int column, order, deep;
         bool onscene, placing, drag;
@@ -159,6 +162,7 @@ class ChartSpace : public QWidget
         // user selection
         void rideSelected(RideItem *item);
         void dateRangeChanged(DateRange);
+        void filterChanged();
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
