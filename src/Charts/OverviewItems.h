@@ -46,7 +46,7 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, CAT };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT };
 
 //
 // Configuration widget for ALL Overview Items
@@ -307,6 +307,47 @@ class ZoneOverviewItem : public ChartSpaceItem
         QBarSet *barset;
         QBarSeries *barseries;
         QStringList categories;
+        QBarCategoryAxis *barcategoryaxis;
+};
+
+struct aggmeta {
+    aggmeta(QString category, double value, double percentage, double count)
+    : category(category), value(value), percentage(percentage), count(count) {}
+
+    QString category;
+    double value, percentage, count;
+};
+
+class DonutOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        DonutOverviewItem(ChartSpace *parent, QString name, QString symbol, QString meta);
+        ~DonutOverviewItem();
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *) {} // trends view only
+        void setDateRange(DateRange);
+        void dragChanged(bool x);
+        QWidget *config() { return new OverviewItemConfig(this); }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new DonutOverviewItem(parent, tr("Sport"), "ride_count", "Sport"); }
+
+        // config
+        QString symbol, meta;
+        RideMetric *metric;
+
+        // Categories and values
+        QVector<aggmeta> values;
+
+        // Viz
+        QChart *chart;
+        QBarSet *barset;
+        QBarSeries *barseries;
         QBarCategoryAxis *barcategoryaxis;
 };
 

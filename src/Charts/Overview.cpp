@@ -100,6 +100,14 @@ OverviewWindow::getConfiguration() const
             }
             break;
 
+        case OverviewItemType::DONUT:
+            {
+                DonutOverviewItem *donut = reinterpret_cast<DonutOverviewItem*>(item);
+                config += "\"symbol\":\"" + QString("%1").arg(donut->symbol) + "\",";
+                config += "\"meta\":\"" + QString("%1").arg(donut->meta) + "\",";
+            }
+            break;
+
         case OverviewItemType::TOPN:
         case OverviewItemType::METRIC:
             {
@@ -192,7 +200,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetaOverviewItem(space, "Sport", "Sport");
             space->addItem(2,0,5, add);
 
-            add = new MetaOverviewItem(space, "Workout Code", "Workout Code");
+            add = new MetaOverviewItem(space, "Workout Code", "Workout_Code");
             space->addItem(3,0,5, add);
 
             add = new MetricOverviewItem(space, "Duration", "workout_time");
@@ -387,6 +395,16 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new TopNOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
+                    space->addItem(order,column,deep, add);
+                }
+                break;
+
+            case OverviewItemType::DONUT :
+                {
+                    QString symbol=obj["symbol"].toString();
+                    QString meta=obj["meta"].toString();
+                    add = new DonutOverviewItem(space, name,symbol,meta);
                     add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }

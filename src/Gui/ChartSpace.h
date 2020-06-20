@@ -143,7 +143,7 @@ class ChartSpace : public QWidget
         Context *context;
         int scope;
         QGraphicsView *view;
-        QFont titlefont, bigfont, midfont, smallfont;
+        QFont titlefont, bigfont, midfont, smallfont, tinyfont;
 
         // the item we are currently showing
         RideItem *currentRideItem;

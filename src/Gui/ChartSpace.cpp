@@ -424,6 +424,7 @@ ChartSpace::configChanged(qint32)
     titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
     midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
     smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
+    tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
