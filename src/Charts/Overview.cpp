@@ -200,7 +200,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetaOverviewItem(space, "Sport", "Sport");
             space->addItem(2,0,5, add);
 
-            add = new MetaOverviewItem(space, "Workout Code", "Workout_Code");
+            add = new MetaOverviewItem(space, "Workout Code", "Workout Code");
             space->addItem(3,0,5, add);
 
             add = new MetricOverviewItem(space, "Duration", "workout_time");
