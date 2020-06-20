@@ -1080,23 +1080,35 @@ void AddVirtualPower::mySortTable(int i) {
     bool state = this->blockSignals(true);
     if (state) return;
 
-    struct pair { double x, y; };
+    struct pair { double speed, watts; };
     std::vector<pair> elements;
 
-    for (int i = 0; i < virtualPowerTableWidget->rowCount(); i++) {
-        elements.push_back({ virtualPowerTableWidget->item(i, 0)->text().toDouble(), virtualPowerTableWidget->item(i, 1)->text().toDouble() });
+    int rowCount = virtualPowerTableWidget->rowCount();
+    for (int i = 0; i < rowCount; i++) {
+        double speed = virtualPowerTableWidget->item(i, 0)->text().toDouble();
+        double watts = virtualPowerTableWidget->item(i, 1)->text().toDouble();
+
+        // Remove cleared rows: ignore and remove entries with zero speed, except the final row.
+        if (((i + 1) == rowCount) || (speed != 0.) || (watts != 0.)) {
+            elements.push_back({ speed, watts });
+        }
     }
 
     std::sort(elements.begin(), elements.end(),
         [](const pair& a, const pair& b) {
-            if (a.x == 0.) return false;
-            return a.x < b.x; 
+            if (a.speed == 0. && a.watts == 0.) return false; // ensure 0.,0. entry stays at end.
+            if (a.speed == b.speed) return a.watts < b.watts; // if speed is equal sort by watts.
+            return a.speed < b.speed; 
         }
     );
 
+    // Resize table to element count
+    virtualPowerTableWidget->setRowCount((int)(elements.size()));
+
+    // Rewrite all rows to match sorted elements
     for (int i = 0; i < elements.size(); i++) {
-        virtualPowerTableWidget->item(i, 0)->setData(Qt::EditRole, QString::number(elements[i].x));
-        virtualPowerTableWidget->item(i, 1)->setData(Qt::EditRole, QString::number(elements[i].y));
+        virtualPowerTableWidget->item(i, 0)->setData(Qt::EditRole, QString::number(elements[i].speed));
+        virtualPowerTableWidget->item(i, 1)->setData(Qt::EditRole, QString::number(elements[i].watts));
     }
 
     drawConfig();
