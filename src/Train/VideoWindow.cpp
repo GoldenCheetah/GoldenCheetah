@@ -30,7 +30,7 @@
 VideoWindow::VideoWindow(Context *context)  :
     GcChartWindow(context), context(context), m_MediaChanged(false)
 {
-    setControls(NULL);
+    QWidget *c = NULL;
     setProperty("color", QColor(Qt::black));
 
     QHBoxLayout *layout = new QHBoxLayout();
@@ -80,38 +80,25 @@ VideoWindow::VideoWindow(Context *context)  :
 #endif
 
 #if defined(WIN32) || defined(Q_OS_LINUX)
-        // Video Overlays Initialization: if video config file is not present
-        // copy a default one to be used as a model by the user.
-        // An empty video-layout.xml file disables video overlays
-        QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
-        QFile file(filename);
-        if (!file.exists())
-        {
-            file.setFileName(":/xml/video-layout.xml");
-            file.copy(filename);
-            QFile::setPermissions(filename, QFileDevice::ReadUser|QFileDevice::WriteUser);
-        }
-        if (file.exists())
-        {
-            // clean previous layout
-            foreach(MeterWidget* p_meterWidget, m_metersWidget)
-            {
-                m_metersWidget.removeAll(p_meterWidget);
-                delete p_meterWidget;
-            }
 
-            VideoLayoutParser handler(&m_metersWidget, container);
+        // Read the video layouts just to list the names for the layout selector
+        readVideoLayout(-1);
 
-            QXmlInputSource source (&file);
-            QXmlSimpleReader reader;
-            reader.setContentHandler (&handler);
+        // Create the layout selector form
+        c = new QWidget;
+        QVBoxLayout *cl = new QVBoxLayout(c);
+        QFormLayout *controlsLayout = new QFormLayout();
+        controlsLayout->setSpacing(0);
+        controlsLayout->setContentsMargins(5,5,5,5);
+        cl->addLayout(controlsLayout);
+        QLabel *layoutLabel = new QLabel(tr("Video meters layout"), this);
+        layoutLabel->setAutoFillBackground(true);
+        layoutSelector = new QComboBox(this);
 
-            reader.parse (source);
+        for(int i = 0; i < layoutNames.length(); i++) {
+            layoutSelector->addItem(layoutNames[i], i);
         }
-        else
-        {
-            qDebug() << qPrintable(QString("file" + filename + " (video layout XML file) not found"));
-        }
+        controlsLayout->addRow(layoutLabel, layoutSelector);
 #endif
     } else {
 
@@ -131,6 +118,8 @@ VideoWindow::VideoWindow(Context *context)  :
     layout->addWidget(wd);
 #endif
 
+    setControls(c);
+
     if (init) {
         // get updates..
         connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
@@ -140,6 +129,15 @@ VideoWindow::VideoWindow(Context *context)  :
         connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
         connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
         connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
+        connect(layoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(layoutChanged()));
+
+        // The video file may have been already selected
+        mediaSelected(context->videoFilename);
+        // We may add a video player while training is already running!
+        if(context->isRunning) startPlayback();
+        // Instantiate a layout as initial default
+        layoutChanged();
     }
 }
 
@@ -169,6 +167,62 @@ VideoWindow::~VideoWindow()
 #endif
 }
 
+void VideoWindow::layoutChanged()
+{
+    readVideoLayout(videoLayout());
+}
+
+void VideoWindow::readVideoLayout(int pos)
+{
+    // Video Overlays Initialization: if video config file is not present
+    // copy a default one to be used as a model by the user.
+    // An empty video-layout.xml file disables video overlays
+    QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
+    QFile file(filename);
+    if (!file.exists())
+    {
+        file.setFileName(":/xml/video-layout.xml");
+        file.copy(filename);
+        QFile::setPermissions(filename, QFileDevice::ReadUser|QFileDevice::WriteUser);
+    }
+    if (file.exists())
+    {
+        // clean previous layout
+        foreach(MeterWidget* p_meterWidget, m_metersWidget)
+        {
+            m_metersWidget.removeAll(p_meterWidget);
+            p_meterWidget->deleteLater();
+        }
+        layoutNames.clear();
+
+        VideoLayoutParser handler(&m_metersWidget, &layoutNames, container);
+        QXmlInputSource source(&file);
+        QXmlSimpleReader reader;
+        handler.layoutPositionSelected = pos;
+        reader.setContentHandler(&handler);
+        reader.parse(source);
+        qDebug() << "Video Layout parsing: " << layoutNames;
+        if(context->isRunning) showMeters();
+    }
+    else
+    {
+        qDebug() << qPrintable(QString("file" + filename + " (video layout XML file) not found"));
+    }
+}
+
+void VideoWindow::showMeters()
+{
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        p_meterWidget->setWindowOpacity(1); // Show the widget
+        p_meterWidget->AdjustSizePos();
+        p_meterWidget->update();
+        p_meterWidget->raise();
+        p_meterWidget->show();
+    }
+    prevPosition = mapToGlobal(pos());
+}
+
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
@@ -178,7 +232,7 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    if (context->currentVideoSyncFile()) {
+    if ((!context->isRunning) && context->currentVideoSyncFile()) {
         context->currentVideoSyncFile()->manualOffset = 0.0;
         context->currentVideoSyncFile()->km = 0.0;
     }
@@ -210,21 +264,12 @@ void VideoWindow::startPlayback()
     mp->play();
 #endif
 
-    foreach(MeterWidget* p_meterWidget , m_metersWidget)
-    {
-        p_meterWidget->setWindowOpacity(1); // Show the widget
-        p_meterWidget->AdjustSizePos();
-        p_meterWidget->update();
-
-        p_meterWidget->raise();
-        p_meterWidget->show();
-    }
-    prevPosition = mapToGlobal(pos());
+    showMeters();
 }
 
 void VideoWindow::stopPlayback()
 {
-    if (context->currentVideoSyncFile())
+    if ((!context->isRunning) && context->currentVideoSyncFile())
         context->currentVideoSyncFile()->manualOffset = 0.0;
 
 #ifdef GC_VIDEO_VLC
@@ -239,7 +284,6 @@ void VideoWindow::stopPlayback()
 #endif
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->hide();
-
 }
 
 void VideoWindow::pausePlayback()
@@ -591,6 +635,7 @@ void VideoWindow::mediaSelected(QString filename)
     mc = QMediaContent(QUrl::fromLocalFile(filename));
     mp->setMedia(mc);
 #endif
+    if(context->isRunning) startPlayback();
 }
 
 MediaHelper::MediaHelper()

@@ -32,21 +32,25 @@
 class VideoLayoutParser : public QXmlDefaultHandler
 {
 public:
-    VideoLayoutParser(QList<MeterWidget*>* metersWidget, QWidget* VideoContainer);
+    VideoLayoutParser(QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer);
 
     bool startElement( const QString&, const QString&, const QString&, const QXmlAttributes& );
     bool endElement( const QString&, const QString&, const QString& );
 
     bool characters( const QString& );
     void SetDefaultValues();
+    int  layoutPositionSelected;
 
 private:
     QList<MeterWidget*>* metersWidget;
+    QList<QString>* layoutNames;
     QWidget*    VideoContainer;
 
     QString     buffer;
 
     int         nonameindex;
+    int         layoutPosition;
+    bool        skipLayout;
 
     QString     source;
     QString     meterName;

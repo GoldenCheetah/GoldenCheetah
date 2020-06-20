@@ -143,14 +143,19 @@ class VideoWindow : public GcChartWindow
     Q_OBJECT
     G_OBJECT
 
+    // which layout to use
+    Q_PROPERTY(int videoLayout READ videoLayout WRITE setVideoLayout USER true)
 
     public:
 
         VideoWindow(Context *);
         ~VideoWindow();
+        int videoLayout() const { return layoutSelector->currentIndex(); }
+
 
     public slots:
 
+        void layoutChanged();
         void startPlayback();
         void stopPlayback();
         void pausePlayback();
@@ -162,6 +167,7 @@ class VideoWindow : public GcChartWindow
     protected:
 
         void resizeEvent(QResizeEvent *);
+        void setVideoLayout(int x) { layoutSelector->setCurrentIndex(x); }
 
         // current data
         int curPosition;
@@ -175,6 +181,11 @@ class VideoWindow : public GcChartWindow
 
         QList<MeterWidget*> m_metersWidget;
         QPoint prevPosition;
+
+    private:
+        QList<QString> layoutNames;
+        void readVideoLayout(int x);
+        void showMeters();
 
 #ifdef GC_VIDEO_VLC
 
@@ -193,6 +204,7 @@ class VideoWindow : public GcChartWindow
 #endif
 
         QWidget *container;
+        QComboBox *layoutSelector;
 
         bool init; // we initialised ok ?
 };

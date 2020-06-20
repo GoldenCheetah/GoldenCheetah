@@ -97,6 +97,7 @@ class Context : public QObject
         DateRange dr_;
         ErgFile *workout; // the currently selected workout file
         VideoSyncFile *videosync; // the currently selected videosync file
+        QString videoFilename;
         long now; // point in time during train session
         SpecialFields specialFields;
 
@@ -155,7 +156,7 @@ class Context : public QObject
         void notifyVideoSyncFileSelected(VideoSyncFile *x) { videosync=x; videoSyncFileSelected(x); }
         ErgFile *currentErgFile() { return workout; }
         VideoSyncFile *currentVideoSyncFile() { return videosync; }
-        void notifyMediaSelected( QString x) { mediaSelected(x); }
+        void notifyMediaSelected( QString x) { videoFilename = x; mediaSelected(x); }
         void notifySelectVideo(QString x) { selectMedia(x); }
         void notifySelectWorkout(QString x) { selectWorkout(x); }
         void notifySelectVideoSync(QString x) { selectVideoSync(x); }
