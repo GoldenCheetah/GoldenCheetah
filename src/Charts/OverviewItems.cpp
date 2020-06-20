@@ -1027,6 +1027,7 @@ DonutOverviewItem::setDateRange(DateRange dr)
     double i=1;
     QColor min=GColor(CPLOTMARKER);
     QColor max=GCColor::invertColor(GColor(CCARDBACKGROUND));
+    bool exploded=false;
     foreach(QPieSlice *slice, add->slices()) {
 
         //slice->setExploded();
@@ -1042,6 +1043,15 @@ DonutOverviewItem::setDateRange(DateRange dr)
         slice->setLabelColor(QColor(150,150,150));
         if (values.count() <= minslices) slice->setLabelFont(parent->midfont);
         else slice->setLabelFont(parent->tinyfont);
+
+        // set the largest value that isn't duff to exploded and red, so it stands out from the rest
+        if (exploded == false && slice->label() != "blank" && slice->label() != "other") {
+            slice->setExploded(true);
+            slice->setColor(QColor(Qt::darkRed));
+            exploded=true;
+            i--; // save a hue
+        }
+
         //if (i <colors.size()) slice->setBrush(QColor(colors.at(i)));
         //else slice->setBrush(Qt::red);
         i++;
