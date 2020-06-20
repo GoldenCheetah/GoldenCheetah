@@ -1895,7 +1895,7 @@ deviceModel::add(DeviceConfiguration &newone)
     index = deviceModel::index(0,3, QModelIndex());
     setData(index, newone.deviceProfile, Qt::EditRole);
 
-    // insert postProcess
+    // insert virtualPowerIndex
     index = deviceModel::index(0,4, QModelIndex());
     setData(index, newone.postProcess, Qt::EditRole);
 }
