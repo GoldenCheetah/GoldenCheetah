@@ -1002,6 +1002,8 @@ DonutOverviewItem::setDateRange(DateRange dr)
 
     // now set the pie chart
     QPieSeries *add = new QPieSeries();
+    connect(add, SIGNAL(hovered(QPieSlice*,bool)), this, SLOT(hoverSlice(QPieSlice*,bool)));
+
     add->setPieSize(0.7);
     add->setHoleSize(0.5);
 
@@ -1062,6 +1064,17 @@ DonutOverviewItem::setDateRange(DateRange dr)
 
     // set the pie chart
     chart->addSeries(add);
+}
+
+void
+DonutOverviewItem::hoverSlice(QPieSlice *slice, bool state)
+{
+    if (state == true) {
+        value = QString("%1%").arg(round(slice->percentage()*100));
+    } else {
+        value = ""; // unhover
+    }
+    update();
 }
 
 void
@@ -2041,9 +2054,11 @@ void RouteOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, 
 void IntervalOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 void ZoneOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 
-void DonutOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    // paint legend xxx
+    painter->setFont(parent->bigfont);
+    painter->setPen(GColor(CPLOTMARKER));
+    painter->drawText(chart->geometry(), Qt::AlignHCenter | Qt::AlignVCenter, value);
 }
 
 

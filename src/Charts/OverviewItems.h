@@ -343,12 +343,16 @@ class DonutOverviewItem : public ChartSpaceItem
 
         // Categories and values
         QVector<aggmeta> values;
+        QString value; // currently hovered...
 
         // Viz
         QChart *chart;
         QBarSet *barset;
         QBarSeries *barseries;
         QBarCategoryAxis *barcategoryaxis;
+
+    public slots:
+        void hoverSlice(QPieSlice *slice, bool state);
 };
 
 class RouteOverviewItem : public ChartSpaceItem
