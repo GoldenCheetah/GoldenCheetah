@@ -1071,8 +1071,10 @@ DonutOverviewItem::hoverSlice(QPieSlice *slice, bool state)
 {
     if (state == true) {
         value = QString("%1%").arg(round(slice->percentage()*100));
+        valuename=slice->label();
     } else {
         value = ""; // unhover
+        valuename = "";
     }
     update();
 }
@@ -2059,6 +2061,8 @@ void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsI
     painter->setFont(parent->bigfont);
     painter->setPen(GColor(CPLOTMARKER));
     painter->drawText(chart->geometry(), Qt::AlignHCenter | Qt::AlignVCenter, value);
+    QFontMetrics fm(parent->bigfont);
+    painter->drawText(QRectF(0,ROWHEIGHT, geometry().width(), fm.ascent()+ROWHEIGHT), Qt::AlignHCenter | Qt::AlignTop, valuename);
 }
 
 

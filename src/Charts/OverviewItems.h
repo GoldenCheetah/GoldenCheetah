@@ -343,7 +343,7 @@ class DonutOverviewItem : public ChartSpaceItem
 
         // Categories and values
         QVector<aggmeta> values;
-        QString value; // currently hovered...
+        QString value, valuename; // currently hovered...
 
         // Viz
         QChart *chart;
