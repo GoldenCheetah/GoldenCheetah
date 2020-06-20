@@ -475,11 +475,11 @@ class RemotePage : public QWidget
 
 struct SimBicyclePartEntry
 {
-    const char* m_label;
-    const char* m_path;
-    double      m_defaultValue;
-    double      m_decimalPlaces;
-    const char* m_tooltip;
+    const QString m_label;
+    const char*   m_path;
+    double        m_defaultValue;
+    double        m_decimalPlaces;
+    const QString m_tooltip;
 };
 
 class SimBicyclePage : public QWidget
