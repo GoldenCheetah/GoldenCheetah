@@ -197,77 +197,77 @@ OverviewWindow::setConfiguration(QString config)
             add = new PMCOverviewItem(space, "coggan_tss");
             space->addItem(1,0,9, add);
 
-            add = new MetaOverviewItem(space, "Sport", "Sport");
+            add = new MetaOverviewItem(space, tr("Sport"), "Sport");
             space->addItem(2,0,5, add);
 
-            add = new MetaOverviewItem(space, "Workout Code", "Workout Code");
+            add = new MetaOverviewItem(space, tr("Workout Code"), "Workout Code");
             space->addItem(3,0,5, add);
 
-            add = new MetricOverviewItem(space, "Duration", "workout_time");
+            add = new MetricOverviewItem(space, tr("Duration"), "workout_time");
             space->addItem(4,0,9, add);
 
-            add = new MetaOverviewItem(space, "Notes", "Notes");
+            add = new MetaOverviewItem(space, tr("Notes"), "Notes");
             space->addItem(5,0,13, add);
 
             // column 1
-            add = new MetricOverviewItem(space, "HRV rMSSD", "rMSSD");
+            add = new MetricOverviewItem(space, tr("HRV rMSSD"), "rMSSD");
             space->addItem(1,1,9, add);
 
-            add = new MetricOverviewItem(space, "Heartrate", "average_hr");
+            add = new MetricOverviewItem(space, tr("Heartrate"), "average_hr");
             space->addItem(2,1,5, add);
 
-            add = new ZoneOverviewItem(space, "Heartrate Zones", RideFile::hr);
+            add = new ZoneOverviewItem(space, tr("Heartrate Zones"), RideFile::hr);
             space->addItem(3,1,11, add);
 
-            add = new MetricOverviewItem(space, "Climbing", "elevation_gain");
+            add = new MetricOverviewItem(space, tr("Climbing"), "elevation_gain");
             space->addItem(4,1,5, add);
 
-            add = new MetricOverviewItem(space, "Cadence", "average_cad");
+            add = new MetricOverviewItem(space, tr("Cadence"), "average_cad");
             space->addItem(5,1,5, add);
 
-            add = new MetricOverviewItem(space, "Work", "total_work");
+            add = new MetricOverviewItem(space, tr("Work"), "total_work");
             space->addItem(6,1,5, add);
 
             // column 2
-            add = new RPEOverviewItem(space, "RPE");
+            add = new RPEOverviewItem(space, tr("RPE"));
             space->addItem(1,2,9, add);
 
-            add = new MetricOverviewItem(space, "Stress", "coggan_tss");
+            add = new MetricOverviewItem(space, tr("Stress"), "coggan_tss");
             space->addItem(2,2,5, add);
 
-            add = new ZoneOverviewItem(space, "Fatigue Zones", RideFile::wbal);
+            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal);
             space->addItem(3,2,11, add);
 
-            add = new IntervalOverviewItem(space, "Intervals", "elapsed_time", "average_power", "workout_time");
+            add = new IntervalOverviewItem(space, tr("Intervals"), "elapsed_time", "average_power", "workout_time");
             space->addItem(4,2,17, add);
 
             // column 3
-            add = new MetricOverviewItem(space, "Power", "average_power");
+            add = new MetricOverviewItem(space, tr("Power"), "average_power");
             space->addItem(1,3,9, add);
 
-            add = new MetricOverviewItem(space, "IsoPower", "coggan_np");
+            add = new MetricOverviewItem(space, tr("IsoPower"), "coggan_np");
             space->addItem(2,3,5, add);
 
-            add = new ZoneOverviewItem(space, "Power Zones", RideFile::watts);
+            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts);
             space->addItem(3,3,11, add);
 
-            add = new MetricOverviewItem(space, "Peak Power Index", "peak_power_index");
+            add = new MetricOverviewItem(space, tr("Peak Power Index"), "peak_power_index");
             space->addItem(4,3,8, add);
 
-            add = new MetricOverviewItem(space, "Variability", "coggam_variability_index");
+            add = new MetricOverviewItem(space, tr("Variability"), "coggam_variability_index");
             space->addItem(5,3,8, add);
 
             // column 4
-            add = new MetricOverviewItem(space, "Distance", "total_distance");
+            add = new MetricOverviewItem(space, tr("Distance"), "total_distance");
             space->addItem(1,4,9, add);
 
-            add = new MetricOverviewItem(space, "Speed", "average_speed");
+            add = new MetricOverviewItem(space, tr("Speed"), "average_speed");
             space->addItem(2,4,5, add);
 
-            add = new ZoneOverviewItem(space, "Pace Zones", RideFile::kph);
+            add = new ZoneOverviewItem(space, tr("Pace Zones"), RideFile::kph);
             space->addItem(3,4,11, add);
 
-            add = new RouteOverviewItem(space, "Route");
+            add = new RouteOverviewItem(space, tr("Route"));
             space->addItem(4,4,17, add);
 
         }
