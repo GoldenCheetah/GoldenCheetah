@@ -2061,8 +2061,10 @@ void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsI
     painter->setFont(parent->bigfont);
     painter->setPen(GColor(CPLOTMARKER));
     painter->drawText(chart->geometry(), Qt::AlignHCenter | Qt::AlignVCenter, value);
-    QFontMetrics fm(parent->bigfont);
-    painter->drawText(QRectF(0,ROWHEIGHT, geometry().width(), fm.ascent()+ROWHEIGHT), Qt::AlignHCenter | Qt::AlignTop, valuename);
+    painter->setPen(QColor(100,100,100));
+    QFontMetrics fm(parent->midfont);
+    painter->setFont(parent->midfont);
+    painter->drawText(QRectF(0,ROWHEIGHT*2, geometry().width(), fm.ascent()+(ROWHEIGHT*2)), Qt::AlignHCenter | Qt::AlignTop, valuename);
 }
 
 
