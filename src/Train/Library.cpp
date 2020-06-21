@@ -261,7 +261,7 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     findWorkouts->setChecked(true);
     findMedia = new QCheckBox(tr("Video files (.mp4, .avi etc)"), this);
     findMedia->setChecked(true);
-    findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv)"), this);
+    findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv, .tts etc)"), this);
     findVideoSyncs->setChecked(true);
     addPath = new QPushButton("+", this);
     removePath = new QPushButton("-", this);

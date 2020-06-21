@@ -42,18 +42,7 @@ static bool setSupported()
     ::supported << ".zwo";
     ::supported << ".gpx";
     ::supported << ".tts";
-
-    // Additional supportable ridefile types. Uncomment to enable.
-    //::supported << ".bin";
-    //::supported << ".bin2";
-    //::supported << ".fit";
-    //::supported << ".fitlog";
-    //::supported << ".hrm";
-    //::supported << ".pwx";
-    //::supported << ".srd";
-    //::supported << ".srm";
-    //::supported << ".tcx";
-    //::supported << ".wko";
+    ::supported << ".json";
 
     return true;
 }
@@ -67,7 +56,7 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), context(context), StrictGradient(true)
+    filename(filename), mode(mode), StrictGradient(true), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -76,7 +65,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), context(context), StrictGradient(true)
+ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), context(context)
 {
     if (context->athlete->zones(false)) {
         int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
@@ -123,7 +112,7 @@ void ErgFile::reload()
     // All file endings that can be loaded as ergfile from rideFileFactory.
     // Actual permitted file types are controlled by ::supported list at
     // top of this file.
-    QRegExp fact(".+[.](gpx|bin|bin2|fit|fitlog|hrm|pwx|srd|srm|tcx|wko)$", Qt::CaseInsensitive);
+    QRegExp fact(".+[.](gpx|json)$", Qt::CaseInsensitive);
 
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
@@ -714,17 +703,8 @@ void ErgFile::parseComputrainer(QString p)
 // and which contains gps data, altitude or slope.
 //
 // File types supported:
-// .bin     Joule GPS File
-// .bin2    Joule GPS File
-// .fit     Garmin FIT
-// .fitlog  Sporttracks FITLOG
 // .gpx     GPS Track
-// .hrm     Polar Precision
-// .pwx     TrainingPeaks PWX
-// .srd     Polar SRD
-// .srm     SRM Powercontrol
-// .tcx     Garmin TCX
-// .wko     TrainingPeaks WKO
+// .json    GoldenCheetah JSON
 void ErgFile::parseFromRideFileFactory()
 {
     // Initialise

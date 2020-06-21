@@ -30,20 +30,7 @@ static bool setSupported()
 {
     ::supported << ".rlv";
     ::supported << ".tts";
-
-    // Additional file types that are supportable as videosync file.
-    // Uncomment to enable.
-    //::supported << ".gpx";
-    //::supported << ".bin";
-    //::supported << ".bin2";
-    //::supported << ".fit";
-    //::supported << ".fitlog";
-    //::supported << ".hrm";
-    //::supported << ".pwx";
-    //::supported << ".srd";
-    //::supported << ".srm";
-    //::supported << ".tcx";
-    //::supported << ".wko";
+    ::supported << ".json";
 
     return true;
 }
@@ -70,7 +57,7 @@ VideoSyncFile::VideoSyncFile(Context *context) : context(context)
 void VideoSyncFile::reload()
 {
     // These types are enabled using ::supported list at top of this file.
-    QRegExp fact(".+[.](gpx|bin|bin2|fit|fit|fitlog|hrm|pwx|srd|srm|tcx|wko)$", Qt::CaseInsensitive);
+    QRegExp fact(".+[.](gpx|json)$", Qt::CaseInsensitive);
 
     // which parser to call?
     if      (filename.endsWith(".rlv", Qt::CaseInsensitive)) parseRLV();
