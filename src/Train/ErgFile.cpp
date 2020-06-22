@@ -42,6 +42,19 @@ static bool setSupported()
     ::supported << ".zwo";
     ::supported << ".gpx";
     ::supported << ".tts";
+
+    // Additional supportable ridefile types. Uncomment to enable.
+    //::supported << ".bin";
+    //::supported << ".bin2";
+    //::supported << ".fit";
+    //::supported << ".fitlog";
+    //::supported << ".hrm";
+    //::supported << ".pwx";
+    //::supported << ".srd";
+    //::supported << ".srm";
+    //::supported << ".tcx";
+    //::supported << ".wko";
+
     return true;
 }
 static bool isinit = setSupported();
@@ -107,15 +120,19 @@ ErgFile::fromContent2(QString contents, Context *context)
 
 void ErgFile::reload()
 {
+    // All file endings that can be loaded as ergfile from rideFileFactory.
+    // Actual permitted file types are controlled by ::supported list at
+    // top of this file.
+    QRegExp fact(".+[.](gpx|bin|bin2|fit|fitlog|hrm|pwx|srd|srm|tcx|wko)$", Qt::CaseInsensitive);
+
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
-    if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
-    else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
-    else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
-    else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
-    else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
+    if      (filename.endsWith(".pgmf",   Qt::CaseInsensitive)) parseTacx();
+    else if (filename.endsWith(".zwo",    Qt::CaseInsensitive)) parseZwift();
+    else if (fact.exactMatch(filename))                         parseFromRideFileFactory();
+    else if (filename.endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
+    else if (filename.endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
-
 }
 
 void ErgFile::parseZwift()
@@ -693,8 +710,22 @@ void ErgFile::parseComputrainer(QString p)
     }
 }
 
-// parse gpx into ergfile
-void ErgFile::parseGpx()
+// Parse anything that the ridefile factory knows how to load
+// and which contains gps data, altitude or slope.
+//
+// File types supported:
+// .bin     Joule GPS File
+// .bin2    Joule GPS File
+// .fit     Garmin FIT
+// .fitlog  Sporttracks FITLOG
+// .gpx     GPS Track
+// .hrm     Polar Precision
+// .pwx     TrainingPeaks PWX
+// .srd     Polar SRD
+// .srm     SRM Powercontrol
+// .tcx     Garmin TCX
+// .wko     TrainingPeaks WKO
+void ErgFile::parseFromRideFileFactory()
 {
     // Initialise
     Version = "";

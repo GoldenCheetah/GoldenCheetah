@@ -106,18 +106,18 @@ class ErgFile
         static ErgFile *fromContent(QString, Context *); // read from memory *.erg
         static ErgFile *fromContent2(QString, Context *); // read from memory *.erg2
 
-        static bool isWorkout(QString); // is this a supported workout?
+        static bool isWorkout(QString);  // is this a supported workout?
 
-        void reload();          // reload after messed about
+        void reload();                   // reload after messed about
 
         void parseComputrainer(QString p = ""); // its an erg,crs or mrc file
-        void parseTacx();       // its a pgmf file
-        void parseZwift();      // its a zwo file (zwift xml)
-        void parseGpx();        // its a gpx...
-        void parseErg2(QString p = "");       // ergdb
-        void parseTTS();        // its ahh tts
+        void parseTacx();                // its a pgmf file
+        void parseZwift();               // its a zwo file (zwift xml)
+        void parseFromRideFileFactory(); // its something we can parse using ridefilefactory...
+        void parseErg2(QString p = "");  // ergdb
+        void parseTTS();                 // its ahh tts
 
-        bool isValid();         // is the file valid or not?
+        bool isValid();                  // is the file valid or not?
 
         double Cp;
         int format;                      // ERG, CRS, MRC, ERG2 currently supported
