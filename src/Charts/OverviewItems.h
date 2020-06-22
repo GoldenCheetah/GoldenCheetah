@@ -174,6 +174,10 @@ class MetricOverviewItem : public ChartSpaceItem
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
+
+        int rank; // rank 1,2 or 3
+        QString beststring;
+        QPixmap gold, silver, bronze; // medals
 };
 
 // top N uses this to hold details for date range

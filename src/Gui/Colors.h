@@ -29,6 +29,7 @@
 // A selection of distinct colours, user can adjust also
 extern QList<QColor> standardColors;
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
+extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;

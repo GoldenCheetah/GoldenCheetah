@@ -842,7 +842,7 @@ ColorLabel::paintEvent(QPaintEvent *)
     painter.restore();
 }
 
-QIcon colouredIconFromPNG(QString filename, QColor color)
+QPixmap colouredPixmapFromPNG(QString filename, QColor color)
 {
     QImage pngImage;
     pngImage.load(filename);
@@ -851,5 +851,11 @@ QIcon colouredIconFromPNG(QString filename, QColor color)
     QImage colored = pngImage.convertToFormat(QImage::Format_Indexed8);
     colored.setColor(0, color.rgb());
 
-    return QIcon(QPixmap::fromImage(colored));
+    return QPixmap::fromImage(colored);
 }
+
+QIcon colouredIconFromPNG(QString filename, QColor color)
+{
+    return QIcon(colouredPixmapFromPNG(filename, color));
+}
+

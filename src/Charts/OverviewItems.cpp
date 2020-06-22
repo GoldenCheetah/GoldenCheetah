@@ -323,6 +323,11 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
 
+    // prepare the gold, silver and bronze medal
+    gold = colouredPixmapFromPNG(":/images/medal.png", QColor(Qt::yellow)).scaledToWidth(ROWHEIGHT*2);
+    silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth(ROWHEIGHT*2);
+    bronze = colouredPixmapFromPNG(":/images/medal.png", QColor(184,115,51)).scaledToWidth(ROWHEIGHT*2);
+
     // we may plot the metric sparkline if the tile is big enough
     bool bigdot = parent->scope == ANALYSIS ? true : false;
     sparkline = new Sparkline(this, name, bigdot);
@@ -600,6 +605,64 @@ MetricOverviewItem::setData(RideItem *item)
     if (diff==0) {
         showrange=false;
         diff = value.toDouble()/10.0f;
+    }
+
+    int rank30=0; // 30d rank
+    int rank90=0; // 90d rank
+    int rank365=0; // 365d rank
+    int alltime=0; // all time
+    int career=0; // Career
+    bool first=true;
+    index = parent->context->athlete->rideCache->rides().count()-1;
+    v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+    while(index >=0) { // ultimately go no further back than first ever ride
+
+        // get value from items before me
+        RideItem *prior = parent->context->athlete->rideCache->rides().at(index);
+        if (prior == item) {
+            index--;
+            continue;
+        }
+
+        // days ago?
+        int daysago = prior->dateTime.date().daysTo(item->dateTime.date());
+        double priorv = prior->getForSymbol(symbol);
+
+        if (daysago >= 0) {
+            if (daysago < 30 && priorv >= v) rank30++;
+            if (daysago < 90 && priorv >= v) rank90++;
+            if (daysago < 365 && priorv >= v) rank365++;
+            if (priorv >= v) alltime++;
+        }
+        if (priorv >= v) career++;
+
+        first=false;
+        index--;
+    }
+
+    // set rankstring
+    rank=99;
+    if (first != true) {
+        // we get to compare
+        if (alltime < 3) {
+            beststring = tr("Career");
+            rank = career+1;
+        } else if (alltime < 3) {
+            beststring = tr("So far");
+            rank = alltime+1;
+        } else if (rank365 < 3) {
+            beststring = tr("Year");
+            rank = rank365+1;
+        } else if (rank90 < 3) {
+            beststring = tr("90d");
+            rank = rank90+1;
+        } else if (rank30 < 3) {
+            beststring = tr("30d");
+            rank = rank30+1;
+        } else {
+            beststring = "";
+            rank=99;
+        }
     }
 
     // update the sparkline
@@ -1688,6 +1751,29 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
 void
 MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    // put the medal up so all else paints over it
+    if (parent->scope == OverviewScope::ANALYSIS && rank < 4) {
+
+        // paint a medal
+        QPixmap *medal;
+        switch(rank) {
+        case 1: medal=&gold; break;
+        case 2: medal=&silver; break;
+        default:
+        case 3: medal=&bronze; break;
+        }
+
+        // draw unscaled
+        painter->setClipRect(0,0,geometry().width(),geometry().height());
+        painter->drawPixmap(QPointF(ROWHEIGHT, ROWHEIGHT*2), *medal);
+
+        // rank
+        if (beststring == tr("Career"))  painter->setPen(GColor(CPLOTMARKER));
+        else painter->setPen(QPen(QColor(150,150,150)));
+        painter->setFont(parent->midfont);
+        painter->drawText(QRectF(0, (ROWHEIGHT*2)+medal->height()+10, medal->width()+(ROWHEIGHT*2), ROWHEIGHT*2), beststring, Qt::AlignTop|Qt::AlignHCenter);
+    }
 
     double addy = 0;
     if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
