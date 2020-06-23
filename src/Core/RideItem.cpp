@@ -818,8 +818,7 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 
             double value = metrics_[m->index()];
             if (std::isinf(value) || std::isnan(value)) value=0;
-            const_cast<RideMetric*>(m)->setValue(value);
-            returning = m->toString(useMetricUnits);
+            returning = m->toString(useMetricUnits, value);
         }
     }
     return returning;

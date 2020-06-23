@@ -316,6 +316,6 @@ RideMetric::toString(bool useMetricUnits) const
 QString
 RideMetric::toString(bool useMetricUnits, double v) const
 {
-    if (isTime()) return time_to_string(value(useMetricUnits));
+    if (isTime()) return time_to_string(value(v, useMetricUnits));
     return QString("%1").arg(value(v, useMetricUnits), 0, 'f', this->precision());
 }

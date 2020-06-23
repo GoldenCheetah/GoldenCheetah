@@ -750,7 +750,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
     }
 
     // get the metric value
-    value = Utils::removeDP(QString("%1").arg(v,0,'f',metric->precision()));
+    value = metric->toString(parent->context->athlete->useMetricUnits, v);
     if (value == "nan") value ="";
     if (std::isinf(v) || std::isnan(v)) v=0;
 
