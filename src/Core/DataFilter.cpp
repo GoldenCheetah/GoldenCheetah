@@ -3551,10 +3551,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                 } else {
 
                     // usual activity samples; HR, Power etc
-                    foreach(RideFilePoint *p, m->ride()->dataPoints()) {
-                        double value=p->value(leaf->seriesType);
-                        returning.number += value;
-                        returning.vector.append(value);
+                    if (!s.isEmpty(m->ride())) {
+
+                        // spec may limit to an interval
+                        RideFileIterator it(m->ride(), s);
+                        while(it.hasNext()) {
+                            struct RideFilePoint *p = it.next();
+                            double value=p->value(leaf->seriesType);
+                            returning.number += value;
+                            returning.vector.append(value);
+                        }
                     }
                 }
                 return returning;
