@@ -2725,6 +2725,8 @@ DataFilterEdit::checkErrors()
     QStringList errors = checker.check(toPlainText());
     checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
 
+    if (checker.rt.functions.contains("sample")) errors << tr("Warning: sample() is slow -- update code to use samples()");
+
     // even if no errors need to tell folks
     emit syntaxErrors(errors);
 }
