@@ -41,7 +41,7 @@ class OverviewWindow : public GcChartWindow
 
     public:
 
-        OverviewWindow(Context *context, int scope=ANALYSIS);
+        OverviewWindow(Context *context, int scope=OverviewScope::ANALYSIS);
 
         // used by children
         Context *context;

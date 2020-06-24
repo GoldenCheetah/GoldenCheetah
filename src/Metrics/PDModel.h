@@ -120,7 +120,7 @@ class PDModel : public QObject, public QwtSyntheticPointData
         virtual void saveParameters(QList<double>&here) = 0;
         virtual void loadParameters(QList<double>&here) = 0;
 
-        virtual QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
+        virtual QString name()   { return tr("Base Model"); }  // model name e.g. CP 2 parameter model
         virtual QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
 
         bool inverseTime;
@@ -237,7 +237,7 @@ class CP2Model : public PDModel
         double WPrime();
         double CP();
 
-        QString name()   { return "Classic  Parameter"; }  // model name e.g. CP 2 parameter model
+        QString name()   { return tr("Classic 2 Parameter"); }  // model name e.g. CP 2 parameter model
         QString code()   { return "cp2"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
@@ -289,7 +289,7 @@ class CP3Model : public PDModel
         double CP();
         double PMax();
 
-        QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
+        QString name()   { return tr("Morton 3 Parameter"); }  // model name e.g. CP 2 parameter model
         QString code()   { return "cp3"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
@@ -322,7 +322,7 @@ class WSModel : public PDModel // ward-smith
         double FTP();
         double PMax();
 
-        QString name()   { return "Ward-Smith"; }  // model name e.g. CP 2 parameter model
+        QString name()   { return tr("Ward-Smith"); }  // model name e.g. CP 2 parameter model
         QString code()   { return "WS"; }        // short name used in metric names e.g. 2P model
 
         void saveParameters(QList<double>&here);
@@ -357,7 +357,7 @@ class MultiModel : public PDModel
         double FTP();
         double PMax();
 
-        QString name()   { return "Veloclinic Multicomponent"; }  // model name e.g. CP 2 parameter model
+        QString name()   { return tr("Veloclinic Multicomponent"); }  // model name e.g. CP 2 parameter model
         QString code()   { return "Velo"; }        // short name used in metric names e.g. 2P model
 
         // veloclinic has multiple additional parameters
@@ -470,7 +470,7 @@ class ExtendedModel : public PDModel
         double FTP();
         double PMax();
 
-        QString name()   { return "Extended CP"; }  // model name e.g. CP 2 parameter model
+        QString name()   { return tr("Extended CP"); }  // model name e.g. CP 2 parameter model
         QString code()   { return "ext"; }        // short name used in metric names e.g. 2P model
 
         // Extended has multiple additional parameters

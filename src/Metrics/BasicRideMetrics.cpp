@@ -42,6 +42,7 @@ class RideCount : public RideMetric {
     }
     void initialize() {
         setName(tr("Activities"));
+        setType(MetricType::Total);
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setDescription(tr("Activity Count"));

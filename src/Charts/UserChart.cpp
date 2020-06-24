@@ -389,7 +389,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
 
     // Chart tab
     QWidget *cs= new QWidget(this);
-    tabs->addTab(cs, "Chart");
+    tabs->addTab(cs, tr("Chart"));
 
     QVBoxLayout *vf = new QVBoxLayout(cs);
     QFormLayout *cf = new QFormLayout();
@@ -446,7 +446,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // Series tab
     QWidget *seriesWidget = new QWidget(this);
     QVBoxLayout *seriesLayout = new QVBoxLayout(seriesWidget);
-    tabs->addTab(seriesWidget, "Series");
+    tabs->addTab(seriesWidget, tr("Series"));
 
     seriesTable = new QTableWidget(this);
 #ifdef Q_OS_MAX
@@ -509,7 +509,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // axis tab
     QWidget *axisWidget = new QWidget(this);
     QVBoxLayout *axisLayout = new QVBoxLayout(axisWidget);
-    tabs->addTab(axisWidget, "Axes");
+    tabs->addTab(axisWidget, tr("Axes"));
 
     axisTable = new QTableWidget(this);
 #ifdef Q_OS_MAX

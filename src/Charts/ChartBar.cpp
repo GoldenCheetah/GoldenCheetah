@@ -26,7 +26,7 @@
 #ifdef Q_OS_MAC
 static int spacing_=4;
 #else
-static int spacing_=4;
+static int spacing_=8;
 #endif
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -459,21 +459,29 @@ ChartBarItem::paintEvent(QPaintEvent *)
     // now paint the text
     QPen pen(GCColor::invertColor(brush.color()));
     painter.setPen(pen);
-    painter.drawText(body, text, Qt::AlignBottom | Qt::AlignCenter);
+    painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
     if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
 
     // draw the menu indicator
-    if (underMouse() && checked) {
+    if (underMouse()) {
 
         QPoint mouse = mapFromGlobal(QCursor::pos());
-        QBrush brush(Qt::darkGray);
         painter.setPen (Qt :: NoPen);
 
-        // different color if under mouse
-        if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
-        painter.fillPath (triangle, brush);
+        if (checked) {
+
+            // different color if under mouse
+            QBrush brush(Qt::darkGray);
+            if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
+            painter.fillPath (triangle, brush);
+        } else {
+
+            // visual clue there is a menu option when tab selected
+            QBrush brush(Qt::lightGray);
+            painter.fillPath (triangle, brush);
+        }
     }
     painter.restore();
 }

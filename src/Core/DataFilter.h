@@ -187,7 +187,7 @@ class DataFilter : public QObject
 
         // RideItem always available and supplies th context
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
-        Result evaluate(DateRange dr);
+        Result evaluate(DateRange dr, QString filter="");
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 

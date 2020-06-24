@@ -103,8 +103,8 @@ ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
     item->column = column;
     item->deep = deep;
     items.append(item);
-    if (scope&ANALYSIS && currentRideItem) item->setData(currentRideItem);
-    if (scope&TRENDS) item->setDateRange(currentDateRange);
+    if (scope&OverviewScope::ANALYSIS && currentRideItem) item->setData(currentRideItem);
+    if (scope&OverviewScope::TRENDS) item->setDateRange(currentDateRange);
 }
 
 void
@@ -145,6 +145,13 @@ ChartSpace::rideSelected(RideItem *item)
     // ok, remember we did this one
     currentRideItem = item;
     stale=false;
+}
+
+void
+ChartSpace::filterChanged()
+{
+    // redo trends
+    dateRangeChanged(currentDateRange);
 }
 
 void
@@ -417,6 +424,7 @@ ChartSpace::configChanged(qint32)
     titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
     midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
     smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
+    tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));

@@ -51,20 +51,37 @@ static bool _registerItems()
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
     // Register      TYPE                        SHORT                      DESCRIPTION                                        SCOPE            CREATOR
-    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               ANALYSIS|TRENDS, MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   ANALYSIS|TRENDS, KPIOverviewItem::create);
-    registry.addItem(OverviewItemType::TOPN,     QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               TRENDS,          TopNOverviewItem::create);
-    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             ANALYSIS,        MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     ANALYSIS|TRENDS, ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         ANALYSIS,        RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              ANALYSIS,        IntervalOverviewItem::create);
-    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 ANALYSIS,        PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      ANALYSIS,        RouteOverviewItem::create);
+    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::TOPN,     QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
+    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::create);
+    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
+    registry.addItem(OverviewItemType::DONUT,    QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
 
     return true;
 }
 static bool registered = _registerItems();
 
+static void setFilter(ChartSpaceItem *item, Specification &spec)
+{
+    // trends view filter
+    if (item->parent->scope & OverviewScope::TRENDS) {
+
+        // general filters
+        FilterSet fs;
+        fs.addFilter(item->parent->context->isfiltered, item->parent->context->filters);
+        fs.addFilter(item->parent->context->ishomefiltered, item->parent->context->homeFilters);
+
+        // local filter
+        fs.addFilter(item->datafilter != "", SearchFilterBox::matches(item->parent->context, item->datafilter));
+        spec.setFilterSet(fs);
+    }
+    return;
+}
 
 RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
@@ -269,6 +286,33 @@ ZoneOverviewItem::~ZoneOverviewItem()
     delete chart;
 }
 
+DonutOverviewItem::DonutOverviewItem(ChartSpace *parent, QString name, QString symbol, QString meta) : ChartSpaceItem(parent, name)
+{
+
+    this->type = OverviewItemType::DONUT;
+    this->symbol = symbol;
+    this->meta = meta;
+
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
+
+    chart = new QChart(this);
+
+    // basic chart setup
+    chart->setBackgroundVisible(false); // draw on canvas
+    chart->legend()->setVisible(false); // no legends
+    chart->setTitle(""); // none wanted
+    chart->setAnimationOptions(QChart::AllAnimations);
+
+    // we have a mid sized font for chart labels etc
+    chart->setFont(parent->midfont);
+}
+
+DonutOverviewItem::~DonutOverviewItem()
+{
+    delete chart;
+}
+
 MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
 {
     // metric
@@ -398,7 +442,7 @@ KPIOverviewItem::setDateRange(DateRange dr)
 {
     // calculate the value...
     DataFilter parser(this, parent->context, program);
-    Result res = parser.evaluate(dr);
+    Result res = parser.evaluate(dr, datafilter);
 
     // set to zero for daft values
     value = QString("%1").arg(res.number);
@@ -585,8 +629,12 @@ MetricOverviewItem::setData(RideItem *item)
 void
 MetricOverviewItem::setDateRange(DateRange dr)
 {
+    // for metrics lets truncate to today
+    if (dr.to > QDate::currentDate()) dr.to = QDate::currentDate();
+
     Specification spec;
     spec.setDateRange(dr);
+    setFilter(this, spec);
 
     // aggregate sum and count etc
     double v=0; // value
@@ -676,6 +724,9 @@ MetricOverviewItem::setDateRange(DateRange dr)
         first = false;
     }
 
+    // do we want fill?
+    sparkline->setFill(metric->type()== RideMetric::Total || metric->type()== RideMetric::RunningTotal);
+
     // update the sparkline
     sparkline->setPoints(points);
 
@@ -698,6 +749,7 @@ TopNOverviewItem::setDateRange(DateRange dr)
     // filtering
     Specification spec;
     spec.setDateRange(dr);
+    setFilter(this, spec);
 
     // pmc data
     PMCData stressdata(parent->context, spec, "coggan_tss");
@@ -852,6 +904,181 @@ PMCOverviewItem::setData(RideItem *item)
 
 }
 
+static bool lessthan(const aggmeta &a, const aggmeta &b)
+{
+    return a.value > b.value;
+}
+
+void
+DonutOverviewItem::setDateRange(DateRange dr)
+{
+    // stop any animation before starting, just in case- stops a crash
+    // when we update a chart in the middle of its animation
+    if (chart) chart->setAnimationOptions(QChart::NoAnimation);;
+
+    // enable animation when setting values (disabled at all other times)
+    if (chart) chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    struct aggregator {
+        aggregator(double v, double c) : value(v), count(c) {}
+        double value, count;
+    };
+
+    Specification spec;
+    spec.setDateRange(dr);
+    setFilter(this, spec);
+
+    // aggregate sum and count etc
+    QMap<QString, aggregator> data;
+    foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue;
+
+        // get meta value
+        QString category = item->getText(meta, "");
+        aggregator d = data.value(category, aggregator(-1,-1));
+
+        // is this first time we've seen this meta value?
+        bool first = false;
+        if (d.value == -1 && d.count == -1) {
+            first = true;
+            d.value=0;
+            d.count=0;
+        }
+
+        // get metric value and count
+        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double count = item->getCountForSymbol(symbol);
+        if (count <= 0) count = 1;
+
+        // ignore zeroes when aggregating?
+        if (metric->aggregateZero() == false && value == 0) continue;
+
+        // what we gonna do with this?
+        switch(metric->type()) {
+        case RideMetric::StdDev:
+        case RideMetric::MeanSquareRoot:
+        case RideMetric::Average:
+            d.value = (d.value*d.count) + (value * count); // convert to sum
+            d.count += count;
+            d.value = d.value / d.count; // turn back to average
+            break;
+        case RideMetric::Total:
+        case RideMetric::RunningTotal:
+            d.value += value;
+            break;
+        case RideMetric::Peak:
+            if (first || value > d.value) d.value = value;
+            break;
+        case RideMetric::Low:
+            if (first || value < d.value) d.value = value;
+            break;
+            break;
+        }
+
+        // update map
+        data.insert(category, d);
+    }
+
+    // now create a sorted list of values
+    values.clear();
+
+    double sum=0;
+    QMapIterator<QString, aggregator>it(data);
+    while (it.hasNext()) {
+        it.next();
+        values << aggmeta(it.key(), it.value().value, 0, it.value().count);
+        sum += it.value().value;
+    }
+
+    // calculate as percentages
+    for(int i=0; i<values.count(); i++) values[i].percentage = (values[i].value / sum) * 100;
+
+    // sort with highest values first
+    qSort(values.begin(), values.end(), lessthan);
+
+    // wipe any existing series
+    chart->removeAllSeries();
+
+    // now set the pie chart
+    QPieSeries *add = new QPieSeries();
+    connect(add, SIGNAL(hovered(QPieSlice*,bool)), this, SLOT(hoverSlice(QPieSlice*,bool)));
+
+    add->setPieSize(0.7);
+    add->setHoleSize(0.5);
+
+    // setup the slices
+    int maxslices=8; // more than this and we aggregate into a category 'other'
+    int minslices=5; // more than this and we get a small font for labels
+    for (int i=0; i<values.count() && i<maxslices; i++) {
+        // get label?
+        add->append(values[i].category.trimmed() == "" ? "blank" : values[i].category, values[i].percentage);
+    }
+
+    // add "other"
+    if (values.count() >= maxslices) {
+        // other....
+        double sum=0;
+        for(int i=maxslices; i<values.count(); i++) {
+            sum += values[i].percentage;
+        }
+        add->append("other", sum);
+    }
+
+    // now do the colors
+    double i=1;
+    QColor min=GColor(CPLOTMARKER);
+    QColor max=GCColor::invertColor(GColor(CCARDBACKGROUND));
+    bool exploded=false;
+    foreach(QPieSlice *slice, add->slices()) {
+
+        //slice->setExploded();
+        slice->setLabelVisible();
+        slice->setPen(Qt::NoPen);
+
+        // gradient color
+        QColor color = QColor(min.red() + (double(max.red()-min.red()) * (i/double(add->slices().count()))),
+                              min.green() + (double(max.green()-min.green()) * (i/double(add->slices().count()))),
+                              min.blue() + (double(max.blue()-min.blue()) * (i/double(add->slices().count()))));
+
+        slice->setColor(color);
+        slice->setLabelColor(QColor(150,150,150));
+        if (values.count() <= minslices) slice->setLabelFont(parent->midfont);
+        else slice->setLabelFont(parent->tinyfont);
+
+        // set the largest value that isn't duff to exploded and red, so it stands out from the rest
+        if (exploded == false && slice->label() != "blank" && slice->label() != "other") {
+            slice->setExploded(true);
+            slice->setColor(QColor(Qt::darkRed));
+            exploded=true;
+            i--; // save a hue
+        }
+
+        //if (i <colors.size()) slice->setBrush(QColor(colors.at(i)));
+        //else slice->setBrush(Qt::red);
+        i++;
+    }
+
+    // shadows on pie
+    chart->setDropShadowEnabled(false);
+
+    // set the pie chart
+    chart->addSeries(add);
+}
+
+void
+DonutOverviewItem::hoverSlice(QPieSlice *slice, bool state)
+{
+    if (state == true) {
+        value = QString("%1%").arg(round(slice->percentage()*100));
+        valuename=slice->label();
+    } else {
+        value = ""; // unhover
+        valuename = "";
+    }
+    update();
+}
+
 void
 ZoneOverviewItem::setDateRange(DateRange dr)
 {
@@ -867,6 +1094,7 @@ ZoneOverviewItem::setDateRange(DateRange dr)
 
     Specification spec;
     spec.setDateRange(dr);
+    setFilter(this, spec);
 
     // aggregate sum and count etc
     foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
@@ -1203,9 +1431,9 @@ KPIOverviewItem::itemGeometryChanged() {
         int minh=6;
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
-            if (start != 0 || stop != 0)  progressbar->show();
+        if (!drag && geom.height() > (ROWHEIGHT*minh) && (start != 0 || stop != 0)) {
             progressbar->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+            progressbar->show();
         } else {
             progressbar->hide();
         }
@@ -1293,6 +1521,28 @@ ZoneOverviewItem::dragChanged(bool drag)
 }
 void
 ZoneOverviewItem::itemGeometryChanged() {
+
+    QRectF geom = geometry();
+
+    // if we contain charts etc lets update their geom
+    if (!drag) chart->show();
+
+    // disable animation when changing geometry
+    chart->setAnimationOptions(QChart::NoAnimation);
+    chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+}
+
+void
+DonutOverviewItem::dragChanged(bool drag)
+{
+    if (chart) {
+        if (drag) chart->hide();
+        else chart->show();
+    }
+}
+
+void
+DonutOverviewItem::itemGeometryChanged() {
 
     QRectF geom = geometry();
 
@@ -1806,6 +2056,18 @@ void RouteOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, 
 void IntervalOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 void ZoneOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {  }
 
+void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    painter->setFont(parent->bigfont);
+    painter->setPen(GColor(CPLOTMARKER));
+    painter->drawText(chart->geometry(), Qt::AlignHCenter | Qt::AlignVCenter, value);
+    painter->setPen(QColor(100,100,100));
+    QFontMetrics fm(parent->midfont);
+    painter->setFont(parent->midfont);
+    painter->drawText(QRectF(0,ROWHEIGHT*2, geometry().width(), fm.ascent()+(ROWHEIGHT*2)), Qt::AlignHCenter | Qt::AlignTop, valuename);
+}
+
+
 //
 // OverviewItem Configuration Widget
 //
@@ -1815,7 +2077,10 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 }
 OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item), block(false)
 {
-    QFormLayout *layout = new QFormLayout(this);
+    QVBoxLayout *main = new QVBoxLayout(this);
+    QFormLayout *layout = new QFormLayout();
+    main->addLayout(layout);
+    main->addStretch();
 
     // everyone except PMC
     if (item->type != OverviewItemType::PMC) {
@@ -1824,8 +2089,17 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         layout->addRow(tr("Name"), name);
     }
 
+    // trends view always has a filter
+    if (item->parent->scope & OverviewScope::TRENDS) {
+        filterEditor = new SearchFilterBox(this, item->parent->context);
+        layout->addRow(tr("Filter"), filterEditor);
+        connect(filterEditor->searchbox, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
+    }
+
     // single metric names
-    if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC || item->type == OverviewItemType::PMC) {
+    if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC  ||
+        item->type == OverviewItemType::PMC || item->type == OverviewItemType::DONUT) {
+
         metric1 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
         layout->addRow(tr("Metric"), metric1);
         connect(metric1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
@@ -1846,7 +2120,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         layout->addRow(tr("Bubble Size Metric"), metric3);
     }
 
-    if (item->type == OverviewItemType::META) {
+    if (item->type == OverviewItemType::META || item->type == OverviewItemType::DONUT) {
         meta1 = new MetricSelect(this, item->parent->context, MetricSelect::Meta);
         connect(meta1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->addRow(tr("Field Name"), meta1);
@@ -1983,26 +2257,40 @@ void
 OverviewItemConfig::setWidgets()
 {
     block = true;
+
+    // always have a filter on trends view
+    if (item->parent->scope & OverviewScope::TRENDS)  filterEditor->setFilter(item->datafilter);
+
     // set the widget values from the item
     switch(item->type) {
     case OverviewItemType::RPE:
         {
-            RPEOverviewItem *mi = reinterpret_cast<RPEOverviewItem*>(item);
+            RPEOverviewItem *mi = dynamic_cast<RPEOverviewItem*>(item);
             name->setText(mi->name);
         }
         break;
 
     case OverviewItemType::METRIC:
         {
-            MetricOverviewItem *mi = reinterpret_cast<MetricOverviewItem*>(item);
+            MetricOverviewItem *mi = dynamic_cast<MetricOverviewItem*>(item);
             name->setText(mi->name);
             metric1->setSymbol(mi->symbol);
         }
         break;
 
+    case OverviewItemType::DONUT:
+        {
+            DonutOverviewItem *mi = dynamic_cast<DonutOverviewItem*>(item);
+            name->setText(mi->name);
+            metric1->setSymbol(mi->symbol);
+            meta1->setMeta(mi->meta);
+        }
+        break;
+
+
     case OverviewItemType::TOPN:
         {
-            TopNOverviewItem *mi = reinterpret_cast<TopNOverviewItem*>(item);
+            TopNOverviewItem *mi = dynamic_cast<TopNOverviewItem*>(item);
             name->setText(mi->name);
             metric1->setSymbol(mi->symbol);
         }
@@ -2010,15 +2298,15 @@ OverviewItemConfig::setWidgets()
 
     case OverviewItemType::META:
         {
-            MetaOverviewItem *mi = reinterpret_cast<MetaOverviewItem*>(item);
+            MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             name->setText(mi->name);
-            meta1->setText(mi->symbol);
+            meta1->setMeta(mi->symbol);
         }
         break;
 
     case OverviewItemType::ZONE:
         {
-            ZoneOverviewItem *mi = reinterpret_cast<ZoneOverviewItem*>(item);
+            ZoneOverviewItem *mi = dynamic_cast<ZoneOverviewItem*>(item);
             name->setText(mi->name);
             series1->setSeries(mi->series);
         }
@@ -2026,7 +2314,7 @@ OverviewItemConfig::setWidgets()
 
     case OverviewItemType::INTERVAL:
         {
-            IntervalOverviewItem *mi = reinterpret_cast<IntervalOverviewItem*>(item);
+            IntervalOverviewItem *mi = dynamic_cast<IntervalOverviewItem*>(item);
             name->setText(mi->name);
             metric1->setSymbol(mi->xsymbol);
             metric2->setSymbol(mi->ysymbol);
@@ -2036,21 +2324,21 @@ OverviewItemConfig::setWidgets()
 
     case OverviewItemType::ROUTE:
         {
-            RouteOverviewItem *mi = reinterpret_cast<RouteOverviewItem*>(item);
+            RouteOverviewItem *mi = dynamic_cast<RouteOverviewItem*>(item);
             name->setText(mi->name);
         }
         break;
 
     case OverviewItemType::PMC:
         {
-            PMCOverviewItem *mi = reinterpret_cast<PMCOverviewItem*>(item);
+            PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             metric1->setSymbol(mi->symbol);
         }
         break;
 
     case OverviewItemType::KPI:
         {
-            KPIOverviewItem *mi = reinterpret_cast<KPIOverviewItem*>(item);
+            KPIOverviewItem *mi = dynamic_cast<KPIOverviewItem*>(item);
             name->setText(mi->name);
             editor->setText(mi->program);
             double1->setValue(mi->start);
@@ -2070,18 +2358,21 @@ OverviewItemConfig::dataChanged()
     // are being initialised
     if (block) return;
 
+    // get filter
+    if (item->parent->scope & OverviewScope::TRENDS)  item->datafilter = filterEditor->filter();
+
     // set the widget values from the item
     switch(item->type) {
     case OverviewItemType::RPE:
         {
-            RPEOverviewItem *mi = reinterpret_cast<RPEOverviewItem*>(item);
+            RPEOverviewItem *mi = dynamic_cast<RPEOverviewItem*>(item);
             mi->name = name->text();
         }
         break;
 
     case OverviewItemType::METRIC:
         {
-            MetricOverviewItem *mi = reinterpret_cast<MetricOverviewItem*>(item);
+            MetricOverviewItem *mi = dynamic_cast<MetricOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
@@ -2090,9 +2381,18 @@ OverviewItemConfig::dataChanged()
         }
         break;
 
+    case OverviewItemType::DONUT:
+        {
+            DonutOverviewItem *mi = dynamic_cast<DonutOverviewItem*>(item);
+            mi->name = name->text();
+            if (metric1->isValid())  mi->symbol = metric1->rideMetric()->symbol();
+            if (meta1->isValid())  mi->meta = meta1->metaname();
+        }
+        break;
+
     case OverviewItemType::TOPN:
         {
-            TopNOverviewItem *mi = reinterpret_cast<TopNOverviewItem*>(item);
+            TopNOverviewItem *mi = dynamic_cast<TopNOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
@@ -2103,15 +2403,15 @@ OverviewItemConfig::dataChanged()
 
     case OverviewItemType::META:
         {
-            MetaOverviewItem *mi = reinterpret_cast<MetaOverviewItem*>(item);
+            MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             mi->name = name->text();
-            if (meta1->isValid()) mi->symbol = meta1->text();
+            if (meta1->isValid()) mi->symbol = meta1->metaname();
         }
         break;
 
     case OverviewItemType::ZONE:
         {
-            ZoneOverviewItem *mi = reinterpret_cast<ZoneOverviewItem*>(item);
+            ZoneOverviewItem *mi = dynamic_cast<ZoneOverviewItem*>(item);
             mi->name = name->text();
             if (series1->currentIndex() >= 0) mi->series = static_cast<RideFile::SeriesType>(series1->itemData(series1->currentIndex(), Qt::UserRole).toInt());
         }
@@ -2119,7 +2419,7 @@ OverviewItemConfig::dataChanged()
 
     case OverviewItemType::INTERVAL:
         {
-            IntervalOverviewItem *mi = reinterpret_cast<IntervalOverviewItem*>(item);
+            IntervalOverviewItem *mi = dynamic_cast<IntervalOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) mi->xsymbol = metric1->rideMetric()->symbol();
             if (metric2->isValid()) mi->ysymbol = metric2->rideMetric()->symbol();
@@ -2129,21 +2429,21 @@ OverviewItemConfig::dataChanged()
 
     case OverviewItemType::ROUTE:
         {
-            RouteOverviewItem *mi = reinterpret_cast<RouteOverviewItem*>(item);
+            RouteOverviewItem *mi = dynamic_cast<RouteOverviewItem*>(item);
             mi->name = name->text();
         }
         break;
 
     case OverviewItemType::PMC:
         {
-            PMCOverviewItem *mi = reinterpret_cast<PMCOverviewItem*>(item);
+            PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             if (metric1->isValid()) mi->symbol = metric1->rideMetric()->symbol();
         }
         break;
 
     case OverviewItemType::KPI:
         {
-            KPIOverviewItem *mi = reinterpret_cast<KPIOverviewItem*>(item);
+            KPIOverviewItem *mi = dynamic_cast<KPIOverviewItem*>(item);
             mi->name = name->text();
             mi->units = string1->text();
             mi->program = editor->toPlainText();
@@ -2759,7 +3059,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 }
 
 Sparkline::Sparkline(QGraphicsWidget *parent, QString name, bool bigdot)
-    : QGraphicsItem(NULL), parent(parent), name(name), sparkdays(SPARKDAYS), bigdot(bigdot)
+    : QGraphicsItem(NULL), parent(parent), name(name), sparkdays(SPARKDAYS), bigdot(bigdot), fill(false)
 {
     min = max = 0.0f;
     setGeometry(20,20,100,100);
@@ -2805,18 +3105,39 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     // so draw a line connecting the points
     double xfactor = (geom.width() - (ROWHEIGHT*6)) / sparkdays;
-    double xoffset = boundingRect().left()+(ROWHEIGHT*2);
+    double xoffset = boundingRect().left()+(ROWHEIGHT*3);
     double yfactor = (geom.height()-(ROWHEIGHT)) / (max-min);
     double bottom = boundingRect().bottom()-ROWHEIGHT/2;
 
     // draw a sparkline -- need more than 1 point !
     if (points.count() > 1) {
 
+
         QPainterPath path;
         path.moveTo((points[0].x()*xfactor)+xoffset, bottom-((points[0].y()-min)*yfactor));
         for(int i=1; i<points.count();i++) {
             path.lineTo((points[i].x()*xfactor)+xoffset, bottom-((points[i].y()-min)*yfactor));
         }
+
+        if (fill) {
+            QColor fillColor=GColor(CPLOTMARKER);
+            fillColor.setAlpha(64);
+            QPainterPath fillpath = path;
+            fillpath.lineTo((points.last().x()*xfactor)+xoffset,bottom);
+            fillpath.lineTo((points.first().x()*xfactor)+xoffset,bottom);
+            fillpath.lineTo((points.first().x()*xfactor)+xoffset,bottom);
+            fillpath.lineTo((points.first().x()*xfactor)+xoffset, bottom-((points.first().y()-min)*yfactor));
+            painter->fillPath(fillpath, QBrush(fillColor));
+        }
+
+        // xaxis
+        QPainterPath line;
+        line.moveTo(xoffset, bottom);
+        line.lineTo(xoffset+geom.width()-(ROWHEIGHT*6), bottom);
+        QPen lpen(QColor(100,100,100,75));
+        lpen.setWidth(4);
+        painter->setPen(lpen);
+        painter->drawPath(line);
 
         QPen pen(QColor(150,150,150));
         pen.setWidth(8);

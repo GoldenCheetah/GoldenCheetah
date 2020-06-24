@@ -31,6 +31,7 @@
 #include "VDOTCalculator.h"
 #include "DataProcessor.h"
 #include "GenericSelectTool.h" // for generic calculator
+#include "SearchFilterBox.h" // for SearchFilterBox::matches
 #include <QDebug>
 #include <QMutex>
 #include "lmcurve.h"
@@ -2732,7 +2733,7 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
     return res;
 }
 
-Result DataFilter::evaluate(DateRange dr)
+Result DataFilter::evaluate(DateRange dr, QString filter)
 {
     // if there is no current ride item then there is no data
     // so it really is ok to baulk at no current ride item here
@@ -2744,17 +2745,21 @@ Result DataFilter::evaluate(DateRange dr)
 
     Result res(0);
 
+    Specification spec;
+    spec.setDateRange(dr);
+    if (filter != "")  spec.addMatches(SearchFilterBox::matches(context, filter));
+
     // if we are a set of functions..
     if (rt.functions.count()) {
 
         // ... start at main
         if (rt.functions.contains("main"))
-            res = treeRoot->eval(&rt, rt.functions.value("main"), 0, 0, const_cast<RideItem*>(context->currentRideItem()), NULL, NULL, Specification(), dr);
+            res = treeRoot->eval(&rt, rt.functions.value("main"), 0, 0, const_cast<RideItem*>(context->currentRideItem()), NULL, NULL, spec, dr);
 
     } else {
 
         // otherwise just evaluate the entire tree
-        res = treeRoot->eval(&rt, treeRoot, 0, 0, const_cast<RideItem*>(context->currentRideItem()), NULL, NULL, Specification(), dr);
+        res = treeRoot->eval(&rt, treeRoot, 0, 0, const_cast<RideItem*>(context->currentRideItem()), NULL, NULL, spec, dr);
     }
 
     return res;

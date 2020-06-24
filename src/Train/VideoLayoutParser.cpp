@@ -26,10 +26,12 @@
 #include "VideoLayoutParser.h"
 #include "MeterWidget.h"
 
-VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QWidget* VideoContainer)
-    : metersWidget(metersWidget), VideoContainer(VideoContainer)
+VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer)
+    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
 {
     nonameindex = 0;
+    skipLayout = false;
+    layoutPosition = 0;
     meterWidget = NULL;
 }
 
@@ -84,9 +86,18 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
     bool boundingRectVisibility;
     bool backgroundVisibility;
 
+    if(skipLayout) return true;
+
     buffer.clear();
 
-    if(qName == "meter")
+    if(qName == "layout")
+    {
+        int i = qAttributes.index("name");
+        layoutNames->append(i >= 0 ? qAttributes.value(i) : QString("noname_") + QString::number(layoutPosition));
+
+        if(layoutPositionSelected != layoutPosition) skipLayout = true;
+    }
+    else if(qName == "meter")
     {
         int i = qAttributes.index("name"); // To be used to enclose another sub meter (typ. text within NeedleMeter)
         if(i >= 0)
@@ -174,6 +185,10 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new ElevationMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("LiveMap"))
+        {
+            meterWidget = new LiveMapWidget(meterName, containerWidget, source);
+        }
         else
         {
             qDebug() << QObject::tr("Error creating meter");
@@ -233,7 +248,7 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         if ((i = qAttributes.index("Size")) >= 0)
             FontSize = qAttributes.value(i).toInt();
         meterWidget->m_MainFont = QFont(FontName, FontSize);
-        // You need fixed width, otherwise the meter digits keep moving sideways from a thin "1" to a fat "5" 
+        // Set fixed width, otherwise the meter digits keep moving sideways from a thin "1" to a fat "5" 
         meterWidget->m_MainFont.setFixedPitch(true);
     }
     else if ((qName == "AltFont") && meterWidget)
@@ -248,7 +263,7 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         meterWidget->m_AltFont = QFont(FontName, FontSize);
         meterWidget->m_AltFont.setFixedPitch(true);
     }
-    else if(qName != "layout" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange")
+    else if(qName != "layouts" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange")
     {
         qDebug() << QObject::tr("Unknown start element ") << qName;
     }
@@ -258,12 +273,23 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
 
 bool VideoLayoutParser::endElement( const QString&, const QString&, const QString& qName)
 {
+    if(qName == "layout")
+    {
+        layoutPosition++;
+        skipLayout = false;
+        return true;
+    }
+
+    if(skipLayout) return true;
+
     if (meterWidget)
     {
         if (qName == "Angle")
             meterWidget->m_Angle = buffer.toFloat();
         else if (qName == "SubRange")
             meterWidget->m_SubRange = buffer.toInt();
+        else if (qName == "Zoom")
+            meterWidget->m_Zoom = buffer.toInt();
         else if (qName == "Text")
             meterWidget->Text = QString(buffer);
         else if (qName == "AltText")
@@ -284,6 +310,8 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
 
 bool VideoLayoutParser::characters( const QString& str )
 {
+    if(skipLayout) return true;
+
     buffer += str;
     return true;
 }

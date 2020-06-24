@@ -46,8 +46,14 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     setChartLayout(main);
 
     // tell space when a ride is selected
-    if (scope & ANALYSIS) connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
-    if (scope & TRENDS) connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
+    if (scope & OverviewScope::ANALYSIS) connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
+    if (scope & OverviewScope::TRENDS) {
+        connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
+        connect(context, SIGNAL(filterChanged()), space, SLOT(filterChanged()));
+        connect(context, SIGNAL(homeFilterChanged()), space, SLOT(filterChanged()));
+    }
+
+    // menu items
     connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
@@ -91,6 +97,14 @@ OverviewWindow::getConfiguration() const
         case OverviewItemType::RPE:
             {
                 //UNUSED RPEOverviewItem *rpe = reinterpret_cast<RPEOverviewItem*>(item);
+            }
+            break;
+
+        case OverviewItemType::DONUT:
+            {
+                DonutOverviewItem *donut = reinterpret_cast<DonutOverviewItem*>(item);
+                config += "\"symbol\":\"" + QString("%1").arg(donut->symbol) + "\",";
+                config += "\"meta\":\"" + QString("%1").arg(donut->meta) + "\",";
             }
             break;
 
@@ -143,6 +157,7 @@ OverviewWindow::getConfiguration() const
             break;
         }
 
+        config += "\"datafilter\":\"" + Utils::jsonprotect(item->datafilter) + "\",";
         config += "\"name\":\"" + item->name + "\"";
 
         config += " }";
@@ -175,89 +190,89 @@ OverviewWindow::setConfiguration(QString config)
 
     if (config == "") {
 
-        if (scope == ANALYSIS) {
+        if (scope == OverviewScope::ANALYSIS) {
 
             // column 0
             ChartSpaceItem *add;
             add = new PMCOverviewItem(space, "coggan_tss");
             space->addItem(1,0,9, add);
 
-            add = new MetaOverviewItem(space, "Sport", "Sport");
+            add = new MetaOverviewItem(space, tr("Sport"), "Sport");
             space->addItem(2,0,5, add);
 
-            add = new MetaOverviewItem(space, "Workout Code", "Workout Code");
+            add = new MetaOverviewItem(space, tr("Workout Code"), "Workout Code");
             space->addItem(3,0,5, add);
 
-            add = new MetricOverviewItem(space, "Duration", "workout_time");
+            add = new MetricOverviewItem(space, tr("Duration"), "workout_time");
             space->addItem(4,0,9, add);
 
-            add = new MetaOverviewItem(space, "Notes", "Notes");
+            add = new MetaOverviewItem(space, tr("Notes"), "Notes");
             space->addItem(5,0,13, add);
 
             // column 1
-            add = new MetricOverviewItem(space, "HRV rMSSD", "rMSSD");
+            add = new MetricOverviewItem(space, tr("HRV rMSSD"), "rMSSD");
             space->addItem(1,1,9, add);
 
-            add = new MetricOverviewItem(space, "Heartrate", "average_hr");
+            add = new MetricOverviewItem(space, tr("Heartrate"), "average_hr");
             space->addItem(2,1,5, add);
 
-            add = new ZoneOverviewItem(space, "Heartrate Zones", RideFile::hr);
+            add = new ZoneOverviewItem(space, tr("Heartrate Zones"), RideFile::hr);
             space->addItem(3,1,11, add);
 
-            add = new MetricOverviewItem(space, "Climbing", "elevation_gain");
+            add = new MetricOverviewItem(space, tr("Climbing"), "elevation_gain");
             space->addItem(4,1,5, add);
 
-            add = new MetricOverviewItem(space, "Cadence", "average_cad");
+            add = new MetricOverviewItem(space, tr("Cadence"), "average_cad");
             space->addItem(5,1,5, add);
 
-            add = new MetricOverviewItem(space, "Work", "total_work");
+            add = new MetricOverviewItem(space, tr("Work"), "total_work");
             space->addItem(6,1,5, add);
 
             // column 2
-            add = new RPEOverviewItem(space, "RPE");
+            add = new RPEOverviewItem(space, tr("RPE"));
             space->addItem(1,2,9, add);
 
-            add = new MetricOverviewItem(space, "Stress", "coggan_tss");
+            add = new MetricOverviewItem(space, tr("Stress"), "coggan_tss");
             space->addItem(2,2,5, add);
 
-            add = new ZoneOverviewItem(space, "Fatigue Zones", RideFile::wbal);
+            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal);
             space->addItem(3,2,11, add);
 
-            add = new IntervalOverviewItem(space, "Intervals", "elapsed_time", "average_power", "workout_time");
+            add = new IntervalOverviewItem(space, tr("Intervals"), "elapsed_time", "average_power", "workout_time");
             space->addItem(4,2,17, add);
 
             // column 3
-            add = new MetricOverviewItem(space, "Power", "average_power");
+            add = new MetricOverviewItem(space, tr("Power"), "average_power");
             space->addItem(1,3,9, add);
 
-            add = new MetricOverviewItem(space, "IsoPower", "coggan_np");
+            add = new MetricOverviewItem(space, tr("IsoPower"), "coggan_np");
             space->addItem(2,3,5, add);
 
-            add = new ZoneOverviewItem(space, "Power Zones", RideFile::watts);
+            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts);
             space->addItem(3,3,11, add);
 
-            add = new MetricOverviewItem(space, "Peak Power Index", "peak_power_index");
+            add = new MetricOverviewItem(space, tr("Peak Power Index"), "peak_power_index");
             space->addItem(4,3,8, add);
 
-            add = new MetricOverviewItem(space, "Variability", "coggam_variability_index");
+            add = new MetricOverviewItem(space, tr("Variability"), "coggam_variability_index");
             space->addItem(5,3,8, add);
 
             // column 4
-            add = new MetricOverviewItem(space, "Distance", "total_distance");
+            add = new MetricOverviewItem(space, tr("Distance"), "total_distance");
             space->addItem(1,4,9, add);
 
-            add = new MetricOverviewItem(space, "Speed", "average_speed");
+            add = new MetricOverviewItem(space, tr("Speed"), "average_speed");
             space->addItem(2,4,5, add);
 
-            add = new ZoneOverviewItem(space, "Pace Zones", RideFile::kph);
+            add = new ZoneOverviewItem(space, tr("Pace Zones"), RideFile::kph);
             space->addItem(3,4,11, add);
 
-            add = new RouteOverviewItem(space, "Route");
+            add = new RouteOverviewItem(space, tr("Route"));
             space->addItem(4,4,17, add);
 
         }
 
-        if (scope == TRENDS) {
+        if (scope == OverviewScope::TRENDS) {
 
             ChartSpaceItem *add;
 
@@ -357,6 +372,7 @@ OverviewWindow::setConfiguration(QString config)
 
             // get the basics
             QString name = obj["name"].toString();
+            QString datafilter = Utils::jsonunprotect(obj["datafilter"].toString());
             int column = obj["column"].toInt();
             int order = obj["order"].toInt();
             int deep = obj["deep"].toInt();
@@ -370,6 +386,7 @@ OverviewWindow::setConfiguration(QString config)
             case OverviewItemType::RPE :
                 {
                     add = new RPEOverviewItem(space, name);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -378,6 +395,17 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new TopNOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
+                    space->addItem(order,column,deep, add);
+                }
+                break;
+
+            case OverviewItemType::DONUT :
+                {
+                    QString symbol=obj["symbol"].toString();
+                    QString meta=obj["meta"].toString();
+                    add = new DonutOverviewItem(space, name,symbol,meta);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -386,6 +414,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new MetricOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -394,6 +423,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new MetaOverviewItem(space, name,symbol);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -402,6 +432,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     QString symbol=obj["symbol"].toString();
                     add = new PMCOverviewItem(space, symbol); // doesn't have a title
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -410,6 +441,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
                     add = new ZoneOverviewItem(space, name, series);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
 
                 }
@@ -418,6 +450,7 @@ OverviewWindow::setConfiguration(QString config)
             case OverviewItemType::ROUTE :
                 {
                     add = new RouteOverviewItem(space, name); // doesn't have a title
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -429,6 +462,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString zsymbol=obj["zsymbol"].toString();
 
                     add = new IntervalOverviewItem(space, name, xsymbol, ysymbol, zsymbol); // doesn't have a title
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -441,6 +475,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString units =obj["units"].toString();
 
                     add = new KPIOverviewItem(space, name, start, stop, program, units);
+                    add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
                 break;
@@ -489,9 +524,13 @@ OverviewConfigDialog::close()
 
         main->removeWidget(item->config()); // doesn't work xxx todo !
 
+        // update geometry to show hide elements
+        item->itemGeometryChanged();
+
         // update after config changed
-        if (item->parent->scope & ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
-        if (item->parent->scope & TRENDS ) item->setDateRange(item->parent->currentDateRange);
+        if (item->parent->scope & OverviewScope::ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
+        if (item->parent->scope & OverviewScope::TRENDS ) item->setDateRange(item->parent->currentDateRange);
+
     }
 
     accept();

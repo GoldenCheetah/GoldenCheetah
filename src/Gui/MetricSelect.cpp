@@ -126,6 +126,23 @@ QString MetricSelect::metaname()
     else return metaMap.value(text(), "");
 }
 
+void
+MetricSelect::setMeta(QString name)
+{
+    if (_metric) return;
+    else {
+        // find it
+        QMapIterator<QString,QString>it(metaMap);
+        while(it.hasNext()) {
+            it.next();
+            if (it.value() == name) {
+                setText(it.key());
+                break;
+            }
+        }
+    }
+}
+
 SeriesSelect::SeriesSelect(QWidget *parent, int scope) : QComboBox(parent), scope(scope)
 {
     // set the scope

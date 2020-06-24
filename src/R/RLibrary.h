@@ -21,11 +21,12 @@
 
 // QFunctionPointer typedef introduced in QT5
 #include <QtGlobal>
-
+#include <QCoreApplication>
 #include <QStringList>
 class QString;
 class QLibrary;
 class RLibrary {
+    Q_DECLARE_TR_FUNCTIONS(RLibrary)
 
     public:
 

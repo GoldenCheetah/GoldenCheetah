@@ -45,6 +45,7 @@ class MetricSelect : public QLineEdit
         void setSymbol(QString symbol);
         const RideMetric *rideMetric();
         QString metaname();
+        void setMeta(QString);
 
         // check what we got
         bool isValid();
