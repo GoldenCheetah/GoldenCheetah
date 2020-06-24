@@ -879,7 +879,7 @@ PythonXDataSeries::PythonXDataSeries()
 
 bool PythonXDataSeries::set(int i, double value)
 {
-    if (rideFile) {
+    if (!readOnly && rideFile) {
         if (!setColIdx()){
             return false;
         }
