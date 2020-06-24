@@ -51,7 +51,9 @@ class MeterWidget : public QWidget
     void    setBoundingRectVisibility(bool show, QColor  boundingRectColor = QColor(255,0,0,255));
 
     float Value, ValueMin, ValueMax;
-    QString Text, AltText;
+    QString Text, AltText, AltTextSuffix;
+    Qt::Alignment alignment;
+    int textWidth;
 
   protected:
     QString  m_Name;
@@ -72,6 +74,7 @@ class MeterWidget : public QWidget
     QColor  m_ScaleColor;
     QColor  m_OutlineColor;
     QColor  m_BackgroundColor;
+    QColor  m_BoundingRectColor;
     QFont   m_MainFont;
     QFont   m_AltFont;
 
@@ -81,8 +84,8 @@ class MeterWidget : public QWidget
     QPen   m_OutlinePen;
     QPen   m_ScalePen;
 
+    bool    backgroundVisibility;
     bool    boundingRectVisibility;
-    QColor  boundingRectColor;
 
     friend class VideoLayoutParser;
 };

@@ -46,18 +46,11 @@ private:
     QList<QString>* layoutNames;
     QWidget*    VideoContainer;
 
+    MeterWidget* meterWidget;
     QString     buffer;
-
     int         nonameindex;
     int         layoutPosition;
     bool        skipLayout;
-
-    QString     source;
-    QString     meterName;
-    QString     meterType;
-    QString     container; // will be "Video" when not defined otherwise another meter name (allows positioning of one meter inside another one)
-
-    MeterWidget* meterWidget;
 };
 
 #endif // _VideoLayoutParser_h

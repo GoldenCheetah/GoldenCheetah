@@ -54,6 +54,7 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_SubRange = 10;
     m_Zoom = 16;
     boundingRectVisibility = false;
+    backgroundVisibility = false;
     forceSquareRatio = true;
 }
 
@@ -117,19 +118,29 @@ QSize MeterWidget::minimumSize() const
 void MeterWidget::paintEvent(QPaintEvent* paintevent)
 {
     Q_UNUSED(paintevent);
+    if(!boundingRectVisibility && !backgroundVisibility) return;
+
+    QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    int radius = qMin(m_Width, m_Height) * 0.1;
+    if(backgroundVisibility) painter.setBrush(QBrush(m_BackgroundColor));
+    else painter.setBrush(Qt::NoBrush);
+
     if (boundingRectVisibility)
     {
-        m_OutlinePen = QPen(boundingRectColor);
+        m_OutlinePen = QPen(m_BoundingRectColor);
         m_OutlinePen.setWidth(2);
         m_OutlinePen.setStyle(Qt::SolidLine);
 
-        //painter
-        QPainter painter(this);
-        painter.setClipRegion(videoContainerRegion);
-        painter.setRenderHint(QPainter::Antialiasing);
-
         painter.setPen(m_OutlinePen);
-        painter.drawRect (1, 1, m_Width-2, m_Height-2);
+        painter.drawRoundedRect (1, 1, m_Width-2, m_Height-2, radius, radius);
+    }
+    else
+    {
+        painter.setPen(Qt::NoPen);
+        painter.drawRoundedRect (0, 0, m_Width, m_Height, radius, radius);
     }
 }
 
@@ -141,7 +152,7 @@ void  MeterWidget::setColor(QColor  mainColor)
 void MeterWidget::setBoundingRectVisibility(bool show, QColor  boundingRectColor)
 {
     this->boundingRectVisibility=show;
-    this->boundingRectColor = boundingRectColor;
+    this->m_BoundingRectColor = boundingRectColor;
 }
 
 TextMeterWidget::TextMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
@@ -154,7 +165,6 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
-    m_BackgroundBrush = QBrush(m_BackgroundColor);
     m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
@@ -164,21 +174,32 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    //draw background
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(m_BackgroundBrush);
-    if (Text!=QString(""))
-        painter.drawRect (0, 0, m_Width, m_Height);
-
     QPainterPath my_painterPath;
     my_painterPath.addText(QPointF(0,0),m_MainFont,Text);
     my_painterPath.addText(QPointF(QFontMetrics(m_MainFont).width(Text), 0),m_AltFont,AltText);
     QRectF ValueBoundingRct = my_painterPath.boundingRect();
 
-    // define scale
+    // We use leading whitespace for alignment which boundingRect() does not count
+    ValueBoundingRct.setLeft(qMin(0.0, ValueBoundingRct.left()));
+
+    // The scale should not change with the string content, we use Font ascent and descent
+    ValueBoundingRct.setTop(qMin(ValueBoundingRct.top(), qreal(qMin(-QFontMetrics(m_MainFont).ascent(), 
+            -QFontMetrics(m_AltFont).ascent()))));
+    ValueBoundingRct.setBottom(qMax(ValueBoundingRct.bottom(), qreal(qMax(QFontMetrics(m_MainFont).descent(),
+            QFontMetrics(m_AltFont).descent()))));
+
+    // scale to fit the available space
     float fontscale = qMin(m_Width / ValueBoundingRct.width(), m_Height / ValueBoundingRct.height());
     painter.scale(fontscale, fontscale);
-    painter.translate(-ValueBoundingRct.x()+(m_Width/fontscale - ValueBoundingRct.width())/2, -ValueBoundingRct.y()+(m_Height/fontscale - ValueBoundingRct.height())/2);
+
+    float translationX = -ValueBoundingRct.x();  // AlignLeft
+
+    if(alignment == Qt::AlignHCenter)
+        translationX += (m_Width/fontscale - ValueBoundingRct.width())/2;
+    else if(alignment == Qt::AlignRight)
+        translationX += (m_Width/fontscale - ValueBoundingRct.width());
+
+    painter.translate(translationX, -ValueBoundingRct.y()+(m_Height/fontscale - ValueBoundingRct.height())/2);
 
     // Write Value
     painter.setPen(m_OutlinePen);
