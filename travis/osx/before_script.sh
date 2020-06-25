@@ -1,6 +1,11 @@
 #!/bin/bash
 set -ev
 
+# Python mandatory packages - refresh cache if folder is empty
+if [ -z "$(ls -A site-packages)" ]; then
+    python3.7 -m pip install -r src/Python/requirements.txt -t site-packages
+fi
+
 # Python SIP
 python3 --version
 python3-config --prefix

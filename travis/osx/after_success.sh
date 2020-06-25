@@ -21,10 +21,9 @@ OLD_PATH=`otool -L GoldenCheetah.app/Contents/Frameworks/Python.framework/Versio
 echo $OLD_PATH
 install_name_tool -change $OLD_PATH "@executable_path/../Python" GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/bin/python3.7
 install_name_tool -change $OLD_PATH "@executable_path/../../../../Python" GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python
-# Add mandatory Python dependencies to site-packages
-rm GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
-mkdir GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
-python3.7 -m pip install -r Python/requirements.txt -t GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
+# Add mandatory Python dependencies
+rm -r GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
+cp -R ../site-packages GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7
 
 # Initial deployment using macdeployqt
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
@@ -66,7 +65,7 @@ aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
 aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
 else
-curl --max-time 300 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --max-time 150 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
 fi
 
 echo "Make sure we are back in the Travis build directory"
