@@ -362,6 +362,9 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 double dLon = rtd.getLongitude();
 
                 if (dLat && dLon) liveMapWidget->plotNewLatLng(dLat, dLon);
+
+                // show/hide depending on Location data presence
+                if (context->currentErgFile() && context->currentErgFile()->gpi.HasLocation()) liveMapWidget->show();
                 else liveMapWidget->hide();
             }
         }
