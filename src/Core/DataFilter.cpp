@@ -2015,7 +2015,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     }
 
                     // need all remaining parameters to be symbols
-                    for(int i=0; i<fparms.count(); i++) {
+                    for(int i=0; i<leaf->fparms.count(); i++) {
 
                         // check parameter is actually a symbol
                         if (leaf->fparms[i]->type != Leaf::Symbol) {
@@ -4244,7 +4244,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         if (leaf->function == "uniq") {
 
             // evaluate all the lists
-            for(int i=0; i<fparms.count(); i++) eval(df, leaf->fparms[i],x, it, m, p, c, s, d);
+            for(int i=0; i<leaf->fparms.count(); i++) eval(df, leaf->fparms[i],x, it, m, p, c, s, d);
 
             // get first and argsort it
             QString symbol = *(leaf->fparms[0]->lvalue.n);
