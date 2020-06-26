@@ -51,16 +51,17 @@ static bool _registerItems()
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
     // Register      TYPE                        SHORT                      DESCRIPTION                                        SCOPE            CREATOR
-    registry.addItem(OverviewItemType::METRIC,   QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
-    registry.addItem(OverviewItemType::KPI,      QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
-    registry.addItem(OverviewItemType::TOPN,     QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
-    registry.addItem(OverviewItemType::META,     QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
-    registry.addItem(OverviewItemType::ZONE,     QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
-    registry.addItem(OverviewItemType::RPE,      QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
-    registry.addItem(OverviewItemType::INTERVAL, QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::create);
-    registry.addItem(OverviewItemType::PMC,      QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
-    registry.addItem(OverviewItemType::ROUTE,    QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
-    registry.addItem(OverviewItemType::DONUT,    QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
+    registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
+    registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::TOPN,       QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
+    registry.addItem(OverviewItemType::META,       QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
+    registry.addItem(OverviewItemType::ZONE,       QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
+    registry.addItem(OverviewItemType::RPE,        QObject::tr("RPE"),        QObject::tr("RPE Widget"),                         OverviewScope::ANALYSIS,                       RPEOverviewItem::create);
+    registry.addItem(OverviewItemType::INTERVAL,   QObject::tr("Intervals"),  QObject::tr("Interval Bubble Chart"),              OverviewScope::ANALYSIS,                       IntervalOverviewItem::createInterval);
+    registry.addItem(OverviewItemType::ACTIVITIES, QObject::tr("Activities"), QObject::tr("Activities Bubble Chart"),            OverviewScope::TRENDS,                         IntervalOverviewItem::createActivities);
+    registry.addItem(OverviewItemType::PMC,        QObject::tr("PMC"),        QObject::tr("PMC Status Summary"),                 OverviewScope::ANALYSIS,                       PMCOverviewItem::create);
+    registry.addItem(OverviewItemType::ROUTE,      QObject::tr("Route"),      QObject::tr("Route Summary"),                      OverviewScope::ANALYSIS,                       RouteOverviewItem::create);
+    registry.addItem(OverviewItemType::DONUT,      QObject::tr("Donut"),      QObject::tr("Metric breakdown by category"),       OverviewScope::TRENDS,                         DonutOverviewItem::create);
 
     return true;
 }
@@ -402,18 +403,15 @@ MetaOverviewItem::~MetaOverviewItem()
 
 IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QString xsymbol, QString ysymbol, QString zsymbol) : ChartSpaceItem(parent, name)
 {
-    this->type = OverviewItemType::INTERVAL;
+    if (parent->scope == OverviewScope::ANALYSIS) this->type = OverviewItemType::INTERVAL;
+    if (parent->scope == OverviewScope::TRENDS) this->type = OverviewItemType::ACTIVITIES;
+
     this->xsymbol = xsymbol;
     this->ysymbol = ysymbol;
     this->zsymbol = zsymbol;
 
     // we may plot the metric sparkline if the tile is big enough
     bubble = new BubbleViz(this, "intervals");
-
-    RideMetricFactory &factory = RideMetricFactory::instance();
-    const RideMetric *xm = factory.rideMetric(xsymbol);
-    const RideMetric *ym = factory.rideMetric(ysymbol);
-    bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
 }
 
 IntervalOverviewItem::~IntervalOverviewItem()
@@ -1410,9 +1408,78 @@ RouteOverviewItem::setData(RideItem *item)
 }
 
 void
+IntervalOverviewItem::setDateRange(DateRange dr)
+{
+    // for metrics lets truncate to today
+    if (dr.to > QDate::currentDate()) dr.to = QDate::currentDate();
+
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *xm = factory.rideMetric(xsymbol);
+    const RideMetric *ym = factory.rideMetric(ysymbol);
+    xdp = xm->precision();
+    ydp = ym->precision();
+    bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
+
+    Specification spec;
+    spec.setDateRange(dr);
+    setFilter(this, spec);
+
+    double minx = 0;
+    double maxx = 0;
+    double miny = 0;
+    double maxy = 0;
+    bool first=true;
+
+    QList<BPointF> points;
+    foreach(RideItem *item, parent->context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue;
+
+        // get the x and y VALUE
+        double x = item->getForSymbol(xsymbol, parent->context->athlete->useMetricUnits);
+        double y = item->getForSymbol(ysymbol, parent->context->athlete->useMetricUnits);
+        double z = item->getForSymbol(zsymbol, parent->context->athlete->useMetricUnits);
+
+        BPointF add;
+        add.x = x;
+        add.y = y;
+        add.z = z;
+        add.fill = item->color;
+        if (add.fill.red() == 1 && add.fill.green() == 1 && add.fill.blue() == 1) add.fill = GColor(CPLOTMARKER);
+        add.label = item->getText("Workout Code","blank");
+        points << add;
+
+        if (first || x<minx) minx=x;
+        if (first || y<miny) miny=y;
+        if (first || x>maxx) maxx=x;
+        if (first || y>maxy) maxy=y;
+        first = false;
+    }
+
+
+    // set scale
+    double ydiff = (maxy-miny) / 10.0f;
+    if (miny >= 0 && ydiff > miny) miny = ydiff;
+    double xdiff = (maxx-minx) / 10.0f;
+    if (minx >= 0 && xdiff > minx) minx = xdiff;
+    maxx=ceil(maxx); minx=floor(minx);
+    maxy=ceil(maxy); miny=floor(miny);
+
+    // set range before points to filter
+    bubble->setPoints(points, minx,maxx,miny,maxy);
+}
+
+void
 IntervalOverviewItem::setData(RideItem *item)
 {
     if (item == NULL || item->ride() == NULL) return;
+
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *xm = factory.rideMetric(xsymbol);
+    const RideMetric *ym = factory.rideMetric(ysymbol);
+    xdp = xm->precision();
+    ydp = ym->precision();
+    bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
 
     double minx = 999999999;
     double maxx =-999999999;
@@ -1451,8 +1518,7 @@ IntervalOverviewItem::setData(RideItem *item)
     maxy=round(maxy); miny=round(miny);
 
     // set range before points to filter
-    bubble->setRange(minx,maxx,miny,maxy);
-    bubble->setPoints(points);
+    bubble->setPoints(points, minx,maxx,miny,maxy);
 }
 
 
@@ -2192,7 +2258,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
     }
 
     // metric1, metric2 and metric3
-    if (item->type == OverviewItemType::INTERVAL) {
+    if (item->type == OverviewItemType::INTERVAL || item->type == OverviewItemType::ACTIVITIES) {
         metric1 = new MetricSelect(this, item->parent->context, MetricSelect::Metric);
         connect(metric1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->addRow(tr("X Axis Metric"), metric1);
@@ -2399,6 +2465,7 @@ OverviewItemConfig::setWidgets()
         break;
 
     case OverviewItemType::INTERVAL:
+    case OverviewItemType::ACTIVITIES:
         {
             IntervalOverviewItem *mi = dynamic_cast<IntervalOverviewItem*>(item);
             name->setText(mi->name);
@@ -2504,6 +2571,7 @@ OverviewItemConfig::dataChanged()
         break;
 
     case OverviewItemType::INTERVAL:
+    case OverviewItemType::ACTIVITIES:
         {
             IntervalOverviewItem *mi = dynamic_cast<IntervalOverviewItem*>(item);
             mi->name = name->text();
@@ -2769,13 +2837,24 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
     setGeometry(20,20,100,100);
     setZValue(11);
     setAcceptHoverEvents(true);
-    animator=new QPropertyAnimation(this, "transition");
+
+    group = new QSequentialAnimationGroup(this);
+
+    QParallelAnimationGroup *par = new QParallelAnimationGroup(this);
+    xaxisAnimation=new QPropertyAnimation(this, "xaxis");
+    yaxisAnimation=new QPropertyAnimation(this, "yaxis");
+    par->addAnimation(xaxisAnimation);
+    par->addAnimation(yaxisAnimation);
+    group->addAnimation(par);
+
+    transitionAnimation=new QPropertyAnimation(this, "transition");
+    group->addAnimation(transitionAnimation);
 }
 
 BubbleViz::~BubbleViz()
 {
-    animator->stop();
-    delete animator;
+    group->stop();
+    delete group;
 }
 
 QVariant BubbleViz::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -2835,8 +2914,18 @@ bool scoresBiggerThan(const BubbleVizTuple i1, const BubbleVizTuple i2)
     return i1.score > i2.score;
 }
 void
-BubbleViz::setPoints(QList<BPointF> p)
+BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, double maxy)
 {
+    xaxisAnimation->setStartValue(QPointF(this->minx,this->maxx));
+    xaxisAnimation->setEndValue(QPointF(minx,maxx));
+    yaxisAnimation->setStartValue(QPointF(this->miny,this->maxy));
+    yaxisAnimation->setEndValue(QPointF(miny,maxy));
+    xaxisAnimation->setEasingCurve(QEasingCurve::OutQuad);
+    xaxisAnimation->setDuration(400);
+    yaxisAnimation->setEasingCurve(QEasingCurve::OutQuad);
+    yaxisAnimation->setDuration(400);
+    transition = -1; // work on axis first
+
     oldpoints = this->points;
     oldmean = this->mean;
 
@@ -2894,12 +2983,12 @@ BubbleViz::setPoints(QList<BPointF> p)
     oldpoints = matches;
 
     // stop any transition animation currently running
-    animator->stop();
-    animator->setStartValue(0);
-    animator->setEndValue(256);
-    animator->setEasingCurve(QEasingCurve::OutQuad);
-    animator->setDuration(1000);
-    animator->start();
+    group->stop();
+    transitionAnimation->setStartValue(0);
+    transitionAnimation->setEndValue(256);
+    transitionAnimation->setEasingCurve(QEasingCurve::OutQuad);
+    transitionAnimation->setDuration(400);
+    group->start();
 }
 
 static double pointDistance(QPointF a, QPointF b)
@@ -2936,100 +3025,139 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     double yratio = plotarea.height() / (maxy*1.03); // boundary space
 
     // old values when transitioning
-    double oxratio = plotarea.width() / (oldmaxx*1.03);
-    double oyratio = plotarea.height() / (oldmaxy*1.03); // boundary space
+    double oxratio = plotarea.width() / (maxx*1.03);
+    double oyratio = plotarea.height() / (maxy*1.03); // boundary space
 
     // run through each point
     double area = 10000; // max size
+    if (parent->parent->scope == OverviewScope::TRENDS) area /= 2; // smaller on trends so many to see
 
     // remember the one we are nearest
     BPointF nearest;
     double nearvalue = -1;
 
-    int index=0;
-    foreach(BPointF point, points) {
+    if (transition >= 0) {
 
-        if (point.x < minx || point.x > maxx ||
-            point.y < miny || point.y > maxy ||
-            !std::isfinite(point.z) || std::isnan(point.z)) {
+        int index=0;
+        foreach(BPointF point, points) {
+
+            if (point.x < minx || point.x > maxx ||
+                point.y < miny || point.y > maxy ||
+                !std::isfinite(point.z) || std::isnan(point.z)) {
+                index++;
+                continue;
+            }
+
+            // resize if transitioning
+            QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
+            int alpha = 200;
+            if (parent->parent->scope == OverviewScope::TRENDS) alpha /= 2;
+
+            double size = (point.z / mean) * area;
+            if (size > area * 6) size=area*6;
+            if (size < 600) size=600;
+
+            if (transition < 256 && oldpoints.count()) {
+                if (oldpoints[index].x != 0 || oldpoints[index].y != 0) {
+                    // where it was
+                    QPointF oldcenter = QPointF(plotarea.left() + (oxratio * oldpoints[index].x),
+                                                plotarea.bottom() - (oyratio * oldpoints[index].y));
+
+                    // transition to new point
+                    center.setX(center.x() - (double(255-transition) * ((center.x()-oldcenter.x())/255.0f)));
+                    center.setY(center.y() - (double(255-transition) * ((center.y()-oldcenter.y())/255.0f)));
+
+                    // transition bubble size
+                    double oldsize = (oldpoints[index].z / oldmean) * area;
+                    if (oldsize > area * 6) oldsize=area*6;
+                    if (oldsize < 600) oldsize=600;
+                    size = size - (double(255-transition) * ((size-oldsize)/255.0f));
+
+                } else {
+                    // just make it appear
+                    alpha = ((parent->parent->scope == OverviewScope::TRENDS ? 100 : 200.0f)/255.0f) * transition;
+                }
+            }
+
+            // once transitioned clear them away
+            if (transition == 256 && oldpoints.count()) oldpoints.clear();
+
+            QColor color = point.fill;
+            color.setAlpha(alpha);
+            painter->setBrush(color);
+            painter->setPen(QColor(150,150,150));
+
+            double radius = sqrt(size/3.1415927f);
+            painter->drawEllipse(center, radius, radius);
+
+            // is the cursor hovering over me?
+            double distance;
+            if (transition == 256 && hover && (distance=pointDistance(center, plotarea.topLeft()+plotpos)) <= radius) {
+
+                // is this the nearest ?
+                if (nearvalue == -1 || distance < nearvalue) {
+                    nearest = point;
+                    nearvalue = distance;
+                }
+
+            }
             index++;
-            continue;
         }
 
-        // resize if transitioning
-        QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
-        int alpha = 200;
+        // if we're transitioning
+        while (transition < 256 && index < oldpoints.count()) {
+           QPointF oldcenter = QPointF(plotarea.left() + (oxratio * oldpoints[index].x),
+                                       plotarea.bottom() - (oyratio * oldpoints[index].y));
 
-        double size = (point.z / mean) * area;
-        if (size > area * 6) size=area*6;
-        if (size < 600) size=600;
+            // fade out
+            QColor color = oldpoints[index].fill;
+            double alpha = ((parent->parent->scope == OverviewScope::TRENDS ? 100 : 200.0f)/255.0f) * transition;
+            color.setAlpha(alpha);
+            painter->setBrush(color);
+            painter->setPen(Qt::NoPen);
 
-        if (transition < 256 && oldpoints.count()) {
-            if (oldpoints[index].x != 0 || oldpoints[index].y != 0) {
-                // where it was
-                QPointF oldcenter = QPointF(plotarea.left() + (oxratio * oldpoints[index].x),
-                                            plotarea.bottom() - (oyratio * oldpoints[index].y));
+            double size = (oldpoints[index].z/oldmean) * area;
+            if (size > area * 6) size=area*6;
+            if (size < 600) size=600;
+            double radius = sqrt(size/3.1415927f);
+            painter->drawEllipse(oldcenter, radius, radius);
 
-                // transition to new point
-                center.setX(center.x() - (double(255-transition) * ((center.x()-oldcenter.x())/255.0f)));
-                center.setY(center.y() - (double(255-transition) * ((center.y()-oldcenter.y())/255.0f)));
-
-                // transition bubble size
-                double oldsize = (oldpoints[index].z / oldmean) * area;
-                if (oldsize > area * 6) oldsize=area*6;
-                if (oldsize < 600) oldsize=600;
-                size = size - (double(255-transition) * ((size-oldsize)/255.0f));
-
-            } else {
-                // just make it appear
-                alpha = (200.0f/255.0f) * transition;
-            }
+            // hide the old ones
+            index++;
         }
 
-        // once transitioned clear them away
-        if (transition == 256 && oldpoints.count()) oldpoints.clear();
+    } else {
+        // when transition is -1 we are rescaling the axes first
+        int index=0;
+        foreach(BPointF point, oldpoints) {
 
-        QColor color = point.fill;
-        color.setAlpha(alpha);
-        painter->setBrush(color);
-        painter->setPen(QColor(150,150,150));
-
-        double radius = sqrt(size/3.1415927f);
-        painter->drawEllipse(center, radius, radius);
-
-        // is the cursor hovering over me?
-        double distance;
-        if (transition == 256 && hover && (distance=pointDistance(center, plotarea.topLeft()+plotpos)) <= radius) {
-
-            // is this the nearest ?
-            if (nearvalue == -1 || distance < nearvalue) {
-                nearest = point;
-                nearvalue = distance;
+            if (point.x < minx || point.x > maxx ||
+                point.y < miny || point.y > maxy ||
+                !std::isfinite(point.z) || std::isnan(point.z)) {
+                index++;
+                continue;
             }
 
+            // resize if transitioning
+            QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
+            int alpha = 200;
+            if (parent->parent->scope == OverviewScope::TRENDS) alpha /= 2;
+
+            double size = (point.z / mean) * area;
+            if (size > area * 6) size=area*6;
+            if (size < 600) size=600;
+
+            QColor color = point.fill;
+            color.setAlpha(alpha);
+            painter->setBrush(color);
+            painter->setPen(QColor(150,150,150));
+
+            double radius = sqrt(size/3.1415927f);
+            painter->drawEllipse(center, radius, radius);
+
+            index++;
         }
-        index++;
-    }
 
-    // if we're transitioning
-    while (transition < 256 && index < oldpoints.count()) {
-       QPointF oldcenter = QPointF(plotarea.left() + (oxratio * oldpoints[index].x),
-                                   plotarea.bottom() - (oyratio * oldpoints[index].y));
-
-        // fade out
-        QColor color = oldpoints[index].fill;
-        color.setAlpha(200 - (200.0f/255.0f) * double(transition));
-        painter->setBrush(color);
-        painter->setPen(Qt::NoPen);
-
-        double size = (oldpoints[index].z/oldmean) * area;
-        if (size > area * 6) size=area*6;
-        if (size < 600) size=600;
-        double radius = sqrt(size/3.1415927f);
-        painter->drawEllipse(oldcenter, radius, radius);
-
-        // hide the old ones
-        index++;
     }
 
     painter->setBrush(Qt::NoBrush);
@@ -3041,19 +3169,6 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     QRectF xlabelspace = QRectF(plotarea.x(), plotarea.bottom() + 20, plotarea.width(), ROWHEIGHT);
     painter->setPen(Qt::red);
     //DIAG painter->drawRect(xlabelspace);
-
-    // x-axis title
-    QRectF xtitlespace = QRectF(plotarea.x(), xlabelspace.bottom(), plotarea.width(), ROWHEIGHT);
-    painter->setPen(Qt::yellow);
-    //DIAG painter->drawRect(xtitlespace);
-
-    QTextOption midcenter;
-    midcenter.setAlignment(Qt::AlignVCenter|Qt::AlignCenter);
-
-    painter->setPen(QColor(150,150,150));
-    painter->setFont(parent->parent->smallfont);
-    painter->drawText(xtitlespace, xlabel, midcenter);
-
 
     // y-axis labels
     QRectF ylabelspace = QRectF(plotarea.x()-20-ROWHEIGHT, plotarea.y(), ROWHEIGHT, plotarea.height());
@@ -3080,19 +3195,25 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     // x-axis range
     QFontMetrics sfm(parent->parent->smallfont);
-    QRectF bminx = sfm.tightBoundingRect(QString("%1").arg(minx));
-    QRectF bmaxx = sfm.tightBoundingRect(QString("%1").arg(maxx));
-    painter->drawText(xlabelspace.left() + (minx*xratio) - (bminx.width()/2),  xlabelspace.bottom(), QString("%1").arg(minx));
-    painter->drawText(xlabelspace.left() + (maxx*xratio) - (bmaxx.width()/2),  xlabelspace.bottom(), QString("%1").arg(maxx));
+    QRectF bminx = sfm.tightBoundingRect(QString("%1").arg(round(minx)));
+    QRectF bmaxx = sfm.tightBoundingRect(QString("%1").arg(round(maxx)));
+    painter->drawText(xlabelspace.left() + (minx*xratio) - (bminx.width()/2),  xlabelspace.bottom(), QString("%1").arg(round(minx)));
+    painter->drawText(xlabelspace.left() + (maxx*xratio) - (bmaxx.width()/2),  xlabelspace.bottom(), QString("%1").arg(round(maxx)));
+
+    // x-axis title - offset from minx
+    QRectF xtitlespace = QRectF(plotarea.x() + (minx*xratio), xlabelspace.bottom(), plotarea.width() - (minx*xratio), ROWHEIGHT);
+    painter->setPen(QColor(150,150,150));
+    painter->setFont(parent->parent->smallfont);
+    painter->drawText(xtitlespace, xlabel, Qt::AlignCenter|Qt::AlignVCenter);
 
     // draw minimum value
     painter->drawLine(QPointF(plotarea.left(), plotarea.bottom() - (miny*yratio)),
                       QPointF(plotarea.left(), plotarea.bottom() - (maxy*yratio)));
     // y-axis range
-    QRectF bminy = sfm.tightBoundingRect(QString("%1").arg(miny));
-    QRectF bmaxy = sfm.tightBoundingRect(QString("%1").arg(maxy));
-    painter->drawText(ylabelspace.right() - bmaxy.width(),  ylabelspace.bottom()-(maxy*yratio) + (bmaxy.height()/2), QString("%1").arg(maxy));
-    painter->drawText(ylabelspace.right() - bminy.width(),  ylabelspace.bottom()-(miny*yratio) + (bminy.height()/2), QString("%1").arg(miny));
+    QRectF bminy = sfm.tightBoundingRect(QString("%1").arg(round(miny)));
+    QRectF bmaxy = sfm.tightBoundingRect(QString("%1").arg(round(maxy)));
+    painter->drawText(ylabelspace.right() - bmaxy.width(),  ylabelspace.bottom()-(maxy*yratio) + (bmaxy.height()/2), QString("%1").arg(round(maxy)));
+    painter->drawText(ylabelspace.right() - bminy.width(),  ylabelspace.bottom()-(miny*yratio) + (bminy.height()/2), QString("%1").arg(round(miny)));
 
     // hover point?
     painter->setPen(GColor(CPLOTMARKER));
@@ -3106,14 +3227,14 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         QPointF center(plotarea.left() + (xratio * nearest.x), plotarea.bottom() - (yratio * nearest.y));
 
         // xlabel
-        QString xlab = QString("%1").arg(nearest.x, 0, 'f', 0);
+        QString xlab = Utils::removeDP(QString("%1").arg(nearest.x,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
         painter->fillRect(bminx, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
         painter->drawText(center.x() - (bminx.width()/2),  xlabelspace.bottom(), xlab);
 
         // ylabel
-        QString ylab = QString("%1").arg(nearest.y, 0, 'f', 0);
+        QString ylab = Utils::removeDP(QString("%1").arg(nearest.y,0,'f',parent->ydp ? 1 : 0));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
         painter->fillRect(bminy, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels

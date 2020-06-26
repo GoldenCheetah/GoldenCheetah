@@ -133,6 +133,7 @@ OverviewWindow::getConfiguration() const
             }
             break;
         case OverviewItemType::INTERVAL:
+        case OverviewItemType::ACTIVITIES:
             {
                 IntervalOverviewItem *interval = reinterpret_cast<IntervalOverviewItem*>(item);
                 config += "\"xsymbol\":\"" + QString("%1").arg(interval->xsymbol) + "\",";
@@ -456,6 +457,7 @@ OverviewWindow::setConfiguration(QString config)
                 break;
 
             case OverviewItemType::INTERVAL :
+            case OverviewItemType::ACTIVITIES:
                 {
                     QString xsymbol=obj["xsymbol"].toString();
                     QString ysymbol=obj["ysymbol"].toString();

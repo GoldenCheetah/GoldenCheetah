@@ -46,7 +46,7 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT, ACTIVITIES };
 
 //
 // Configuration widget for ALL Overview Items
@@ -392,13 +392,15 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
-        void setDateRange(DateRange) {} // doesn't support trends view
+        void setDateRange(DateRange);
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
+        static ChartSpaceItem *createInterval(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
+        static ChartSpaceItem *createActivities(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Activities"), "workout_time", "average_power", "coggan_tss"); }
 
         QString xsymbol, ysymbol, zsymbol;
+        int xdp, ydp;
         BubbleViz *bubble;
 };
 
@@ -430,6 +432,8 @@ class BubbleViz : public QObject, public QGraphicsItem
 
     // want a meta property for property animation
     Q_PROPERTY(int transition READ getTransition WRITE setTransition)
+    Q_PROPERTY(QPointF yaxis READ getYAxis WRITE setYAxis)
+    Q_PROPERTY(QPointF xaxis READ getXAxis WRITE setXAxis)
 
     public:
         BubbleViz(IntervalOverviewItem *parent, QString name=""); // create and say how many days
@@ -443,19 +447,15 @@ class BubbleViz : public QObject, public QGraphicsItem
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
-        // null members for now just get hooked up
-        void setPoints(QList<BPointF>points);
+        // axes
+        QPointF getYAxis() const { return QPointF(miny,maxy); }
+        void setYAxis(QPointF x) { miny=x.x(); maxy=x.y(); update(); }
+        QPointF getXAxis() const { return QPointF(minx,maxx); }
+        void setXAxis(QPointF x) { minx=x.x(); maxx=x.y(); update(); }
 
-        void setRange(double minx, double maxx, double miny, double maxy) {
-            oldminx = this->minx;
-            oldminy = this->miny;
-            oldmaxx = this->maxx;
-            oldmaxy = this->maxy;
-            this->minx=minx;
-            this->maxx=maxx;
-            this->miny=miny;
-            this->maxy=maxy;
-        }
+        // null members for now just get hooked up
+        void setPoints(QList<BPointF>points, double minx, double maxx, double miny, double maxy);
+
         void setAxisNames(QString xlabel, QString ylabel) { this->xlabel=xlabel; this->ylabel=ylabel; update(); }
 
         // needed as pure virtual in QGraphicsItem
@@ -482,8 +482,9 @@ class BubbleViz : public QObject, public QGraphicsItem
         QList <BPointF> oldpoints; // for animation
         int transition;
         double oldmean;
-        double oldminx,oldmaxx,oldminy,oldmaxy;
-        QPropertyAnimation *animator;
+
+        QSequentialAnimationGroup *group;
+        QPropertyAnimation *transitionAnimation, *xaxisAnimation, *yaxisAnimation;
 
         // chart settings
         QList <BPointF> points;
