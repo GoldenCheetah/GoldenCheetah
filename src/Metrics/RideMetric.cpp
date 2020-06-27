@@ -162,7 +162,9 @@
 // 152 20  May 2019 Ale Martinez       Fixed Time in Zone Percentages to aggregate properly
 // 153  8  Dec 2019 Mark Liversedge    Regenerate after v3.5 RC2/RC2X re-issue
 // 154 18  Apr 2020 Mark Liversedge    Added PeakPowerIndex (only for full rides)
-int DBSchemaVersion = 154;
+// 155 27  Jun 2020 Mark Liversedge    Added Ride Date as days since 1900,01,01
+
+int DBSchemaVersion = 155;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
@@ -309,6 +311,7 @@ RideMetric::getForSymbol(QString symbol, const QHash<QString,RideMetric*> *p)
 QString 
 RideMetric::toString(bool useMetricUnits) const
 {
+    if (isDate()) { QDate date(1900,01,01); date = date.addDays(this->value(useMetricUnits)); return date.toString("dd MMM yy"); }
     if (isTime()) return time_to_string(value(useMetricUnits));
     return QString("%1").arg(value(useMetricUnits), 0, 'f', this->precision());
 }
@@ -316,6 +319,7 @@ RideMetric::toString(bool useMetricUnits) const
 QString
 RideMetric::toString(bool useMetricUnits, double v) const
 {
+    if (isDate()) { QDate date(1900,01,01); date = date.addDays(value(v, useMetricUnits)); return date.toString("dd MMM yy"); }
     if (isTime()) return time_to_string(value(v, useMetricUnits));
     return QString("%1").arg(value(v, useMetricUnits), 0, 'f', this->precision());
 }

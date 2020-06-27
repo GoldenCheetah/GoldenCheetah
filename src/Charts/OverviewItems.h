@@ -397,7 +397,7 @@ class IntervalOverviewItem : public ChartSpaceItem
 
         // create and config
         static ChartSpaceItem *createInterval(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
-        static ChartSpaceItem *createActivities(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Activities"), "workout_time", "average_power", "coggan_tss"); }
+        static ChartSpaceItem *createActivities(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Activities"), "activity_date", "average_power", "coggan_tss"); }
 
         QString xsymbol, ysymbol, zsymbol;
         int xdp, ydp;
@@ -413,10 +413,11 @@ class IntervalOverviewItem : public ChartSpaceItem
 class BPointF {
 public:
 
-    BPointF() : x(0), y(0), z(0), fill(GColor(Qt::gray)) {}
+    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(Qt::gray)) {}
 
     double score(BPointF &other);
 
+    double xoff, yoff; // add to x,y,z when converting to string (used for dates)
     double x,y,z;
     QColor fill;
     QString label;

@@ -168,6 +168,9 @@ public:
     // is a time value, ie. render as hh:mm:ss
     virtual bool isTime() const { return false; }
 
+    // is a date since the epoch ie. render as dd mmm yy
+    virtual bool isDate() const { return false; }
+
     // Convert value to string, taking into account metric pref
     virtual QString toString(bool useMetricUnits) const;
     virtual QString toString(bool useMetricUnits, double value) const;

@@ -31,6 +31,36 @@
 #include <QVector>
 #include <QApplication>
 
+class RideDate : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(RideDate)
+    public:
+
+    RideDate()
+    {
+        setSymbol("activity_date"); // ride_date already special (!!)
+        setInternalName("Activity Date");
+    }
+    bool isDate() const { return true; }
+    void initialize() {
+        setName(tr("Activity Date"));
+        setType(MetricType::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setDescription(tr("Activity Date"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+        setValue (QDate(1900,01,01).daysTo(item->dateTime.date()));
+    }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new RideDate(*this); }
+};
+
+static bool dateAdded =
+    RideMetricFactory::instance().addMetric(RideDate());
+
+//////////////////////////////////////////////////////////////////////////////
 class RideCount : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(RideCount)
     public:

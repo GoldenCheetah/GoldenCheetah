@@ -672,9 +672,11 @@ MetricOverviewItem::setData(RideItem *item)
     // set the values for upper lower
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *m = factory.rideMetric(symbol);
-    upper = m->toString(parent->context->athlete->useMetricUnits, max);
-    lower = m->toString(parent->context->athlete->useMetricUnits, min);
-    mean = m->toString(parent->context->athlete->useMetricUnits, avg);
+    if (m) {
+        upper = m->toString(parent->context->athlete->useMetricUnits, max);
+        lower = m->toString(parent->context->athlete->useMetricUnits, min);
+        mean = m->toString(parent->context->athlete->useMetricUnits, avg);
+    }
 }
 
 void
@@ -1424,6 +1426,8 @@ IntervalOverviewItem::setDateRange(DateRange dr)
     double maxx = 0;
     double miny = 0;
     double maxy = 0;
+    double xoff = 0;
+    double yoff = 0;
     bool first=true;
 
     QList<BPointF> points;
@@ -1431,14 +1435,23 @@ IntervalOverviewItem::setDateRange(DateRange dr)
 
         if (!spec.pass(item)) continue;
 
+
         // get the x and y VALUE
         double x = item->getForSymbol(xsymbol, parent->context->athlete->useMetricUnits);
         double y = item->getForSymbol(ysymbol, parent->context->athlete->useMetricUnits);
         double z = item->getForSymbol(zsymbol, parent->context->athlete->useMetricUnits);
 
+        // truncate dates and use offsets
+        if (first && xm->isDate())  xoff = x;
+        if (first && ym->isDate())  yoff = y;
+        x -= xoff;
+        y -= yoff;
+
         BPointF add;
         add.x = x;
+        add.xoff = xoff;
         add.y = y;
+        add.yoff = yoff;
         add.z = z;
         add.fill = item->color;
         if (add.fill.red() == 1 && add.fill.green() == 1 && add.fill.blue() == 1) add.fill = GColor(CPLOTMARKER);
@@ -1815,7 +1828,7 @@ void
 MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     // put the medal up so all else paints over it
-    if (parent->scope == OverviewScope::ANALYSIS && rank < 4) {
+    if (parent->scope == OverviewScope::ANALYSIS && metric && metric->isDate() == false && rank < 4) {
 
         // paint a medal
         QPixmap *medal;
@@ -1895,7 +1908,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
                    bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
     // activity show if current one is up or down on trend for last 30 days..
-    if (parent->scope == ANALYSIS) {
+    if (parent->scope == ANALYSIS && metric && !metric->isDate()) {
 
         // trend triangle
         QPainterPath triangle;
@@ -3032,6 +3045,13 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     BPointF nearest;
     double nearvalue = -1;
 
+    // get xoff and yoff (we assume always the same for now)
+    double xoff=0, yoff=0;
+    if (points.count() > 0) {
+        xoff = points[0].xoff;
+        yoff = points[0].yoff;
+    }
+
     if (transition >= 0) {
 
         int index=0;
@@ -3194,11 +3214,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     const RideMetric *m = factory.rideMetric(parent->xsymbol);
     QString smin, smax;
     if (m) {
-        smin = m->toString(parent->parent->context->athlete->useMetricUnits, round(minx));
-        smax = m->toString(parent->parent->context->athlete->useMetricUnits, round(maxx));
+        smin = m->toString(parent->parent->context->athlete->useMetricUnits, round(minx+xoff));
+        smax = m->toString(parent->parent->context->athlete->useMetricUnits, round(maxx+xoff));
     } else {
-        smin = QString("%1").arg(round(minx));
-        smax = QString("%1").arg(round(maxx));
+        smin = QString("%1").arg(round(minx+xoff));
+        smax = QString("%1").arg(round(maxx+xoff));
     }
 
     QFontMetrics sfm(parent->parent->smallfont);
@@ -3217,10 +3237,10 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->drawLine(QPointF(plotarea.left(), plotarea.bottom() - (miny*yratio)),
                       QPointF(plotarea.left(), plotarea.bottom() - (maxy*yratio)));
     // y-axis range
-    QRectF bminy = sfm.tightBoundingRect(QString("%1").arg(round(miny)));
-    QRectF bmaxy = sfm.tightBoundingRect(QString("%1").arg(round(maxy)));
-    painter->drawText(ylabelspace.right() - bmaxy.width(),  ylabelspace.bottom()-(maxy*yratio) + (bmaxy.height()/2), QString("%1").arg(round(maxy)));
-    painter->drawText(ylabelspace.right() - bminy.width(),  ylabelspace.bottom()-(miny*yratio) + (bminy.height()/2), QString("%1").arg(round(miny)));
+    QRectF bminy = sfm.tightBoundingRect(QString("%1").arg(round(miny+yoff)));
+    QRectF bmaxy = sfm.tightBoundingRect(QString("%1").arg(round(maxy+yoff)));
+    painter->drawText(ylabelspace.right() - bmaxy.width(),  ylabelspace.bottom()-(maxy*yratio) + (bmaxy.height()/2), QString("%1").arg(round(maxy+yoff)));
+    painter->drawText(ylabelspace.right() - bminy.width(),  ylabelspace.bottom()-(miny*yratio) + (bminy.height()/2), QString("%1").arg(round(miny+yoff)));
 
     // hover point?
     painter->setPen(GColor(CPLOTMARKER));
@@ -3236,8 +3256,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // xlabel
         const RideMetric *m = factory.rideMetric(parent->xsymbol);
         QString xlab;
-        if (m)  xlab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.x);
-        else xlab = Utils::removeDP(QString("%1").arg(nearest.x,0,'f',parent->xdp));
+        if (m)  xlab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.x+xoff);
+        else xlab = Utils::removeDP(QString("%1").arg(nearest.x+xoff,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
         painter->fillRect(bminx, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
@@ -3246,8 +3266,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // ylabel
         m = factory.rideMetric(parent->ysymbol);
         QString ylab;
-        if (m)  ylab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.y);
-        else ylab = Utils::removeDP(QString("%1").arg(nearest.y,0,'f',parent->ydp));
+        if (m)  ylab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.y+yoff);
+        else ylab = Utils::removeDP(QString("%1").arg(nearest.y+yoff,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
         painter->fillRect(bminy, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
