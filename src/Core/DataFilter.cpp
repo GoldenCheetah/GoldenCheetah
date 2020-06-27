@@ -220,7 +220,7 @@ static struct {
                        // argsort returns an index, can then be used to select from samples
                        // or activity vectors
 
-    { "uniq", 0 },     // stable uniq will keep original sequence but remove duplicates, does
+    { "multiuniq", 0 },     // stable uniq will keep original sequence but remove duplicates, does
                        // not need the data to be sorted, as it uses argsort internally. As
                        // you can pass multiple vectors they are uniqued in sync with the first list.
 
@@ -299,6 +299,7 @@ static struct {
     { "rank", 2 }, // rank(ascend|descend, list) - returns ranks for the list
 
     { "sort", 2 },     // sort(ascend|descend, list) - returns sorted list
+    { "uniq", 1 },      // uniq(list) - returns only uniq values in the list, stable and preserves order
 
     // add new ones above this line
     { "", -1 }
@@ -449,7 +450,7 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 68) {
 
-            returning << "uniq(list [,list n])";
+            returning << "multiuniq(list [,list n])";
 
         } else if (i == 71) {
 
@@ -2007,11 +2008,11 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                        validateFilter(context, df, leaf->fparms[1]);
                     }
 
-                } else if (leaf->function == "uniq") {
+                } else if (leaf->function == "multiuniq") {
 
                     if (leaf->fparms.count() < 1) {
                         leaf->inerror = true;
-                       DataFiltererrors << QString(tr("uniq(list [, .. list n])"));
+                       DataFiltererrors << QString(tr("multiuniq(list [, .. list n])"));
                     }
 
                     // need all remaining parameters to be symbols
@@ -2020,7 +2021,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         // check parameter is actually a symbol
                         if (leaf->fparms[i]->type != Leaf::Symbol) {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(tr("uniq: list arguments must be a symbol"));
+                            DataFiltererrors << QString(tr("multiuniq: list arguments must be a symbol"));
                         } else {
                             QString symbol = *(leaf->fparms[i]->lvalue.n);
                             if (!df->symbols.contains(symbol)) {
@@ -4225,6 +4226,24 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             return returning;
         }
 
+        // uniq - returns vector
+        if (leaf->function == "uniq") {
+
+            Result returning(0);
+
+            // evaluate all the lists
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            QVector<int> index = Utils::arguniq(v.vector);
+
+            for(int idx=0; idx<index.count(); idx++) {
+                double value = v.vector[index[idx]];
+                returning.vector << value;
+                returning.number += value;
+            }
+
+            return returning;
+        }
+
         // arguniq
         if (leaf->function == "arguniq") {
             Result returning(0);
@@ -4240,8 +4259,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
             return returning;
         }
 
-        // uniq
-        if (leaf->function == "uniq") {
+        // multiuniq
+        if (leaf->function == "multiuniq") {
 
             // evaluate all the lists
             for(int i=0; i<leaf->fparms.count(); i++) eval(df, leaf->fparms[i],x, it, m, p, c, s, d);
@@ -4261,7 +4280,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 // diff length?
                 if (current.vector.count() != len) {
-                    fprintf(stderr, "uniq list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
+                    fprintf(stderr, "multiuniq list '%s': not the same length, ignored\n", symbol.toStdString().c_str()); fflush(stderr);
                     continue;
                 }
 
