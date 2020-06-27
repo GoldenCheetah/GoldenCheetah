@@ -104,6 +104,9 @@ class ElapsedTime : public RideMetric {
         setSymbol("elapsed_time");
         setInternalName("Elapsed Time");
     }
+
+    bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("Elapsed Time"));
         setMetricUnits(tr("secs"));

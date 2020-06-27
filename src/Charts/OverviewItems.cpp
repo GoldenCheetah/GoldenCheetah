@@ -670,21 +670,11 @@ MetricOverviewItem::setData(RideItem *item)
     sparkline->setRange(min-diff,max+diff); // add 10% to each direction
 
     // set the values for upper lower
-    if (units == tr("seconds")) {
-        upper = time_to_string(max, true);
-        lower = time_to_string(min, true);
-        mean = time_to_string(avg, true);
-    } else {
-        upper = QString("%1").arg(max);
-        lower = QString("%1").arg(min);
-
-        // we need the same precision
-        const RideMetricFactory &factory = RideMetricFactory::instance();
-        const RideMetric *m = factory.rideMetric(symbol);
-
-        if (m) mean = m->toString(parent->context->athlete->useMetricUnits, avg);
-        else mean = QString("%1").arg(avg, 0, 'f', 0);
-    }
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *m = factory.rideMetric(symbol);
+    upper = m->toString(parent->context->athlete->useMetricUnits, max);
+    lower = m->toString(parent->context->athlete->useMetricUnits, min);
+    mean = m->toString(parent->context->athlete->useMetricUnits, avg);
 }
 
 void
@@ -748,9 +738,15 @@ MetricOverviewItem::setDateRange(DateRange dr)
     }
 
     // get the metric value
-    value = metric->toString(parent->context->athlete->useMetricUnits, v);
-    if (value == "nan") value ="";
-    if (std::isinf(v) || std::isnan(v)) v=0;
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *m = factory.rideMetric(symbol);
+    if (m) {
+        value = m->toString(parent->context->athlete->useMetricUnits, v);
+    } else {
+        value = Utils::removeDP(QString("%1").arg(v));
+        if (value == "nan") value ="";
+        if (std::isinf(v) || std::isnan(v)) v=0;
+    }
 
 
     // metric history
@@ -3194,11 +3190,22 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
                       QPointF(plotarea.left() + (maxx * xratio), plotarea.bottom()));
 
     // x-axis range
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *m = factory.rideMetric(parent->xsymbol);
+    QString smin, smax;
+    if (m) {
+        smin = m->toString(parent->parent->context->athlete->useMetricUnits, round(minx));
+        smax = m->toString(parent->parent->context->athlete->useMetricUnits, round(maxx));
+    } else {
+        smin = QString("%1").arg(round(minx));
+        smax = QString("%1").arg(round(maxx));
+    }
+
     QFontMetrics sfm(parent->parent->smallfont);
-    QRectF bminx = sfm.tightBoundingRect(QString("%1").arg(round(minx)));
-    QRectF bmaxx = sfm.tightBoundingRect(QString("%1").arg(round(maxx)));
-    painter->drawText(xlabelspace.left() + (minx*xratio) - (bminx.width()/2),  xlabelspace.bottom(), QString("%1").arg(round(minx)));
-    painter->drawText(xlabelspace.left() + (maxx*xratio) - (bmaxx.width()/2),  xlabelspace.bottom(), QString("%1").arg(round(maxx)));
+    QRectF bminx = sfm.tightBoundingRect(smin);
+    QRectF bmaxx = sfm.tightBoundingRect(smax);
+    painter->drawText(xlabelspace.left() + (minx*xratio) - (bminx.width()/2),  xlabelspace.bottom(), smin);
+    painter->drawText(xlabelspace.left() + (maxx*xratio) - (bmaxx.width()/2),  xlabelspace.bottom(), smax);
 
     // x-axis title - offset from minx
     QRectF xtitlespace = QRectF(plotarea.x() + (minx*xratio), xlabelspace.bottom(), plotarea.width() - (minx*xratio), ROWHEIGHT);
@@ -3227,14 +3234,20 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         QPointF center(plotarea.left() + (xratio * nearest.x), plotarea.bottom() - (yratio * nearest.y));
 
         // xlabel
-        QString xlab = Utils::removeDP(QString("%1").arg(nearest.x,0,'f',parent->xdp));
+        const RideMetric *m = factory.rideMetric(parent->xsymbol);
+        QString xlab;
+        if (m)  xlab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.x);
+        else xlab = Utils::removeDP(QString("%1").arg(nearest.x,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
         painter->fillRect(bminx, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
         painter->drawText(center.x() - (bminx.width()/2),  xlabelspace.bottom(), xlab);
 
         // ylabel
-        QString ylab = Utils::removeDP(QString("%1").arg(nearest.y,0,'f',parent->ydp ? 1 : 0));
+        m = factory.rideMetric(parent->ysymbol);
+        QString ylab;
+        if (m)  ylab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.y);
+        else ylab = Utils::removeDP(QString("%1").arg(nearest.y,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
         painter->fillRect(bminy, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
