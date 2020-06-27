@@ -76,7 +76,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[36] = {
+  static GcWindowRegistry GcWindowsInit[35] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Overview "),GcWindowTypes::OverviewTrends },
     { VIEW_HOME|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
@@ -87,7 +87,6 @@ GcWindowRegistry::initialize()
     //{ VIEW_HOME,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
-    { VIEW_HOME|VIEW_DIARY, tr("User Defined"),GcWindowTypes::UserTrends },
     { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },

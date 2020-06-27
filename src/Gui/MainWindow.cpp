@@ -2187,17 +2187,20 @@ void
 MainWindow::configChanged(qint32)
 {
 
-// Windows and Linux menu bar should match chrome
 #if defined (WIN32) || defined (Q_OS_LINUX)
+    // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
     if (GCColor::luminance(GColor(CCHROME)) < 127)  textCol = QColor(Qt::white);
     QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));
+    // search filter box match chrome color
+    searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()));
+
 #endif
 
-// Mac and Linux
+    // All platforms
     QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
