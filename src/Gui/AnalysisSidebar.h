@@ -94,6 +94,7 @@ class AnalysisSidebar : public QWidget
         Context *context;
         GcSplitter *splitter;
 
+        QWidget *activityHistory;
         GcSplitterItem *activityItem;
         QSignalMapper *groupByMapper;
 

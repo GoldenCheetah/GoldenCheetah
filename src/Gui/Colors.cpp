@@ -618,7 +618,7 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Corporate Junky"); // New v3.2 colors // ** DARK **
-    colors << QColor(30,30,30) << QColor(Qt::white) << QColor(85,170,255) << QColor(194,194,194) << QColor(Qt::yellow);
+    colors << QColor(19,19,19) << QColor(Qt::white) << QColor(85,170,255) << QColor(194,194,194) << QColor(Qt::yellow);
     //            HR              Speed                Power                 Cadence             Torque
     colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
@@ -727,12 +727,10 @@ GCColor::applyTheme(int index)
             break;
 
         case COVERVIEWBACKGROUND:
-            // set back to black for dark themes
+            // set back to light black for dark themes
             // and gray for light themes
-            if (GCColor::luminance(theme.colors[0]) < 127) {
-                if (theme.colors[0] == Qt::black) color = QColor(35,35,35);
-                else color = Qt::black;
-            } else color = QColor(243,255,255);
+            if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(39,39,39);
+            else color = QColor(170,180,180);
             break;
 
         // fg color theme.colors[1] not used YET XXX

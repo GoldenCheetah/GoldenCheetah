@@ -74,7 +74,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
         rideNavigator->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGWIDTHS).toString());
     }
 
-    QWidget *activityHistory = new QWidget(this);
+    activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
 #ifndef Q_OS_MAC // not on mac thanks
     activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
@@ -325,6 +325,8 @@ AnalysisSidebar::configChanged(qint32)
     //intervalSummaryWindow->setPalette(GCColor::palette());
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
 
+    splitter->setPalette(GCColor::palette());
+    activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
     rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 

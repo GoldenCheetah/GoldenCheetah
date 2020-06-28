@@ -2295,7 +2295,7 @@ SimBicyclePage::AddSpecBox(int ePart)
 }
 
 void
-SimBicyclePage::SetStatsLabelArray(double d)
+SimBicyclePage::SetStatsLabelArray(double )
 {
     double riderMassKG = 0;
 
@@ -2675,10 +2675,8 @@ ColorsPage::applyThemeClicked()
             case COVERVIEWBACKGROUND:
                 // set back to black for dark themes
                 // and gray for light themes
-                if (GCColor::luminance(theme.colors[0]) < 127) {
-                    if (theme.colors[0] == Qt::black) color = QColor(35,35,35);
-                    else color = Qt::black;
-                } else color = QColor(243,255,255);
+                if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(39,39,39);
+                else color = QColor(170,180,180);
                 break;
 
             // fg color theme.colors[1] not used YET XXX
