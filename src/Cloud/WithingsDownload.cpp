@@ -200,6 +200,8 @@ WithingsDownload::parse(QString text, QList<BodyMeasure> &bodyMeasures)
             w.fatkg = r.fatkg;
             w.leankg = r.leankg;
             w.fatpercent = r.fatpercent;
+            w.musclekg = r.musclekg;
+            w.boneskg = r.boneskg;
             w.source = BodyMeasure::Withings;
             bodyMeasures.append(w);
         }
@@ -251,6 +253,8 @@ WithingsDownload::jsonDocumentToWithingsReading(QJsonDocument doc) {
                 case 5 : thisReading.leankg = value; break;
                 case 6 : thisReading.fatpercent = value; break;
                 case 8 : thisReading.fatkg = value; break;
+                case 76: thisReading.musclekg = value; break;
+                case 88: thisReading.boneskg = value; break;
                 default: break;
             }
         }
