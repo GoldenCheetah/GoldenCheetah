@@ -438,10 +438,10 @@ Xert::readFileCompleted()
                 add.hr = data["hr"].toInt();
 
             if (!data["alt"].isNull())
-                add.alt = data["alt"].toInt();
+                add.alt = data["alt"].toDouble();
 
             if (!data["spd"].isNull())
-                add.kph = data["spd"].toInt() / 1000.0;
+                add.kph = data["spd"].toDouble() / 1000.0;
 
             if (!data["dist"].isNull())
                 add.km = data["dist"].toDouble() / 1000.0;
