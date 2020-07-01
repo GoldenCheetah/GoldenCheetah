@@ -719,17 +719,23 @@ GCColor::applyTheme(int index)
         switch(i) {
 
         case CPLOTBACKGROUND:
-        case CCARDBACKGROUND:
         case CRIDEPLOTBACKGROUND:
         case CTRENDPLOTBACKGROUND:
         case CTRAINPLOTBACKGROUND:
             color = theme.colors[0]; // background color
             break;
 
+        case CCARDBACKGROUND:
+            // set back to light black for dark themes
+            // and gray for light themes
+            if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(42,42,42);
+            else color = QColor(255,255,255);
+            break;
+
         case COVERVIEWBACKGROUND:
             // set back to light black for dark themes
             // and gray for light themes
-            if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(39,39,39);
+            if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(19,19,19);
             else color = QColor(170,180,180);
             break;
 

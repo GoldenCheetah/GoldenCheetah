@@ -596,6 +596,7 @@ MetricOverviewItem::setData(RideItem *item)
 
     // which way up should the arrow be?
     up = v > avg ? true : false;
+    up = (metric && metric->isLowerBetter()) ? !up : up;
 
     // add some space, if only one value +/- 10%
     double diff = (max-min)/10.0f;
@@ -626,13 +627,25 @@ MetricOverviewItem::setData(RideItem *item)
         int daysago = prior->dateTime.date().daysTo(item->dateTime.date());
         double priorv = prior->getForSymbol(symbol);
 
-        if (daysago >= 0) {
-            if (daysago < 30 && priorv >= v) rank30++;
-            if (daysago < 90 && priorv >= v) rank90++;
-            if (daysago < 365 && priorv >= v) rank365++;
-            if (priorv >= v) alltime++;
+        // lower or higher
+        if (metric && metric->isLowerBetter()) {
+            if (daysago >= 0) {
+                if (daysago < 30 && priorv <= v) rank30++;
+                if (daysago < 90 && priorv <= v) rank90++;
+                if (daysago < 365 && priorv <= v) rank365++;
+                if (priorv <= v) alltime++;
+            }
+            if (priorv <= v) career++;
+
+        } else {
+            if (daysago >= 0) {
+                if (daysago < 30 && priorv >= v) rank30++;
+                if (daysago < 90 && priorv >= v) rank90++;
+                if (daysago < 365 && priorv >= v) rank365++;
+                if (priorv >= v) alltime++;
+            }
+            if (priorv >= v) career++;
         }
-        if (priorv >= v) career++;
 
         first=false;
         index--;
