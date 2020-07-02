@@ -322,8 +322,8 @@ public:
     // WE DO NOT REIMPLEMENT THE STANDARD toString() METHOD
     // virtual QString toString(bool useMetricUnits) const;
 
-    // WE DO NOT REIMPLEMENT THE STANDARD isLowerBetter() METHOD
-    // virtual bool isLowerBetter() const { return type_ == Low ? true : false; }
+    // isLowerBetter() reimplemented to use the redefined type()
+    virtual bool isLowerBetter() const { return type() == Low ? true : false; }
 
     private:
     
