@@ -117,8 +117,10 @@ class FixRunningPowerConfig : public DataProcessorConfig
                               "wind speed shall be indicated in kph\n"
                               "wind direction (origin) unit is degrees "
                               "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
-                              "Note: if the file already contain wind data "
-                              "it will be overridden if wind is entered")));
+                              "Note: when the file already contains wind data, "
+                              "it will be overridden if wind speed is set\n\n"
+                              "The activity has to be a Run with Speed, "
+                              "Altitude and without Power data.")));
         }
 
         void readConfig() {
