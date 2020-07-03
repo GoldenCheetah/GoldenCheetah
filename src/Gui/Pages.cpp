@@ -2678,6 +2678,12 @@ ColorsPage::applyThemeClicked()
                 else color = QColor(255,255,255);
                 break;
 
+            case CCHROME:
+                //  set to black for dark themese and grey for light themes
+                if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(12,12,12);
+                else color = QColor(0xec,0xec,0xec);
+                break;
+
             case COVERVIEWBACKGROUND:
                 // set back to light black for dark themes
                 // and gray for light themes
