@@ -156,6 +156,7 @@ class VideoWindow : public GcChartWindow
     public slots:
 
         void layoutChanged();
+        void resetLayout();
         void startPlayback();
         void stopPlayback();
         void pausePlayback();
@@ -184,7 +185,7 @@ class VideoWindow : public GcChartWindow
 
     private:
         QList<QString> layoutNames;
-        void readVideoLayout(int x);
+        void readVideoLayout(int x, bool useDefault=false);
         void showMeters();
 
 #ifdef GC_VIDEO_VLC
@@ -205,6 +206,7 @@ class VideoWindow : public GcChartWindow
 
         QWidget *container;
         QComboBox *layoutSelector;
+        QPushButton *resetLayoutBtn;
 
         bool init; // we initialised ok ?
 };

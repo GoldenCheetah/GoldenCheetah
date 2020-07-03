@@ -84,13 +84,14 @@ VideoWindow::VideoWindow(Context *context)  :
         readVideoLayout(-1);
 
         // Create the layout selector form
-        c = new QWidget;
+        c = new QWidget(this);
+        c->setContentsMargins(0,0,0,0);
         QVBoxLayout *cl = new QVBoxLayout(c);
         QFormLayout *controlsLayout = new QFormLayout();
         controlsLayout->setSpacing(0);
         controlsLayout->setContentsMargins(5,5,5,5);
         cl->addLayout(controlsLayout);
-        QLabel *layoutLabel = new QLabel(tr("Video meters layout"), this);
+        QLabel *layoutLabel = new QLabel(tr("Meters layout"), this);
         layoutLabel->setAutoFillBackground(true);
         layoutSelector = new QComboBox(this);
 
@@ -98,6 +99,13 @@ VideoWindow::VideoWindow(Context *context)  :
             layoutSelector->addItem(layoutNames[i], i);
         }
         controlsLayout->addRow(layoutLabel, layoutSelector);
+        QPushButton *resetLayoutBtn = new QPushButton(tr("Reset Meters layout to default"), this);
+        resetLayoutBtn->setAutoDefault(false);
+        cl->addWidget(resetLayoutBtn);
+
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
+        connect(layoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(layoutChanged()));
+        connect(resetLayoutBtn, SIGNAL(clicked()), this, SLOT(resetLayout()));
 #endif
     } else {
 
@@ -128,8 +136,6 @@ VideoWindow::VideoWindow(Context *context)  :
         connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
         connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
         connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
-        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
-        connect(layoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(layoutChanged()));
 
         // The video file may have been already selected
         mediaSelected(context->videoFilename);
@@ -171,13 +177,23 @@ void VideoWindow::layoutChanged()
     readVideoLayout(videoLayout());
 }
 
-void VideoWindow::readVideoLayout(int pos)
+void VideoWindow::resetLayout()
+{
+    readVideoLayout(-1, true);
+    layoutSelector->clear();
+    for(int i = 0; i < layoutNames.length(); i++) {
+        layoutSelector->addItem(layoutNames[i], i);
+    }
+}
+
+void VideoWindow::readVideoLayout(int pos, bool useDefault)
 {
     // Video Overlays Initialization: if video config file is not present
     // copy a default one to be used as a model by the user.
     // An empty video-layout.xml file disables video overlays
     QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
     QFile file(filename);
+    if (useDefault) file.remove();
     if (!file.exists())
     {
         file.setFileName(":/xml/video-layout.xml");
@@ -200,7 +216,6 @@ void VideoWindow::readVideoLayout(int pos)
         handler.layoutPositionSelected = pos;
         reader.setContentHandler(&handler);
         reader.parse(source);
-        qDebug() << "Video Layout parsing: " << layoutNames;
         if(context->isRunning) showMeters();
     }
     else
