@@ -2675,7 +2675,7 @@ ColorsPage::applyThemeClicked()
                 // set back to light black for dark themes
                 // and gray for light themes
                 if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(42,42,42);
-                else color = QColor(255,255,255);
+                else color = QColor(245,245,245);
                 break;
 
             case CCHROME:
@@ -2688,7 +2688,7 @@ ColorsPage::applyThemeClicked()
                 // set back to light black for dark themes
                 // and gray for light themes
                 if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(19,19,19);
-                else color = QColor(170,180,180);
+                else color = QColor(255,255,255);
                 break;
 
             // fg color theme.colors[1] not used YET XXX
