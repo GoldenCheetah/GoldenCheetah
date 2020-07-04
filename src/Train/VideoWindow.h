@@ -150,7 +150,8 @@ class VideoWindow : public GcChartWindow
 
         VideoWindow(Context *);
         ~VideoWindow();
-        int videoLayout() const { return layoutSelector->currentIndex(); }
+        int videoLayout() const { return layoutSelector ? layoutSelector->currentIndex() : 0; }
+        void setVideoLayout(int x) { if (layoutSelector) layoutSelector->setCurrentIndex(x); }
 
 
     public slots:
@@ -168,7 +169,6 @@ class VideoWindow : public GcChartWindow
     protected:
 
         void resizeEvent(QResizeEvent *);
-        void setVideoLayout(int x) { layoutSelector->setCurrentIndex(x); }
 
         // current data
         int curPosition;

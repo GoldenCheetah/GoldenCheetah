@@ -27,7 +27,7 @@
 #include "VideoLayoutParser.h"
 
 VideoWindow::VideoWindow(Context *context)  :
-    GcChartWindow(context), context(context), m_MediaChanged(false)
+    GcChartWindow(context), context(context), m_MediaChanged(false), layoutSelector(NULL)
 {
     QWidget *c = NULL;
     setProperty("color", QColor(Qt::black));
@@ -106,6 +106,9 @@ VideoWindow::VideoWindow(Context *context)  :
         connect(context, SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
         connect(layoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(layoutChanged()));
         connect(resetLayoutBtn, SIGNAL(clicked()), this, SLOT(resetLayout()));
+
+        // Instantiate a layout as initial default
+        layoutChanged();
 #endif
     } else {
 
@@ -141,8 +144,6 @@ VideoWindow::VideoWindow(Context *context)  :
         mediaSelected(context->videoFilename);
         // We may add a video player while training is already running!
         if(context->isRunning) startPlayback();
-        // Instantiate a layout as initial default
-        layoutChanged();
     }
 }
 
