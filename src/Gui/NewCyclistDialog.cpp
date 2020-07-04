@@ -309,14 +309,13 @@ NewCyclistDialog::saveClicked()
                 appsettings->setCValue(name->text(), GC_DOB, dob->date());
                 appsettings->setCValue(name->text(), GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
                 appsettings->setCValue(name->text(), GC_HEIGHT, height->value() * (useMetricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
-                appsettings->setCValue(name->text(), GC_WBALTAU, wbaltau->value());
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
                 appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
                 avatar.save(athleteHome->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
                 // Setup Power Zones
                 Zones zones;
-                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), cp->value(), w->value(), pmax->value());
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), cp->value(), w->value(), wbaltau->value(), pmax->value());
                 zones.write(athleteHome->config().canonicalPath());
 
                 // HR Zones too!

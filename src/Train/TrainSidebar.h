@@ -247,6 +247,7 @@ class TrainSidebar : public GcWindow
 
         int FTP; // current FTP / CP
         int WPRIME; // current W'
+        int TAU; // current Tau
 
         QList<DeviceConfiguration> Devices;
         QList<int> activeDevices;

@@ -74,7 +74,7 @@ void Zones::initializeZoneParameters()
 }
 
 // read zone file, allowing for zones with or without end dates
-bool Zones::read(QFile &file)
+bool Zones::read(QFile &file, int defaulttau)
 {
     defaults_from_user = false;
     scheme.zone_default.clear();
@@ -125,6 +125,7 @@ bool Zones::read(QFile &file)
     };
     QRegExp ftpx("^FTP=(\\d+)$");
     QRegExp wprimerx("^W'=(\\d+)$");
+    QRegExp taurx("^Tau=(\\d+)$");
     QRegExp pmaxx("^Pmax=(\\d+)$");
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
                    "(\\d+)\\s*(%?)\\s*(?:,\\s*(\\d+|MAX)\\s*(%?)\\s*)?$",
@@ -141,6 +142,7 @@ bool Zones::read(QFile &file)
     int cp=0;
     int ftp=0;
     int wprime=0;
+    int tau=0;
     int pmax=0;
     QList<ZoneInfo> zoneInfos;
 
@@ -182,7 +184,7 @@ bool Zones::read(QFile &file)
                 if (in_range) {
 
                     // if zones are empty, then generate them
-                    ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
+                    ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, tau ? tau : defaulttau, pmax ? pmax : defaultpmax);
                     range.zones = zoneInfos;
 
                     if (range.zones.empty()) {
@@ -279,6 +281,22 @@ bool Zones::read(QFile &file)
                     defaultwprime = wprime;
                 } else {
                     wprime = defaultwprime;
+                }
+            }
+        }
+
+        // check for tau
+        if (taurx.indexIn(line, 0) != -1) {
+            if (!in_range)
+                qDebug()<<"ignoring errant Tau= in "<<fileName_;
+            else {
+                tau = taurx.cap(1).toInt();
+
+                // if it is zero as never set, then use default
+                if (tau) {
+                    defaulttau = tau;
+                } else {
+                    tau = defaulttau;
                 }
             }
         }
@@ -380,7 +398,7 @@ next_line: {}
 
     if (in_range) {
 
-        ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, pmax ? pmax : defaultpmax);
+        ZoneRange range(begin, end, cp, ftp ? ftp : cp, wprime ? wprime : defaultwprime, tau ? tau : defaulttau, pmax ? pmax : defaultpmax);
         range.zones = zoneInfos;
 
         if (range.zones.empty()) {
@@ -585,6 +603,12 @@ int Zones::getWprime(int rnum) const
     return ranges[rnum].wprime;
 }
 
+int Zones::getTau(int rnum) const
+{
+    assert(rnum < ranges.size());
+    return ranges[rnum].tau;
+}
+
 int Zones::getPmax(int rnum) const
 {
     assert(rnum < ranges.size());
@@ -606,6 +630,12 @@ void Zones::setFTP(int rnum, int ftp)
 void Zones::setWprime(int rnum, int wprime)
 {
     ranges[rnum].wprime = wprime;
+    modificationTime = QDateTime::currentDateTime();
+}
+
+void Zones::setTau(int rnum, int tau)
+{
+    ranges[rnum].tau = tau;
     modificationTime = QDateTime::currentDateTime();
 }
 
@@ -802,6 +832,7 @@ void Zones::write(QDir home)
         int cp = getCP(i);
         int ftp = getFTP(i);
         int wprime = getWprime(i);
+        int tau = getTau(i);
         int pmax = getPmax(i);
 
         // print header for range
@@ -818,6 +849,8 @@ void Zones::write(QDir home)
         strzones += QString("FTP=%1\n").arg(ftp);
         // wite out the W' value
         strzones += QString("W'=%1\n").arg(wprime);
+        // wite out the Tau value
+        strzones += QString("Tau=%1\n").arg(tau);
         // wite out the Pmax value
         strzones += QString("Pmax=%1\n").arg(pmax);
 
@@ -879,14 +912,14 @@ void Zones::write(QDir home)
     }
 }
 
-void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax)
+void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _tau, int _pmax)
 {
-    ranges.append(ZoneRange(_start, _end, _cp, _ftp, _wprime, _pmax));
+    ranges.append(ZoneRange(_start, _end, _cp, _ftp, _wprime, _tau, _pmax));
 }
 
 // insert a new zone range using the current scheme
 // return the range number
-int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
+int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _tau, int _pmax)
 {
     int rnum;
 
@@ -894,8 +927,8 @@ int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _pmax));
-    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _ftp, _wprime, _pmax));
+    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _ftp, _wprime, _tau, _pmax));
+    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _ftp, _wprime, _tau, _pmax));
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
@@ -904,6 +937,7 @@ int Zones::addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax)
     if (_cp > 0) {
         setCP(rnum, _cp);
         setWprime(rnum, _wprime);
+        setTau(rnum, _tau);
         setZonesFromCP(rnum);
     }
 
@@ -1012,6 +1046,9 @@ Zones::getFingerprint() const
         // W'
         x += ranges[i].wprime;
 
+        // Tau
+        x += ranges[i].tau;
+
         // W'
         x += ranges[i].pmax;
 
@@ -1044,6 +1081,9 @@ Zones::getFingerprint(QDate forDate) const
 
         // W'
         x += ranges[i].wprime;
+
+        // Tau
+        x += ranges[i].tau;
 
         // Pmax
         x += ranges[i].pmax;

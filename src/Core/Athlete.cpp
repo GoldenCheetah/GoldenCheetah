@@ -100,11 +100,13 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // Power Zones for Bike & Run
+    // read tau from athlete settings to migrate it from there to the power zones
+    int defaulttau = appsettings->cvalue(cyclist, GC_WBALTAU, 300).toInt();
     for (int i=0; i < 2; i++) {
         zones_[i] = new Zones(i>0);
         QFile zonesFile(home->config().canonicalPath() + "/" + zones_[i]->fileName());
         if (zonesFile.exists()) {
-            if (!zones_[i]->read(zonesFile)) {
+            if (!zones_[i]->read(zonesFile, defaulttau)) {
                 QMessageBox::critical(context->mainWindow, tr("Zones File %1 Error").arg(zones_[i]->fileName()), zones_[i]->errorString());
             } else if (! zones_[i]->warningString().isEmpty()) {
                 QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
@@ -114,7 +116,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             // Start with Cycling Power zones for backward compatibilty
             QFile zonesFile(home->config().canonicalPath() + "/" + zones_[0]->fileName());
             // Load without error/warning report to avoid repetition
-            if (zonesFile.exists()) zones_[i]->read(zonesFile);
+            if (zonesFile.exists()) zones_[i]->read(zonesFile, defaulttau);
         }
     }
 

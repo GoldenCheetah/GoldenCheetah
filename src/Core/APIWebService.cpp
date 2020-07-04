@@ -513,7 +513,10 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
         QFile zonesFile(home.absolutePath() + "/" + athlete + "/config/power.zones");
         if (zonesFile.exists()) {
             Zones *zones = new Zones;
-            if (zones->read(zonesFile)) {
+
+            // read tau from athlete settings to migrate it from there to the power zones
+            int defaulttau = appsettings->cvalue(athlete, GC_WBALTAU, 300).toInt();
+            if (zones->read(zonesFile, defaulttau)) {
 
                 // success - write out
                 response.write("date, cp, w', pmax\n");

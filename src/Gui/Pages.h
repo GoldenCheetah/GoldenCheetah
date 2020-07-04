@@ -309,8 +309,6 @@ class AboutModelPage : public QWidget
     private:
         Context *context;
 
-        QLabel *wbaltaulabel;
-        QSpinBox *wbaltau;
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
         QLineEdit *perfManSTSavg;
@@ -962,6 +960,7 @@ class CPPage : public QWidget
         QDoubleSpinBox *cpEdit;
         QDoubleSpinBox *ftpEdit;
         QDoubleSpinBox *wEdit;
+        QDoubleSpinBox *tauEdit;
         QDoubleSpinBox *pmaxEdit;
 
         Context *context;
