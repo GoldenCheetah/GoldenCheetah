@@ -106,7 +106,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     menuButton->setAutoFillBackground(false);
     menuButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    menuButton->setIcon(iconFromPNG(":images/sidebar/extra.png"));
+    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png"));
     menuButton->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
@@ -119,13 +119,12 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
 
     barMenu = new QMenu("Add");
-    chartMenu = barMenu->addMenu(tr("Add Chart"));
+    chartMenu = barMenu->addMenu(tr("New "));
 
-    barMenu->addAction(tr("Import Chart..."), context->mainWindow, SLOT(importChart()));
+    barMenu->addAction(tr("Import ..."), context->mainWindow, SLOT(importChart()));
 
 #ifdef GC_HAS_CLOUD_DB
-    barMenu->addAction(tr("Upload Chart..."), context->mainWindow, SLOT(exportChartToCloudDB()));
-    barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));
+    barMenu->addAction(tr("Download ..."), context->mainWindow, SLOT(addChartFromCloudDB()));
 #endif
     // menu
     connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));

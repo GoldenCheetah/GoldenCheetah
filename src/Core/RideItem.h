@@ -39,8 +39,6 @@ class Context;
 class UserData;
 class ComparePane;
 
-Q_DECLARE_METATYPE(RideItem*)
-
 class RideItem : public QObject
 {
 
@@ -221,5 +219,8 @@ class RideItem : public QObject
     private:
         void updateIntervals();
 };
+
+Q_DECLARE_OPAQUE_POINTER(RideItem*);
+Q_DECLARE_METATYPE(RideItem*)
 
 #endif // _GC_RideItem_h

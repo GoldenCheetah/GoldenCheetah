@@ -92,6 +92,7 @@ private slots:
         void onAutoHideChanged(bool enabled);
 };
 
+class LTMSidebar;
 class HomeView : public TabView
 {
     Q_OBJECT
@@ -101,6 +102,10 @@ class HomeView : public TabView
         HomeView(Context *context, QStackedWidget *controls);
         ~HomeView();
 
+        LTMSidebar *sidebar;
+
+    signals:
+        void dateChanged(DateRange);
 
     public slots:
 

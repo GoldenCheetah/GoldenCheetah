@@ -25,6 +25,7 @@
 #include "IntervalTreeView.h"
 #include "MainWindow.h"
 #include "Colors.h"
+#include "NavigationModel.h"
 
 #include <QPaintEvent>
 
@@ -88,6 +89,12 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     chartSettings->setMaximumHeight(600);
     chartSettings->hide();
 
+    // navigation model after main items as it uses the observer
+    // pattern on views etc, so they need to be created first
+    // but we need to get setup before ride selection happens
+    // below, so we can observe the iniital ride select
+    nav = new NavigationModel(this);
+
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
@@ -100,9 +107,11 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
             break;
         }
     }
+
     // otherwise just the latest
-    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) 
+    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
         context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+    }
 }
 
 Tab::~Tab()
@@ -112,6 +121,7 @@ Tab::~Tab()
     delete trainView;
     delete diaryView;
     delete views;
+    delete nav;
 }
 
 RideNavigator *
@@ -174,6 +184,8 @@ Tab::view(int index)
 void
 Tab::selectView(int index)
 {
+    emit viewChanged(index);
+
     // first we deselect the current
     view(views->currentIndex())->setSelected(false);
 
@@ -187,6 +199,8 @@ Tab::selectView(int index)
 void
 Tab::rideSelected(RideItem*)
 {
+    emit rideItemSelected(context->ride);
+
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride (now the tree is up to date)

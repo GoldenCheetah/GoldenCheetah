@@ -324,6 +324,33 @@ LTMSidebar::configChanged(qint32)
  *----------------------------------------------------------------------*/
 
 void
+LTMSidebar::selectDateRange(DateRange dr)
+{
+    for(int i=0; i<seasons->seasons.count(); i++) {
+        Season s = seasons->seasons.at(i);
+        if (s.start == dr.from && s.end == dr.to && s.name == dr.name) {
+            // bingo
+            dateRangeTree->selectionModel()->clearSelection(); // clear selection
+            allDateRanges->child(i)->setSelected(true); // select ours
+            return;
+        } else {
+            QStringList names=dr.name.split("/");
+            if (names.count() == 2 && s.name == names.at(0)) {
+                for (int j=0; j<s.phases.count(); j++) {
+                    Phase p = s.phases.at(j);
+                    if (p.start == dr.from && p.end == dr.to && p.name == names.at(1)) {
+                        // bingo
+                        dateRangeTree->selectionModel()->clearSelection(); // clear selection
+                        allDateRanges->child(i)->child(j)->setSelected(true); // select ours
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void
 LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 {
     if (active == true) return;

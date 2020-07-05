@@ -17,6 +17,7 @@
  */
 
 #include "RideItem.h"
+#include "RideCache.h"
 #include "RideMetric.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
@@ -238,6 +239,9 @@ RideFile *RideItem::ride(bool open)
 
 RideItem::~RideItem()
 {
+    // add to the deleted list
+    if (context->athlete->rideCache) context->athlete->rideCache->deletelist << this;
+
     //qDebug()<<"deleting:"<<fileName;
     if (isOpen()) close();
     if (fileCache_) delete fileCache_;

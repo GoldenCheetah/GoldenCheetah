@@ -271,7 +271,25 @@ MainWindow::MainWindow(const QDir &home)
     lowbarIcon = iconFromPNG(":images/mac/lowbar.png");
     tabbedIcon = iconFromPNG(":images/mac/tabbed.png");
     tiledIcon = iconFromPNG(":images/mac/tiled.png");
+    backIcon = iconFromPNG(":images/mac/back.png");
+    forwardIcon = iconFromPNG(":images/mac/forward.png");
     QSize isize(19 *dpiXFactor,19 *dpiYFactor);
+
+    back = new QPushButton(this);
+    back->setIcon(backIcon);
+    back->setFixedHeight(24 *dpiYFactor);
+    back->setFixedWidth(32 *dpiYFactor);
+    back->setIconSize(isize);
+    back->setStyle(toolStyle);
+    connect(back, SIGNAL(clicked(bool)), this, SIGNAL(backClicked()));
+
+    forward = new QPushButton(this);
+    forward->setIcon(forwardIcon);
+    forward->setFixedHeight(24 *dpiYFactor);
+    forward->setFixedWidth(32 *dpiYFactor);
+    forward->setIconSize(isize);
+    forward->setStyle(toolStyle);
+    connect(forward, SIGNAL(clicked(bool)), this, SIGNAL(forwardClicked()));
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
@@ -324,11 +342,19 @@ MainWindow::MainWindow(const QDir &home)
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(400 * dpiXFactor);
     searchBox->setFixedHeight(28 * dpiYFactor);
+
+    QWidget *space = new QWidget(this);
+    space->setAutoFillBackground(false);
+    space->setFixedWidth(5 * dpiYFactor);
+
+    head->addWidget(space);
+    head->addWidget(back);
+    head->addWidget(forward);
     head->addStretch();
     head->addWidget(sidelist);
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
-    head->setFixedHeight(searchBox->height() + (10 *dpiXFactor));
+    head->setFixedHeight(searchBox->height() + (16 *dpiXFactor));
 
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
@@ -2199,6 +2225,9 @@ MainWindow::configChanged(qint32)
     searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()));
 
 #endif
+    QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CCHROME);
+    back->setStyleSheet(buttonstyle);
+    forward->setStyleSheet(buttonstyle);
 
     // All platforms
     QPalette tabbarPalette;

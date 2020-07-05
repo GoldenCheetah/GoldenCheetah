@@ -26,6 +26,7 @@ class RideNavigator;
 class MainWindow;
 class ProgressLine;
 class QPaintEvent;
+class NavigationModel;
 
 class Tab: public QWidget
 {
@@ -41,14 +42,20 @@ class Tab: public QWidget
         int currentView() { return views->currentIndex(); }
         TabView *view(int index);
 
+        NavigationModel *nav; // back/forward for this tab
         RideNavigator *rideNavigator(); // to get logical headings
 
     protected:
 
         friend class ::MainWindow;
+        friend class ::NavigationModel;
         Context *context;
 
     signals:
+
+        void viewChanged(int);
+        void rideItemSelected(RideItem*);
+        void dateRangeSelected(DateRange);
 
     public slots:
 

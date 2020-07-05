@@ -93,6 +93,7 @@ class MainWindow : public QMainWindow
 
         // currently selected tab
         Tab *athleteTab() { return currentTab; }
+        NewSideBar *newSidebar() { return sidebar; }
 
     protected:
 
@@ -111,6 +112,10 @@ class MainWindow : public QMainWindow
         QWidget *splash;
         void setSplash(bool first=false);
         void clearSplash();
+
+    signals:
+        void backClicked();
+        void forwardClicked();
 
     public slots:
 
@@ -273,11 +278,12 @@ class MainWindow : public QMainWindow
 
         // Not on Mac so use other types
         QPushButton *sidelist, *lowbar;
+        QPushButton *back, *forward;
         QtSegmentControl *styleSelector;
         GcToolBar *head;
 
         // the icons
-        QIcon sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
+        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;

@@ -20,6 +20,7 @@
 #include "Athlete.h"
 
 #include "RideMetric.h"
+#include "NavigationModel.h"
 #include "UserMetricSettings.h"
 #include "UserMetricParser.h"
 #include "DataFilter.h"

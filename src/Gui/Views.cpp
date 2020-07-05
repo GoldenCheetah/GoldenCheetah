@@ -117,7 +117,7 @@ DiaryView::setRide(RideItem*ride)
 void
 DiaryView::dateRangeChanged(DateRange dr)
 {
-    context->dr_ = dr;
+    //context->notifyDateRangeChanged(dr); // diary view deprecated and not part of navigation model
     page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 
@@ -130,18 +130,18 @@ DiaryView::isBlank()
 
 HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_HOME)
 {
-    LTMSidebar *s = new LTMSidebar(context);
+    sidebar = new LTMSidebar(context);
     HomeWindow *h = new HomeWindow(context, "home", "Trends");
     controls->addWidget(h->controls());
     controls->setCurrentIndex(0);
     BlankStateHomePage *b = new BlankStateHomePage(context);
 
-    setSidebar(s);
+    setSidebar(sidebar);
     setPage(h);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    connect(sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -161,7 +161,8 @@ HomeView::compareChanged(bool state)
 void
 HomeView::dateRangeChanged(DateRange dr)
 {
-    context->dr_ = dr;
+    emit dateChanged(dr);
+    context->notifyDateRangeChanged(dr);
     page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 bool
@@ -176,7 +177,7 @@ HomeView::justSelected()
 {
     if (isSelected()) {
         // force date range refresh
-        static_cast<LTMSidebar*>(sidebar())->dateRangeTreeWidgetSelectionChanged();
+        static_cast<LTMSidebar*>(sidebar)->dateRangeTreeWidgetSelectionChanged();
     }
 }
 

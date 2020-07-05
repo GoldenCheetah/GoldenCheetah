@@ -68,6 +68,7 @@ class Context;
 class Athlete;
 class MainWindow;
 class Tab;
+class NavigationModel;
 
 class Context : public QObject
 {
@@ -78,6 +79,7 @@ class Context : public QObject
         ~Context();
 
         // mainwindow state
+        NavigationModel *nav;
         int viewIndex;
         bool showSidebar, showLowbar, showToolbar, showTabbar;
         int style;
@@ -169,6 +171,8 @@ class Context : public QObject
         void notifyStop() { emit stop(); }
         void notifySeek(long x) { emit seek(x); }
 
+        // date range selection
+        void notifyDateRangeChanged(DateRange x) { dr_=x; emit dateRangeSelected(x); }
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
         void notifyVideoSyncChanged() { emit VideoSyncChanged(); }
 
@@ -243,6 +247,7 @@ class Context : public QObject
         void autoDownloadEnd();
         void autoDownloadProgress(QString, double, int, int);
 
+        void dateRangeSelected(DateRange);
         void rideSelected(RideItem*);
 
         // we added/deleted/changed an item

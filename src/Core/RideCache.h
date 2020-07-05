@@ -135,11 +135,16 @@ class RideCache : public QObject
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
         friend class ::Leaf; // get weekly performances
+        friend class ::RideItem; // adds to deletelist in destructor
+        friend class ::NavigationModel; // checks deletelist during redo/undo
 
         Context *context;
         QDir directory, plannedDirectory;
 
-        QVector<RideItem*> rides_, reverse_, delete_;
+        // rides and reverse are the main lists
+        // delete_ is a list of items to garbage collect (delete later)
+        // deletelist is a list of items that no longer exist (deleted)
+        QVector<RideItem*> rides_, reverse_, delete_, deletelist;
         RideCacheModel *model_;
         bool exiting;
 	    double progress_; // percent
