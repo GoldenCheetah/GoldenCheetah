@@ -734,7 +734,7 @@ GCColor::applyTheme(int index)
 
         case CCHROME:
             //  set to black for dark themese and grey for light themes
-            if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(12,12,12);
+            if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(32,32,32);
             else color = QColor(0xec,0xec,0xec);
             break;
 

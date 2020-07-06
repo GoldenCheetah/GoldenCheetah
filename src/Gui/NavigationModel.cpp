@@ -143,10 +143,15 @@ NavigationModel::action(bool redo, NavigationEvent event)
 {
     block = true; // don't observe events during redo/undo
 
+    // NOTE: as well as undo/redo the state variables are
+    //       also updated- so we DELIBERATELY use 'view'
+    //       'dr' amd 'item' when extracting from the
+    //       before and after QVariants to update state
+    //       at the same time as executing the undo/redo.
     switch(event.type) {
     case NavigationEvent::VIEW:
     {
-        int view = redo ? event.after.toInt() : event.before.toInt();
+        view = redo ? event.after.toInt() : event.before.toInt();
         tab->selectView(view);
 
         // new side bar uses a different id, which will
@@ -165,17 +170,21 @@ NavigationModel::action(bool redo, NavigationEvent event)
 
     case NavigationEvent::RIDE:
     {
-        RideItem *item = redo ? event.after.value<RideItem*>() : event.before.value<RideItem*>();
+        RideItem *pitem = redo ? event.after.value<RideItem*>() : event.before.value<RideItem*>();
 
         // don't select deleted rides (!!)
-        if (!tab->context->athlete->rideCache->deletelist.contains(item))
+        if (!tab->context->athlete->rideCache->deletelist.contains(pitem)) {
+            item = pitem;
+            tab->setNoSwitch(true); // can't be doing that when we are undo/redo ride selection
             tab->context->athlete->selectRideFile(item->fileName);
+            tab->setNoSwitch(false);
+        }
     }
     break;
 
     case NavigationEvent::DATERANGE:
     {
-        DateRange dr = redo ? event.after.value<DateRange>() : event.before.value<DateRange>();
+        dr = redo ? event.after.value<DateRange>() : event.before.value<DateRange>();
         static_cast<HomeView*>(tab->view(0))->sidebar->selectDateRange(dr);
     }
     break;
@@ -190,6 +199,20 @@ NavigationModel::back()
     // are we the current tab?
     if (tab->context->mainWindow->athleteTab() == tab) {
         if (stackpointer >= 0) {
+
+            // we need to check for rideselects+view change
+            // so we reverse them both at the same time
+            // this is because when a ride is selected on
+            // any view other than analysis it triggers a
+            // view change, so we need to do them together
+            if (stackpointer > 0 && stack[stackpointer].type == NavigationEvent::VIEW &&    // switch view
+                                    stack[stackpointer].after.toInt() == 1 &&               // switch to analysis
+                                    stack[stackpointer-1].type == NavigationEvent::RIDE) {  // ride selected before
+                action(false, stack[stackpointer]);
+                stackpointer--;
+            }
+
+            // undo
             action(false, stack[stackpointer]);
             stackpointer--;
         }
@@ -202,6 +225,18 @@ NavigationModel::forward()
     // are we the current tab?
     if (tab->context->mainWindow->athleteTab() == tab) {
         if ((stackpointer+1) < stack.count() && stack.count()) {
+
+            // check for ride select followed by view change to analysis
+            if (stackpointer+2 < stack.count() &&
+                stack[stackpointer].type == NavigationEvent::RIDE &&     // ride selected before
+                stack[stackpointer+1].type == NavigationEvent::VIEW &&   // switch view
+                stack[stackpointer+1].after.toInt() == 1) {              // switch to analysis
+
+                action(false, stack[stackpointer]);
+                stackpointer++;
+            }
+
+            // redo
             stackpointer++;
             action(true, stack[stackpointer]);
         }

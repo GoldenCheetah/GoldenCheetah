@@ -63,6 +63,7 @@ class Tab: public QWidget
 
         // set Ride
         void setRide(RideItem*);
+        void setNoSwitch(bool x) { noswitch = x; }
 
         // tile mode
         void setTiled(bool);
@@ -91,6 +92,9 @@ class Tab: public QWidget
 
     private:
 
+        // constructor finished and navigation
+        // model isn't undo/redo ride selection
+        bool noswitch;
 
         // Each of the views
         QStackedWidget *views;

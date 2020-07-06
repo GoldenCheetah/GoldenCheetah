@@ -25,11 +25,12 @@
 #include "IntervalTreeView.h"
 #include "MainWindow.h"
 #include "Colors.h"
+#include "NewSideBar.h"
 #include "NavigationModel.h"
 
 #include <QPaintEvent>
 
-Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
+Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
 {
     context->tab = this;
 
@@ -112,6 +113,8 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
         context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
     }
+
+    noswitch = false; // we only let it happen when we're initialised
 }
 
 Tab::~Tab()
@@ -208,6 +211,16 @@ Tab::rideSelected(RideItem*)
 
     // notify that the intervals have been cleared too
     context->notifyIntervalsChanged();
+
+    // if we selected a ride we should be on the analysis
+    // view-- this is new with the overview and click thru
+    // coming in other charts but when navigation model is
+    // going back we need to stay on the target view
+    // so noswitch is set by the nav model whilst it is working
+    if (!noswitch && views->currentIndex() != 1) {
+        context->mainWindow->newSidebar()->setItemSelected(3, true);
+        selectView(1);
+    }
 }
 
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)

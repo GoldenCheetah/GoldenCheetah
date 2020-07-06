@@ -413,14 +413,15 @@ class IntervalOverviewItem : public ChartSpaceItem
 class BPointF {
 public:
 
-    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(Qt::gray)) {}
+    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(Qt::gray)), item(NULL) {}
 
     double score(BPointF &other);
 
-    double xoff, yoff; // add to x,y,z when converting to string (used for dates)
     double x,y,z;
+    double xoff, yoff; // add to x,y,z when converting to string (used for dates)
     QColor fill;
     QString label;
+    RideItem *item;
 };
 
 
@@ -477,6 +478,7 @@ class BubbleViz : public QObject, public QGraphicsItem
 
         // where is the cursor?
         bool hover;
+        bool click;
         QPointF plotpos;
 
         // for animated transition

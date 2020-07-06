@@ -1467,6 +1467,7 @@ IntervalOverviewItem::setDateRange(DateRange dr)
         add.yoff = yoff;
         add.z = z;
         add.fill = item->color;
+        add.item = item; // for click thru
         if (add.fill.red() == 1 && add.fill.green() == 1 && add.fill.blue() == 1) add.fill = GColor(CPLOTMARKER);
         add.label = item->getText("Workout Code","blank");
         points << add;
@@ -2854,7 +2855,7 @@ double BPointF::score(BPointF &other)
     return score;
 }
 
-BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name), hover(false)
+BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem(NULL), parent(parent), name(name), hover(false), click(false)
 {
     setGeometry(20,20,100,100);
     setZValue(11);
@@ -2921,6 +2922,10 @@ BubbleViz::sceneEvent(QEvent *event)
             hover=false;
             update();
        }
+    }
+
+    if (event->type() == QEvent::GraphicsSceneMousePress) {
+        click = true;
     }
     return false;
 }
@@ -3307,6 +3312,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->drawText(canvas.center().x()-(bminx.width()/2.0f),
                           canvas.top()+bminx.height()-10, nearest.label);
     }
+
+    if (click && nearvalue >= 0 && nearest.item != NULL) {
+        parent->parent->context->notifyRideSelected(nearest.item);
+    }
+    click = false;
 
     painter->restore();
 }
