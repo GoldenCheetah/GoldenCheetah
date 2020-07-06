@@ -33,7 +33,7 @@ public:
 
     // events we observe and replay is a limited subset mostly
     // about changing views, dates and ride selections
-    enum NavigationEventType { VIEW=0, TAB, RIDE, DATERANGE, FILTER } type;
+    enum NavigationEventType { VIEW=0, RIDE, DATERANGE } type;
 
     NavigationEvent(NavigationEventType t, int v) : type(t) { after.setValue(v); }
     NavigationEvent(NavigationEventType t, DateRange v) : type(t) { after.setValue(v); }

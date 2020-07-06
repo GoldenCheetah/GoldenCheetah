@@ -26,7 +26,7 @@
 #include "MainWindow.h"
 
 
-NavigationModel::NavigationModel(Tab *tab) : tab(tab), block(false), viewinit(false), iteminit(false), drinit(false)
+NavigationModel::NavigationModel(Tab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
 {
     connect(tab, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(tab, SIGNAL(rideItemSelected(RideItem*)), this, SLOT(rideChanged(RideItem*)));
@@ -228,12 +228,12 @@ NavigationModel::forward()
 
             // check for ride select followed by view change to analysis
             if (stackpointer+2 < stack.count() &&
-                stack[stackpointer].type == NavigationEvent::RIDE &&     // ride selected before
-                stack[stackpointer+1].type == NavigationEvent::VIEW &&   // switch view
-                stack[stackpointer+1].after.toInt() == 1) {              // switch to analysis
+                stack[stackpointer+1].type == NavigationEvent::RIDE &&   // ride selected before
+                stack[stackpointer+2].type == NavigationEvent::VIEW &&   // switch view
+                stack[stackpointer+2].after.toInt() == 1) {              // switch to analysis
 
-                action(false, stack[stackpointer]);
                 stackpointer++;
+                action(false, stack[stackpointer]);
             }
 
             // redo
