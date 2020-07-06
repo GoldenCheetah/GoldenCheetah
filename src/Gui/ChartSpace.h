@@ -62,6 +62,8 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
         virtual void setDateRange(DateRange )=0;
+        virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
+
         virtual QWidget *config()=0; // must supply a widget to configure
 
         // what type am I- managed by user
@@ -89,6 +91,7 @@ class ChartSpaceItem : public QGraphicsWidget
         // watch mouse enter/leave
         bool sceneEvent(QEvent *event);
         bool inCorner();
+        bool inHotspot();
         bool underMouse();
 
         // keep track of reuse of xyseries and delete to

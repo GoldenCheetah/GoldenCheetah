@@ -185,7 +185,7 @@ struct topnentry {
 
 public:
 
-    topnentry(QDate date, double v, QString value, QColor color, int tsb) : date(date), v(v), value(value), color(color), tsb(tsb) {}
+    topnentry(QDate date, double v, QString value, QColor color, int tsb, RideItem *item) : date(date), v(v), value(value), color(color), tsb(tsb), item(item) {}
     inline bool operator<(const topnentry &other) const { return (v > other.v); }
     inline bool operator>(const topnentry &other) const { return (v < other.v); }
     QDate date;
@@ -193,6 +193,7 @@ public:
     QString value; // as should be shown
     QColor color; // ride color
     int tsb; // on the day
+    RideItem *item;
 };
 
 class TopNOverviewItem : public ChartSpaceItem
@@ -211,10 +212,12 @@ class TopNOverviewItem : public ChartSpaceItem
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
+        bool sceneEvent(QEvent *event);
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *) {} // doesn't support analysis view
         void setDateRange(DateRange);
+        QRectF hotspot();
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -233,6 +236,9 @@ class TopNOverviewItem : public ChartSpaceItem
         // animation
         int transition;
         QPropertyAnimation *animator;
+
+        // interaction
+        bool click;
 };
 
 class MetaOverviewItem : public ChartSpaceItem

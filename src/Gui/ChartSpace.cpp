@@ -226,6 +226,18 @@ ChartSpaceItem::sceneEvent(QEvent *event)
 }
 
 bool
+ChartSpaceItem::inHotspot()
+{
+
+    QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+    QPointF spos = parent->view->mapToScene(vpos);
+
+    QRectF spot(hotspot().topLeft()+geometry().topLeft(), hotspot().bottomRight()+geometry().topLeft());
+    if (spot.width() >0 && spot.contains(spos.x(), spos.y()))  return true;
+    return false;
+}
+
+bool
 ChartSpaceItem::inCorner()
 {
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
@@ -683,6 +695,9 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
             // ignore other scene elements (e.g. charts)
             if (!items.contains(item)) item=NULL;
+
+            // the item may have a hotspot it wants us to honour
+            if (item && item->inHotspot()) item=NULL;
 
             // trigger config. so drop out completely as
             // we may end up deleting the item etc

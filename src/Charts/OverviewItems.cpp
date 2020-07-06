@@ -340,7 +340,7 @@ MetricOverviewItem::~MetricOverviewItem()
     delete sparkline;
 }
 
-TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
+TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false)
 {
     // metric
     this->type = OverviewItemType::TOPN;
@@ -841,7 +841,7 @@ TopNOverviewItem::setDateRange(DateRange dr)
 
         // add to the list
         QColor color = (item->color.red() == 1 && item->color.green() == 1 && item->color.blue() == 1) ? GColor(CPLOTMARKER) : item->color;
-        ranked << topnentry(item->dateTime.date(), v, value, color, tsb);
+        ranked << topnentry(item->dateTime.date(), v, value, color, tsb, item);
 
         // biggest value?
         if (v > maxv) {
@@ -1939,6 +1939,48 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 }
 
+QRectF
+TopNOverviewItem::hotspot()
+{
+    return QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+}
+
+bool
+TopNOverviewItem::sceneEvent(QEvent *event)
+{
+
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+        // mouse moved so hover paint anyway
+        update();
+
+    }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+        QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+        QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+        QPointF pos = parent->view->mapToScene(vpos);
+        QPointF cpos = pos - geometry().topLeft();
+
+        // grab this before its interpreted as initiate drag
+        if (paintarea.contains(cpos)) {
+            event->accept();
+            click = true;
+            update();
+            return true;
+        }
+
+    } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        update();
+    }
+    return false;
+}
+
 void
 TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
@@ -1988,6 +2030,23 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // PAINT
     for (int i=0; i<maxrows && i<ranked.count(); i++) {
 
+        // containing area
+        QRectF itemarea(paintarea.left(), paintarea.top()+margins+(i*rowheight), paintarea.width(), rowheight);
+
+        // set value based upon the location of the mouse
+        QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+        QPointF pos = parent->view->mapToScene(vpos);
+        QPointF cpos = pos - geometry().topLeft();
+
+        if (itemarea.contains(cpos)) {
+            painter->setPen(Qt::NoPen);
+            QColor darkgray(120,120,120,120);
+            painter->setBrush(darkgray);
+            painter->drawRect(itemarea);
+
+            if (click && ranked[i].item) parent->context->notifyRideSelected(ranked[i].item);
+        }
+
         // rank
         painter->setPen(QColor(100,100,100));
         painter->drawText(paintarea.topLeft()+QPointF(margins, margins+(i*rowheight)+fm.ascent()), QString("%1.").arg(i+1));
@@ -2019,7 +2078,10 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         // value
         painter->setPen(QColor(100,100,100));
         painter->drawText(paintarea.topLeft()+QPointF(numrect.width()+daterect.width()+fullbar.width()+(margins*4),0)+QPointF(margins, margins+(i*rowheight)+fm.ascent()), ranked[i].value);
+
     }
+
+    click=false;
 }
 
 void
