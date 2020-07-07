@@ -24,7 +24,6 @@
 #include <QtWebChannel>
 #include <QWebEnginePage>
 #include <QWebEngineView>
-#include <QMessageBox>
 
 class MeterWidget : public QWidget
 {
