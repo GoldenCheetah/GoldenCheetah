@@ -754,15 +754,16 @@ MetricOverviewItem::setDateRange(DateRange dr)
 
     // get the metric value
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    const RideMetric *m = factory.rideMetric(symbol);
+    RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(symbol));
+    if (std::isinf(v) || std::isnan(v)) v=0;
+    m->setValue(v);
+    m->setCount(c);
     if (m) {
         value = m->toString(parent->context->athlete->useMetricUnits, v);
     } else {
         value = Utils::removeDP(QString("%1").arg(v));
         if (value == "nan") value ="";
-        if (std::isinf(v) || std::isnan(v)) v=0;
     }
-
 
     // metric history
     QList<QPointF> points;
@@ -778,21 +779,21 @@ MetricOverviewItem::setDateRange(DateRange dr)
 
         if (!spec.pass(item)) continue;
 
-        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
 
         // no zero values
-        if (value == 0) continue;
+        if (v == 0) continue;
 
         // cum sum for Total and RunningTotals
         if (metric->type() == RideMetric::Total || metric->type() == RideMetric::RunningTotal) {
-            sum += value;
-            value = sum;
+            sum += v;
+            v = sum;
         }
 
-        points << QPointF(earliest.daysTo(item->dateTime.date()) - earliest.daysTo(dr.from), value);
+        points << QPointF(earliest.daysTo(item->dateTime.date()) - earliest.daysTo(dr.from), v);
 
-        if (value < min) min=value;
-        if (first || value > max) max=value;
+        if (v < min) min=v;
+        if (first || v > max) max=v;
         first = false;
     }
 
