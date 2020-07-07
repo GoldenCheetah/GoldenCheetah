@@ -325,7 +325,7 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
 
     // prepare the gold, silver and bronze medal
-    gold = colouredPixmapFromPNG(":/images/medal.png", QColor(Qt::yellow)).scaledToWidth(ROWHEIGHT*2);
+    gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
     silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth(ROWHEIGHT*2);
     bronze = colouredPixmapFromPNG(":/images/medal.png", QColor(184,115,51)).scaledToWidth(ROWHEIGHT*2);
 

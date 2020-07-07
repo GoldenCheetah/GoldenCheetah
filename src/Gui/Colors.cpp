@@ -609,22 +609,22 @@ Themes::Themes()
     //
     // Add all the standard themes
     //
-    add.name = tr("Default"); // New v3.1 default colors // ** DARK **
-    colors << QColor(52,52,52) << QColor(Qt::white) << QColor(Qt::cyan) << QColor(Qt::blue) << QColor(Qt::red);
-    //            HR              Speed                Power                 Cadence             Torque
-    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
-    add.colors = colors;
-    themes << add;
-    colors.clear();
-
-    add.name = tr("Corporate Junky"); // New v3.2 colors // ** DARK **
+    add.name = tr("Modern Dark"); // was corporate junky
     colors << QColor(19,19,19) << QColor(Qt::white) << QColor(85,170,255) << QColor(194,194,194) << QColor(Qt::yellow);
     //            HR              Speed                Power                 Cadence             Torque
-    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(255,170,0) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
+
+    add.name = tr("Modern Light"); // Blue version of old classic colors
+    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(38,132,246) << QColor(Qt::blue) << QColor(Qt::red);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(85,170,0) << QColor(255,170,0) << QColor(0,204,204) << QColor(Qt::magenta) ;
+    add.colors = colors;
+    themes << add;
+    colors.clear();
 
     // now some popular combos from Kueler
     add.name = tr("Neutral Blue"); // ** DARK **
@@ -688,15 +688,6 @@ Themes::Themes()
     colors << QColor(Qt::white) << QColor(Qt::darkGray) << QColor(Qt::black) << QColor(Qt::green) << QColor(Qt::red);
     //            HR              Speed                Power                 Cadence             Torque
     colors << QColor(Qt::red) << QColor(Qt::magenta) << QColor(Qt::green) << QColor(Qt::blue) << QColor(Qt::darkGreen) ;
-    add.colors = colors;
-    themes << add;
-    colors.clear();
-
-    // we can add more later ....
-    add.name = tr("Classic"); // Old GoldenCheetah colors // ** LIGHT **
-    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(204,67,104) << QColor(Qt::blue) << QColor(Qt::red);
-    //            HR              Speed                Power                 Cadence             Torque
-    colors << QColor(Qt::red) << QColor(85,170,0) << QColor(255,170,0) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();

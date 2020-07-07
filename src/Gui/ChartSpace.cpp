@@ -316,6 +316,19 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
 
     } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
 
+    // thin border
+    if (!drag) {
+        QPainterPath path;
+        path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)), ROWHEIGHT/5, ROWHEIGHT/5);
+        QColor edge(GColor(CCARDBACKGROUND));
+        edge = edge.darker(105);
+        QPen pen(edge);
+        pen.setWidth(2*dpiXFactor);
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(path);
+    }
+
     itemPaint(painter, opt, widget);
 }
 
