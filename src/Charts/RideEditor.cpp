@@ -285,6 +285,7 @@ RideEditor::configChanged(qint32)
     table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 #ifndef Q_OS_MAC
     table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
     table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
