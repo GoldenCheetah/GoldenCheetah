@@ -1,18 +1,21 @@
 #!/bin/bash
 set -ev
 
+python3.7 --version
+python3.7-config --prefix
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7 /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7/bin/python3.7 /usr/local/opt/python/bin/python3.7
+
 # Python mandatory packages - refresh cache if folder is empty
 if [ -z "$(ls -A site-packages)" ]; then
     python3.7 -m pip install -r src/Python/requirements.txt -t site-packages
 fi
 
 # Python SIP
-python3 --version
-python3-config --prefix
 curl -O https://www.riverbankcomputing.com/static/Downloads/sip/4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
-python3 configure.py
+python3.7 configure.py
 make
 sudo make install
 cd ..
@@ -51,8 +54,8 @@ sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 # Python (avoiding colision between GC Context.h and Python context.h)
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
-echo PYTHONINCLUDES = -ICore `python3-config --includes` >> src/gcconfig.pri
-echo PYTHONLIBS = `python3-config --ldflags` >> src/gcconfig.pri
+echo PYTHONINCLUDES = -ICore `python3.7-config --includes` >> src/gcconfig.pri
+echo PYTHONLIBS = `python3.7-config --ldflags` >> src/gcconfig.pri
 # GSL
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
 
