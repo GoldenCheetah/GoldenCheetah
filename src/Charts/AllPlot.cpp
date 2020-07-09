@@ -935,6 +935,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     showO2Hb(true),
     showHHb(true),
     showGear(true),
+    showMarkers(true),
     bydist(false),
     bytimeofday(false),
     timeoffset(0),
@@ -2538,7 +2539,8 @@ AllPlot::refreshIntervalMarkers()
         delete mrk;
     }
     standard->d_mrk.clear();
-    if (rideItem && rideItem->ride()) {
+
+    if (showMarkers && rideItem && rideItem->ride()) {
         foreach(IntervalItem *interval, rideItem->intervals()) {
 
             bool nolabel = false;
@@ -6511,6 +6513,18 @@ AllPlot::setShowPCO(bool show)
     standard->lpcoCurve->setVisible(show);
     standard->rpcoCurve->setVisible(show);
     setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowMarkers(bool show)
+{
+    showMarkers = show;
+    refreshIntervalMarkers();
 
     // remember the curves and colors
     isolation = false;

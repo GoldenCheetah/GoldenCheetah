@@ -249,9 +249,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showFull);
 
-    showInterval = new QCheckBox(tr("Interval Navigator"), this);
-    showInterval->setCheckState(Qt::Checked);
-    guiControls->addRow(new QLabel(""), showInterval);
+    showIntervalMarkers = new QCheckBox(tr("Show Interval Markers"), this);
+    showIntervalMarkers->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalMarkers);
+
+    showIntervalNavigator = new QCheckBox(tr("Interval Navigator"), this);
+    showIntervalNavigator->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalNavigator);
 
     showHover = new QCheckBox(tr("Hover intervals"), this);
     showHover->setCheckState(Qt::Checked);
@@ -785,7 +789,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
-    connect(showInterval, SIGNAL(stateChanged(int)), this, SLOT(setShowInterval(int)));
+    connect(showIntervalNavigator, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalNavigator(int)));
+    connect(showIntervalMarkers, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalMarkers(int)));
     connect(showHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -1579,7 +1584,7 @@ AllPlotWindow::compareChanged()
 
     } else {
 
-        if (showInterval->isChecked())
+        if (showIntervalNavigator->isChecked())
             intervalPlot->show();
 
         // reset to normal view?
@@ -3263,10 +3268,23 @@ AllPlotWindow::setShowFull(int value)
 }
 
 void
-AllPlotWindow::setShowInterval(int value)
+AllPlotWindow::setShowIntervalMarkers(int value)
 {
-    showInterval->setChecked(value);
-    if (showInterval->isChecked()) {
+    showIntervalMarkers->setChecked(value);
+
+    allPlot->setShowMarkers(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowMarkers(value);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+    fullPlot->setShowMarkers(value);
+}
+
+void
+AllPlotWindow::setShowIntervalNavigator(int value)
+{
+    showIntervalNavigator->setChecked(value);
+    if (showIntervalNavigator->isChecked()) {
         intervalPlot->show();
         //allPlotLayout->setStretch(1,20);
     }
@@ -3686,6 +3704,7 @@ AllPlotWindow::setupSeriesStackPlots()
 
         if (x.one == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
         else _allPlot->setShadeZones(false);
+        _allPlot->setShowMarkers(allPlot->showMarkers);
         first = false;
 
         // add to the list

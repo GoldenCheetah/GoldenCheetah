@@ -646,6 +646,7 @@ class AllPlot : public QwtPlot
         void setShowPCO(bool show);
         void setShowDC(bool show);
         void setShowPPP(bool show);
+        void setShowMarkers(bool show);
         void setShowGrid(bool show);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -713,6 +714,7 @@ class AllPlot : public QwtPlot
         bool showO2Hb;
         bool showHHb;
         bool showGear;
+        bool showMarkers;
 
         // plot objects
         AllPlotObject *standard;
