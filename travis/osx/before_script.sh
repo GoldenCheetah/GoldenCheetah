@@ -1,10 +1,15 @@
 #!/bin/bash
 set -ev
 
+# Create simlinks to python3.7 binaries, likely removed during upgrade to 3.8
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7 /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7/bin/python3.7 /usr/local/opt/python/bin
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7/bin/python3.7 /usr/local/bin
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7/bin/python3.7-config /usr/local/opt/python/bin
+sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7/bin/python3.7-config /usr/local/bin
+
 python3.7 --version
 python3.7-config --prefix
-sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7 /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7
-sudo ln -s /usr/local/Cellar/python/3.7.5/Frameworks/Python.framework/Versions/3.7/bin/python3.7 /usr/local/opt/python/bin/python3.7
 
 # Python mandatory packages - refresh cache if folder is empty
 if [ -z "$(ls -A site-packages)" ]; then
