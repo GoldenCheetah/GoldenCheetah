@@ -382,7 +382,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
     RideItem *rideItem = context->ride;
 
     if (rideItem != NULL) { 
-        QMenu menu(rideNavigator);
+        QMenu menu(this);
 
 
         QAction *actSaveRide = new QAction(tr("Save Changes"), rideNavigator);
@@ -470,7 +470,7 @@ AnalysisSidebar::intervalPopup()
     // to manipulate the interval tree
 
     // always show the 'find best' 'find peaks' options
-    QMenu menu(intervalItem);
+    QMenu menu(this);
 
     RideItem *rideItem = context->ride;
 
@@ -549,7 +549,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         //bool isUser = interval->rideInterval != NULL;
 
         activeInterval = interval;
-        QMenu menu(intervalTree);
+        QMenu menu(this);
 
         // ZOOM IN AND OUT FOR ALL
         QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);

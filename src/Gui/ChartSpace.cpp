@@ -323,7 +323,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
         QColor edge(GColor(CCARDBACKGROUND));
         edge = edge.darker(105);
         QPen pen(edge);
-        pen.setWidth(2*dpiXFactor);
+        pen.setWidth(3*dpiXFactor);
         painter->setPen(pen);
         painter->setBrush(Qt::NoBrush);
         painter->drawPath(path);

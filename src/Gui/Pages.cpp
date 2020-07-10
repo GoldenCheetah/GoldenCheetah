@@ -2668,30 +2668,20 @@ ColorsPage::applyThemeClicked()
             case CRIDEPLOTBACKGROUND:
             case CTRENDPLOTBACKGROUND:
             case CTRAINPLOTBACKGROUND:
+            case COVERVIEWBACKGROUND:
                 color = theme.colors[0]; // background color
                 break;
 
             case CCARDBACKGROUND:
                 // set back to light black for dark themes
                 // and gray for light themes
-                if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(42,42,42);
-                else color = QColor(245,245,245);
+                color = theme.colors[10];
                 break;
 
             case CCHROME:
                 //  set to black for dark themese and grey for light themes
-                if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(32,32,32);
-                else color = QColor(0xec,0xec,0xec);
+                color = theme.colors[1];
                 break;
-
-            case COVERVIEWBACKGROUND:
-                // set back to light black for dark themes
-                // and gray for light themes
-                if (GCColor::luminance(theme.colors[0]) < 127)  color = QColor(19,19,19);
-                else color = QColor(255,255,255);
-                break;
-
-            // fg color theme.colors[1] not used YET XXX
 
             case CPLOTSYMBOL:
             case CRIDEPLOTXAXIS:
