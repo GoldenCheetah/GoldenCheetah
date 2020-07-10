@@ -34,7 +34,7 @@
 #include <limits>
 #include <cmath>
 
-#define FIT_DEBUG               true // debug traces
+#define FIT_DEBUG               false // debug traces
 #define FIT_DEBUG_LEVEL         4    // debug level : 1 message, 2 definition, 3 data without record, 4 data
 
 #ifndef MATHCONST_PI
@@ -88,16 +88,6 @@ struct FitDeveField {
     fit_string_value unit;
 };
 
-struct FitDeveApp {
-    fit_string_value dev_id; // Developer Data Index
-    fit_string_value app_id; // application_id
-    int man_id; // manufacturer_id
-    int dev_data_id; // developer_data_index
-    qint64 app_version; // application_version
-
-    QList<FitDeveField> fields;
-};
-
 struct FitDefinition {
     int global_msg_num;
     bool is_big_endian;
@@ -130,7 +120,6 @@ struct FitFileReaderState
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
     QMap<QString, FitDeveField>  local_deve_fields; // All developer fields
-    QMap<int, FitDeveApp> local_deve_fields_app; // All developper apps
     QMap<int, int> record_extra_fields;
     QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA or STANDARD DATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
@@ -766,10 +755,6 @@ struct FitFileReaderState
             record_deve_fields.insert(key, deveXdata->valuename.count()-1);
         } else
             record_deve_fields.insert(key, -1);
-
-        if (local_deve_fields_app.contains(deveField.dev_id)) {
-            local_deve_fields_app[deveField.dev_id].fields.append(deveField);
-        }
     }
 
     void decodeFileId(const FitDefinition &def, int,
@@ -2742,7 +2727,6 @@ struct FitFileReaderState
         //qDebug() << "num" << fieldDef.num << "deve_idx" << fieldDef.dev_id << "type" << fieldDef.type << "native" << fieldDef.native << "name" << fieldDef.name.c_str() << "unit" << fieldDef.unit.c_str() << "scale" << fieldDef.scale << "offset" << fieldDef.offset;
 
         QString key = QString("%1.%2").arg(fieldDef.dev_id).arg(fieldDef.num);
-        qDebug() << "decodeDeveloperField" << key;
 
         if (!local_deve_fields.contains(key)) {
             local_deve_fields.insert((key), fieldDef);
@@ -2757,91 +2741,6 @@ struct FitFileReaderState
                 QString nativeName = rideFile->symbolForSeries(series);
                 dataInfos.append(QString("NATIVE %1 : Field %2").arg(nativeName).arg(fieldDef.name.c_str()));
             }*/
-        }
-    }
-
-    void decodeDeveloperID(const FitDefinition &def, int time_offset,
-                      const std::vector<FitValue>& values) {
-        Q_UNUSED(time_offset);
-
-        FitDeveApp deve;
-
-        // 0	developer_id	byte
-        // 1	application_id	byte
-        // 2	manufacturer_id	manufacturer
-        // 3	developer_data_index	uint8
-        // 4	application_version	uint32
-
-        int i = 0;
-        foreach(const FitField &field, def.fields) {
-            FitValue value = values[i++];
-
-            qDebug() << "deveID : num" << field.num  << value.v << value.s.c_str();
-
-            fit_string_value dev_id = "";
-
-            switch (field.num) {
-                case 0:  // developer_id
-                        dev_id = "";
-
-                        foreach(fit_value_t val, value.list) {
-                            char hex[1];
-                            if (val != NA_VALUE) {
-                                sprintf(hex, "%x", (int)val);
-                                dev_id += hex;
-                                if (hex[1]<10)
-                                    dev_id += "0";
-                            }
-                        }
-                        if (dev_id.length()>=20) {
-                            dev_id.insert(8, "-");
-                            dev_id.insert(13, "-");
-                            dev_id.insert(18, "-");
-                            dev_id.insert(23, "-");
-                        }
-                        qDebug() << dev_id.c_str();
-                        deve.dev_id = dev_id;
-                        break;
-                case 1:  // application_id
-                        dev_id = "";
-
-                        foreach(fit_value_t val, value.list) {
-                            char hex[1];
-                            if (val != NA_VALUE) {
-                                sprintf(hex, "%x", (int)val);
-                                if (hex[1]<10)
-                                    dev_id += "0";
-                                dev_id += hex;
-                            }
-                        }
-                        if (dev_id.length()>=20) {
-                            dev_id.insert(8, "-");
-                            dev_id.insert(13, "-");
-                            dev_id.insert(18, "-");
-                            dev_id.insert(23, "-");
-                        }
-
-                        qDebug() << dev_id.c_str();
-                        deve.app_id = dev_id;
-                        break;
-                case 2:  // manufacturer_id
-                        deve.man_id = value.v;
-                        break;
-                case 3:  // developer_data_index
-                        deve.dev_data_id = value.v;
-                        break;
-                case 4: deve.app_version = value.v;
-                        break;
-                default:
-                        // ignore it
-                        break;
-            }
-        }
-
-        qDebug() << "DEVE ID" << deve.dev_id.c_str() << "app_id" << deve.app_id.c_str() << "man_id" << deve.man_id << "dev_data_id" << deve.dev_data_id << "app_version" << deve.app_version;
-
-        if (!local_deve_fields_app.contains(deve.dev_data_id)) {
-            local_deve_fields_app.insert(deve.dev_data_id, deve);
         }
     }
 
@@ -3181,10 +3080,6 @@ struct FitFileReaderState
                     decodeDeveloperFieldDescription(def, time_offset, values);
                     break;
 
-                case 207: /* Developer ID */
-                    decodeDeveloperID(def, time_offset, values);
-                    break;
-
                 case 140: /* undocumented Garmin/Firstbeat specific metrics */
                     decodePhysiologicalMetrics(def, time_offset, values);
                     break;
@@ -3249,7 +3144,7 @@ struct FitFileReaderState
                            / #3: ID of source garmin connect activity (uint32) ? OR ? timestamp ? / #4: time to finish (ms) / #254: message counter idx */
                 case 150: /* segment trackpoint (undocumented) ; see details below: */
                           /* #1: latitude / #2: longitude / #3: distance from start point / #4: elevation / #5: timer since start (ms) / #6: message counter index */
-
+                case 207: /* Developer ID */
                     break;
                 default:
                     unknown_global_msg_nums.insert(def.global_msg_num);
@@ -3401,26 +3296,6 @@ struct FitFileReaderState
 
             setRideFileDeviceInfo(rideFile, deviceInfos);
             setRideFileDataInfo(rideFile, dataInfos);
-
-            QString ciqInfo = "[";
-            int i=0;
-            foreach(FitDeveApp deve_app, local_deve_fields_app) {
-                ciqInfo += QString("{\"application_id\": %1,\"developer_data_index\": %2,").arg(deve_app.app_id.c_str() ).arg(deve_app.dev_data_id);
-                ciqInfo += QString("\"fields\": [");
-                int j=0;
-                foreach(FitDeveField deve_field, deve_app.fields) {
-                    ciqInfo += QString("{\"dev_id\": %1,\"name\": \"%2\"}").arg(deve_field.dev_id).arg(deve_field.name.c_str());
-                    if (++j<deve_app.fields.count())
-                        ciqInfo += ",\n";
-                }
-                ciqInfo += QString("]}");
-                if (++i<local_deve_fields_app.count())
-                    ciqInfo += ",\n";
-            }
-            ciqInfo += "]";
-
-            if (ciqInfo.length()>2)
-                rideFile->setTag("CIQ", ciqInfo);
 
             file.close();
 
