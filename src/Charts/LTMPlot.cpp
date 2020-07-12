@@ -2841,7 +2841,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
         // PARSE + EVALUATE
         Result res = parser.evaluate(ride, NULL);
-        if (res.isNumber) value = res.number;
+        if (res.isNumber) value = res.number();
 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;

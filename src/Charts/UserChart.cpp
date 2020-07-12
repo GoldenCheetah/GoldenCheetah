@@ -159,8 +159,8 @@ UserChart::setRide(RideItem *item)
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
         ucd->compute(ride, Specification(), dr);
-        series.xseries = ucd->x.vector;
-        series.yseries = ucd->y.vector;
+        series.xseries = ucd->x.asNumeric();
+        series.yseries = ucd->y.asNumeric();
 
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,

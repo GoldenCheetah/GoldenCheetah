@@ -185,7 +185,7 @@ UserMetric::isRelevantForRide(const RideItem *item) const
     if (item->context && root) {
         if (frelevant) {
             Result res = root->eval(rt, frelevant, 0, 0, const_cast<RideItem*>(item), NULL, NULL);
-            return res.number;
+            return res.number();
         } else
             return true;
     }
@@ -262,14 +262,14 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
     // value ?
     if (fvalue) {
         Result v = root->eval(rt, fvalue, 0, 0, const_cast<RideItem*>(item), NULL, c, spec);
-        setValue(v.number);
+        setValue(v.number());
     }
 
     //qDebug()<<"COUNT";
     // count?
     if (fcount) {
         Result n = root->eval(rt, fcount, 0, 0, const_cast<RideItem*>(item), NULL, c, spec);
-        setCount(n.number);
+        setCount(n.number());
     }
 
     //qDebug()<<symbol()<<index_<<value_<<"ELAPSED="<<timer.elapsed()<<"ms";

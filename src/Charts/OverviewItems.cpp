@@ -429,7 +429,7 @@ KPIOverviewItem::setData(RideItem *item)
     Result res = parser.evaluate(item, NULL);
 
     // set to zero for daft values
-    value = QString("%1").arg(res.number);
+    value = QString("%1").arg(res.number());
     if (value == "nan") value ="";
     value=Utils::removeDP(value);
 
@@ -448,7 +448,7 @@ KPIOverviewItem::setDateRange(DateRange dr)
     Result res = parser.evaluate(dr, datafilter);
 
     // set to zero for daft values
-    value = QString("%1").arg(res.number);
+    value = QString("%1").arg(res.number());
     if (value == "nan") value ="";
     value=Utils::removeDP(value);
 

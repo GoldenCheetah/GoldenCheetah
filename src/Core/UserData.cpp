@@ -359,7 +359,7 @@ UserData::setRideItem(RideItem*m)
             // run through each sample and create an equivalent
             foreach(RideFilePoint *p, rideItem->ride()->dataPoints()) {
                 Result res = parser.evaluate(rideItem, p);
-                vector << res.number;
+                vector << res.number();
             }
 
             // cache for next time !

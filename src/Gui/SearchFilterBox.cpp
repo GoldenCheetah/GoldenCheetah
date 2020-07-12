@@ -89,7 +89,7 @@ SearchFilterBox::matches(Context *context, QString filter)
         DataFilter df(NULL, context, spec);
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
             Result res = df.evaluate(item, NULL);
-            if (res.isNumber && res.number)
+            if (res.isNumber && res.number())
                 returning << item->fileName;
         }
     }

@@ -29,6 +29,7 @@
 #include <QTextDocument>
 #include "RideCache.h"
 #include "RideFile.h" //for SeriesType
+#include "Utils.h" //for SeriesType
 
 #include <gsl/gsl_randist.h>
 
@@ -43,18 +44,64 @@ class Result {
     public:
 
         // construct a result
-        Result (double value) : isNumber(true), string(""), number(value) {}
-        Result (QString value) : isNumber(false), string(value), number(0.0f) {}
-        Result () : isNumber(true), string(""), number(0) {}
+        Result (double value) : isNumber(true), string_(""), number_(value) {}
+        Result (QString value) : isNumber(false), string_(value), number_(0.0f) {}
+        Result () : isNumber(true), string_(""), number_(0) {}
 
         // vectorize, turn into vector of size n
         void vectorize(int size);
 
         // we can't use QString with union
         bool isNumber;           // if true, value is numeric
-        QString string;
-        double number;
+        bool isVector() const { return vector.count() > 0 || strings.count() > 0; }
+
+        // return as number or string, coerce if needed
+        double &number() {
+            if (!isNumber) {
+                if (!isVector()) number_ = string_.toDouble();
+                else asNumeric(); // this will coerce and crucially compute sum
+            }
+            return number_;
+        }
+
+        QString &string() { if (isNumber) string_ = Utils::removeDP("%1").arg(number_); return string_; }
+
+        // coerce strings to numbers
+        QVector<double>&asNumeric() {
+            if (!isNumber) {
+                if (strings.count() == vector.count()) return vector;
+                else {
+                    vector.clear();
+                    number_=0;
+                    for(int i=0; i<strings.count(); i++) {
+                        double v = strings.at(i).toDouble();
+                        vector << v;
+                        number_ += v;
+                    }
+                }
+            }
+            return vector;
+        }
+
+        // coerce numbers to strings
+        QVector<QString> &asString() {
+            if (isNumber) {
+                if (strings.count() == vector.count()) return strings;
+                else {
+                    strings.clear();
+                    for(int i=0; i<vector.count(); i++)  strings << Utils::removeDP(QString("%1").arg(vector.at(i)));
+                }
+            }
+            return strings;
+        }
+
+    private:
+
+        QString string_;
+        double number_;
         QVector<double> vector;
+        QVector<QString> strings;
+
 };
 
 class DataFilterRuntime;

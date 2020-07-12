@@ -67,7 +67,7 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
     // is it relevant ?
     if (frelevant) {
         relevant = root->eval(rt, frelevant, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-        if (relevant.number == 0) return;
+        if (relevant.number() == 0) return;
     }
 
     // process samples, if there are any and a function exists
