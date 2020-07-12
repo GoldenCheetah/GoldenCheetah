@@ -3210,8 +3210,18 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         // bool(expr)
         if (leaf->function == "bool") {
             Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
-            if (r.number() != 0) return Result(1);
-            else return Result(0);
+            if (r.isVector()) {
+                Result returning;
+                for(int i=0; i<r.asNumeric().count(); i++) {
+                    int v = r.asNumeric().at(i) != 0 ? 1 : 0;
+                    returning.asNumeric() << v;
+                    returning.number() += v;
+                }
+                return returning;
+            } else {
+                if (r.number() != 0) return Result(1);
+                else return Result(0);
+            }
         }
 
         // c (concat into a vector)
