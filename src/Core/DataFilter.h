@@ -64,7 +64,9 @@ class Result {
             return number_;
         }
 
-        QString &string() { if (isNumber) string_ = Utils::removeDP("%1").arg(number_); return string_; }
+        QString &string() { if (isNumber) string_ = Utils::removeDP("%1").arg(number_);
+                            else if (strings.count() == 1) string_ = strings.at(0); // when vector is only 1 entry
+                            return string_; }
 
         // coerce strings to numbers
         QVector<double>&asNumeric() {
@@ -122,7 +124,7 @@ class Leaf {
         // User Metric - using symbols from QHash<..> (RideItem + Interval) and
         // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, float x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
+        Result eval(DataFilterRuntime *df, Leaf *, Result x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
 
         // tree traversal etc
         void print(int level, DataFilterRuntime*);  // print leaf and all children

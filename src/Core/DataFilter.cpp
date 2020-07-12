@@ -2581,21 +2581,6 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
             } else {
 
-                // first lets make sure the lhs and rhs are of the same type
-                bool lhsType = Leaf::isNumber(df, leaf->lvalue.l);
-                bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
-                if (lhsType != rhsType) {
-                    DataFiltererrors << QString(tr("comparing strings with numbers"));
-                    leaf->inerror = true;
-                }
-
-                // what about using string operations on a lhs/rhs that
-                // are numeric?
-                if ((lhsType || rhsType) && leaf->op >= MATCHES && leaf->op <= CONTAINS) {
-                    DataFiltererrors << tr("using a string operations with a number");
-                    leaf->inerror = true;
-                }
-
                 validateFilter(context, df, leaf->lvalue.l);
                 validateFilter(context, df, leaf->rvalue.l);
             }
@@ -2937,20 +2922,27 @@ static double myisnan(double x) { return std::isnan(x); }
 void
 Result::vectorize(int count)
 {
-
-    if (asNumeric().count() >= count) return;
+    // already vector of sufficient size
+    if ((isNumber && asNumeric().count() >= count) ||
+        (!isNumber && asString().count() >= count)) return;
 
     // ok, so must have at least 1 element to repeat
-    if (asNumeric().count() == 0) asNumeric() << number();
+    if (isNumber && asNumeric().count() == 0) asNumeric() << number();
+    if (!isNumber && asString().count() == 0) asString() << "";
 
     // repeat for size
     int it=0;
-    int n=asNumeric().count();
+    int n=isNumber ? asNumeric().count() : asString().count();
 
     // repeat whatever we have
-    while (asNumeric().count() < count) {
-        asNumeric() << asNumeric()[it];
-        number() += asNumeric()[it];
+    while ((isNumber && asNumeric().count() < count) || (!isNumber && asString().count() < count)) {
+
+        if (isNumber) {
+            asNumeric() << asNumeric()[it];
+            number() += asNumeric()[it];
+        } else {
+            asString() << asString()[it];
+        }
 
         // loop thru wot we have
         it++; if (it == n) it=0;
@@ -2978,7 +2970,7 @@ static int monthsTo(QDate from, QDate to)
     return months;
 }
 
-Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
+Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
 {
     // if error state all bets are off
     //if (inerror) return Result(0);
@@ -4944,7 +4936,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                         if (c) duration = RideMetric::getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), c);
                         else duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
                     } else if (*(leaf->lvalue.l->lvalue.n) == "x") {
-                        duration = x;
+                        duration = x.number();
                     } else if (*(leaf->lvalue.l->lvalue.n) == "i") {
                         duration = it;
                     } else {
@@ -5859,8 +5851,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
         } else if (symbol == "x") {
 
-            lhsdouble = x;
-            lhsisNumber = true;
+            if (x.isNumber) {
+                lhsdouble = x.number();
+                lhsisNumber = true;
+            } else {
+                lhsstring = x.string();
+                lhsisNumber = false;
+            }
 
         } else if (symbol == "isRide") {
             lhsdouble = m->isBike ? 1 : 0;
@@ -6019,8 +6016,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                 } else {
 
-                    // bit harder we need to get the symbol first
-                    // to update its vector
+                    // for an index we need the symbol first to update its vector
                     QString symbol = *(leaf->lvalue.l->lvalue.l->lvalue.n);
 
                     // we may have multiple indexes to assign!
@@ -6030,6 +6026,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     if (df->symbols.contains(symbol)) {
                         Result sym = df->symbols.value(symbol);
 
+                        // is it a single value e.g. a[10] or a range e.g. a[x>2]
                         QVector<double> selected;
                         if (indexes.asNumeric().count()) selected=indexes.asNumeric();
                         else selected << indexes.number();
@@ -6038,11 +6035,29 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
                             int index=static_cast<int>(selected[i]);
 
-                            // resize if need to
-                            if (sym.isNumber && sym.asNumeric().count() <= index) { sym.asNumeric().resize(index+1); }
+                            // working with numbers on both sides
+                            if (rhs.isNumber && sym.isNumber) {
+                                if (sym.asNumeric().count() <= index) { sym.asNumeric().resize(index+1); }
+                                sym.asNumeric()[index] = rhs.number();
+                            }
 
-                            // add value
-                            sym.asNumeric()[index] = rhs.number(); //XXX todo for string arrays
+                            // assigning number to strings, need to coerce rhs to string
+                            if (rhs.isNumber && !sym.isNumber) {
+                                rhs.string();
+                                rhs.isNumber = false;
+                            }
+
+                            // assigning a string to a numeric vector - need to convert sym to strings
+                            if (sym.isNumber && !rhs.isNumber) {
+                                sym.asString(); // will coerce
+                                sym.isNumber = false;
+                            }
+
+                            // working with strings on both sides
+                            if (!sym.isNumber && !rhs.isNumber) {
+                                if (sym.asString().count() <= index) { sym.asString().resize(index+1); }
+                                sym.asString()[index] = rhs.string();
+                            }
                         }
 
                         // update
@@ -6104,6 +6119,31 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
                     case MULTIPLY: returning.number() = lhs.number() * rhs.number(); break;
                     case POW: returning.number() = pow(lhs.number(), rhs.number()); break;
                     }
+                }
+            } else {
+
+                // either the left or rhs is not a number, it is a string
+                // so we need to return a string result
+                returning.isNumber = false;
+
+                // basically add is the only meaningful operation to apply
+                // to string values; for vectors append, for string just concatenate
+                if (leaf->op == ADD) {
+                    if (lhs.isVector() || rhs.isVector()) {
+
+                        // create a bigger vector
+                        if (lhs.isVector()) returning.asString() << lhs.asString();
+                        else returning.asString() << lhs.string();
+                        if (rhs.isVector()) returning.asString() << rhs.asString();
+                        else returning.asString() << rhs.string();
+
+                    } else {
+                        // cat strings
+                        returning.string() = lhs.string() + rhs.string();
+                    }
+                } else {
+                    // just return the lhs
+                    returning = lhs;
                 }
             }
             return returning;
@@ -6173,8 +6213,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
 
         case CONTAINS:
             {
-            if (!lhs.isNumber && !rhs.isNumber) return Result(lhs.string().contains(rhs.string()) ? true : false);
-            else return Result(false);
+            if (!lhs.isNumber && !rhs.isNumber) {
+                if (lhs.isVector()) return Result(lhs.asString().contains(rhs.string()));
+                else return Result(lhs.string().contains(rhs.string()) ? true : false);
+            } else return Result(false);
             }
             break;
 
@@ -6239,21 +6281,36 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         if (index.asNumeric().count()) {
 
             Result returning(0);
+            if (!value.isNumber) returning.isNumber = false;
 
             // a range
             for(int i=0; i<index.asNumeric().count(); i++) {
                 int ii=index.asNumeric()[i];
-                if (ii < 0 || ii >= value.asNumeric().count()) continue; // ignore out of bounds
-                returning.asNumeric() << value.asNumeric()[ii];
-                returning.number() += value.asNumeric()[ii];
+
+                // ignore out of bounds
+                if (ii < 0 || (value.isNumber && ii >= value.asNumeric().count()) || (!value.isNumber && ii >= value.asString().count())) continue;
+
+                if (value.isNumber) {
+                    // numbers do sum
+                    returning.asNumeric() << value.asNumeric()[ii];
+                    returning.number() += value.asNumeric()[ii];
+                } else {
+                    returning.asString() << value.asString()[ii];
+                }
             }
 
             return returning;
 
         } else {
             // a single value
-            if (index.number() < 0 || index.number() >= value.asNumeric().count()) return Result(0);
-            return Result(value.asNumeric()[index.number()]);
+            if (value.isNumber) {
+                if (index.number() < 0 || index.number() >= value.asNumeric().count()) return Result(0);
+                return Result(value.asNumeric()[index.number()]);
+            } else {
+                if (index.number() < 0 || index.number() >= value.asString().count()) return Result("");
+                return Result(value.asString()[index.number()]);
+
+            }
         }
     }
 
@@ -6265,18 +6322,31 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, float x, long it, RideItem 
         //int index = eval(df,leaf->fparms[0],x, it, m, p, c, s, d).number;
         Result value = eval(df,leaf->lvalue.l,x, it, m, p, c, s, d); // lhs might also be a symbol
 
+        // return the same type
+        returning.isNumber = value.isNumber;
+
         // need a vector, always
-        if (!value.asNumeric().count()) return returning;
+        if (!value.isVector()) return returning;
 
         // loop and evaluate, non-zero we keep, zero we lose
-        for(int i=0; i<value.asNumeric().count(); i++) {
-            x = value.asNumeric().at(i);
+        for(int i=0; (value.isNumber && i<value.asNumeric().count()) || (!value.isNumber && i<value.asString().count()) ; i++) {
+
+            // we pass around x for the logical expression
+            x = Result(0);
+            x.isNumber = value.isNumber;
+            if (value.isNumber)  x.number() = value.asNumeric().at(i);
+            else x.string() = value.asString().at(i);
+
             int boolresult = eval(df,leaf->fparms[0],x, i, m, p, c, s, d).number();
 
             // we want it
             if (boolresult != 0) {
-                returning.asNumeric() << x;
-                returning.number() += x;
+                if (value.isNumber) {
+                    returning.asNumeric() << x.number();
+                    returning.number() += x.number();
+                } else {
+                    returning.asString() << x.string();
+                }
             }
         }
 
