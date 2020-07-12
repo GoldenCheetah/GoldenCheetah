@@ -38,6 +38,7 @@ public:
 
     QString buffer;
     int secs;  // rolling secs as points read
+    int sSecs; // rolling starting secs as points read
     int watts; // watts set at last point
 
     // the data in it

@@ -1808,6 +1808,21 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     }
                 }
 
+                // Text Cues
+                if (ergFile && ergFile->Texts.count() > 0) {
+                    // find the next cue
+                    double pos = status&RT_MODE_ERGO ? load_msecs : displayWorkoutDistance*1000;
+                    int idx = ergFile->nextText(pos);
+                    if (idx >= 0) {
+                        ErgFileText cue = ergFile->Texts.at(idx);
+                        // show when we are approaching it
+                        if (((status&RT_MODE_ERGO) && cue.x<load_msecs+1000) ||
+                            ((status&RT_MODE_SLOPE) && cue.x < displayWorkoutDistance*1000 + 10)) {
+                            emit setNotification(cue.text, cue.duration);
+                        }
+                    }
+                }
+
                 if(lapTimeRemaining < 0) {
                         if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
                         if (lapTimeRemaining < 0)

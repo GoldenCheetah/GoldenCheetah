@@ -140,6 +140,7 @@ void ErgFile::parseZwift()
     format = ERG; // default to couse until we know
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     gpi.Reset();
 
@@ -201,6 +202,7 @@ void ErgFile::parseErg2(QString p)
     mode = format = ERG; // default to couse until we know
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     gpi.Reset();
 
@@ -268,6 +270,7 @@ void ErgFile::parseTacx()
     format = CRS; // default to couse until we know
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     gpi.Reset();
 
@@ -452,6 +455,7 @@ void ErgFile::parseComputrainer(QString p)
     int lapcounter = 0;
     format = ERG;                         // either ERG or MRC
     Points.clear();
+    Texts.clear();
 
     // start by assuming the input file is Metric
     bool bIsMetric = true;
@@ -470,6 +474,8 @@ void ErgFile::parseComputrainer(QString p)
     QRegExp endHeader("^.*\\[END COURSE HEADER\\].*$", Qt::CaseInsensitive);
     QRegExp startData("^.*\\[COURSE DATA\\].*$", Qt::CaseInsensitive);
     QRegExp endData("^.*\\[END COURSE DATA\\].*$", Qt::CaseInsensitive);
+    QRegExp startText("^.*\\[COURSE TEXT\\].*$", Qt::CaseInsensitive);
+    QRegExp endText("^.*\\[END COURSE TEXT\\].*$", Qt::CaseInsensitive);
     // ignore whitespace and support for ';' comments (a GC extension)
     QRegExp ignore("^(;.*|[ \\t\\n]*)$", Qt::CaseInsensitive);
     // workout settings
@@ -491,6 +497,9 @@ void ErgFile::parseComputrainer(QString p)
     // Lap marker in an ERG/MRC file
     QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
     QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
+
+    // text cue records
+    QRegExp textCue("^([0-9\\.]+)[ \\t]*([^\\t]+)[\\t]+([0-9]+)[ \\t\\n]*$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -522,6 +531,10 @@ void ErgFile::parseComputrainer(QString p)
             } else if (startData.exactMatch(line)) {
                 section = DATA;
             } else if (endData.exactMatch(line)) {
+                section = END;
+            } else if (startText.exactMatch(line)) {
+                section = TEXTS;
+            } else if (endText.exactMatch(line)) {
                 section = END;
             } else if (ergformat.exactMatch(line)) {
                 // save away the format
@@ -642,6 +655,12 @@ void ErgFile::parseComputrainer(QString p)
 
             } else if (ignore.exactMatch(line)) {
                 // do nothing for this line
+
+            } else if (section == TEXTS && textCue.exactMatch(line)) {
+                // x, text cue, duration
+                double x = textCue.cap(1).toDouble() * 1000.; // convert to msecs or m
+                int duration = textCue.cap(3).toInt(); // duration in secs
+                Texts<<ErgFileText(x, duration, textCue.cap(2));
             } else {
               // ignore bad lines for now. just bark.
               //qDebug()<<"huh?" << line;
@@ -721,6 +740,7 @@ void ErgFile::parseFromRideFileFactory()
     format = mode = CRS;
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     gpi.Reset();
 
@@ -815,6 +835,14 @@ void ErgFile::parseFromRideFileFactory()
         Points.append(add);
     }
 
+    // Add interval names as text cues
+    foreach(const RideFileInterval* lap, ride->intervals()) {
+        double x = ride->timeToDistance(lap->start) * 1000.0;
+        int duration = lap->stop - lap->start + 1;
+        if (x > 0 && duration > 0 && !lap->name.isEmpty())
+            Texts<<ErgFileText(x, duration, lap->name);
+    }
+
     gpxFile.close();
 
     valid = true;
@@ -847,6 +875,7 @@ void ErgFile::parseTTS()
     format = mode = CRS;
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     gpi.Reset();
 
@@ -1114,6 +1143,17 @@ ErgFile::save(QStringList &errors)
         }
 
         out << "[END COURSE DATA]\n";
+
+        // TEXTS in TrainerRoad compatible format
+        if (Texts.count() > 0) {
+            out << "[COURSE TEXT]\n";
+            foreach(ErgFileText cue, Texts)
+                out <<QString("%1\t%2\t%3\n").arg(cue.x/1000)
+                                             .arg(cue.text)
+                                             .arg(cue.duration);
+            out << "[END COURSE TEXT]\n";
+        }
+
         f.close();
 
     }
@@ -1191,6 +1231,17 @@ ErgFile::save(QStringList &errors)
         }
 
         out << "[END COURSE DATA]\n";
+
+        // TEXTS in TrainerRoad compatible format
+        if (Texts.count() > 0) {
+            out << "[COURSE TEXT]\n";
+            foreach(ErgFileText cue, Texts)
+                out <<QString("%1\t%2\t%3\n").arg(cue.x/1000)
+                                             .arg(cue.text)
+                                             .arg(cue.duration);
+            out << "[END COURSE TEXT]\n";
+        }
+
         f.close();
 
     }
@@ -1243,6 +1294,7 @@ ErgFile::save(QStringList &errors)
 
         out << "    <workout>\n";
         QList<ErgFileSection> sections = Sections();
+        int msecs = 0;
         for(int i=0; i<sections.count(); i++) {
 
             // are there repeated sections of efforts and recovery?
@@ -1270,8 +1322,22 @@ ErgFile::save(QStringList &errors)
                     << "PowerOnLow=\"" << sections[i].start/CP << "\" "
                     << "PowerOnHigh=\"" << sections[i].end/CP << "\" "
                     << "PowerOffLow=\"" << sections[i+1].start/CP << "\" "
-                    << "PowerOffHigh=\"" << sections[i+1].end/CP << "\" />\n";
+                    << "PowerOffHigh=\"" << sections[i+1].end/CP << "\" ";
 
+                int d = (count+1)*(sections[i].duration+sections[i+1].duration);
+                if (Texts.count() > 0) {
+                    out << ">\n";
+                    foreach (ErgFileText cue, Texts)
+                        if (cue.x >= msecs && cue.x <= msecs+d)
+                            out << "          <textevent "
+                                << "timeoffset=\""<<(cue.x-msecs)/1000
+                                << "\" message=\"" << cue.text
+                                << "\" duration=\"" << cue.duration << "\"/>\n";
+                    out << "        </IntervalsT>\n";
+                } else {
+                    out << "/>\n";
+                }
+                msecs += d;
                 // skip on, bearing in mind the main loop increases i by 1
                 i += 1 + (count*2);
 
@@ -1286,8 +1352,20 @@ ErgFile::save(QStringList &errors)
 
                 out << "        <" << tag << " Duration=\""<<sections[i].duration/1000 << "\" "
                                   << "PowerLow=\"" <<sections[i].start/CP << "\" "
-                                  << "PowerHigh=\"" <<sections[i].end/CP << "\" />\n";
-
+                                  << "PowerHigh=\"" <<sections[i].end/CP << "\"";
+                if (Texts.count() > 0) {
+                    out << ">\n";
+                    foreach (ErgFileText cue, Texts)
+                        if (cue.x >= msecs && cue.x <= msecs+sections[i].duration)
+                            out << "          <textevent "
+                                << "timeoffset=\""<<(cue.x-msecs)/1000
+                                << "\" message=\"" << cue.text
+                                << "\" duration=\"" << cue.duration << "\"/>\n";
+                    out << "        </" << tag << ">\n";
+                } else {
+                    out << "/>\n";
+                }
+                msecs += sections[i].duration;
             }
         }
         out << "    </workout>\n";
@@ -1520,6 +1598,20 @@ ErgFile::currentLap(long x)
         if (x<Laps.at(i+1).x) return Laps.at(i).x;
     }
     return -1; // No matching lap
+}
+
+// Retrieve the index of next text cue.
+// Params: x - current workout distance (m) / time (ms)
+// Returns: index of next text cue.
+int ErgFile::nextText(long x)
+{
+    if (!isValid()) return -1; // not a valid ergfile
+
+    // If the current position is before the text, then the text is next
+    for (int i=0; i<Texts.count(); i++) {
+        if (x <= Texts.at(i).x) return i;
+    }
+    return -1; // nope, no marker ahead of there
 }
 
 void
