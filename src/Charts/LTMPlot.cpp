@@ -4302,7 +4302,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                     markers.append(mrk);
                     mrk->attach(this);
                     mrk->setLineStyle(QwtIndPlotMarker::VLine);
-                    mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+                    mrk->setLabelAlignment(Qt::AlignCenter | Qt::AlignTop);
                     mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
                     mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
 
