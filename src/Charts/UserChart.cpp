@@ -162,6 +162,10 @@ UserChart::setRide(RideItem *item)
         series.xseries = ucd->x.asNumeric();
         series.yseries = ucd->y.asNumeric();
 
+        // pie charts need labels
+        if (chartinfo.type == GC_CHART_PIE || GC_CHART_BAR)
+            for(int i=0; i<ucd->x.asString().count(); i++) series.labels << ucd->x.asString()[i];
+
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,
                         series.labels, series.colors,

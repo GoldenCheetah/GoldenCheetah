@@ -319,6 +319,10 @@ GenericChart::finaliseChart()
     // match what we want with what we got
     for(int i=0; i<newPlots.count(); i++) {
         int index = GenericPlotInfo::findPlot(currentPlots, newPlots[i]);
+
+        // don't reuse bar/pie charts, easier to rebuild
+        if (type == GC_CHART_PIE || type == GC_CHART_BAR) index = -1;
+
         if (index <0) {
             // new one required
             newPlots[i].plot = new GenericPlot(this, context);

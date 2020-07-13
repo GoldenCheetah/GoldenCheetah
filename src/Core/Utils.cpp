@@ -315,6 +315,32 @@ argsort(QVector<double> &v, bool ascending)
     return returning;
 }
 
+struct stringtuple {
+    stringtuple(QString v, int i) : value(v), index(i) {}
+    QString value;
+    int index;
+};
+
+static bool stringtuplelessthan(const stringtuple &s1, const stringtuple &s2) { return s1.value < s2.value; }
+static bool stringtuplegreaterthan(const stringtuple &s1, const stringtuple &s2) { return s1.value > s2.value; }
+
+QVector<int>
+argsort(QVector<QString>&v, bool ascending)
+{
+    // we will use an x/y - x is the sort, y is the index
+    QVector<stringtuple> tuple;
+    for(int i=0; i<v.count(); i++) tuple << stringtuple(v[i],i);
+
+    if (ascending) qSort(tuple.begin(), tuple.end(), stringtuplelessthan);
+    else qSort(tuple.begin(), tuple.end(), stringtuplegreaterthan);
+
+    // now create vector of indexes
+    QVector<int> returning;
+    for(int i=0; i<tuple.count(); i++) returning << static_cast<int>(tuple[i].index);
+
+    return returning;
+}
+
 QVector<int>
 arguniq(QVector<double> &v)
 {
@@ -337,6 +363,44 @@ arguniq(QVector<double> &v)
             int low=r[i];
             last = v[r[i]];
             while (i < v.count() && fabs(v[r[i]] - last) <=  std::numeric_limits<double>::epsilon()) {
+                if (r[i] < low) low=r[i];
+                i++;
+            }
+
+            // remember
+            returning << low;
+            first = false;
+
+            i--;
+        }
+    }
+    qSort(returning);
+
+    return returning;
+}
+
+QVector<int>
+arguniq(QVector<QString> &v)
+{
+    QVector<int> returning;
+    QVector<int> r = Utils::argsort(v, false);
+
+    // now loop thru looking for uniq, since we are working
+    // with a double we need the values to be different by
+    // a small amount.
+    bool first=true;
+    QString last="";
+
+    // look for uniqs
+    for(int i=0; i<v.count(); i++) {
+
+        // make sure they are different
+        if (first || v[r[i]] != last) {
+
+            // ok its changed, lets find the lowest index
+            int low=r[i];
+            last = v[r[i]];
+            while (i < v.count() && v[r[i]] != last) {
                 if (r[i] < low) low=r[i];
                 i++;
             }
