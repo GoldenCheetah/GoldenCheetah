@@ -163,7 +163,7 @@ UserChart::setRide(RideItem *item)
         series.yseries = ucd->y.asNumeric();
 
         // pie charts need labels
-        if (chartinfo.type == GC_CHART_PIE || chartinfo.type == GC_CHART_BAR) {
+        if (chartinfo.type == GC_CHART_PIE) {
             series.labels.clear();
             for(int i=0; i<ucd->x.asString().count(); i++) series.labels << ucd->x.asString()[i];
 
@@ -201,6 +201,42 @@ UserChart::setRide(RideItem *item)
         // config has changed. might be a better way to handle this but
         // it works for now.
         if (axis.orientation == Qt::Horizontal)  axis.labelcolor = axis.axiscolor = GColor(CPLOTMARKER);
+
+        // on a user chart the series sets the categories for a bar chart
+        // find the first series for this axis and set the categories
+        // to the x series values.
+        if (chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Horizontal) {
+            // find the first series for axis.name
+            foreach(GenericSeriesInfo s, seriesinfo) {
+                if (s.xname == axis.name && s.user1) {
+                    axis.type =  GenericAxisInfo::CATEGORY;
+                    axis.categories.clear();
+                    UserChartData *ucd = static_cast<UserChartData*>(s.user1);
+                    for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
+                    break;
+                }
+            }
+        }
+
+        // we need to set max and min based upon the barsets for bar charts since
+        // the generic plot only looks are series associated with an axis and we have 0 of those
+        if (min==-1 && max==-1 && chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Vertical) {
+
+            // loop through all the series and look at max and min y values
+            bool first=true;
+            foreach(GenericSeriesInfo s, seriesinfo) {
+                if (s.yname == axis.name && s.user1) {
+                    UserChartData *ucd = static_cast<UserChartData*>(s.user1);
+                    for(int i=0; i<ucd->y.asNumeric().count(); i++) {
+                        double yy = ucd->y.asNumeric()[i];
+                        if (first || yy > max) max = yy;
+                        if (first || yy < min) min = yy;
+                        first = false;
+                    }
+                    break;
+                }
+            }
+        }
 
         // we do NOT set align, this is managed in generic plot on our behalf
         // we also don't hide axes, so visible is always set to true

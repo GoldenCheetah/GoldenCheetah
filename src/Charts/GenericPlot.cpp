@@ -736,6 +736,8 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         {
             // set up the curves
             QPieSeries *add = new QPieSeries();
+            add->setPieSize(0.7);
+            add->setHoleSize(0.5);
 
             // setup the slices
             for(int i=0; i<yseries.size(); i++) {
@@ -840,7 +842,6 @@ GenericPlot::finaliseChart()
                     if (axisinfo->log) vaxis= new QLogValueAxis(qchart);
                     else vaxis= new QValueAxis(qchart);
                     add=vaxis; // gets added later
-
                     vaxis->setMin(axisinfo->min());
                     vaxis->setMax(axisinfo->max());
 
@@ -1019,6 +1020,7 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
         // min should be minimum value for all attached series
         foreach(QAbstractSeries *series, axis->series) {
             if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
+                series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
                 series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
                 foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
                     if (usey) {
@@ -1044,6 +1046,7 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
         // min should be minimum value for all attached series
         foreach(QAbstractSeries *series, axis->series) {
             if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
+                series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
                 series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
                 foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
                     if (usey) {
