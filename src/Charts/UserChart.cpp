@@ -163,8 +163,21 @@ UserChart::setRide(RideItem *item)
         series.yseries = ucd->y.asNumeric();
 
         // pie charts need labels
-        if (chartinfo.type == GC_CHART_PIE || GC_CHART_BAR)
+        if (chartinfo.type == GC_CHART_PIE || chartinfo.type == GC_CHART_BAR) {
+            series.labels.clear();
             for(int i=0; i<ucd->x.asString().count(); i++) series.labels << ucd->x.asString()[i];
+
+            series.colors.clear();
+            QColor min=QColor(series.color);
+            QColor max=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            for(int i=0; i<series.labels.count(); i++) {
+                QColor color = QColor(min.red() + (double(max.red()-min.red()) * (i/double(series.labels.count()))),
+                              min.green() + (double(max.green()-min.green()) * (i/double(series.labels.count()))),
+                              min.blue() + (double(max.blue()-min.blue()) * (i/double(series.labels.count()))));
+
+                series.colors << color.name();
+            }
+        }
 
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,
