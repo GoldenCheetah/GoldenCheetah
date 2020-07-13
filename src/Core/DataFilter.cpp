@@ -305,6 +305,8 @@ static struct {
     { "isNumber", 1 }, // is the passed thing a number or list of numbers ?
     { "isString", 1 }, // is the passed thing a string or list of strings ?
 
+    { "metadata", 1 }, // get metadata value for current ride, or a vector for all rides.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -3632,6 +3634,40 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             }
         }
 
+        if (leaf->function == "metadata") {
+
+            Result returning("");
+            returning.isNumber = false;
+            QString name = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+
+            if (d.from==QDate() && d.to==QDate()) {
+
+                // ride only
+                returning.string() = m->getText(name, "");
+
+            } else {
+
+                // vector for a date range
+                FilterSet fs;
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+                Specification spec;
+                spec.setFilterSet(fs);
+
+                // date range
+                spec.setDateRange(d);
+                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                    if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                    if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+                    QString tag = ride->getText(name, "");
+                    returning.asString() << tag;
+                }
+            }
+            return returning;
+        }
+
         if (leaf->function == "metrics") {
 
             QDate earliest(1900,01,01);
@@ -4279,6 +4315,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
 
             // use the utils function to actually do it
             Result v = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            returning.isNumber = v.isNumber;
 
             if (v.isNumber) {
                 if (ascending) qSort(v.asNumeric());
@@ -4289,9 +4326,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             }
 
             // put the index into the result we are returning.
-            foreach(double x, v.asNumeric()) {
-                returning.number() += x;
-                returning.asNumeric() << x;
+            if (v.isNumber) {
+                foreach(double x, v.asNumeric()) {
+                    returning.number() += x;
+                    returning.asNumeric() << x;
+                }
+            } else {
+                returning.asString() = v.asString();
             }
 
             return returning;
@@ -4515,7 +4556,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                     current.asNumeric() = replace;
                 } else {
                     QVector<QString> replace = current.asString();
-                    for(int idx=0; idx<index.count(); idx++) replace[idx] = current.asNumeric()[index[idx]];
+                    for(int idx=0; idx<index.count(); idx++) replace[idx] = current.asString()[index[idx]];
                     current.asString() = replace;
                 }
 

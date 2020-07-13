@@ -236,6 +236,7 @@ UserChart::setRide(RideItem *item)
                     break;
                 }
             }
+            if (min >0 && max >0) min=0;
         }
 
         // we do NOT set align, this is managed in generic plot on our behalf

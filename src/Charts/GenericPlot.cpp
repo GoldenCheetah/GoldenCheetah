@@ -744,8 +744,10 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 // get label?
                 if (i>=labels.size())
                     add->append(QString("%1").arg(i), yseries.at(i));
-                else
-                    add->append(labels.at(i), yseries.at(i));
+                else {
+                    if (labels.at(i) == "")add->append("(blank)", yseries.at(i));
+                    else add->append(labels.at(i), yseries.at(i));
+                }
             }
 
             // now do the colors
@@ -949,7 +951,7 @@ GenericPlot::finaliseChart()
         }
 
     }
-
+#if 0 // fugly with lots of entries, needs hover instead.
     if (charttype== GC_CHART_PIE) {
         foreach(QAbstractSeries *series, qchart->series()) {
             if (series->type()== QAbstractSeries::SeriesTypePie) {
@@ -961,6 +963,7 @@ GenericPlot::finaliseChart()
         }
         legend->setClickable(false);
     }
+#endif
 
     // barseries special case
     if (charttype==GC_CHART_BAR && barseries) {
