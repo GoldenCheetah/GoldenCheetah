@@ -4293,8 +4293,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
         } //end foreach season
 
         foreach (Season s, tmpSeasons) {
-            /* if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) { */
-            if ((s.getStart() >= from && s.getStart() <= to) || (s.getEnd() >= from && s.getEnd() <= to)) {
+            if (s.getStart() <= to && s.getEnd() >= from) {
             foreach (SeasonEvent event, s.events) {
                 if (event.date >= from && event.date <= to) {
 
