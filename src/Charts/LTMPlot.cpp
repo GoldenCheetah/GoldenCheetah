@@ -4272,50 +4272,49 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
     if (settings->events) {
         QList<Season> tmpSeasons = context->athlete->seasons->seasons;
         qSort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
-        foreach (Season s, tmpSeasons) {
-
-            if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from && s.getStart() <= to) {
-                QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
-                markers.append(mrk);
-                mrk->attach(this);
-                mrk->setLineStyle(QwtIndPlotMarker::VLine);
-                mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                mrk->setLinePen(QPen(color, 0, Qt::DashLine));
-                mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
-
-                if (position % viewDepth == 0) {
-                    QwtText text(s.getName());
-                    text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                    text.setColor(color);
-                    mrk->setLabel(text);
-                }
-            }
-        } //end foreach season
 
         foreach (Season s, tmpSeasons) {
+            // for each season that intersects the date range
             if (s.getStart() <= to && s.getEnd() >= from) {
-            foreach (SeasonEvent event, s.events) {
-                if (event.date >= from && event.date <= to) {
-
-                    // and the events...
+                // add a season marker
+                if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from) {
                     QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                     markers.append(mrk);
                     mrk->attach(this);
                     mrk->setLineStyle(QwtIndPlotMarker::VLine);
-                    mrk->setLabelAlignment(Qt::AlignCenter | Qt::AlignTop);
-                    mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
-                    mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
+                    mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+                    mrk->setLinePen(QPen(color, 0, Qt::DashLine));
+                    mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
 
                     if (position % viewDepth == 0) {
-                        QwtText text(event.name);
+                        QwtText text(s.getName());
                         text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                        text.setColor(Qt::red);
+                        text.setColor(color);
                         mrk->setLabel(text);
                     }
                 }
+
+                // add event markers
+                foreach (SeasonEvent event, s.events) {
+                    if (event.date >= from && event.date <= to) {
+                        QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
+                        markers.append(mrk);
+                        mrk->attach(this);
+                        mrk->setLineStyle(QwtIndPlotMarker::VLine);
+                        mrk->setLabelAlignment(Qt::AlignCenter | Qt::AlignTop);
+                        mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
+                        mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
+
+                        if (position % viewDepth == 0) {
+                            QwtText text(event.name);
+                            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+                            text.setColor(Qt::red);
+                            mrk->setLabel(text);
+                        }
+                    }
+                }
             }
-            }
-        }//end foreach season
+        } //end foreach season
     }
 
     // Add marker for today when the date range goes to the future
