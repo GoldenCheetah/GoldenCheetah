@@ -110,6 +110,7 @@
 #define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
 #define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
 #define GC_SETTINGS_MAIN_STATE          "<system>mainwindow/state"
+#define GC_SETTINGS_MAIN_SIDEBAR        "<system>mainwindow/sidebar/"
 #define GC_SETTINGS_LAST_IMPORT_PATH    "<system>mainwindow/lastImportPath"
 #define GC_SETTINGS_LAST_WORKOUT_PATH   "<system>mainwindow/lastWorkoutPath"
 #define GC_LAST_DOWNLOAD_DEVICE         "<system>mainwindow/lastDownloadDevice"

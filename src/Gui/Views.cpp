@@ -43,6 +43,8 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
 
+    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", true).toBool());
+
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
 }
@@ -54,6 +56,7 @@ RideNavigator *AnalysisView::rideNavigator()
 
 AnalysisView::~AnalysisView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "analysis", _sidebar);
 }
 
 void
@@ -100,11 +103,13 @@ DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(conte
     setPage(d);
     setBlank(b);
 
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", true).toBool());
     connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
 DiaryView::~DiaryView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
 }
 
 void
@@ -141,6 +146,7 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", true).toBool());
     connect(sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
@@ -149,6 +155,7 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
 
 HomeView::~HomeView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
 }
 
 void
@@ -199,6 +206,7 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
     setBottom(trainBottom);
     setHideBottomOnIdle(false);
 
+    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train").toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
     connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
 }
@@ -210,6 +218,7 @@ void TrainView::onAutoHideChanged(bool enabled)
 
 TrainView::~TrainView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "train", _sidebar);
 }
 
 void

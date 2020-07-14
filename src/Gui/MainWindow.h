@@ -95,6 +95,9 @@ class MainWindow : public QMainWindow
         Tab *athleteTab() { return currentTab; }
         NewSideBar *newSidebar() { return sidebar; }
 
+        // tab view keeps this up to date
+        QAction *showhideSidebar;
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
@@ -306,7 +309,6 @@ class MainWindow : public QMainWindow
 
         // Toolbar state checkables in View menu / context
         QAction *styleAction;
-        QAction *showhideSidebar;
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;
