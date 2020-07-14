@@ -241,6 +241,14 @@ GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
     labels << add;
 }
 
+void
+GenericPlot::pieHover(QPieSlice *slice, bool state)
+{
+    if (havelegend.count() == 0) return;
+    if (state == true)  legend->setValue(QPointF(0, round(slice->percentage()*1000)/10), havelegend.first());
+    else legend->unhover(havelegend.first());
+}
+
 // handle hover on barset
 void GenericPlot::barsetHover(bool status, int index, QBarSet *)
 {
@@ -736,6 +744,8 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         {
             // set up the curves
             QPieSeries *add = new QPieSeries();
+            havelegend << name.append(" %");
+            connect(add, SIGNAL(hovered(QPieSlice*,bool)), this, SLOT(pieHover(QPieSlice*,bool)));
             add->setPieSize(0.7);
             add->setHoleSize(0.5);
 
@@ -756,6 +766,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 slice->setExploded();
                 slice->setLabelVisible();
+                slice->setLabelBrush(QBrush(GColor(CPLOTMARKER)));
                 slice->setPen(Qt::NoPen);
                 if (i <colors.size()) slice->setBrush(QColor(colors.at(i)));
                 else slice->setBrush(Qt::red);
@@ -883,6 +894,9 @@ GenericPlot::finaliseChart()
                         // category labels
                         for(int i=axisinfo->categories.count(); i<=axisinfo->maxx; i++)
                             axisinfo->categories << QString("%1").arg(i+1);
+                        // set blank to "(blank)"
+                        for(int i=0; i<axisinfo->categories.count(); i++)
+                            if (axisinfo->categories.at(i) == "") axisinfo->categories[i]="(blank)";
                         caxis->setCategories(axisinfo->categories);
                     }
                 }
@@ -951,19 +965,12 @@ GenericPlot::finaliseChart()
         }
 
     }
-#if 0 // fugly with lots of entries, needs hover instead.
+
     if (charttype== GC_CHART_PIE) {
-        foreach(QAbstractSeries *series, qchart->series()) {
-            if (series->type()== QAbstractSeries::SeriesTypePie) {
-                foreach (QPieSlice *slice, static_cast<QPieSeries*>(series)->slices()) {
-                    legend->addSeries(slice->label(), slice->color());
-                    legend->setValue(QPointF(0,slice->value()), slice->label());
-                }
-            }
-        }
+        foreach(QString name, havelegend)  legend->addSeries(name, GColor(CPLOTMARKER));
         legend->setClickable(false);
     }
-#endif
+
 
     // barseries special case
     if (charttype==GC_CHART_BAR && barseries) {

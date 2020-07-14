@@ -3029,6 +3029,7 @@ XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QTableView(parent), x
     setGridStyle(Qt::NoPen);
     setItemDelegate(new XDataCellDelegate(this));
     setContextMenuPolicy(Qt::CustomContextMenu);
+    horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     setContentsMargins(0,0,0,0);
     installEventFilter(this);
@@ -3051,7 +3052,7 @@ void XDataEditor::configChanged()
     palette.setColor(QPalette::Inactive, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Inactive, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
-    //setFrameStyle(QFrame::NoFrame);
+    setFrameStyle(QFrame::NoFrame);
     setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                   "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())

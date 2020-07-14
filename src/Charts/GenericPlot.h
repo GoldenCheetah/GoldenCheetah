@@ -112,7 +112,7 @@ class GenericPlot : public QWidget {
         bool eventHandler(int eventsource, void *obj, QEvent *event);
         void barsetHover(bool status, int index, QBarSet *barset);
         void plotAreaChanged();
-
+        void pieHover(QPieSlice *slice, bool state);
 
     protected:
 

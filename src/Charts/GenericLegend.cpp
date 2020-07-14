@@ -152,7 +152,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.setFont(QFont());
 
     // series
-    painter.drawText(namerect, name, Qt::AlignHCenter|Qt::AlignVCenter);
+    painter.drawText(namerect, Qt::TextSingleLine, name);
     painter.drawText(valuerect, string, Qt::AlignHCenter|Qt::AlignVCenter);
     painter.restore();
 
