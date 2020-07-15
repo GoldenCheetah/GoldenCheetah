@@ -302,10 +302,16 @@ static struct {
     { "sort", 2 },     // sort(ascend|descend, list) - returns sorted list
     { "uniq", 1 },      // uniq(list) - returns only uniq values in the list, stable and preserves order
 
+    // introduced to support string vectors
     { "isNumber", 1 }, // is the passed thing a number or list of numbers ?
     { "isString", 1 }, // is the passed thing a string or list of strings ?
-
     { "metadata", 1 }, // get metadata value for current ride, or a vector for all rides.
+    { "tolower", 1 },  // convert strings to lower case
+    { "toupper", 1 },  // convert strings to upper case
+    { "join", 2 },     // join(list, sep) - join a vector of strings into a single string separated by sep
+    { "split", 2 },    // split(string, sep) - split a string into a vector of strings
+    { "trim", 1 },      // trim whitespace from front/back of strings or vectors of strings.
+    { "replace", 3 },   // replace(list|string, s1, s2) -replace s1 with s2 in list or string
 
     // add new ones above this line
     { "", -1 }
@@ -3043,11 +3049,130 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
         }
 
         if (leaf->function == "isNumber") {
-           return eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
+            return eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
         }
 
         if (leaf->function == "isString") {
-           return !eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
+            return !eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
+        }
+
+
+        // string functions
+        if (leaf->function == "tolower") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            // coerce to string and then force returning as a string
+            returning.asString();
+            returning.isNumber=false;
+
+            // update
+            if (returning.isVector()) {
+                for(int i=0; i<returning.asString().count(); i++)
+                    returning.asString()[i]=returning.asString().at(i).toLower();
+            } else {
+                returning.string()=returning.string().toLower();
+            }
+            return returning;
+        }
+
+        if (leaf->function == "toupper") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            // coerce to string and then force returning as a string
+            returning.asString();
+            returning.isNumber=false;
+
+            // update
+            if (returning.isVector()) {
+                for(int i=0; i<returning.asString().count(); i++)
+                    returning.asString()[i]=returning.asString().at(i).toUpper();
+            } else {
+                returning.string()=returning.string().toUpper();
+            }
+            return returning;
+
+        }
+
+        if (leaf->function == "join") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            QString sep = eval(df, leaf->fparms[1],x, it, m, p, c, s, d).string();
+
+            // coerce to string and then force returning as a string
+            returning.asString();
+            returning.isNumber=false;
+
+            // only join vectors
+            if (returning.isVector()) {
+                returning.string() = "";
+                bool first = true;
+                for(int i=0; i<returning.asString().count(); i++) {
+                    if (!first) returning.string() += sep;
+                    returning.string() += returning.asString().at(i);
+                    first = false;
+                }
+                returning.asString().clear();
+            }
+            return returning;
+        }
+
+        if (leaf->function == "split") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            QString sep = eval(df, leaf->fparms[1],x, it, m, p, c, s, d).string();
+
+            // coerce to string and then force returning as a string
+            returning.asString();
+            returning.isNumber=false;
+
+            QStringList tokens = returning.string().split(sep);
+            returning.asString().clear();
+            returning.string()="";
+
+            // populate vector
+            foreach(QString token, tokens) returning.asString() << token;
+
+            return returning;
+        }
+
+        if (leaf->function == "trim") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            // coerce to string and then force returning as a string
+            returning.asString();
+            returning.isNumber=false;
+
+            // update
+            if (returning.isVector()) {
+                for(int i=0; i<returning.asString().count(); i++)
+                    returning.asString()[i]=returning.asString().at(i).trimmed();
+            } else {
+                returning.string()=returning.string().trimmed();
+            }
+            return returning;
+        }
+
+        if (leaf->function == "replace") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            QString s1 =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d).string();
+            QString s2 =  eval(df, leaf->fparms[2],x, it, m, p, c, s, d).string();
+
+            // coerce to string and then force returning as a string
+            returning.asString();
+            returning.isNumber=false;
+
+            // update
+            if (returning.isVector()) {
+                for(int i=0; i<returning.asString().count(); i++)
+                    returning.asString()[i].replace(s1,s2);
+            } else {
+                returning.string().replace(s1,s2);
+            }
+            return returning;
         }
 
         if (leaf->function == "exists") {
