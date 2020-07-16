@@ -180,6 +180,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class ManualRideDialog;
         friend class PolarFileReader;
         friend class Strava;
+        friend class ErgFile; // access to intervals
         // split and mergers
         friend class MergeActivityWizard;
         friend class SplitActivityWizard;
