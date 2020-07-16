@@ -695,7 +695,7 @@ HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Cor
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
-           Core/Measures.h Core/BodyMeasures.h Core/HrvMeasures.h Core/BlinnSolver.h Core/Quadtree.h
+           Core/Measures.h Core/BodyMeasures.h Core/HrvMeasures.h Core/Quadtree.h
 
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
@@ -728,7 +728,8 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
            Metrics/PDModel.h Metrics/PMCData.h Metrics/PowerProfile.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h \
-           Metrics/Statistic.h Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h
+           Metrics/Statistic.h Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h \
+           Metrics/BlinnSolver.h
 
 ## Planning and Compliance
 HEADERS += Planning/PlanningWindow.h
@@ -788,7 +789,7 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
-           Core/Measures.cpp Core/BodyMeasures.cpp Core/HrvMeasures.cpp Core/BlinnSolver.cpp Core/Quadtree.cpp
+           Core/Measures.cpp Core/BodyMeasures.cpp Core/HrvMeasures.cpp Core/Quadtree.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
@@ -828,7 +829,7 @@ SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.
            Metrics/PMCData.cpp Metrics/PowerProfile.cpp Metrics/RideMetadata.cpp Metrics/RideMetric.cpp Metrics/RunMetrics.cpp \
            Metrics/SwimMetrics.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
            Metrics/TimeInZone.cpp Metrics/TRIMPPoints.cpp Metrics/UserMetric.cpp Metrics/UserMetricParser.cpp Metrics/VDOTCalculator.cpp \
-           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp
+           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp Metrics/BlinnSolver.cpp
 
 ## Planning and Compliance
 SOURCES += Planning/PlanningWindow.cpp
