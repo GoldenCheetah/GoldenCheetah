@@ -310,8 +310,11 @@ static struct {
     { "toupper", 1 },  // convert strings to upper case
     { "join", 2 },     // join(list, sep) - join a vector of strings into a single string separated by sep
     { "split", 2 },    // split(string, sep) - split a string into a vector of strings
-    { "trim", 1 },      // trim whitespace from front/back of strings or vectors of strings.
-    { "replace", 3 },   // replace(list|string, s1, s2) -replace s1 with s2 in list or string
+    { "trim", 1 },     // trim whitespace from front/back of strings or vectors of strings.
+    { "replace", 3 },  // replace(list|string, s1, s2) -replace s1 with s2 in list or string
+
+    { "filename", 0 }, // filename() - returns a string or vector of strings for a range, can be used
+                       // when plotting on trends chart to enable click thru to activity view
 
     // add new ones above this line
     { "", -1 }
@@ -541,6 +544,11 @@ DataFilter::builtins(Context *context)
 
             // sort
             returning << "sort(ascend|descend, list)";
+
+        } else if (i == 108) {
+
+            // filename (or vector of names)
+            returning << "filename()";
 
         } else {
 
@@ -1603,6 +1611,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("daterange(start|stop) or daterange(datefrom, dateto, expression)"));
                         leaf->inerror = true;
                     }
+                } else if (leaf->function == "filename") {
+
+                    if (leaf->fparms.count() != 0) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("filename() has no parameters"));
+                    }
+
                 } else if (leaf->function == "exists") {
 
                     // needs one parameter and must be a string constant
@@ -3788,6 +3803,38 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
 
                     QString tag = ride->getText(name, "");
                     returning.asString() << tag;
+                }
+            }
+            return returning;
+        }
+
+        if (leaf->function == "filename") {
+
+            Result returning("");
+            returning.isNumber = false;
+
+            if (d.from==QDate() && d.to==QDate()) {
+
+                // ride only
+                returning.string() = m->fileName;
+
+            } else {
+
+                // vector for a date range
+                FilterSet fs;
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+                Specification spec;
+                spec.setFilterSet(fs);
+
+                // date range
+                spec.setDateRange(d);
+                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                    if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                    if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+                    returning.asString() << ride->fileName;
                 }
             }
             return returning;

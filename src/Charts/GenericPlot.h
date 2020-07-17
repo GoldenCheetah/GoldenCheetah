@@ -90,7 +90,7 @@ class GenericPlot : public QWidget {
         bool initialiseChart(QString title, int type, bool animate, int legendpos);
 
         // add a curve, associating an axis
-        bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+        bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
 

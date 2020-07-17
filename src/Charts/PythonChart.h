@@ -136,7 +136,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
     signals:
         void setUrl(QUrl);
         void emitChart(QString title, int type, bool animate, int legpos, bool stack, int orientation);
-        void emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+        void emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
         void emitAxis(QString name, bool visible, int align, double min, double max,

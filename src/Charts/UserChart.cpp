@@ -161,6 +161,7 @@ UserChart::setRide(RideItem *item)
         ucd->compute(ride, Specification(), dr);
         series.xseries = ucd->x.asNumeric();
         series.yseries = ucd->y.asNumeric();
+        series.fseries = ucd->f.asString();
 
         // pie charts need labels
         if (chartinfo.type == GC_CHART_PIE) {
@@ -180,7 +181,7 @@ UserChart::setRide(RideItem *item)
         }
 
         // data now generated so can add curve
-        chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,
+        chart->addCurve(series.name, series.xseries, series.yseries, series.fseries, series.xname, series.yname,
                         series.labels, series.colors,
                         series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels, series.fill);
 

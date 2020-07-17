@@ -65,7 +65,7 @@ Bindings::configChart(QString title, int type, bool animate, int pos, bool stack
 }
 
 bool 
-Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels,  QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill) const
 {
@@ -98,7 +98,7 @@ Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QString x
     }
 
     // now just add via the chart
-    python->chart->emitCurve(name, xs, ys, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    python->chart->emitCurve(name, xs, ys, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
     return true;
 }
 

@@ -1098,30 +1098,33 @@ static PyObject *meth_Bindings_setCurve(PyObject *sipSelf, PyObject *sipArgs, Py
         int a0State = 0;
         PyObject * a1;
         PyObject * a2;
-         ::QString* a3;
+         ::QStringList* a3;
         int a3State = 0;
          ::QString* a4;
         int a4State = 0;
-         ::QStringList* a5;
+         ::QString* a5;
         int a5State = 0;
          ::QStringList* a6;
         int a6State = 0;
-        int a7;
+         ::QStringList* a7;
+        int a7State = 0;
         int a8;
         int a9;
-         ::QString* a10;
-        int a10State = 0;
-        int a11;
-        bool a12;
+        int a10;
+         ::QString* a11;
+        int a11State = 0;
+        int a12;
         bool a13;
         bool a14;
         bool a15;
+        bool a16;
         const  ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_name,
             sipName_xseries,
             sipName_yseries,
+            sipName_fseries,
             sipName_xname,
             sipName_yname,
             sipName_labels,
@@ -1137,17 +1140,18 @@ static PyObject *meth_Bindings_setCurve(PyObject *sipSelf, PyObject *sipArgs, Py
             sipName_fill,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1P0P0J1J1J1J1iiiJ1ibbbb", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, sipType_QString,&a3, &a3State, sipType_QString,&a4, &a4State, sipType_QStringList,&a5, &a5State, sipType_QStringList,&a6, &a6State, &a7, &a8, &a9, sipType_QString,&a10, &a10State, &a11, &a12, &a13, &a14, &a15))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1P0P0J1J1J1J1J1iiiJ1ibbbb", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2, sipType_QStringList,&a3, &a3State, sipType_QString,&a4, &a4State, sipType_QString,&a5, &a5State, sipType_QStringList,&a6, &a6State, sipType_QStringList,&a7, &a7State, &a8, &a9, &a10, sipType_QString,&a11, &a11State, &a12, &a13, &a14, &a15, &a16))
         {
             bool sipRes;
 
-            sipRes = sipCpp->setCurve(*a0,a1,a2,*a3,*a4,*a5,*a6,a7,a8,a9,*a10,a11,a12,a13,a14,a15);
+            sipRes = sipCpp->setCurve(*a0,a1,a2,*a3,*a4,*a5,*a6,*a7,a8,a9,a10,*a11,a12,a13,a14,a15,a16);
             sipReleaseType(a0,sipType_QString,a0State);
-            sipReleaseType(a3,sipType_QString,a3State);
+            sipReleaseType(a3,sipType_QStringList,a3State);
             sipReleaseType(a4,sipType_QString,a4State);
-            sipReleaseType(a5,sipType_QStringList,a5State);
+            sipReleaseType(a5,sipType_QString,a5State);
             sipReleaseType(a6,sipType_QStringList,a6State);
-            sipReleaseType(a10,sipType_QString,a10State);
+            sipReleaseType(a7,sipType_QStringList,a7State);
+            sipReleaseType(a11,sipType_QString,a11State);
 
             return PyBool_FromLong(sipRes);
         }

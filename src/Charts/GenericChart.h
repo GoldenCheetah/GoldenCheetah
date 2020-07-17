@@ -37,11 +37,11 @@ class GenericSeriesInfo {
 
     public:
 
-        GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+        GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill) :
                       user1(NULL), user2(NULL), user3(NULL), user4(NULL),
-                      name(name), xseries(xseries), yseries(yseries), xname(xname), yname(yname),
+                      name(name), xseries(xseries), yseries(yseries), fseries(fseries), xname(xname), yname(yname),
                       labels(labels), colors(colors),
                       line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl), legend(legend), datalabels(datalabels), fill(fill)
                       {}
@@ -62,6 +62,7 @@ class GenericSeriesInfo {
         QString group;
         QVector<double> xseries;
         QVector<double> yseries;
+        QVector<QString> fseries;
         QString xname;
         QString yname;
         QStringList labels;
@@ -260,7 +261,12 @@ class GenericChart : public QWidget {
         bool initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation);
 
         // add a curve, associating an axis
-        bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+        bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
+                      QStringList labels, QStringList colors,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
+
+        // helper for Python charts fseries is a stringlist
+        bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
 

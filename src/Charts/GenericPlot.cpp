@@ -443,7 +443,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 
 // rendering to qt chart
 bool
-GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> /** UNUSED fseries **/, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
 {
