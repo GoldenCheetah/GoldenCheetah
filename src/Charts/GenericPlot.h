@@ -109,6 +109,7 @@ class GenericPlot : public QWidget {
         void setSeriesVisible(QString name, bool visible);
 
         // watching scene events and managing interaction
+        void seriesClicked(QAbstractSeries*series, GPointF point);
         bool eventHandler(int eventsource, void *obj, QEvent *event);
         void barsetHover(bool status, int index, QBarSet *barset);
         void plotAreaChanged();
@@ -139,7 +140,6 @@ class GenericPlot : public QWidget {
         // quadtrees
         QMap<QAbstractSeries*, Quadtree*> quadtrees;
 
-
         // annotation labels
         QList<QLabel *> labels;
 
@@ -149,6 +149,9 @@ class GenericPlot : public QWidget {
 
         // curves
         QMap<QString, QAbstractSeries *>curves;
+
+        // filenames
+        QMap<QAbstractSeries*, QVector<QString> > filenames;
 
         // decorations (symbols for line charts, lines for scatter)
         QMap<QAbstractSeries*, QAbstractSeries *>decorations;

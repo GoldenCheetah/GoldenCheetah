@@ -279,7 +279,7 @@ GenericLegend::removeAllSeries()
 }
 
 void
-GenericLegend::setValue(QPointF value, QString name)
+GenericLegend::setValue(GPointF value, QString name)
 {
     GenericLegendItem *call = items.value(name, NULL);
     if (call) call->setValue(value.y());

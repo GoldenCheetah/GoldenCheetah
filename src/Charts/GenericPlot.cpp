@@ -22,6 +22,7 @@
 #include "Colors.h"
 #include "TabView.h"
 #include "RideFileCommand.h"
+#include "RideCache.h"
 #include "Utils.h"
 
 #include <limits>
@@ -85,7 +86,8 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // get notifications when values change
-    connect(selector, SIGNAL(hover(QPointF,QString,QAbstractSeries*)), legend, SLOT(setValue(QPointF,QString)));
+    connect(selector, SIGNAL(seriesClicked(QAbstractSeries*,GPointF)), this, SLOT(seriesClicked(QAbstractSeries*,GPointF)));
+    connect(selector, SIGNAL(hover(GPointF,QString,QAbstractSeries*)), legend, SLOT(setValue(GPointF,QString)));
     connect(selector, SIGNAL(unhover(QString)), legend, SLOT(unhover(QString)));
     connect(selector, SIGNAL(unhoverx()), legend, SLOT(unhoverx()));
     connect(legend, SIGNAL(clicked(QString,bool)), this, SLOT(setSeriesVisible(QString,bool)));
@@ -94,6 +96,19 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     // config changed...
     configChanged(0);
 }
+
+void
+GenericPlot::seriesClicked(QAbstractSeries*series, GPointF point)
+{
+    // user clicked on a point, do we need to click thru?
+    QVector<QString> fseries = filenames.value(series, QVector<QString>());
+    if (point.index >= 0 && point.index < fseries.count()) {
+        // click thru
+        RideItem *item = context->athlete->rideCache->getRide(fseries.at(point.index));
+        if (item) context->notifyRideSelected(item);
+    }
+}
+bool GenericPlot::eventFilter(QObject *obj, QEvent *e) { return eventHandler(1, obj, e); }
 
 // source 0=scene, 1=widget
 bool
@@ -245,7 +260,7 @@ void
 GenericPlot::pieHover(QPieSlice *slice, bool state)
 {
     if (havelegend.count() == 0) return;
-    if (state == true)  legend->setValue(QPointF(0, round(slice->percentage()*1000)/10), havelegend.first());
+    if (state == true)  legend->setValue(GPointF(0, round(slice->percentage()*1000)/10, -1), havelegend.first());
     else legend->unhover(havelegend.first());
 }
 
@@ -253,7 +268,7 @@ GenericPlot::pieHover(QPieSlice *slice, bool state)
 void GenericPlot::barsetHover(bool status, int index, QBarSet *)
 {
     foreach(QBarSet *barset, barsets) {
-        if (status)  legend->setValue(QPointF(0, barset->at(index)), barset->label());
+        if (status)  legend->setValue(GPointF(0, barset->at(index), -1), barset->label());
         else legend->unhover(barset->label());
     }
 }
@@ -371,6 +386,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
     if (charttype != type) {
         qchart->removeAllSeries();
         curves.clear();
+        filenames.clear();
         barseries=NULL;
     }
 
@@ -443,7 +459,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
 
 // rendering to qt chart
 bool
-GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> /** UNUSED fseries **/, QString xname, QString yname,
+GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
 {
@@ -627,6 +643,10 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             QScatterSeries *add = new QScatterSeries();
             add->setName(name);
 
+            // handle click thru
+            connect(add, SIGNAL(clicked(QPointF)), selector, SLOT(seriesClicked())); // catch series clicks
+            filenames.insert(add, fseries);
+
             // aesthetics
             if (symbol == 0) add->setVisible(false); // no marker !
             else if (symbol == 1) add->setMarkerShape(QScatterSeries::MarkerShapeCircle);
@@ -661,7 +681,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             Quadtree *tree = new Quadtree(QPointF(calc.x.min, calc.y.min), QPointF(calc.x.max, calc.y.max));
             for (int i=0; i<xseries.size() && i<yseries.size(); i++)
                 if (xseries.at(i) != 0 && yseries.at(i) != 0) // 0,0 is common and lets ignore (usually means no data)
-                    tree->insert(QPointF(xseries.at(i), yseries.at(i)));
+                    tree->insert(GPointF(xseries.at(i), yseries.at(i), i));
 
             if (tree->nodes.count() || tree->root->contents.count()) quadtrees.insert(add, tree);
 
