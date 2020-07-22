@@ -587,12 +587,10 @@ SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
             stream << context->athlete->seasons->seasons[seasonIdx].name + "/" + context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].name; // name
             stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].start;
             stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].end;
-            stream << (quint64)context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].days();
         } else {
             stream << context->athlete->seasons->seasons[seasonIdx].name; // name
             stream << context->athlete->seasons->seasons[seasonIdx].start;
             stream << context->athlete->seasons->seasons[seasonIdx].end;
-            stream << (quint64)context->athlete->seasons->seasons[seasonIdx].days();
         }
 
     }

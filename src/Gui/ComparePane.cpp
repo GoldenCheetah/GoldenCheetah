@@ -988,7 +988,6 @@ ComparePane::dropEvent(QDropEvent *event)
         // lets get the basic data
         stream >> count;
         for (int i=0; i<count; i++) {
-            int days;
 
             CompareDateRange add;
 
@@ -999,7 +998,6 @@ ComparePane::dropEvent(QDropEvent *event)
             stream >> add.name;
             stream >> add.start;
             stream >> add.end;
-            stream >> days;
 
             // The specification is a date range
             add.specification.setDateRange(DateRange(add.start,add.end));
