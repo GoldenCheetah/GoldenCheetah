@@ -99,7 +99,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     mainLayout->addWidget(notes);
 
     connect(rides, SIGNAL(itemSelectionChanged()), this, SLOT(rideSelected()));
-    connect(rides, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(rideOpen()));
+    connect(rides, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(rideOpen()));
 
 }
 
@@ -533,8 +533,6 @@ LTMPopup::rideOpen()
 
             // Select Activity in Activities view
             context->notifyRideSelected(have);
-            // Select Activities view
-            context->mainWindow->selectAnalysis();
         }
     }
 }
