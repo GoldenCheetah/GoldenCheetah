@@ -61,8 +61,8 @@ class Season
 
         Season();
 
-        QDate getStart();
-        QDate getEnd();
+        QDate getStart() const ;
+        QDate getEnd() const ;
         int getSeed() { return _seed; }
         int getLow() { return _low; }
         int getMaxRamp() { return _ramp; }
@@ -83,8 +83,6 @@ class Season
         QVector<int> &load() { return _load; }
 
         int type;
-        QDate start; // first day of the season
-        QDate end; // last day of the season
 
         QString name; // name, typically users name them by year e.g. "2011 Season"
 
@@ -94,7 +92,8 @@ class Season
         QList<SeasonEvent> events;
 
     protected:
-
+        QDate _start; // first day of the season
+        QDate _end; // last day of the season
         int _seed;
         int _low; // low point for SB .. default to -50
         int _ramp; // max ramp rate for CTL we want to see

@@ -328,7 +328,7 @@ LTMSidebar::selectDateRange(DateRange dr)
 {
     for(int i=0; i<seasons->seasons.count(); i++) {
         Season s = seasons->seasons.at(i);
-        if (s.start == dr.from && s.end == dr.to && s.name == dr.name) {
+        if (s.getStart() == dr.from && s.getEnd() == dr.to && s.name == dr.name) {
             // bingo
             dateRangeTree->selectionModel()->clearSelection(); // clear selection
             allDateRanges->child(i)->setSelected(true); // select ours
@@ -338,7 +338,7 @@ LTMSidebar::selectDateRange(DateRange dr)
             if (names.count() == 2 && s.name == names.at(0)) {
                 for (int j=0; j<s.phases.count(); j++) {
                     Phase p = s.phases.at(j);
-                    if (p.start == dr.from && p.end == dr.to && p.name == names.at(1)) {
+                    if (p.getStart() == dr.from && p.getEnd() == dr.to && p.name == names.at(1)) {
                         // bingo
                         dateRangeTree->selectionModel()->clearSelection(); // clear selection
                         allDateRanges->child(i)->child(j)->setSelected(true); // select ours
@@ -408,8 +408,8 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
     }
 
     // Let the view know its changed....
-    if (phase) emit dateRangeChanged(DateRange(phase->start, phase->end, dateRange->name + "/" + phase->name));
-    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->start, dateRange->end, dateRange->name));
+    if (phase) emit dateRangeChanged(DateRange(phase->getStart(), phase->getEnd(), dateRange->name + "/" + phase->name));
+    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->getStart(), dateRange->getEnd(), dateRange->name));
     else emit dateRangeChanged(DateRange());
 
 }
@@ -1159,10 +1159,10 @@ LTMSidebar::addRange()
         active = true;
 
         // check dates are right way round...
-        if (newOne.start > newOne.end) {
-            QDate temp = newOne.start;
-            newOne.start = newOne.end;
-            newOne.end = temp;
+        if (newOne.getStart() > newOne.getEnd()) {
+            QDate temp = newOne.getStart();
+            newOne.setStart(newOne.getEnd());
+            newOne.setEnd(temp);
         }
 
         // save 
@@ -1210,20 +1210,20 @@ LTMSidebar::editRange()
 
         if (phaseIdx> -1) {
             // check dates are right way round...
-            if (seasons->seasons[seasonIdx].phases[phaseIdx].start > seasons->seasons[seasonIdx].phases[phaseIdx].end) {
-                QDate temp = seasons->seasons[seasonIdx].phases[phaseIdx].start;
-                seasons->seasons[seasonIdx].phases[phaseIdx].start = seasons->seasons[seasonIdx].phases[phaseIdx].end;
-                seasons->seasons[seasonIdx].phases[phaseIdx].end = temp;
+            if (seasons->seasons[seasonIdx].phases[phaseIdx].getStart() > seasons->seasons[seasonIdx].phases[phaseIdx].getEnd()) {
+                QDate temp = seasons->seasons[seasonIdx].phases[phaseIdx].getStart();
+                seasons->seasons[seasonIdx].phases[phaseIdx].setStart(seasons->seasons[seasonIdx].phases[phaseIdx].getEnd());
+                seasons->seasons[seasonIdx].phases[phaseIdx].setEnd(temp);
             }
 
             // update name
             dateRangeTree->selectedItems().first()->setText(0, seasons->seasons[seasonIdx].phases[phaseIdx].getName());
         } else {
             // check dates are right way round...
-            if (seasons->seasons[seasonIdx].start > seasons->seasons[seasonIdx].end) {
-                QDate temp = seasons->seasons[seasonIdx].start;
-                seasons->seasons[seasonIdx].start = seasons->seasons[seasonIdx].end;
-                seasons->seasons[seasonIdx].end = temp;
+            if (seasons->seasons[seasonIdx].getStart() > seasons->seasons[seasonIdx].getEnd()) {
+                QDate temp = seasons->seasons[seasonIdx].getStart();
+                seasons->seasons[seasonIdx].setStart(seasons->seasons[seasonIdx].getEnd());
+                seasons->seasons[seasonIdx].setEnd(temp);
             }
 
             // update name

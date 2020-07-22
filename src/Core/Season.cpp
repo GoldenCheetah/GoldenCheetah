@@ -57,14 +57,14 @@ QString Season::getName() {
     return name;
 }
 
-QDate Season::getStart()
+QDate Season::getStart() const
 {
-    return start;
+    return _start;
 }
 
-QDate Season::getEnd()
+QDate Season::getEnd() const
 {
-    return end;
+    return _end;
 }
 
 int Season::getType()
@@ -90,14 +90,14 @@ int Season::prior()
     return 0;
 }
 
-void Season::setEnd(QDate _end)
+void Season::setEnd(QDate end)
 {
-    end = _end;
+    _end = end;
 }
 
-void Season::setStart(QDate _start)
+void Season::setStart(QDate start)
 {
-    start = _start;
+    _start = start;
 }
 
 void Season::setName(QString _name)
@@ -112,7 +112,7 @@ void Season::setType(int _type)
 
 bool Season::LessThanForStarts(const Season &a, const Season &b)
 {
-    return a.start.toJulianDay() < b.start.toJulianDay();
+    return a.getStart().toJulianDay() < b.getStart().toJulianDay();
 }
 
 /*----------------------------------------------------------------------
@@ -496,7 +496,7 @@ Season
 Seasons::seasonFor(QDate date)
 {
     foreach(Season season, seasons)
-        if (date >= season.start && date <= season.end)
+        if (date >= season.getStart() && date <= season.getEnd())
             return season;
 
     // if not found just return an all dates season
@@ -585,12 +585,12 @@ SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
         // season[index] ...
         if (phaseIdx > -1) {
             stream << context->athlete->seasons->seasons[seasonIdx].name + "/" + context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].name; // name
-            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].start;
-            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].end;
+            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].getStart();
+            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].getEnd();
         } else {
             stream << context->athlete->seasons->seasons[seasonIdx].name; // name
-            stream << context->athlete->seasons->seasons[seasonIdx].start;
-            stream << context->athlete->seasons->seasons[seasonIdx].end;
+            stream << context->athlete->seasons->seasons[seasonIdx].getStart();
+            stream << context->athlete->seasons->seasons[seasonIdx].getEnd();
         }
 
     }
@@ -622,12 +622,12 @@ Phase::Phase() : Season()
     _low = -50;
 }
 
-Phase::Phase(QString _name, QDate _start, QDate _end) : Season()
+Phase::Phase(QString _name, QDate start, QDate end) : Season()
 {
     type = phase;  // by default phase are of type phase
     name = _name;
-    start = _start;
-    end = _end;
+    _start = start;
+    _end = end;
     _id = QUuid::createUuid(); // in case it isn't set yet
     _seed = 0;
     _low = -50;
