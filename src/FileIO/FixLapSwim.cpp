@@ -23,6 +23,7 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
+#include <QHash>
 
 #include <cmath>
 
@@ -154,11 +155,11 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
-    // Preserve HR data
-    QVector<double> hrdata(ride->dataPoints().count());
-    for (int i=0; i<ride->dataPoints().count(); i++)
-        hrdata[i] = ride->dataPoints()[i]->hr;
-
+    // Preserve existing data (HR, Temp, etc.)
+    QHash<double, RideFilePoint> ptHash;
+    foreach (const RideFilePoint* pt, ride->dataPoints()) {
+        ptHash.insert(pt->secs, *pt);
+    }
     // delete current lap markers
     ride->clearIntervals();
     // ok, lets start a transaction and drop existing samples
@@ -203,20 +204,15 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
            kph = 3600.0 * length_distance / length_duration;
            if (length_distance == 0.0) interval++; // pauses mark laps
            for (int i = 0; i < length_duration; i++) {
-               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
-               newRows << RideFilePoint(
-                   last_time + i, cad, hr,
-                   last_distance + (length_distance * i/length_duration),
-                   kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                   0.0, 0.0,
-                   RideFile::NA,RideFile::NA,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0, 0.0, 0.0,
-                   interval);
+               // recover previous data or create a new sample point,
+               // and fix time/speed/distance/cadence/interval
+               RideFilePoint pt = ptHash.value(last_time + i);
+               pt.secs = last_time + i;
+               pt.cad = cad;
+               pt.km = last_distance + (length_distance * i/length_duration);
+               pt.kph = kph;
+               pt.interval = interval;
+               newRows << pt;
             }
             ride->command->appendPoints(newRows);
             last_time += length_duration;
@@ -228,20 +224,15 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
            QVector<struct RideFilePoint> newRows;
            interval++; // pauses mark laps
            for (int i=0; i<p->number[restIdx] && i<100*GarminHWM.toInt(); i++) {
-               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
-               newRows << RideFilePoint(
-                   last_time + i, 0.0, hr,
-                   last_distance,
-                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                   0.0, 0.0,
-                   RideFile::NA,RideFile::NA,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0, 0.0, 0.0,
-                   interval);
+               // recover previous data or create a new sample point,
+               // and fix time/speed/distance/cadence/interval
+               RideFilePoint pt = ptHash.value(last_time + i);
+               pt.secs = last_time + i;
+               pt.cad = 0.0;
+               pt.km = last_distance;
+               pt.kph = 0.0;
+               pt.interval = interval;
+               newRows << pt;
            }
            ride->command->appendPoints(newRows);
            last_time += p->number[restIdx];
