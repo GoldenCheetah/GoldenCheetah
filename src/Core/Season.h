@@ -165,9 +165,6 @@ class Seasons : public QObject {
         void writeSeasons();
         QList<Season> seasons;
 
-        // get first season the date falls within
-        Season seasonFor(QDate);
-
     signals:
         void seasonsChanged();
 
