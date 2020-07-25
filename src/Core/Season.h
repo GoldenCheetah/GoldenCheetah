@@ -50,6 +50,21 @@ class SeasonEvent
         QString id; // unique id
 };
 
+class SeasonLength
+{
+
+    public:
+        SeasonLength(int _years, int _months, qint64 _days);
+
+        QDate substractFrom(QDate end);
+
+    private:
+        int years;
+        int months;
+        qint64 days;
+
+};
+
 class Season
 {
     Q_DECLARE_TR_FUNCTIONS(Season)
@@ -73,6 +88,7 @@ class Season
 
         void setStart(QDate _start);
         void setEnd(QDate _end);
+        void setLength(int _years, int _months, qint64 _days);
         void setName(QString _name);
         void setType(int _type);
         void setSeed(int x) { _seed = x; }
