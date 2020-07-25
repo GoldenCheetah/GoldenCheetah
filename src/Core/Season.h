@@ -54,7 +54,10 @@ class SeasonLength
 {
 
     public:
+        SeasonLength();
         SeasonLength(int _years, int _months, qint64 _days);
+
+        bool operator==(const SeasonLength& length);
 
         QDate substractFrom(QDate end);
 
@@ -64,6 +67,7 @@ class SeasonLength
         qint64 days;
 
 };
+
 
 class Season
 {
@@ -82,7 +86,7 @@ class Season
         int getLow() { return _low; }
         int getMaxRamp() { return _ramp; }
         QString getName();
-        int prior(); // if a relative season, how many days prior does it cover e.g. Last 21 days returns 21. 0 if not relative
+        SeasonLength getLength() { return _length; } // if a relative season, how long it is
         int getType();
         static bool LessThanForStarts(const Season &a, const Season &b);
 
@@ -108,6 +112,7 @@ class Season
         QList<SeasonEvent> events;
 
     protected:
+        SeasonLength _length;
         QDate _start; // first day of the season
         QDate _end; // last day of the season
         int _seed;

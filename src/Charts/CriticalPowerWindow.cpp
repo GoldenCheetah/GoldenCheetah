@@ -1299,8 +1299,8 @@ CriticalPowerWindow::rideSelected()
         Season season = seasons->seasons.at(cComboSeason->currentIndex());
 
         // Refresh aggregated curve (ride added/filter changed)
-        if (season.prior() == 0) cpPlot->setDateRange(season.getStart(), season.getEnd()); // fixed
-        else if (myRideItem) cpPlot->setDateRange(myRideItem->dateTime.date().addDays(season.prior()), myRideItem->dateTime.date());
+        if (season.getLength() == SeasonLength()) cpPlot->setDateRange(season.getStart(), season.getEnd()); // fixed
+        else if (myRideItem) cpPlot->setDateRange(season.getLength().substractFrom(myRideItem->dateTime.date()), myRideItem->dateTime.date());
     }
 
     if (!amVisible()) return;
