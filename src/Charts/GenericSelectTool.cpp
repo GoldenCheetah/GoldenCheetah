@@ -414,7 +414,7 @@ GenericSelectTool::clicked(QPointF pos)
     bool updatescene = false;
 
     // click on a point to click-thru
-    if (hoverpoint.index != -1) { // hovering and clicked
+    if (hoverpoint.index != -1) { // scatter plot
         emit seriesClicked(hoverseries, hoverpoint);
 
         // not sure need to do this....

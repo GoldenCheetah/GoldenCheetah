@@ -54,6 +54,8 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(setRide(RideItem*)));
     } else {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(setDateRange(DateRange)));
+        connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
+        connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
     }
 
     // need to refresh when chart settings change
@@ -139,6 +141,8 @@ UserChart::setRide(RideItem *item)
  void
  UserChart::refresh()
  {
+    if (!amVisible()) { stale=true; return; }
+
     // ok, we've run out of excuses, looks like we need to plot
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
 

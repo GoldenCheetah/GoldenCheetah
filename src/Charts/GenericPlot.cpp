@@ -529,6 +529,10 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             QLineSeries *add = new QLineSeries();
             add->setName(name);
 
+            // get setup for click thru
+            connect(add, SIGNAL(clicked(QPointF)), selector, SLOT(seriesClicked())); // catch series clicks
+            filenames.insert(add, fseries);
+
             // aesthetics
             add->setBrush(Qt::NoBrush);
             QPen pen(color);
