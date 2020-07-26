@@ -50,6 +50,20 @@ class SeasonEvent
         QString id; // unique id
 };
 
+class SeasonOffset
+{
+    public:
+        SeasonOffset(int _years, int _months, qint64 _weeks);
+
+        QDate getStart();
+
+    private:
+        int years;
+        int months;
+        qint64 weeks;
+
+};
+
 class SeasonLength
 {
 
@@ -67,7 +81,6 @@ class SeasonLength
         qint64 days;
 
 };
-
 
 class Season
 {
@@ -92,7 +105,7 @@ class Season
 
         void setStart(QDate _start);
         void setEnd(QDate _end);
-        void setLength(int _years, int _months, qint64 _days);
+        void setLength(int years, int months, qint64 days);
         void setName(QString _name);
         void setType(int _type);
         void setSeed(int x) { _seed = x; }

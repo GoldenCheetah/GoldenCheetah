@@ -44,6 +44,29 @@ static QList<QString> _setSeasonTypes()
 
 QList<QString> Season::types = _setSeasonTypes();
 
+SeasonOffset::SeasonOffset(int _years, int _months, qint64 _weeks)
+{
+    years = _years;
+    months = _months;
+    weeks = _weeks;
+}
+
+QDate SeasonOffset::getStart()
+{
+    QDate today = QDate::currentDate();
+
+    if (years<=0) {
+        return QDate(today.year(), 1,1).addYears(years);
+    } else if (months<=0) {
+        return QDate(today.year(), today.month(),1).addMonths(months);
+    } else if (weeks<=0) {
+        // from Mon-Sun
+        return today.addDays((Qt::Monday - today.dayOfWeek()) + 7*weeks);
+    } else {
+        return QDate();
+    }
+}
+
 SeasonLength::SeasonLength()
 {
     years = 0;
@@ -58,7 +81,8 @@ SeasonLength::SeasonLength(int _years, int _months, qint64 _days)
     days = _days;
 }
 
-bool SeasonLength::operator==(const SeasonLength& length) {
+bool SeasonLength::operator==(const SeasonLength& length)
+{
     return years==length.years && months==length.months && days==length.days;
 }
 
@@ -76,8 +100,8 @@ Season::Season()
     _length = SeasonLength();
 }
 
-QString Season::getName() {
-
+QString Season::getName()
+{
     return name;
 }
 
@@ -336,54 +360,47 @@ Seasons::readSeasons()
     seasons = handler.getSeasons();
 
     Season season;
-    QDate today = QDate::currentDate();
-    QDate eom = QDate(today.year(), today.month(), today.daysInMonth());
 
     // add Default Date Ranges
     season.setName(tr("All Dates"));
     season.setType(Season::temporary);
-    season.setStart(QDate::currentDate().addYears(-50));
-    season.setEnd(QDate::currentDate().addYears(50));
+    season.setStart(SeasonOffset(-50, 1, 1).getStart());
+    season.setEnd(SeasonOffset(-50, 1, 1).getStart().addYears(100).addDays(-1));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000001}"));
     seasons.append(season);
 
     season.setName(tr("This Year"));
     season.setType(Season::temporary);
-    season.setStart(QDate(today.year(), 1,1));
-    season.setEnd(QDate(today.year(), 12, 31));
+    season.setStart(SeasonOffset(0, 1, 1).getStart());
+    season.setEnd(SeasonOffset(0, 1, 1).getStart().addYears(1).addDays(-1));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000002}"));
     seasons.append(season);
 
     season.setName(tr("This Month"));
     season.setType(Season::temporary);
-    season.setStart(QDate(today.year(), today.month(),1));
-    season.setEnd(eom);
+    season.setStart(SeasonOffset(1, 0, 1).getStart());
+    season.setEnd(SeasonOffset(1, 0, 1).getStart().addMonths(1).addDays(-1));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000003}"));
     seasons.append(season);
 
     season.setName(tr("Last Month"));
     season.setType(Season::temporary);
-    season.setStart(QDate(today.year(), today.month(),1).addMonths(-1));
-    season.setEnd(QDate(today.year(), today.month(),1).addDays(-1));
+    season.setStart(SeasonOffset(1, -1, 1).getStart());
+    season.setEnd(SeasonOffset(1, -1, 1).getStart().addMonths(1).addDays(-1));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000013}"));
     seasons.append(season);
 
     season.setName(tr("This Week"));
     season.setType(Season::temporary);
-    // from Mon-Sun
-    QDate wstart = QDate::currentDate();
-    wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
-    QDate wend = wstart.addDays(6); // first day + 6 more
-    season.setStart(wstart);
-    season.setEnd(wend);
+    season.setStart(SeasonOffset(1, 1, 0).getStart());
+    season.setEnd(SeasonOffset(1, 1, 0).getStart().addDays(6));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000004}"));
     seasons.append(season);
 
     season.setName(tr("Last Week"));
     season.setType(Season::temporary);
-    // from Mon-Sun
-    season.setStart(wstart.addDays(-7));
-    season.setEnd(wend.addDays(-7));
+    season.setStart(SeasonOffset(1, 1, -1).getStart());
+    season.setEnd(SeasonOffset(1, 1, -1).getStart().addDays(6));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000014}"));
     seasons.append(season);
 
