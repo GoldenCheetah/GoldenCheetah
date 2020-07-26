@@ -53,9 +53,10 @@ class SeasonEvent
 class SeasonOffset
 {
     public:
+        SeasonOffset();
         SeasonOffset(int _years, int _months, qint64 _weeks);
 
-        QDate getStart();
+        QDate getStart(QDate reference) const;
 
     private:
         int years;
@@ -73,7 +74,8 @@ class SeasonLength
 
         bool operator==(const SeasonLength& length);
 
-        QDate substractFrom(QDate end);
+        QDate addTo(QDate start) const;
+        QDate substractFrom(QDate end) const;
 
     private:
         int years;
@@ -93,19 +95,32 @@ class Season
 
         Season();
 
+        // get the date range (if relative, use today as origin)
         QDate getStart() const ;
         QDate getEnd() const ;
+        // get the date range (if relative, use the sepecified origin)
+        QDate getStart(QDate _end) const;
+        QDate getEnd(QDate _end) const;
+
         int getSeed() { return _seed; }
         int getLow() { return _low; }
         int getMaxRamp() { return _ramp; }
         QString getName();
-        SeasonLength getLength() { return _length; } // if a relative season, how long it is
+        SeasonLength getLength() const { return _length; } // if a relative season, how long it is
         int getType();
         static bool LessThanForStarts(const Season &a, const Season &b);
 
+        // set the limits of a fixed season
         void setStart(QDate _start);
         void setEnd(QDate _end);
+
+        // set the offset (with respect to the current year/month/week)
+        // and length of a relative season
+        void setOffsetAndLength(int offetYears, int offsetMonths, qint64 offsetWeeks, int years, int months, qint64 days);
+
+        // set the length of a relative season that ends today
         void setLength(int years, int months, qint64 days);
+
         void setName(QString _name);
         void setType(int _type);
         void setSeed(int x) { _seed = x; }
@@ -125,6 +140,7 @@ class Season
         QList<SeasonEvent> events;
 
     protected:
+        SeasonOffset _offset;
         SeasonLength _length;
         QDate _start; // first day of the season
         QDate _end; // last day of the season

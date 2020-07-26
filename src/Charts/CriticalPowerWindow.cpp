@@ -1289,18 +1289,16 @@ CriticalPowerWindow::rideSelected()
             hoverCurve = NULL;
         }
 
-        // when plotting a single ride, the date range is either as selected
-        // for a fixed period (e.g. 2018) or it is for a fixed period
-        // prior to the ride (e.g. Last 28 days), we look at the
-        // date range id to map to known first, then just use the season
-        // range, that way as you look at older rides the dates being
-        // used change to reflect capability at that time, whilst in
-        // range mode (trends) its just the season selected.
         Season season = seasons->seasons.at(cComboSeason->currentIndex());
 
-        // Refresh aggregated curve (ride added/filter changed)
-        if (season.getLength() == SeasonLength()) cpPlot->setDateRange(season.getStart(), season.getEnd()); // fixed
-        else if (myRideItem) cpPlot->setDateRange(season.getLength().substractFrom(myRideItem->dateTime.date()), myRideItem->dateTime.date());
+        if (myRideItem) {
+            // if the range selected is relative (e.g. "This Year" or
+            // "Last 28 days", compute it with respect to the ride's
+            // date
+            cpPlot->setDateRange(season.getStart(myRideItem->dateTime.date()), season.getEnd(myRideItem->dateTime.date()));
+        } else {
+            cpPlot->setDateRange(season.getStart(), season.getEnd());
+        }
     }
 
     if (!amVisible()) return;
