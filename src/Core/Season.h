@@ -53,14 +53,34 @@ class SeasonEvent
 class SeasonOffset
 {
     public:
+        // by default, the offset is invalid
         SeasonOffset();
+
+        // if different from the default, the offset represent the start
+        // of the season with respect to the year/month/week that
+        // contains the reference date (i.e. either the current date, or
+        // the date of the selected activity)
         SeasonOffset(int _years, int _months, qint64 _weeks);
 
+        // get the start of the season, or QDate() if the offset is
+        // invalid
         QDate getStart(QDate reference) const;
 
     private:
+        // if <=0, offset in years of the season with respect to the
+        // current year
+        // if >0, unused: go to `months`
         int years;
+
+        // if <=0, offset in months of the season with respect to the
+        // current month
+        // if >0, unused: go to `weeks`
         int months;
+
+        // if <=0, offset in weeks of the season with respect to the
+        // current week (Qt weeks start on Monday)
+        // if >0, the whole offset is unused (either the season is
+        // fixed, or it ends on the reference day)
         qint64 weeks;
 
 };
@@ -69,7 +89,12 @@ class SeasonLength
 {
 
     public:
+        // by default, the length is invalid
         SeasonLength();
+
+        // if different from the default, the length represent the
+        // number of years, months and days from the start to the end,
+        // included (i.e. if start==end, the length is (0,0,1))
         SeasonLength(int _years, int _months, qint64 _days);
 
         bool operator==(const SeasonLength& length);
@@ -78,6 +103,7 @@ class SeasonLength
         QDate substractFrom(QDate end) const;
 
     private:
+        // if (0,0,0), the length is invalid (the season is fixed)
         int years;
         int months;
         qint64 days;
@@ -95,30 +121,37 @@ class Season
 
         Season();
 
-        // get the date range (if relative, use today as origin)
+        // get the date range (if relative, use today as reference)
         QDate getStart() const ;
         QDate getEnd() const ;
-        // get the date range (if relative, use the sepecified origin)
-        QDate getStart(QDate _end) const;
-        QDate getEnd(QDate _end) const;
+        // get the date range (if relative, use the specified date as reference)
+        QDate getStart(QDate reference) const;
+        QDate getEnd(QDate reference) const;
 
         int getSeed() { return _seed; }
         int getLow() { return _low; }
         int getMaxRamp() { return _ramp; }
         QString getName();
-        SeasonLength getLength() const { return _length; } // if a relative season, how long it is
+
+        // length of a relative season, SeasonLength() if fixed
+        SeasonLength getLength() const { return _length; }
+
         int getType();
         static bool LessThanForStarts(const Season &a, const Season &b);
 
-        // set the limits of a fixed season
+        // make the season fixed (by invalidating _offset and _length)
+        // and set the limits of a fixed season
         void setStart(QDate _start);
         void setEnd(QDate _end);
 
-        // set the offset (with respect to the current year/month/week)
-        // and length of a relative season
+        // make the season relative (by setting _length; also
+        // invalidates _start and _end) and set the offset of the start
+        // with respect to the reference
         void setOffsetAndLength(int offetYears, int offsetMonths, qint64 offsetWeeks, int years, int months, qint64 days);
 
-        // set the length of a relative season that ends today
+        // make the season relative (by setting _length; also
+        // invalidates _start and _end) and invalidates the offset to
+        // make the season end on the reference
         void setLength(int years, int months, qint64 days);
 
         void setName(QString _name);
@@ -140,10 +173,10 @@ class Season
         QList<SeasonEvent> events;
 
     protected:
-        SeasonOffset _offset;
-        SeasonLength _length;
-        QDate _start; // first day of the season
-        QDate _end; // last day of the season
+        SeasonOffset _offset; // offset of the start (relative season)
+        SeasonLength _length; // length (relative season)
+        QDate _start; // first day (fixed season)
+        QDate _end; // last day (fixed season)
         int _seed;
         int _low; // low point for SB .. default to -50
         int _ramp; // max ramp rate for CTL we want to see
