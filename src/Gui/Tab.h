@@ -24,6 +24,7 @@
 
 class RideNavigator;
 class MainWindow;
+class AthleteLoader;
 class ProgressLine;
 class QPaintEvent;
 class NavigationModel;
@@ -33,6 +34,8 @@ class Tab: public QWidget
     Q_OBJECT
 
     public:
+
+        bool init; // am I ready yet?
 
         Tab(Context *context);
         ~Tab();
@@ -49,6 +52,7 @@ class Tab: public QWidget
 
         friend class ::MainWindow;
         friend class ::NavigationModel;
+        friend class ::AthleteLoader;
         Context *context;
 
     signals:

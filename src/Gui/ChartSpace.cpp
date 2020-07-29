@@ -35,7 +35,7 @@ static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
 ChartSpace::ChartSpace(Context *context, int scope) :
-    state(NONE), context(context), scope(scope), group(NULL), _viewY(0),
+    state(NONE), context(context), scope(scope), group(NULL), fixedZoom(0), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
 {
@@ -145,6 +145,14 @@ ChartSpace::rideSelected(RideItem *item)
     // ok, remember we did this one
     currentRideItem = item;
     stale=false;
+}
+
+void
+ChartSpace::refresh()
+{
+    stale = true;
+    if (scope == TRENDS) dateRangeChanged(currentDateRange);
+    else if (scope == ANALYSIS) rideSelected(currentRideItem);
 }
 
 void
@@ -483,6 +491,13 @@ ChartSpace::configChanged(qint32)
 }
 
 void
+ChartSpace::setFixedZoom(int zoom)
+{
+    fixedZoom=zoom;
+    updateView();
+}
+
+void
 ChartSpace::updateView()
 {
     scene->setSceneRect(sceneRect);
@@ -598,10 +613,13 @@ void
 ChartSpace::setViewRect(QRectF rect)
 {
     viewRect = rect;
+    if (fixedZoom) viewRect.setWidth(fixedZoom);
 
     // fit to scene width XXX need to fix scrollbars.
     double scale = view->frameGeometry().width() / viewRect.width();
-    QRectF scaledRect(0,_viewY, viewRect.width(), view->frameGeometry().height() / scale);
+    QRectF scaledRect(0,_viewY, fixedZoom ? fixedZoom :viewRect.width(), view->frameGeometry().height() / scale);
+
+    // fprintf(stderr, "setViewRect: scale=%f, scaledRect=%f,%f width=%f height=%f\n", scale, scaledRect.x(), scaledRect.y(), scaledRect.width(), scaledRect.height()); fflush(stderr);
 
     // scale to selection
     view->scale(scale,scale);

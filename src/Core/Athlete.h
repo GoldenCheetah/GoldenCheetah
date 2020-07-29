@@ -166,6 +166,7 @@ class Athlete : public QObject
     public slots:
         void checkCPX(RideItem*ride);
         void configChanged(qint32);
+        void loadComplete();
 
 };
 
@@ -224,5 +225,17 @@ class AthleteDirectoryStructure : public QObject {
 
 };
 
+class MainWindow;
+class AthleteLoader : public QThread
+{
+    public:
+
+        // load an athlete in background
+        AthleteLoader(Context *context) : context(context) {}
+        void run() override;
+
+    private:
+        Context *context;
+};
 
 #endif

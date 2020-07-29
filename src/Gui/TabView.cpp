@@ -168,7 +168,7 @@ TabView::ourStyleSheet()
            "    border: 0px solid darkGray; "
            "    background:%1;"
            "    width: %4px;    "
-           "    margin: 1px 1px 1px 1px;"
+           "    margin: 0px 0px 0px 0px;"
            "}"
            "QScrollBar::handle:vertical:enabled:hover {"
            "    background: lightGray; "
@@ -403,7 +403,7 @@ TabView::sidebarChanged()
         // we are the analysis view
         // all a bit of a hack to stop the column widths from
         // being adjusted as the splitter gets resized and reset
-        if (context->mainWindow->init && type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
+        if (context->mainWindow->init && context->tab->init && type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
             context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
         setUpdatesEnabled(true);
 

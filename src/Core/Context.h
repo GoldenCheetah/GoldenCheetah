@@ -135,6 +135,11 @@ class Context : public QObject
                                             // when config has changed - and to get a
                                             // signal emitted to notify its children
 
+        // athlete load/close
+        void notifyLoadProgress(QString folder, double progress) { emit loadProgress(folder,progress); }
+        void notifyLoadCompleted(QString folder, Context *context) { emit loadCompleted(folder,context); }
+        void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
+
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
         void notifyPresetSelected(int n) { emit presetSelected(n); }
@@ -218,6 +223,11 @@ class Context : public QObject
         void userMetricsConfigChanged();
 
     signals:
+
+        // loading an athlete
+        void loadProgress(QString,double);
+        void loadCompleted(QString, Context*);
+        void athleteClose(QString, Context*);
 
         // global filter changed
         void filterChanged();

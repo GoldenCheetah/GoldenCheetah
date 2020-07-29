@@ -91,14 +91,15 @@ ride: '{' rideelement_list '}'                                  {
                                                                                 found = true;
 
                                                                                 // progress update
+                                                                                double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
                                                                                 if (jc->context->mainWindow->progress) {
 
                                                                                     // percentage progress
-                                                                                    QString m = QString("%1%")
-                                                                                    .arg(double(jc->context->mainWindow->loading++) /
-                                                                                         double(jc->cache->rides().count()) * 100.0f, 0, 'f', 0);
+                                                                                    QString m = QString("%1%").arg(progress , 0, 'f', 0);
                                                                                     jc->context->mainWindow->progress->setText(m);
                                                                                     QApplication::processEvents();
+                                                                                } else {
+                                                                                    jc->context->notifyLoadProgress(jc->folder,progress);
                                                                                 }
 
                                                                                 // update from our loaded value
@@ -359,6 +360,8 @@ RideCache::load()
         jc->cache = this;
         jc->api = NULL;
         jc->old = false;
+        jc->loading = 0;
+        jc->folder = context->athlete->home->root().canonicalPath();
 
         // clean item
         jc->item.path = directory.canonicalPath(); // TODO use plannedDirectory for planned

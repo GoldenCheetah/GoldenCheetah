@@ -295,6 +295,14 @@ HomeWindow::configChanged(qint32)
     tileArea->setPalette(palette);
     winWidget->setPalette(palette);
     winArea->setPalette(palette);
+
+    // tab colors
+    if (currentStyle == 0) {
+        for (int i=0; i<charts.count(); i++) {
+            if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(COVERVIEWBACKGROUND));
+            else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
+        }
+    }
 }
 
 void
@@ -662,6 +670,10 @@ HomeWindow::addChart(GcChartWindow* newone)
             //tabbed->addTab(newone, newone->property("title").toString());
             tabbed->addWidget(newone);
             chartbar->addWidget(newone->property("title").toString());
+
+            // tab colors
+            if (newone->type() == GcWindowTypes::Overview || newone->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(chartnum, GColor(COVERVIEWBACKGROUND));
+            else chartbar->setColor(chartnum, GColor(CPLOTBACKGROUND));
 
             // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
             if (newone->showTitle())  newone->setContentsMargins(0,25*dpiYFactor,0,0);

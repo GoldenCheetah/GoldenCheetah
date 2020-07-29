@@ -48,7 +48,7 @@ class ChartSpace;
 class ChartSpaceItemFactory;
 
 // we need a scope for a chart space, one or more of
-enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02 };
+enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
 
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
@@ -176,6 +176,7 @@ class ChartSpace : public QWidget
         QRectF getViewRect() const { return viewRect; }
 
         // trap signals
+        void refresh();
         void configChanged(qint32);
 
         // scale on first show
@@ -200,6 +201,11 @@ class ChartSpace : public QWidget
         // remove an item
         void removeItem(ChartSpaceItem *item);
 
+        // mostly for athlete view, we just set a fixed
+        // zoom width, so we don't get a massive athlete
+        // card when only one athlete
+        void setFixedZoom(int width);
+
     protected:
 
         // process events
@@ -217,6 +223,7 @@ class ChartSpace : public QWidget
         QPropertyAnimation *scroller;
 
         // scene and view
+        int fixedZoom;
         int _viewY;
         QRectF sceneRect;
         QRectF viewRect;

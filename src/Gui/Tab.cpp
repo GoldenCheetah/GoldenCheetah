@@ -33,6 +33,7 @@
 Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
 {
     context->tab = this;
+    init = false;
 
     setContentsMargins(0,0,0,0);
     QVBoxLayout *main = new QVBoxLayout(this);
@@ -115,6 +116,7 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), nos
     }
 
     noswitch = false; // we only let it happen when we're initialised
+    init = true;
 }
 
 Tab::~Tab()

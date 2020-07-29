@@ -227,6 +227,12 @@ ChartBar::setText(int index, QString text)
     tidy(true); // still fit ?
 }
 
+void
+ChartBar::setColor(int index, QColor color)
+{
+    buttons[index]->setColor(color);
+}
+
 
 // tidy up the scrollers on first show...
 void
@@ -452,7 +458,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
     // background - chrome or slected colour
     QBrush brush(GColor(CCHROME));
     if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
-    if (checked) brush = QBrush(GColor(CPLOTBACKGROUND));
+    if (checked) brush = color;
     painter.fillRect(body, brush);
 
     // now paint the text

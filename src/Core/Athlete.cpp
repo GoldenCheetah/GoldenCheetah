@@ -58,6 +58,7 @@
 
 Athlete::Athlete(Context *context, const QDir &homeDir)
 {
+fprintf(stderr, "new athlete preamble...\n"); fflush(stderr);
     // athlete name / structured directory
     this->home = new AthleteDirectoryStructure(homeDir);
     this->context = context;
@@ -177,9 +178,29 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     cloudAutoDownload = new CloudServiceAutoDownload(context);
     connect(context, SIGNAL(refreshEnd()), cloudAutoDownload, SLOT(autoDownload()));
 
-    // now most dependencies are in get cache
-    rideCache = new RideCache(context);
+    // blocking as at startup
+    if (context->mainWindow->progress) {
+        // now most dependencies are in get cache
+        rideCache = new RideCache(context);
+        loadComplete();
+    } else {
+        // load in background once GC is up and running
+        AthleteLoader *loader = new AthleteLoader(context);
+        connect(loader, SIGNAL(finished()), this, SLOT(loadComplete()));
+        loader->start();
+    }
+}
 
+void
+AthleteLoader::run()
+{
+    context->athlete->rideCache = new RideCache(context);
+}
+
+void
+Athlete::loadComplete()
+{
+    // once ridecache is up and running load the rest
     // read athlete's charts.xml and translate etc, it needs to be
     // after RideCache creation to allow for Custom Metrics initialization
     loadCharts();
@@ -198,11 +219,17 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
+
+    // done, tell main window
+    context->notifyLoadCompleted(cyclist, context);
 }
 
 void
 Athlete::close()
 {
+    // let everyone know we're going
+    context->notifyAthleteClose(cyclist, context);
+
     // set to latest so we don't repeat
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_VERSION_USED, VERSION_LATEST);
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_SAFEEXIT, true);

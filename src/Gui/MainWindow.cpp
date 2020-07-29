@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "AthleteView.h"
 #include "AthleteBackup.h"
 
 #include "Colors.h"
@@ -217,7 +218,7 @@ MainWindow::MainWindow(const QDir &home)
 
     sidebar = new NewSideBar(context, this);
     sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0);
-    sidebar->setItemEnabled(0, false);
+    sidebar->setItemEnabled(1, false);
 
     sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1);
     sidebar->setItemEnabled(1, false);
@@ -380,7 +381,12 @@ MainWindow::MainWindow(const QDir &home)
     tabbar->setDocumentMode(true);
 #endif
 
+    athleteView = new AthleteView(context);
+    viewStack = new QStackedWidget(this);
+    viewStack->addWidget(athleteView);
+
     tabStack = new QStackedWidget(this);
+    viewStack->addWidget(tabStack);
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
@@ -416,7 +422,7 @@ MainWindow::MainWindow(const QDir &home)
     tablayout->setContentsMargins(0,0,0,0);
     lrlayout->addLayout(tablayout);
     tablayout->addWidget(tabbar);
-    tablayout->addWidget(tabStack);
+    tablayout->addWidget(viewStack);
     setCentralWidget(central);
 
     /*----------------------------------------------------------------------
@@ -432,19 +438,14 @@ MainWindow::MainWindow(const QDir &home)
     // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
 
-    openWindowMenu = fileMenu->addMenu(tr("Open &Window"));
-    openTabMenu = fileMenu->addMenu(tr("Open &Tab"));
-    connect(openWindowMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenWindowMenu()));
+    openTabMenu = fileMenu->addMenu(tr("Open..."));
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
-
-    windowMapper = new QSignalMapper(this); // maps each option
-    connect(windowMapper, SIGNAL(mapped(const QString &)), this, SLOT(openWindow(const QString &)));
 
     tabMapper = new QSignalMapper(this); // maps each option
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
 
     fileMenu->addSeparator();
-    backupAthleteMenu = fileMenu->addMenu(tr("Backup Athlete Data"));
+    backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
     connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
@@ -454,7 +455,6 @@ MainWindow::MainWindow(const QDir &home)
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
     fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
-    fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
 
     HelpWhatsThis *fileMenuHelp = new HelpWhatsThis(fileMenu);
     fileMenu->setWhatsThis(fileMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Athlete));
@@ -1064,19 +1064,6 @@ void MainWindow::setFilter(QStringList f) { currentTab->context->setFilter(f); }
 void MainWindow::clearFilter() { currentTab->context->clearFilter(); }
 
 void
-MainWindow::closeAll()
-{
-    QList<MainWindow *> windows = mainwindows; // get a copy, since it is updated as closed
-
-    foreach(MainWindow *window, windows)
-        if (window != this)
-            window->closeWindow();
-
-    // now close us down!
-    closeWindow();
-}
-
-void
 MainWindow::aboutDialog()
 {
     AboutDialog *ad = new AboutDialog(currentTab->context);
@@ -1206,6 +1193,8 @@ MainWindow::sidebarSelected(int id)
 {
     switch (id) {
     case 0: // athlete not written yet
+            selectAthlete();
+            break;
     case 1: // plan not written yet
             break;
     case 2: selectHome(); break;
@@ -1219,8 +1208,15 @@ MainWindow::sidebarSelected(int id)
 }
 
 void
+MainWindow::selectAthlete()
+{
+    viewStack->setCurrentIndex(0);
+}
+
+void
 MainWindow::selectAnalysis()
 {
+    viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(3, true);
     currentTab->selectView(1);
     setToolButtons();
@@ -1229,6 +1225,7 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
+    viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(5, true);
     currentTab->selectView(3);
     setToolButtons();
@@ -1237,6 +1234,7 @@ MainWindow::selectTrain()
 void
 MainWindow::selectDiary()
 {
+    viewStack->setCurrentIndex(1);
     currentTab->selectView(2);
     setToolButtons();
 }
@@ -1244,6 +1242,7 @@ MainWindow::selectDiary()
 void
 MainWindow::selectHome()
 {
+    viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(2, true);
     currentTab->selectView(0);
     setToolButtons();
@@ -1665,41 +1664,12 @@ MainWindow::addDevice()
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::newCyclistWindow()
-{
-    QDir newHome = currentTab->context->athlete->home->root();
-    newHome.cdUp();
-    QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
-    if (!name.isEmpty()) openWindow(name);
-}
-
-void
 MainWindow::newCyclistTab()
 {
     QDir newHome = currentTab->context->athlete->home->root();
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) openTab(name);
-}
-
-void
-MainWindow::openWindow(QString name)
-{
-    // open window...
-    QDir home(gcroot);
-    appsettings->initializeQSettingsGlobal(gcroot);
-    home.cd(name);
-
-    if (!home.exists()) return;
-    appsettings->initializeQSettingsAthlete(gcroot, name);
-
-    GcUpgrade v3;
-    if (!v3.upgradeConfirmedByUser(home)) return;
-
-    // main window will register itself
-    MainWindow *main = new MainWindow(home);
-    main->show();
-    main->ridesAutoImport();
 }
 
 void
@@ -1723,20 +1693,24 @@ MainWindow::openTab(QString name)
     GcUpgrade v3;
     if (!v3.upgradeConfirmedByUser(home)) return;
 
-    setUpdatesEnabled(false);
+    Context *con= new Context(this);
+    con->athlete = NULL;
+    emit openingAthlete(name, con);
 
-    // splash screen - progress whilst loading tab
-    setSplash();
+    connect(con, SIGNAL(loadCompleted(QString,Context*)), this, SLOT(loadCompleted(QString, Context*)));
 
-    // bootstrap
-    Context *context = new Context(this);
-    context->athlete = new Athlete(context, home);
+    // will emit loadCompleted when done
+    con->athlete = new Athlete(con, home);
+}
 
-    // now open up a new tab
+void
+MainWindow::loadCompleted(QString name, Context *context)
+{
+    // athlete loaded
     currentTab = new Tab(context);
 
     // clear splash - progress whilst loading tab
-    clearSplash();
+    //clearSplash();
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
@@ -1749,19 +1723,9 @@ MainWindow::openTab(QString name)
     // switch to newly created athlete
     tabbar->setCurrentIndex(tabList.count()-1);
 
-    // kick off on analysis
-    setWindowTitle(currentTab->context->athlete->home->root().dirName());
-    selectAnalysis(); // sets scope bar ..
-
-    // now apply current
-    saveGCState(currentTab->context);
-    restoreGCState(currentTab->context);
-
     // show the tabbar if we're gonna open tabs -- but wait till the last second
     // to show it to avoid crappy paint artefacts
     showTabbar(true);
-
-    setUpdatesEnabled(true);
 
     // now do the automatic ride file import
     context->athlete->importFilesWhenOpeningAthlete();
@@ -1860,48 +1824,6 @@ MainWindow::removeTab(Tab *tab)
     setUpdatesEnabled(true);
 
     return;
-}
-
-void
-MainWindow::setOpenWindowMenu()
-{
-    // wipe existing
-    openWindowMenu->clear();
-
-    // get a list of all cyclists
-    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
-    while (i.hasNext()) {
-
-        QString name = i.next();
-        SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
-        // new action
-        QAction *action = new QAction(QString("%1").arg(name), this);
-
-        // get the config directory
-        AthleteDirectoryStructure subDirs(name);
-        // icon / mugshot ?
-        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
-        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
-
-        // only allow selection of cyclists which are not already open
-        foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
-            while (t.hasNext()) {
-                t.next();
-                if (t.key() == name)
-                    action->setEnabled(false);
-            }
-        }
-
-        // add to menu
-        openWindowMenu->addAction(action);
-        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
-        windowMapper->setMapping(action, name);
-    }
-
-    // add create new option
-    openWindowMenu->addSeparator();
-    openWindowMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistWindow()), tr("Ctrl+N"));
 }
 
 void
@@ -2240,6 +2162,7 @@ MainWindow::configChanged(qint32)
     else
         tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
+    athleteView->setPalette(tabbarPalette);
 
     head->updateGeometry();
     repaint();

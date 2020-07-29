@@ -46,12 +46,17 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     setChartLayout(main);
 
     // tell space when a ride is selected
-    if (scope & OverviewScope::ANALYSIS) connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
+    if (scope & OverviewScope::ANALYSIS) {
+        connect(this, SIGNAL(rideItemChanged(RideItem*)), space, SLOT(rideSelected(RideItem*)));
+    }
+
     if (scope & OverviewScope::TRENDS) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
         connect(context, SIGNAL(filterChanged()), space, SLOT(filterChanged()));
         connect(context, SIGNAL(homeFilterChanged()), space, SLOT(filterChanged()));
     }
+    connect(context, SIGNAL(refreshEnd()), space, SLOT(refresh()));
+    connect(context, SIGNAL(estimatesRefreshed()), space, SLOT(refresh()));
 
     // menu items
     connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
