@@ -2406,7 +2406,6 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         list << "config(w')";
         list << "config(pmax)";
         list << "config(cv)";
-        list << "config(scv)";
         list << "config(height)";
         list << "config(weight)";
         list << "config(lthr)";

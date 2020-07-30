@@ -1534,7 +1534,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|isopower|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|d\\'|scv|sd\\'|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
+            QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
@@ -3272,20 +3272,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             int MaxHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getMaxHr(hrZoneRange) : 0;
 
             //
-            // CV' D'
+            // CV
             //
             int paceZoneRange = m->context->athlete->paceZones(m->isSwim) ?
                                 m->context->athlete->paceZones(m->isSwim)->whichRange(m->dateTime.date()) :
                                 -1;
 
-            double CV = (paceZoneRange != -1) ? m->context->athlete->paceZones(false)->getCV(paceZoneRange) : 0.0;
-            double DPRIME = 0; //XXX(paceZoneRange != -1) ? m->context->athlete->paceZones(false)->getDPrime(paceZoneRange) : 0.0;
-
-            int spaceZoneRange = m->context->athlete->paceZones(true) ?
-                                m->context->athlete->paceZones(true)->whichRange(m->dateTime.date()) :
-                                -1;
-            double SCV = (spaceZoneRange != -1) ? m->context->athlete->paceZones(true)->getCV(spaceZoneRange) : 0.0;
-            double SDPRIME = 0; //XXX (spaceZoneRange != -1) ? m->context->athlete->paceZones(true)->getDPrime(spaceZoneRange) : 0.0;
+            double CV = (paceZoneRange != -1) ? m->context->athlete->paceZones(m->isSwim)->getCV(paceZoneRange) : 0.0;
 
             //
             // HEIGHT and WEIGHT
@@ -3312,17 +3305,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             if (symbol == "pmax") {
                 return Result(PMAX);
             }
-            if (symbol == "scv") {
-                return Result(SCV);
-            }
-            if (symbol == "sd'") {
-                return Result(SDPRIME);
-            }
             if (symbol == "cv") {
                 return Result(CV);
-            }
-            if (symbol == "d'") {
-                return Result(DPRIME);
             }
             if (symbol == "lthr") {
                 return Result(LTHR);
