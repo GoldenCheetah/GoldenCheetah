@@ -102,6 +102,9 @@ class RideCache : public QObject
         void load();
         void save(bool opendata=false, QString filename="");
 
+        // find entry quickly
+        int find(RideItem *);
+
         // user updated options/preferences
         void configChanged(qint32);
 

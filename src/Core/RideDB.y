@@ -83,33 +83,21 @@ ride: '{' rideelement_list '}'                                  {
                                                                     #endif
                                                                     } else {
 
-                                                                        // we're loading the cache
-                                                                        bool found = false;
-                                                                        foreach(RideItem *i, jc->cache->rides()) {
-                                                                            if (i->fileName == jc->item.fileName) {
+                                                                        double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
+                                                                        if (jc->context->mainWindow->progress) {
 
-                                                                                found = true;
-
-                                                                                // progress update
-                                                                                double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
-                                                                                if (jc->context->mainWindow->progress) {
-
-                                                                                    // percentage progress
-                                                                                    QString m = QString("%1%").arg(progress , 0, 'f', 0);
-                                                                                    jc->context->mainWindow->progress->setText(m);
-                                                                                    QApplication::processEvents();
-                                                                                } else {
-                                                                                    jc->context->notifyLoadProgress(jc->folder,progress);
-                                                                                }
-
-                                                                                // update from our loaded value
-                                                                                i->setFrom(jc->item);
-                                                                                break;
-                                                                            }
+                                                                            // percentage progress
+                                                                            QString m = QString("%1%").arg(progress , 0, 'f', 0);
+                                                                            jc->context->mainWindow->progress->setText(m);
+                                                                            QApplication::processEvents();
+                                                                        } else {
+                                                                            jc->context->notifyLoadProgress(jc->folder,progress);
                                                                         }
-                                                                        // not found !
-                                                                        if (found == false)
-                                                                            qDebug()<<"unable to load:"<<jc->item.fileName<<jc->item.dateTime<<jc->item.weight;
+
+                                                                        // find entry and update it
+                                                                        int index=jc->cache->find(&jc->item);
+                                                                        if (index==-1)  qDebug()<<"unable to load:"<<jc->item.fileName<<jc->item.dateTime<<jc->item.weight;
+                                                                        else  jc->cache->rides().at(index)->setFrom(jc->item);
                                                                     }
 
                                                                     // now set our ride item clean again, so we don't

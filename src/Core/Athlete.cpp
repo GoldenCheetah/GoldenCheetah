@@ -58,7 +58,6 @@
 
 Athlete::Athlete(Context *context, const QDir &homeDir)
 {
-fprintf(stderr, "new athlete preamble...\n"); fflush(stderr);
     // athlete name / structured directory
     this->home = new AthleteDirectoryStructure(homeDir);
     this->context = context;

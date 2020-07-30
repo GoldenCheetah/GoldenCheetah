@@ -84,6 +84,22 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     painter.drawEllipse(0, 0, img.width(), img.height());
     avatar = canvas.toImage();
 
+#if 0
+    // ridecache raw
+    if (loadprogress == 0) {
+        QTime timer;
+        timer.start();
+        QFile rideDB(gcroot + "/" + path + "/cache/rideDB.json");
+        if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+
+            QByteArray contents = rideDB.readAll();
+            rideDB.close();
+            QJsonDocument json = QJsonDocument::fromJson(contents);
+        }
+        fprintf(stderr, "'%s' read rideDB took %d usecs\n", path.toStdString().c_str(), timer.elapsed()); fflush(stderr);
+    }
+#endif
+
 }
 
 void

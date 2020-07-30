@@ -95,6 +95,8 @@ class RideItem : public QObject
 
     public:
 
+        bool operator==(RideItem &other) { return other.dateTime == dateTime; }
+
         Context *context; // to notify widgets when date/time changes
         bool isdirty;     // ride data has changed and needs saving
         bool isstale;     // metric data is out of date and needs recomputing

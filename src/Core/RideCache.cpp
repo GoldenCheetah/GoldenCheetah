@@ -124,11 +124,11 @@ RideCache::RideCache(Context *context) : context(context)
         }
     }
 
+    // now sort it - we need to use find on it
+    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+
     // load the store - will unstale once cache restored
     load();
-
-    // now sort it
-    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
 
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
@@ -150,6 +150,20 @@ RideCache::RideCache(Context *context) : context(context)
     connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
     connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
     connect(&watcher, SIGNAL(progressValueChanged(int)), this, SLOT(progressing(int)));
+}
+
+struct comparerideitem { bool operator()(const RideItem *p1, const RideItem *p2) { return p1->dateTime < p2->dateTime; } };
+
+int
+RideCache::find(RideItem *dt)
+{
+    // use lower_bound to binary search
+    QVector<RideItem*>::const_iterator i = std::lower_bound(rides_.begin(), rides_.end(), dt, comparerideitem());
+    int index = i - rides_.begin();
+
+    // did it find the right value?
+    if (index < 0 || index >= rides_.count() || rides_.at(index)->dateTime != dt->dateTime) return -1;
+    return index;
 }
 
 RideCache::~RideCache()
