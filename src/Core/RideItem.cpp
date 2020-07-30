@@ -1344,15 +1344,7 @@ RideItem::updateIntervals()
     if ((discovery & RideFileInterval::intervalTypeBits(RideFileInterval::CLIMB)) &&
         !f->isSwim() && f->isDataPresent(RideFile::alt)) {
 
-        // log of progress
-        QFile log(context->athlete->home->logs().canonicalPath() + "/" + "climb.log");
-        log.open(QIODevice::ReadWrite);
-        log.atEnd();
-        QTextStream out(&log);
-
         //qDebug() << "SEARCH CLIMB STARTS: " << fileName;
-        out << "SEARCH CLIMB STARTS: " << fileName << "\r\n";
-        out << "START" << QDateTime::currentDateTime().toString() + "\r\n";
 
         // Initialisation
         int hills = 0;
@@ -1424,8 +1416,6 @@ RideItem::updateIntervals()
                             (distance >= 4.0 && height/distance >= 20)) {
 
                             //qDebug() << "    NEW HILL " << (hills+1) << " at " << pstart->km  << "km " << pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " << distance << "km " << height/distance/10.0 << "%";
-                            out << "    NEW HILL " << (hills+1) << " at " << pstart->km << "km " << pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " << distance << "km " << height/distance/10.0 << "%\r\n";
-
 
                             // create a new interval item
                             IntervalItem *intervalItem = new IntervalItem(this, QString(tr("Climb %1")).arg(++hills),
@@ -1440,8 +1430,6 @@ RideItem::updateIntervals()
                             intervalItem->refresh();        // XXX will get called in constructore when refactor
                             intervals_ << intervalItem;
                         } else {
-                            out << "        NOT HILL " << "at " << pstart->km << "km " << pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " << distance << "km " << height/distance/10.0 << "%\r\n";
-
                             //qDebug() << "        NOT HILL " << "at " << pstart->km << "km " <<  pstart->secs/60.0 <<"-"<< pstop->secs/60.0 << "min " <<  distance  << "km" << height/distance/10.0 << "%";
                         }
                     }
@@ -1450,8 +1438,7 @@ RideItem::updateIntervals()
                 pstart = pstop;
             }
         }
-        out << "STOP" << QDateTime::currentDateTime().toString() + "\r\n";
-        log.close();
+        //qDebug() << "STOP" << QDateTime::currentDateTime().toString() + "\r\n";
     }
 
 
