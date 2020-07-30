@@ -855,7 +855,7 @@ TopNOverviewItem::setDateRange(DateRange dr)
     }
 
     // sort the list
-    if (metric->type() == RideMetric::Low) qSort(ranked.begin(), ranked.end(), entrylessthan);
+    if (metric->type() == RideMetric::Low || metric->isLowerBetter()) qSort(ranked.begin(), ranked.end(), entrylessthan);
     else qSort(ranked);
 
     // change painting details
