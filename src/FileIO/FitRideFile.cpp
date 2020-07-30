@@ -401,6 +401,7 @@ struct FitFileReaderState
                 case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
                 case 3405: case 3639: return "Garmin Swim 2";
+                case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -581,6 +582,8 @@ struct FitFileReaderState
             case 4: return "Headunit"; // bike_power
             case 11: return "Powermeter"; // bike_power
             case 17: return "Biketrainer"; // fitness equipment
+            case 35: case 36: "Bikelight"; // bike_light_main/shared
+            case 40: return "Bikeradar"; // bike_radar
             case 120: return "HR"; // heart_rate
             case 121: return "Speed-Cadence"; // bike_speed_cadence
             case 122: return "Cadence"; // bike_speed
