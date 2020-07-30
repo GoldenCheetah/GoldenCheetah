@@ -1000,6 +1000,7 @@ RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent
     dateTimeEdit = new QDateTimeEdit;
     dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     dateTimeEdit->setCalendarPopup(true);
+    dateTimeEdit->setDisplayFormat(tr("MMM d, yyyy - hh:mm:ss"));
 
     QString weighttext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::WeightKg);
     weightlabel = new QLabel(weighttext);
@@ -1421,6 +1422,7 @@ HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(c
     dateTimeEdit = new QDateTimeEdit;
     dateTimeEdit->setDateTime(QDateTime::currentDateTime());
     dateTimeEdit->setCalendarPopup(true);
+    dateTimeEdit->setDisplayFormat(tr("MMM d, yyyy - hh:mm:ss"));
 
     QString rmssdtext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::RMSSD);
     rmssdlabel = new QLabel(rmssdtext);
