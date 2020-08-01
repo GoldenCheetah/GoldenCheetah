@@ -2670,14 +2670,19 @@ ColorsPage::applyThemeClicked()
             case CRIDEPLOTBACKGROUND:
             case CTRENDPLOTBACKGROUND:
             case CTRAINPLOTBACKGROUND:
-            case COVERVIEWBACKGROUND:
                 color = theme.colors[0]; // background color
+                break;
+
+            case COVERVIEWBACKGROUND:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[10];
                 break;
 
             case CCARDBACKGROUND:
                 // set back to light black for dark themes
                 // and gray for light themes
-                color = theme.colors[10];
+                color = theme.colors[11];
                 break;
 
             case CCHROME:
