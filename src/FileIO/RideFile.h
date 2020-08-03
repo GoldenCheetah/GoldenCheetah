@@ -611,6 +611,7 @@ struct RideFileReader {
 };
 
 class MetricAggregator;
+class AthleteCard;
 class RideFileFactory {
 
     private:
@@ -625,6 +626,7 @@ class RideFileFactory {
 
         friend class ::MetricAggregator;
         friend class ::RideCache;
+        friend class ::AthleteCard;
 
         // will become private as code should work with
         // in memory representation not on disk .. but as we

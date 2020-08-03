@@ -3735,3 +3735,81 @@ ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->fillRect(bar, QBrush(GColor(CPLOTMARKER)));
 
 }
+
+Button::Button(QGraphicsItem*parent, QString text) : QGraphicsItem(parent), text(text), state(None)
+{
+    // not much really
+    setZValue(11);
+    setAcceptHoverEvents(true);
+}
+
+void
+Button::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width, height);
+}
+
+void
+Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+
+    // button background
+    QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+    pc.setAlpha(128);
+    painter->setPen(QPen(pc));
+    QPointF pos=mapToParent(geom.x(), geom.y());
+    if (isUnderMouse()) {
+        QColor hover=GColor(CPLOTMARKER);
+        if (state==Clicked) hover.setAlpha(200);
+        else hover.setAlpha(100);
+        painter->setBrush(QBrush(hover));
+    } else painter->setBrush(QBrush(GColor(CCARDBACKGROUND)));
+    painter->drawRoundedRect(pos.x(), pos.y(), geom.width(), geom.height(), 20, 20);
+
+    // text using large font clipped
+    if (isUnderMouse()) {
+        QColor tc = GCColor::invertColor(CPLOTMARKER);
+        tc.setAlpha(200);
+        painter->setPen(tc);
+    } else {
+        QColor tc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+        tc.setAlpha(200);
+        painter->setPen(tc);
+    }
+    painter->setFont(font);
+    painter->drawText(geom, text, Qt::AlignHCenter | Qt::AlignVCenter);
+}
+
+bool
+Button::sceneEvent(QEvent *event)
+{
+
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+        // mouse moved so hover paint anyway
+        update();
+
+    }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        if (isUnderMouse() && state == Clicked) {
+            emit clicked();
+        }
+        state = None;
+        update();
+
+
+    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+        if (isUnderMouse()) state = Clicked;
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        update();
+    }
+    return false;
+}

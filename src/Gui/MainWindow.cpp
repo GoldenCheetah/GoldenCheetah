@@ -1727,6 +1727,9 @@ MainWindow::loadCompleted(QString name, Context *context)
     // to show it to avoid crappy paint artefacts
     showTabbar(true);
 
+    // tell everyone
+    currentTab->context->notifyLoadDone(name, context);
+
     // now do the automatic ride file import
     context->athlete->importFilesWhenOpeningAthlete();
 }
@@ -1749,6 +1752,18 @@ MainWindow::closeTabClicked(int index)
 
     // lets wipe it
     removeTab(tab);
+}
+
+bool
+MainWindow::closeTab(QString name)
+{
+    for(int i=0; i<tabbar->count(); i++) {
+        if (name == tabbar->tabText(i)) {
+            closeTabClicked(i);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool
@@ -2157,10 +2172,8 @@ MainWindow::configChanged(qint32)
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    if (GCColor::isFlat())
-        tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
-    else
-        tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
+    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CCHROME)));
     tabbar->setPalette(tabbarPalette);
     athleteView->setPalette(tabbarPalette);
 

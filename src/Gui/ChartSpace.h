@@ -66,13 +66,18 @@ class ChartSpaceItem : public QGraphicsWidget
 
         virtual QWidget *config()=0; // must supply a widget to configure
 
+        // turn off/on the config corner button
+        void setShowConfig(bool x) { showconfig=x; update(); }
+        bool showConfig() const { return showconfig; }
+
         // what type am I- managed by user
         int type;
 
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), invisible(false)  {
+                                       placing(false), drag(false), invisible(false),
+                                       showconfig(true)  {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -119,6 +124,7 @@ class ChartSpaceItem : public QGraphicsWidget
         bool onscene, placing, drag;
         bool incorner;
         bool invisible;
+        bool showconfig;
 
         // base paint
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);

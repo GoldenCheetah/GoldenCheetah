@@ -137,8 +137,9 @@ class Context : public QObject
 
         // athlete load/close
         void notifyLoadProgress(QString folder, double progress) { emit loadProgress(folder,progress); }
-        void notifyLoadCompleted(QString folder, Context *context) { emit loadCompleted(folder,context); }
+        void notifyLoadCompleted(QString folder, Context *context) { emit loadCompleted(folder,context); } // Athlete loaded
         void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
+        void notifyLoadDone(QString folder, Context *context) { emit loadDone(folder, context); } // MainWindow finished
 
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
@@ -227,6 +228,7 @@ class Context : public QObject
         // loading an athlete
         void loadProgress(QString,double);
         void loadCompleted(QString, Context*);
+        void loadDone(QString, Context*);
         void athleteClose(QString, Context*);
 
         // global filter changed

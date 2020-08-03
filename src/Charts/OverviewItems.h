@@ -654,4 +654,45 @@ class ProgressBar : public QObject, public QGraphicsItem
 
         QPropertyAnimation *animator;
 };
+
+// simple button to use on graphics views
+class Button : public QObject, public QGraphicsItem
+{
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
+    public:
+        Button(QGraphicsItem *parent, QString text);
+
+        void setText(QString text) { this->text = text; update(); }
+        void setFont(QFont font) { this->font = font; }
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+
+        // needed as pure virtual in QGraphicsItem
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+
+        QRectF boundingRect() const {
+            QPointF pos=mapToParent(geom.x(), geom.y());
+            return QRectF(pos.x(), pos.y(), geom.width(), geom.height());
+        }
+
+        // for interaction
+        bool sceneEvent(QEvent *event);
+
+    signals:
+        void clicked();
+
+    private:
+        QGraphicsItem *parent;
+        QString text;
+        QFont font;
+
+        QRectF geom;
+        enum { None, Clicked } state;
+};
+
 #endif // _GC_OverviewItem_h
