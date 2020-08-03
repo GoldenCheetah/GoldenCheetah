@@ -44,9 +44,11 @@ QString Bindings::version() const
     return VERSION_STRING;
 }
 
-int
+bool
 Bindings::webpage(QString url) const
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
+
 #ifdef Q_OS_WIN
     url = url.replace("://C:", ":///C:"); // plotly fails to use enough slashes
     url = url.replace("\\", "/");
@@ -54,12 +56,13 @@ Bindings::webpage(QString url) const
 
     QUrl p(url);
     python->chart->emitUrl(p);
-    return 0;
+    return true;
 }
 
 bool 
 Bindings::configChart(QString title, int type, bool animate, int pos, bool stack, int orientation) const
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
     python->chart->emitChart(title, type, animate, pos, stack, orientation);
     return true;
 }
@@ -69,6 +72,8 @@ Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QStringLi
                       QStringList labels,  QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill) const
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
+
     QVector<double>xs, ys;
 
     // xseries type conversion
@@ -106,6 +111,7 @@ bool
 Bindings::configAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories)
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
     python->chart->emitAxis(name, visible, align, min, max, type, labelcolor, color, log, categories);
     return false;
 }
@@ -113,6 +119,8 @@ Bindings::configAxis(QString name, bool visible, int align, double min, double m
 bool
 Bindings::addAnnotation(QString, QString s1, QString s2, double)
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
+
     // we will reuse later but for now just assume its a label
     // will likely need to refactor all of this and create an
     // annotation class to throw around, but lets wait till we

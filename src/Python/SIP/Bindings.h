@@ -69,7 +69,7 @@ class Bindings {
         void result(double);
 
         // working with the web view
-        int webpage(QString url) const;
+        bool webpage(QString url) const;
 
         // working with athlete data
         PyObject* athlete() const;
