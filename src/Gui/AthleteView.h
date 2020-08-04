@@ -50,6 +50,8 @@ class AthleteCard : public ChartSpaceItem
         QImage avatar;
         Button *button;
 
+        bool anchor; // holds app context so not allowed to close it
+
         // little graph of last 90 days
         int count; // total activities
         QDateTime last; // date of last activity recorded

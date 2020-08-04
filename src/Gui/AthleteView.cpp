@@ -95,10 +95,13 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     if (parent->context->athlete->cyclist == path) {
         context = parent->context;
         loadprogress = 100;
+        anchor=true;
         button->setText("Close");
+        button->hide();
     } else {
         context = NULL;
         loadprogress = 0;
+        anchor=false;
     }
 
     connect(parent->context->mainWindow, SIGNAL(openingAthlete(QString,Context*)), this, SLOT(opening(QString,Context*)));
@@ -183,7 +186,7 @@ void AthleteCard::loadDone(QString name, Context *)
     if (this->name == name) {
         loadprogress = 100;
         refreshStats();
-        button->show();
+        if (!anchor) button->show();
         update();
     }
 }
@@ -191,7 +194,7 @@ void AthleteCard::loadDone(QString name, Context *)
 void AthleteCard::dragChanged(bool drag)
 {
     if (drag || (loadprogress != 100 && loadprogress != 0)) button->hide();
-    else button->show();
+    else if (!anchor) button->show();
 }
 
 void

@@ -3795,11 +3795,17 @@ Button::sceneEvent(QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
+
         if (isUnderMouse() && state == Clicked) {
+            state = None;
+            update();
+            QApplication::processEvents();
             emit clicked();
+        } else {
+            state = None;
+            update();
+            QApplication::processEvents();
         }
-        state = None;
-        update();
 
 
     } else if (event->type() == QEvent::GraphicsSceneMousePress) {

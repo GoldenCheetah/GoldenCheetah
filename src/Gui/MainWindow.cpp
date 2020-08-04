@@ -376,7 +376,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 
     tabbar = new DragBar(this);
-    tabbar->setTabsClosable(true);
+    tabbar->setTabsClosable(false); // use athlete view
 #ifdef Q_OS_MAC
     tabbar->setDocumentMode(true);
 #endif
@@ -399,7 +399,7 @@ MainWindow::MainWindow(const QDir &home)
 
     connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchTab(int)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
-    connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int)));
+    //connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int))); // use athlete view
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -438,8 +438,8 @@ MainWindow::MainWindow(const QDir &home)
     // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
 
-    openTabMenu = fileMenu->addMenu(tr("Open..."));
-    connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
+    //openTabMenu = fileMenu->addMenu(tr("Open...")); use athlete view
+    //connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
@@ -454,7 +454,7 @@ MainWindow::MainWindow(const QDir &home)
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
-    fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
+    //fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab())); use athlete view
 
     HelpWhatsThis *fileMenuHelp = new HelpWhatsThis(fileMenu);
     fileMenu->setWhatsThis(fileMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Athlete));
@@ -1951,6 +1951,7 @@ MainWindow::switchTab(int index)
 
     setUpdatesEnabled(false);
 
+#if 0 // use athlete view, these buttons don't exist
 #ifdef Q_OS_MAC // close buttons on the left on Mac
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
@@ -1959,6 +1960,7 @@ MainWindow::switchTab(int index)
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
     tabbar->tabButton(index, QTabBar::RightSide)->show();
+#endif
 #endif
 
     // save how we are
