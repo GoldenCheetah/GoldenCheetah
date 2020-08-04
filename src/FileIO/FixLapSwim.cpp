@@ -118,12 +118,11 @@ static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor
 bool
 FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(op)
-
     // get settings
     double pl;
     if (config == NULL) { // being called automatically
-        pl = appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble();
+        // when the file is created use poll length in the file
+        pl = (op == "NEW") ? 0.0 : appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble();
     } else { // being called manually
         pl = ((FixLapSwimConfig*)(config))->pl->value();
     }
@@ -248,10 +247,12 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     ride->setDataPresent(ride->kph, true);
     ride->setDataPresent(ride->cad, strokesIdx>0);
     ride->command->endLUW();
-    // rebuild intervals and force metric update
-    ride->fillInIntervals();
-    ride->context->rideItem()->isstale = true;
-    ride->context->rideItem()->refresh();
+    if (op != "NEW") {
+        // rebuild intervals and force metric update
+        ride->fillInIntervals();
+        ride->context->rideItem()->isstale = true;
+        ride->context->rideItem()->refresh();
+    }
 
     return true;
 }
