@@ -6198,10 +6198,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             if (m->ride(false)) lhsdouble = m->ride(false)->recIntSecs();
             lhsisNumber = true;
 
-        } else if (!symbol.compare("Device", Qt::CaseInsensitive)) {
-
-            if (m->ride(false)) lhsstring = m->ride(false)->deviceType();
-
         } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
 
             if (m->context->currentRideItem())
