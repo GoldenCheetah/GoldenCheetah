@@ -1293,7 +1293,7 @@ ZoneOverviewItem::setData(RideItem *item)
                 }
 
                 // update as percent of total
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<categories.count(); i++) {
                     double time =round(item->getForSymbol(timeInZonesHR[i]));
                     if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                     else barset->replace(i, 0);
@@ -1331,7 +1331,7 @@ ZoneOverviewItem::setData(RideItem *item)
                 }
 
                 // update as percent of total
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<categories.count(); i++) {
                     double time =round(item->getForSymbol(timeInZones[i]));
                     if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                     else barset->replace(i, 0);
@@ -1368,7 +1368,7 @@ ZoneOverviewItem::setData(RideItem *item)
                 }
 
                 // update as percent of total
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<categories.count(); i++) {
                     double time =round(item->getForSymbol(paceTimeInZones[i]));
                     if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                     else barset->replace(i, 0);
