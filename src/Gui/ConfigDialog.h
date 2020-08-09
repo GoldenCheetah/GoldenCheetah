@@ -184,6 +184,7 @@ class ConfigDialog : public QMainWindow
 
     public:
         ConfigDialog(QDir home, Context *context);
+        ~ConfigDialog();
 
     public slots:
         void changePage(int);

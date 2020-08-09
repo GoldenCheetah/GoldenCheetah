@@ -123,6 +123,7 @@
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
 extern QDesktopWidget *desktop;
+extern ConfigDialog *configdialog_ptr;
 
 MainWindow::MainWindow(const QDir &home)
 {
@@ -988,11 +989,14 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
+    // Create a new config dialog only if it doesn't exist
+    ConfigDialog *cd = configdialog_ptr ? configdialog_ptr
+                                        : new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
     cd->show();
+    cd->raise();
 }
 
 void
@@ -1057,6 +1061,7 @@ MainWindow::~MainWindow()
 {
     // aside from the tabs, we may need to clean
     // up any dangling widgets created in MainWindow::MainWindow (?)
+    if (configdialog_ptr) configdialog_ptr->close();
 }
 
 // global search/data filter

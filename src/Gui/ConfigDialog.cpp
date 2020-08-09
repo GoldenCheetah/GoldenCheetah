@@ -189,6 +189,12 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
 }
 
+ConfigDialog::~ConfigDialog()
+{
+    // hack for raise event
+    configdialog_ptr = NULL;
+}
+
 void ConfigDialog::changePage(int index)
 {
     pagesWidget->setCurrentIndex(index);
@@ -196,9 +202,6 @@ void ConfigDialog::changePage(int index)
 
 void ConfigDialog::closeClicked()
 {
-    // hack for raise event
-    configdialog_ptr = NULL;
-
     // don't save!
     close();
 }
