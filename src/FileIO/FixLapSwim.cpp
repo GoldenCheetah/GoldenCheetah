@@ -183,14 +183,14 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
         // another pool length or pause
         double length_distance = (p->number[typeIdx] ? pl / 1000.0 : 0.0);
 
-        // Adjust length duration using fractional carry
+        // Adjust truncated length duration using fractional carry
         double length_duration = p->number[durationIdx] + frac_time;
         frac_time = modf(length_duration, &length_duration);
 
         // Cadence from Strokes and Duration, if Strokes available
-        if (p->number[typeIdx] > 0.0 && length_duration > 0.0) {
+        if (p->number[typeIdx] > 0.0 && p->number[durationIdx] > 0.0) {
             cad = (strokesIdx == -1) ? 0.0 :
-                  round(60.0 * p->number[strokesIdx] / length_duration);
+                  60.0 * p->number[strokesIdx] / p->number[durationIdx];
         } else { // pause length
             cad = 0.0;
         }
@@ -200,7 +200,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
        // or corrupt files
        if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
            QVector<struct RideFilePoint> newRows;
-           kph = 3600.0 * length_distance / length_duration;
+           kph = 3600.0 * length_distance / p->number[durationIdx];
            if (length_distance == 0.0) interval++; // pauses mark laps
            for (int i = 0; i < length_duration; i++) {
                // recover previous data or create a new sample point,
