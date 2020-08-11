@@ -220,7 +220,7 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
     sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
 
     // lets watch the mouse move...

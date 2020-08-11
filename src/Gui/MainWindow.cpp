@@ -663,7 +663,7 @@ MainWindow::MainWindow(const QDir &home)
     installEventFilter(this);
 
     // catch config changes
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(CONFIG_APPEARANCE);
 
     init = true;

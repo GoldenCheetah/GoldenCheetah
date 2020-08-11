@@ -70,6 +70,21 @@ class MainWindow;
 class Tab;
 class NavigationModel;
 
+
+class GlobalContext : public QObject
+{
+    Q_OBJECT
+
+    public:
+
+        GlobalContext() {}
+        static GlobalContext *context();
+        void notifyConfigChanged(qint32 x) { emit configChanged(x); }
+
+    signals:
+        void configChanged(qint32);
+};
+
 class Context : public QObject
 {
     Q_OBJECT;
@@ -234,8 +249,6 @@ class Context : public QObject
         // global filter changed
         void filterChanged();
         void homeFilterChanged();
-
-        void configChanged(qint32);
 
         void workoutsChanged(); // added or deleted a workout in train view
         void VideoSyncChanged(); // added or deleted a workout in train view

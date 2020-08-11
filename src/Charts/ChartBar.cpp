@@ -135,7 +135,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     installEventFilter(this);
 
     // appearance update
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 }

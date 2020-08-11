@@ -47,7 +47,7 @@ TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, Context *context)
     setContentsMargins(0,0,0,0);
 
     configChanged(CONFIG_APPEARANCE); // set basic colors
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 TreeMapPlot::~TreeMapPlot()

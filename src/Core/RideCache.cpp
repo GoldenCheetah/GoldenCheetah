@@ -141,7 +141,7 @@ RideCache::RideCache(Context *context) : context(context)
     refresh();
 
     // do we have any stale items ?
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
 
     // future watching

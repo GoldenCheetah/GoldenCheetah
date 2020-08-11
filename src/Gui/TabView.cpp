@@ -75,7 +75,7 @@ TabView::TabView(Context *context, int type) :
     anim = new QPropertyAnimation(mainSplitter, "hpos");
 
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
-    connect(context,SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(),SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(&IdleTimer::getInstance(), SIGNAL(userIdle()), this, SLOT(onIdle()));
     connect(&IdleTimer::getInstance(), SIGNAL(userActive()), this, SLOT(onActive()));
 }
@@ -358,7 +358,7 @@ TabView::setBlank(BlankStatePage *blank)
     connect(blank, SIGNAL(closeClicked()), this, SLOT(checkBlank()));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(checkBlank()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(checkBlank()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(checkBlank()));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(checkBlank()));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
 
 }

@@ -149,7 +149,7 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
 
     configChanged(CONFIG_APPEARANCE | CONFIG_METRICS); // set up ready to go...
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(itemsWereSorted()));
 }
 

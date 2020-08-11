@@ -1848,7 +1848,7 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     connect(addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
     connect(delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
-    connect(context, SIGNAL(configChanged(qint32)), deviceListModel, SLOT(doReset()));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), deviceListModel, SLOT(doReset()));
 }
 
 qint32

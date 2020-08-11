@@ -195,7 +195,7 @@ HrPwWindow::HrPwWindow(Context *context) :
     connect(rDelaySlider, SIGNAL(valueChanged(int)), this, SLOT(setrDelayFromSlider()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors etc on first run
     configChanged(CONFIG_APPEARANCE);

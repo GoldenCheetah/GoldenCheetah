@@ -86,7 +86,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     setDragEnabled(true);
     checkMenu();
     connect(this, SIGNAL(returnPressed()), this, SLOT(searchSubmit()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors and curviness
     configChanged(CONFIG_APPEARANCE | CONFIG_FIELDS);

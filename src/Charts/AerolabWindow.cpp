@@ -268,8 +268,8 @@ AerolabWindow::AerolabWindow(Context *context) :
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
   connect(btnSave, SIGNAL(clicked()), this, SLOT(saveParametersInRide()));
-  connect(context, SIGNAL(configChanged(qint32)), aerolab, SLOT(configChanged(qint32)));
-  connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+  connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), aerolab, SLOT(configChanged(qint32)));
+  connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
   connect(context, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
   connect(context, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
   connect(allZoomer, SIGNAL( zoomed(const QRectF) ), this, SLOT(zoomChanged()));

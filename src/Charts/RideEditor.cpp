@@ -230,7 +230,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(tabbarSelected(int)));
     connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTabRequested(int)));
 

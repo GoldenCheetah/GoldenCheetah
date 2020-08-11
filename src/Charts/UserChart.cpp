@@ -60,7 +60,7 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
 
     // need to refresh when chart settings change
     connect(settingsTool, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 }

@@ -106,7 +106,7 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     installEventFilter(this);
     setMouseTracking(true);
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
     configChanged(CONFIG_APPEARANCE);

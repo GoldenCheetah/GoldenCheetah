@@ -38,7 +38,7 @@ RConsole::RConsole(Context *context, RChart *parent)
     putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rMessage(QString)), this, SLOT(rMessage(QString)));
 
     // history position
@@ -392,7 +392,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         connect(plotOnChartSetting, SIGNAL(stateChanged(int)), this, SLOT(plotOnChartChanged()));
 
         // config changes
-        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+        connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
         configChanged(CONFIG_APPEARANCE);
 
         // filter ESC so we can stop scripts

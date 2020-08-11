@@ -241,7 +241,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(chartTree,SIGNAL(itemSelectionChanged()), this, SLOT(presetSelectionChanged()));
 
     // GC signal
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));

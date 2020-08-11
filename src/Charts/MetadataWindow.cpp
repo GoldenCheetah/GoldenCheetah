@@ -42,7 +42,7 @@ MetadataWindow::MetadataWindow(Context *context) :
 
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors
     configChanged(CONFIG_APPEARANCE);

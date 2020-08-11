@@ -2671,7 +2671,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     gsl_rng_set(r, mySeed);
 
     configChanged(CONFIG_FIELDS);
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
 }
 

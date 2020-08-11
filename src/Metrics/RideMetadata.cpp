@@ -77,7 +77,7 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     configChanged(CONFIG_FIELDS | CONFIG_APPEARANCE);
 
     // watch for config changes
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // Extra tab is expensive to update so we only update if it
     // is visible. In this case we need to trigger refresh when the

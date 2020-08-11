@@ -83,7 +83,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     leftLayout->addWidget(chartview);
 
     // watch for colors changing
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // get notifications when values change
     connect(selector, SIGNAL(seriesClicked(QAbstractSeries*,GPointF)), this, SLOT(seriesClicked(QAbstractSeries*,GPointF)));

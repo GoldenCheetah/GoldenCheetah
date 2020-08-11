@@ -148,7 +148,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitter->prepare(context->athlete->cyclist, "analysis");
 
     // GC signal
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsUpdate(RideItem*)));
     connect(context, SIGNAL(intervalItemSelectionChanged(IntervalItem*)), this, SLOT(intervalItemSelectionChanged(IntervalItem*)));
 

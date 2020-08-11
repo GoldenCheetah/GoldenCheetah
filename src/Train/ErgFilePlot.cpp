@@ -265,7 +265,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     configChanged(CONFIG_ZONES);
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 void

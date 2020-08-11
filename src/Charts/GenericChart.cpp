@@ -81,7 +81,7 @@ GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent),
     stackFrame->setWidget(stackWidget);
 
     // watch for color/themes change
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 }

@@ -28,7 +28,7 @@ NewSideBar::NewSideBar(Context *context, QWidget *parent) : QWidget(parent), con
     layout->setSpacing(0);
     layout->setContentsMargins(0,gl_margin *dpiXFactor,0,gl_margin*dpiYFactor);
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(0);
 
     show();
@@ -141,7 +141,7 @@ NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString
 
     // trap events
     installEventFilter(this);
-    connect(sidebar->context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 

@@ -384,7 +384,7 @@ GCColor::themes()
 ColorEngine::ColorEngine(Context* context) : QObject(context), defaultColor(QColor(Qt::white)), context(context)
 {
     configChanged(CONFIG_NOTECOLOR);
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 void ColorEngine::configChanged(qint32)

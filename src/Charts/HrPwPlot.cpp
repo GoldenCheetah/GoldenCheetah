@@ -100,7 +100,7 @@ HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
 
     shade_zones = true;
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // setup colors on first run
     configChanged(CONFIG_APPEARANCE);

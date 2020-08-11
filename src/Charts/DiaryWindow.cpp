@@ -91,7 +91,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(filterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(rideSelected()));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(title, SIGNAL(dateChanged(const QDate)), this, SLOT(dateChanged(const QDate)));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));

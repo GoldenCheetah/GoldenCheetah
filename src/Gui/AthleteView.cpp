@@ -25,7 +25,7 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     // fixed width - 1200 col width, 70 margins + scrollbar
     setFixedZoom(50 + (gl_athletes_per_row*1200) + ((gl_athletes_per_row+1) * 70));
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // lets look for athletes
     int row=0, col=0;

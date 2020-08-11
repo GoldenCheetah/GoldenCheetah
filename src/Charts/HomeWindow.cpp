@@ -159,7 +159,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     //connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     //connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
     connect(chartbar, SIGNAL(itemMoved(int,int)), this, SLOT(tabMoved(int,int)));

@@ -29,7 +29,10 @@
 #include <QXmlSimpleReader>
 #include <QMutex>
 
+// singleton
+static GlobalContext *globalContext = new GlobalContext();
 static QList<Context*> _contexts;
+GlobalContext *GlobalContext::context() { return globalContext; }
 
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
@@ -102,7 +105,7 @@ Context::notifyConfigChanged(qint32 state)
         specialFields = SpecialFields();
 
     }
-    configChanged(state);
+    GlobalContext::context()->notifyConfigChanged(state);
 }
 
 void 
