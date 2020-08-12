@@ -214,9 +214,8 @@ class MainWindow : public QMainWindow
         void showWorkoutWizard();
         void importWorkout();
 
-        // Measures View
-        void downloadBodyMeasures();
-        void downloadHrvMeasures();
+        // Measures
+        void downloadMeasures();
 
         // cloud
         void uploadCloud(QAction *);

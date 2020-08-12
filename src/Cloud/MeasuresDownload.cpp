@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2017 Ale Martinez (amtriathlon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,8 +17,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "BodyMeasuresDownload.h"
-#include "BodyMeasures.h"
+#include "MeasuresDownload.h"
+#include "Measures.h"
 #include "Athlete.h"
 #include "RideCache.h"
 #include "HelpWhatsThis.h"
@@ -28,13 +29,24 @@
 #include <QMessageBox>
 
 
-BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) {
+MeasuresDownload::MeasuresDownload(Context *context) : context(context) {
 
-    setWindowTitle(tr("Body Measurements download"));
+    setWindowTitle(tr("Time Dependent Measures download"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_BodyMeasures));
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_Measures));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    QLabel *measuresLabel = new QLabel(tr("Measures Group"));
+    measuresCombo = new QComboBox();
+    foreach (QString name, context->athlete->measures->getGroupNames())
+        measuresCombo->addItem(name);
+    measuresCombo->setCurrentIndex(0);
+    QHBoxLayout *measuresLayout = new QHBoxLayout;
+    measuresLayout->addWidget(measuresLabel);
+    measuresLayout->addWidget(measuresCombo);
+    measuresLayout->addStretch();
+    mainLayout->addLayout(measuresLayout);
 
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose the download or import source"));
     downloadWithings = new QRadioButton(tr("Withings"));
@@ -51,6 +63,7 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     dateRangeAll = new QRadioButton(tr("From date of first recorded activity to today"));
     dateRangeLastMeasure = new QRadioButton(tr("From date of last downloaded measurement to today"));
     dateRangeManual = new QRadioButton(tr("Enter manually:"));
+    dateRangeAll->setChecked(true);
     QVBoxLayout *vbox2 = new QVBoxLayout;
     vbox2->addWidget(dateRangeAll);
     vbox2->addWidget(dateRangeLastMeasure);
@@ -97,6 +110,7 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     mainLayout->addLayout(buttonLayout);
 
 
+    connect(measuresCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(measuresChanged(int)));
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(download()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(dateRangeAll, SIGNAL(toggled(bool)), this, SLOT(dateRangeAllSettingChanged(bool)));
@@ -107,21 +121,69 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     connect(downloadTP, SIGNAL(toggled(bool)), this, SLOT(downloadTPSettingChanged(bool)));
     connect(downloadCSV, SIGNAL(toggled(bool)), this, SLOT(downloadCSVSettingChanged(bool)));
 
+    // set buttons initial state
+    measuresChanged(0);
+
+    // set the default from "last"
+    int last_timeframe = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, ALL).toInt();
+    switch (last_timeframe) {
+    case ALL:
+        dateRangeAll->setChecked(true);
+        break;
+    case LAST:
+        dateRangeLastMeasure->setChecked(true);
+        break;
+    case MANUAL:
+        dateRangeManual->setChecked(true);
+        manualFromDate->setEnabled(true);
+        manualToDate->setEnabled(true);
+        break;
+    default:
+        dateRangeAll->setChecked(true);
+    }
+
+    // initialize the downloader
+    withingsDownload = new WithingsDownload(context);
+    todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
+    csvFileImport = new MeasuresCsvImport(context);
+
+    // connect the progress bar
+    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
+    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
+    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+
+    connect(withingsDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
+    connect(withingsDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
+    connect(withingsDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+
+    connect(csvFileImport, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
+    connect(csvFileImport, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
+    connect(csvFileImport, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+}
+
+MeasuresDownload::~MeasuresDownload() {
+
+    delete withingsDownload;
+    delete todaysPlanBodyMeasureDownload;
+    delete csvFileImport;
+
+}
+
+
+
+void
+MeasuresDownload::measuresChanged(int) {
+
     // don't allow options which are not authorized
     QString strToken =appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN, "").toString();
     QString strSecret= appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_SECRET, "").toString();
 
     QString strToken2 =appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString();
 
-    if (strToken2 =="" && strToken == "" && strSecret == "") {
-        downloadWithings->setEnabled(false);
-    }
+    downloadWithings->setEnabled((measuresCombo->currentIndex() == 0) && (strToken2 != "" || strToken != "" || strSecret != ""));
 
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
-    if (token == "") {
-        downloadTP->setEnabled(false);
-    }
-
+    downloadTP->setEnabled((measuresCombo->currentIndex() == 0) && (token != ""));
 
     // select the default checked / based on available properties and last selection
     int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
@@ -141,55 +203,10 @@ BodyMeasuresDownload::BodyMeasuresDownload(Context *context) : context(context) 
     if (!done) {
         downloadCSV->setChecked(true);
     }
-
-
-    // set the default from "last"
-    int last_timeframe = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, ALL).toInt();
-    switch (last_timeframe) {
-    case ALL:
-        dateRangeAll->setChecked(true);
-        break;
-    case LAST:
-        dateRangeLastMeasure->setChecked(true);
-        break;
-    case MANUAL:
-        dateRangeManual->setChecked(true);
-        manualFromDate->setEnabled(true);
-        manualToDate->setEnabled(true);
-        break;
-    default:
-        dateRangeAll->setChecked(true);
-    }
-    // initialize the downloader
-    withingsDownload = new WithingsDownload(context);
-    todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
-    csvFileImport = new BodyMeasuresCsvImport(context);
-
-    // connect the progress bar
-    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
-    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
-    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
-
-    connect(withingsDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
-    connect(withingsDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
-    connect(withingsDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
-
-    connect(csvFileImport, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
-    connect(csvFileImport, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
-    connect(csvFileImport, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
 }
-
-BodyMeasuresDownload::~BodyMeasuresDownload() {
-
-    delete withingsDownload;
-    delete todaysPlanBodyMeasureDownload;
-    delete csvFileImport;
-
-}
-
 
 void
-BodyMeasuresDownload::download() {
+MeasuresDownload::download() {
 
    // de-activate the buttons
    downloadButton->setEnabled(false);
@@ -199,9 +216,10 @@ BodyMeasuresDownload::download() {
    progressBar->setValue(0);
 
    // do the job
-   BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
-   QList<BodyMeasure> current = pBodyMeasures->bodyMeasures();
-   QList<BodyMeasure> bodyMeasures;
+   MeasuresGroup* measuresGroup = context->athlete->measures->getGroup(measuresCombo->currentIndex());
+   if (!measuresGroup) return; // it shouldn't happen, but just in case...
+   QList<Measure> current = measuresGroup->measures();
+   QList<Measure> measures;
    QDateTime fromDate;
    QDateTime toDate;
    QDateTime firstRideDate;
@@ -245,20 +263,19 @@ BodyMeasuresDownload::download() {
 
    // do the download
    if (downloadWithings->isChecked()) {
-     downloadOk = withingsDownload->getBodyMeasures(err, fromDate, toDate, bodyMeasures);
+     downloadOk = withingsDownload->getBodyMeasures(err, fromDate, toDate, measures);
    } else if (downloadTP->isChecked()) {
-     downloadOk = todaysPlanBodyMeasureDownload->getBodyMeasures(err, fromDate, toDate, bodyMeasures);
+     downloadOk = todaysPlanBodyMeasureDownload->getBodyMeasures(err, fromDate, toDate, measures);
    } else if (downloadCSV->isChecked()) {
-       downloadOk = csvFileImport->getBodyMeasures(err, fromDate, toDate, bodyMeasures);
+       downloadOk = csvFileImport->getMeasures(measuresGroup, err, fromDate, toDate, measures);
    } else return;
 
    if (downloadOk) {
 
        // selection from various source may not be 100% accurate w.r.t. the from/to date filtering
-       // e.g. on TodaysPlan the measureDate and selectionDate can deviate
        // so remove all measures which do not fit the selection from/to interval
-       QMutableListIterator<BodyMeasure> i(bodyMeasures);
-       BodyMeasure c;
+       QMutableListIterator<Measure> i(measures);
+       Measure c;
        while (i.hasNext()) {
            c = i.next();
            if (c.when <= fromDate || c.when >= toDate) {
@@ -266,43 +283,7 @@ BodyMeasuresDownload::download() {
            }
        }
 
-       // we discard only if we have new data loaded - otherwise keep what is there
-       if (discardExistingMeasures->isChecked()) {
-           // now the new measures do not contain any "ts" of the current data any more
-           current.clear();
-       };
-
-       // if exists, merge current data with new data - new data has preferences
-       // no merging of weight data which has the same time stamp - new wins
-       if (current.count() > 0) {
-           // remove entry from current list if a new entry with same timestamp exists
-           QMutableListIterator<BodyMeasure> i(current);
-           BodyMeasure c;
-           while (i.hasNext()) {
-               c = i.next();
-               foreach(BodyMeasure m, bodyMeasures) {
-                   if (m.when == c.when) {
-                       i.remove();
-                   }
-               }
-           }
-           // combine the result (without duplicates)
-           bodyMeasures.append(current);
-       }
-
-       // update measures in cache and on file store
-       context->athlete->rideCache->cancel();
-
-       // store in athlete
-       pBodyMeasures->setBodyMeasures(bodyMeasures);
-
-       // now save data away if we actually got something !
-       // doing it here means we don't overwrite previous responses
-       // when we fail to get any data (e.g. errors / network problems)
-       pBodyMeasures->write();
-
-       // do a refresh, it will check if needed
-       context->athlete->rideCache->refresh();
+       updateMeasures(context, measuresGroup, measures, discardExistingMeasures->isChecked());
 
 #ifdef Q_MAC_OS
        // since progressBar on MacOS does not show the % values
@@ -313,7 +294,7 @@ BodyMeasuresDownload::download() {
 
    } else {
        // handle error document in err String
-       QMessageBox::warning(this, tr("Body Measurements"), tr("Downloading of body measurements failed with error: %1").arg(err));
+       QMessageBox::warning(this, tr("Measurements"), tr("Downloading of measurements failed with error: %1").arg(err));
    }
 
    // re-activate the buttons
@@ -323,14 +304,14 @@ BodyMeasuresDownload::download() {
 }
 
 void
-BodyMeasuresDownload::close() {
+MeasuresDownload::close() {
 
     accept();
 
 }
 
 void
-BodyMeasuresDownload::dateRangeAllSettingChanged(bool checked) {
+MeasuresDownload::dateRangeAllSettingChanged(bool checked) {
 
     if (checked) {
         manualFromDate->setEnabled(false);
@@ -341,7 +322,7 @@ BodyMeasuresDownload::dateRangeAllSettingChanged(bool checked) {
 
 
 void
-BodyMeasuresDownload::dateRangeLastSettingChanged(bool checked) {
+MeasuresDownload::dateRangeLastSettingChanged(bool checked) {
 
     if (checked) {
         manualFromDate->setEnabled(false);
@@ -351,7 +332,7 @@ BodyMeasuresDownload::dateRangeLastSettingChanged(bool checked) {
 }
 
 void
-BodyMeasuresDownload::dateRangeManualSettingChanged(bool checked) {
+MeasuresDownload::dateRangeManualSettingChanged(bool checked) {
 
     if (checked) {
         manualFromDate->setEnabled(true);
@@ -361,7 +342,7 @@ BodyMeasuresDownload::dateRangeManualSettingChanged(bool checked) {
 }
 
 void
-BodyMeasuresDownload::downloadWithingsSettingChanged(bool checked) {
+MeasuresDownload::downloadWithingsSettingChanged(bool checked) {
 
     if (checked) {
         appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, WITHINGS);
@@ -369,7 +350,7 @@ BodyMeasuresDownload::downloadWithingsSettingChanged(bool checked) {
 }
 
 void
-BodyMeasuresDownload::downloadTPSettingChanged(bool checked) {
+MeasuresDownload::downloadTPSettingChanged(bool checked) {
 
     if (checked) {
         appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, TP);
@@ -377,7 +358,7 @@ BodyMeasuresDownload::downloadTPSettingChanged(bool checked) {
 }
 
 void
-BodyMeasuresDownload::downloadCSVSettingChanged(bool checked) {
+MeasuresDownload::downloadCSVSettingChanged(bool checked) {
 
     if (checked) {
         appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, CSV);
@@ -386,15 +367,62 @@ BodyMeasuresDownload::downloadCSVSettingChanged(bool checked) {
 
 
 void
-BodyMeasuresDownload::downloadProgressStart(int total) {
+MeasuresDownload::downloadProgressStart(int total) {
     progressBar->setMaximum(total);
 }
 void
-BodyMeasuresDownload::downloadProgress(int current) {
+MeasuresDownload::downloadProgress(int current) {
     progressBar->setValue(current);
 }
 
 void
-BodyMeasuresDownload::downloadProgressEnd(int final) {
+MeasuresDownload::downloadProgressEnd(int final) {
     progressBar->setValue(final);
+}
+
+void
+MeasuresDownload::updateMeasures(Context *context,
+                                 MeasuresGroup *measuresGroup,
+                                 QList<Measure>&measures,
+                                 bool discardExisting) {
+
+   QList<Measure> current = measuresGroup->measures();
+
+   // we discard only if we have new data loaded - otherwise keep what is there
+   if (discardExisting) {
+       // now the new measures do not contain any "ts" of the current data any more
+       current.clear();
+   };
+
+   // if exists, merge current data with new data - new data has preferences
+   // no merging of data which has the same time stamp - new wins
+   if (current.count() > 0) {
+       // remove entry from current list if a new entry with same timestamp exists
+       QMutableListIterator<Measure> i(current);
+       Measure c;
+       while (i.hasNext()) {
+           c = i.next();
+           foreach(Measure m, measures) {
+               if (m.when == c.when) {
+                   i.remove();
+               }
+           }
+       }
+       // combine the result (without duplicates)
+       measures.append(current);
+   }
+
+   // update measures in cache and on file store
+   context->athlete->rideCache->cancel();
+
+   // store in athlete
+   measuresGroup->setMeasures(measures);
+
+   // now save data away if we actually got something !
+   // doing it here means we don't overwrite previous responses
+   // when we fail to get any data (e.g. errors / network problems)
+   measuresGroup->write();
+
+   // do a refresh, it will check if needed
+   context->athlete->rideCache->refresh();
 }
