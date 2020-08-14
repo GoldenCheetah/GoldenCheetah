@@ -2734,6 +2734,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2792,7 +2793,8 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                         }
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -2877,6 +2879,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2908,7 +2911,8 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -3003,6 +3007,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -3038,7 +3043,8 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -3518,7 +3524,6 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds; 
 
             } else {
@@ -3620,7 +3625,6 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3705,7 +3709,6 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3841,7 +3844,6 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
