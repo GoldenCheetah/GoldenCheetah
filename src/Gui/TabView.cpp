@@ -82,7 +82,10 @@ TabView::TabView(Context *context, int type) :
 
 TabView::~TabView()
 {
-    if (page_) page_->saveState();
+    if (page_) {
+        page_->saveState();
+        delete page_;
+    }
 }
 
 void

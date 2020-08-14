@@ -1802,6 +1802,9 @@ MainWindow::removeTab(Tab *tab)
 
     if (tabList.count() == 2) showTabbar(false); // don't need it for one!
 
+    // cancel ridecache refresh if its in progress
+    tab->context->athlete->rideCache->cancel();
+
     // save the named searches
     tab->context->athlete->namedSearches->write();
 

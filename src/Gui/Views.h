@@ -48,9 +48,11 @@ class AnalysisView : public TabView
 
     private:
         AnalysisSidebar *analSidebar;
+        HomeWindow *hw;
 
 };
 
+class DiarySidebar;
 class DiaryView : public TabView
 {
     Q_OBJECT
@@ -65,6 +67,10 @@ class DiaryView : public TabView
 
         bool isBlank();
         void dateRangeChanged(DateRange);
+
+    private:
+        DiarySidebar *diarySidebar;
+        HomeWindow *hw;
 
 };
 
@@ -87,6 +93,7 @@ class TrainView : public TabView
 
         TrainSidebar *trainTool;
         TrainBottom *trainBottom;
+        HomeWindow *hw;
 
 private slots:
         void onAutoHideChanged(bool enabled);
@@ -103,6 +110,7 @@ class HomeView : public TabView
         ~HomeView();
 
         LTMSidebar *sidebar;
+        HomeWindow *hw;
 
     signals:
         void dateChanged(DateRange);
