@@ -139,7 +139,13 @@ class PaceSwim : public RideMetric {
         setDescription(tr("Average Speed expressed in swim pace units: min/100m or min/100yd"));
    }
 
-    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+        // not a swim
+        if (!item->isSwim) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         RideMetric *as = deps.value("average_speed");
 
