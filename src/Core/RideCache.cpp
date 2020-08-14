@@ -49,6 +49,18 @@
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
+class RideCacheLoader : public QThread
+{
+public:
+
+    RideCacheLoader(RideCache *cache) : cache(cache) {}
+    void run() { cache->load(); }
+
+private:
+
+        RideCache *cache;
+};
+
 RideCache::RideCache(Context *context) : context(context)
 {
     directory = context->athlete->home->activities();
@@ -128,8 +140,15 @@ RideCache::RideCache(Context *context) : context(context)
     qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
 
     // load the store - will unstale once cache restored
-    load();
+    RideCacheLoader *rideCacheLoader = new RideCacheLoader(this);
+    connect(rideCacheLoader, SIGNAL(finished()), this, SLOT(postLoad()));
+    connect(rideCacheLoader, SIGNAL(finished()), this, SIGNAL(loadComplete()));
+    rideCacheLoader->start();
+}
 
+void
+RideCache::postLoad()
+{
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
@@ -461,6 +480,9 @@ RideCache::writeAsCSV(QString filename)
 void
 itemRefresh(RideItem *&item)
 {
+    // debugging below to watch refreshing take place
+    //fprintf(stderr, "%s %s refresh\n", item->context->athlete->cyclist.toStdString().c_str(), item->dateTime.toString().toStdString().c_str()); fflush(stderr);
+
     // need parser to be reentrant !item->refresh();
     if (item->isstale) {
         item->refresh();

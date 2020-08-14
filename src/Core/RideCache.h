@@ -100,6 +100,7 @@ class RideCache : public QObject
 
         // restore / dump cache to disk (json)
         void load();
+        void postLoad();
         void save(bool opendata=false, QString filename="");
 
         // find entry quickly
@@ -126,6 +127,7 @@ class RideCache : public QObject
     signals:
 
         void modelProgress(int, int); // let others know when we're refreshing the model estimates
+        void loadComplete(); // when loading the cache completes...
 
         // us telling the world the item changed
         void itemChanged(RideItem*);

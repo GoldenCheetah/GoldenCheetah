@@ -177,23 +177,14 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     cloudAutoDownload = new CloudServiceAutoDownload(context);
     connect(context, SIGNAL(refreshEnd()), cloudAutoDownload, SLOT(autoDownload()));
 
-    // blocking as at startup
-    if (context->mainWindow->progress) {
-        // now most dependencies are in get cache
-        rideCache = new RideCache(context);
-        loadComplete();
-    } else {
-        // load in background once GC is up and running
-        AthleteLoader *loader = new AthleteLoader(context);
-        connect(loader, SIGNAL(finished()), this, SLOT(loadComplete()));
-        loader->start();
-    }
-}
+    // now most dependencies are in get cache
+    QEventLoop loop;
+    rideCache = new RideCache(context);
+    connect(rideCache, SIGNAL(loadComplete()), &loop, SLOT(quit()));
+    connect(rideCache, SIGNAL(loadComplete()), this, SLOT(loadComplete()));
 
-void
-AthleteLoader::run()
-{
-    context->athlete->rideCache = new RideCache(context);
+    // we need to block on load complete if first (before mainwindow ready)
+    if (context->mainWindow->progress)  loop.exec();
 }
 
 void
