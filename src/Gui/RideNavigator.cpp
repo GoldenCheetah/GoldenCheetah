@@ -1077,7 +1077,7 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
         rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight((rideNavigator->fontHeight+2) * 3);
+        s.setHeight((rideNavigator->fontHeight+2) * 4);
     } else s.setHeight(rideNavigator->fontHeight + 2);
     return s;
 }
@@ -1211,12 +1211,12 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 3);
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
+            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
             //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 
