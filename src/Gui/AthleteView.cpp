@@ -66,7 +66,7 @@ AthleteView::configChanged(qint32)
 
 }
 
-AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(parent, path), path(path)
+AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(parent, path), path(path), refresh(false)
 {
     // no config icon thanks
     setShowConfig(false);
@@ -98,6 +98,12 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
         anchor=true;
         button->setText("Close");
         button->hide();
+
+        // watch metric updates
+        connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
+        connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
+        connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate))); // we might miss 1st one
+
     } else {
         context = NULL;
         loadprogress = 0;
@@ -171,9 +177,18 @@ AthleteCard::opening(QString name, Context*context)
         connect(context,SIGNAL(loadProgress(QString,double)), this, SLOT(loadProgress(QString,double)));
         connect(context,SIGNAL(loadDone(QString,Context*)), this, SLOT(loadDone(QString,Context*)));
         connect(context,SIGNAL(athleteClose(QString,Context*)), this, SLOT(closing(QString,Context*)));
-    }
 
+        // refresh updates
+        connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
+        connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
+        connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate))); // we might miss 1st one
+    }
 }
+
+// track refreshes
+void AthleteCard::refreshStart() { refresh = true; update(); }
+void AthleteCard::refreshEnd() { refresh = false; update(); }
+void AthleteCard::refreshUpdate(QDate) { refresh = true; update();  }
 
 void AthleteCard::itemGeometryChanged()
 {
@@ -233,8 +248,15 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
         painter->drawText(rectf, message, Qt::AlignHCenter | Qt::AlignVCenter);
     }
 
-
     // load status
     QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (loadprogress/100), gl_progress_width);
     painter->fillRect(progressbar, QBrush(GColor(CPLOTMARKER)));
+
+    // refresh status
+    if (refresh && Context::isValid(context)) {
+        QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (double(context->athlete->rideCache->progress())/100), gl_progress_width);
+        QColor over(Qt::white);
+        over.setAlpha(128);
+        painter->fillRect(progressbar, QBrush(over));
+    }
 }

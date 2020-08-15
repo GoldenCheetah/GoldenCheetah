@@ -93,6 +93,9 @@ class Context : public QObject
         Context(MainWindow *mainWindow);
         ~Context();
 
+        // check if valid (might be deleted)
+        static bool isValid(Context *);
+
         // mainwindow state
         NavigationModel *nav;
         int viewIndex;

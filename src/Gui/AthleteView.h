@@ -36,10 +36,16 @@ class AthleteCard : public ChartSpaceItem
         static ChartSpaceItem *create(ChartSpace *parent) { return new AthleteCard(parent, ""); }
 
     public slots:
+        // opening/closing etc
         void opening(QString, Context*);
         void closing(QString, Context*);
         void loadProgress(QString, double);
         void loadDone(QString, Context*);
+
+        // metric refreshing
+        void refreshStart();
+        void refreshEnd();
+        void refreshUpdate(QDate);
 
         void clicked();
 
@@ -55,5 +61,6 @@ class AthleteCard : public ChartSpaceItem
         // little graph of last 90 days
         int count; // total activities
         QDateTime last; // date of last activity recorded
+        bool refresh;
 };
 

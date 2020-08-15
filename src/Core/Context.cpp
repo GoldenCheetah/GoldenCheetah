@@ -32,6 +32,7 @@
 // singleton
 static GlobalContext *globalContext = new GlobalContext();
 static QList<Context*> _contexts;
+bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 GlobalContext *GlobalContext::context() { return globalContext; }
 
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
