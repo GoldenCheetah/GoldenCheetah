@@ -660,7 +660,24 @@ Themes::Themes()
     themes  << add;
     colors.clear();
 
-    add.name = tr("Ollie's Oatmeal");
+    add.name = tr("Team Colours (light)");
+    colors << QColor(Qt::white)  // Plot Background
+           << QColor(0x36,0x37,0x4b) // Toolbar and Sidebar Chrome
+           << QColor(0x65,0x69,0xa5) // Accent color (markers)
+           << QColor(194,194,194) // Selection color
+           << QColor(Qt::yellow) // Critical Power and W'Bal
+           << QColor(Qt::red) // Heartrate
+           << QColor(Qt::green) // Speed
+           << QColor(255,170,0) // Power
+           << QColor(0,204,204) // Cadence
+           << QColor(Qt::magenta) // Torque
+           << QColor(0xe3,0xe0,0xe8) // Overview Background
+           << QColor(Qt::white);// Overview Card Background
+    add.colors = colors;
+    themes  << add;
+    colors.clear();
+
+    add.name = tr("Ollie's Oatmeal (light)");
     colors << QColor(0xdd,0xef,0xe6)  // Plot Background
            << QColor(0x31,0x25,0x0b) // Toolbar and Sidebar Chrome
            << QColor(0x8d,0x57,0x30) // Accent color (markers)
@@ -677,42 +694,7 @@ Themes::Themes()
     themes  << add;
     colors.clear();
 
-    // now some popular combos from Kueler
-    add.name = tr("Neutral Blue"); // ** DARK **
-    colors << QColor(25,52,65)  // Plot Background
-           << QColor(0xec,0xec,0xec) // Toolbar and Sidebar Chrome
-           << QColor(209,219,189) // Accent color (markers)
-           << QColor(145,170,157) // Selection color
-           << QColor(62,96,188) // Critical Power and W'Bal
-           << QColor(Qt::red) // Heartrate
-           << QColor(Qt::green) // Speed
-           << QColor(Qt::yellow) // Power
-           << QColor(0,204,204) // Cadence
-           << QColor(Qt::magenta) // Torque
-           << QColor(25,52,65) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
-    add.colors = colors;
-    themes  << add;
-    colors.clear();
-
-    add.name = tr("Firenze"); // ** LIGHT **
-    colors << QColor(255,240,165)  // Plot Background
-           << QColor(0xec,0xec,0xec) // Toolbar and Sidebar Chrome
-           << QColor(70,137,102) // Accent color (markers)
-           << QColor(182,73,38) // Selection color
-           << QColor(142,40,0) // Critical Power and W'Bal
-           << QColor(Qt::red) // Heartrate
-           << QColor(Qt::green) // Speed
-           << QColor(85,90,127) // Power
-           << QColor(0,204,204) // Cadence
-           << QColor(Qt::magenta) // Torque
-           << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
-    add.colors = colors;
-    themes  << add;
-    colors.clear();
-
-    add.name = tr("Mustang"); // ** DARK **
+    add.name = tr("Mustang (dark)"); // ** DARK **
     colors << QColor(0,0,0)  // Plot Background
            << QColor(35,35,35) // Toolbar and Sidebar Chrome
            << QColor(255,152,0) // Accent color (markers)
@@ -727,40 +709,6 @@ Themes::Themes()
            << QColor(42,42,42);// Overview Card Background
     add.colors = colors;
     themes  << add;
-    colors.clear();
-
-    add.name = tr("Japanese Garden"); // ** DARK **
-    colors << QColor(56,37,19)  // Plot Background
-           << QColor(216,202,168) // Toolbar and Sidebar Chrome
-           << QColor(92,131,47) // Accent color (markers)
-           << QColor(54,57,66) // Selection color
-           << QColor(40,73,7) // Critical Power and W'Bal
-           << QColor(Qt::red) // Heartrate
-           << QColor(Qt::green) // Speed
-           << QColor(Qt::yellow) // Power
-           << QColor(0,204,204) // Cadence
-           << QColor(Qt::magenta) // Torque
-           << QColor(56,37,19) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
-    add.colors = colors;
-    themes  << add;
-    colors.clear();
-
-    add.name = tr("Zen and Tea"); // ** DARK **
-    colors << QColor(246,255,224)  // Plot Background
-           << QColor(149,171,99) // Toolbar and Sidebar Chrome
-           << QColor(16,34,43) // Accent color (markers)
-           << QColor(226,240,214) // Selection color
-           << QColor(189,214,132) // Critical Power and W'Bal
-           << QColor(Qt::red) // Heartrate
-           << QColor(Qt::green) // Speed
-           << QColor(Qt::yellow) // Power
-           << QColor(0,204,204) // Cadence
-           << QColor(Qt::magenta) // Torque
-           << QColor(246,255,224) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
-    add.colors = colors;
-    themes << add;
     colors.clear();
 
     add.name = tr("Mono (dark)"); // New v3.1 default colors // ** DARK **
@@ -798,7 +746,7 @@ Themes::Themes()
     colors.clear();
 
     // we can add more later ....
-    add.name = tr("Schoberer"); // Old GoldenCheetah colors // ** LIGHT **
+    add.name = tr("Schoberer (light)"); // Old GoldenCheetah colors // ** LIGHT **
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xec,0xec,0xec) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
