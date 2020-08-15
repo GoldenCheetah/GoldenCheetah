@@ -156,56 +156,6 @@ void nostderr(QString dir)
         fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
     }
 }
-#else
-static FILE *fpLog = NULL;
-
-void logMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &message)
-{
-    QByteArray msg = message.toLocal8Bit();
-    QByteArray timeStamp = QTime::currentTime().toString("hh:mm:ss:zzz").toLocal8Bit();
-
-    switch (type) {
-    case QtDebugMsg:
-        fprintf(fpLog, "[%s][Debug] %s\n", timeStamp.constData(), msg.constData());
-        fflush(fpLog);
-        break;
-    case QtInfoMsg:
-        fprintf(fpLog, "[%s][Info] %s\n", timeStamp.constData(), msg.constData());
-        fflush(fpLog);
-        break;
-    case QtWarningMsg: // supress warnings unless server mode
-        if (nogui) {
-            fprintf(fpLog, "[%s][Warning] %s\n", timeStamp.constData(), msg.constData());
-            fflush(fpLog);
-        }
-        break;
-    case QtCriticalMsg:
-        fprintf(fpLog, "[%s][Critical] %s\n", timeStamp.constData(), msg.constData());
-        fflush(fpLog);
-        break;
-    case QtFatalMsg:
-        fprintf(fpLog, "[%s][Fatal] %s\n", timeStamp.constData(), msg.constData());
-        fflush(fpLog);
-        abort();
-    }
-
-}
-
-void nostderr(QString dir)
-{
-    // redirect qt messages to a file
-    fpLog = fopen(QString("%1/goldencheetah.log").arg(dir).toLocal8Bit().constData(), "w");
-    if (fpLog) {
-        qInstallMessageHandler(logMessageOutput);
-    } else {
-        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
-    }
-    // Close standard handles
-    fclose(stdout);
-    fclose(stderr);
-    // Release the console in GUI mode
-    if (!nogui) FreeConsole();
-}
 #endif
 
 //
@@ -585,7 +535,11 @@ main(int argc, char *argv[])
 
 
         // now redirect stderr
+#ifndef WIN32
         if (!debug) nostderr(home.canonicalPath());
+#else
+        Q_UNUSED(debug)
+#endif
 
         // install QT Translator to enable QT Dialogs translation
         // we may have restarted JUST to get this!
@@ -662,7 +616,7 @@ main(int argc, char *argv[])
                 qDebug()<<"Athlete directory:"<<home.absolutePath();
             } else {
                 // switch off warnings if in gui mode
-#if !defined GC_WANT_ALLDEBUG && !defined Q_OS_WIN
+#ifndef GC_WANT_ALLDEBUG
                 qInstallMessageHandler(myMessageOutput);
 #endif
             }
