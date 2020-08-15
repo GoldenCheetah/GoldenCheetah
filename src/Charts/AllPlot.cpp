@@ -55,6 +55,8 @@
 
 #include <string.h> // for memcpy
 
+static const int gl_alpha = 100;
+
 class IntervalPlotData : public QwtSeriesData<QPointF>
 {
     public:
@@ -226,7 +228,7 @@ class AllPlotZoneLabel: public QwtPlotItem
                     }
 
                     QColor text_color = zoneColor(zone_number, num_zones);
-                    text_color.setAlpha(64);
+                    text_color.setAlpha(gl_alpha);
                     text.setColor(text_color);
                 }
             }
@@ -564,7 +566,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
 
         if (plot->fill || zones.count()>0) {
             QColor p = add.color;
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             add.curve->setBrush(QBrush(p));
         } else {
             add.curve->setBrush(Qt::NoBrush);
@@ -1246,7 +1248,7 @@ AllPlot::configChanged(qint32 what)
         ihlbrush.setAlpha(128);
         standard->intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
         QColor hbrush = QColor(Qt::lightGray);
-        hbrush.setAlpha(64);
+        hbrush.setAlpha(gl_alpha);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
         //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
         QPen gridPen(GColor(CPLOTGRID));
@@ -1258,169 +1260,169 @@ AllPlot::configChanged(qint32 what)
 
             for(int k=0; k<standard->U.count(); k++) {
                 QColor p = standard->U[k].color;
-                p.setAlpha(64);
+                p.setAlpha(gl_alpha);
                 standard->U[k].curve->setBrush(QBrush(p));
             }
 
             QColor p;
             p = standard->wattsCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->wattsCurve->setBrush(QBrush(p));
 
             p = standard->atissCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->atissCurve->setBrush(QBrush(p));
 
             p = standard->antissCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->antissCurve->setBrush(QBrush(p));
 
             p = standard->npCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->npCurve->setBrush(QBrush(p));
 
             p = standard->rvCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rvCurve->setBrush(QBrush(p));
 
             p = standard->rcadCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rcadCurve->setBrush(QBrush(p));
 
             p = standard->rgctCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rgctCurve->setBrush(QBrush(p));
 
             p = standard->gearCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->gearCurve->setBrush(QBrush(p));
 
             p = standard->smo2Curve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->smo2Curve->setBrush(QBrush(p));
 
             p = standard->thbCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->thbCurve->setBrush(QBrush(p));
 
             p = standard->o2hbCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->o2hbCurve->setBrush(QBrush(p));
 
             p = standard->hhbCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->hhbCurve->setBrush(QBrush(p));
 
             p = standard->xpCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->xpCurve->setBrush(QBrush(p));
 
             p = standard->apCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->apCurve->setBrush(QBrush(p));
 
             p = standard->wCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->wCurve->setBrush(QBrush(p));
 
             p = standard->tcoreCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->tcoreCurve->setBrush(QBrush(p));
 
             p = standard->hrCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->hrCurve->setBrush(QBrush(p));
 
             p = standard->accelCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->accelCurve->setBrush(QBrush(p));
 
             p = standard->wattsDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->wattsDCurve->setBrush(QBrush(p));
 
             p = standard->cadDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->cadDCurve->setBrush(QBrush(p));
 
             p = standard->nmDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->nmDCurve->setBrush(QBrush(p));
 
             p = standard->hrDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->hrDCurve->setBrush(QBrush(p));
 
             p = standard->speedCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->speedCurve->setBrush(QBrush(p));
 
             p = standard->cadCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->cadCurve->setBrush(QBrush(p));
 
             p = standard->torqueCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->torqueCurve->setBrush(QBrush(p));
 
             p = standard->tempCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->tempCurve->setBrush(QBrush(p));
 
             p = standard->lteCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lteCurve->setBrush(QBrush(p));
 
             p = standard->rteCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rteCurve->setBrush(QBrush(p));
 
             p = standard->lpsCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lpsCurve->setBrush(QBrush(p));
 
             p = standard->rpsCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rpsCurve->setBrush(QBrush(p));
 
             p = standard->lpcoCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lpcoCurve->setBrush(QBrush(p));
 
             p = standard->rpcoCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rpcoCurve->setBrush(QBrush(p));
 
             p = standard->lppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lppCurve->setBrush(QBrush(p));
 
             p = standard->rppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rppCurve->setBrush(QBrush(p));
 
             p = standard->lpppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lpppCurve->setBrush(QBrush(p));
 
             p = standard->rpppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rpppCurve->setBrush(QBrush(p));
 
             p = standard->slopeCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->slopeCurve->setBrush(QBrush(p));
 
             /*p = standard->altSlopeCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->altSlopeCurve->setBrush(QBrush(p));
 
             p = standard->balanceLCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->balanceLCurve->setBrush(QBrush(p));
 
             p = standard->balanceRCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->balanceRCurve->setBrush(QBrush(p));*/
         } else {
             for(int k=0; k<standard->U.count(); k++) {
@@ -2554,7 +2556,7 @@ AllPlot::refreshIntervalMarkers()
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
 
-            if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,64), 0, Qt::DashLine));
+            if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,65), 0, Qt::DashLine));
             else mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashLine));
 
             // put matches on second line down
@@ -6551,150 +6553,150 @@ AllPlot::setPaintBrush(int state)
 
         for(int k=0; k<standard->U.count(); k++) {
             QColor p = standard->U[k].color;
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->U[k].curve->setBrush(QBrush(p));
         }
 
         QColor p;
         p = standard->wCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->wCurve->setBrush(QBrush(p));
 
         p = standard->wattsCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->wattsCurve->setBrush(QBrush(p));
 
         p = standard->npCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->npCurve->setBrush(QBrush(p));
         standard->atissCurve->setBrush(QBrush(p));
         standard->antissCurve->setBrush(QBrush(p));
 
 
         p = standard->rvCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rvCurve->setBrush(QBrush(p));
         p = standard->rgctCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rgctCurve->setBrush(QBrush(p));
         p = standard->rcadCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rcadCurve->setBrush(QBrush(p));
         p = standard->gearCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->gearCurve->setBrush(QBrush(p));
         p = standard->smo2Curve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->smo2Curve->setBrush(QBrush(p));
         p = standard->thbCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->thbCurve->setBrush(QBrush(p));
         p = standard->o2hbCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->o2hbCurve->setBrush(QBrush(p));
         p = standard->hhbCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->hhbCurve->setBrush(QBrush(p));
 
 
         p = standard->xpCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->xpCurve->setBrush(QBrush(p));
 
         p = standard->apCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->apCurve->setBrush(QBrush(p));
 
         p = standard->tcoreCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->tcoreCurve->setBrush(QBrush(p));
 
         p = standard->hrCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->hrCurve->setBrush(QBrush(p));
 
         p = standard->accelCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->accelCurve->setBrush(QBrush(p));
 
         p = standard->wattsDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->wattsDCurve->setBrush(QBrush(p));
 
         p = standard->cadDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->cadDCurve->setBrush(QBrush(p));
 
         p = standard->nmDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->nmDCurve->setBrush(QBrush(p));
 
         p = standard->hrDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->hrDCurve->setBrush(QBrush(p));
 
         p = standard->speedCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->speedCurve->setBrush(QBrush(p));
 
         p = standard->cadCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->cadCurve->setBrush(QBrush(p));
 
         p = standard->tempCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->tempCurve->setBrush(QBrush(p));
 
         p = standard->torqueCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->torqueCurve->setBrush(QBrush(p));
 
         p = standard->lteCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lteCurve->setBrush(QBrush(p));
         p = standard->rteCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rteCurve->setBrush(QBrush(p));
         p = standard->lpsCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lpsCurve->setBrush(QBrush(p));
         p = standard->rpsCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rpsCurve->setBrush(QBrush(p));
         p = standard->lpcoCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lpcoCurve->setBrush(QBrush(p));
         p = standard->rpcoCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rpcoCurve->setBrush(QBrush(p));
         p = standard->lppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lppCurve->setBrush(QBrush(p));
         p = standard->rppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rppCurve->setBrush(QBrush(p));
         p = standard->lpppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lpppCurve->setBrush(QBrush(p));
 
         p = standard->rpppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rpppCurve->setBrush(QBrush(p));
 
         p = standard->slopeCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->slopeCurve->setBrush(QBrush(p));
 
         /*p = standard->altSlopeCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->altSlopeCurve->setBrush(QBrush(p));
 
         p = standard->balanceLCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->balanceLCurve->setBrush(QBrush(p));
 
         p = standard->balanceRCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->balanceRCurve->setBrush(QBrush(p));*/
     } else {
         for(int k=0; k<standard->U.count(); k++) {
@@ -7052,7 +7054,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
                 // hover curve color aligns to the type of interval we are highlighting
                 QColor hbrush = chosen->color;
-                hbrush.setAlpha(64);
+                hbrush.setAlpha(gl_alpha);
                 standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
                 // we chose one?
@@ -7113,7 +7115,7 @@ AllPlot::intervalHover(IntervalItem *chosen)
 
         // hover curve color aligns to the type of interval we are highlighting
         QColor hbrush = chosen->color;
-        hbrush.setAlpha(64);
+        hbrush.setAlpha(gl_alpha);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
         if (bydist) {
