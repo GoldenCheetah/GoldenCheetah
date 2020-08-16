@@ -31,6 +31,7 @@
 #include "TabView.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "RideEditor.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -74,6 +75,7 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     qRegisterMetaType<RideItem*>("ride");
 
     extraForm = new Form(this);
+    editor = new RideEditor(context);
 
     configChanged(CONFIG_FIELDS | CONFIG_APPEARANCE);
 
@@ -100,6 +102,7 @@ RideMetadata::setRideItem(RideItem *ride)
         setExtraTab();
         metadataChanged();
     }
+    editor->rideSelected(ride);
 }
 
 void
@@ -268,6 +271,8 @@ RideMetadata::configChanged(qint32)
     tabList.clear();
     formFields.empty();
 
+    // remove editor if it exists
+    if (tabs->count() > 0) tabs->removeTab(tabs->count()-1);
 
     // create forms and populate with fields
     for(int i=0; i<fieldDefinitions.count(); i++) {
@@ -297,6 +302,9 @@ RideMetadata::configChanged(qint32)
 
     // set Extra tab for current ride
     setExtraTab();
+
+    // add editor
+    tabs->addTab(editor, "Raw Data");
 
     // tab bar look reasonably modern
     QString styling = QString("QTabWidget { background: %1; }"

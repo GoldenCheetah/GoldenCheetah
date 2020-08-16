@@ -39,7 +39,7 @@ enum gcwinid {
         PerformanceManager =9,
         PfPv =10,
         Race =11, // deprecated
-        RideEditor =13,
+        RideEditor =13, // deprecated - include in MetadataWindow (23)
         RideSummary =14,
         Scatter =15,
         Summary =16,

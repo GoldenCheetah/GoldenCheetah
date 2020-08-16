@@ -1521,7 +1521,7 @@ bool ViewParser::startDocument()
 
 bool ViewParser::endElement( const QString&, const QString&, const QString &qName )
 {
-    if (qName == "chart") { // add to the list
+    if (qName == "chart" && chart) { // add to the list
         charts.append(chart);
     }
     return true;
@@ -1551,9 +1551,10 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         // new chart
         type = static_cast<GcWinID>(typeStr.toInt());
         chart = GcWindowRegistry::newGcWindow(type, context);
-        chart->hide();
-        chart->setProperty("title", QVariant(title));
-
+        if (chart != NULL) {
+            chart->hide();
+            chart->setProperty("title", QVariant(title));
+        }
     }
     else if (name == "property") {
 
@@ -1567,14 +1568,14 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         }
 
         // set the chart property
-        if (type == "int") chart->setProperty(name.toLatin1(), QVariant(value.toInt()));
-        if (type == "double") chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
+        if (type == "int" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toInt()));
+        if (type == "double" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
 
         // deprecate dateRange asa chart property THAT IS DSAVED IN STATE
-        if (type == "QString" && name != "dateRange") chart->setProperty(name.toLatin1(), QVariant(QString(value)));
-        if (type == "QDate") chart->setProperty(name.toLatin1(), QVariant(QDate::fromString(value)));
-        if (type == "bool") chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
-        if (type == "LTMSettings") {
+        if (type == "QString" && name != "dateRange" && chart) chart->setProperty(name.toLatin1(), QVariant(QString(value)));
+        if (type == "QDate" && chart) chart->setProperty(name.toLatin1(), QVariant(QDate::fromString(value)));
+        if (type == "bool" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
+        if (type == "LTMSettings" && chart) {
             QByteArray base64(value.toLatin1());
             QByteArray unmarshall = QByteArray::fromBase64(base64);
             QDataStream s(&unmarshall, QIODevice::ReadOnly);

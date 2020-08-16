@@ -89,9 +89,9 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
     { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Summary"),GcWindowTypes::RideSummary },
-    { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
-    { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
-    { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
+    { VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
+    //{ VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
+    //{ VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Performance"),GcWindowTypes::AllPlot },
     { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
@@ -206,11 +206,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Model: returning = new GcChartWindow(context); break;
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
-    case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;
+    case GcWindowTypes::RideEditor: returning = NULL; break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(context, true); break;
     case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(context, false); break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
-    case GcWindowTypes::Summary: returning = new SummaryWindow(context); break;
+    case GcWindowTypes::Summary: returning = NULL; break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
 #ifdef GC_VIDEO_NONE

@@ -43,6 +43,7 @@
 #define FIELD_CHECKBOX  7
 
 class RideMetadata;
+class RideEditor;
 
 class KeywordDefinition
 {
@@ -201,6 +202,8 @@ class RideMetadata : public QWidget
     QVector<FormField*>   formFields;
 
     QString colorfield;
+
+    RideEditor *editor;
 };
 
 class MetadataXMLParser : public QXmlDefaultHandler

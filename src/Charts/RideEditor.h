@@ -52,7 +52,7 @@ class EditorTabBar;
 class XDataEditor;
 class XDataTableModel;
 
-class RideEditor : public GcChartWindow
+class RideEditor : public QWidget
 {
     Q_OBJECT
     G_OBJECT
@@ -128,7 +128,7 @@ class RideEditor : public GcChartWindow
 
         // GC signals
         void configChanged(qint32);
-        void rideSelected();
+        void rideSelected(RideItem *);
         void setTabBar(bool force);
         void tabbarSelected(int);
         void removeTabRequested(int);

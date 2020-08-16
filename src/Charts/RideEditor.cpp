@@ -113,14 +113,12 @@ getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, 
     }
 }
 
-RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
+RideEditor::RideEditor(Context *context) : QWidget(context->mainWindow), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
 {
-    setControls(NULL);
-
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(2,0,2,2);
-    setChartLayout(mainLayout);
+    setLayout(mainLayout);
 
     //Left in the code to display a title, but
     //its a waste of screen estate, maybe uncomment
@@ -220,14 +218,16 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
 
     // layout the widget
     //mainLayout->addWidget(title);
+    mainLayout->addSpacing(20*dpiXFactor); // bit of white space
     mainLayout->addWidget(toolbar);
+    mainLayout->addSpacing(20*dpiXFactor);
     mainLayout->addWidget(stack);
     mainLayout->addWidget(tabbar);
 
     // trap GC signals
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
-    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    //connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
     connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -1480,20 +1480,17 @@ RideEditor::intervalSelected()
 }
 
 void
-RideEditor::rideSelected()
+RideEditor::rideSelected(RideItem *selected)
 {
     findTool->hide(); // hide the dialog!
     anomalyTool->hide();
     xdataTool->hide();
 
-    RideItem *current = myRideItem;
+    RideItem *current = selected;
     if (!current || !current->ride() || !current->ride()->dataPoints().count()) {
         model->setRide(NULL);
-        setIsBlank(true);
         findTool->rideSelected();
         return;
-    } else {
-        setIsBlank(false);
     }
 
     ride = current;
