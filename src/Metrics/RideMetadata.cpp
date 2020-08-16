@@ -61,6 +61,7 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     // setup the tabs widget
     tabs = new QTabWidget(this);
     tabs->setMovable(true);
+    tabs->setContentsMargins(0,0,0,0);
 
     // better styling on Linux with fusion controls
 #ifndef Q_OS_MAC
@@ -297,11 +298,25 @@ RideMetadata::configChanged(qint32)
     // set Extra tab for current ride
     setExtraTab();
 
-    // when constructing we have not registered
-    // the properties nor selected a ride
-#ifndef Q_OS_MAC
-    tabs->setStyleSheet(TabView::ourStyleSheet());
-#endif
+    // tab bar look reasonably modern
+    QString styling = QString("QTabWidget { background: %1; }"
+                              "QTabWidget::pane { border: 0px; }"
+                              "QTabBar::tab { background: %1; "
+                              "               color: %6; "
+                              "               min-width: %5px; "
+                              "               padding: %4px; "
+                              "               border-top: 0px;"
+                              "               border-left: 0px;"
+                              "               border-right: 0px;"
+                              "               border-bottom: %3px solid %1; } "
+                              "QTabBar::tab:selected { border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-bottom-color: %2; }"
+                             ).arg(GColor(CPLOTBACKGROUND).name())                        // 1 tab background color
+                              .arg(GColor(CPLOTMARKER).name())                            // 2 selected bar color
+                              .arg(4*dpiYFactor)                                          // 3 selected bar width
+                              .arg(2*dpiXFactor)                                          // 4 padding
+                              .arg(75*dpiXFactor)                                         // 5 tab minimum width
+                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()); // 6 tab text color
+    tabs->setStyleSheet(styling);
 
     metadataChanged(); // re-read the values!
 }
@@ -380,6 +395,7 @@ Form::initialise()
 {
     setPalette(meta->palette);
     contents = new QWidget;
+    contents->setContentsMargins(5*dpiXFactor, 20*dpiXFactor,5*dpiXFactor,5*dpiXFactor); // padding between tabbar and fields
     contents->setPalette(meta->palette);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(contents);
