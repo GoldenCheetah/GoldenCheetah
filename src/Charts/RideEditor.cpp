@@ -267,12 +267,13 @@ RideEditor::configChanged(qint32)
     tabbar->setPalette(palette);
     QColor faded = GCColor::invertColor(GColor(CPLOTBACKGROUND));
     tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; border: 0.5px solid %1; color: rgba(%3,%4,%5,50%) }"
-                                  "QTabBar::tab:selected { background-color: %1; color: %2; border: 2px solid %1; border-bottom-color: %6 }"
+                                  "QTabBar::tab:selected { background-color: %1; color: %2; border-bottom: %7px solid %1; border-bottom-color: %6 }"
                                   "QTabBar::close-button:!selected { background-color: %1; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
                     .arg(faded.red()).arg(faded.green()).arg(faded.blue())
-                    .arg(GColor(CPLOTMARKER).name()));
+                    .arg(GColor(CPLOTMARKER).name())
+                    .arg(4 * dpiXFactor));
     table->setPalette(palette);
     table->setStyleSheet(QString("QTableView { background-color: %1; color: %2; border: %1 }"
                                  "QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
@@ -1571,7 +1572,7 @@ RideEditor::setTabBar(bool force)
     QStringList xd, tabs;
     for(int i=0; i< tabbar->count()-1; i++) tabs << tabbar->tabText(i);
     QMapIterator<QString, XDataSeries *>ie(ride->ride()->xdata());
-    xd<<tr("STANDARD");
+    xd<<tr("Basic Data");
     ie.toFront();
     while(ie.hasNext()) {
        ie.next();
@@ -1595,7 +1596,7 @@ RideEditor::setTabBar(bool force)
 
     while(tabbar->count()) tabbar->removeTab(0);
     tabbar->hide();
-    tabbar->addTab(tr("STANDARD"));
+    tabbar->addTab(tr("Basic Data"));
 
     // disable close button on STANDARD tab
     tabbar->setTabButton(0, QTabBar::RightSide, 0);
