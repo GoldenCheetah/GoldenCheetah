@@ -190,7 +190,7 @@ RideEditor::RideEditor(Context *context) : QWidget(context->mainWindow), data(NU
     model = new RideFileTableModel(NULL);
 
     // set up the table
-    table = new QTableView();
+    table = new QTableView(this);
 
     stack->addWidget(table);
     stack->setCurrentIndex(0);
@@ -280,9 +280,10 @@ RideEditor::configChanged(qint32)
                                  "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-    table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+    table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px; border-bottom: %3px solid %2; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(2 * dpiYFactor));
     table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
@@ -3056,9 +3057,10 @@ void XDataEditor::configChanged()
                                   "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-    horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+    horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px; border-bottom: %3px solid %2; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(2 * dpiYFactor));
     verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
