@@ -201,7 +201,7 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
        if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
            QVector<struct RideFilePoint> newRows;
            kph = 3600.0 * length_distance / p->number[durationIdx];
-           double deltaDist = length_duration >= 1 ? length_distance / (length_duration - 1) : 0.0;
+           double deltaDist = length_duration > 1 ? length_distance / (length_duration - 1) : 0.0;
            if (length_distance == 0.0) interval++; // pauses mark laps
            for (int i = 0; i < length_duration; i++) {
                // recover previous data or create a new sample point,
