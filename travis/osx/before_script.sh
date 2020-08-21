@@ -14,7 +14,7 @@ if [ -z "$(ls -A site-packages)" ]; then
 fi
 
 # Python SIP
-curl -O https://www.riverbankcomputing.com/static/Downloads/sip/4.19.8/sip-4.19.8.tar.gz
+curl -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
 python3.7 configure.py
