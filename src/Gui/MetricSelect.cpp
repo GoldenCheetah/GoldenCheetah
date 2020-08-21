@@ -40,12 +40,12 @@ MetricSelect::MetricSelect(QWidget *parent, Context *context, int scope)
     if (scope & Meta) {
 
         // now add the ride metadata fields -- should be the same generally
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             QString text = field.name;
-            if (!context->specialFields.isMetric(text)) {
+            if (!GlobalContext::context()->specialFields.isMetric(text)) {
 
                 // translate to internal name if name has non Latin1 characters
-                text = context->specialFields.internalName(text);
+                text = GlobalContext::context()->specialFields.internalName(text);
                 text = text.replace(" ","_");
                 metaMap.insert(text, field.name);
             }

@@ -334,7 +334,7 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
-    bool metric = context->athlete->useMetricUnits;
+    bool metric = GlobalContext::context()->useMetricUnits;
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {

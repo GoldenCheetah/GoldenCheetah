@@ -322,7 +322,7 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
+    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 
     // prepare the gold, silver and bronze medal
     gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
@@ -348,7 +348,7 @@ TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString sym
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
+    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 
     animator=new QPropertyAnimation(this, "transition");
 }
@@ -381,7 +381,7 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 
     //  Get the field type
     fieldtype = -1;
-    foreach(FieldDefinition p, parent->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
         if (p.name == symbol) {
             fieldtype = p.type;
             break;
@@ -542,9 +542,9 @@ MetricOverviewItem::setData(RideItem *item)
     QList<QPointF> points;
 
     // get the metric value
-    value = item->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+    value = item->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
     if (value == "nan") value ="";
-    double v = (units == tr("seconds")) ? item->getForSymbol(symbol, parent->context->athlete->useMetricUnits) : value.toDouble();
+    double v = (units == tr("seconds")) ? item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits) : value.toDouble();
     if (std::isinf(v) || std::isnan(v)) v=0;
 
     points << QPointF(SPARKDAYS, v);
@@ -568,9 +568,9 @@ MetricOverviewItem::setData(RideItem *item)
         // only activities with matching sport flags
         if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
 
-            if (units == tr("seconds")) v = prior->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+            if (units == tr("seconds")) v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             else {
-                QString vs = prior->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+                QString vs = prior->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
                 if (vs == "nan") vs="0";
                 v = vs.toDouble();
             }
@@ -613,7 +613,7 @@ MetricOverviewItem::setData(RideItem *item)
     int career=0; // Career
     bool first=true;
     index = parent->context->athlete->rideCache->rides().count()-1;
-    v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+    v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
     while(index >=0) { // ultimately go no further back than first ever ride
 
         // get value from items before me
@@ -686,9 +686,9 @@ MetricOverviewItem::setData(RideItem *item)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *m = factory.rideMetric(symbol);
     if (m) {
-        upper = m->toString(parent->context->athlete->useMetricUnits, max);
-        lower = m->toString(parent->context->athlete->useMetricUnits, min);
-        mean = m->toString(parent->context->athlete->useMetricUnits, avg);
+        upper = m->toString(GlobalContext::context()->useMetricUnits, max);
+        lower = m->toString(GlobalContext::context()->useMetricUnits, min);
+        mean = m->toString(GlobalContext::context()->useMetricUnits, avg);
     }
 }
 
@@ -711,7 +711,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
         if (!spec.pass(item)) continue;
 
         // get value and count
-        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double value = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
         double count = item->getCountForSymbol(symbol);
         if (count <= 0) count = 1;
 
@@ -759,7 +759,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
     m->setValue(v);
     m->setCount(c);
     if (m) {
-        value = m->toString(parent->context->athlete->useMetricUnits, v);
+        value = m->toString(GlobalContext::context()->useMetricUnits, v);
     } else {
         value = Utils::removeDP(QString("%1").arg(v));
         if (value == "nan") value ="";
@@ -779,7 +779,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
 
         if (!spec.pass(item)) continue;
 
-        double v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
 
         // no zero values
         if (v == 0) continue;
@@ -834,8 +834,8 @@ TopNOverviewItem::setDateRange(DateRange dr)
         if (!spec.pass(item)) continue;
 
         // get value and count
-        double v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
-        QString value = item->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
+        QString value = item->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
         int index = stressdata.indexOf(item->dateTime.date());
         double tsb = 0;
         if (index >= 0 && index < stressdata.sb().count()) tsb = stressdata.sb()[index];
@@ -1020,7 +1020,7 @@ DonutOverviewItem::setDateRange(DateRange dr)
         }
 
         // get metric value and count
-        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double value = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
         double count = item->getCountForSymbol(symbol);
         if (count <= 0) count = 1;
 
@@ -1451,9 +1451,9 @@ IntervalOverviewItem::setDateRange(DateRange dr)
 
 
         // get the x and y VALUE
-        double x = item->getForSymbol(xsymbol, parent->context->athlete->useMetricUnits);
-        double y = item->getForSymbol(ysymbol, parent->context->athlete->useMetricUnits);
-        double z = item->getForSymbol(zsymbol, parent->context->athlete->useMetricUnits);
+        double x = item->getForSymbol(xsymbol, GlobalContext::context()->useMetricUnits);
+        double y = item->getForSymbol(ysymbol, GlobalContext::context()->useMetricUnits);
+        double z = item->getForSymbol(zsymbol, GlobalContext::context()->useMetricUnits);
 
         // truncate dates and use offsets
         if (first && xm->isDate())  xoff = x;
@@ -1514,9 +1514,9 @@ IntervalOverviewItem::setData(RideItem *item)
     QList<BPointF> points;
     foreach(IntervalItem *interval, item->intervals()) {
         // get the x and y VALUE
-        double x = interval->getForSymbol(xsymbol, parent->context->athlete->useMetricUnits);
-        double y = interval->getForSymbol(ysymbol, parent->context->athlete->useMetricUnits);
-        double z = interval->getForSymbol(zsymbol, parent->context->athlete->useMetricUnits);
+        double x = interval->getForSymbol(xsymbol, GlobalContext::context()->useMetricUnits);
+        double y = interval->getForSymbol(ysymbol, GlobalContext::context()->useMetricUnits);
+        double z = interval->getForSymbol(zsymbol, GlobalContext::context()->useMetricUnits);
 
         BPointF add;
         add.x = x;
@@ -2614,7 +2614,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
-                mi->units = metric1->rideMetric()->units(mi->parent->context->athlete->useMetricUnits);
+                mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
         }
         break;
@@ -2634,7 +2634,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
-                mi->units = metric1->rideMetric()->units(mi->parent->context->athlete->useMetricUnits);
+                mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
         }
         break;
@@ -3294,8 +3294,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     const RideMetric *m = factory.rideMetric(parent->xsymbol);
     QString smin, smax;
     if (m) {
-        smin = m->toString(parent->parent->context->athlete->useMetricUnits, round(minx+xoff));
-        smax = m->toString(parent->parent->context->athlete->useMetricUnits, round(maxx+xoff));
+        smin = m->toString(GlobalContext::context()->useMetricUnits, round(minx+xoff));
+        smax = m->toString(GlobalContext::context()->useMetricUnits, round(maxx+xoff));
     } else {
         smin = QString("%1").arg(round(minx+xoff));
         smax = QString("%1").arg(round(maxx+xoff));
@@ -3336,7 +3336,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // xlabel
         const RideMetric *m = factory.rideMetric(parent->xsymbol);
         QString xlab;
-        if (m)  xlab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.x+xoff);
+        if (m)  xlab = m->toString(GlobalContext::context()->useMetricUnits, nearest.x+xoff);
         else xlab = Utils::removeDP(QString("%1").arg(nearest.x+xoff,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
@@ -3346,7 +3346,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // ylabel
         m = factory.rideMetric(parent->ysymbol);
         QString ylab;
-        if (m)  ylab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.y+yoff);
+        if (m)  ylab = m->toString(GlobalContext::context()->useMetricUnits, nearest.y+yoff);
         else ylab = Utils::removeDP(QString("%1").arg(nearest.y+yoff,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));

@@ -2558,7 +2558,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2698,7 +2698,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -3690,7 +3690,7 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, context->athlete->useMetricUnits);
+        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, GlobalContext::context()->useMetricUnits);
 
         if (value || wantZero) {
             unsigned long seconds = 1;
@@ -4040,7 +4040,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             c.next();
             if (c.value() == curve) {
                 const RideMetric *metric =factory.rideMetric(c.key());
-                units = metric ? metric->units(context->athlete->useMetricUnits) : "";
+                units = metric ? metric->units(GlobalContext::context()->useMetricUnits) : "";
                 precision = metric ? metric->precision() : 1;
 
                 // BikeScore, RI and Daniels Points have no units

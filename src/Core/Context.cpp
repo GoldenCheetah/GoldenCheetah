@@ -18,6 +18,7 @@
 
 #include "Context.h"
 #include "Athlete.h"
+#include "RideMetadata.h"
 
 #include "RideMetric.h"
 #include "NavigationModel.h"
@@ -30,11 +31,48 @@
 #include <QMutex>
 
 // singleton
-static GlobalContext *globalContext = new GlobalContext();
+static GlobalContext *globalContext = NULL;
 static QList<Context*> _contexts;
-bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
-GlobalContext *GlobalContext::context() { return globalContext; }
+GlobalContext::GlobalContext()
+{
+    rideMetadata = NULL;
+    colorEngine = NULL;
+    readConfig();
+}
 
+void
+GlobalContext::readConfig()
+{
+    if (rideMetadata) {
+        delete rideMetadata;
+        delete colorEngine;
+    }
+
+    // metric / non-metric
+    QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
+    if (unit == 0) {
+        // Default to system locale
+        unit = QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL;
+        appsettings->setValue(GC_UNIT, unit);
+    }
+    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
+
+    // redo
+    rideMetadata = new RideMetadata(NULL);
+    colorEngine = new ColorEngine(this);
+    specialFields = SpecialFields();
+
+    // watch config changes
+    connect(this, SIGNAL(configChanged(qint32)), rideMetadata, SLOT(configChanged(qint32)));
+}
+
+GlobalContext *GlobalContext::context()
+{
+    if (globalContext == NULL) globalContext = new GlobalContext();
+    return globalContext;
+}
+
+bool Context::isValid(Context *p) { return p != NULL &&_contexts.contains(p); }
 Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
     ride = NULL;
@@ -103,7 +141,7 @@ Context::notifyConfigChanged(qint32 state)
         userMetricsConfigChanged();
 
         // reset special fields (e.g. metric overrides)
-        specialFields = SpecialFields();
+        GlobalContext::context()->specialFields = SpecialFields();
 
     }
     GlobalContext::context()->notifyConfigChanged(state);

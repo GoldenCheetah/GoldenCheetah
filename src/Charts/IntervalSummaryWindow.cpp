@@ -303,7 +303,7 @@ QString IntervalSummaryWindow::summary(IntervalItem *interval)
 {
     QString html;
 
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     QString s;
     if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))

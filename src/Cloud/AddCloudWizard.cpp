@@ -526,7 +526,7 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     metaCombo = new QComboBox(this);
     metaCombo->addItem("None", QVariant("")); // default "None" .. before adding the rest
     // add an entry for every single metadata field, which is a text
-    foreach(FieldDefinition field, wizard->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // only add text fields
         if (field.type < 3) metaCombo->addItem(field.name, QVariant(field.name));

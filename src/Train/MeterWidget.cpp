@@ -469,12 +469,12 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 
     double routeDistance = this->Value;
-    if (!context->athlete->useMetricUnits) routeDistance *= MILES_PER_KM;
+    if (!GlobalContext::context()->useMetricUnits) routeDistance *= MILES_PER_KM;
 
     routeDistance = ((int)(routeDistance * 1000.)) / 1000.;
 
     QString distanceString = QString::number(routeDistance, 'f', 3) +
-        ((context->athlete->useMetricUnits) ? tr("km") : tr("mi"));
+        ((GlobalContext::context()->useMetricUnits) ? tr("km") : tr("mi"));
 
     double distanceDrawX = (double)cyclistX;
     double distanceDrawY = ((double)m_Height * 0.75);

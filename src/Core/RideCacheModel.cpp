@@ -98,7 +98,7 @@ RideCacheModel::data(const QModelIndex &index, int role) const
                     return QTime(0,0,0).addSecs(rideCache->rides().at(index.row())->metrics_[m->index()]);
                 } else if (m->units(true) != "km" && m->precision() > 0) {
                     m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
-                    return m->toString(context->athlete->useMetricUnits); // string
+                    return m->toString(GlobalContext::context()->useMetricUnits); // string
                 } else {
 
                     // make low precision numbers sort, including distance which we picked
@@ -106,7 +106,7 @@ RideCacheModel::data(const QModelIndex &index, int role) const
                     double value = rideCache->rides().at(index.row())->metrics_[m->index()];
 
                     // convert to imperial if needed
-                    if (context->athlete->useMetricUnits == false) 
+                    if (GlobalContext::context()->useMetricUnits == false) 
                         value = (value * m->conversion()) + m->conversionSum();
 
                     return round(value);
@@ -187,7 +187,7 @@ RideCacheModel::configChanged(qint32)
     beginResetModel();
 
     // get field config
-    metadata = context->athlete->rideMetadata()->getFields();
+    metadata = GlobalContext::context()->rideMetadata->getFields();
 
     // set new column count
     // 0    QString path;
@@ -224,7 +224,7 @@ RideCacheModel::configChanged(qint32)
 
                     // is a metadata
                     int i= section -5 - factory->metricCount();
-                    headings_<< QString("%1").arg(context->specialFields.makeTechName(metadata[i].name));
+                    headings_<< QString("%1").arg(GlobalContext::context()->specialFields.makeTechName(metadata[i].name));
                 }
             }
             break;

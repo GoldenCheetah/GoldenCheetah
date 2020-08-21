@@ -32,7 +32,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     setControls(NULL);
 
     // get config
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     QVBoxLayout *vlayout = new QVBoxLayout;
     setChartLayout(vlayout);
@@ -104,7 +104,7 @@ void
 DiaryWindow::configChanged(qint32)
 {
     // get config
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     // change colors to reflect preferences
     setProperty("color", GColor(CPLOTBACKGROUND));

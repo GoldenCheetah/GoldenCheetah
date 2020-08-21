@@ -381,10 +381,10 @@ GCColor::themes()
     return allThemes;
 }
 
-ColorEngine::ColorEngine(Context* context) : QObject(context), defaultColor(QColor(Qt::white)), context(context)
+ColorEngine::ColorEngine(GlobalContext *gc) : gc(gc), defaultColor(QColor(Qt::white))
 {
     configChanged(CONFIG_NOTECOLOR);
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(gc, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 void ColorEngine::configChanged(qint32)
@@ -396,7 +396,7 @@ void ColorEngine::configChanged(qint32)
     reverseColor = GColor(CPLOTBACKGROUND);
 
     // setup the keyword/color combinations from config settings
-    foreach (KeywordDefinition keyword, context->athlete->rideMetadata()->getKeywords()) {
+    foreach (KeywordDefinition keyword, gc->rideMetadata->getKeywords()) {
         if (keyword.name == "Default")
             defaultColor = keyword.color; // we actually ignore this now
         else if (keyword.name == "Reverse")

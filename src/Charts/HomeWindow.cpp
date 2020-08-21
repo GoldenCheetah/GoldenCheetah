@@ -1486,7 +1486,7 @@ HomeWindow::restoreState(bool useDefault)
                     // now get the LTMMetrics
                     LTMSettings workSettings = ltmW->getSettings();
                     // replace name and unit for translated versions
-                    workSettings.translateMetrics(context->athlete->useMetricUnits);
+                    workSettings.translateMetrics(GlobalContext::context()->useMetricUnits);
                     ltmW->applySettings(workSettings);
                 }
             }

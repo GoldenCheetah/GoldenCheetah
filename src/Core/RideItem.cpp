@@ -469,7 +469,7 @@ RideItem::checkStale()
     if (isstale) return true;
 
     // just change it .. its as quick to change as it is to check !
-    color = context->athlete->colorEngine->colorFor(getText(context->athlete->rideMetadata()->getColorField(), ""));
+    color = GlobalContext::context()->colorEngine->colorFor(getText(GlobalContext::context()->rideMetadata->getColorField(), ""));
 
     // upgraded metrics
     if (udbversion != UserMetricSchemaVersion || dbversion != DBSchemaVersion) {
@@ -596,7 +596,7 @@ RideItem::refresh()
         isRun = f->isRun();
         isSwim = f->isSwim();
         isXtrain = f->isXtrain();
-        color = context->athlete->colorEngine->colorFor(f->getTag(context->athlete->rideMetadata()->getColorField(), ""));
+        color = GlobalContext::context()->colorEngine->colorFor(f->getTag(GlobalContext::context()->rideMetadata->getColorField(), ""));
         present = f->getTag("Data", "");
         samples = f->dataPoints().count() > 0;
 
@@ -666,7 +666,7 @@ RideItem::refresh()
         metacrc = metaCRC();
 
         // Construct the summary text used on the calendar
-        metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(this));
+        metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(this));
 
         // close if we opened it
         if (doclose) {

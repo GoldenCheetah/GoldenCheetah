@@ -2916,20 +2916,20 @@ void DataFilter::configChanged(qint32)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         QString symbol = factory.metricName(i);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
 
         rt.lookupMap.insert(name.replace(" ","_"), symbol);
         rt.lookupType.insert(name.replace(" ","_"), true);
     }
 
     // now add the ride metadata fields -- should be the same generally
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             QString underscored = field.name;
-            if (!context->specialFields.isMetric(underscored)) {
+            if (!GlobalContext::context()->specialFields.isMetric(underscored)) {
 
                 // translate to internal name if name has non Latin1 characters
-                underscored = context->specialFields.internalName(underscored);
-                field.name = context->specialFields.internalName((field.name));
+                underscored = GlobalContext::context()->specialFields.internalName(underscored);
+                field.name = GlobalContext::context()->specialFields.internalName((field.name));
 
                 rt.lookupMap.insert(underscored.replace(" ","_"), field.name);
                 rt.lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
@@ -3324,7 +3324,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                 return Result(HEIGHT);
             }
             if (symbol == "units") {
-                return Result(m->context->athlete->useMetricUnits ? 1 : 0);
+                return Result(GlobalContext::context()->useMetricUnits ? 1 : 0);
             }
         }
 

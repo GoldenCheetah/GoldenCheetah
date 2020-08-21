@@ -69,6 +69,8 @@ class Athlete;
 class MainWindow;
 class Tab;
 class NavigationModel;
+class RideMetadata;
+class ColorEngine;
 
 
 class GlobalContext : public QObject
@@ -77,9 +79,20 @@ class GlobalContext : public QObject
 
     public:
 
-        GlobalContext() {}
+        GlobalContext();
         static GlobalContext *context();
-        void notifyConfigChanged(qint32 x) { emit configChanged(x); }
+        void notifyConfigChanged(qint32 x) { readConfig(); emit configChanged(x); }
+
+        // metadata etc
+        RideMetadata *rideMetadata;
+        SpecialFields specialFields;
+        ColorEngine *colorEngine;
+
+        // metric units
+        bool useMetricUnits;
+
+    public slots:
+        void readConfig();
 
     signals:
         void configChanged(qint32);
@@ -119,7 +132,6 @@ class Context : public QObject
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
         long now; // point in time during train session
-        SpecialFields specialFields;
 
         // search filter
         bool isfiltered;

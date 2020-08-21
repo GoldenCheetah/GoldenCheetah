@@ -296,8 +296,8 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
         double distance = rideItem->ride()->timeToDistance(interval->stop) - 
                           rideItem->ride()->timeToDistance(interval->start);
         add->setText(5, QString("%1 %2")
-                        .arg(distance * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
-                        .arg(context->athlete->useMetricUnits ? "km" : "mi"));
+                        .arg(distance * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
+                        .arg(GlobalContext::context()->useMetricUnits ? "km" : "mi"));
 
         // interval name
         add->setText(6, interval->name);
@@ -343,7 +343,7 @@ SplitActivityWizard::setFilesList()
         add->setText(3, time);
 
         // set distance
-        QString dist = context->athlete->useMetricUnits
+        QString dist = GlobalContext::context()->useMetricUnits
             ? QString ("%1 km").arg(km, 0, 'f', 1)
             : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
         add->setText(4, dist);
@@ -390,7 +390,7 @@ SplitActivityWizard::setFilesList()
         add->setText(3, time);
 
         // set distance
-        QString dist = context->athlete->useMetricUnits
+        QString dist = GlobalContext::context()->useMetricUnits
             ? QString ("%1 km").arg(km, 0, 'f', 1)
             : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
         add->setText(4, dist);

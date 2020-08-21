@@ -699,7 +699,7 @@ RideImportWizard::process()
                    tableWidget->item(i,DURATION_COLUMN)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // show distance by looking at last data point
-                   QString dist = context->athlete->useMetricUnits
+                   QString dist = GlobalContext::context()->useMetricUnits
                        ? QString ("%1 km").arg(km, 0, 'f', 1)
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
                    tableWidget->item(i,DISTANCE_COLUMN)->setText(dist);
@@ -1084,7 +1084,7 @@ RideImportWizard::abortClicked()
                 ride->setTag("Import errors", errors.join("\n"));
 
             // process linked defaults
-            context->athlete->rideMetadata()->setLinkedDefaults(ride);
+            GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
             // run the processor first... import
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Processing..."));

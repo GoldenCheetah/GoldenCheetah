@@ -100,7 +100,7 @@ RideCache::RideCache(Context *context) : context(context)
         }
 
         // reset special fields to take into account user metrics
-        context->specialFields = SpecialFields();
+        GlobalContext::context()->specialFields = SpecialFields();
     }
 
     // set the list
@@ -228,7 +228,7 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
+            item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
         }
     }
 

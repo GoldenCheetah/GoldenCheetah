@@ -541,7 +541,7 @@ void GradientPage::initializePage()
 {
     int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
     ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
-    metricUnits = hackContext->athlete->useMetricUnits;
+    metricUnits = GlobalContext::context()->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
     setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is +-40."));
@@ -642,7 +642,7 @@ void ImportPage::initializePage()
         setSubTitle(tr("Import current activity as a Gradient ride (slope based)"));
         setFinalPage(true);
         plot = new WorkoutPlot();
-        metricUnits = hackContext->athlete->useMetricUnits;
+        metricUnits = GlobalContext::context()->useMetricUnits;
         QString s = (metricUnits ? tr("KM") : tr("Miles"));
         QString distance = QString(tr("Distance (")) + s + QString(")");
         plot->setXAxisTitle(distance);

@@ -278,7 +278,7 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         break;
 
     case CriticalPowerWindow::wattsKg:
-        if (context->athlete->useMetricUnits) {
+        if (GlobalContext::context()->useMetricUnits) {
             series = tr("Watts per kilogram");
             units = tr("w/kg");
         } else {
@@ -288,7 +288,7 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         break;
 
     case CriticalPowerWindow::aPowerKg:
-        if (context->athlete->useMetricUnits) {
+        if (GlobalContext::context()->useMetricUnits) {
             series = tr("Altitude Power per kilogram");
             units = tr("w/kg");
         } else {
@@ -1086,7 +1086,7 @@ CPPlot::plotTests(RideItem *rideitem)
                 if (interval->istest()) {
 
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
-                    double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
+                    double watts = interval->getForSymbol("average_power",  GlobalContext::context()->useMetricUnits);
 
 
                     // ignore where no power present
@@ -2115,7 +2115,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         bool metricPace = true;
         if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
         else if (isRun)  metricPace = appsettings->value(this, GC_PACE, true).toBool();
-        else  metricPace = context->athlete->useMetricUnits;
+        else  metricPace = GlobalContext::context()->useMetricUnits;
 
 
         if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
@@ -3156,7 +3156,7 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 QString
 CPPlot::kphToString(double kph)
 {
-    if (context->athlete->useMetricUnits) {
+    if (GlobalContext::context()->useMetricUnits) {
         return tr("%1 kph").arg(kph, 0, 'f', 1);
     } else {
         return tr("%1 mph").arg(kph*MILES_PER_KM, 0, 'f', 1);
@@ -3166,7 +3166,7 @@ CPPlot::kphToString(double kph)
 QString
 CPPlot::kmToString(double km)
 {
-    if (context->athlete->useMetricUnits) {
+    if (GlobalContext::context()->useMetricUnits) {
         return tr("%1 km").arg(km, 0, 'f', 3);
     } else {
         return tr("%1 mi").arg(km*MILES_PER_KM, 0, 'f', 3);

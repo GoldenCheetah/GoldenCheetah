@@ -51,6 +51,7 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBUserMetric.h"
 #endif
+#include "MainWindow.h"
 extern ConfigDialog *configdialog_ptr;
 
 //
@@ -115,7 +116,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     unitCombo->addItem(tr("Metric"));
     unitCombo->addItem(tr("Imperial"));
 
-    if (context->athlete->useMetricUnits)
+    if (GlobalContext::context()->useMetricUnits)
         unitCombo->setCurrentIndex(0);
     else
         unitCombo->setCurrentIndex(1);
@@ -582,7 +583,7 @@ CredentialsPage::editClicked()
 //
 AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
-    metricUnits = context->athlete->useMetricUnits;
+    metricUnits = GlobalContext::context()->useMetricUnits;
 
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
@@ -972,7 +973,7 @@ BackupPage::saveClicked()
 //
 MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *measuresGroup) : QWidget(parent), context(context), measuresGroup(measuresGroup)
 {
-    metricUnits = context->athlete->useMetricUnits;
+    metricUnits = GlobalContext::context()->useMetricUnits;
     QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
 
     QVBoxLayout *all = new QVBoxLayout(this);
@@ -3257,10 +3258,10 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config using default file
-    keywordDefinitions = context->athlete->rideMetadata()->getKeywords();
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
-    colorfield = context->athlete->rideMetadata()->getColorField();
-    defaultDefinitions = context->athlete->rideMetadata()->getDefaults();
+    keywordDefinitions = GlobalContext::context()->rideMetadata->getKeywords();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
+    colorfield = GlobalContext::context()->rideMetadata->getColorField();
+    defaultDefinitions = GlobalContext::context()->rideMetadata->getDefaults();
 
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
@@ -3271,7 +3272,7 @@ MetadataPage::MetadataPage(Context *context) : context(context)
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
-    tabs->addTab(keywordsPage, tr("Notes Keywords"));
+    tabs->addTab(keywordsPage, tr("Colour Keywords"));
     tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processing"));
 
@@ -3300,7 +3301,7 @@ MetadataPage::saveClicked()
     appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
 
     // write to metadata.xml
-    RideMetadata::serialize(context->athlete->home->config().canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+    RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
     // save processors config
     processorPage->saveClicked();

@@ -1299,8 +1299,8 @@ void CellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     if (rideEditor->isTooPrecise(index.row(), index.column())) {
         QPolygon triangle(3);
         triangle.putPoints(0, 3, option.rect.x(), option.rect.y(),
-                                option.rect.x()+4, option.rect.y(),
-                                option.rect.x(), option.rect.y()+4);
+                                option.rect.x()+(4*int(dpiXFactor)), option.rect.y(),
+                                option.rect.x(), option.rect.y()+(4*int(dpiXFactor)));
         painter->setBrush(QBrush(QColor(Qt::darkGreen)));
         painter->setPen(QPen(QColor(Qt::darkGreen)));
         painter->drawPolygon(triangle);

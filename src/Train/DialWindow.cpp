@@ -238,7 +238,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Speed:
     case RealtimeData::VirtualSpeed:
-        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
@@ -253,7 +253,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Distance:
     case RealtimeData::LapDistance:
-        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
@@ -270,7 +270,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         sum += rtData.value(RealtimeData::Speed);
         count++;
         value = sum / count;
-        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
