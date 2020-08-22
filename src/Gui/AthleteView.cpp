@@ -1,4 +1,5 @@
 #include "AthleteView.h"
+#include "AthleteConfigDialog.h"
 #include "TabView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 
@@ -56,6 +57,9 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
 
     // setup geometry
     updateGeometry();
+
+    // athelte config dialog...
+    connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
 void
@@ -64,6 +68,13 @@ AthleteView::configChanged(qint32)
     // appearances
     setStyleSheet(TabView::ourStyleSheet());
 
+}
+
+void
+AthleteView::configItem(ChartSpaceItem*item)
+{
+    AthleteCard *card = static_cast<AthleteCard*>(item);
+    card->configAthlete();
 }
 
 AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(parent, path), path(path), refresh(false)
@@ -96,6 +107,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
         context = parent->context;
         loadprogress = 100;
         anchor=true;
+        setShowConfig(true);
         button->setText("Close");
         button->hide();
 
@@ -137,6 +149,10 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
             }
         }
 
+        // when was rideDB.json last updated- thats when the athlete was last viewed
+        //QFileInfo fi(gcroot + "/" + path + "/cache/rideDB.json");
+        //fprintf(stderr, "%s: last accessed %s\n", path.toStdString().c_str(), fi.lastModified().date().toString().toStdString().c_str());
+
     } else {
 
         // use ridecache
@@ -156,6 +172,13 @@ AthleteCard::refreshStats()
         // last activity date?
         if (last==QDateTime() || item->dateTime > last) last = item->dateTime;
     }
+}
+
+void
+AthleteCard::configAthlete()
+{
+    AthleteConfigDialog *dialog = new AthleteConfigDialog(context->athlete->home->root(), context);
+    dialog->exec();
 }
 
 void
@@ -199,6 +222,7 @@ void AthleteCard::itemGeometryChanged()
 void AthleteCard::loadDone(QString name, Context *)
 {
     if (this->name == name) {
+        setShowConfig(true);
         loadprogress = 100;
         refreshStats();
         if (!anchor) button->show();
@@ -216,6 +240,7 @@ void
 AthleteCard::closing(QString name, Context *)
 {
     if (name == path) {
+        setShowConfig(false);
         this->context = NULL;
         loadprogress = 0;
         button->setText("Open");

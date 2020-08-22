@@ -135,7 +135,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     QVBoxLayout *editor = new QVBoxLayout;
     setChartLayout(main);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // the workout scene
     workout = new WorkoutWidget(this, context);

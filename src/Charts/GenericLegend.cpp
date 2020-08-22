@@ -43,7 +43,7 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
     setMouseTracking(true);
 
     // watch for changes...
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
 }
 
@@ -168,7 +168,7 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     clickable=true;
     setAutoFillBackground(true);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 }

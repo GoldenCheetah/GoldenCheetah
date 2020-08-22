@@ -240,7 +240,7 @@ MainWindow::MainWindow(const QDir &home)
     // we can click on the quick icons, but they aren't selectable views
     sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7);
     sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("settings"), 8);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8);
     sidebar->setItemSelectable(8, false);
 
     connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
@@ -660,7 +660,7 @@ MainWindow::MainWindow(const QDir &home)
 
     installEventFilter(this);
 
-    // catch config changes
+    // catch global config changes
     connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(CONFIG_APPEARANCE);
 

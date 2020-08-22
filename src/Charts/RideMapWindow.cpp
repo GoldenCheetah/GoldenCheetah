@@ -157,7 +157,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // just the hr and power as a plot
     smallPlot = new SmallPlot(this);

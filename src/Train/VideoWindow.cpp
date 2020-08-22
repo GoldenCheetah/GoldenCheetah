@@ -103,7 +103,7 @@ VideoWindow::VideoWindow(Context *context)  :
         resetLayoutBtn->setAutoDefault(false);
         cl->addWidget(resetLayoutBtn);
 
-        connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
         connect(layoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(layoutChanged()));
         connect(resetLayoutBtn, SIGNAL(clicked()), this, SLOT(resetLayout()));
 

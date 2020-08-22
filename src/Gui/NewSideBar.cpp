@@ -28,7 +28,7 @@ NewSideBar::NewSideBar(Context *context, QWidget *parent) : QWidget(parent), con
     layout->setSpacing(0);
     layout->setContentsMargins(0,gl_margin *dpiXFactor,0,gl_margin*dpiYFactor);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(0);
 
     show();

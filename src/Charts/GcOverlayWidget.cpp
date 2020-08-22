@@ -98,7 +98,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     m_isEditing = true;
     installEventFilter(parent);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // setup colors
     configChanged(CONFIG_APPEARANCE);

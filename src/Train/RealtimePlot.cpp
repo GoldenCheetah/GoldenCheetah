@@ -362,7 +362,7 @@ RealtimePlot::RealtimePlot(Context *context) :
 //    lodCurve->setYAxis(QwtPlot::yLeft);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set to current config
     configChanged(CONFIG_APPEARANCE); // set colors

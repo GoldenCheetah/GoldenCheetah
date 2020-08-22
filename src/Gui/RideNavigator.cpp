@@ -118,7 +118,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     resetView();
 
     // refresh when config changes (metric/imperial?)
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));

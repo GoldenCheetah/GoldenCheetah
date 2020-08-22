@@ -33,15 +33,31 @@
 // singleton
 static GlobalContext *globalContext = NULL;
 static QList<Context*> _contexts;
+
 GlobalContext::GlobalContext()
 {
     rideMetadata = NULL;
     colorEngine = NULL;
-    readConfig();
+    readConfig(0); // don't reread user metrics just yet
 }
 
 void
-GlobalContext::readConfig()
+GlobalContext::notifyConfigChanged(qint32 state)
+{
+    // read it in - global only
+    readConfig(state);
+
+    // tell global widgets, like the sidebar
+    emit configChanged(state);
+
+    // tell every valid context, for athlete specific widgets/charts
+    foreach(Context *p, _contexts)
+        if (Context::isValid(p))
+            p->notifyConfigChanged(state);
+}
+
+void
+GlobalContext::readConfig(qint32 state)
 {
     if (rideMetadata) {
         delete rideMetadata;
@@ -62,8 +78,52 @@ GlobalContext::readConfig()
     colorEngine = new ColorEngine(this);
     specialFields = SpecialFields();
 
-    // watch config changes
+    if (state & CONFIG_USERMETRICS)  userMetricsConfigChanged();
+
+    // watch config changes- we do it for ridemetadata since it cannot connect
+    // whilst we are being instantiated- and it gets deleted on each
+    // change to configuration- so needs to be redone every time we reset
     connect(this, SIGNAL(configChanged(qint32)), rideMetadata, SLOT(configChanged(qint32)));
+}
+
+void
+GlobalContext::userMetricsConfigChanged()
+{
+    // read em in...
+    QString metrics(gcroot + "/usermetrics.xml");
+    if (QFile(metrics).exists()) {
+
+        QFile metricfile(metrics);
+        QXmlInputSource source(&metricfile);
+        QXmlSimpleReader xmlReader;
+        UserMetricParser handler;
+
+        xmlReader.setContentHandler(&handler);
+        xmlReader.setErrorHandler(&handler);
+
+        // parse and get return values
+        xmlReader.parse(source);
+        _userMetrics = handler.getSettings();
+        UserMetric::addCompatibility(_userMetrics);
+    }
+
+
+    // change the schema version
+    quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);
+
+    if (UserMetricSchemaVersion != changed) {
+
+        // we'll fix it
+        UserMetricSchemaVersion = changed;
+
+        // update metric factory deleting originals
+        RideMetricFactory::instance().removeUserMetrics();
+
+        // now add user metrics
+        foreach(UserMetricSettings m, _userMetrics) {
+            RideMetricFactory::instance().addMetric(UserMetric(_contexts.at(0), m));
+        }
+    }
 }
 
 GlobalContext *GlobalContext::context()
@@ -129,66 +189,6 @@ Context::notifyCompareDateRangesChanged()
 void
 Context::notifyConfigChanged(qint32 state)
 {
-    //if (state & CONFIG_ZONES) qDebug()<<"Zones config changed!";
-    //if (state & CONFIG_ATHLETE) qDebug()<<"Athlete config changed!";
-    //if (state & CONFIG_GENERAL) qDebug()<<"General config changed!";
-    //if (state & CONFIG_PMC) qDebug()<<"PMC constants changed!";
-    //if (state & CONFIG_UNITS) qDebug()<<"Unit of Measure config changed!";
-    //if (state & CONFIG_APPEARANCE) qDebug()<<"Appearance config changed!";
-    //if (state & CONFIG_NOTECOLOR) qDebug()<<"Note color config changed!";
-    //if (state & CONFIG_FIELDS) qDebug()<<"Metadata config changed!";
-    if (state & CONFIG_USERMETRICS) {
-        userMetricsConfigChanged();
-
-        // reset special fields (e.g. metric overrides)
-        GlobalContext::context()->specialFields = SpecialFields();
-
-    }
-    GlobalContext::context()->notifyConfigChanged(state);
+    emit configChanged(state);
 }
 
-void 
-Context::userMetricsConfigChanged()
-{
-
-    // read em in...
-    QString metrics = QString("%1/../usermetrics.xml").arg(athlete->home->root().absolutePath());
-    if (QFile(metrics).exists()) {
-
-        QFile metricfile(metrics);
-        QXmlInputSource source(&metricfile);
-        QXmlSimpleReader xmlReader;
-        UserMetricParser handler;
-
-        xmlReader.setContentHandler(&handler);
-        xmlReader.setErrorHandler(&handler);
-
-        // parse and get return values
-        xmlReader.parse(source);
-        _userMetrics = handler.getSettings();
-        UserMetric::addCompatibility(_userMetrics);
-    }
-
-
-    // change the schema version
-    quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);
-
-    if (UserMetricSchemaVersion != changed) {
-
-        // we'll fix it
-        UserMetricSchemaVersion = changed;
-
-        // update metric factory deleting originals
-        RideMetricFactory::instance().removeUserMetrics();
-    
-        // now add initial metrics -- what about multiple contexts (?) XXX
-        foreach(UserMetricSettings m, _userMetrics) {
-            RideMetricFactory::instance().addMetric(UserMetric(this, m));
-        }
-
-        // tell eveyone else to compute metrics...
-        foreach(Context *x, _contexts)
-            if (x != this)
-                x->notifyConfigChanged(CONFIG_USERMETRICS);
-    }
-}

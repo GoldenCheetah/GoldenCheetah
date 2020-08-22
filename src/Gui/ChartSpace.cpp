@@ -82,7 +82,7 @@ ChartSpace::ChartSpace(Context *context, int scope) :
     scene->installEventFilter(this);
 
     // once all widgets created we can connect the signals
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(scroller, SIGNAL(finished()), this, SLOT(scrollFinished()));
     connect(scrollbar, SIGNAL(valueChanged(int)), this, SLOT(scrollbarMoved(int)));
 

@@ -133,7 +133,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     }
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
     connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(refresh()));
 

@@ -82,7 +82,7 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
         // is visible. In this case we need to trigger refresh when the
         // tab is selected -or- when the ride changes. Below is for tab.
         connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
-        connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     } else {
 

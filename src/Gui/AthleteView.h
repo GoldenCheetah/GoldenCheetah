@@ -10,6 +10,7 @@ public:
 
 public slots:
     void configChanged(qint32);
+    void configItem(ChartSpaceItem*);
 
 };
 
@@ -48,6 +49,7 @@ class AthleteCard : public ChartSpaceItem
         void refreshUpdate(QDate);
 
         void clicked();
+        void configAthlete();
 
     private:
         double loadprogress;

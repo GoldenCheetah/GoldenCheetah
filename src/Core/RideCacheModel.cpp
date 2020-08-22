@@ -30,7 +30,7 @@ RideCacheModel::RideCacheModel(Context *context, RideCache *cache) : QAbstractTa
     factory = &RideMetricFactory::instance();
     configChanged(CONFIG_FIELDS | CONFIG_NOTECOLOR);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));

@@ -230,7 +230,7 @@ RideEditor::RideEditor(Context *context) : QWidget(context->mainWindow), data(NU
     //connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(tabbarSelected(int)));
     connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(removeTabRequested(int)));
 

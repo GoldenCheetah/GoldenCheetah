@@ -48,7 +48,7 @@ PythonConsole::PythonConsole(Context *context, PythonHost *pythonHost, QWidget *
     putData(GColor(CPLOTMARKER), QString(tr("Python Console (%1)").arg(python->version)));
     putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n>>> ");
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rMessage(QString)), this, SLOT(rMessage(QString)));
 
     // history position
@@ -389,7 +389,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         connect(web, SIGNAL(stateChanged(int)), this, SLOT(showWebChanged(int)));
 
         // config changes
-        connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
         configChanged(CONFIG_APPEARANCE);
 
         // filter ESC so we can stop scripts

@@ -209,8 +209,8 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), pfPvPlot, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), pfPvPlot, SLOT(configChanged(qint32)));
 
     // comparing things
     connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));

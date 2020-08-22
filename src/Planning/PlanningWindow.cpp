@@ -30,7 +30,7 @@ PlanningWindow::PlanningWindow(Context *context) :
     QVBoxLayout *main = new QVBoxLayout;
     setChartLayout(main);
 
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set the widgets etc
     configChanged(CONFIG_APPEARANCE);

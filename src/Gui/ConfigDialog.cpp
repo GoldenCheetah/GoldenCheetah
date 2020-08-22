@@ -60,7 +60,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     // icons
     static QIcon generalIcon(QPixmap(":images/toolbar/GeneralPreferences.png"));
-    static QIcon athleteIcon(QPixmap(":/images/toolbar/user.png"));
     static QIcon appearanceIcon(QPixmap(":/images/toolbar/color.png"));
     static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
     static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
@@ -81,30 +80,26 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 0);
 
-    added =head->addAction(athleteIcon, tr("Athlete"));
+    added =head->addAction(appearanceIcon, tr("Appearance"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
-    added =head->addAction(appearanceIcon, tr("Appearance"));
+    added =head->addAction(dataIcon, tr("Data Fields"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
-    added =head->addAction(dataIcon, tr("Data Fields"));
+    added =head->addAction(metricsIcon, tr("Metrics"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 3);
 
-    added =head->addAction(metricsIcon, tr("Metrics"));
-    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 4);
-
     added =head->addAction(intervalIcon, tr("Intervals"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 5);
+    iconMapper->setMapping(added, 4);
 
 
     added =head->addAction(devicesIcon, tr("Training"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 6);
+    iconMapper->setMapping(added, 5);
 
     // more space
     spacer = new QWidget(this);
@@ -120,16 +115,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     HelpWhatsThis *generalHelp = new HelpWhatsThis(general);
     general->setWhatsThis(generalHelp->getWhatsThisText(HelpWhatsThis::Preferences_General));
     pagesWidget->addWidget(general);
-
-    athlete = new AthleteConfig(_home, context);
-    HelpWhatsThis *athleteHelp = new HelpWhatsThis(athlete);
-    athlete->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
-    pagesWidget->addWidget(athlete);
-
-    // units change on general affects units used on entry in athlete pages
-    connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePage, SLOT(unitChanged(int)));
-    for (int i = 0; i < athlete->measuresPages.count(); i++)
-        connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->measuresPages[i], SLOT(unitChanged(int)));
 
     appearance = new AppearanceConfig(_home, context);
     HelpWhatsThis *appearanceHelp = new HelpWhatsThis(appearance);
@@ -219,7 +204,6 @@ void ConfigDialog::saveClicked()
     qint32 changed = 0;
 
     changed |= general->saveClicked();
-    changed |= athlete->saveClicked();
     changed |= appearance->saveClicked();
     changed |= metric->saveClicked();
     changed |= data->saveClicked();
@@ -271,8 +255,10 @@ void ConfigDialog::saveClicked()
 
     } 
 
-    // we're done.
-    context->notifyConfigChanged(changed);
+    // global context changed, will be cascaded to each athlete context
+    GlobalContext::context()->notifyConfigChanged(changed);
+
+    // done.
     close();
 }
 
@@ -291,97 +277,6 @@ GeneralConfig::GeneralConfig(QDir home, Context *context) :
 qint32 GeneralConfig::saveClicked()
 {
     return generalPage->saveClicked();
-}
-
-// ATHLETE CONFIG
-AthleteConfig::AthleteConfig(QDir home, Context *context) :
-    home(home), context(context)
-{
-    //static QIcon passwordIcon(QPixmap(":/images/toolbar/cloud.png")); //Not used for now
-
-    // the widgets
-    athletePage = new AboutRiderPage(this, context);
-    HelpWhatsThis *athleteHelp = new HelpWhatsThis(athletePage);
-    athletePage->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
-
-    modelPage = new AboutModelPage(context);
-    HelpWhatsThis *athleteModelHelp = new HelpWhatsThis(modelPage);
-    modelPage->setWhatsThis(athleteModelHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Model));
-
-    // one for each Measures Group
-    measuresPages = QVector<MeasuresPage*>(context->athlete->measures->getGroupNames().count());
-    for (int i = 0; i < measuresPages.count(); i++) {
-        measuresPages[i] = new MeasuresPage(this, context, context->athlete->measures->getGroup(i));
-        HelpWhatsThis *measuresHelp = new HelpWhatsThis(measuresPages[i]);
-        measuresPages[i]->setWhatsThis(measuresHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Measures));
-    }
-
-    zonePage = new ZonePage(context);
-    HelpWhatsThis *zoneHelp = new HelpWhatsThis(zonePage);
-    zonePage->setWhatsThis(zoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_Power));
-
-    hrZonePage = new HrZonePage(context);
-    HelpWhatsThis *hrZoneHelp = new HelpWhatsThis(hrZonePage);
-    hrZonePage->setWhatsThis(hrZoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_HR));
-
-    paceZonePage = new PaceZonePage(context);
-    HelpWhatsThis *paceZoneHelp = new HelpWhatsThis(paceZonePage);
-    paceZonePage->setWhatsThis(paceZoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_Pace));
-
-    credentialsPage = new CredentialsPage(context);
-    HelpWhatsThis *credentialsHelp = new HelpWhatsThis(credentialsPage);
-    credentialsPage->setWhatsThis(credentialsHelp->getWhatsThisText(HelpWhatsThis::Preferences_Passwords));
-
-    autoImportPage = new AutoImportPage(context);
-    HelpWhatsThis *autoImportHelp = new HelpWhatsThis(autoImportPage);
-    autoImportPage->setWhatsThis(autoImportHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Autoimport));
-
-    backupPage = new BackupPage(context);
-    HelpWhatsThis *backupPageHelp = new HelpWhatsThis(backupPage);
-    autoImportPage->setWhatsThis(backupPageHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Backup));
-
-    setContentsMargins(0,0,0,0);
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
-
-    QTabWidget *measuresTab = new QTabWidget(this);
-    for (int i=0; i<context->athlete->measures->getGroupNames().count(); i++)
-        measuresTab->addTab(measuresPages[i], context->athlete->measures->getGroupNames()[i]);
-
-    QTabWidget *zonesTab = new QTabWidget(this);
-    zonesTab->addTab(zonePage, tr("Power Zones"));
-    zonesTab->addTab(hrZonePage, tr("Heartrate Zones"));
-    zonesTab->addTab(paceZonePage, tr("Pace Zones"));
-
-    QTabWidget *tabs = new QTabWidget(this);
-    tabs->addTab(athletePage, tr("About"));
-    tabs->addTab(modelPage, tr("Model"));
-    tabs->addTab(measuresTab, tr("Measures"));
-    tabs->addTab(zonesTab, tr("Zones"));
-    tabs->addTab(credentialsPage, tr("Accounts"));
-    tabs->addTab(autoImportPage, tr("Auto Import"));
-    tabs->addTab(backupPage, tr("Backup"));
-
-    mainLayout->addWidget(tabs);
-}
-
-qint32 AthleteConfig::saveClicked()
-{
-    qint32 state = 0;
-
-    state |= athletePage->saveClicked();
-    state |= modelPage->saveClicked();
-    foreach (MeasuresPage *measuresPage, measuresPages)
-        state |= measuresPage->saveClicked();
-    state |= zonePage->saveClicked();
-    state |= hrZonePage->saveClicked();
-    state |= paceZonePage->saveClicked();
-    state |= credentialsPage->saveClicked();
-    state |= autoImportPage->saveClicked();
-    state |= backupPage->saveClicked();
-
-    return state;
 }
 
 // APPEARANCE CONFIG

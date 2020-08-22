@@ -81,7 +81,7 @@ class GlobalContext : public QObject
 
         GlobalContext();
         static GlobalContext *context();
-        void notifyConfigChanged(qint32 x) { readConfig(); emit configChanged(x); }
+        void notifyConfigChanged(qint32);
 
         // metadata etc
         RideMetadata *rideMetadata;
@@ -92,10 +92,12 @@ class GlobalContext : public QObject
         bool useMetricUnits;
 
     public slots:
-        void readConfig();
+        void readConfig(qint32);
+        void userMetricsConfigChanged();
 
     signals:
-        void configChanged(qint32);
+        void configChanged(qint32); // for global widgets that aren't athlete specific
+
 };
 
 class Context : public QObject
@@ -161,9 +163,7 @@ class Context : public QObject
         // *********************************************
         // APPLICATION EVENTS
         // *********************************************
-        void notifyConfigChanged(qint32); // used by ConfigDialog to notify Context *
-                                            // when config has changed - and to get a
-                                            // signal emitted to notify its children
+        void notifyConfigChanged(qint32); // Global and athlete specific changes communicated via this signal
 
         // athlete load/close
         void notifyLoadProgress(QString folder, double progress) { emit loadProgress(folder,progress); }
@@ -271,6 +271,7 @@ class Context : public QObject
         void presetSelected(int);
 
         // user metrics
+        void configChanged(qint32);
         void userMetricsChanged();
 
         // view changed

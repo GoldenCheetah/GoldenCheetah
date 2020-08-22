@@ -76,7 +76,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refresh()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set up for current selections
     configChanged(CONFIG_APPEARANCE);
@@ -380,7 +380,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
 
     // set up for current selections - and watch for future changes
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(CONFIG_APPEARANCE);
 }
 

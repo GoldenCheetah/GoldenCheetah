@@ -160,7 +160,7 @@ RideCache::postLoad()
     refresh();
 
     // do we have any stale items ?
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
 
     // future watching
@@ -218,6 +218,7 @@ RideCache::initEstimates()
 void
 RideCache::configChanged(qint32 what)
 {
+
     // if the wbal formula changed invalidate all cached values
     if (what & CONFIG_WBAL) {
         foreach(RideItem *item, rides()) {

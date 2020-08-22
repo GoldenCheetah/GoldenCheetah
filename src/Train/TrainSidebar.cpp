@@ -311,7 +311,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(context, SIGNAL(selectVideoSync(QString)), this, SLOT(selectVideoSync(QString)));
 #endif //GC_HAVE_VLC
 #endif //GC_VIDEO_NONE
-    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
