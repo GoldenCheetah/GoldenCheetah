@@ -18,6 +18,7 @@
 
 #include "Measures.h"
 #include "Units.h"
+#include "MainWindow.h" // for gcroot
 
 #include <QList>
 #include <QMessageBox>
@@ -252,45 +253,43 @@ MeasuresGroup::unserialize(QFile &file, QList<Measure> &data)
 
 Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
 {
+    // pre-load mandatory measures in MeasuresGroupType order
+
+    groups.append(new MeasuresGroup("Body", tr("Body"),
+        QStringList()<<"WEIGHTKG"<<"FATKG"<<"MUSCLEKG"<<"BONESKG"<<"LEANKG"<<"FATPERCENT",
+        QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bone Mass")<<tr("Lean Mass")<<tr("Fat Percent"),
+        QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%"),
+        QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%"),
+        QList<double>()<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<1.0,
+        QList<QStringList>()<<
+            (QStringList()<<"weightkg")<<
+            (QStringList()<<"fatkg")<<
+            (QStringList()<<"boneskg")<<
+            (QStringList()<<"musclekg")<<
+            (QStringList()<<"leankg")<<
+            (QStringList()<<"fatpercent"),
+        dir, withData));
+
+    groups.append(new MeasuresGroup("Hrv", tr("Hrv"),
+        QStringList()<<"RMSSD"<<"HR"<<"AVNN"<<"SDNN"<<"PNN50"<<"LF"<<"HF"<<"Recovery_Points",
+        QStringList()<<tr("RMSSD")<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points"),
+        QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
+        QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
+        QList<double>()<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0,
+        QList<QStringList>()<<
+            (QStringList()<<"rMSSD"<<"rMSSD_lying"<<"Rmssd")<<
+            (QStringList()<<"HR"<<"HR_lying")<<
+            (QStringList()<<"AVNN"<<"AVNN_lying")<<
+            (QStringList()<<"SDNN"<<"SDNN_lying"<<"Sdnn")<<
+            (QStringList()<<"pNN50"<<"pNN50_lying"<<"Pnn50")<<
+            (QStringList()<<"LF"<<"LF_lying")<<
+            (QStringList()<<"HF"<<"HF_lying")<<
+            (QStringList()<<"HRV4T_Recovery_Points"<<"lnRmssd"),
+        dir, withData));
+
     // load user defined measures from measures.ini
-    QString filename = dir.canonicalPath() + "/measures.ini";
-
+    QString filename = QDir(gcroot).canonicalPath() + "/measures.ini";
     if (!QFile(filename).exists()) {
-
-        // By default pre-load mandatory measures in MeasuresGroupType order
-
-        groups.append(new MeasuresGroup("Body", tr("Body"),
-            QStringList()<<"WEIGHTKG"<<"FATKG"<<"MUSCLEKG"<<"BONESKG"<<"LEANKG"<<"FATPERCENT",
-            QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bone Mass")<<tr("Lean Mass")<<tr("Fat Percent"),
-            QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%"),
-            QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%"),
-            QList<double>()<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<1.0,
-            QList<QStringList>()<<
-                (QStringList()<<"weightkg")<<
-                (QStringList()<<"fatkg")<<
-                (QStringList()<<"boneskg")<<
-                (QStringList()<<"musclekg")<<
-                (QStringList()<<"leankg")<<
-                (QStringList()<<"fatpercent"),
-            dir, withData));
-
-        groups.append(new MeasuresGroup("Hrv", tr("Hrv"),
-            QStringList()<<"RMSSD"<<"HR"<<"AVNN"<<"SDNN"<<"PNN50"<<"LF"<<"HF"<<"Recovery_Points",
-            QStringList()<<tr("RMSSD")<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points"),
-            QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
-            QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
-            QList<double>()<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0,
-            QList<QStringList>()<<
-                (QStringList()<<"rMSSD"<<"rMSSD_lying"<<"Rmssd")<<
-                (QStringList()<<"HR"<<"HR_lying")<<
-                (QStringList()<<"AVNN"<<"AVNN_lying")<<
-                (QStringList()<<"SDNN"<<"SDNN_lying"<<"Sdnn")<<
-                (QStringList()<<"pNN50"<<"pNN50_lying"<<"Pnn50")<<
-                (QStringList()<<"LF"<<"LF_lying")<<
-                (QStringList()<<"HF"<<"HF_lying")<<
-                (QStringList()<<"HRV4T_Recovery_Points"<<"lnRmssd"),
-            dir, withData));
-
         // other standard measures can be loaded from resources
         filename = ":/ini/measures.ini";
     }
