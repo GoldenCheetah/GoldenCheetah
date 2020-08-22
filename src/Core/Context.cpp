@@ -17,6 +17,7 @@
  */
 
 #include "Context.h"
+#include "Settings.h"
 #include "Athlete.h"
 #include "RideMetadata.h"
 
