@@ -2509,7 +2509,6 @@ PaceZonePage::saveClicked()
     qint32 changed = 0;
     // write it
     for (int i=0; i < nSports; i++) {
-        appsettings->setValue(paceZones[i]->paceSetting(), cvPages[i]->metric->isChecked());
         paceZones[i]->setScheme(schemePages[i]->getScheme());
         paceZones[i]->write(context->athlete->home->config());
 
@@ -2690,6 +2689,8 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 {
     active = false;
 
+    metricPace = appsettings->value(this, paceZones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
+
     QGridLayout *mainLayout = new QGridLayout(this);
     mainLayout->setSpacing(10 *dpiXFactor);
 
@@ -2735,15 +2736,16 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     // CV default is 4min/km for Running a round number inline with
     // CP default and 1:36min/100 for swimming (4:1 relation)
     cvEdit = new QTimeEdit(QTime::fromString(paceZones->isSwim() ? "01:36" : "04:00", "mm:ss"));
+    if (!metricPace) { // convert to Imperial
+        double kphCV = paceZones->kphFromTime(cvEdit, !metricPace);
+        cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(kphCV, metricPace), "mm:ss"));
+    }
     cvEdit->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
     cvEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
     cvEdit->setDisplayFormat("mm:ss");
 
     per = new QLabel(this);
-    metric = new QCheckBox(tr("Metric Pace"));
-    metric->setChecked(appsettings->value(this, paceZones->paceSetting(), true).toBool());
-    per->setText(paceZones->paceUnits(metric->isChecked()));
-    if (!metric->isChecked()) metricChanged(); // default is metric
+    per->setText(paceZones->paceUnits(metricPace));
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2 *dpiXFactor);
@@ -2751,7 +2753,6 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     actionButtons->addWidget(cvEdit);
     actionButtons->addWidget(per);
     actionButtons->addStretch();
-    actionButtons->addWidget(metric);
     actionButtons->addStretch();
     actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
@@ -2830,16 +2831,6 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
     connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
     connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
-    connect(metric, SIGNAL(stateChanged(int)), this, SLOT(metricChanged()));
-}
-
-void
-CVPage::metricChanged()
-{
-    // Switch between metric and imperial!
-    per->setText(paceZones->paceUnits(metric->isChecked()));
-    double kphCV = paceZones->kphFromTime(cvEdit, !metric->isChecked());
-    cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(kphCV, metric->isChecked()), "mm:ss"));
 }
 
 void
@@ -2848,7 +2839,7 @@ CVPage::addClicked()
     // get current scheme
     paceZones->setScheme(schemePage->getScheme());
 
-    int cp = paceZones->kphFromTime(cvEdit, metric->isChecked());
+    int cp = paceZones->kphFromTime(cvEdit, metricPace);
     if( cp <= 0 ){
         QMessageBox err;
         err.setText(tr("CV must be > 0"));
@@ -2857,7 +2848,7 @@ CVPage::addClicked()
         return;
     }
 
-    int index = paceZones->addZoneRange(dateEdit->date(), paceZones->kphFromTime(cvEdit, metric->isChecked()));
+    int index = paceZones->addZoneRange(dateEdit->date(), paceZones->kphFromTime(cvEdit, metricPace));
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -2868,7 +2859,7 @@ CVPage::addClicked()
     add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CV
-    double kph = paceZones->kphFromTime(cvEdit, metric->isChecked());
+    double kph = paceZones->kphFromTime(cvEdit, metricPace);
 
     add->setText(1, QString("%1 %2 %3 %4")
             .arg(paceZones->kphToPaceString(kph, true))
@@ -2892,7 +2883,7 @@ CVPage::editClicked()
     edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CV
-    double kph = paceZones->kphFromTime(cvEdit, metric->isChecked());
+    double kph = paceZones->kphFromTime(cvEdit, metricPace);
     paceZones->setCV(index, kph);
     edit->setText(1, QString("%1 %2 %3 %4")
             .arg(paceZones->kphToPaceString(kph, true))
@@ -2948,7 +2939,7 @@ CVPage::rangeEdited()
         QDate date = dateEdit->date();
         QDate odate = paceZones->getStartDate(index);
         QTime cv = cvEdit->time();
-        QTime ocv = QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metric->isChecked()), "mm:ss");
+        QTime ocv = QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metricPace), "mm:ss");
 
         if (date != odate || cv != ocv)
             updateButton->show();
@@ -2974,7 +2965,7 @@ CVPage::rangeSelectionChanged()
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         PaceZoneRange current = paceZones->getZoneRange(index);
         dateEdit->setDate(paceZones->getStartDate(index));
-        cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metric->isChecked()), "mm:ss"));
+        cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metricPace), "mm:ss"));
 
         if (current.zonesSetFromCV) {
 
@@ -2998,7 +2989,7 @@ CVPage::rangeSelectionChanged()
             add->setText(1, current.zones[i].desc);
 
             // low
-            QTimeEdit *loedit = new QTimeEdit(QTime::fromString(paceZones->kphToPaceString(current.zones[i].lo, metric->isChecked()), "mm:ss"), this);
+            QTimeEdit *loedit = new QTimeEdit(QTime::fromString(paceZones->kphToPaceString(current.zones[i].lo, metricPace), "mm:ss"), this);
             loedit->setMinimumTime(QTime::fromString("00:00", "mm:ss"));
             loedit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
             loedit->setDisplayFormat("mm:ss");
@@ -3107,7 +3098,7 @@ CVPage::zonesChanged()
             for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
                 QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
                 QTimeEdit *loTimeEdit = (QTimeEdit*)zones->itemWidget(item, 2);
-                double kph = loTimeEdit->time() == QTime(0,0,0) ? 0.0 : paceZones->kphFromTime(loTimeEdit, metric->isChecked());
+                double kph = loTimeEdit->time() == QTime(0,0,0) ? 0.0 : paceZones->kphFromTime(loTimeEdit, metricPace);
                 zoneinfos << PaceZoneInfo(item->text(0),
                                       item->text(1),
                                       kph,

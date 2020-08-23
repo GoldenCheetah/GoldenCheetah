@@ -26,7 +26,6 @@
 #include "Units.h"
 #include "Settings.h"
 #include "UserMetricParser.h"
-#include "Units.h"
 #include "Colors.h"
 #include "AddDeviceWizard.h"
 #include "AddCloudWizard.h"
@@ -111,6 +110,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(langLabel, 0,0, Qt::AlignRight);
     configLayout->addWidget(langCombo, 0,1, Qt::AlignLeft);
 
+    //
+    // Units
+    //
     QLabel *unitlabel = new QLabel(tr("Unit"));
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
@@ -123,6 +125,14 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     configLayout->addWidget(unitlabel, 1,0, Qt::AlignRight);
     configLayout->addWidget(unitCombo, 1,1, Qt::AlignLeft);
+
+    metricRunPace = new QCheckBox(tr("Metric Run Pace"), this);
+    metricRunPace->setCheckState(appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool() ? Qt::Checked : Qt::Unchecked);
+    configLayout->addWidget(metricRunPace, 2,1, Qt::AlignLeft);
+
+    metricSwimPace = new QCheckBox(tr("Metric Swim Pace"), this);
+    metricSwimPace->setCheckState(appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool() ? Qt::Checked : Qt::Unchecked);
+    configLayout->addWidget(metricSwimPace, 3,1, Qt::AlignLeft);
 
     //
     // Garmin crap
@@ -139,9 +149,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
-    configLayout->addWidget(garminSmartRecord, 2,1, Qt::AlignLeft);
-    configLayout->addWidget(garminHWLabel, 3,0, Qt::AlignRight);
-    configLayout->addWidget(garminHWMarkedit, 3,1, Qt::AlignLeft);
+    configLayout->addWidget(garminSmartRecord, 4,1, Qt::AlignLeft);
+    configLayout->addWidget(garminHWLabel, 5,0, Qt::AlignRight);
+    configLayout->addWidget(garminHWMarkedit, 5,1, Qt::AlignLeft);
 
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
     QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
@@ -152,8 +162,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
 
-    configLayout->addWidget(hystlabel, 4,0, Qt::AlignRight);
-    configLayout->addWidget(hystedit, 4,1, Qt::AlignLeft);
+    configLayout->addWidget(hystlabel, 6,0, Qt::AlignRight);
+    configLayout->addWidget(hystedit, 6,1, Qt::AlignLeft);
 
 
     // wbal formula preference
@@ -164,15 +174,15 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
     else wbalForm->setCurrentIndex(1);
 
-    configLayout->addWidget(wbalFormLabel, 5,0, Qt::AlignRight);
-    configLayout->addWidget(wbalForm, 5,1, Qt::AlignLeft);
+    configLayout->addWidget(wbalFormLabel, 7,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 7,1, Qt::AlignLeft);
 
 
     //
     // Warn to save on exit
     warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
     warnOnExit->setChecked(appsettings->value(NULL, GC_WARNEXIT, true).toBool());
-    configLayout->addWidget(warnOnExit, 6,1, Qt::AlignLeft);
+    configLayout->addWidget(warnOnExit, 8,1, Qt::AlignLeft);
 
     //
     // Run API web services when running
@@ -182,12 +192,12 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     offset += 1;
     startHttp = new QCheckBox(tr("Enable API Web Services"), this);
     startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, false).toBool());
-    configLayout->addWidget(startHttp, 7,1, Qt::AlignLeft);
+    configLayout->addWidget(startHttp, 9,1, Qt::AlignLeft);
 #endif
 #ifdef GC_WANT_R
     embedR = new QCheckBox(tr("Enable R"), this);
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
-    configLayout->addWidget(embedR, 7+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(embedR, 9+offset,1, Qt::AlignLeft);
     offset += 1;
     connect(embedR, SIGNAL(stateChanged(int)), this, SLOT(embedRchanged(int)));
 #endif
@@ -195,7 +205,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #ifdef GC_WANT_PYTHON
     embedPython = new QCheckBox(tr("Enable Python"), this);
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
-    configLayout->addWidget(embedPython, 7+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(embedPython, 9+offset,1, Qt::AlignLeft);
     connect(embedPython, SIGNAL(stateChanged(int)), this, SLOT(embedPythonchanged(int)));
     offset += 1;
 #endif
@@ -203,7 +213,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     opendata = new QCheckBox(tr("Share to the OpenData project"), this);
     QString grant = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_GRANTED, "X").toString();
     opendata->setChecked(grant == "Y");
-    configLayout->addWidget(opendata, 7+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(opendata, 9+offset,1, Qt::AlignLeft);
     if (grant == "X") opendata->hide();
     offset += 1;
 
@@ -218,9 +228,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteBrowseButton = new QPushButton(tr("Browse"));
     //XXathleteBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(athleteLabel, 7 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 7 + offset,1);
-    configLayout->addWidget(athleteBrowseButton, 7 + offset,2);
+    configLayout->addWidget(athleteLabel, 9 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 9 + offset,1);
+    configLayout->addWidget(athleteBrowseButton, 9 + offset,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
 
@@ -236,9 +246,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutBrowseButton = new QPushButton(tr("Browse"));
     //XXworkoutBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(workoutLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 8 + offset,1);
-    configLayout->addWidget(workoutBrowseButton, 8 + offset,2);
+    configLayout->addWidget(workoutLabel, 10 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 10 + offset,1);
+    configLayout->addWidget(workoutBrowseButton, 10 + offset,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
     offset++;
@@ -256,9 +266,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     rBrowseButton = new QPushButton(tr("Browse"));
     //XXrBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(rLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(rDirectory, 8 + offset,1);
-    configLayout->addWidget(rBrowseButton, 8 + offset,2);
+    configLayout->addWidget(rLabel, 10 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(rDirectory, 10 + offset,1);
+    configLayout->addWidget(rBrowseButton, 10 + offset,2);
     offset++;
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
@@ -274,9 +284,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectory->setText(pythonDir.toString());
     pythonBrowseButton = new QPushButton(tr("Browse"));
 
-    configLayout->addWidget(pythonLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(pythonDirectory, 8 + offset,1);
-    configLayout->addWidget(pythonBrowseButton, 8 + offset,2);
+    configLayout->addWidget(pythonLabel, 10 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(pythonDirectory, 10 + offset,1);
+    configLayout->addWidget(pythonBrowseButton, 10 + offset,2);
     offset++;
 
     bool embedPython = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
@@ -287,6 +297,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     // save away initial values
     b4.unit = unitCombo->currentIndex();
+    b4.metricRunPace = metricRunPace->isChecked();
+    b4.metricSwimPace = metricSwimPace->isChecked();
     b4.hyst = elevationHysteresis.toFloat();
     b4.wbal = wbalForm->currentIndex();
     b4.warn = warnOnExit->isChecked();
@@ -350,11 +362,14 @@ GeneralPage::saveClicked()
     // wbal formula
     appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
 
+    // Units
     if (unitCombo->currentIndex()==0)
         appsettings->setValue(GC_UNIT, GC_UNIT_METRIC);
     else if (unitCombo->currentIndex()==1)
         appsettings->setValue(GC_UNIT, GC_UNIT_IMPERIAL);
 
+    appsettings->setValue(GC_PACE, metricRunPace->isChecked());
+    appsettings->setValue(GC_SWIMPACE, metricSwimPace->isChecked());
 
 #ifdef GC_WANT_HTTP
     // start http
@@ -384,7 +399,9 @@ GeneralPage::saveClicked()
         state += CONFIG_WBAL;
 
     // units prefs changed?
-    if (b4.unit != unitCombo->currentIndex())
+    if (b4.unit != unitCombo->currentIndex() ||
+        b4.metricRunPace != metricRunPace->isChecked() ||
+        b4.metricSwimPace != metricSwimPace->isChecked())
         state += CONFIG_UNITS;
 
     return state;

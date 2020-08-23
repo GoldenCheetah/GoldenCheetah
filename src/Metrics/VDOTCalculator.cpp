@@ -25,6 +25,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
+#include "Context.h"
 
 #include <QHeaderView>
 
@@ -68,7 +69,7 @@ VDOTCalculator::eqvTime(double VDOT, double dist)
 
 VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 {
-    bool metricRnPace = appsettings->value(this, GC_PACE, true).toBool();
+    bool metricRnPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
     setWindowTitle(tr("VDOT and T-Pace Calculator"));
 
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -229,7 +230,7 @@ void VDOTCalculator::on_btnOK_clicked()
 
 void VDOTCalculator::on_btnCalculate_clicked()
 {
-    bool metricRnPace = appsettings->value(this, GC_PACE, true).toBool();
+    bool metricRnPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
     double paceFactor = metricRnPace ? 1.0 : KM_PER_MILE;
 
     double mins = hoursSpinBox->value() * 60.0 + minsSpinBox->value() + secsSpinBox->value() / 60.0;

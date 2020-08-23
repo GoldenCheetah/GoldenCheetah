@@ -811,7 +811,7 @@ CPPlot::updateModelHelper()
 
         const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
         // Rank field is reused for pace according to sport
-        bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
+        bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
         cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
 
         //DPrime
@@ -2113,8 +2113,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // use the right pace config
         bool metricPace = true;
-        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
-        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, true).toBool();
+        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         else  metricPace = GlobalContext::context()->useMetricUnits;
 
 

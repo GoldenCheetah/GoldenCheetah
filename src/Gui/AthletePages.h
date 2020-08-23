@@ -461,7 +461,7 @@ class CVPage : public QWidget
 
     public:
         CVPage(PaceZones* paceZones, PaceSchemePage *schemePage);
-        QCheckBox *metric;
+        bool metricPace;
 
     public slots:
         void addClicked();
@@ -473,8 +473,6 @@ class CVPage : public QWidget
         void addZoneClicked();
         void deleteZoneClicked();
         void zonesChanged();
-
-        void metricChanged();
 
     private:
         bool active;

@@ -686,7 +686,7 @@ QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor col
     if (time_in_zone.size() != range.zones.size()) time_in_zone.resize(range.zones.size());
 
     // are we in metric or imperial ?
-    bool metric = appsettings->value(this, GC_PACE, true).toBool();
+    bool metric = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
     QString cvunit = metric ? "kph" : "mph";
     double cvfactor = metric ? 1.0f : KM_PER_MILE;
     QString paceunit = this->paceUnits(metric);

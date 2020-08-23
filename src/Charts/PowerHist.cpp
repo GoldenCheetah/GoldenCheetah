@@ -2456,12 +2456,12 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
                 // only when there is no ride (home) or the activity is a run/swim.
                 QString runPaceStr, swimPaceStr;
                 if (series == RideFile::kph && (!rideItem || rideItem->isRun)) {
-                    bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                    bool metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
                     QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
                     runPaceStr = tr("\n%1 Pace (%2)").arg(GlobalContext::context()->useMetricUnits ? kphToPace(xvalue, metricPace, false) : mphToPace(xvalue, metricPace, false)).arg(paceunit);
                 }
                 if (series == RideFile::kph && (!rideItem || rideItem->isSwim)) {
-                    bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+                    bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
                     QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
                     swimPaceStr = tr("\n%1 Pace (%2)").arg(GlobalContext::context()->useMetricUnits ? kphToPace(xvalue, metricPace, true) : mphToPace(xvalue, metricPace, true)).arg(paceunit);
                 }

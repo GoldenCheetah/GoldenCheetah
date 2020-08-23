@@ -6963,11 +6963,11 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         if (curve->title() == tr("Speed") && rideItem) {
             precision = 2;
             if (rideItem->isRun) {
-                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                bool metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
                 QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
                 paceStr = tr("\n%1 %2").arg(GlobalContext::context()->useMetricUnits ? kphToPace(yvalue, metricPace, false) : mphToPace(yvalue, metricPace, false)).arg(paceunit);
             } else if (rideItem->isSwim) {
-                bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+                bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
                 QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
                 paceStr = tr("\n%1 %2").arg(GlobalContext::context()->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
             }

@@ -84,6 +84,7 @@ class GeneralPage : public QWidget
 
         QString athleteWAS; // remember what we started with !
         QComboBox *unitCombo;
+        QCheckBox *metricRunPace, *metricSwimPace;
 
     public slots:
         void browseWorkoutDir();
@@ -138,6 +139,7 @@ class GeneralPage : public QWidget
 
         struct {
             int unit;
+            bool metricRunPace, metricSwimPace;
             float hyst;
             int wbal;
             bool warn;
