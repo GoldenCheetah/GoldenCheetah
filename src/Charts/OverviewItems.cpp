@@ -695,6 +695,8 @@ MetricOverviewItem::setData(RideItem *item)
 void
 MetricOverviewItem::setDateRange(DateRange dr)
 {
+    if (!metric) return; // avoid crashes when metric is not available
+
     // for metrics lets truncate to today
     if (dr.to > QDate::currentDate()) dr.to = QDate::currentDate();
 
@@ -816,6 +818,8 @@ static bool entrylessthan(struct topnentry &a, const topnentry &b)
 void
 TopNOverviewItem::setDateRange(DateRange dr)
 {
+    if (!metric) return; // avoid crashes when metric is not available
+
     // clear out the old values
     ranked.clear();
 
@@ -985,6 +989,8 @@ static bool lessthan(const aggmeta &a, const aggmeta &b)
 void
 DonutOverviewItem::setDateRange(DateRange dr)
 {
+    if (!metric) return; // avoid crashes when metric is not available
+
     // stop any animation before starting, just in case- stops a crash
     // when we update a chart in the middle of its animation
     if (chart) chart->setAnimationOptions(QChart::NoAnimation);;
