@@ -4,18 +4,14 @@
 
 ## About 
 
-GoldenCheetah is an open-source data analysis tool primarily written in C++
-with Qt for cyclists and triathletes 
-with support for training as well. 
+GoldenCheetah is an open-source desktop application for cyclists and triathletes.
 
-GoldenCheetah can connect with indoor trainers and cycling equipment such 
-as cycling computers and power meters to import data. 
+GoldenCheetah works with cloud services like Strava, imports data from bike computers
+and will also connect to indoor trainers. 
 
-In addition, GoldenCheetah can connect to cloud services. 
-
-It can then manipulate and view the data, as well as analyze it.
-
-
+GoldenCheetah provides a rich set of metrics and charts for tracking and managing
+training as well as implementations of power duration and impulse response models
+to estimate and track changes in performance.
 
 ## Installing 
 
