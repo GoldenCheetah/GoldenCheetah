@@ -316,6 +316,10 @@ static struct {
     { "filename", 0 }, // filename() - returns a string or vector of strings for a range, can be used
                        // when plotting on trends chart to enable click thru to activity view
 
+    { "xdata", 2 },    // xdata("series", "column" | km | secs) - get xdata samples without any
+                       // kind of interpolation applied (resample/interpolate are available to
+                       // do that if needed.
+
     // add new ones above this line
     { "", -1 }
 };
@@ -1788,6 +1792,31 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() != 3) {
                         leaf->inerror = true;
                         DataFiltererrors << QString(tr("should be mid(a,pos,count)"));
+                    }
+
+                } else if (leaf->function == "xdata") {
+
+                    // will only get here if we have 2 parameters
+                    Leaf *first=leaf->fparms[0];
+                    Leaf *second=leaf->fparms[1];
+
+                    if (first->type != Leaf::String) {
+                        DataFiltererrors << QString(tr("XDATA expects a string for the first parameters"));
+                        leaf->inerror = true;
+                    }
+
+                    if (second->type == Leaf::Symbol) {
+
+                        QString symbol = *(leaf->fparms[1]->lvalue.n);
+                        if (symbol != "km" && symbol != "secs") {
+                            DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                            leaf->inerror = true;
+                        }
+
+                    } else if (second->type != Leaf::String) {
+
+                        DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                        leaf->inerror = true;
                     }
 
                 } else if (leaf->function == "samples") {
@@ -3710,6 +3739,45 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             return returning;
         }
 
+        if (leaf->function == "xdata") {
+            Result returning(0);
+
+            QString name = *(leaf->fparms[0]->lvalue.s);
+            QString series; // name, km or secs
+            bool km=false, secs=false;
+
+            if (leaf->fparms[1]->type == Leaf::String) series = *(leaf->fparms[1]->lvalue.s);
+            if (leaf->fparms[1]->type == Leaf::Symbol) {
+                series = *(leaf->fparms[1]->lvalue.n);
+                if (series == "km") km = true;
+                if (series == "secs") secs = true;
+            }
+
+            // lets get the xdata series - only if the item is already open to avoid accidentally
+            // iterating over all ride data, same approach as in the samples function below
+            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+                return Result(0);
+
+            } else {
+                XDataSeries *xds = m->ride()->xdata(name);
+                if (xds == NULL) return returning;
+
+                // now we need to get all the values into returning
+                int index=0;
+                if (km || secs || (index=xds->valuename.indexOf(series)) != -1) {
+                    foreach(XDataPoint *p, xds->datapoints) {
+                        double value=0;
+                        if (km) value = p->km;
+                        else if (secs) value = p->secs;
+                        else if (index >=0)  value =p->number[index];
+
+                        returning.asNumeric() << value;
+                        returning.number()  += value;
+                    }
+                }
+            }
+            return returning;
+        }
         if (leaf->function == "samples") {
 
             // nothing to return -- note we check if the ride is open
