@@ -73,6 +73,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
     rollingResistance = 0.0033;
     windResistance = 0.6;
     wheelSize = 2100;
+    has_power = false;
 }
 
 BT40Device::~BT40Device()
@@ -160,7 +161,7 @@ void
 BT40Device::serviceScanDone()
 {
     qDebug() << "Service scan done for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
-    bool has_power = false;
+    has_power = false;
     bool has_csc = false;
     QLowEnergyService* csc_service=NULL;
     foreach (QLowEnergyService* const &service, m_services) {
@@ -541,7 +542,8 @@ BT40Device::getWheelRpm(QDataStream& ds)
     if(!prevWheelStaleness) {
         quint16 time = wheeltime - prevWheelTime;
         quint32 revs = wheelrevs - prevWheelRevs;
-        if (time) rpm = 2048*60*revs / double(time);
+        // Power sensor uses 2048 time base and CSC sensor 1048
+        if (time) rpm = (has_power ? 2048 : 1024)*60*revs / double(time);
     }
     else prevWheelStaleness = false;
 
