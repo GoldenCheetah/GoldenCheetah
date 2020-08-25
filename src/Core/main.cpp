@@ -114,7 +114,8 @@ void terminate(int code)
 #ifdef GC_WANT_HTTP
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &string)
  {
-    const char *msg = string.toLocal8Bit().constData();
+    QByteArray ba = string.toLocal8Bit();
+    const char *msg = ba.constData();
      //in this function, you can write the message to any stream!
      switch (type) {
      default: // QtInfoMsg from 5.5 would arrive here
