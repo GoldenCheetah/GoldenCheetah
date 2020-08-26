@@ -59,6 +59,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
     prevWheelTime = 0;
     prevWheelRevs = 0;
     prevWheelStaleness = true;
+    wheelTimeUnit = 1024; // Cycling Speed profile reports Wheel time in 1/1024 second units
     prevCrankTime = 0;
     prevCrankRevs = 0;
     prevCrankStaleness = -1; // indicates prev crank data values aren't measured values
@@ -176,6 +177,7 @@ BT40Device::serviceScanDone()
         if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
 
             has_power = true;
+            wheelTimeUnit = 2048; // Cycling Power profile reports Wheel time in 1/2048 second units
             service->discoverDetails();
 
         } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
@@ -541,7 +543,7 @@ BT40Device::getWheelRpm(QDataStream& ds)
     if(!prevWheelStaleness) {
         quint16 time = wheeltime - prevWheelTime;
         quint32 revs = wheelrevs - prevWheelRevs;
-        if (time) rpm = 2048*60*revs / double(time);
+        if (time) rpm = wheelTimeUnit*60*revs / double(time);
     }
     else prevWheelStaleness = false;
 

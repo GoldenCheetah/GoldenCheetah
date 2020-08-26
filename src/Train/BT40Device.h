@@ -78,6 +78,7 @@ private:
     bool prevWheelStaleness;
     quint16 prevWheelTime;
     quint32 prevWheelRevs;
+    int wheelTimeUnit;
     double load;
     double gradient;
     double prevGradient;
