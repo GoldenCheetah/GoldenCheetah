@@ -542,7 +542,7 @@ BT40Device::getWheelRpm(QDataStream& ds)
     if(!prevWheelStaleness) {
         quint16 time = wheeltime - prevWheelTime;
         quint32 revs = wheelrevs - prevWheelRevs;
-        // Power sensor uses 2048 time base and CSC sensor 1048
+        // Power sensor uses 1/2048 second time base and CSC sensor 1/1024
         if (time) rpm = (has_power ? 2048 : 1024)*60*revs / double(time);
     }
     else prevWheelStaleness = false;
