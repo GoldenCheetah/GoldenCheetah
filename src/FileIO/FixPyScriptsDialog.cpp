@@ -157,14 +157,16 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     outerSplitter->addWidget(splitter);
 
     // ride editor
-    GcChartWindow *win = GcWindowRegistry::newGcWindow(GcWindowTypes::RideEditor, context);
-    win->setProperty("nomenu", true);
+    GcChartWindow *win = GcWindowRegistry::newGcWindow(GcWindowTypes::MetadataWindow, context);
+    if (win) {
+        win->setProperty("nomenu", true);
 
-    RideItem *notconst = (RideItem*)context->currentRideItem();
-    win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-    DateRange dr = context->currentDateRange();
-    win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-    outerSplitter->addWidget(win);
+        RideItem *notconst = (RideItem*)context->currentRideItem();
+        win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        DateRange dr = context->currentDateRange();
+        win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+        outerSplitter->addWidget(win);
+    }
 
     mainLayout->addWidget(outerSplitter);
 
