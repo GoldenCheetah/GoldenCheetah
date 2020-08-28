@@ -89,6 +89,13 @@ class ChartSpaceItem : public QGraphicsWidget
             type = 0;
             delcounter=0;
 
+            effect = new QGraphicsDropShadowEffect();
+            effect->setXOffset(6);
+            effect->setYOffset(6);
+            effect->setColor(QColor(127,127,127,64));
+            effect->setBlurRadius(10);
+            this->setGraphicsEffect(effect);
+
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
@@ -125,6 +132,7 @@ class ChartSpaceItem : public QGraphicsWidget
         bool incorner;
         bool invisible;
         bool showconfig;
+        QGraphicsDropShadowEffect *effect;
 
         // base paint
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
