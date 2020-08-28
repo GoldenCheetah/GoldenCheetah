@@ -20,6 +20,7 @@
 #define _TimeUtils_h
 
 #include <QDate>
+#include <QUuid>
 #include <QDateEdit>
 #include <QColor>
 #include <QDateTime>
@@ -46,9 +47,19 @@ class DateRange : QObject
         DateRange(const DateRange& other);
         DateRange(QDate from = QDate(), QDate to = QDate(), QString name ="", QColor=QColor(127,127,127));
         DateRange& operator=(const DateRange &);
+        bool operator!=(const DateRange&other) {
+            if (other.from != from || other.to != to || other.name != name) return true;
+            return false;
+        }
+        bool operator==(const DateRange&other) {
+            if (other.from == from && other.to == to && other.name == name) return true;
+            return false;
+        }
+
         QDate from, to;
         QString name;
         QColor color; // used by R code only
+        QUuid id;
 
         // does this date fall in the range selection ?
         bool pass(QDate date) {

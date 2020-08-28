@@ -38,7 +38,7 @@ public:
     void compute(RideItem *item, Specification spec, DateRange=DateRange());
 
     // the results ...
-    Result relevant, x, y, z, t, d;
+    Result relevant, x, y, z, t, d, f;
 
     Context *context;
 
@@ -49,7 +49,7 @@ public:
     Leaf *root;
 
     // functions, to save lots of lookups
-    Leaf *frelevant, *finit, *fsample, *factivity, *ffinalise, *fx, *fy, *fz, *ft, *fd;
+    Leaf *frelevant, *finit, *fsample, *factivity, *ffinalise, *fx, *fy, *fz, *ft, *fd, *ff;
 
     // our runtime
     DataFilterRuntime *rt;

@@ -23,6 +23,8 @@
 #include "Context.h"
 #include "Units.h"
 
+#include <QtWebEngineWidgets/QWebEngineView>
+
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -50,7 +52,9 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
+    m_Zoom = 16;
     boundingRectVisibility = false;
+    backgroundVisibility = false;
     forceSquareRatio = true;
 }
 
@@ -114,19 +118,29 @@ QSize MeterWidget::minimumSize() const
 void MeterWidget::paintEvent(QPaintEvent* paintevent)
 {
     Q_UNUSED(paintevent);
+    if(!boundingRectVisibility && !backgroundVisibility) return;
+
+    QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    int radius = qMin(m_Width, m_Height) * 0.1;
+    if(backgroundVisibility) painter.setBrush(QBrush(m_BackgroundColor));
+    else painter.setBrush(Qt::NoBrush);
+
     if (boundingRectVisibility)
     {
-        m_OutlinePen = QPen(boundingRectColor);
+        m_OutlinePen = QPen(m_BoundingRectColor);
         m_OutlinePen.setWidth(2);
         m_OutlinePen.setStyle(Qt::SolidLine);
 
-        //painter
-        QPainter painter(this);
-        painter.setClipRegion(videoContainerRegion);
-        painter.setRenderHint(QPainter::Antialiasing);
-
         painter.setPen(m_OutlinePen);
-        painter.drawRect (1, 1, m_Width-2, m_Height-2);
+        painter.drawRoundedRect (1, 1, m_Width-2, m_Height-2, radius, radius);
+    }
+    else
+    {
+        painter.setPen(Qt::NoPen);
+        painter.drawRoundedRect (0, 0, m_Width, m_Height, radius, radius);
     }
 }
 
@@ -138,7 +152,7 @@ void  MeterWidget::setColor(QColor  mainColor)
 void MeterWidget::setBoundingRectVisibility(bool show, QColor  boundingRectColor)
 {
     this->boundingRectVisibility=show;
-    this->boundingRectColor = boundingRectColor;
+    this->m_BoundingRectColor = boundingRectColor;
 }
 
 TextMeterWidget::TextMeterWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
@@ -151,7 +165,6 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
-    m_BackgroundBrush = QBrush(m_BackgroundColor);
     m_OutlinePen = QPen(m_OutlineColor);
     m_OutlinePen.setWidth(1);
     m_OutlinePen.setStyle(Qt::SolidLine);
@@ -161,21 +174,32 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setClipRegion(videoContainerRegion);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    //draw background
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(m_BackgroundBrush);
-    if (Text!=QString(""))
-        painter.drawRect (0, 0, m_Width, m_Height);
-
     QPainterPath my_painterPath;
     my_painterPath.addText(QPointF(0,0),m_MainFont,Text);
     my_painterPath.addText(QPointF(QFontMetrics(m_MainFont).width(Text), 0),m_AltFont,AltText);
     QRectF ValueBoundingRct = my_painterPath.boundingRect();
 
-    // define scale
+    // We use leading whitespace for alignment which boundingRect() does not count
+    ValueBoundingRct.setLeft(qMin(0.0, ValueBoundingRct.left()));
+
+    // The scale should not change with the string content, we use Font ascent and descent
+    ValueBoundingRct.setTop(qMin(ValueBoundingRct.top(), qreal(qMin(-QFontMetrics(m_MainFont).ascent(), 
+            -QFontMetrics(m_AltFont).ascent()))));
+    ValueBoundingRct.setBottom(qMax(ValueBoundingRct.bottom(), qreal(qMax(QFontMetrics(m_MainFont).descent(),
+            QFontMetrics(m_AltFont).descent()))));
+
+    // scale to fit the available space
     float fontscale = qMin(m_Width / ValueBoundingRct.width(), m_Height / ValueBoundingRct.height());
     painter.scale(fontscale, fontscale);
-    painter.translate(-ValueBoundingRct.x()+(m_Width/fontscale - ValueBoundingRct.width())/2, -ValueBoundingRct.y()+(m_Height/fontscale - ValueBoundingRct.height())/2);
+
+    float translationX = -ValueBoundingRct.x();  // AlignLeft
+
+    if(alignment == Qt::AlignHCenter)
+        translationX += (m_Width/fontscale - ValueBoundingRct.width())/2;
+    else if(alignment == Qt::AlignRight)
+        translationX += (m_Width/fontscale - ValueBoundingRct.width());
+
+    painter.translate(translationX, -ValueBoundingRct.y()+(m_Height/fontscale - ValueBoundingRct.height())/2);
 
     // Write Value
     painter.setPen(m_OutlinePen);
@@ -429,9 +453,9 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.setPen(m_OutlinePen);
     painter.drawLine(cyclistX, 0.0, cyclistX, (double)m_Height-bubbleSize);
 
-    // Display grade as #.#% 
-    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-"):QString("")) +
-        QString::number((int) this->gradientValue) + QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
+    // Display grade as #.#%
+    QString gradientString = ((-1.0 < this->gradientValue && this->gradientValue < 0.0) ? QString("-") : QString("")) + QString::number((int)this->gradientValue) +
+        QString(".") + QString::number(abs((int)(this->gradientValue * 10.0) % 10)) + QString("%");
 
     // Display gradient text to the right of the line until the middle, then display to the left of the line
     double gradientDrawX = cyclistX;
@@ -445,12 +469,12 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 
     double routeDistance = this->Value;
-    if (!context->athlete->useMetricUnits) routeDistance *= MILES_PER_KM;
+    if (!GlobalContext::context()->useMetricUnits) routeDistance *= MILES_PER_KM;
 
     routeDistance = ((int)(routeDistance * 1000.)) / 1000.;
 
     QString distanceString = QString::number(routeDistance, 'f', 3) +
-        ((context->athlete->useMetricUnits) ? tr("km") : tr("mi"));
+        ((GlobalContext::context()->useMetricUnits) ? tr("km") : tr("mi"));
 
     double distanceDrawX = (double)cyclistX;
     double distanceDrawY = ((double)m_Height * 0.75);
@@ -462,4 +486,88 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
         distanceDrawX -= 45;
 
     painter.drawText(distanceDrawX, distanceDrawY, distanceString);
+}
+
+
+LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
+{
+    forceSquareRatio = false;
+    liveMapView = new QWebEngineView(this);
+    liveMapInitialized = false;
+}
+
+void LiveMapWidget::resizeEvent(QResizeEvent *)
+{
+    liveMapView->resize(m_Width, m_Height);
+}
+
+void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
+{
+    if ( ! liveMapInitialized ) initLiveMap(dLat, dLon);
+
+    QString sLat = QString::number(dLat);
+    QString sLon = QString::number(dLon);
+    QString code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
+
+    liveMapView->page()->runJavaScript(code);
+}
+
+void LiveMapWidget::initLiveMap(double dLat, double dLon)
+{
+    createHtml(dLat, dLon, m_Zoom);
+    liveMapView->page()->setHtml(currentPage);
+    liveMapView->show();
+    liveMapInitialized = true;
+}
+
+void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
+{
+    QString sLat = QString::number(dLat);
+    QString sLon = QString::number(dLon);
+    QString sWidth = QString::number(m_Width);
+    QString sHeight = QString::number(m_Height);
+    QString sMapZoom = QString::number(iMapZoom);
+    currentPage = "";
+
+    currentPage = QString("<html><head>\n"
+    "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
+    "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
+    "<title>GoldenCheetah LiveMap - TrainView</title>\n");
+    //Leaflet CSS and JS
+    currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css\"\n"
+    "integrity=\"sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==\" crossorigin=\"\"/>\n"
+	"<script src=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.js\"\n"
+    "integrity=\"sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==\" crossorigin=\"\"></script>\n"
+	"<style>#mapid {height:100%; width:100%}</style></head>\n");
+
+    // local functions
+    currentPage += QString("<body><div id=\"mapid\"></div>\n"
+    "<script type=\"text/javascript\">\n");
+    // Create Map options
+    currentPage += QString("var mapOptions = {\n"
+        "    center: [" + sLat + ", " + sLon + "] ,\n"
+        "    zoom : " + sMapZoom + ",\n"
+        "    zoomControl : true,\n"
+        "    scrollWheelZoom : false,\n"
+        "    dragging : false,\n"
+        "    doubleClickZoom : false}\n");
+    // Create map object
+    currentPage += QString("var mymap = L.map('mapid', mapOptions);\n");
+    // Create layer object
+    currentPage += QString("var layer = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');\n");
+    // Add layer to the map
+    currentPage += QString("mymap.addLayer(layer);\n");
+    // mymarker var
+    currentPage += QString("var mymarker = new L.marker([" + sLat + ", " + sLon + "], {\n"
+    "    draggable: false,\n"
+    "    title: \"GoldenCheetah - Workout LiveMap\",\n"
+    "    alt: \"GoldenCheetah - Workout LiveMap\",\n"
+    "    riseOnHover: true\n"
+    "}).addTo(mymap)\n");
+    // Move marker function
+    currentPage += QString(    "function moveMarker(myLat, myLon) { \n"
+    "   mymap.panTo(new L.LatLng(myLat, myLon));\n"
+    "    mymarker.setLatLng(new L.latLng(myLat, myLon));}\n"
+    "</script>\n"
+    "</body></html>\n");
 }

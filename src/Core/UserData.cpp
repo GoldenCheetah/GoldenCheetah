@@ -127,7 +127,6 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
@@ -359,7 +358,7 @@ UserData::setRideItem(RideItem*m)
             // run through each sample and create an equivalent
             foreach(RideFilePoint *p, rideItem->ride()->dataPoints()) {
                 Result res = parser.evaluate(rideItem, p);
-                vector << res.number;
+                vector << res.number();
             }
 
             // cache for next time !

@@ -389,7 +389,7 @@ public:
 
     // working with qt charts
     bool configChart(QString title, int type, bool animate, int legpos, bool stack, int orientation) const;
-    bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+    bool setCurve(QString name, PyObject *xseries, PyObject *yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int symbolsize, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill) const;
     bool configAxis(QString name, bool visible, int align, double min, double max,

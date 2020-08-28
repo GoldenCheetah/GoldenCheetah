@@ -82,7 +82,10 @@ TabView::TabView(Context *context, int type) :
 
 TabView::~TabView()
 {
-    if (page_) page_->saveState();
+    if (page_) {
+        page_->saveState();
+        delete page_;
+    }
 }
 
 void
@@ -168,7 +171,7 @@ TabView::ourStyleSheet()
            "    border: 0px solid darkGray; "
            "    background:%1;"
            "    width: %4px;    "
-           "    margin: 1px 1px 1px 1px;"
+           "    margin: 0px 0px 0px 0px;"
            "}"
            "QScrollBar::handle:vertical:enabled:hover {"
            "    background: lightGray; "
@@ -367,7 +370,11 @@ TabView::setBlank(BlankStatePage *blank)
 void
 TabView::sidebarChanged()
 {
+    // wait for main window to catch up
     if (sidebar_ == NULL) return;
+
+    // tell main window qmenu we changed
+    if (context->mainWindow->init) context->mainWindow->showhideSidebar->setChecked(_sidebar);
 
     if (sidebarEnabled()) {
 
@@ -386,8 +393,8 @@ TabView::sidebarChanged()
         // if it was collapsed we need set to at least 200
         // unless the mainwindow isn't big enough
         if (sidebar_->width()<10) {
-            int size = width() - 200;
-            if (size>200) size = 200;
+            int size = width() - 200 * dpiXFactor;
+            if (size>(200* dpiXFactor)) size = 200* dpiXFactor;
 
             QList<int> sizes;
             sizes.append(size);
@@ -399,7 +406,7 @@ TabView::sidebarChanged()
         // we are the analysis view
         // all a bit of a hack to stop the column widths from
         // being adjusted as the splitter gets resized and reset
-        if (type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
+        if (context->mainWindow->init && context->tab->init && type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
             context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
         setUpdatesEnabled(true);
 
@@ -417,6 +424,9 @@ TabView::selectionChanged()
 {
     // we got selected..
     if (isSelected()) {
+
+        // makes sure menu now reflects our setting
+        context->mainWindow->showhideSidebar->setChecked(_sidebar);
 
         // or do we need to show blankness?
         if (isBlank() && blank_ && page_ && blank_->canShow()) {

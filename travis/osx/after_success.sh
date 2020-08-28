@@ -10,28 +10,28 @@ mkdir GoldenCheetah.app/Contents/Frameworks
 # This is a hack to include libicudata.*.dylib, not handled by macdployqt[fix]
 cp /usr/local/opt/icu4c/lib/libicudata.*.dylib GoldenCheetah.app/Contents/Frameworks
 
-# Copy python framework and change the path in binaries
-cp -R /usr/local/opt/python/Frameworks/Python.framework GoldenCheetah.app/Contents/Frameworks
+# Copy python framework and change permissions to fix paths
+cp -R /Library/Frameworks/Python.framework GoldenCheetah.app/Contents/Frameworks
+chmod -R +w GoldenCheetah.app/Contents/Frameworks
 # Update deployed Python framework path
 install_name_tool -id @executable_path/../Frameworks/Python.framework/Versions/3.7/Python ./GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/Python
 # Update GoldenCheetah binary to reference deployed lib
-install_name_tool -change /usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/Python @executable_path/../Frameworks/Python.framework/Versions/3.7/Python ./GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.7/Python @executable_path/../Frameworks/Python.framework/Versions/3.7/Python ./GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 # Update Python binary to reference deployed lib instead of the Cellar one
-OLD_PATH=`otool -L GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/bin/python3.7 | grep "local" | cut -f 1 -d ' '`
+OLD_PATH=`otool -L GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/bin/python3.7 | grep "Library" | cut -f 1 -d ' '`
 echo $OLD_PATH
 install_name_tool -change $OLD_PATH "@executable_path/../Python" GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/bin/python3.7
 install_name_tool -change $OLD_PATH "@executable_path/../../../../Python" GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/Resources/Python.app/Contents/MacOS/Python
-# Add mandatory Python dependencies to site-packages
-rm GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
-mkdir GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
-python3.7 -m pip install -r Python/requirements.txt -t GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
+# Add mandatory Python dependencies
+rm -r GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages
+cp -R ../site-packages GoldenCheetah.app/Contents/Frameworks/Python.framework/Versions/3.7/lib/python3.7
 
 # Initial deployment using macdeployqt
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 
 # Fix QtWebEngineProcess due to bug in macdployqt from homebrew
 pushd GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS
-for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtNetwork QtPositioning #QtQmlModels QtQml required for 5.14.2
+for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtNetwork QtPositioning QtQmlModels QtQml
 do
     OLD_PATH=`otool -L QtWebEngineProcess | grep ${LIB}.framework | cut -f 1 -d ' '`
     NEW_PATH="@loader_path/../../../../../../../${LIB}.framework/${LIB}"
@@ -42,9 +42,6 @@ popd
 
 # Final deployment to generate dmg
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
-
-# Fix remaining issues
-python ../travis/macdeployqtfix.py GoldenCheetah.app /usr/local/opt/qt5
 
 echo "Renaming dmg file to branch and build number ready for deploy"
 export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
@@ -66,7 +63,7 @@ aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
 aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
 else
-curl --max-time 300 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --max-time 60 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
 fi
 
 echo "Make sure we are back in the Travis build directory"

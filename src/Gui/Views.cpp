@@ -33,15 +33,17 @@ extern QDesktopWidget *desktop;
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
-    HomeWindow *a = new HomeWindow(context, "analysis", "Activities");
-    controls->addWidget(a->controls());
+    hw = new HomeWindow(context, "analysis", "Activities");
+    controls->addWidget(hw->controls());
     controls->setCurrentIndex(0);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
 
     setSidebar(analSidebar);
-    setPage(a);
+    setPage(hw);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
+
+    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", true).toBool());
 
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -54,6 +56,9 @@ RideNavigator *AnalysisView::rideNavigator()
 
 AnalysisView::~AnalysisView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "analysis", _sidebar);
+    delete analSidebar;
+    //delete hw; tabview deletes after save state
 }
 
 void
@@ -90,21 +95,25 @@ AnalysisView::isBlank()
 
 DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_DIARY)
 {
-    DiarySidebar *s = new DiarySidebar(context);
-    HomeWindow *d = new HomeWindow(context, "diary", "Diary");
-    controls->addWidget(d->controls());
+    diarySidebar = new DiarySidebar(context);
+    hw = new HomeWindow(context, "diary", "Diary");
+    controls->addWidget(hw->controls());
     controls->setCurrentIndex(0);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
 
-    setSidebar(s);
-    setPage(d);
+    setSidebar(diarySidebar);
+    setPage(hw);
     setBlank(b);
 
-    connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", true).toBool());
+    connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
 DiaryView::~DiaryView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
+    delete diarySidebar;
+    //delete hw; tabview deletes after save state
 }
 
 void
@@ -117,7 +126,7 @@ DiaryView::setRide(RideItem*ride)
 void
 DiaryView::dateRangeChanged(DateRange dr)
 {
-    context->dr_ = dr;
+    //context->notifyDateRangeChanged(dr); // diary view deprecated and not part of navigation model
     page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 
@@ -130,18 +139,19 @@ DiaryView::isBlank()
 
 HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_HOME)
 {
-    LTMSidebar *s = new LTMSidebar(context);
-    HomeWindow *h = new HomeWindow(context, "home", "Trends");
-    controls->addWidget(h->controls());
+    sidebar = new LTMSidebar(context);
+    hw = new HomeWindow(context, "home", "Trends");
+    controls->addWidget(hw->controls());
     controls->setCurrentIndex(0);
     BlankStateHomePage *b = new BlankStateHomePage(context);
 
-    setSidebar(s);
-    setPage(h);
+    setSidebar(sidebar);
+    setPage(hw);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", true).toBool());
+    connect(sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -149,6 +159,9 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
 
 HomeView::~HomeView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
+    delete sidebar;
+    //delete hw; tabview deletes after save state
 }
 
 void
@@ -161,7 +174,8 @@ HomeView::compareChanged(bool state)
 void
 HomeView::dateRangeChanged(DateRange dr)
 {
-    context->dr_ = dr;
+    emit dateChanged(dr);
+    context->notifyDateRangeChanged(dr);
     page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 bool
@@ -176,7 +190,7 @@ HomeView::justSelected()
 {
     if (isSelected()) {
         // force date range refresh
-        static_cast<LTMSidebar*>(sidebar())->dateRangeTreeWidgetSelectionChanged();
+        static_cast<LTMSidebar*>(sidebar)->dateRangeTreeWidgetSelectionChanged();
     }
 }
 
@@ -185,19 +199,20 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
     trainTool = new TrainSidebar(context);
     trainTool->hide();
 
-    HomeWindow *t = new HomeWindow(context, "train", "train");
-    controls->addWidget(t->controls());
+    hw = new HomeWindow(context, "train", "train");
+    controls->addWidget(hw->controls());
     controls->setCurrentIndex(0);
     BlankStateTrainPage *b = new BlankStateTrainPage(context);
 
     setSidebar(trainTool->controls());
-    setPage(t);
+    setPage(hw);
     setBlank(b);
 
     trainBottom = new TrainBottom(trainTool, this);
     setBottom(trainBottom);
     setHideBottomOnIdle(false);
 
+    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train").toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
     connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
 }
@@ -209,6 +224,9 @@ void TrainView::onAutoHideChanged(bool enabled)
 
 TrainView::~TrainView()
 {
+    appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "train", _sidebar);
+    delete trainTool;
+    //delete hw; tabview deletes after save state
 }
 
 void

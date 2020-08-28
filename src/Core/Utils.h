@@ -44,7 +44,9 @@ namespace Utils
     QString removeDP(QString);
     QVector<int> rank(QVector<double>&, bool ascending=false);
     QVector<int> argsort(QVector<double>&, bool ascending=false);
+    QVector<int> argsort(QVector<QString>&v, bool ascending=false);
     QVector<int> arguniq(QVector<double> &v);
+    QVector<int> arguniq(QVector<QString> &v);
     QVector<double> smooth_sma(QVector<double>&, int pos, int window);
     QVector<double> smooth_ewma(QVector<double>&, double alpha);
 };

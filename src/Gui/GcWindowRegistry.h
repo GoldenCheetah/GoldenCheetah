@@ -39,7 +39,7 @@ enum gcwinid {
         PerformanceManager =9,
         PfPv =10,
         Race =11, // deprecated
-        RideEditor =13,
+        RideEditor =13, // deprecated - include in MetadataWindow (23)
         RideSummary =14,
         Scatter =15,
         Summary =16,
@@ -72,8 +72,8 @@ enum gcwinid {
         Python = 43,
         PythonSeason = 44,
         UserTrends=45,
-        UserAnalysis=46
-
+        UserAnalysis=46,
+        OverviewTrends=47
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

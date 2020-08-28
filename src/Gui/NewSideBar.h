@@ -91,8 +91,8 @@ class NewSideBarItem : public QWidget
 
         // pre-rendered/calculated icons and colors
         QImage icon;
-        QPixmap iconNormal, iconDisabled;
-        QColor fg_normal, fg_disabled;
+        QPixmap iconNormal, iconDisabled, iconSelect;
+        QColor fg_normal, fg_disabled, fg_select;
         QColor bg_normal, bg_hover, bg_select, bg_disable;
         QFont textfont;
 

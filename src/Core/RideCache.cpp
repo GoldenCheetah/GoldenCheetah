@@ -49,6 +49,18 @@
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
+class RideCacheLoader : public QThread
+{
+public:
+
+    RideCacheLoader(RideCache *cache) : cache(cache) {}
+    void run() { cache->load(); }
+
+private:
+
+        RideCache *cache;
+};
+
 RideCache::RideCache(Context *context) : context(context)
 {
     directory = context->athlete->home->activities();
@@ -88,7 +100,7 @@ RideCache::RideCache(Context *context) : context(context)
         }
 
         // reset special fields to take into account user metrics
-        context->specialFields = SpecialFields();
+        GlobalContext::context()->specialFields = SpecialFields();
     }
 
     // set the list
@@ -124,12 +136,19 @@ RideCache::RideCache(Context *context) : context(context)
         }
     }
 
-    // load the store - will unstale once cache restored
-    load();
-
-    // now sort it
+    // now sort it - we need to use find on it
     qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
 
+    // load the store - will unstale once cache restored
+    RideCacheLoader *rideCacheLoader = new RideCacheLoader(this);
+    connect(rideCacheLoader, SIGNAL(finished()), this, SLOT(postLoad()));
+    connect(rideCacheLoader, SIGNAL(finished()), this, SIGNAL(loadComplete()));
+    rideCacheLoader->start();
+}
+
+void
+RideCache::postLoad()
+{
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
@@ -150,6 +169,20 @@ RideCache::RideCache(Context *context) : context(context)
     connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
     connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
     connect(&watcher, SIGNAL(progressValueChanged(int)), this, SLOT(progressing(int)));
+}
+
+struct comparerideitem { bool operator()(const RideItem *p1, const RideItem *p2) { return p1->dateTime < p2->dateTime; } };
+
+int
+RideCache::find(RideItem *dt)
+{
+    // use lower_bound to binary search
+    QVector<RideItem*>::const_iterator i = std::lower_bound(rides_.begin(), rides_.end(), dt, comparerideitem());
+    int index = i - rides_.begin();
+
+    // did it find the right value?
+    if (index < 0 || index >= rides_.count() || rides_.at(index)->dateTime != dt->dateTime) return -1;
+    return index;
 }
 
 RideCache::~RideCache()
@@ -185,6 +218,7 @@ RideCache::initEstimates()
 void
 RideCache::configChanged(qint32 what)
 {
+
     // if the wbal formula changed invalidate all cached values
     if (what & CONFIG_WBAL) {
         foreach(RideItem *item, rides()) {
@@ -195,7 +229,7 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
+            item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
         }
     }
 
@@ -447,6 +481,9 @@ RideCache::writeAsCSV(QString filename)
 void
 itemRefresh(RideItem *&item)
 {
+    // debugging below to watch refreshing take place
+    //fprintf(stderr, "%s %s refresh\n", item->context->athlete->cyclist.toStdString().c_str(), item->dateTime.toString().toStdString().c_str()); fflush(stderr);
+
     // need parser to be reentrant !item->refresh();
     if (item->isstale) {
         item->refresh();

@@ -19,6 +19,11 @@
 #if !defined(_BLINNSOLVER_H)
 #define _BLINNSOLVER_H
 
+// Is value zero wrt scale of arg? Returns true if value is indistinguishable
+// from zero with respect to magnitude precision of arg. Put another way,
+// is arg + value ~= arg?
+bool IsZero2(double value, double arg);
+
 // Holds up to 3 roots.
 template <typename T> struct T_resultstruct
 {

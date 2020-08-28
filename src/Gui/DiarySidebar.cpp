@@ -224,7 +224,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     layout->setContentsMargins(0,0,0,0);
 
     // get the model
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
     calendarModel->setSourceModel(context->athlete->rideCache->model());
 
@@ -697,7 +697,7 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 
     connect(mini, SIGNAL(dateChanged(int,int)), this, SLOT(dateChanged(int,int)));
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
-    connect (context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect (GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(CONFIG_APPEARANCE);
 }

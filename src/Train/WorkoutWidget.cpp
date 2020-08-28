@@ -126,6 +126,8 @@ WorkoutWidget::updateErgFile(ErgFile *f)
 
     f->Laps = laps_;
 
+    f->Texts = texts_;
+
     // update METADATA too
     // XXX missing!
 }
@@ -1443,6 +1445,9 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
         // get laps
         laps_ = ergFile->Laps;
 
+        // get texts
+        texts_ = ergFile->Texts;
+
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
             WWPoint *add = new WWPoint(this, point.x / 1000.0f, point.y); // in ms
@@ -1495,6 +1500,7 @@ WorkoutWidget::save()
         ergFile->Duration = p->x * 1000; // whatever the last is
     }
     ergFile->Laps = laps_;
+    ergFile->Texts = texts_;
 
     //
     // SAVE
@@ -1896,6 +1902,17 @@ WorkoutWidget::qwkcode()
                 count++;
             else
                 break; // stop when end of matches
+        }
+
+        foreach (const ErgFileText cue, texts_) {
+            int secs = i > 0 ? points_[sectionp[i-1]]->x : 0;
+            int offset = cue.x/1000 - secs;
+            if (offset >= 0 && cue.x/1000 < points_[sectionp[i]]->x) {
+                codeStrings << QString("#%1@%2/%4").arg(cue.text)
+                                                   .arg(qduration(offset))
+                                                   .arg(cue.duration);
+                codePoints << sectionp[i];
+            }
         }
 
         // multiple or no ..

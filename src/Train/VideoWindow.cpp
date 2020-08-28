@@ -26,11 +26,10 @@
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
 
-
 VideoWindow::VideoWindow(Context *context)  :
-    GcChartWindow(context), context(context), m_MediaChanged(false)
+    GcChartWindow(context), context(context), m_MediaChanged(false), layoutSelector(NULL)
 {
-    setControls(NULL);
+    QWidget *c = NULL;
     setProperty("color", QColor(Qt::black));
 
     QHBoxLayout *layout = new QHBoxLayout();
@@ -80,38 +79,36 @@ VideoWindow::VideoWindow(Context *context)  :
 #endif
 
 #if defined(WIN32) || defined(Q_OS_LINUX)
-        // Video Overlays Initialization: if video config file is not present
-        // copy a default one to be used as a model by the user.
-        // An empty video-layout.xml file disables video overlays
-        QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
-        QFile file(filename);
-        if (!file.exists())
-        {
-            file.setFileName(":/xml/video-layout.xml");
-            file.copy(filename);
-            QFile::setPermissions(filename, QFileDevice::ReadUser|QFileDevice::WriteUser);
-        }
-        if (file.exists())
-        {
-            // clean previous layout
-            foreach(MeterWidget* p_meterWidget, m_metersWidget)
-            {
-                m_metersWidget.removeAll(p_meterWidget);
-                delete p_meterWidget;
-            }
 
-            VideoLayoutParser handler(&m_metersWidget, container);
+        // Read the video layouts just to list the names for the layout selector
+        readVideoLayout(-1);
 
-            QXmlInputSource source (&file);
-            QXmlSimpleReader reader;
-            reader.setContentHandler (&handler);
+        // Create the layout selector form
+        c = new QWidget(this);
+        c->setContentsMargins(0,0,0,0);
+        QVBoxLayout *cl = new QVBoxLayout(c);
+        QFormLayout *controlsLayout = new QFormLayout();
+        controlsLayout->setSpacing(0);
+        controlsLayout->setContentsMargins(5,5,5,5);
+        cl->addLayout(controlsLayout);
+        QLabel *layoutLabel = new QLabel(tr("Meters layout"), this);
+        layoutLabel->setAutoFillBackground(true);
+        layoutSelector = new QComboBox(this);
 
-            reader.parse (source);
+        for(int i = 0; i < layoutNames.length(); i++) {
+            layoutSelector->addItem(layoutNames[i], i);
         }
-        else
-        {
-            qDebug() << qPrintable(QString("file" + filename + " (video layout XML file) not found"));
-        }
+        controlsLayout->addRow(layoutLabel, layoutSelector);
+        QPushButton *resetLayoutBtn = new QPushButton(tr("Reset Meters layout to default"), this);
+        resetLayoutBtn->setAutoDefault(false);
+        cl->addWidget(resetLayoutBtn);
+
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(layoutChanged()));
+        connect(layoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(layoutChanged()));
+        connect(resetLayoutBtn, SIGNAL(clicked()), this, SLOT(resetLayout()));
+
+        // Instantiate a layout as initial default
+        layoutChanged();
 #endif
     } else {
 
@@ -131,6 +128,8 @@ VideoWindow::VideoWindow(Context *context)  :
     layout->addWidget(wd);
 #endif
 
+    setControls(c);
+
     if (init) {
         // get updates..
         connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
@@ -140,6 +139,11 @@ VideoWindow::VideoWindow(Context *context)  :
         connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
         connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
         connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
+
+        // The video file may have been already selected
+        mediaSelected(context->videoFilename);
+        // We may add a video player while training is already running!
+        if(context->isRunning) startPlayback();
     }
 }
 
@@ -169,6 +173,71 @@ VideoWindow::~VideoWindow()
 #endif
 }
 
+void VideoWindow::layoutChanged()
+{
+    readVideoLayout(videoLayout());
+}
+
+void VideoWindow::resetLayout()
+{
+    readVideoLayout(-1, true);
+    layoutSelector->clear();
+    for(int i = 0; i < layoutNames.length(); i++) {
+        layoutSelector->addItem(layoutNames[i], i);
+    }
+}
+
+void VideoWindow::readVideoLayout(int pos, bool useDefault)
+{
+    // Video Overlays Initialization: if video config file is not present
+    // copy a default one to be used as a model by the user.
+    // An empty video-layout.xml file disables video overlays
+    QString filename = context->athlete->home->config().canonicalPath() + "/" + "video-layout.xml";
+    QFile file(filename);
+    if (useDefault) file.remove();
+    if (!file.exists())
+    {
+        file.setFileName(":/xml/video-layout.xml");
+        file.copy(filename);
+        QFile::setPermissions(filename, QFileDevice::ReadUser|QFileDevice::WriteUser);
+    }
+    if (file.exists())
+    {
+        // clean previous layout
+        foreach(MeterWidget* p_meterWidget, m_metersWidget)
+        {
+            m_metersWidget.removeAll(p_meterWidget);
+            p_meterWidget->deleteLater();
+        }
+        layoutNames.clear();
+
+        VideoLayoutParser handler(&m_metersWidget, &layoutNames, container);
+        QXmlInputSource source(&file);
+        QXmlSimpleReader reader;
+        handler.layoutPositionSelected = pos;
+        reader.setContentHandler(&handler);
+        reader.parse(source);
+        if(context->isRunning) showMeters();
+    }
+    else
+    {
+        qDebug() << qPrintable(QString("file" + filename + " (video layout XML file) not found"));
+    }
+}
+
+void VideoWindow::showMeters()
+{
+    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    {
+        p_meterWidget->setWindowOpacity(1); // Show the widget
+        p_meterWidget->AdjustSizePos();
+        p_meterWidget->update();
+        p_meterWidget->raise();
+        p_meterWidget->show();
+    }
+    prevPosition = mapToGlobal(pos());
+}
+
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
@@ -178,7 +247,7 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    if (context->currentVideoSyncFile()) {
+    if ((!context->isRunning) && context->currentVideoSyncFile()) {
         context->currentVideoSyncFile()->manualOffset = 0.0;
         context->currentVideoSyncFile()->km = 0.0;
     }
@@ -210,21 +279,12 @@ void VideoWindow::startPlayback()
     mp->play();
 #endif
 
-    foreach(MeterWidget* p_meterWidget , m_metersWidget)
-    {
-        p_meterWidget->setWindowOpacity(1); // Show the widget
-        p_meterWidget->AdjustSizePos();
-        p_meterWidget->update();
-
-        p_meterWidget->raise();
-        p_meterWidget->show();
-    }
-    prevPosition = mapToGlobal(pos());
+    showMeters();
 }
 
 void VideoWindow::stopPlayback()
 {
-    if (context->currentVideoSyncFile())
+    if ((!context->isRunning) && context->currentVideoSyncFile())
         context->currentVideoSyncFile()->manualOffset = 0.0;
 
 #ifdef GC_VIDEO_VLC
@@ -239,7 +299,6 @@ void VideoWindow::stopPlayback()
 #endif
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
         p_meterWidget->hide();
-
 }
 
 void VideoWindow::pausePlayback()
@@ -275,19 +334,21 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
-    bool metric = context->athlete->useMetricUnits;
+    bool metric = GlobalContext::context()->useMetricUnits;
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
+        QString myQstr1 = p_meterWidget->Source();
+        std::string smyStr1 = myQstr1.toStdString();
         if (p_meterWidget->Source() == QString("None"))
         {
-            //Nothing
+            p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("Speed"))
         {
             p_meterWidget->Value = rtd.getSpeed() * (metric ? 1.0 : MILES_PER_KM);
-            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
-            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph"));
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" kph") : tr(" mph")) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("Elevation"))
         {
@@ -306,61 +367,93 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 elevationMeterWidget->gradientValue = rtd.getSlope();
             }
         }
+        else if (p_meterWidget->Source() == QString("LiveMap"))
+        {
+            LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
+            if (!liveMapWidget)
+                qDebug() << "Error: LiveMap keyword used but widget is not LiveMap type";
+            else
+            {
+                double dLat = rtd.getLatitude();
+                double dLon = rtd.getLongitude();
+
+                if (dLat && dLon) liveMapWidget->plotNewLatLng(dLat, dLon);
+
+                // show/hide depending on Location data presence
+                if (context->currentErgFile() && context->currentErgFile()->gpi.HasLocation()) liveMapWidget->show();
+                else liveMapWidget->hide();
+            }
+        }
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();
-            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("Watt"))
         {
             p_meterWidget->Value =  rtd.getWatts();
-            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
+        }
+        else if (p_meterWidget->Source() == QString("Altitude"))
+        {
+            p_meterWidget->Value =  rtd.getAltitude() * (metric ? 1.0 : FEET_PER_METER);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = (metric ? tr(" m") : tr(" feet")) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("HRM"))
         {
             p_meterWidget->Value =  rtd.getHr();
-            p_meterWidget->Text = QString::number((int)p_meterWidget->Value);
+            p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("Load"))
         {
             if (rtd.mode == ERG || rtd.mode == MRC) {
                 p_meterWidget->Value = rtd.getLoad();
-                p_meterWidget->Text = QString("%1").arg(round(p_meterWidget->Value));
-                p_meterWidget->AltText = tr("w");
+                p_meterWidget->Text = QString("%1").arg(round(p_meterWidget->Value)).rightJustified(p_meterWidget->textWidth);
+                p_meterWidget->AltText = tr("w") +  p_meterWidget->AltTextSuffix;
             } else {
                 p_meterWidget->Value = rtd.getSlope();
-                p_meterWidget->Text = QString("%1").arg(p_meterWidget->Value, 0, 'f', 1);
-                p_meterWidget->AltText = tr("%");
+                p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+                p_meterWidget->AltText = QString(".") + QString::number(abs((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10))) + tr("%") + p_meterWidget->AltTextSuffix;
             }
         }
         else if (p_meterWidget->Source() == QString("Distance"))
         {
             p_meterWidget->Value = rtd.getDistance() * (metric ? 1.0 : MILES_PER_KM);
-            p_meterWidget->Text = QString::number((int) p_meterWidget->Value);
-            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" km") : tr(" mi"));
+            p_meterWidget->Text = QString::number((int) p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = QString(".") +QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + (metric ? tr(" km") : tr(" mi")) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("Time"))
         {
             p_meterWidget->Value = round(rtd.value(RealtimeData::Time)/100.0)/10.0;
-            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+            p_meterWidget->Text = time_to_string(trunc(p_meterWidget->Value)).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = QString(".") + QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("LapTime"))
         {
             p_meterWidget->Value = round(rtd.value(RealtimeData::LapTime)/100.0)/10.0;
-            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+            p_meterWidget->Text = time_to_string(trunc(p_meterWidget->Value)).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = QString(".") + QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("LapTimeRemaining"))
         {
             p_meterWidget->Value = round(rtd.value(RealtimeData::LapTimeRemaining)/100.0)/10.0;
-            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+            p_meterWidget->Text = time_to_string(trunc(p_meterWidget->Value)).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = QString(".") + QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("ErgTimeRemaining"))
         {
             p_meterWidget->Value = round(rtd.value(RealtimeData::ErgTimeRemaining)/100.0)/10.0;
-            p_meterWidget->Text = time_to_string(p_meterWidget->Value);
+            p_meterWidget->Text = time_to_string(trunc(p_meterWidget->Value)).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = QString(".") + QString::number((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10)) + p_meterWidget->AltTextSuffix;
         }
         else if (p_meterWidget->Source() == QString("TrainerStatus"))
         {
+            p_meterWidget->AltText = p_meterWidget->AltTextSuffix;
+
             if (!rtd.getTrainerStatusAvailable())
             {  // we don't have status from trainer thus we cannot indicate anything on screen
                 p_meterWidget->Text = tr("");
@@ -591,6 +684,7 @@ void VideoWindow::mediaSelected(QString filename)
     mc = QMediaContent(QUrl::fromLocalFile(filename));
     mp->setMedia(mc);
 #endif
+    if(context->isRunning) startPlayback();
 }
 
 MediaHelper::MediaHelper()

@@ -792,7 +792,7 @@ PowerHist::recalc(bool force)
         LASTrideItem == rideItem &&
         LASTseries == series &&
         LASTshade == shade &&
-        LASTuseMetricUnits == context->athlete->useMetricUnits &&
+        LASTuseMetricUnits == GlobalContext::context()->useMetricUnits &&
         LASTlny == lny &&
         LASTzoned == zoned &&
         LASTcpzoned == cpzoned &&
@@ -810,7 +810,7 @@ PowerHist::recalc(bool force)
         LASTrideItem = rideItem;
         LASTseries = series;
         LASTshade = shade;
-        LASTuseMetricUnits = context->athlete->useMetricUnits;
+        LASTuseMetricUnits = GlobalContext::context()->useMetricUnits;
         LASTlny = lny;
         LASTzoned = zoned;
         LASTcpzoned = cpzoned;
@@ -1355,7 +1355,7 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(standard.kphArray, cache->distributionArray(RideFile::kph));
     longFromDouble(standard.wbalArray, cache->distributionArray(RideFile::wbal));
 
-    if (!context->athlete->useMetricUnits) {
+    if (!GlobalContext::context()->useMetricUnits) {
         for(int i=1; i<standard.nmArray.size(); i++) {
             int nmIndex = round(i / FOOT_POUNDS_PER_METER);
             if (nmIndex < standard.nmArray.size())
@@ -1504,7 +1504,7 @@ PowerHist::setDataFromCompare()
         if (add.wbalArray.size() < 101) add.wbalArray.resize(101);
 
         // convert for metric imperial types
-        if (!context->athlete->useMetricUnits) {
+        if (!GlobalContext::context()->useMetricUnits) {
             for(int i=1; i<add.nmArray.size(); i++) {
                 int nmIndex = round(i / FOOT_POUNDS_PER_METER);
                 if (nmIndex < add.nmArray.size())
@@ -1723,7 +1723,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         if (!specification.pass(x)) continue;
 
         // get computed value
-        double v = x->getForSymbol(distMetric, context->athlete->useMetricUnits);
+        double v = x->getForSymbol(distMetric, GlobalContext::context()->useMetricUnits);
 
         // ignore no temp files
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NA) continue;
@@ -1732,8 +1732,8 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         if (std::isnan(v) || std::isinf(v)) v = 0;
 
         // seconds to minutes
-        if (m->units(context->athlete->useMetricUnits) == "seconds" ||
-            m->units(context->athlete->useMetricUnits) == tr("seconds")) v /= 60;
+        if (m->units(GlobalContext::context()->useMetricUnits) == "seconds" ||
+            m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")) v /= 60;
 
         // apply multiplier
         v *= multiplier;
@@ -1761,7 +1761,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         if (!specification.pass(x)) continue;
 
         // get computed value
-        double v = x->getForSymbol(distMetric, context->athlete->useMetricUnits);
+        double v = x->getForSymbol(distMetric, GlobalContext::context()->useMetricUnits);
 
         // ignore no temp files
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NA) continue;
@@ -1770,8 +1770,8 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         if (std::isnan(v) || std::isinf(v)) v = 0;
 
         // seconds to minutes
-        if (m->units(context->athlete->useMetricUnits) == "seconds" ||
-            m->units(context->athlete->useMetricUnits) == tr("seconds")) v /= 60;
+        if (m->units(GlobalContext::context()->useMetricUnits) == "seconds" ||
+            m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")) v /= 60;
 
         // apply multiplier
         v *= multiplier;
@@ -1783,11 +1783,11 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         // there will be some loss of precision due to totalising
         // a double in an int, but frankly that should be minimal
         // since most values of note are integer based anyway.
-        double t = x->getForSymbol(totalMetric, context->athlete->useMetricUnits);
+        double t = x->getForSymbol(totalMetric, GlobalContext::context()->useMetricUnits);
 
         // totalise in minutes
-        if (tm->units(context->athlete->useMetricUnits) == "seconds" ||
-            tm->units(context->athlete->useMetricUnits) == tr("seconds")) t /= 60;
+        if (tm->units(GlobalContext::context()->useMetricUnits) == "seconds" ||
+            tm->units(GlobalContext::context()->useMetricUnits) == tr("seconds")) t /= 60;
 
         // sum up
         data->metricArray[(int)(v)-min] += t;
@@ -1808,17 +1808,17 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
     absolutetime = true;
 
     // and the plot itself
-    QString yunits = tm->units(context->athlete->useMetricUnits);
+    QString yunits = tm->units(GlobalContext::context()->useMetricUnits);
     if (yunits == "seconds" || yunits == tr("seconds")) yunits = tr("minutes");
-    QString xunits = m->units(context->athlete->useMetricUnits);
+    QString xunits = m->units(GlobalContext::context()->useMetricUnits);
     if (xunits == "seconds" || xunits == tr("seconds")) xunits = tr("minutes");
 
-    if (tm->units(context->athlete->useMetricUnits) != "")
+    if (tm->units(GlobalContext::context()->useMetricUnits) != "")
         setAxisTitle(yLeft, QString(tr("Total %1 (%2)")).arg(tm->name()).arg(yunits));
     else
         setAxisTitle(yLeft, QString(tr("Total %1")).arg(tm->name()));
 
-    if (m->units(context->athlete->useMetricUnits) != "")
+    if (m->units(GlobalContext::context()->useMetricUnits) != "")
         setAxisTitle(xBottom, QString(tr("%1 of Activity (%2)")).arg(m->name()).arg(xunits));
     else
         setAxisTitle(xBottom, QString(tr("%1 of Activity")).arg(m->name()));
@@ -1934,8 +1934,8 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.wbalZoneSelectedArray.resize(0);
 
     // unit conversion factor for imperial units for selected parameters
-    double torque_factor = (context->athlete->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
-    double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
+    double torque_factor = (GlobalContext::context()->useMetricUnits ? 1.0 : FOOT_POUNDS_PER_METER);
+    double speed_factor  = (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM);
 
     // cp and zones
     int zoneRange = zones ? zones->whichRange(ride->startTime().date()) : -1;
@@ -2347,11 +2347,11 @@ PowerHist::setParameterAxisTitle()
             if (zoned && (!rideItem || rideItem->isRun || rideItem->isSwim))
                 axislabel = tr("Pace zone");
             else
-                axislabel = QString(tr("Speed (%1)")).arg(context->athlete->useMetricUnits ? tr("kph") : tr("mph"));
+                axislabel = QString(tr("Speed (%1)")).arg(GlobalContext::context()->useMetricUnits ? tr("kph") : tr("mph"));
             break;
 
         case RideFile::nm:
-            axislabel = QString(tr("Torque (%1)")).arg(context->athlete->useMetricUnits ? tr("N-m") : tr("ft-lbf"));
+            axislabel = QString(tr("Torque (%1)")).arg(GlobalContext::context()->useMetricUnits ? tr("N-m") : tr("ft-lbf"));
             break;
 
         case RideFile::gear:
@@ -2456,14 +2456,14 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
                 // only when there is no ride (home) or the activity is a run/swim.
                 QString runPaceStr, swimPaceStr;
                 if (series == RideFile::kph && (!rideItem || rideItem->isRun)) {
-                    bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                    bool metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
                     QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
-                    runPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace, false) : mphToPace(xvalue, metricPace, false)).arg(paceunit);
+                    runPaceStr = tr("\n%1 Pace (%2)").arg(GlobalContext::context()->useMetricUnits ? kphToPace(xvalue, metricPace, false) : mphToPace(xvalue, metricPace, false)).arg(paceunit);
                 }
                 if (series == RideFile::kph && (!rideItem || rideItem->isSwim)) {
-                    bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+                    bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
                     QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
-                    swimPaceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace, true) : mphToPace(xvalue, metricPace, true)).arg(paceunit);
+                    swimPaceStr = tr("\n%1 Pace (%2)").arg(GlobalContext::context()->useMetricUnits ? kphToPace(xvalue, metricPace, true) : mphToPace(xvalue, metricPace, true)).arg(paceunit);
                 }
                 // output the tooltip
                 text = QString("%1 %2%5%6\n%3 %4")

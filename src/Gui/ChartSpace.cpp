@@ -34,8 +34,8 @@
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
-ChartSpace::ChartSpace(Context *context) :
-    state(NONE), context(context), group(NULL), _viewY(0),
+ChartSpace::ChartSpace(Context *context, int scope) :
+    state(NONE), context(context), scope(scope), group(NULL), fixedZoom(0), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
 {
@@ -92,7 +92,7 @@ ChartSpace::ChartSpace(Context *context) :
     // we're ready to plot, but not configured
     configured=false;
     stale=true;
-    current=NULL;
+    currentRideItem=NULL;
 }
 
 // add the item
@@ -103,7 +103,8 @@ ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
     item->column = column;
     item->deep = deep;
     items.append(item);
-    if (current) item->setData(current);
+    if (scope&OverviewScope::ANALYSIS && currentRideItem) item->setData(currentRideItem);
+    if (scope&OverviewScope::TRENDS) item->setDateRange(currentDateRange);
 }
 
 void
@@ -125,31 +126,61 @@ void
 ChartSpace::rideSelected(RideItem *item)
 {
     // don't plot when we're not visible, unless we have nothing plotted yet
-    if (!isVisible() && current != NULL && item != NULL) {
+    if (!isVisible() && currentRideItem != NULL && item != NULL) {
         stale=true;
         return;
     }
 
     // don't replot .. we already did this one
-    if (current == item && stale == false) {
+    if (currentRideItem == item && stale == false) {
         return;
     }
 
-// profiling the code
-//QTime timer;
-//timer.start();
-
     // ride item changed
     foreach(ChartSpaceItem *ChartSpaceItem, items) ChartSpaceItem->setData(item);
-
-// profiling the code
-//qDebug()<<"took:"<<timer.elapsed();
 
     // update
     updateView();
 
     // ok, remember we did this one
-    current = item;
+    currentRideItem = item;
+    stale=false;
+}
+
+void
+ChartSpace::refresh()
+{
+    stale = true;
+    if (scope == TRENDS) dateRangeChanged(currentDateRange);
+    else if (scope == ANALYSIS) rideSelected(currentRideItem);
+}
+
+void
+ChartSpace::filterChanged()
+{
+    // redo trends
+    dateRangeChanged(currentDateRange);
+}
+
+void
+ChartSpace::dateRangeChanged(DateRange dr)
+{
+    // remember
+    currentDateRange = dr;
+
+    // don't plot when we're not visible, unless we have nothing plotted yet
+    if (!isVisible()) {
+        stale=true;
+        return;
+    }
+
+    // ride item changed
+    foreach(ChartSpaceItem *ChartSpaceItem, items) ChartSpaceItem->setDateRange(dr);
+
+    // update
+    updateView();
+
+    // ok, remember we did this one
     stale=false;
 }
 
@@ -203,8 +234,23 @@ ChartSpaceItem::sceneEvent(QEvent *event)
 }
 
 bool
+ChartSpaceItem::inHotspot()
+{
+    if (showconfig == false) return false;
+
+    QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+    QPointF spos = parent->view->mapToScene(vpos);
+
+    QRectF spot(hotspot().topLeft()+geometry().topLeft(), hotspot().bottomRight()+geometry().topLeft());
+    if (spot.width() >0 && spot.contains(spos.x(), spos.y()))  return true;
+    return false;
+}
+
+bool
 ChartSpaceItem::inCorner()
 {
+    if (showconfig == false) return false;
+
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
     QPointF spos = parent->view->mapToScene(vpos);
 
@@ -253,35 +299,55 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     if (drag) return;
 
     // not dragging so we can get to work painting the rest
-    if (parent->state != ChartSpace::DRAG && underMouse()) {
 
-        if (inCorner()) {
+    // config icon
+    if (showconfig) {
+        if (parent->state != ChartSpace::DRAG && underMouse()) {
 
-            // if hovering over the button show a background to indicate
-            // that pressing a button is good
-            QPainterPath path;
-            path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
-                                ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
-            painter->setPen(Qt::NoPen);
-            QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
-            painter->setBrush(darkgray);
-            painter->drawPath(path);
-            painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
-            painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, ROWHEIGHT/5, ROWHEIGHT+40, ROWHEIGHT+40-(ROWHEIGHT/5)), QBrush(darkgray));
+            if (inCorner()) {
 
-            // draw the config button and make it more obvious
-            // when hovering over the card
-            painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                // if hovering over the button show a background to indicate
+                // that pressing a button is good
+                QPainterPath path;
+                path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
+                                    ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
+                painter->setBrush(darkgray);
+                painter->drawPath(path);
+                painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
+                painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, ROWHEIGHT/5, ROWHEIGHT+40, ROWHEIGHT+40-(ROWHEIGHT/5)), QBrush(darkgray));
 
-        } else {
+                // draw the config button and make it more obvious
+                // when hovering over the card
+                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
 
-            // hover on card - make it more obvious there is a config button
-            painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
-        }
+            } else {
 
-    } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                // hover on card - make it more obvious there is a config button
+                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+            }
 
+        } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+    }
+
+    // thin border
+    if (!drag) {
+        QPainterPath path;
+        path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)), ROWHEIGHT/5, ROWHEIGHT/5);
+        QColor edge(GColor(CCARDBACKGROUND));
+        edge = edge.darker(105);
+        QPen pen(edge);
+        pen.setWidth(3*dpiXFactor);
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(path);
+    }
+
+    // item paints itself and can completely repaint everything
+    // including the title etc, in case this is useful
     itemPaint(painter, opt, widget);
+
 }
 
 static bool ChartSpaceItemSort(const ChartSpaceItem* left, const ChartSpaceItem* right)
@@ -401,6 +467,7 @@ ChartSpace::configChanged(qint32)
     titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
     midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
     smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
+    tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
@@ -431,6 +498,13 @@ ChartSpace::configChanged(qint32)
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
     //code->setPalette(palette);
     repaint();
+}
+
+void
+ChartSpace::setFixedZoom(int zoom)
+{
+    fixedZoom=zoom;
+    updateView();
 }
 
 void
@@ -549,10 +623,13 @@ void
 ChartSpace::setViewRect(QRectF rect)
 {
     viewRect = rect;
+    if (fixedZoom) viewRect.setWidth(fixedZoom);
 
     // fit to scene width XXX need to fix scrollbars.
     double scale = view->frameGeometry().width() / viewRect.width();
-    QRectF scaledRect(0,_viewY, viewRect.width(), view->frameGeometry().height() / scale);
+    QRectF scaledRect(0,_viewY, fixedZoom ? fixedZoom :viewRect.width(), view->frameGeometry().height() / scale);
+
+    // fprintf(stderr, "setViewRect: scale=%f, scaledRect=%f,%f width=%f height=%f\n", scale, scaledRect.x(), scaledRect.y(), scaledRect.width(), scaledRect.height()); fflush(stderr);
 
     // scale to selection
     view->scale(scale,scale);
@@ -659,6 +736,9 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
             // ignore other scene elements (e.g. charts)
             if (!items.contains(item)) item=NULL;
+
+            // the item may have a hotspot it wants us to honour
+            if (item && item->inHotspot()) item=NULL;
 
             // trigger config. so drop out completely as
             // we may end up deleting the item etc

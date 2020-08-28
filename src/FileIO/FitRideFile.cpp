@@ -22,6 +22,7 @@
 #include "Units.h"
 #include "RideItem.h"
 #include "Specification.h"
+#include "DataProcessor.h"
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
@@ -130,11 +131,10 @@ struct FitFileReaderState
     int devices;
     bool stopped;
     bool isLapSwim;
-    double pool_length;
+    double last_length;
     int last_event_type;
     int last_event;
     int last_msg_type;
-    double frac_time; // to carry sub-second length time in pool swimming
     double last_altitude; // to avoid problems when records lacks altitude
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
@@ -157,8 +157,8 @@ struct FitFileReaderState
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
-        devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
-        last_event_type(-1), last_event(-1), last_msg_type(-1), frac_time(0.0),
+        devices(0), stopped(true), isLapSwim(false), last_length(0.0),
+        last_event_type(-1), last_event(-1), last_msg_type(-1),
         last_altitude(0.0)
     {}
 
@@ -332,6 +332,7 @@ struct FitFileReaderState
             // Multiple product IDs refer to different regions e.g. China, Japan etc. 
             switch (prod) {
                 case -1: return "Garmin";
+                case 16: case 20: return "Garmin Cadence Sensor 2";
                 case 473: case 474: case 475: case 494: return "Garmin FR301";
                 case 717: case 987: return "Garmin FR405";
                 case 782: return "Garmin FR50";
@@ -354,6 +355,7 @@ struct FitFileReaderState
                 case 1623: case 2173: return "Garmin FR620";
                 case 1632: case 2174: return "Garmin FR220";
                 case 1743: return "Garmin HRM-Tri";
+                case 1752: return "Garmin HRM-Run";
                 case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
@@ -368,6 +370,7 @@ struct FitFileReaderState
                 case 2157: return "Garmin FR230";
                 case 2158: return "Garmin FR735XT";
                 case 2204: return "Garmin Edge 1000 Explore";
+                case 2327: return "Garmin HRM4 Run";
                 case 2238: return "Garmin Edge 20";
                 case 2337: return "Garmin Vivoactive HR";
                 case 2347: return "Garmin Vivosmart HR+";
@@ -392,8 +395,13 @@ struct FitFileReaderState
                 case 3121: return "Garmin Edge 530";
                 case 3122: return "Garmin Edge 830";
                 case 3126: return "Garmin Instinct";
-                case 3291: return "Garmin Fenix 6x";
+                case 3192: return "Garmin Speed Sensor 2";
+                case 3287: case 3288: case 3512: case 3513: return "Garmin Fenix 6s";
+                case 3289: case 3290: case 3514: case 3515: return "Garmin Fenix 6";
+                case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
+                case 3405: case 3639: return "Garmin Swim 2";
+                case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -537,6 +545,7 @@ struct FitFileReaderState
             // Favero
             switch (prod) {
                 case -1: return "Favero";
+                case 12: return "Favero Assioma Duo";
                 default: return QString("Favero %1").arg(prod);
             }
         } else if (manu == 267) {
@@ -573,6 +582,8 @@ struct FitFileReaderState
             case 4: return "Headunit"; // bike_power
             case 11: return "Powermeter"; // bike_power
             case 17: return "Biketrainer"; // fitness equipment
+            case 35: case 36: return "Bikelight"; // bike_light_main/shared
+            case 40: return "Bikeradar"; // bike_radar
             case 120: return "HR"; // heart_rate
             case 121: return "Speed-Cadence"; // bike_speed_cadence
             case 122: return "Cadence"; // bike_speed
@@ -656,6 +667,12 @@ struct FitFileReaderState
 
             case 108: // to confirm : RESPIRATIONRATE
                 return "RESPIRATIONRATE"; // Performance Contition
+
+            case 114: // MTB Dynamics - Grit
+                return "GRIT";
+
+            case 115: // MTB Dynamics - Flow
+                return "FLOW";
 
             default:
                     return QString("FIELD_%1").arg(native_num);
@@ -847,7 +864,7 @@ struct FitFileReaderState
         QString sport, subsport;
         bool sport_found = false, subsport_found = false;
         QString prevSport = rideFile->getTag("Sport", "");
-
+        double pool_length = 0.0;
 
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -857,7 +874,8 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 5: // sport field
-                sport_found = true;
+                  if (sport_found == false) {
+                    sport_found = true;
                     switch (value) {
                         case 0: // Generic
                           sport = "";
@@ -921,11 +939,13 @@ struct FitFileReaderState
                             break;
                         default: // if we can't work it out, treat as Generic
                             sport = ""; break;
+                      }
                     }
                     break;
                 case 6: // sub sport (ignored at present)
-                    subsport_found = true;
-                    switch (value) {
+                    if (subsport_found == false) {
+                      subsport_found = true;
+                      switch (value) {
                         case 0:    // generic
                             subsport = "";
                             break;
@@ -1056,6 +1076,7 @@ struct FitFileReaderState
                       default:    // default, treat as Generic
                         subsport = "";
                         break;
+                      }
                     }
                     break;
                 case 44: // pool_length
@@ -1167,11 +1188,6 @@ struct FitFileReaderState
         active_session_.clear();
         session_device_info_.clear();
         session_data_info_.clear();
-
-        // If the Sport changed tag as a Multisport activity
-        QString newSport = rideFile->getTag("Sport", "");
-        if (prevSport != "" && newSport != "" && newSport != prevSport)
-            rideFile->setTag("Sport", "Multisport");
     }
 
     void decodeDeviceInfo(const FitDefinition &def, int,
@@ -1590,28 +1606,20 @@ struct FitFileReaderState
         } 
 
         if (isLapSwim) {
-            // Fill empty laps due to false starts or pauses in some devices
-            // s.t. Garmin 910xt - cap to avoid crashes on bad data
+            // Fill empty lengths due to false starts or pauses in some devices
+            // s.t. Garmin 910xt
             double secs = time - start_time;
-            if ((total_distance == 0.0) && (secs > last_time + 1) &&
-                (secs - last_time < 100*GarminHWM.toInt())) {
-                double deltaSecs = secs - last_time;
-                for (int i = 1; i <= deltaSecs; i++) {
-                    rideFile->appendPoint(
-                        last_time+i, 0.0, 0.0,
-                        last_distance,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, RideFile::NA, RideFile::NA,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
-                }
-                last_time += deltaSecs;
+            if ((total_distance == 0.0) && (secs > last_length + 1)) {
+
+                XDataPoint *p = new XDataPoint();
+                p->secs = secs;
+                p->km = last_distance;
+                p->number[0] = 0;
+                p->number[1] = secs-last_length;
+                p->number[2] = 0;
+                swimXdata->datapoints.append(p);
+
+                last_length = secs;
             }
             ++interval;
         } else if (rideFile->dataPoints().count()) { // no samples means no laps
@@ -1628,8 +1636,6 @@ struct FitFileReaderState
 
     void decodeRecord(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
-        if (isLapSwim) return; // We use the length message for Lap Swimming
-
         time_t time = 0;
         if (time_offset == 0) // Damien : I have to confirm this...
             last_reference_time = last_time;
@@ -2161,25 +2167,12 @@ struct FitFileReaderState
                       const std::vector<FitValue>& values) {
         if (!isLapSwim) {
             isLapSwim = true;
-            // reset rideFile if not empty
-            if (!rideFile->dataPoints().empty()) {
-                start_time = 0;
-                last_time = 0;
-                last_distance = 0.00f;
-                interval = 1;
-                QString deviceType = rideFile->deviceType();
-                QString fileFormat = rideFile->fileFormat();
-                delete rideFile;
-                rideFile = new RideFile;
-                rideFile->setDeviceType(deviceType);
-                rideFile->setFileFormat(fileFormat);
-                rideFile->setRecIntSecs(1.0);
-             }
+            last_length = 0.0;
         }
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double cad = 0, km = 0, kph = 0;
+        double km = 0;
 
         int length_type = 0;
         int swim_stroke = 0;
@@ -2205,27 +2198,27 @@ struct FitFileReaderState
                         // Time MUST NOT go backwards
                         // You canny break the laws of physics, Jim
 
-                        if (time < last_time)
-                            time = last_time; // Not true for Bryton
+                        if (time < last_length)
+                            time = last_length;
                         break;
                 case 3: // total elapsed time
-                        length_duration = value / 1000.0;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_elapsed_time:" << value;
                         break;
                 case 4: // total timer time
-                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_timer_time:" << value;
+                        length_duration = value / 1000.0;
                         break;
                 case 5: // total strokes
                         total_strokes = value;
                         break;
                 case 6: // avg speed
-                        kph = value * 3.6 / 1000.0;
+                        // kph = value * 3.6 / 1000.0;
                         break;
                 case 7: // swim stroke: 0-free, 1-back, 2-breast, 3-fly,
                         //              4-drill, 5-mixed, 6-IM
                         swim_stroke = value;
                         break;
                 case 9: // cadence
-                        cad = value;
+                        // cad = value;
                         break;
                 case 11: // total_calories
                         if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_calories:" << value;
@@ -2241,23 +2234,18 @@ struct FitFileReaderState
             }
         }
 
-        XDataPoint *p = new XDataPoint();
-        p->secs = last_time;
-        p->km = last_distance;
-        p->number[0] = length_type + swim_stroke;
-        p->number[1] = length_duration;
-        p->number[2] = total_strokes;
+        if (length_duration > 0) {
+            XDataPoint *p = new XDataPoint();
+            p->secs = last_length;
+            p->km = last_distance;
+            p->number[0] = length_type + swim_stroke;
+            p->number[1] = length_duration;
+            p->number[2] = total_strokes;
 
-        swimXdata->datapoints.append(p);
-
-        // Rest interval
-        if (!length_type) {
-            kph = 0.0;
-            cad = 0.0;
+            swimXdata->datapoints.append(p);
         }
-        if (time == last_time)
-            return; // Sketchy, but some FIT files do this.
-        if (start_time == 0) {
+
+        if (last_length == 0) {
             start_time = time - 1; // recording interval?
             last_reference_time = start_time;
             QDateTime t;
@@ -2266,50 +2254,8 @@ struct FitFileReaderState
             interval = 1;
         }
 
-        // Normalize distance for the most common pool lengths,
-        // this is a hack to avoid the need for a double pass when
-        // pool_length comes in Session message at the end of the file.
-        if (pool_length == 0.0) {
-            pool_length = kph*length_duration/3600;
-            if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
-            else if (fabs(pool_length - 0.033) < 0.003) pool_length = 0.033;
-            else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
-            else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
-            else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
-        }
+        last_length += length_duration;
 
-        // another pool length or pause
-        km = last_distance + (length_type ? pool_length : 0.0);
-
-        // Adjust length duration using fractional carry
-        length_duration += frac_time;
-        frac_time = modf(length_duration, &length_duration);
-
-        // only fill 100x the maximal smart recording gap defined
-        // in preferences - we don't want to crash / stall on bad
-        // or corrupt files
-        if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
-            double deltaSecs = length_duration;
-            double deltaDist = km - last_distance;
-            kph = 3600.0 * deltaDist / deltaSecs;
-            for (int i = 1; i <= deltaSecs; i++) {
-                rideFile->appendPoint(
-                    last_time + i, cad, 0.0,
-                    last_distance + (deltaDist * i/deltaSecs),
-                    kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0,
-                    RideFile::NA,RideFile::NA,
-                    0.0, 0.0,0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0,0.0, 0.0,
-                    0.0, 0.0,0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0,
-                    interval);
-            }
-            last_time += deltaSecs;
-            last_distance += deltaDist;
-        }
     }
 
     /* weather broadcast as observed at weather station (undocumented) */
@@ -2503,7 +2449,6 @@ struct FitFileReaderState
         int i = 0;
         time_t this_start_time = 0;
         ++interval;
-        double total_elapsed_time = 0.0;
 
         QString segment_name;
         bool fail = false;
@@ -2541,8 +2486,8 @@ struct FitFileReaderState
                 case 7:  // personal best (ms) ? segment elapsed time from this activity (ms) ?
                          // => depends on file / device / version ?
                          // FIXME: to be investigated/confirmed.
-                    total_elapsed_time = round(value.v / 1000.0);
-                    break;
+                         // total_elapsed_time = round(value.v / 1000.0);
+                        break;
                 case 8:  // challenger best (ms) ? segment total timer time from this activity (ms) ?
                          // => depends on file / device / version ?
                          // FIXME: to be investigated/confirmed.
@@ -2643,16 +2588,8 @@ struct FitFileReaderState
             }
         }
         if (rideFile->dataPoints().count()) { // no samples means no laps..
-            if (segment_name == "") {
-                segment_name = QObject::tr("Lap %1").arg(interval);
-            }
-            if (isLapSwim && total_elapsed_time > 0.0) {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
-                                      this_start_time - start_time + total_elapsed_time, segment_name);
-            } else {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
-                                      segment_name);
-            }
+            if (segment_name == "") segment_name = QObject::tr("Lap %1").arg(interval);
+            rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, segment_name);
         }
 
     }
@@ -3289,6 +3226,13 @@ struct FitFileReaderState
 
             appendXData(rideFile);
 
+            if (!swimXdata->datapoints.empty()) {
+                // Build synthetic kph, km and cad sample data for Lap Swims
+                DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
+                if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
+                else qDebug()<<"Fix Lap Swim Data Processor not found.";
+            }
+
             return rideFile;
         }
     }
@@ -3480,8 +3424,9 @@ struct FitFileReaderState
 RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*> *rides) const
 {
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
-    auto ret = state->run();
-    ret = state->splitSessions(rides);
+    RideFile* ret = state->run();
+    // Split sessions, only if we have a valid RideFile
+    if (ret) ret = state->splitSessions(rides);
     return ret;
 }
 

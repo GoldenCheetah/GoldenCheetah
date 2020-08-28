@@ -20,7 +20,7 @@
 
 // add a node
 bool
-QuadtreeNode::insert(Quadtree *root, QPointF value)
+QuadtreeNode::insert(Quadtree *root, GPointF value)
 {
     if (!contains(value)) return false;
 
@@ -44,7 +44,7 @@ QuadtreeNode::insert(Quadtree *root, QPointF value)
 
 // get candidates
 int
-QuadtreeNode::candidates(QRectF rect, QList<QPointF> &here)
+QuadtreeNode::candidates(QRectF rect, QList<GPointF> &here)
 {
     // nope
     if (!intersect(rect)) return 0;
@@ -125,7 +125,7 @@ Quadtree::newnode(QPointF topleft, QPointF bottomright)
     return add;
 }
 
-bool Quadtree::insert(QPointF point)
+bool Quadtree::insert(GPointF point)
 {
     bool result= root->insert(this, point);
     if (result == false) {

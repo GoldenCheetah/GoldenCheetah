@@ -26,7 +26,7 @@
 #ifdef Q_OS_MAC
 static int spacing_=4;
 #else
-static int spacing_=4;
+static int spacing_=8;
 #endif
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -106,7 +106,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     menuButton->setAutoFillBackground(false);
     menuButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    menuButton->setIcon(iconFromPNG(":images/sidebar/extra.png"));
+    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png"));
     menuButton->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
@@ -119,13 +119,12 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
 
     barMenu = new QMenu("Add");
-    chartMenu = barMenu->addMenu(tr("Add Chart"));
+    chartMenu = barMenu->addMenu(tr("New "));
 
-    barMenu->addAction(tr("Import Chart..."), context->mainWindow, SLOT(importChart()));
+    barMenu->addAction(tr("Import ..."), context->mainWindow, SLOT(importChart()));
 
 #ifdef GC_HAS_CLOUD_DB
-    barMenu->addAction(tr("Upload Chart..."), context->mainWindow, SLOT(exportChartToCloudDB()));
-    barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));
+    barMenu->addAction(tr("Download ..."), context->mainWindow, SLOT(addChartFromCloudDB()));
 #endif
     // menu
     connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));
@@ -226,6 +225,12 @@ ChartBar::setText(int index, QString text)
     buttons[index]->update();
 
     tidy(true); // still fit ?
+}
+
+void
+ChartBar::setColor(int index, QColor color)
+{
+    buttons[index]->setColor(color);
 }
 
 
@@ -453,27 +458,35 @@ ChartBarItem::paintEvent(QPaintEvent *)
     // background - chrome or slected colour
     QBrush brush(GColor(CCHROME));
     if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
-    if (checked) brush = QBrush(GColor(CPLOTBACKGROUND));
+    if (checked) brush = color;
     painter.fillRect(body, brush);
 
     // now paint the text
     QPen pen(GCColor::invertColor(brush.color()));
     painter.setPen(pen);
-    painter.drawText(body, text, Qt::AlignBottom | Qt::AlignCenter);
+    painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
     if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
 
     // draw the menu indicator
-    if (underMouse() && checked) {
+    if (underMouse()) {
 
         QPoint mouse = mapFromGlobal(QCursor::pos());
-        QBrush brush(Qt::darkGray);
         painter.setPen (Qt :: NoPen);
 
-        // different color if under mouse
-        if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
-        painter.fillPath (triangle, brush);
+        if (checked) {
+
+            // different color if under mouse
+            QBrush brush(Qt::darkGray);
+            if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
+            painter.fillPath (triangle, brush);
+        } else {
+
+            // visual clue there is a menu option when tab selected
+            QBrush brush(Qt::lightGray);
+            painter.fillPath (triangle, brush);
+        }
     }
     painter.restore();
 }

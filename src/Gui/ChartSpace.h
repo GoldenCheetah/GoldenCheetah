@@ -47,6 +47,9 @@
 class ChartSpace;
 class ChartSpaceItemFactory;
 
+// we need a scope for a chart space, one or more of
+enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
+
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
 {
@@ -58,7 +61,14 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) =0;
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
+        virtual void setDateRange(DateRange )=0;
+        virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
+
         virtual QWidget *config()=0; // must supply a widget to configure
+
+        // turn off/on the config corner button
+        void setShowConfig(bool x) { showconfig=x; update(); }
+        bool showConfig() const { return showconfig; }
 
         // what type am I- managed by user
         int type;
@@ -66,7 +76,8 @@ class ChartSpaceItem : public QGraphicsWidget
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), invisible(false)  {
+                                       placing(false), drag(false), invisible(false),
+                                       showconfig(true)  {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -85,6 +96,7 @@ class ChartSpaceItem : public QGraphicsWidget
         // watch mouse enter/leave
         bool sceneEvent(QEvent *event);
         bool inCorner();
+        bool inHotspot();
         bool underMouse();
 
         // keep track of reuse of xyseries and delete to
@@ -104,11 +116,15 @@ class ChartSpaceItem : public QGraphicsWidget
         // name
         QString name;
 
+        // datafilter - only relevant on trends view
+        QString datafilter;
+
         // which column, sequence and size in rows
         int column, order, deep;
         bool onscene, placing, drag;
         bool incorner;
         bool invisible;
+        bool showconfig;
 
         // base paint
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
@@ -127,18 +143,20 @@ class ChartSpace : public QWidget
 
     public:
 
-        ChartSpace(Context *context);
+        ChartSpace(Context *context, int scope);
 
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
 
         // used by children
         Context *context;
+        int scope;
         QGraphicsView *view;
-        QFont titlefont, bigfont, midfont, smallfont;
+        QFont titlefont, bigfont, midfont, smallfont, tinyfont;
 
         // the item we are currently showing
-        RideItem *current;
+        RideItem *currentRideItem;
+        DateRange currentDateRange;
 
         // to get paint device
         QGraphicsView *device() { return view; }
@@ -150,8 +168,10 @@ class ChartSpace : public QWidget
 
     public slots:
 
-        // ride item changed
+        // user selection
         void rideSelected(RideItem *item);
+        void dateRangeChanged(DateRange);
+        void filterChanged();
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
@@ -162,6 +182,7 @@ class ChartSpace : public QWidget
         QRectF getViewRect() const { return viewRect; }
 
         // trap signals
+        void refresh();
         void configChanged(qint32);
 
         // scale on first show
@@ -186,6 +207,11 @@ class ChartSpace : public QWidget
         // remove an item
         void removeItem(ChartSpaceItem *item);
 
+        // mostly for athlete view, we just set a fixed
+        // zoom width, so we don't get a massive athlete
+        // card when only one athlete
+        void setFixedZoom(int width);
+
     protected:
 
         // process events
@@ -203,6 +229,7 @@ class ChartSpace : public QWidget
         QPropertyAnimation *scroller;
 
         // scene and view
+        int fixedZoom;
         int _viewY;
         QRectF sceneRect;
         QRectF viewRect;

@@ -94,11 +94,11 @@ class TPace : public RideMetric {
     bool isLowerBetter() const { return true; }
     // Overrides to use Pace units setting
     QString units(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         return RideMetric::units(metricRunPace);
     }
     double value(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         return RideMetric::value(metricRunPace);
     }
     QString toString(bool metric) const {

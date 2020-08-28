@@ -21,6 +21,9 @@
 
 #include <QWidget>
 #include "Context.h"
+#include <QWebEnginePage>
+#include <QWebEngineView>
+#include <QtWebEngineWidgets>
 
 class MeterWidget : public QWidget
 {
@@ -48,7 +51,9 @@ class MeterWidget : public QWidget
     void    setBoundingRectVisibility(bool show, QColor  boundingRectColor = QColor(255,0,0,255));
 
     float Value, ValueMin, ValueMax;
-    QString Text, AltText;
+    QString Text, AltText, AltTextSuffix;
+    Qt::Alignment alignment;
+    int textWidth;
 
   protected:
     QString  m_Name;
@@ -62,12 +67,14 @@ class MeterWidget : public QWidget
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
+    int      m_Zoom;
     bool     forceSquareRatio;
 
     QColor  m_MainColor;
     QColor  m_ScaleColor;
     QColor  m_OutlineColor;
     QColor  m_BackgroundColor;
+    QColor  m_BoundingRectColor;
     QFont   m_MainFont;
     QFont   m_AltFont;
 
@@ -77,8 +84,8 @@ class MeterWidget : public QWidget
     QPen   m_OutlinePen;
     QPen   m_ScalePen;
 
+    bool    backgroundVisibility;
     bool    boundingRectVisibility;
-    QColor  boundingRectColor;
 
     friend class VideoLayoutParser;
 };
@@ -127,8 +134,23 @@ class ElevationMeterWidget : public MeterWidget
   public:
     explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
     void setContext(Context* context) { this->context = context; }
-
     float gradientValue;
+};
+
+class LiveMapWidget : public MeterWidget
+{
+  public:
+    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
+    void plotNewLatLng (double newLat, double newLong);
+
+  protected:
+    void createHtml(double sLon, double sLat, int mapZoom);
+    void initLiveMap(double sLon, double sLat);
+    void resizeEvent(QResizeEvent *);
+
+    bool liveMapInitialized;
+    QWebEngineView *liveMapView;
+    QString currentPage;
 };
 
 #endif // _MeterWidget_h

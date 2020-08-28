@@ -29,7 +29,7 @@
 #include <QJsonValue>
 
 #ifndef RIDEWITHGPS_DEBUG
-#define RIDEWITHGPS_DEBUG false
+#define RIDEWITHGPS_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -63,6 +63,7 @@ RideWithGPS::RideWithGPS(Context *context) : CloudService(context), context(cont
     // config
     settings.insert(Username, GC_RWGPSUSER);
     settings.insert(Password, GC_RWGPSPASS);
+    settings.insert(OAuthToken, GC_RWGPS_AUTH_TOKEN);
 }
 
 RideWithGPS::~RideWithGPS() {
@@ -79,9 +80,15 @@ bool
 RideWithGPS::open(QStringList &errors)
 {
     printd("RideWithGPS::open\n");
-    QString username = getSetting(GC_RWGPSUSER).toString();
+    /*QString username = getSetting(GC_RWGPSUSER).toString();
     if (username == "") {
         errors << tr("RideWithGPS account not configured.");
+        return false;
+    }*/
+    // do we have a token
+    QString token = getSetting(GC_RWGPS_AUTH_TOKEN, "").toString();
+    if (token == "") {
+        errors << tr("You must authorise with RideWithGPS first");
         return false;
     }
     return true;
@@ -114,12 +121,14 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
 
     QString username = getSetting(GC_RWGPSUSER).toString();
     QString password = getSetting(GC_RWGPSPASS).toString();
+    QString auth_token = getSetting(GC_RWGPS_AUTH_TOKEN).toString();
 
     // application/json
     out += "{\"apikey\": \"p24n3a9e\", ";
-    out += "\"email\": \""+username+"\", ";
-    out += "\"password\": \""+password+"\", ";
-    out += "\"track_points\": \"";
+    //out += "\"email\": \""+username+"\", ";
+    //out += "\"password\": \""+password+"\", ";
+    out += "\"auth_token\": \""+auth_token+"\", ";
+    out += "\"trip\": {\"track_points\": \"";
 
     data += "\[";
     foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -152,7 +161,7 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
         if(size < totalSize)
            data += ",";
     }
-    data += "]";
+    data += "]}";
     out += data.replace("\"","\\\"");
     out += "\"}";
 

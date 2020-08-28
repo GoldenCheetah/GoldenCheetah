@@ -110,6 +110,7 @@
 #define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
 #define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
 #define GC_SETTINGS_MAIN_STATE          "<system>mainwindow/state"
+#define GC_SETTINGS_MAIN_SIDEBAR        "<system>mainwindow/sidebar/"
 #define GC_SETTINGS_LAST_IMPORT_PATH    "<system>mainwindow/lastImportPath"
 #define GC_SETTINGS_LAST_WORKOUT_PATH   "<system>mainwindow/lastWorkoutPath"
 #define GC_LAST_DOWNLOAD_DEVICE         "<system>mainwindow/lastDownloadDevice"
@@ -223,6 +224,7 @@
 #define GC_DEV_DEF                      "<global-trainmode>devicedef"
 #define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
+#define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
@@ -341,6 +343,7 @@
 
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
+#define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
 #define GC_TTBPASS                      "<athlete-private>ttb/pass"
 #define GC_VELOHEROUSER                 "<athlete-private>velohero/user"

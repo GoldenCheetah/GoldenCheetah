@@ -87,6 +87,7 @@ private:
     double rollingResistance;
     double windResistance;
     double wheelSize;
+    bool has_power;
 
     // Service and Characteristic to set load
     enum {Load_None, Tacx_UART, Wahoo_Kickr} loadType;

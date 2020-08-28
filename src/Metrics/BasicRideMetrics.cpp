@@ -31,6 +31,36 @@
 #include <QVector>
 #include <QApplication>
 
+class RideDate : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(RideDate)
+    public:
+
+    RideDate()
+    {
+        setSymbol("activity_date"); // ride_date already special (!!)
+        setInternalName("Activity Date");
+    }
+    bool isDate() const { return true; }
+    void initialize() {
+        setName(tr("Activity Date"));
+        setType(MetricType::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setDescription(tr("Activity Date"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+        setValue (QDate(1900,01,01).daysTo(item->dateTime.date()));
+    }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new RideDate(*this); }
+};
+
+static bool dateAdded =
+    RideMetricFactory::instance().addMetric(RideDate());
+
+//////////////////////////////////////////////////////////////////////////////
 class RideCount : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(RideCount)
     public:
@@ -42,6 +72,7 @@ class RideCount : public RideMetric {
     }
     void initialize() {
         setName(tr("Activities"));
+        setType(MetricType::Total);
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setDescription(tr("Activity Count"));
@@ -103,6 +134,9 @@ class ElapsedTime : public RideMetric {
         setSymbol("elapsed_time");
         setInternalName("Elapsed Time");
     }
+
+    bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("Elapsed Time"));
         setMetricUnits(tr("secs"));
@@ -625,7 +659,7 @@ class AthleteFat : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        setValue(item->getWeight(BodyMeasure::FatKg));
+        setValue(item->getWeight(Measure::FatKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -661,7 +695,7 @@ class AthleteBones : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::BonesKg));
+        setValue(item->getWeight(Measure::BonesKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -697,7 +731,7 @@ class AthleteMuscles : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::MuscleKg));
+        setValue(item->getWeight(Measure::MuscleKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -733,7 +767,7 @@ class AthleteLean : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::LeanKg));
+        setValue(item->getWeight(Measure::LeanKg));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -768,7 +802,7 @@ class AthleteFatP : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::FatPercent));
+        setValue(item->getWeight(Measure::FatPercent));
     }
 
     MetricClass classification() const { return Undefined; }
@@ -929,6 +963,7 @@ class TotalWork : public RideMetric {
 
     void initialize() {
         setName(tr("Work"));
+        setType(RideMetric::Total);
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
         setDescription(tr("Total Work in kJ computed from power data"));

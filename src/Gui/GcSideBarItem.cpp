@@ -290,7 +290,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     // set handle size according to font metric
     QFont font;
     QFontMetrics fm(font);
-    bigHandle = fm.height() + 8;
+    bigHandle = fm.height() + 16;
     smallHandle = fm.height() + 5;
 
     // use the sizes as set
@@ -403,7 +403,7 @@ GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
     setFixedHeight(22 *dpiYFactor);
-    setIconSize(QSize(14 *dpiXFactor,14 *dpiYFactor));
+    setIconSize(QSize(18 *dpiXFactor,18 *dpiYFactor));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
 

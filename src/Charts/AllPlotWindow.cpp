@@ -249,9 +249,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showFull);
 
-    showInterval = new QCheckBox(tr("Interval Navigator"), this);
-    showInterval->setCheckState(Qt::Checked);
-    guiControls->addRow(new QLabel(""), showInterval);
+    showIntervalMarkers = new QCheckBox(tr("Show Interval Markers"), this);
+    showIntervalMarkers->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalMarkers);
+
+    showIntervalNavigator = new QCheckBox(tr("Interval Navigator"), this);
+    showIntervalNavigator->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalNavigator);
 
     showHover = new QCheckBox(tr("Hover intervals"), this);
     showHover->setCheckState(Qt::Checked);
@@ -785,7 +789,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
-    connect(showInterval, SIGNAL(stateChanged(int)), this, SLOT(setShowInterval(int)));
+    connect(showIntervalNavigator, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalNavigator(int)));
+    connect(showIntervalMarkers, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalMarkers(int)));
     connect(showHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -1579,7 +1584,7 @@ AllPlotWindow::compareChanged()
 
     } else {
 
-        if (showInterval->isChecked())
+        if (showIntervalNavigator->isChecked())
             intervalPlot->show();
 
         // reset to normal view?
@@ -1655,8 +1660,8 @@ AllPlotWindow::redrawFullPlot()
     // use the ride to decide
     if (fullPlot->bydist)
         fullPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        ride->ride()->dataPoints().first()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
     else
         fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                  ride->ride()->dataPoints().last()->secs/60);
@@ -1679,8 +1684,8 @@ AllPlotWindow::redrawIntervalPlot()
     // use the ride to decide
     if (intervalPlot->bydist)
         intervalPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        ride->ride()->dataPoints().first()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
     else
         intervalPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                 ride->ride()->dataPoints().last()->secs/60);
@@ -2366,7 +2371,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         // code.
         if (plot->bydist) {
 
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 // convert to metric
                 x1 *= KM_PER_MILE;
                 x2 *=  KM_PER_MILE;
@@ -3263,10 +3268,23 @@ AllPlotWindow::setShowFull(int value)
 }
 
 void
-AllPlotWindow::setShowInterval(int value)
+AllPlotWindow::setShowIntervalMarkers(int value)
 {
-    showInterval->setChecked(value);
-    if (showInterval->isChecked()) {
+    showIntervalMarkers->setChecked(value);
+
+    allPlot->setShowMarkers(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowMarkers(value);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+    fullPlot->setShowMarkers(value);
+}
+
+void
+AllPlotWindow::setShowIntervalNavigator(int value)
+{
+    showIntervalNavigator->setChecked(value);
+    if (showIntervalNavigator->isChecked()) {
         intervalPlot->show();
         //allPlotLayout->setStretch(1,20);
     }
@@ -3429,9 +3447,9 @@ AllPlotWindow::resetStackedDatas()
         int startIndex, stopIndex;
         if (plot->bydist) {
             startIndex = allPlot->rideItem->ride()->distanceIndex(
-                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+                        (GlobalContext::context()->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->distanceIndex(
-                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+                        (GlobalContext::context()->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
@@ -3686,6 +3704,7 @@ AllPlotWindow::setupSeriesStackPlots()
 
         if (x.one == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
         else _allPlot->setShadeZones(false);
+        _allPlot->setShowMarkers(allPlot->showMarkers);
         first = false;
 
         // add to the list
@@ -3779,7 +3798,7 @@ AllPlotWindow::setupStackPlots()
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
 
     double duration = rideItem->ride()->dataPoints().last()->secs;
-    double distance =  (context->athlete->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
+    double distance =  (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
     int nbplot;
 
     if (fullPlot->bydist)
@@ -3795,9 +3814,9 @@ AllPlotWindow::setupStackPlots()
         // calculate the segment of ride this stack plot contains
         int startIndex, stopIndex;
         if (fullPlot->bydist) {
-            startIndex = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
+            startIndex = fullPlot->rideItem->ride()->distanceIndex((GlobalContext::context()->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*i);
-            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
+            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((GlobalContext::context()->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = fullPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);

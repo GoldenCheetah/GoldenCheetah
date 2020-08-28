@@ -124,12 +124,24 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
 
 // add a curve, associating an axis
 bool
-GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
 {
 
-    newSeries << GenericSeriesInfo(name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    newSeries << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    return true;
+}
+
+// helper for python
+bool
+GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
+                      QStringList labels, QStringList colors,
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+{
+    QVector<QString> flist;
+    for(int i=0; i<fseries.count(); i++) flist << fseries.at(i);
+    newSeries << GenericSeriesInfo(name, xseries, yseries, flist, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
     return true;
 }
 
@@ -319,6 +331,10 @@ GenericChart::finaliseChart()
     // match what we want with what we got
     for(int i=0; i<newPlots.count(); i++) {
         int index = GenericPlotInfo::findPlot(currentPlots, newPlots[i]);
+
+        // don't reuse bar/pie charts, easier to rebuild
+        if (type == GC_CHART_PIE || type == GC_CHART_BAR) index = -1;
+
         if (index <0) {
             // new one required
             newPlots[i].plot = new GenericPlot(this, context);
@@ -360,7 +376,7 @@ GenericChart::finaliseChart()
         QListIterator<GenericSeriesInfo>s(newPlots[i].series);
         while(s.hasNext()) {
             GenericSeriesInfo p=s.next();
-            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill);
+            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.fseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill);
 
             // did we get some labels associated with the curve?
             QListIterator<QStringList>l(p.annotateLabels);

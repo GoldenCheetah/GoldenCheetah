@@ -10,6 +10,7 @@ cache:
   - $HOME/Library/Caches/Homebrew
   - qwt
   - D2XX
+  - site-packages
 
 env:
   global:

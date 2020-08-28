@@ -198,7 +198,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         // set default for the user overiddable fields
         adds.uname  = adds.name;
-        adds.units = adds.metric->units(context->athlete->useMetricUnits);
+        adds.units = adds.metric->units(GlobalContext::context()->useMetricUnits);
         adds.uunits = adds.units;
 
         // default units to metric name if it is blank
@@ -218,7 +218,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     // metadata metrics
     SpecialFields sp;
-    foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach (FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
@@ -1478,8 +1478,8 @@ LTMTool::applySettings()
                 // usemetricUnits changed since charts.xml was
                 // written
                 if (saved && saved->conversion() != 1.0 &&
-                    metrics[i].uunits.contains(saved->units(!context->athlete->useMetricUnits)))
-                    metrics[i].uunits.replace(saved->units(!context->athlete->useMetricUnits), saved->units(context->athlete->useMetricUnits));
+                    metrics[i].uunits.contains(saved->units(!GlobalContext::context()->useMetricUnits)))
+                    metrics[i].uunits.replace(saved->units(!GlobalContext::context()->useMetricUnits), saved->units(GlobalContext::context()->useMetricUnits));
 
 
                 break;
@@ -1875,7 +1875,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
@@ -2724,6 +2723,8 @@ DataFilterEdit::checkErrors()
     DataFilter checker(this, context);
     QStringList errors = checker.check(toPlainText());
     checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
+
+    if (checker.rt.functions.contains("sample")) errors << tr("Warning: sample() is slow -- update code to use samples()");
 
     // even if no errors need to tell folks
     emit syntaxErrors(errors);

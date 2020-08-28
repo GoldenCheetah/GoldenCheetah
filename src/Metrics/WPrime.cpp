@@ -127,7 +127,7 @@ WPrime::setRide(RideFile *input)
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
     QVector<QPointF> pointsd;
-    double convert = input->context->athlete->useMetricUnits ? 1.00f : MILES_PER_KM;
+    double convert = GlobalContext::context()->useMetricUnits ? 1.00f : MILES_PER_KM;
 
     last=0;
     double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)

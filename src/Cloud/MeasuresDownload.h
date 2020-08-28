@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017 Joern Rischmueller (joern.rm@gmail.com)
+ * Copyright (c) 2017 Ale Martinez (amtriathlon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,14 +17,14 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _Gc_BodyMeasuresDownload_h
-#define _Gc_BodyMeasuresDownload_h
+#ifndef _Gc_MeasuresDownload_h
+#define _Gc_MeasuresDownload_h
 
 #include "Context.h"
 
 #include "WithingsDownload.h"
 #include "TodaysPlanBodyMeasures.h"
-#include "BodyMeasuresCsvImport.h"
+#include "MeasuresCsvImport.h"
 
 #include <QDialog>
 #include <QCheckBox>
@@ -33,21 +34,27 @@
 #include <QProgressBar>
 
 
-class BodyMeasuresDownload : public QDialog
+class MeasuresDownload : public QDialog
 {
     Q_OBJECT
 
 public:
-    BodyMeasuresDownload(Context *context);
-    ~BodyMeasuresDownload();
+    MeasuresDownload(Context *context);
+    ~MeasuresDownload();
+    static void updateMeasures(Context *context,
+                               MeasuresGroup *measuresGroup,
+                               QList<Measure>&measures,
+                               bool discardExisting=false);
 
 private:
 
      Context *context;
 
+     QComboBox *measuresCombo;
+
      WithingsDownload *withingsDownload;
      TodaysPlanBodyMeasures *todaysPlanBodyMeasureDownload;
-     BodyMeasuresCsvImport *csvFileImport;
+     MeasuresCsvImport *csvFileImport;
 
      QPushButton *downloadButton;
      QPushButton *closeButton;
@@ -70,7 +77,6 @@ private:
      // Progress Bar
      QProgressBar *progressBar;
 
-
      enum source { WITHINGS = 1,
                    TP = 2,
                    CSV = 3
@@ -81,8 +87,8 @@ private:
                       MANUAL = 3
                     } ;
 
-
 private slots:
+     void measuresChanged(int);
      void download();
      void close();
      void dateRangeAllSettingChanged(bool);
@@ -92,7 +98,6 @@ private slots:
      void downloadWithingsSettingChanged(bool);
      void downloadTPSettingChanged(bool);
      void downloadCSVSettingChanged(bool);
-
 
      void downloadProgressStart(int);
      void downloadProgress(int);

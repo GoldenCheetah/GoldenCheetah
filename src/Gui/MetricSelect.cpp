@@ -40,12 +40,12 @@ MetricSelect::MetricSelect(QWidget *parent, Context *context, int scope)
     if (scope & Meta) {
 
         // now add the ride metadata fields -- should be the same generally
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             QString text = field.name;
-            if (!context->specialFields.isMetric(text)) {
+            if (!GlobalContext::context()->specialFields.isMetric(text)) {
 
                 // translate to internal name if name has non Latin1 characters
-                text = context->specialFields.internalName(text);
+                text = GlobalContext::context()->specialFields.internalName(text);
                 text = text.replace(" ","_");
                 metaMap.insert(text, field.name);
             }
@@ -124,6 +124,23 @@ QString MetricSelect::metaname()
     isValid();
     if (_metric) return "";
     else return metaMap.value(text(), "");
+}
+
+void
+MetricSelect::setMeta(QString name)
+{
+    if (_metric) return;
+    else {
+        // find it
+        QMapIterator<QString,QString>it(metaMap);
+        while(it.hasNext()) {
+            it.next();
+            if (it.value() == name) {
+                setText(it.key());
+                break;
+            }
+        }
+    }
 }
 
 SeriesSelect::SeriesSelect(QWidget *parent, int scope) : QComboBox(parent), scope(scope)

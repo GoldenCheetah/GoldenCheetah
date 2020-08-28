@@ -162,6 +162,9 @@ class WorkoutWidget : public QWidget
         // lap markers
         QList<ErgFileLap> &laps() { return laps_; }
 
+        // lap markers
+        QList<ErgFileText> &texts() { return texts_; }
+
         // get WPrime values
         WPrime &wprime() { return wpBal; }
 
@@ -366,6 +369,9 @@ class WorkoutWidget : public QWidget
 
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file
+
+        // the lap definitions
+        QList<ErgFileText>   texts_;    // text cues in the file
 
         // Workout starts at 0 ends at maxWX_
         double maxWX_;

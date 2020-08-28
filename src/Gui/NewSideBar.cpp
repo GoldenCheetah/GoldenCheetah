@@ -121,16 +121,12 @@ NewSideBar::configChanged(qint32)
 {
     QFont font;
     QFontMetrics fm(font);
-    top->setFixedHeight(fm.height() + 8); // no scaling...
-    bottom->setFixedHeight(fm.height() + 4); // no scaling...
+    top->setFixedHeight(fm.height() + 16); // no scaling...
+    bottom->setFixedHeight(22 * dpiXFactor);
     QColor col=GColor(CCHROME);
     QString style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
     top->setStyleSheet(style);
     bottom->setStyleSheet(style);
-    col=GColor(CPLOTBACKGROUND);
-    col=GCColor::invertColor(col); // invert makes dark white, light black
-    col=GCColor::invertColor(col); // invert again, so now its white or black
-    style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
     middle->setStyleSheet(style);
 }
 
@@ -145,7 +141,7 @@ NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString
 
     // trap events
     installEventFilter(this);
-    connect(sidebar->context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 
@@ -221,12 +217,12 @@ static QImage imageRGB(QImage &source, QColor target)
 void
 NewSideBarItem::configChanged(qint32)
 {
-    QColor col(Qt::darkGray);
+    QColor col = GColor(CCHROME);
     QString style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
     setStyleSheet(style);
 
     // set foreground colors
-    fg_normal = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+    fg_normal = GCColor::invertColor(GColor(CCHROME));
 
     // if foreground is white then we're "dark" if its
     // black the we're "light" so this controls palette
@@ -236,25 +232,24 @@ NewSideBarItem::configChanged(qint32)
     else fg_disabled = QColor(180,180,180);
 
     // set background colors
-    col=GColor(CPLOTBACKGROUND);
+    col=GColor(CCHROME);
     bool isblack = (col == QColor(Qt::black)); // e.g. mustang theme
-    col=GCColor::invertColor(col); // invert makes dark white, light black
-    col=GCColor::invertColor(col); // invert again, so now its white or black
     bg_normal = col;
 
     // on select
-    bg_select =GColor(CPLOTBACKGROUND);
+    bg_select =GColor(CCHROME);
     if (dark) bg_select = bg_select.lighter(200);
     else bg_select = bg_select.darker(200);
     if (isblack) bg_select = QColor(30,30,30);
+    fg_select = GCColor::invertColor(bg_select);
 
     // on hover
-    bg_hover =GColor(CPLOTBACKGROUND);
-    if (dark) bg_hover = bg_hover.lighter(300);
-    else bg_hover = bg_hover.darker(300);
-    if (isblack) bg_hover = QColor(50,50,50);
+    bg_hover =GColor(CCHROME);
+    if (dark) bg_hover = QColor(Qt::darkGray);
+    else bg_hover = QColor(Qt::lightGray);
 
     iconNormal = QPixmap::fromImage(imageRGB(icon, fg_normal), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
+    iconSelect = QPixmap::fromImage(imageRGB(icon, fg_select), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
     iconDisabled = QPixmap::fromImage(imageRGB(icon, fg_disabled), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
 }
 
@@ -270,7 +265,8 @@ NewSideBarItem::paintEvent(QPaintEvent *)
     painter.fillRect(QRectF(0,0,gl_itemwidth*dpiXFactor, gl_itemheight*dpiXFactor), brush);
 
     // icon is normal or disabled
-    if (enabled) painter.drawPixmap(27*dpiXFactor,6*dpiXFactor,24*dpiXFactor,24*dpiXFactor,iconNormal);
+    if (selected) painter.drawPixmap(27*dpiXFactor,6*dpiXFactor,24*dpiXFactor,24*dpiXFactor,iconSelect);
+    else if (enabled) painter.drawPixmap(27*dpiXFactor,6*dpiXFactor,24*dpiXFactor,24*dpiXFactor,iconNormal);
     else painter.drawPixmap(27*dpiXFactor,6*dpiXFactor,24*dpiXFactor,24*dpiXFactor,iconDisabled);
 
     // block
@@ -279,6 +275,7 @@ NewSideBarItem::paintEvent(QPaintEvent *)
     // draw name
     QPen pen(fg_normal);
     if (!enabled) pen = QPen(fg_disabled);
+    if (selected) pen = fg_select;
     QFont f;
     f.setPixelSize(12*dpiYFactor);
     painter.setFont(f);

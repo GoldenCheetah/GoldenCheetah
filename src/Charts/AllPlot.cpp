@@ -55,6 +55,8 @@
 
 #include <string.h> // for memcpy
 
+static const int gl_alpha = 100;
+
 class IntervalPlotData : public QwtSeriesData<QPointF>
 {
     public:
@@ -226,7 +228,7 @@ class AllPlotZoneLabel: public QwtPlotItem
                     }
 
                     QColor text_color = zoneColor(zone_number, num_zones);
-                    text_color.setAlpha(64);
+                    text_color.setAlpha(gl_alpha);
                     text.setColor(text_color);
                 }
             }
@@ -401,7 +403,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot, QList<UserData*> user) : plot(plot)
 
     tempCurve = new QwtPlotCurve(tr("Temperature"));
     tempCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    if (plot->context->athlete->useMetricUnits)
+    if (GlobalContext::context()->useMetricUnits)
         tempCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
     else
         tempCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1)); // with cadence
@@ -564,7 +566,7 @@ AllPlotObject::setUserData(QList<UserData*>user)
 
         if (plot->fill || zones.count()>0) {
             QColor p = add.color;
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             add.curve->setBrush(QBrush(p));
         } else {
             add.curve->setBrush(Qt::NoBrush);
@@ -935,6 +937,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     showO2Hb(true),
     showHHb(true),
     showGear(true),
+    showMarkers(true),
     bydist(false),
     bytimeofday(false),
     timeoffset(0),
@@ -1245,7 +1248,7 @@ AllPlot::configChanged(qint32 what)
         ihlbrush.setAlpha(128);
         standard->intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
         QColor hbrush = QColor(Qt::lightGray);
-        hbrush.setAlpha(64);
+        hbrush.setAlpha(gl_alpha);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
         //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
         QPen gridPen(GColor(CPLOTGRID));
@@ -1257,169 +1260,169 @@ AllPlot::configChanged(qint32 what)
 
             for(int k=0; k<standard->U.count(); k++) {
                 QColor p = standard->U[k].color;
-                p.setAlpha(64);
+                p.setAlpha(gl_alpha);
                 standard->U[k].curve->setBrush(QBrush(p));
             }
 
             QColor p;
             p = standard->wattsCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->wattsCurve->setBrush(QBrush(p));
 
             p = standard->atissCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->atissCurve->setBrush(QBrush(p));
 
             p = standard->antissCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->antissCurve->setBrush(QBrush(p));
 
             p = standard->npCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->npCurve->setBrush(QBrush(p));
 
             p = standard->rvCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rvCurve->setBrush(QBrush(p));
 
             p = standard->rcadCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rcadCurve->setBrush(QBrush(p));
 
             p = standard->rgctCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rgctCurve->setBrush(QBrush(p));
 
             p = standard->gearCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->gearCurve->setBrush(QBrush(p));
 
             p = standard->smo2Curve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->smo2Curve->setBrush(QBrush(p));
 
             p = standard->thbCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->thbCurve->setBrush(QBrush(p));
 
             p = standard->o2hbCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->o2hbCurve->setBrush(QBrush(p));
 
             p = standard->hhbCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->hhbCurve->setBrush(QBrush(p));
 
             p = standard->xpCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->xpCurve->setBrush(QBrush(p));
 
             p = standard->apCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->apCurve->setBrush(QBrush(p));
 
             p = standard->wCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->wCurve->setBrush(QBrush(p));
 
             p = standard->tcoreCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->tcoreCurve->setBrush(QBrush(p));
 
             p = standard->hrCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->hrCurve->setBrush(QBrush(p));
 
             p = standard->accelCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->accelCurve->setBrush(QBrush(p));
 
             p = standard->wattsDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->wattsDCurve->setBrush(QBrush(p));
 
             p = standard->cadDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->cadDCurve->setBrush(QBrush(p));
 
             p = standard->nmDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->nmDCurve->setBrush(QBrush(p));
 
             p = standard->hrDCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->hrDCurve->setBrush(QBrush(p));
 
             p = standard->speedCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->speedCurve->setBrush(QBrush(p));
 
             p = standard->cadCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->cadCurve->setBrush(QBrush(p));
 
             p = standard->torqueCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->torqueCurve->setBrush(QBrush(p));
 
             p = standard->tempCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->tempCurve->setBrush(QBrush(p));
 
             p = standard->lteCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lteCurve->setBrush(QBrush(p));
 
             p = standard->rteCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rteCurve->setBrush(QBrush(p));
 
             p = standard->lpsCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lpsCurve->setBrush(QBrush(p));
 
             p = standard->rpsCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rpsCurve->setBrush(QBrush(p));
 
             p = standard->lpcoCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lpcoCurve->setBrush(QBrush(p));
 
             p = standard->rpcoCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rpcoCurve->setBrush(QBrush(p));
 
             p = standard->lppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lppCurve->setBrush(QBrush(p));
 
             p = standard->rppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rppCurve->setBrush(QBrush(p));
 
             p = standard->lpppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->lpppCurve->setBrush(QBrush(p));
 
             p = standard->rpppCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->rpppCurve->setBrush(QBrush(p));
 
             p = standard->slopeCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->slopeCurve->setBrush(QBrush(p));
 
             /*p = standard->altSlopeCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->altSlopeCurve->setBrush(QBrush(p));
 
             p = standard->balanceLCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->balanceLCurve->setBrush(QBrush(p));
 
             p = standard->balanceRCurve->pen().color();
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->balanceRCurve->setBrush(QBrush(p));*/
         } else {
             for(int k=0; k<standard->U.count(); k++) {
@@ -1550,7 +1553,7 @@ AllPlot::setLeftOnePalette()
     if (standard->smo2Curve->isVisible()) {
         single = GColor(CSMO2);
     }
-    if (standard->tempCurve->isVisible() && !context->athlete->useMetricUnits) {
+    if (standard->tempCurve->isVisible() && !GlobalContext::context()->useMetricUnits) {
         single = GColor(CTEMP);
     }
     if (standard->cadCurve->isVisible()) {
@@ -1589,7 +1592,7 @@ AllPlot::setRightPalette()
     if (standard->speedCurve->isVisible()) {
         single = GColor(CSPEED);
     }
-    if (standard->tempCurve->isVisible() && context->athlete->useMetricUnits) {
+    if (standard->tempCurve->isVisible() && GlobalContext::context()->useMetricUnits) {
         single = GColor(CTEMP);
     }
     if (standard->o2hbCurve->isVisible()) {
@@ -2293,7 +2296,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothAP.append(dp->apower);
             objects->smoothHr.append(dp->hr);
             objects->smoothTcore.append(dp->tcore);
-            objects->smoothSpeed.append(context->athlete->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
+            objects->smoothSpeed.append(GlobalContext::context()->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
             objects->smoothAccel.append(dp->kphd);
             objects->smoothWattsD.append(dp->wattsd);
             objects->smoothCadD.append(dp->cadd);
@@ -2301,13 +2304,13 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothHrD.append(dp->hrd);
             objects->smoothCad.append(dp->cad);
             objects->smoothTime.append(dp->secs/60);
-            objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
-            objects->smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
+            objects->smoothDistance.append(GlobalContext::context()->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
+            objects->smoothAltitude.append(GlobalContext::context()->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
             objects->smoothSlope.append(dp->slope);
             if (dp->temp == RideFile::NA && !objects->smoothTemp.empty())
                 dp->temp = objects->smoothTemp.last();
-            objects->smoothTemp.append(context->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
-            objects->smoothWind.append(context->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
+            objects->smoothTemp.append(GlobalContext::context()->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
+            objects->smoothWind.append(GlobalContext::context()->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             objects->smoothTorque.append(dp->nm);
 
             if (dp->lrbalance == RideFile::NA || (dp->lrbalance == 0)) {
@@ -2334,8 +2337,8 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothRPPP.append(QwtIntervalSample( bydist ? objects->smoothDistance.last() : objects->smoothTime.last(), QwtInterval(dp->rpppb , dp->rpppe ) ));
 
 
-            double head = dp->headwind * (context->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
-            double speed = dp->kph * (context->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
+            double head = dp->headwind * (GlobalContext::context()->useMetricUnits ? 1.0f : MILES_PER_KM);
+            double speed = dp->kph * (GlobalContext::context()->useMetricUnits ? 1.0f : MILES_PER_KM);
             objects->smoothRelSpeed.append(QwtIntervalSample( bydist ? objects->smoothDistance.last() : objects->smoothTime.last(), QwtInterval(qMin(head, speed) , qMax(head, speed) ) ));
 
         }
@@ -2538,7 +2541,8 @@ AllPlot::refreshIntervalMarkers()
         delete mrk;
     }
     standard->d_mrk.clear();
-    if (rideItem && rideItem->ride()) {
+
+    if (showMarkers && rideItem && rideItem->ride()) {
         foreach(IntervalItem *interval, rideItem->intervals()) {
 
             bool nolabel = false;
@@ -2552,7 +2556,7 @@ AllPlot::refreshIntervalMarkers()
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
 
-            if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,64), 0, Qt::DashLine));
+            if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,65), 0, Qt::DashLine));
             else mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashLine));
 
             // put matches on second line down
@@ -2572,7 +2576,7 @@ AllPlot::refreshIntervalMarkers()
             if (!bydist) {
                 mrk->setValue(interval->start / 60.0, 0.0);
             } else
-                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM) *
                                 interval->startKM, 0.0);
             mrk->setLabel(text);
         }
@@ -2606,7 +2610,7 @@ AllPlot::refreshCalibrationMarkers()
             if (!bydist)
                 mrk->setValue(calibration->start / 60.0, 0.0);
             else
-                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM) *
                                 rideItem->ride()->timeToDistance(calibration->start), 0.0);
 
             //Lots of markers can clutter things, so avoid texts for now
@@ -2848,7 +2852,7 @@ AllPlot::setYMax()
     // QwtAxis::yLeft, 1
     if (standard->hrCurve->isVisible() || standard->tcoreCurve->isVisible() ||
         standard->cadCurve->isVisible() || standard->smo2Curve->isVisible() ||
-       (!context->athlete->useMetricUnits && standard->tempCurve->isVisible())) {
+       (!GlobalContext::context()->useMetricUnits && standard->tempCurve->isVisible())) {
 
         double ymin = 0;
         double ymax = 0;
@@ -2882,7 +2886,7 @@ AllPlot::setYMax()
             else
                 ymax = qMax(ymax, referencePlot->standard->cadCurve->maxYValue());
         }
-        if (standard->tempCurve->isVisible() && !context->athlete->useMetricUnits) {
+        if (standard->tempCurve->isVisible() && !GlobalContext::context()->useMetricUnits) {
 
             labels << QString::fromUtf8("°F");
 
@@ -2961,7 +2965,7 @@ AllPlot::setYMax()
     // QwtAxis::yRight, 0
     if (standard->speedCurve->isVisible() || standard->thbCurve->isVisible() || 
         standard->o2hbCurve->isVisible() || standard->hhbCurve->isVisible() ||
-        (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || 
+        (GlobalContext::context()->useMetricUnits && standard->tempCurve->isVisible()) || 
          standard->torqueCurve->isVisible()) {
 
         double ymin = -10;
@@ -2973,14 +2977,14 @@ AllPlot::setYMax()
         static_cast<ScaleScaleDraw*>(axisScaleDraw(QwtAxisId(QwtAxis::yRight, 0)))->setDecimals(2);
 
         if (standard->speedCurve->isVisible()) {
-            labels << (context->athlete->useMetricUnits ? tr("KPH") : tr("MPH"));
+            labels << (GlobalContext::context()->useMetricUnits ? tr("KPH") : tr("MPH"));
 
             if (referencePlot == NULL)
                 ymax = standard->speedCurve->maxYValue();
             else
                 ymax = referencePlot->standard->speedCurve->maxYValue();
         }
-        if (standard->tempCurve->isVisible() && context->athlete->useMetricUnits) {
+        if (standard->tempCurve->isVisible() && GlobalContext::context()->useMetricUnits) {
 
             labels << QString::fromUtf8("°C");
 
@@ -3002,7 +3006,7 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, referencePlot->standard->thbCurve->maxYValue());
         }
         if (standard->torqueCurve->isVisible()) {
-            labels << (context->athlete->useMetricUnits ? tr("Nm") : tr("ftLb"));
+            labels << (GlobalContext::context()->useMetricUnits ? tr("Nm") : tr("ftLb"));
 
             if (referencePlot == NULL)
                 ymax = qMax(ymax, standard->torqueCurve->maxYValue());
@@ -3051,7 +3055,7 @@ AllPlot::setYMax()
 
     // QwtAxis::yRight, 1
     if (standard->altCurve->isVisible() || standard->altSlopeCurve->isVisible())  {
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 1), context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 1), GlobalContext::context()->useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin,ymax;
 
         if (referencePlot == NULL) {
@@ -3084,7 +3088,7 @@ void
 AllPlot::setXTitle()
 {
     if (bydist)
-        setAxisTitle(xBottom, context->athlete->useMetricUnits ? "KM" : "Miles");
+        setAxisTitle(xBottom, GlobalContext::context()->useMetricUnits ? "KM" : "Miles");
     else
         setAxisTitle(xBottom, tr("")); // time is bloody obvious, less noise
     enableAxis(xBottom, true);
@@ -5706,25 +5710,25 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here, QList<UserData
 
             if (!here->speedArray.empty())
                 here->speedArray[arrayLength] = max(0,
-                                              (context->athlete->useMetricUnits
+                                              (GlobalContext::context()->useMetricUnits
                                                ? point->kph
                                                : point->kph * MILES_PER_KM));
             if (!here->cadArray.empty())
                 here->cadArray[arrayLength]   = max(0, point->cad);
             if (!here->altArray.empty())
-                here->altArray[arrayLength]   = (context->athlete->useMetricUnits
+                here->altArray[arrayLength]   = (GlobalContext::context()->useMetricUnits
                                            ? point->alt
                                            : point->alt * FEET_PER_METER);
 
             if (!here->slopeArray.empty()) here->slopeArray[arrayLength] = point->slope;
 
             if (!here->tempArray.empty())
-                here->tempArray[arrayLength]   = context->athlete->useMetricUnits ? point->temp
+                here->tempArray[arrayLength]   = GlobalContext::context()->useMetricUnits ? point->temp
                                                  : point->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE;
 
             if (!here->windArray.empty())
                 here->windArray[arrayLength] = max(0,
-                                             (context->athlete->useMetricUnits
+                                             (GlobalContext::context()->useMetricUnits
                                               ? point->headwind
                                               : point->headwind * MILES_PER_KM));
 
@@ -5746,13 +5750,13 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here, QList<UserData
             if (!here->rpppeArray.empty()) here->rpppeArray[arrayLength] = point->rpppe;
 
             here->distanceArray[arrayLength] = max(0,
-                                             (context->athlete->useMetricUnits
+                                             (GlobalContext::context()->useMetricUnits
                                               ? point->km
                                               : point->km * MILES_PER_KM));
 
             if (!here->torqueArray.empty())
                 here->torqueArray[arrayLength] = max(0,
-                                              (context->athlete->useMetricUnits
+                                              (GlobalContext::context()->useMetricUnits
                                                ? point->nm
                                                : point->nm * FEET_LB_PER_NM));
             ++arrayLength;
@@ -6519,6 +6523,18 @@ AllPlot::setShowPCO(bool show)
 }
 
 void
+AllPlot::setShowMarkers(bool show)
+{
+    showMarkers = show;
+    refreshIntervalMarkers();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
 AllPlot::setShowGrid(bool show)
 {
     standard->grid->setVisible(show);
@@ -6537,150 +6553,150 @@ AllPlot::setPaintBrush(int state)
 
         for(int k=0; k<standard->U.count(); k++) {
             QColor p = standard->U[k].color;
-            p.setAlpha(64);
+            p.setAlpha(gl_alpha);
             standard->U[k].curve->setBrush(QBrush(p));
         }
 
         QColor p;
         p = standard->wCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->wCurve->setBrush(QBrush(p));
 
         p = standard->wattsCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->wattsCurve->setBrush(QBrush(p));
 
         p = standard->npCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->npCurve->setBrush(QBrush(p));
         standard->atissCurve->setBrush(QBrush(p));
         standard->antissCurve->setBrush(QBrush(p));
 
 
         p = standard->rvCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rvCurve->setBrush(QBrush(p));
         p = standard->rgctCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rgctCurve->setBrush(QBrush(p));
         p = standard->rcadCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rcadCurve->setBrush(QBrush(p));
         p = standard->gearCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->gearCurve->setBrush(QBrush(p));
         p = standard->smo2Curve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->smo2Curve->setBrush(QBrush(p));
         p = standard->thbCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->thbCurve->setBrush(QBrush(p));
         p = standard->o2hbCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->o2hbCurve->setBrush(QBrush(p));
         p = standard->hhbCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->hhbCurve->setBrush(QBrush(p));
 
 
         p = standard->xpCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->xpCurve->setBrush(QBrush(p));
 
         p = standard->apCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->apCurve->setBrush(QBrush(p));
 
         p = standard->tcoreCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->tcoreCurve->setBrush(QBrush(p));
 
         p = standard->hrCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->hrCurve->setBrush(QBrush(p));
 
         p = standard->accelCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->accelCurve->setBrush(QBrush(p));
 
         p = standard->wattsDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->wattsDCurve->setBrush(QBrush(p));
 
         p = standard->cadDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->cadDCurve->setBrush(QBrush(p));
 
         p = standard->nmDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->nmDCurve->setBrush(QBrush(p));
 
         p = standard->hrDCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->hrDCurve->setBrush(QBrush(p));
 
         p = standard->speedCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->speedCurve->setBrush(QBrush(p));
 
         p = standard->cadCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->cadCurve->setBrush(QBrush(p));
 
         p = standard->tempCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->tempCurve->setBrush(QBrush(p));
 
         p = standard->torqueCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->torqueCurve->setBrush(QBrush(p));
 
         p = standard->lteCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lteCurve->setBrush(QBrush(p));
         p = standard->rteCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rteCurve->setBrush(QBrush(p));
         p = standard->lpsCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lpsCurve->setBrush(QBrush(p));
         p = standard->rpsCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rpsCurve->setBrush(QBrush(p));
         p = standard->lpcoCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lpcoCurve->setBrush(QBrush(p));
         p = standard->rpcoCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rpcoCurve->setBrush(QBrush(p));
         p = standard->lppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lppCurve->setBrush(QBrush(p));
         p = standard->rppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rppCurve->setBrush(QBrush(p));
         p = standard->lpppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->lpppCurve->setBrush(QBrush(p));
 
         p = standard->rpppCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->rpppCurve->setBrush(QBrush(p));
 
         p = standard->slopeCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->slopeCurve->setBrush(QBrush(p));
 
         /*p = standard->altSlopeCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->altSlopeCurve->setBrush(QBrush(p));
 
         p = standard->balanceLCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->balanceLCurve->setBrush(QBrush(p));
 
         p = standard->balanceRCurve->pen().color();
-        p.setAlpha(64);
+        p.setAlpha(gl_alpha);
         standard->balanceRCurve->setBrush(QBrush(p));*/
     } else {
         for(int k=0; k<standard->U.count(); k++) {
@@ -6852,7 +6868,7 @@ double IntervalPlotData::x(size_t i) const
     int interval = i ? i/4 : 0;
     interval += 1; // interval numbers start at 1 not ZERO in the utility functions
 
-    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+    double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
 
     // get the interval
     IntervalItem *current = intervalNum(interval);
@@ -6947,13 +6963,13 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         if (curve->title() == tr("Speed") && rideItem) {
             precision = 2;
             if (rideItem->isRun) {
-                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                bool metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
                 QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
-                paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, false) : mphToPace(yvalue, metricPace, false)).arg(paceunit);
+                paceStr = tr("\n%1 %2").arg(GlobalContext::context()->useMetricUnits ? kphToPace(yvalue, metricPace, false) : mphToPace(yvalue, metricPace, false)).arg(paceunit);
             } else if (rideItem->isSwim) {
-                bool metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
+                bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
                 QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
-                paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
+                paceStr = tr("\n%1 %2").arg(GlobalContext::context()->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
             }
         } else if (curve->title().text().startsWith(tr("W'"))) {
             // need to scale for W' bal
@@ -7038,13 +7054,13 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
                 // hover curve color aligns to the type of interval we are highlighting
                 QColor hbrush = chosen->color;
-                hbrush.setAlpha(64);
+                hbrush.setAlpha(gl_alpha);
                 standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
                 // we chose one?
                 if (bydist) {
 
-                    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+                    double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
                     double start = multiplier * chosen->startKM;
                     double stop = multiplier * chosen->stopKM;
 
@@ -7099,11 +7115,11 @@ AllPlot::intervalHover(IntervalItem *chosen)
 
         // hover curve color aligns to the type of interval we are highlighting
         QColor hbrush = chosen->color;
-        hbrush.setAlpha(64);
+        hbrush.setAlpha(gl_alpha);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
         if (bydist) {
-            double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+            double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
             double start = multiplier * chosen->startKM;
             double stop = multiplier * chosen->stopKM;
 

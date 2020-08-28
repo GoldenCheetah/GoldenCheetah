@@ -202,7 +202,7 @@ RTool::RTool()
             // return a data.frame of measure fields (all=FALSE, group="Body")
             { "GC.season.measures", (DL_FUNC) &RTool::measures, 2 },
             { "GC.chart.set", (DL_FUNC) &RTool::setChart, 6 },
-            { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 16 },
+            { "GC.chart.addCurve", (DL_FUNC) &RTool::addCurve, 17 },
             { "GC.chart.configureAxis", (DL_FUNC) &RTool::configureAxis, 10 },
             { "GC.chart.annotate", (DL_FUNC) &RTool::annotate, 4 },
             { NULL, NULL, 0 }
@@ -305,7 +305,7 @@ RTool::RTool()
 
                                // charts
                                "GC.setChart <- function(title=\"\", type=1, animate=FALSE, legpos=2, stack=FALSE, orientation=2) { .Call(\"GC.chart.set\", title, type, animate, legpos ,stack, orientation)}\n"
-                               "GC.addCurve <- function(name=\"curve\", xseries=c(), yseries=c(), xname=\"xaxis\", yname=\"yaxis\", min=-1, max=-1, labels=c(), colors=c(), line=1,symbol=1,size=2,color=\"red\",opacity=100,opengl=TRUE, legend=TRUE, datalabels=FALSE, fill=FALSE) { .Call(\"GC.chart.addCurve\", name, xseries, yseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill)}\n"
+                               "GC.addCurve <- function(name=\"curve\", xseries=c(), yseries=c(), fseries=c(), xname=\"xaxis\", yname=\"yaxis\", min=-1, max=-1, labels=c(), colors=c(), line=1,symbol=1,size=2,color=\"red\",opacity=100,opengl=TRUE, legend=TRUE, datalabels=FALSE, fill=FALSE) { .Call(\"GC.chart.addCurve\", name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill)}\n"
                                "GC.setAxis <- function(name=\"xaxis\",visible=TRUE, align=-1, min=-1, max=-1, type=0, labelcolor=\"\", color=\"\", log=FALSE, categories=c()) { .Call(\"GC.chart.configureAxis\", name, visible, align, min, max, type, labelcolor,color,log,categories)}\n"
                                "GC.annotate <- function(type=\"label\", series=\"curve\", strings=c()) { .Call(\"GC.chart.annotate\", type, series, strings, FALSE)}\n"
 
@@ -1004,12 +1004,12 @@ RTool::dfForRideItem(const RideItem *ri)
 
     // count the number of meta fields to add
     int meta = 0;
-    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+    if (rtool->context) {
 
         // count active fields
-        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition def, GlobalContext::context()->rideMetadata->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !rtool->context->specialFields.isMetric(def.name))
+                !GlobalContext::context()->specialFields.isMetric(def.name))
                 meta++;
         }
     }
@@ -1084,11 +1084,11 @@ RTool::dfForRideItem(const RideItem *ri)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
         REAL(m)[0] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
 
         // add to the list
@@ -1106,11 +1106,11 @@ RTool::dfForRideItem(const RideItem *ri)
     //
     // META
     //
-    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            rtool->context->specialFields.isMetric(field.name)) continue;
+            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1174,12 +1174,12 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
     // count the number of meta fields to add
     int meta = 0;
-    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+    if (rtool->context) {
 
         // count active fields
-        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition def, GlobalContext::context()->rideMetadata->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !rtool->context->specialFields.isMetric(def.name))
+                !GlobalContext::context()->specialFields.isMetric(def.name))
                 meta++;
         }
     }
@@ -1298,11 +1298,11 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
@@ -1328,11 +1328,11 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     //
     // META
     //
-    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            rtool->context->specialFields.isMetric(field.name)) continue;
+            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1553,11 +1553,11 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
@@ -1976,11 +1976,11 @@ RTool::activityIntervals(SEXP pTypes, SEXP datetime)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(IntervalItem *interval, ride->intervals()) {
@@ -3370,7 +3370,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++) {
             QString symbol = factory.metricName(i);
-            QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
             name.replace(" ","_");
 
             if (name == metric) {
@@ -4035,7 +4035,7 @@ RTool::setChart(SEXP title, SEXP type, SEXP animate, SEXP legpos, SEXP stack, SE
 }
 
 SEXP
-RTool::addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP xname, SEXP yname, SEXP labels, SEXP colors,
+RTool::addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP fseries, SEXP xname, SEXP yname, SEXP labels, SEXP colors,
               SEXP line, SEXP symbol, SEXP size, SEXP color, SEXP opacity, SEXP opengl, SEXP legend, SEXP datalabels, SEXP fill)
 {
     Q_UNUSED(labels) //XXX todo
@@ -4062,6 +4062,13 @@ RTool::addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP xname, SEXP yname, S
     vs=Rf_length(yseries);
     info.yseries.resize(vs);
     for(int i=0; i<vs; i++) info.yseries[i]=REAL(yseries)[i];
+    UNPROTECT(1);
+
+    // fseries
+    PROTECT(fseries=Rf_coerceVector(fseries,STRSXP));
+    vs=Rf_length(fseries);
+    info.fseries.resize(vs);
+    for(int i=0; i<vs; i++) info.fseries[i] = QString(CHAR(STRING_ELT(fseries,i)));
     UNPROTECT(1);
 
     // yname
@@ -4122,7 +4129,7 @@ RTool::addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP xname, SEXP yname, S
     info.fill = LOGICAL(fill)[0];
 
     // add to chart
-    rtool->chart->chart->addCurve(info.name, info.xseries, info.yseries, info.xname, info.yname, info.labels, info.colors, info.line, info.symbol, info.size, info.color, info.opacity, info.opengl, info.legend, info.datalabels, info.fill);
+    rtool->chart->chart->addCurve(info.name, info.xseries, info.yseries, info.fseries, info.xname, info.yname, info.labels, info.colors, info.line, info.symbol, info.size, info.color, info.opacity, info.opengl, info.legend, info.datalabels, info.fill);
 
     // return 0
     return Rf_allocVector(INTSXP,0);

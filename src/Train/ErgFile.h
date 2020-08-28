@@ -39,6 +39,7 @@
 #define SETTINGS 1
 #define DATA     2
 #define END      3
+#define TEXTS    4
 
 // is this in .erg or .mrc format?
 #define ERG     1
@@ -75,11 +76,11 @@ class ErgFileSection
 class ErgFileText
 {
     public:
-        ErgFileText() : x(0), pos(0), text("") {}
-        ErgFileText(double x, int pos, QString text) : x(x), pos(pos), text(text) {}
+        ErgFileText() : x(0), duration(0), text("") {}
+        ErgFileText(double x, int duration, QString text) : x(x), duration(duration), text(text) {}
 
         double x;
-        int pos;
+        int duration;
         QString text;
 };
 
@@ -106,18 +107,18 @@ class ErgFile
         static ErgFile *fromContent(QString, Context *); // read from memory *.erg
         static ErgFile *fromContent2(QString, Context *); // read from memory *.erg2
 
-        static bool isWorkout(QString); // is this a supported workout?
+        static bool isWorkout(QString);  // is this a supported workout?
 
-        void reload();          // reload after messed about
+        void reload();                   // reload after messed about
 
         void parseComputrainer(QString p = ""); // its an erg,crs or mrc file
-        void parseTacx();       // its a pgmf file
-        void parseZwift();      // its a zwo file (zwift xml)
-        void parseGpx();        // its a gpx...
-        void parseErg2(QString p = "");       // ergdb
-        void parseTTS();        // its ahh tts
+        void parseTacx();                // its a pgmf file
+        void parseZwift();               // its a zwo file (zwift xml)
+        void parseFromRideFileFactory(); // its something we can parse using ridefilefactory...
+        void parseErg2(QString p = "");  // ergdb
+        void parseTTS();                 // its ahh tts
 
-        bool isValid();         // is the file valid or not?
+        bool isValid();                  // is the file valid or not?
 
         double Cp;
         int format;                      // ERG, CRS, MRC, ERG2 currently supported
@@ -127,6 +128,8 @@ class ErgFile
 
         int nextLap(long);      // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         int currentLap(long);   // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+
+        int nextText(long);     // return the index for the next text cue
 
         // turn the ergfile into a series of sections rather
         // than a list of points

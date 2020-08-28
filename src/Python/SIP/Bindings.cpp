@@ -44,9 +44,11 @@ QString Bindings::version() const
     return VERSION_STRING;
 }
 
-int
+bool
 Bindings::webpage(QString url) const
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
+
 #ifdef Q_OS_WIN
     url = url.replace("://C:", ":///C:"); // plotly fails to use enough slashes
     url = url.replace("\\", "/");
@@ -54,21 +56,24 @@ Bindings::webpage(QString url) const
 
     QUrl p(url);
     python->chart->emitUrl(p);
-    return 0;
+    return true;
 }
 
 bool 
 Bindings::configChart(QString title, int type, bool animate, int pos, bool stack, int orientation) const
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
     python->chart->emitChart(title, type, animate, pos, stack, orientation);
     return true;
 }
 
 bool 
-Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QString xname, QString yname,
+Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels,  QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill) const
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
+
     QVector<double>xs, ys;
 
     // xseries type conversion
@@ -98,7 +103,7 @@ Bindings::setCurve(QString name, PyObject *xseries, PyObject *yseries, QString x
     }
 
     // now just add via the chart
-    python->chart->emitCurve(name, xs, ys, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    python->chart->emitCurve(name, xs, ys, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
     return true;
 }
 
@@ -106,6 +111,7 @@ bool
 Bindings::configAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories)
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
     python->chart->emitAxis(name, visible, align, min, max, type, labelcolor, color, log, categories);
     return false;
 }
@@ -113,6 +119,8 @@ Bindings::configAxis(QString name, bool visible, int align, double min, double m
 bool
 Bindings::addAnnotation(QString, QString s1, QString s2, double)
 {
+    if (!python->chart) return false; // Do nothing when no chart is avaliable
+
     // we will reuse later but for now just assume its a label
     // will likely need to refactor all of this and create an
     // annotation class to throw around, but lets wait till we
@@ -879,7 +887,7 @@ PythonXDataSeries::PythonXDataSeries()
 
 bool PythonXDataSeries::set(int i, double value)
 {
-    if (rideFile) {
+    if (!readOnly && rideFile) {
         if (!setColIdx()){
             return false;
         }
@@ -1026,11 +1034,11 @@ Bindings::activityMetrics(RideItem* item) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
         double value = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
 
         // Override if we have precomputed values in ScriptContext (UserMetric)
@@ -1046,11 +1054,11 @@ Bindings::activityMetrics(RideItem* item) const
     //
     // META
     //
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            context->specialFields.isMetric(field.name)) continue;
+            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // add to the dict
         PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
@@ -1220,12 +1228,12 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
     // METRICS
     //
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
     for(int i=0; i<factory.metricCount();i++) {
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1247,11 +1255,11 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
     //
     // META
     //
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            context->specialFields.isMetric(field.name)) continue;
+            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // Create a string list
         PyObject* metalist = PyList_New(rides);
@@ -1426,11 +1434,11 @@ Bindings::seasonIntervals(DateRange range, QString type) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
@@ -1538,11 +1546,11 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(IntervalItem *item, ride->intervals()) {
@@ -1693,12 +1701,12 @@ Bindings::metrics(QString metric, bool all, QString filter) const
     }
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
     for(int i=0; i<factory.metricCount();i++) {
 
         QString symbol = factory.metricName(i);
         const RideMetric *m = factory.rideMetric(symbol);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
@@ -1938,7 +1946,7 @@ Bindings::seasonPmc(bool all, QString metric) const
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++) {
             QString symbol = factory.metricName(i);
-            QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
             name.replace(" ","_");
 
             if (name == metric) {

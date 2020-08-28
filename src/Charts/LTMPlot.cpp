@@ -2558,7 +2558,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2698,7 +2698,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2734,6 +2734,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2792,7 +2793,8 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                         }
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -2841,7 +2843,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
         // PARSE + EVALUATE
         Result res = parser.evaluate(ride, NULL);
-        if (res.isNumber) value = res.number;
+        if (res.isNumber) value = res.number();
 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
@@ -2877,6 +2879,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2908,7 +2911,8 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -3003,6 +3007,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -3038,7 +3043,8 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -3518,7 +3524,6 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds; 
 
             } else {
@@ -3620,7 +3625,6 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3686,7 +3690,7 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, context->athlete->useMetricUnits);
+        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, GlobalContext::context()->useMetricUnits);
 
         if (value || wantZero) {
             unsigned long seconds = 1;
@@ -3705,7 +3709,6 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3841,7 +3844,6 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -4038,7 +4040,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             c.next();
             if (c.value() == curve) {
                 const RideMetric *metric =factory.rideMetric(c.key());
-                units = metric ? metric->units(context->athlete->useMetricUnits) : "";
+                units = metric ? metric->units(GlobalContext::context()->useMetricUnits) : "";
                 precision = metric ? metric->precision() : 1;
 
                 // BikeScore, RI and Daniels Points have no units

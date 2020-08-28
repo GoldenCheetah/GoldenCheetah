@@ -180,6 +180,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class ManualRideDialog;
         friend class PolarFileReader;
         friend class Strava;
+        friend class ErgFile; // access to intervals
         // split and mergers
         friend class MergeActivityWizard;
         friend class SplitActivityWizard;
@@ -610,6 +611,7 @@ struct RideFileReader {
 };
 
 class MetricAggregator;
+class AthleteCard;
 class RideFileFactory {
 
     private:
@@ -624,6 +626,7 @@ class RideFileFactory {
 
         friend class ::MetricAggregator;
         friend class ::RideCache;
+        friend class ::AthleteCard;
 
         // will become private as code should work with
         // in memory representation not on disk .. but as we

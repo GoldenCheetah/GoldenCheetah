@@ -1095,7 +1095,6 @@ GcChartWindow::exportChartToCloudDB()
 
     // block the upload of charts which do not contain any usefull configuration
     if ( chart.ChartType.toInt() == GcWindowTypes::RideSummary ||
-         chart.ChartType.toInt() == GcWindowTypes::Overview ||
          chart.ChartType.toInt() == GcWindowTypes::MetadataWindow ||
          chart.ChartType.toInt() == GcWindowTypes::Summary ||
          chart.ChartType.toInt() == GcWindowTypes::RideEditor ||

@@ -100,7 +100,11 @@ class RideCache : public QObject
 
         // restore / dump cache to disk (json)
         void load();
+        void postLoad();
         void save(bool opendata=false, QString filename="");
+
+        // find entry quickly
+        int find(RideItem *);
 
         // user updated options/preferences
         void configChanged(qint32);
@@ -123,6 +127,7 @@ class RideCache : public QObject
     signals:
 
         void modelProgress(int, int); // let others know when we're refreshing the model estimates
+        void loadComplete(); // when loading the cache completes...
 
         // us telling the world the item changed
         void itemChanged(RideItem*);
@@ -135,11 +140,16 @@ class RideCache : public QObject
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
         friend class ::Leaf; // get weekly performances
+        friend class ::RideItem; // adds to deletelist in destructor
+        friend class ::NavigationModel; // checks deletelist during redo/undo
 
         Context *context;
         QDir directory, plannedDirectory;
 
-        QVector<RideItem*> rides_, reverse_, delete_;
+        // rides and reverse are the main lists
+        // delete_ is a list of items to garbage collect (delete later)
+        // deletelist is a list of items that no longer exist (deleted)
+        QVector<RideItem*> rides_, reverse_, delete_, deletelist;
         RideCacheModel *model_;
         bool exiting;
 	    double progress_; // percent

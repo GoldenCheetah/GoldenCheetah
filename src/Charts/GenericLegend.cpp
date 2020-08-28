@@ -152,7 +152,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.setFont(QFont());
 
     // series
-    painter.drawText(namerect, name, Qt::AlignHCenter|Qt::AlignVCenter);
+    painter.drawText(namerect, Qt::TextSingleLine, name);
     painter.drawText(valuerect, string, Qt::AlignHCenter|Qt::AlignVCenter);
     painter.restore();
 
@@ -279,7 +279,7 @@ GenericLegend::removeAllSeries()
 }
 
 void
-GenericLegend::setValue(QPointF value, QString name)
+GenericLegend::setValue(GPointF value, QString name)
 {
     GenericLegendItem *call = items.value(name, NULL);
     if (call) call->setValue(value.y());

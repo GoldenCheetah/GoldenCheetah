@@ -46,7 +46,7 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT, ACTIVITIES, ATHLETE };
 
 //
 // Configuration widget for ALL Overview Items
@@ -78,6 +78,7 @@ class OverviewItemConfig : public QWidget
 
         // editor for program
         DataFilterEdit *editor;
+        SearchFilterBox *filterEditor;
         QLabel *errors;
 
         // block updates during initialisation
@@ -103,6 +104,7 @@ class KPIOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -131,6 +133,7 @@ class RPEOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -157,6 +160,7 @@ class MetricOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -170,6 +174,71 @@ class MetricOverviewItem : public ChartSpaceItem
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
+
+        int rank; // rank 1,2 or 3
+        QString beststring;
+        QPixmap gold, silver, bronze; // medals
+};
+
+// top N uses this to hold details for date range
+struct topnentry {
+
+public:
+
+    topnentry(QDate date, double v, QString value, QColor color, int tsb, RideItem *item) : date(date), v(v), value(value), color(color), tsb(tsb), item(item) {}
+    inline bool operator<(const topnentry &other) const { return (v > other.v); }
+    inline bool operator>(const topnentry &other) const { return (v < other.v); }
+    QDate date;
+    double v; // for sorting
+    QString value; // as should be shown
+    QColor color; // ride color
+    int tsb; // on the day
+    RideItem *item;
+};
+
+class TopNOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    // want a meta property for property animation
+    Q_PROPERTY(int transition READ getTransition WRITE setTransition)
+
+    public:
+
+        TopNOverviewItem(ChartSpace *parent, QString name, QString symbol);
+        ~TopNOverviewItem();
+
+        // transition animation 0-100
+        int getTransition() const {return transition;}
+        void setTransition(int x) { if (transition !=x) {transition=x; update();}}
+
+        bool sceneEvent(QEvent *event);
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *) {} // doesn't support analysis view
+        void setDateRange(DateRange);
+        QRectF hotspot();
+        QWidget *config() { return new OverviewItemConfig(this); }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new TopNOverviewItem(parent, "PowerIndex", "power_index"); }
+
+        QString symbol;
+        RideMetric *metric;
+        QString units;
+
+        QList<topnentry> ranked;
+
+        // maximums to index from
+        QString maxvalue;
+        double maxv,minv;
+
+        // animation
+        int transition;
+        QPropertyAnimation *animator;
+
+        // interaction
+        bool click;
 };
 
 class MetaOverviewItem : public ChartSpaceItem
@@ -184,6 +253,7 @@ class MetaOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -211,6 +281,7 @@ class PMCOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -233,6 +304,7 @@ class ZoneOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         void dragChanged(bool x);
         QWidget *config() { return new OverviewItemConfig(this); }
 
@@ -248,6 +320,51 @@ class ZoneOverviewItem : public ChartSpaceItem
         QBarCategoryAxis *barcategoryaxis;
 };
 
+struct aggmeta {
+    aggmeta(QString category, double value, double percentage, double count)
+    : category(category), value(value), percentage(percentage), count(count) {}
+
+    QString category;
+    double value, percentage, count;
+};
+
+class DonutOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        DonutOverviewItem(ChartSpace *parent, QString name, QString symbol, QString meta);
+        ~DonutOverviewItem();
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *) {} // trends view only
+        void setDateRange(DateRange);
+        void dragChanged(bool x);
+        QWidget *config() { return new OverviewItemConfig(this); }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent) { return new DonutOverviewItem(parent, tr("Sport"), "ride_count", "Sport"); }
+
+        // config
+        QString symbol, meta;
+        RideMetric *metric;
+
+        // Categories and values
+        QVector<aggmeta> values;
+        QString value, valuename; // currently hovered...
+
+        // Viz
+        QChart *chart;
+        QBarSet *barset;
+        QBarSeries *barseries;
+        QBarCategoryAxis *barcategoryaxis;
+
+    public slots:
+        void hoverSlice(QPieSlice *slice, bool state);
+};
+
 class RouteOverviewItem : public ChartSpaceItem
 {
     Q_OBJECT
@@ -260,6 +377,7 @@ class RouteOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange) {} // doesn't support trends view
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
@@ -280,12 +398,15 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setDateRange(DateRange);
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
+        static ChartSpaceItem *createInterval(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
+        static ChartSpaceItem *createActivities(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Activities"), "activity_date", "average_power", "coggan_tss"); }
 
         QString xsymbol, ysymbol, zsymbol;
+        int xdp, ydp;
         BubbleViz *bubble;
 };
 
@@ -298,13 +419,15 @@ class IntervalOverviewItem : public ChartSpaceItem
 class BPointF {
 public:
 
-    BPointF() : x(0), y(0), z(0), fill(GColor(Qt::gray)) {}
+    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(Qt::gray)), item(NULL) {}
 
     double score(BPointF &other);
 
     double x,y,z;
+    double xoff, yoff; // add to x,y,z when converting to string (used for dates)
     QColor fill;
     QString label;
+    RideItem *item;
 };
 
 
@@ -317,6 +440,8 @@ class BubbleViz : public QObject, public QGraphicsItem
 
     // want a meta property for property animation
     Q_PROPERTY(int transition READ getTransition WRITE setTransition)
+    Q_PROPERTY(QPointF yaxis READ getYAxis WRITE setYAxis)
+    Q_PROPERTY(QPointF xaxis READ getXAxis WRITE setXAxis)
 
     public:
         BubbleViz(IntervalOverviewItem *parent, QString name=""); // create and say how many days
@@ -330,19 +455,15 @@ class BubbleViz : public QObject, public QGraphicsItem
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
-        // null members for now just get hooked up
-        void setPoints(QList<BPointF>points);
+        // axes
+        QPointF getYAxis() const { return QPointF(miny,maxy); }
+        void setYAxis(QPointF x) { miny=x.x(); maxy=x.y(); update(); }
+        QPointF getXAxis() const { return QPointF(minx,maxx); }
+        void setXAxis(QPointF x) { minx=x.x(); maxx=x.y(); update(); }
 
-        void setRange(double minx, double maxx, double miny, double maxy) {
-            oldminx = this->minx;
-            oldminy = this->miny;
-            oldmaxx = this->maxx;
-            oldmaxy = this->maxy;
-            this->minx=minx;
-            this->maxx=maxx;
-            this->miny=miny;
-            this->maxy=maxy;
-        }
+        // null members for now just get hooked up
+        void setPoints(QList<BPointF>points, double minx, double maxx, double miny, double maxy);
+
         void setAxisNames(QString xlabel, QString ylabel) { this->xlabel=xlabel; this->ylabel=ylabel; update(); }
 
         // needed as pure virtual in QGraphicsItem
@@ -363,14 +484,16 @@ class BubbleViz : public QObject, public QGraphicsItem
 
         // where is the cursor?
         bool hover;
+        bool click;
         QPointF plotpos;
 
         // for animated transition
         QList <BPointF> oldpoints; // for animation
         int transition;
         double oldmean;
-        double oldminx,oldmaxx,oldminy,oldmaxy;
-        QPropertyAnimation *animator;
+
+        QSequentialAnimationGroup *group;
+        QPropertyAnimation *transitionAnimation, *xaxisAnimation, *yaxisAnimation;
 
         // chart settings
         QList <BPointF> points;
@@ -422,12 +545,14 @@ class RPErating : public QGraphicsItem
 class Sparkline : public QGraphicsItem
 {
     public:
-        Sparkline(QGraphicsWidget *parent, int count,QString name=""); // create and say how many days
+        Sparkline(QGraphicsWidget *parent, QString name="", bool bigdot=true); // create and say how many days
 
         // we monkey around with this *A LOT*
         void setGeometry(double x, double y, double width, double height);
         QRectF geometry() { return geom; }
 
+        void setDays(int n) { sparkdays=n; } // defaults to SPARKDAYS
+        void setFill(bool x) { fill = x; }
         void setPoints(QList<QPointF>);
         void setRange(double min, double max); // upper lower
 
@@ -444,6 +569,9 @@ class Sparkline : public QGraphicsItem
         QRectF geom;
         QString name;
         double min, max;
+        int sparkdays;
+        bool bigdot;
+        bool fill;
         QList<QPointF> points;
 };
 
@@ -526,4 +654,45 @@ class ProgressBar : public QObject, public QGraphicsItem
 
         QPropertyAnimation *animator;
 };
+
+// simple button to use on graphics views
+class Button : public QObject, public QGraphicsItem
+{
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
+    public:
+        Button(QGraphicsItem *parent, QString text);
+
+        void setText(QString text) { this->text = text; update(); }
+        void setFont(QFont font) { this->font = font; }
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+
+        // needed as pure virtual in QGraphicsItem
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+
+        QRectF boundingRect() const {
+            QPointF pos=mapToParent(geom.x(), geom.y());
+            return QRectF(pos.x(), pos.y(), geom.width(), geom.height());
+        }
+
+        // for interaction
+        bool sceneEvent(QEvent *event);
+
+    signals:
+        void clicked();
+
+    private:
+        QGraphicsItem *parent;
+        QString text;
+        QFont font;
+
+        QRectF geom;
+        enum { None, Clicked } state;
+};
+
 #endif // _GC_OverviewItem_h

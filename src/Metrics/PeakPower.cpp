@@ -99,12 +99,10 @@ class PeakPercent : public RideMetric {
 class PowerZone : public RideMetric {
 
     Q_DECLARE_TR_FUNCTIONS(PowerZone)
-    double maxp;
-    double minp;
 
     public:
 
-    PowerZone() : maxp(0.0), minp(10000)
+    PowerZone()
     {
         setType(RideMetric::Average);
         setSymbol("power_zone");
@@ -153,7 +151,7 @@ class PowerZone : public RideMetric {
             // use Pmax as upper bound, this is used
             // for the limit of upper zone ALWAYS
             const int pmax = zones->getPmax(item->zoneRange);
-            high = std::max(high, pmax);
+            high = std::min(high, pmax);
             
             // how far in?
             percent = double(ap-low) / double(high-low);

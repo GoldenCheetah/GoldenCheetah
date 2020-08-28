@@ -76,13 +76,8 @@ class Athlete : public QObject
         // basic athlete info
         QString cyclist; // the cyclist name
         QUuid id; // unique identifier
-        bool useMetricUnits;
         AthleteDirectoryStructure *home;
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
-
-        // metadata definitions
-        RideMetadata *rideMetadata_;
-        ColorEngine *colorEngine;
 
         // zones
         const Zones *zones(bool isRun) const { return zones_[isRun]; }
@@ -132,9 +127,6 @@ class Athlete : public QObject
         RideImportWizard *autoImport;
         RideAutoImportConfig *autoImportConfig;
 
-        // ride metadata definitions
-        RideMetadata *rideMetadata() { return rideMetadata_; }
-
         // preset charts
         QList<LTMSettings> presets;
         void loadCharts(); // load charts.xml
@@ -166,6 +158,7 @@ class Athlete : public QObject
     public slots:
         void checkCPX(RideItem*ride);
         void configChanged(qint32);
+        void loadComplete();
 
 };
 
@@ -223,6 +216,5 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_media;
 
 };
-
 
 #endif

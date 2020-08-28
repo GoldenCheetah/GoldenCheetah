@@ -100,7 +100,7 @@ class GenericLegend : public QWidget {
 
     public slots:
 
-        void setValue(QPointF value, QString name);
+        void setValue(GPointF value, QString name);
         void unhover(QString name);
         void unhoverx();
         void setClickable(bool x);

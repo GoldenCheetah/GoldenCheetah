@@ -56,6 +56,7 @@ public slots:
     void triggerContextMenu(int);
     void removeWidget(int);
     void setText(int index, QString);
+    void setColor(int index, QColor);
     void setCurrentIndex(int index);
     void scrollLeft();
     void scrollRight();
@@ -122,6 +123,7 @@ class ChartBarItem : public QWidget
     public:
         ChartBarItem(ChartBar *parent);
         void setText(QString _text) { text = _text; }
+        void setColor(QColor _color) { color = _color; update(); }
         void setChecked(bool _checked) { checked = _checked; update(); }
         bool isChecked() { return checked; }
         void setWidth(int x) { setFixedWidth(x); }
@@ -148,6 +150,7 @@ class ChartBarItem : public QWidget
         int indexPos(int); // calculating drop position
         ChartBarItem *dragging;
 
+        QColor color; // background when selected
         bool checked;
         bool highlighted;
         bool red;

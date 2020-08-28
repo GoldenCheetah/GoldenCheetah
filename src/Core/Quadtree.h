@@ -23,6 +23,15 @@
 #include <QRectF>
 #include <QList>
 
+class GPointF : public QPointF
+{
+public:
+    GPointF() : QPointF(), index(-1) {}
+    GPointF(double x, double y, int index) : QPointF(x,y), index(index) {}
+
+    int index;
+};
+
 class GenericPlot;
 class Quadtree;
 class QuadtreeNode
@@ -40,17 +49,17 @@ class QuadtreeNode
               topleft(topleft), bottomright(bottomright), mid((topleft+bottomright)/2.0), leaf(true) {}
 
         // is the point in our space - when inserting
-        bool contains(QPointF p) { return ((p.x() >= topleft.x() && p.x() <= bottomright.x()) &&
+        bool contains(GPointF p) { return ((p.x() >= topleft.x() && p.x() <= bottomright.x()) &&
                                            p.y() >= topleft.y() && p.y() <= bottomright.y()); }
 
         // do we overlap with the search space - when looking
         bool intersect(QRectF r) { return r.intersects(QRectF(topleft,bottomright)); }
 
         // add a point - return false if not added
-        bool insert(Quadtree *root, QPointF value);
+        bool insert(Quadtree *root, GPointF value);
 
         // get candidates in same quadrant (might be miles away for big quadrant).
-        int candidates(QRectF,QList<QPointF>&tohere);
+        int candidates(QRectF,QList<GPointF>&tohere);
 
     protected:
 
@@ -64,7 +73,7 @@ class QuadtreeNode
         QuadtreeNode *aabb[4];
 
         // the points in this quadrant
-        QList<QPointF> contents;
+        QList<GPointF> contents;
 
         // if no children in aabb leaf==true
         bool leaf;
@@ -79,10 +88,10 @@ class Quadtree
         ~Quadtree();
 
         // add a point - returns false if not in range
-        bool insert(QPointF x);
+        bool insert(GPointF x);
 
         // find points in boundg rect, of course might be long way away...
-        int candidates(QRectF rect, QList<QPointF>&tohere) { return root->candidates(rect, tohere); }
+        int candidates(QRectF rect, QList<GPointF>&tohere) { return root->candidates(rect, tohere); }
 
         // manage the entire child tree on a single qvector to delete quickly
         QuadtreeNode *newnode(QPointF topleft, QPointF bottomright);

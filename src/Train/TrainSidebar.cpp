@@ -179,7 +179,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
 #endif //GC_VIDEO_NONE
 
-    deviceTree = new QTreeWidget;
+    deviceTree = new DeviceTreeView;
     deviceTree->setFrameStyle(QFrame::NoFrame);
     if (appsettings->value(this, TRAIN_MULTI, false).toBool() == true)
         deviceTree->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -299,6 +299,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     // handle config changes
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(deviceTreeMenuPopup(const QPoint &)));
+    connect(deviceTree,SIGNAL(itemMoved(int, int)), this, SLOT(moveDevices(int, int)));
 
 #if !defined GC_VIDEO_NONE
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
@@ -1635,7 +1636,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             rtData.setAltitude(displayAltitude); // always set display altitude
 
             double distanceTick = 0;
-            bool fReceivedKphTelemetry = false;
 
             // fetch the right data from each device...
             foreach(int dev, activeDevices) {
@@ -1679,7 +1679,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setRouteDistance(local.getRouteDistance());
                     rtData.setLapDistance(local.getLapDistance());
                     rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
-                    fReceivedKphTelemetry = true;
                 }
                 if (dev == wattsTelemetry) {
                     rtData.setWatts(local.getWatts());
@@ -1815,6 +1814,21 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     }
                 }
 
+                // Text Cues
+                if (ergFile && ergFile->Texts.count() > 0) {
+                    // find the next cue
+                    double pos = status&RT_MODE_ERGO ? load_msecs : displayWorkoutDistance*1000;
+                    int idx = ergFile->nextText(pos);
+                    if (idx >= 0) {
+                        ErgFileText cue = ergFile->Texts.at(idx);
+                        // show when we are approaching it
+                        if (((status&RT_MODE_ERGO) && cue.x<load_msecs+1000) ||
+                            ((status&RT_MODE_SLOPE) && cue.x < displayWorkoutDistance*1000 + 10)) {
+                            emit setNotification(cue.text, cue.duration);
+                        }
+                    }
+                }
+
                 if(lapTimeRemaining < 0) {
                         if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
                         if (lapTimeRemaining < 0)
@@ -1943,11 +1957,6 @@ void TrainSidebar::steerScroll(int scrollAmount)
         emit setNotification(tr("Recalibrating steering.."), 10);
     else
         context->notifySteerScroll(scrollAmount);
-}
-
-// can be called from the controller
-void TrainSidebar::nextDisplayMode()
-{
 }
 
 void TrainSidebar::warnnoConfig()
@@ -2740,6 +2749,21 @@ TrainSidebar::deleteDevice()
     context->notifyConfigChanged(CONFIG_DEVICES);
 }
 
+void
+TrainSidebar::moveDevices(int oldposition, int newposition)
+{
+    // get the configuration
+    DeviceConfigurations all;
+    QList<DeviceConfiguration>list = all.getList();
+
+    // move the devices
+    list.move(oldposition, newposition);
+    all.writeConfig(list);
+
+    // tell everyone
+    context->notifyConfigChanged(CONFIG_DEVICES);
+}
+
 // we have been told to select this video (usually because
 // the user just dragndropped it in)
 void
@@ -2823,6 +2847,7 @@ TrainSidebar::remoteControl(uint16_t command)
 // HRV R-R data received
 void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 {
+    Q_UNUSED(count)
     if (status&RT_RECORDING && rrFile == NULL && recordFile != NULL) {
         QString rrfile = recordFile->fileName().replace("csv", "rr");
         //fprintf(stderr, "First r-r, need to open file %s\n", rrfile.toStdString().c_str()); fflush(stderr);
@@ -2953,4 +2978,29 @@ int TrainSidebar::getCalibrationIndex()
         Devices[index].controller->setCalibrationTimestamp();
 
     return index;
+}
+
+DeviceTreeView::DeviceTreeView()
+{
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropOverwriteMode(true);
+}
+
+void
+DeviceTreeView::dropEvent(QDropEvent* event)
+{
+    // get the list of the items that are about to be dropped
+    QTreeWidgetItem* item = selectedItems()[0];
+
+    // row we started on
+    int idx1 = indexFromItem(item).row();
+
+    // the default implementation takes care of the actual move inside the tree
+    QTreeWidget::dropEvent(event);
+
+    // moved to !
+    int idx2 = indexFromItem(item).row();
+
+    // notify subscribers in some useful way
+    Q_EMIT itemMoved(idx1, idx2);
 }

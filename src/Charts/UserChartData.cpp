@@ -40,6 +40,7 @@ UserChartData::UserChartData(Context *context, UserChart *parent, QString script
     fz = rt->functions.contains("z") ? rt->functions.value("z") : NULL;
     ft = rt->functions.contains("t") ? rt->functions.value("t") : NULL;
     fd = rt->functions.contains("d") ? rt->functions.value("d") : NULL;
+    ff = rt->functions.contains("f") ? rt->functions.value("f") : NULL;
 
 }
 
@@ -67,7 +68,7 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
     // is it relevant ?
     if (frelevant) {
         relevant = root->eval(rt, frelevant, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-        if (relevant.number == 0) return;
+        if (relevant.number() == 0) return;
     }
 
     // process samples, if there are any and a function exists
@@ -114,5 +115,6 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
     if (fz) z = root->eval(rt, fz, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
     if (ft) t = root->eval(rt, ft, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
     if (fd) d = root->eval(rt, fd, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (ff) f = root->eval(rt, ff, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
 
 }

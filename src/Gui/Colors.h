@@ -29,6 +29,7 @@
 // A selection of distinct colours, user can adjust also
 extern QList<QColor> standardColors;
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
+extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 
 // dialog scaling
 extern double dpiXFactor, dpiYFactor;
@@ -138,13 +139,14 @@ class GCColor : public QObject
 };
 
 // return a color for a ride file
+class GlobalContext;
 class ColorEngine : public QObject
 {
     Q_OBJECT
     G_OBJECT
 
     public:
-        ColorEngine(Context *);
+        ColorEngine(GlobalContext *);
 
         QColor colorFor(QString);
         QColor defaultColor, reverseColor;
@@ -154,7 +156,7 @@ class ColorEngine : public QObject
 
     private:
         QMap<QString, QColor> workoutCodes;
-        Context *context;
+        GlobalContext *gc; // bootstrapping
 };
 
 

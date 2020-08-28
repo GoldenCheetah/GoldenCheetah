@@ -5,6 +5,7 @@
 #                                                                             #
 ###############################################################################
 
+!versionAtLeast(QT_VERSION, 5.13):error("Use at least Qt version 5.13")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -683,22 +684,22 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
            Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h
 
 # cloud services
-HEADERS += Cloud/BodyMeasuresDownload.h Cloud/CalendarDownload.h Cloud/CloudService.h \
+HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
-           Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/HrvMeasuresDownload.h Cloud/Xert.h
+           Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h
 
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
-           Core/Measures.h Core/BodyMeasures.h Core/HrvMeasures.h Core/BlinnSolver.h Core/Quadtree.h
+           Core/Measures.h Core/Quadtree.h
 
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
-           FileIO/BodyMeasuresCsvImport.h FileIO/CommPort.h \
+           FileIO/CommPort.h \
            FileIO/Computrainer3dpFile.h FileIO/CsvRideFile.h FileIO/DataProcessor.h FileIO/Device.h  \
            FileIO/FitlogParser.h FileIO/FitlogRideFile.h FileIO/FitRideFile.h FileIO/GcRideFile.h FileIO/GpxParser.h \
            FileIO/GpxRideFile.h FileIO/JouleDevice.h FileIO/JsonRideFile.h FileIO/LapsEditor.h FileIO/MacroDevice.h \
@@ -709,7 +710,8 @@ HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h Fi
            FileIO/SlfParser.h FileIO/SlfRideFile.h FileIO/SmfParser.h FileIO/SmfRideFile.h FileIO/SmlParser.h \
            FileIO/SmlRideFile.h FileIO/SrdRideFile.h FileIO/SrmRideFile.h FileIO/SyncRideFile.h FileIO/TcxParser.h \
            FileIO/TcxRideFile.h FileIO/TxtRideFile.h FileIO/WkoRideFile.h FileIO/XDataDialog.h FileIO/XDataTableModel.h \
-           FileIO/FilterHRV.h FileIO/HrvMeasuresCsvImport.h FileIO/LocationInterpolation.h FileIO/TTSReader.h
+           FileIO/FilterHRV.h FileIO/MeasuresCsvImport.h FileIO/LocationInterpolation.h FileIO/TTSReader.h \
+           FileIO/EpmParser.h FileIO/EpmRideFile.h
 
 # GUI components
 HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/ChooseCyclistDialog.h Gui/ColorButton.h \
@@ -720,12 +722,13 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/SolveCPDialog.h Gui/Tab.h Gui/TabView.h Gui/ToolsRhoEstimator.h \
            Gui/Views.h Gui/BatchExportDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/NewMainWindow.h Gui/NewSideBar.h \
            Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h Gui/SolverDisplay.h Gui/MetricSelect.h \
-           Gui/AddChartWizard.h
+           Gui/AddChartWizard.h Gui/NavigationModel.h Gui/AthleteView.h Gui/AthleteConfigDialog.h Gui/AthletePages.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
            Metrics/PDModel.h Metrics/PMCData.h Metrics/PowerProfile.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h \
-           Metrics/Statistic.h Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h
+           Metrics/Statistic.h Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h \
+           Metrics/BlinnSolver.h
 
 ## Planning and Compliance
 HEADERS += Planning/PlanningWindow.h
@@ -741,7 +744,8 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/DeviceTypes.h Train/DialWindow.h Train/ErgDBDownloadDialog.h Train/ErgDB.h Train/ErgFile.h Train/ErgFilePlot.h \
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
-           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h
+           Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
+           Train/PolynomialRegression.h Train/MultiRegressionizer.h
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/TodaysPlanWorkoutDownload.h
@@ -773,22 +777,22 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
            Charts/TreeMapWindow.cpp
 
 ## Cloud Services / Web resources
-SOURCES += Cloud/BodyMeasuresDownload.cpp Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
+SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
-           Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/HrvMeasuresDownload.cpp Cloud/Xert.cpp
+           Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
-           Core/Measures.cpp Core/BodyMeasures.cpp Core/HrvMeasures.cpp Core/BlinnSolver.cpp Core/Quadtree.cpp
+           Core/Measures.cpp Core/Quadtree.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
-           FileIO/BodyMeasuresCsvImport.cpp FileIO/CommPort.cpp \
+           FileIO/CommPort.cpp \
            FileIO/Computrainer3dpFile.cpp FileIO/CsvRideFile.cpp FileIO/DataProcessor.cpp FileIO/Device.cpp \
            FileIO/FitlogParser.cpp FileIO/FitlogRideFile.cpp FileIO/FitRideFile.cpp FileIO/FixAeroPod.cpp FileIO/FixDeriveDistance.cpp \
            FileIO/FixDeriveHeadwind.cpp FileIO/FixDerivePower.cpp FileIO/FixDeriveTorque.cpp FileIO/FixElevation.cpp FileIO/FixLapSwim.cpp \
@@ -802,8 +806,8 @@ SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.c
            FileIO/Serial.cpp FileIO/SlfParser.cpp FileIO/SlfRideFile.cpp FileIO/SmfParser.cpp FileIO/SmfRideFile.cpp FileIO/SmlParser.cpp \
            FileIO/SmlRideFile.cpp FileIO/Snippets.cpp FileIO/SrdRideFile.cpp FileIO/SrmRideFile.cpp FileIO/SyncRideFile.cpp \
            FileIO/TacxCafRideFile.cpp FileIO/TcxParser.cpp FileIO/TcxRideFile.cpp FileIO/TxtRideFile.cpp FileIO/WkoRideFile.cpp \
-           FileIO/XDataDialog.cpp FileIO/XDataTableModel.cpp FileIO/FilterHRV.cpp FileIO/HrvMeasuresCsvImport.cpp \
-           FileIO/LocationInterpolation.cpp FileIO/TTSReader.cpp
+           FileIO/XDataDialog.cpp FileIO/XDataTableModel.cpp FileIO/FilterHRV.cpp FileIO/MeasuresCsvImport.cpp \
+           FileIO/LocationInterpolation.cpp FileIO/TTSReader.cpp FileIO/EpmRideFile.cpp FileIO/EpmParser.cpp
 
 ## GUI Elements and Dialogs
 SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp Gui/ChooseCyclistDialog.cpp Gui/ColorButton.cpp \
@@ -814,7 +818,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/SolveCPDialog.cpp Gui/Tab.cpp Gui/TabView.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp \
            Gui/BatchExportDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp Gui/NewMainWindow.cpp Gui/NewSideBar.cpp \
            Gui/MergeActivityWizard.cpp Gui/RideImportWizard.cpp Gui/SplitActivityWizard.cpp Gui/SolverDisplay.cpp Gui/MetricSelect.cpp \
-           Gui/AddChartWizard.cpp
+           Gui/AddChartWizard.cpp Gui/NavigationModel.cpp Gui/AthleteView.cpp Gui/AthleteConfigDialog.cpp Gui/AthletePages.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/Banister.cpp Metrics/BasicRideMetrics.cpp \
@@ -824,7 +828,7 @@ SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.
            Metrics/PMCData.cpp Metrics/PowerProfile.cpp Metrics/RideMetadata.cpp Metrics/RideMetric.cpp Metrics/RunMetrics.cpp \
            Metrics/SwimMetrics.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
            Metrics/TimeInZone.cpp Metrics/TRIMPPoints.cpp Metrics/UserMetric.cpp Metrics/UserMetricParser.cpp Metrics/VDOTCalculator.cpp \
-           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp
+           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp Metrics/BlinnSolver.cpp
 
 ## Planning and Compliance
 SOURCES += Planning/PlanningWindow.cpp
@@ -843,7 +847,8 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/DeviceTypes.cpp Train/DialWindow.cpp Train/ErgDB.cpp Train/ErgDBDownloadDialog.cpp Train/ErgFile.cpp Train/ErgFilePlot.cpp \
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
-           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp
+           Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
+           Train/PolynomialRegression.cpp
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     SOURCES  += Train/TodaysPlanWorkoutDownload.cpp

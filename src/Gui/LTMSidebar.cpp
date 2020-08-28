@@ -324,6 +324,33 @@ LTMSidebar::configChanged(qint32)
  *----------------------------------------------------------------------*/
 
 void
+LTMSidebar::selectDateRange(DateRange dr)
+{
+    for(int i=0; i<seasons->seasons.count(); i++) {
+        Season s = seasons->seasons.at(i);
+        if (s.start == dr.from && s.end == dr.to && s.name == dr.name) {
+            // bingo
+            dateRangeTree->selectionModel()->clearSelection(); // clear selection
+            allDateRanges->child(i)->setSelected(true); // select ours
+            return;
+        } else {
+            QStringList names=dr.name.split("/");
+            if (names.count() == 2 && s.name == names.at(0)) {
+                for (int j=0; j<s.phases.count(); j++) {
+                    Phase p = s.phases.at(j);
+                    if (p.start == dr.from && p.end == dr.to && p.name == names.at(1)) {
+                        // bingo
+                        dateRangeTree->selectionModel()->clearSelection(); // clear selection
+                        allDateRanges->child(i)->child(j)->setSelected(true); // select ours
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void
 LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 {
     if (active == true) return;
@@ -714,7 +741,7 @@ LTMSidebar::setAutoFilterMenu()
 
     // Convert field names for Internal to Display (to work with the translated values)
     SpecialFields sp;
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         if (field.tab != "" && (field.type == 0 || field.type == 2)) { // we only do text or shorttext fields
 
@@ -786,7 +813,7 @@ LTMSidebar::autoFilterChanged()
             // Convert field names for Internal to Display (to work with the translated values)
             SpecialFields sp;
             // update the values available in the tree
-            foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
                 if (sp.displayName(field.name) == action->text()) {
                     foreach (QString value, context->athlete->rideCache->getDistinctValues(field.name)) {
                         if (value == "") value = tr("(blank)");
@@ -944,7 +971,7 @@ LTMSidebar::autoFilterRefresh()
         QString fieldname = sp.internalName(item->splitterHandle->title());
 
         // update the values available in the tree
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             if (field.name == fieldname) {
                 foreach (QString value, context->athlete->rideCache->getDistinctValues(field.name)) {
                     if (value == "") value = tr("(blank)");

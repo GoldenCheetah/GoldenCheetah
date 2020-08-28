@@ -53,6 +53,9 @@ class HttpRequest;
 // using context (we are reentrant)
 struct RideDBContext {
 
+    // athlete folder name
+    QString folder;
+
     // either reading a cache or providing an api ...
     RideCache *cache;
     Context *context;
@@ -78,6 +81,7 @@ struct RideDBContext {
 
     // is cache/rideDB.json an older version ?
     bool old;
+    int loading;
 };
 
 #endif

@@ -54,6 +54,8 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(setRide(RideItem*)));
     } else {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(setDateRange(DateRange)));
+        connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
+        connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
     }
 
     // need to refresh when chart settings change
@@ -139,6 +141,8 @@ UserChart::setRide(RideItem *item)
  void
  UserChart::refresh()
  {
+    if (!amVisible()) { stale=true; return; }
+
     // ok, we've run out of excuses, looks like we need to plot
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
 
@@ -159,11 +163,29 @@ UserChart::setRide(RideItem *item)
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
         ucd->compute(ride, Specification(), dr);
-        series.xseries = ucd->x.vector;
-        series.yseries = ucd->y.vector;
+        series.xseries = ucd->x.asNumeric();
+        series.yseries = ucd->y.asNumeric();
+        series.fseries = ucd->f.asString();
+
+        // pie charts need labels
+        if (chartinfo.type == GC_CHART_PIE) {
+            series.labels.clear();
+            for(int i=0; i<ucd->x.asString().count(); i++) series.labels << ucd->x.asString()[i];
+
+            series.colors.clear();
+            QColor min=QColor(series.color);
+            QColor max=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            for(int i=0; i<series.labels.count(); i++) {
+                QColor color = QColor(min.red() + (double(max.red()-min.red()) * (i/double(series.labels.count()))),
+                              min.green() + (double(max.green()-min.green()) * (i/double(series.labels.count()))),
+                              min.blue() + (double(max.blue()-min.blue()) * (i/double(series.labels.count()))));
+
+                series.colors << color.name();
+            }
+        }
 
         // data now generated so can add curve
-        chart->addCurve(series.name, series.xseries, series.yseries, series.xname, series.yname,
+        chart->addCurve(series.name, series.xseries, series.yseries, series.fseries, series.xname, series.yname,
                         series.labels, series.colors,
                         series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels, series.fill);
 
@@ -184,6 +206,43 @@ UserChart::setRide(RideItem *item)
         // config has changed. might be a better way to handle this but
         // it works for now.
         if (axis.orientation == Qt::Horizontal)  axis.labelcolor = axis.axiscolor = GColor(CPLOTMARKER);
+
+        // on a user chart the series sets the categories for a bar chart
+        // find the first series for this axis and set the categories
+        // to the x series values.
+        if (chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Horizontal) {
+            // find the first series for axis.name
+            foreach(GenericSeriesInfo s, seriesinfo) {
+                if (s.xname == axis.name && s.user1) {
+                    axis.type =  GenericAxisInfo::CATEGORY;
+                    axis.categories.clear();
+                    UserChartData *ucd = static_cast<UserChartData*>(s.user1);
+                    for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
+                    break;
+                }
+            }
+        }
+
+        // we need to set max and min based upon the barsets for bar charts since
+        // the generic plot only looks are series associated with an axis and we have 0 of those
+        if (min==-1 && max==-1 && chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Vertical) {
+
+            // loop through all the series and look at max and min y values
+            bool first=true;
+            foreach(GenericSeriesInfo s, seriesinfo) {
+                if (s.yname == axis.name && s.user1) {
+                    UserChartData *ucd = static_cast<UserChartData*>(s.user1);
+                    for(int i=0; i<ucd->y.asNumeric().count(); i++) {
+                        double yy = ucd->y.asNumeric()[i];
+                        if (first || yy > max) max = yy;
+                        if (first || yy < min) min = yy;
+                        first = false;
+                    }
+                    break;
+                }
+            }
+            if (min >0 && max >0) min=0;
+        }
 
         // we do NOT set align, this is managed in generic plot on our behalf
         // we also don't hide axes, so visible is always set to true
@@ -389,7 +448,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
 
     // Chart tab
     QWidget *cs= new QWidget(this);
-    tabs->addTab(cs, "Chart");
+    tabs->addTab(cs, tr("Chart"));
 
     QVBoxLayout *vf = new QVBoxLayout(cs);
     QFormLayout *cf = new QFormLayout();
@@ -446,7 +505,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // Series tab
     QWidget *seriesWidget = new QWidget(this);
     QVBoxLayout *seriesLayout = new QVBoxLayout(seriesWidget);
-    tabs->addTab(seriesWidget, "Series");
+    tabs->addTab(seriesWidget, tr("Series"));
 
     seriesTable = new QTableWidget(this);
 #ifdef Q_OS_MAX
@@ -509,7 +568,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // axis tab
     QWidget *axisWidget = new QWidget(this);
     QVBoxLayout *axisLayout = new QVBoxLayout(axisWidget);
-    tabs->addTab(axisWidget, "Axes");
+    tabs->addTab(axisWidget, tr("Axes"));
 
     axisTable = new QTableWidget(this);
 #ifdef Q_OS_MAX
@@ -996,7 +1055,6 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";

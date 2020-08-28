@@ -85,6 +85,7 @@ class RealtimePlot;
 class RealtimeData;
 class MultiDeviceDialog;
 class TrainBottom;
+class DeviceTreeView;
 
 class TrainSidebar : public GcWindow
 {
@@ -112,7 +113,6 @@ class TrainSidebar : public GcWindow
         // was realtimewindow,merged into tool
         // update charts/dials and manage controller
         void updateData(RealtimeData &);      // to update telemetry by push devices
-        void nextDisplayMode();     // show next display mode
         void setStreamController();     // based upon selected device
 
         // this
@@ -148,6 +148,7 @@ class TrainSidebar : public GcWindow
 
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
+        void moveDevices(int, int);
 
         void devicePopup();
         void workoutPopup();
@@ -230,7 +231,7 @@ class TrainSidebar : public GcWindow
         QSqlTableModel *videosyncModel;
         QSqlTableModel *workoutModel;
 
-        QTreeWidget *deviceTree;
+        DeviceTreeView *deviceTree;
         QTreeView *workoutTree;
         QTreeView *videosyncTree;
         QTreeView *mediaTree;
@@ -339,5 +340,18 @@ class MultiDeviceDialog : public QDialog
 
         QPushButton *applyButton, *cancelButton;
 };
-#endif // _GC_TrainSidebar_h
 
+class DeviceTreeView : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        DeviceTreeView();
+
+    signals:
+        void itemMoved(int previous, int actual);
+
+    protected:
+        void dropEvent(QDropEvent* event);
+};
+#endif // _GC_TrainSidebar_h

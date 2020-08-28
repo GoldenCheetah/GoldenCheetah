@@ -62,10 +62,12 @@ class SaveSingleDialogWidget;
 class ChooseCyclistDialog;
 class SearchFilterBox;
 class NewSideBar;
+class AthleteView;
 
 
 class MainWindow;
 class Athlete;
+class AthleteLoader;
 class Context;
 class Tab;
 
@@ -93,13 +95,20 @@ class MainWindow : public QMainWindow
 
         // currently selected tab
         Tab *athleteTab() { return currentTab; }
+        NewSideBar *newSidebar() { return sidebar; }
+
+        // tab view keeps this up to date
+        QAction *showhideSidebar;
 
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
         // have already been opened
         friend class ::ChooseCyclistDialog;
+        friend class ::AthleteLoader;
         QMap<QString,Tab*> tabs;
+        Tab *currentTab;
+        QList<Tab*> tabList;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -111,6 +120,11 @@ class MainWindow : public QMainWindow
         QWidget *splash;
         void setSplash(bool first=false);
         void clearSplash();
+
+    signals:
+        void backClicked();
+        void forwardClicked();
+        void openingAthlete(QString, Context *);
 
     public slots:
 
@@ -129,17 +143,14 @@ class MainWindow : public QMainWindow
         void importCharts(QStringList);
 
         // open and closing windows and tabs
-        void closeAll();    // close all windows and tabs
-
-        void setOpenWindowMenu(); // set the Open Window menu
-        void newCyclistWindow();  // create a new Cyclist
-        void openWindow(QString name);
         void closeWindow();
 
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
         void openTab(QString name);
+        void loadCompleted(QString name, Context *context);
         void closeTabClicked(int index); // user clicked to close tab
+        bool closeTab(QString name); // close named athlete
         bool closeTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
         void removeTab(Tab*);  // remove without question
@@ -157,6 +168,7 @@ class MainWindow : public QMainWindow
         void setFilter(QStringList);
         void clearFilter();
 
+        void selectAthlete();
         void selectHome();
         void selectDiary();
         void selectAnalysis();
@@ -202,9 +214,8 @@ class MainWindow : public QMainWindow
         void showWorkoutWizard();
         void importWorkout();
 
-        // Measures View
-        void downloadBodyMeasures();
-        void downloadHrvMeasures();
+        // Measures
+        void downloadMeasures();
 
         // cloud
         void uploadCloud(QAction *);
@@ -262,8 +273,7 @@ class MainWindow : public QMainWindow
     private:
 
         NewSideBar *sidebar;
-        Tab *currentTab;
-        QList<Tab*> tabList;
+        AthleteView *athleteView;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
@@ -273,19 +283,20 @@ class MainWindow : public QMainWindow
 
         // Not on Mac so use other types
         QPushButton *sidelist, *lowbar;
+        QPushButton *back, *forward;
         QtSegmentControl *styleSelector;
         GcToolBar *head;
 
         // the icons
-        QIcon sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
+        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;
-        QStackedWidget *tabStack;
+        QStackedWidget *viewStack, *tabStack;
 
         // window and tab menu
-        QMenu *openWindowMenu, *openTabMenu;
-        QSignalMapper *windowMapper, *tabMapper;
+        QMenu *openTabMenu;
+        QSignalMapper *tabMapper;
 
         // upload and sync menu
         QMenu *uploadMenu, *syncMenu;
@@ -300,7 +311,6 @@ class MainWindow : public QMainWindow
 
         // Toolbar state checkables in View menu / context
         QAction *styleAction;
-        QAction *showhideSidebar;
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;

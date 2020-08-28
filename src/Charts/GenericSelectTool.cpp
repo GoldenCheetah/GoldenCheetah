@@ -32,7 +32,7 @@ GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphi
     mode = RECTANGLE;
     setVisible(true); // always visible - paints on axis
     setZValue(100); // always on top.
-    hoverpoint = QPointF();
+    hoverpoint = GPointF();
     hoverseries = NULL;
     hoveraxis = NULL;
     rect = QRectF(0,0,0,0);
@@ -111,7 +111,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     //
                     // SCATTER PLOT HOVERED POINT
                     //
-                    if (hoverpoint != QPointF()) {
+                    if (hoverpoint != GPointF()) {
                         // draw a circle using marker color
                         QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                         painter->setBrush(invert);
@@ -380,7 +380,6 @@ QRectF GenericSelectTool::boundingRect() const { return rect; }
 
 // trap events and redirect to plot event handler
 bool GenericSelectTool::sceneEventFilter(QGraphicsItem *watched, QEvent *event) { return host->eventHandler(0, watched,event); }
-bool GenericPlot::eventFilter(QObject *obj, QEvent *e) { return eventHandler(1, obj, e); }
 
 bool
 GenericSelectTool::reset()
@@ -390,7 +389,7 @@ GenericSelectTool::reset()
     start=QPointF(0,0);
     finish=QPointF(0,0);
     rect = QRectF(0,0,0,0);
-    hoverpoint = QPointF();
+    hoverpoint = GPointF();
     hoverseries = NULL;
     hoverpoints.clear();
     hoveraxis = NULL;
@@ -403,16 +402,35 @@ GenericSelectTool::reset()
 
 // handle mouse events in selector
 bool
+GenericSelectTool::seriesClicked()
+{
+    // clicked on a point in the series
+    return clicked(QPointF()); // ignore mostly
+}
+
+bool
 GenericSelectTool::clicked(QPointF pos)
 {
     bool updatescene = false;
+
+    // click on a point to click-thru
+    if (hoverpoint.index != -1) { // scatter plot
+        emit seriesClicked(hoverseries, hoverpoint);
+
+        // not sure need to do this....
+        hoverpoints.clear();
+        hoverpoint=GPointF();
+        return false;
+
+    } else if (pos == QPointF()) { // series clicked and not hovering
+        return false;
+
+    }
 
     if (mode == XRANGE || mode == RECTANGLE) {
 
         if (hoveraxis) return false;
 
-        hoverpoints.clear();
-        hoverpoint=QPointF();
 
         if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
 
@@ -506,7 +524,7 @@ GenericSelectTool::released(QPointF pos)
 
             // finishing move/resize
             state = ACTIVE;
-            hoverpoint=QPointF();
+            hoverpoint=GPointF();
             hoverpoints.clear();
             rectchanged = true;
             update(rect);
@@ -600,8 +618,8 @@ GenericSelectTool::moved(QPointF pos)
             // this needs to be super quick as mouse
             // movements are very fast, so we use a
             // quadtree to find the nearest points
-            QPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
-            hoverpoint = QPointF(); // screen coordinates
+            GPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
+            hoverpoint = GPointF(); // screen coordinates
             QAbstractSeries *originalhoverseries = hoverseries;
             hoverseries = NULL;
             foreach(QAbstractSeries *series, host->qchart->series()) {
@@ -618,18 +636,18 @@ GenericSelectTool::moved(QPointF pos)
                     //QPointF vpos = host->qchart->mapToValue(pos, series);
 
                     // find candidates all close by using paint co-ords
-                    QList<QPointF> tohere;
+                    QList<GPointF> tohere;
                     tree->candidates(vrect, tohere);
 
                     QPointF cursorpos=mapFromScene(pos);
-                    foreach(QPointF p, tohere) {
+                    foreach(GPointF p, tohere) {
                         QPointF scpos = mapFromScene(host->qchart->mapToPosition(p, series));
-                        if (hoverpoint == QPointF()) {
-                            hoverpoint = scpos;
+                        if (hoverpoint == GPointF()) {
+                            hoverpoint = GPointF(scpos.x(), scpos.y(), p.index);
                             hoverseries = series;
                             hoverv = p;
                         } else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength()) {
-                            hoverpoint=scpos; // not happy with this XXX needs more work
+                            hoverpoint=GPointF(scpos.x(), scpos.y(), p.index);
                             hoverseries = series;
                             hoverv = p;
                         }
@@ -641,13 +659,13 @@ GenericSelectTool::moved(QPointF pos)
             }
 
             // hoverpoint changed - either a new series selected, a new point, or no point at all
-            if (originalhoverseries != hoverseries || hoverv != QPointF()) {
+            if (originalhoverseries != hoverseries || hoverv != GPointF()) {
                 if (hoverseries != originalhoverseries && originalhoverseries != NULL) emit (unhover(originalhoverseries->name())); // old hover changed
                 if (hoverseries != NULL)  emit hover(hoverv, hoverseries->name(), hoverseries); // new hover changed
             }
 
             // we need to clear x-axis if we aren't hovering on anything at all
-            if (hoverv == QPointF()) {
+            if (hoverv == GPointF()) {
                 emit unhoverx();
             }
 
@@ -660,7 +678,7 @@ GenericSelectTool::moved(QPointF pos)
             // user hovers with a vertical line, but can select a range on the x axis
             // lets get x axis value (any old series will do as they should have a common x axis
             spos = pos;
-            QMap<QAbstractSeries*,QPointF> vals; // what values were found
+            QMap<QAbstractSeries*,GPointF> vals; // what values were found
             double nearestx=-9999;
             foreach(QAbstractSeries *series, host->qchart->series()) {
 
@@ -689,7 +707,7 @@ GenericSelectTool::moved(QPointF pos)
                     QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
 
                     // collect them away
-                    vals.insert(series, QPointF(*i));
+                    vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
 
                     // nearest x?
                     if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
@@ -699,7 +717,7 @@ GenericSelectTool::moved(QPointF pos)
 
             // run over what we found, updating paint points and signal (for legend)
             hoverpoints.clear();
-            QMapIterator<QAbstractSeries*, QPointF> i(vals);
+            QMapIterator<QAbstractSeries*, GPointF> i(vals);
             while (i.hasNext()) {
                 i.next();
                 if (i.value().x() == nearestx) {
@@ -918,7 +936,7 @@ GenericSelectTool::setSeriesVisible(QString name, bool visible)
     // but for now this is the quickes and simplest way
     // to avoid artefacts
     hoverpoints.clear();
-    hoverpoint=QPointF();
+    hoverpoint=GPointF();
 
     // hide/show and updatescenes may overlap/get out of sync
     // so we update scene to be absolutely sure the scene
