@@ -1518,6 +1518,12 @@ void TrainSidebar::Connect()
     activeDevices = devices();
 
     foreach(int dev, activeDevices) {
+        Devices[dev].controller->setWheelCircumference(Devices[dev].wheelSize);
+        Devices[dev].controller->setRollingResistance(bicycle.RollingResistance());
+        Devices[dev].controller->setWindResistance(bicycle.WindResistance());
+        Devices[dev].controller->setWeight(bicycle.MassKG());
+        Devices[dev].controller->setWindSpeed(0); // Move to loadUpdate when wind simulation is added
+
         Devices[dev].controller->start();
         Devices[dev].controller->resetCalibrationState();
         connect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);

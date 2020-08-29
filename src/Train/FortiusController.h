@@ -52,6 +52,7 @@ public:
     void setLoad(double);
     void setGradient(double);
     void setMode(int);
+    void setWeight(double);
 };
 
 #endif // _GC_FortiusController_h
