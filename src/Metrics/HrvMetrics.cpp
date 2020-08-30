@@ -824,8 +824,8 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        if (item->getHrvMeasure("Recovery_Points") > 0)
-            setValue(item->getHrvMeasure("Recovery_Points"));
+        if (item->getHrvMeasure("RECOVERY_POINTS") > 0)
+            setValue(item->getHrvMeasure("RECOVERY_POINTS"));
         else if (item->getHrvMeasure("RMSSD") > 0)
             setValue(1.5 * log(item->getHrvMeasure("RMSSD")) + 2);
         else
