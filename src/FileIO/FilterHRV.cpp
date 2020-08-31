@@ -284,7 +284,7 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         // Set HRV Measures according to user request
         if (setRestHrv) {
             RideItem *rideItem = ride->context->rideItem();
-            QStringList fieldSymbols = ride->context->athlete->measures->getFieldNames(Measures::Hrv);
+            QStringList fieldSymbols = ride->context->athlete->measures->getFieldSymbols(Measures::Hrv);
 
             double avnn = rideItem->getForSymbol("AVNN");
 
