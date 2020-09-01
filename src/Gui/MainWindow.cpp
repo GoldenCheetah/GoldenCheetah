@@ -123,6 +123,8 @@
 QList<MainWindow *> mainwindows;
 extern QDesktopWidget *desktop;
 extern ConfigDialog *configdialog_ptr;
+extern QString gl_version;
+extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
 
 MainWindow::MainWindow(const QDir &home)
 {
@@ -370,6 +372,18 @@ MainWindow::MainWindow(const QDir &home)
     spacer->setFixedWidth(5 *dpiYFactor);
     head->addWidget(spacer);
 
+
+    // check opengl is available with version 2 or higher
+    QOffscreenSurface surf;
+    surf.create();
+
+    QOpenGLContext ctx;
+    ctx.create();
+    ctx.makeCurrent(&surf);
+
+    // OpenGL version number
+    gl_version = QString::fromUtf8((char *)(ctx.functions()->glGetString(GL_VERSION)));
+    gl_major = Utils::number(gl_version);
 
     /*----------------------------------------------------------------------
      * Central Widget

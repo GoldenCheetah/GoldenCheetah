@@ -44,6 +44,8 @@
 #define SPACING 80
 #define ROWHEIGHT 80
 
+extern double gl_major;
+
 class ChartSpace;
 class ChartSpaceItemFactory;
 

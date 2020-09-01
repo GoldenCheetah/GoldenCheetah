@@ -62,9 +62,7 @@ void
 ColorButton::clicked()
 {
     // Color picker dialog
-    QColorDialog picker(this);
-    picker.setCurrentColor(color);
-    QColor rcolor = picker.getColor(color, this, tr("Choose Color"), QColorDialog::DontUseNativeDialog);
+    QColor rcolor = QColorDialog::getColor(color, this, tr("Choose Color"), QColorDialog::DontUseNativeDialog);
 
     // if we got a good color use it and notify others
     if (rcolor.isValid()) {

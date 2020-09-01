@@ -72,6 +72,8 @@
 
 #include "levmar.h"
 
+QString gl_version;
+
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
@@ -255,6 +257,7 @@ QString GcCrashDialog::versionHTML()
             "<br>DB Schema: %5"
             "<br>Metrics: %7"
             "<br>OS: %6"
+            "<br>OpenGL: %8"
             "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
@@ -266,7 +269,8 @@ QString GcCrashDialog::versionHTML()
 #endif
             .arg(schemaVersion)
             .arg(os)
-            .arg(factory.metricCount());
+            .arg(factory.metricCount())
+            .arg(gl_version);
 
     QString lib_version = tr(
             "<table>"

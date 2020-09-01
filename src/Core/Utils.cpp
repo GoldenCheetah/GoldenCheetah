@@ -488,5 +488,34 @@ smooth_ewma(QVector<double>&data, double alpha)
     return returning;
 }
 
+double
+number(QString x)
+{
+    // convert opening text to a number, ignore crap
+    // before and after something that looks like a number
+    // e.g. "xx yy zz 0.345 more crap" -> 0.345, "4.5.6 Nvidia 460" -> 4.5
+    bool innumber=false;
+    bool seendp=false;
+
+    // does not need to be high performace, used to coervce gl_version string to number
+    QString extract;
+
+    for(int i=0; i<x.length(); i++) {
+
+        // numeric digit
+        if (QString("0123456789").contains(x[i])) {
+            innumber = true;
+            extract += x[i];
+        } else if (innumber && (x[i] == "," ||  x[i]==".")) {
+            if (seendp) break;
+            else {
+                seendp = true;
+                extract += x[i];
+            }
+        } else if (innumber) break;
+    }
+    return extract.toDouble();
+}
+
 };
 

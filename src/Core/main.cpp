@@ -49,7 +49,7 @@
 #include <signal.h>
 
 
-#ifdef Q_OS_X11
+#ifdef GC_WANT_X11
 #include <X11/Xlib.h>
 #endif
 
@@ -326,7 +326,7 @@ main(int argc, char *argv[])
     listener = NULL;
 #endif
 
-#ifdef Q_OS_X11
+#ifdef GC_WANT_X11
     XInitThreads();
 #endif
 

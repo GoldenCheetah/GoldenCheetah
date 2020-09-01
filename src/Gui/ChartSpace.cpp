@@ -31,6 +31,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+double gl_major;
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
@@ -48,7 +49,13 @@ ChartSpace::ChartSpace(Context *context, int scope) :
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(this);
-    view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
+
+    // if we have OpenGL and its 2.0 or higher, lets use it.
+    // this is pretty much any GPU since 2004 and keeps Qt happy.
+    if (gl_major >= 2.0) {
+        view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
+        view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
+    }
     scrollbar = new QScrollBar(Qt::Vertical, this);
 
     // how to move etc

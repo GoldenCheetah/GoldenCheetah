@@ -177,7 +177,10 @@ macx {
 HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
 SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
 
-
+# X11
+if (defined(GC_WANT_X11)) {
+    LIBS += -lX11
+}
 
 ###=================
 ### LANGUAGE SUPPORT
