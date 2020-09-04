@@ -1195,7 +1195,8 @@ struct FitFileReaderState
         int i = 0;
 
         int index=-1;
-        int manu = -1, prod = -1, version = -1, type = -1, serial = -1;
+        int manu = -1, prod = -1, version = -1, type = -1;
+        quint32 serial = 0;
         fit_string_value name;
 
         QString deviceInfo;
@@ -1254,7 +1255,7 @@ struct FitFileReaderState
             deviceInfo += QString(" %1").arg(name.c_str());
         if (version>0)
             deviceInfo += QString(" (v%1)").arg(version/100.0);
-        if (serial>0 && serial < 100000)
+        if (serial > 0 && serial < std::numeric_limits<quint32>::max())
             deviceInfo += QString(" ID:%1").arg(serial);
 
         // What is 7 and 0 ?
