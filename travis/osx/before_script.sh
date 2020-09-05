@@ -2,8 +2,8 @@
 set -ev
 
 # Python 3.7.8
-curl -O https://www.python.org/ftp/python/3.7.8/python-3.7.8-macosx10.9.pkg
-sudo installer -pkg python-3.7.8-macosx10.9.pkg -target /
+curl -O https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg
+sudo installer -pkg python-3.7.9-macosx10.9.pkg -target /
 
 python3.7 --version
 python3.7-config --prefix
