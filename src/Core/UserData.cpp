@@ -238,12 +238,9 @@ EditUserDataDialog::cancelClicked()
 void
 EditUserDataDialog::colorClicked()
 {
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(color);
-
     // don't use native dialog, since there is a nasty bug causing focus loss
     // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor newcolor = picker.getColor(color, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor newcolor = QColorDialog::getColor(color, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     if (newcolor.isValid()) {
         setButtonIcon(color=newcolor);

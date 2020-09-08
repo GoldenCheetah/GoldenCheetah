@@ -2654,12 +2654,9 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(penColor);
-
     // don't use native dialog, since there is a nasty bug causing focus loss
     // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = picker.getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor color = QColorDialog::getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     if (color.isValid()) {
         setButtonIcon(penColor=color);

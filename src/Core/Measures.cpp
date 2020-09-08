@@ -271,7 +271,7 @@ Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
         dir, withData));
 
     groups.append(new MeasuresGroup("Hrv", tr("Hrv"),
-        QStringList()<<"RMSSD"<<"HR"<<"AVNN"<<"SDNN"<<"PNN50"<<"LF"<<"HF"<<"Recovery_Points",
+        QStringList()<<"RMSSD"<<"HR"<<"AVNN"<<"SDNN"<<"PNN50"<<"LF"<<"HF"<<"RECOVERY_POINTS",
         QStringList()<<tr("RMSSD")<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points"),
         QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
         QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
