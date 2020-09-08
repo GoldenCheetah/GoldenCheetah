@@ -392,8 +392,29 @@ void Fortius::run()
                 // UPDATE BASIC TELEMETRY (HR, CAD, SPD et al)
                 // The data structure is very simple, no bit twiddling needed here
                 //----------------------------------------------------------------
-
-                // buf[14] changes from time to time (controller status?)
+                // The first 12 bytes are almost always identical, with buf[10] being
+                // exceptionally 40 instead of 50:
+                //
+                // 20 9f 00 00 08 01 00 00 07 00 50 bd
+                //
+                // buf[12] is heart rate
+                // buf[13] is buttons
+                // buf[14, 15] change from time to time, 00 00 or 00 01 (controller status?)
+                // buf[16, 17] remain around 6d 02
+                // buf[18, 19] is the steering
+                // buf[20 - 27] remain constant at d0 07 d0 07 03 13 02 00
+                // buf[28 - 31] is the distance
+                // buf[32, 33] is the speed
+                // buf[34] varies around 2c
+                // buf[35] jumps mostly between 02 and 0e.
+                // buf[36, 37] vary with the speed but go to 0 more quickly than the speed or power
+                // buf[38, 39] is the torque output of the cyclist
+                // buf[40, 41] also vary somewhat with speed
+                // buf[42] pedal sensor, normally 0, 1 when the pedal passes near the sensor
+                // buf[43] remains 0
+                // buf[44, 45] cadence
+                // buf[46] is 0x02 when active, 0x00 at the end
+                // buf[47] varies even when the system is idle
                 
                 // buttons
                 curButtons = buf[13];
@@ -410,27 +431,24 @@ void Fortius::run()
             if (actualLength >= 48) {
                 // brake status status&0x04 == stopping wheel
                 //              status&0x01 == brake on
-                //curBrakeStatus = buf[42];
+                //curBrakeStatus = buf[46?];
                 
                 // pedal sensor is 0x01 when cycling
-                pedalSensor = buf[46];
+                pedalSensor = buf[42];
                 
-                // UNUSED curDistance = buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24);
+                // UNUSED curDistance = (buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24)) / 16384.0;
 
-                // cadence - confirmed correct
-				//qDebug() << "raw cadence " << buf[44];
                 curCadence = buf[44];
 				
                 // speed
-				//qDebug() << "raw speed " << buf[32];
+
                 curSpeed = 1.3f * (double)(qFromLittleEndian<quint16>(&buf[32])) / (3.6f * 100.00f);
-				
-                // power - changed scale from 10 to 13, seems correct in erg mode, slope mode needs work
-				//qDebug() << "raw power " << buf[38];
-                curPower = qFromLittleEndian<qint16>(&buf[38])/13;
+
+                // If this is torque, we could also compute power from distance and time				
+                curPower = qFromLittleEndian<qint16>(&buf[38]) * curSpeed / 448.5;
                 if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
                 
-                // average power over last 1s
+                // average power over last 10 readings
                 powertot += curPower;
                 powertot -= powerhist[powerindex];
                 powerhist[powerindex] = curPower;
@@ -440,8 +458,6 @@ void Fortius::run()
 
                 curPower *= powerScaleFactor; // apply scale factor
                 
-                // heartrate - confirmed correct
-				//qDebug() << "raw heartrate " << buf[12];
                 curHeartRate = buf[12];
 
                 // update public fields
@@ -491,8 +507,8 @@ void Fortius::run()
 
         
         // The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
-        // only packages (24byte).
-        msleep(10);
+        // only packages (24byte). Tacx software uses 100ms.
+        msleep(50);
     }
 }
 
@@ -525,38 +541,36 @@ int Fortius::sendCloseCommand()
 
 int Fortius::sendRunCommand(int16_t pedalSensor)
 {
-	int retCode = 0;
+    int retCode = 0;
     pvars.lock();
     int mode = this->mode;
-    int16_t gradient = (int16_t)this->gradient;
-    int16_t load = (int16_t)this->load;
-    unsigned int weight = (unsigned int)this->weight;
-    int16_t brakeCalibrationFactor = (int16_t)this->brakeCalibrationFactor;
+    double gradient = this->gradient;
+    double load = this->load;
+    double weight = this->weight;
+    double brakeCalibrationFactor = this->brakeCalibrationFactor;
     pvars.unlock();
     
     if (mode == FT_ERGOMODE)
     {
 		//qDebug() << "send load " << load;
 		
-        qToLittleEndian<int16_t>(13 * load, &ERGO_Command[4]);
+        qToLittleEndian<int16_t>((int16_t)(13 * load), &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
         
-        qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &ERGO_Command[10]);
+        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &ERGO_Command[10]);
                 
         retCode = rawWrite(ERGO_Command, 12);
     }
     else if (mode == FT_SSMODE)
     {
-        // Tacx driver appears to add an offset to create additional load at
-        // zero slope, also seems to be slightly dependent on weight but have
-        // ignored this for now.
-        qToLittleEndian<int16_t>(1300 * gradient + 507, &SLOPE_Command[4]);
+        qToLittleEndian<int16_t>((int16_t)(650 * gradient), &SLOPE_Command[4]);
         SLOPE_Command[6] = pedalSensor;
-        SLOPE_Command[9] = weight;
+        SLOPE_Command[9] = (unsigned int)weight;
         
-        qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &SLOPE_Command[10]);
+        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &SLOPE_Command[10]);
         
         retCode = rawWrite(SLOPE_Command, 12);
+        // qDebug() << "Send Gradient " << gradient << ", Weight " << weight << ", Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
     }
     else if (mode == FT_IDLE)
     {
