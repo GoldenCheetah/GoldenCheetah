@@ -391,18 +391,17 @@ class FixGPSConfig : public DataProcessorConfig
 
             // Altitude Outlier Criteria
 
-            outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier criteria %:"));
+            outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier Criteria - Centimeters:"));
             outlierSpinBox = new QDoubleSpinBox();
             outlierSpinBox->setRange(0.001, 10000);
             outlierSpinBox->setSingleStep(10);
             outlierSpinBox->setDecimals(3);
             outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
-            outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA (%)\n"
+            outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA - CENTIMETERS:\n"
                                           "An outlier point is one so eggregiously out of range that it should not be used to\n"
                                           "build the smoothing spline. A clear example consider a point at the north pole that\n"
-                                          "is part of a route in Seattle. This outlier criteria is the multiple of the data to\n"
-                                          "spline stddev past which a value will be considered an outlier and not used to compute\n"
-                                          "the final smoothing spline.\n"));
+                                          "is part of a route in Seattle. This outlier criteria is distance in centimeters from\n"
+                                          "spline.\n"));
 
             // ROUTE SMOOTHING CONTROLS
 
@@ -440,18 +439,18 @@ class FixGPSConfig : public DataProcessorConfig
                                                "the ridefile and can vary by sample. This is the degree to be\n"
                                                "used for the second pass spline made after outliers are removed.\n"));
 
-            outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria %:"));
+            outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria - Centimeters:"));
             outlierSpinBoxRoute = new QDoubleSpinBox();
             outlierSpinBoxRoute->setRange(0.001, 10000);
             outlierSpinBoxRoute->setSingleStep(10);
             outlierSpinBoxRoute->setDecimals(3);
             outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
-            outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA (%)"
+            outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA - CENTIMETERS"
                                                "An outlier point is one so eggregiously out of range that it should not be used to\n"
                                                "build the smoothing spline. A clear example consider a point at the north pole that\n"
-                                               "is part of a route in Seattle. This outlier criteria is the multiple of the data to\n"
-                                               "spline stddev past which a value will be considered an outlier and not used to compute\n"
-                                               "the final smoothing spline.\n"));
+                                               "is part of a route in Seattle. This outlier criteria is the distance from spline in\n"
+                                               "centimeters past which a value will be considered an outlier and not used to compute the\n"
+                                               "final smoothing spline.\n"));
 
             // If no ridefile is provided then present simple dialog
             if (rideFile == NULL)
@@ -795,6 +794,9 @@ double EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilo
 
     double t = prevT;
     double step = std::max(0.1, 1 / (double)sampleCount); // default step size if gradient descent isn't used.
+
+    step = std::min(step, (1. - t) / 2.);
+
     bool fGoingUp = true;
     bool fGradientPossible = true;
     double achievedPrecision = 1000000.;
@@ -855,6 +857,8 @@ double EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilo
                         step = evalStep;
                         fGoingUp = (step > 0);
                         fSuccess = true;
+                    } else {
+                        fGradientPossible = false;
                     }
                 }
             }
@@ -986,12 +990,14 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     if (degree1 >= 3) {
         // Push non-outliers to new input vector
         std::vector <Vector2<double>> inControls2;
-        for (int i = 0; i < outControls.size(); i++) {
-            double d = inControls[i][1] - outControls[i][1];
-            if (outlierCriteria > sqrt(d*d)) {
+        inControls2.push_back(inControls.front());
+        for (int i = 1; i < outControls.size() - 1; i++) {
+            double d = fabs(inControls[i][1] - outControls[i][1]);
+            if (outlierCriteria > d) {
                 inControls2.push_back(inControls[i]);
             }
         }
+        inControls2.push_back(inControls.back());
 
         // If there are outliers or second pass degree is different than first:
         // Create new bspline from non-outliers and redo interpolation.
@@ -1017,16 +1023,23 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     double slopeDistance = 0;
     double prevSlope = 0;
     for (int i = 1; i < outControls.size(); i++) {
-        double run = 10*(outControls[i][0] - outControls[i-1][0]);
+        // Use input distance because altitude smoothing does not rewrite it.
+        double run = inControls[i][0] - inControls[i-1][0];
         double rise = outControls[i][1] - outControls[i-1][1];
-        double slope = run ? (rise / run) : prevSlope;
+
+        double run10 = run * 10.;
+
+        double slope = prevSlope;
+
+        // Slope is noisy at end of route. Only compute new slope if outside a step of end of route. 
+        if (run && (inControls[i][0] + run < inControls.back()[0]))
+            slope = (rise / run10);
 
         stats.minSlope = std::min(stats.minSlope, slope);
         stats.maxSlope = std::max(stats.maxSlope, slope);
+        stats.sampleDistanceStdDev += (1000 * run10 * 1000 * run10);
 
-        slopeDistance += slope * run;
-
-        stats.sampleDistanceStdDev += (1000 * run * 1000 * run);
+        slopeDistance += slope * run10;
 
         prevSlope = slope;
     }
@@ -1124,7 +1137,7 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
             xyz out(outControls[i][1], outControls[i][2], outControls[i][3]);
 
             double d = out.subtract(in).magnitude();
-            if (outlierCriteria > sqrt(d*d)) {
+            if (outlierCriteria > d) {
                 inControls2.push_back(inControls[i]);
             }
         }
@@ -1249,12 +1262,12 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
         fDoSmoothAltitude    = ((FixGPSConfig*)(config))->doSmoothAltitude->checkState();
         degree0              = ((FixGPSConfig*)(config))->degree0SpinBox->value();
         degree1              = ((FixGPSConfig*)(config))->degree1SpinBox->value();
-        outlierCriteria      = (((FixGPSConfig*)(config))->outlierSpinBox->value()) / 100.;
+        outlierCriteria      = (((FixGPSConfig*)(config))->outlierSpinBox->value()) / 100.;      // cm to m
 
         fDoSmoothRoute       = ((FixGPSConfig*) (config))->doSmoothRoute->checkState();
         degree0Route         = ((FixGPSConfig*) (config))->degree0SpinBoxRoute->value();
         degree1Route         = ((FixGPSConfig*) (config))->degree1SpinBoxRoute->value();
-        outlierCriteriaRoute = (((FixGPSConfig*)(config))->outlierSpinBoxRoute->value()) / 100.;
+        outlierCriteriaRoute = (((FixGPSConfig*)(config))->outlierSpinBoxRoute->value()) / 100.; // cm to m
     } else {
         fDoSmoothAltitude     = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool();
         degree0               = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toUInt();
