@@ -225,7 +225,6 @@ main(int argc, char *argv[])
             fprintf(stderr, "usage: GoldenCheetah [[directory] athlete]\n\n");
             fprintf(stderr, "--help or --usage   to print this message and exit\n");
             fprintf(stderr, "--version           to print detailed version information and exit\n");
-            fprintf(stderr, "--newgui            to open the new gui (WIP)\n");
 #ifdef GC_WANT_HTTP
             fprintf(stderr, "--server            to run as an API server\n");
 #endif
@@ -255,9 +254,6 @@ main(int argc, char *argv[])
             QByteArray ba = text.toLocal8Bit();
             const char *c_str = ba.data();
             fprintf(stderr, "\n%s\n\n", c_str);
-
-        } else if (arg == "--newgui") {
-            newgui = true;
 
         } else if (arg == "--server") {
 #ifdef GC_WANT_HTTP
@@ -673,7 +669,7 @@ main(int argc, char *argv[])
 
         // lets attempt to open as asked/remembered
         bool anyOpened = false;
-        if (lastOpened != QVariant() && !newgui) {
+        if (lastOpened != QVariant()) {
             QStringList list = lastOpened.toStringList();
             QStringListIterator i(list);
             while (i.hasNext()) {
@@ -700,7 +696,7 @@ main(int argc, char *argv[])
         // ack, didn't manage to open an athlete
         // and the upgradeWarning was
         // lets ask the user which / create a new one
-        if (!anyOpened && !newgui) {
+        if (!anyOpened) {
             ChooseCyclistDialog d(home, true);
             d.setModal(true);
 
@@ -730,12 +726,6 @@ main(int argc, char *argv[])
                 delete trainDB;
                 terminate(0);
             }
-        }
-
-        // start with the new gui, a prototype in progress
-        if (newgui) {
-            NewMainWindow *newgui = new NewMainWindow(application);
-            newgui->show();
         }
 
         ret=application->exec();
