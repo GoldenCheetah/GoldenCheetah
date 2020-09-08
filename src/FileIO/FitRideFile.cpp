@@ -594,6 +594,18 @@ struct FitFileReaderState
         }
     }
 
+    QString getBatteryStatus(quint8 battery_status) {
+        switch (battery_status) {
+            case  1: return "new";
+            case  2: return "good";
+            case  3: return "ok";
+            case  4: return "low";
+            case  5: return "critical";
+            case  6: return "charging";
+            default: return "unknown";
+        }
+    }
+
     RideFile::SeriesType getSeriesForNative(int native_num) {
         switch (native_num) {
 
@@ -1197,6 +1209,7 @@ struct FitFileReaderState
         int index=-1;
         int manu = -1, prod = -1, version = -1, type = -1;
         quint32 serial = 0;
+        quint8 battery_status = 0;
         fit_string_value name;
 
         QString deviceInfo;
@@ -1213,11 +1226,10 @@ struct FitFileReaderState
                 case 1:   // ANT+ device type
                      type = value.v;
                      break;
-                      // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
                 case 2:   // manufacturer
                      manu = value.v;
                      break;
-                case 3:   // serial number (can be ANT id)
+                case 3:   // serial number
                      serial = value.v;
                      break;
                 case 4:   // product
@@ -1226,15 +1238,17 @@ struct FitFileReaderState
                 case 5:   // software version
                      version = value.v;
                      break;
+                case 11:  // battery status
+                     battery_status = value.v;
+                     break;
                 case 27:   // product name
                      name = value.s;
-                 break;
+                     break;
 
                 // all other fields are ignored at present
                 case 253: //timestamp
                 case 10:  // battery voltage
                 case 6:   // hardware version
-                case 11:  // battery status
                 case 22:  // ANT network
                 case 25:  // source type
                 case 24:  // equipment ID
@@ -1257,6 +1271,8 @@ struct FitFileReaderState
             deviceInfo += QString(" (v%1)").arg(version/100.0);
         if (serial > 0 && serial < std::numeric_limits<quint32>::max())
             deviceInfo += QString(" ID:%1").arg(serial);
+        if (battery_status > 0 && battery_status < 8)
+            deviceInfo += QString(" BAT:%1").arg(getBatteryStatus(battery_status));
 
         // What is 7 and 0 ?
         // 3 for Moxy ?
