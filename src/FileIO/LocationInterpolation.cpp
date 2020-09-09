@@ -54,6 +54,27 @@ xyz geolocation::toxyz() const
     return(xyz(dx, dy, dz));                             //Return x, y, z in ECEF
 }
 
+// Compute initial bearing from this geoloc to another, in RADIANS.
+// Note that unless bearing is 0 or pi it will vary on the path from one to the other.
+double geolocation::BearingTo(const geolocation& to) const
+{
+    if (this->Lat() == to.Lat() && this->Long() == to.Long())
+        return 0.;
+
+    double phi0   = degreestoradians(this->Lat());
+    double phi1   = degreestoradians(to.Lat());
+    double lamda0 = degreestoradians(this->Long());
+    double lamda1 = degreestoradians(to.Long());
+
+    double y = sin(lamda1 - lamda0) * cos(phi1);
+    double x = cos(phi0) * sin(phi1) - sin(phi0) * cos(phi1) * cos(lamda1 - lamda0);
+
+    double bearing = atan2(y, x);
+
+    return bearing;
+}
+
+
 geolocation xyz::togeolocation() const
 {
     // Approach developed by:

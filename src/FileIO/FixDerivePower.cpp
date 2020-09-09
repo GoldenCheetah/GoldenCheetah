@@ -21,18 +21,13 @@
 #include "Settings.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "LocationInterpolation.h"
 #include <algorithm>
 #include <QVector>
 
 #ifndef MATHCONST_PI
 #define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
 #endif
-
-static double DegreesToRadians(double degrees) {
-    static const double degToRad = MATHCONST_PI / 180.;
-
-    return degrees * degToRad;
-}
 
 // Config widget used by the Preferences/Options config panes
 class FixDerivePower;
@@ -275,18 +270,15 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 RideFilePoint *prevPoint = ride->dataPoints()[i-1];
 
                 // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-                if (  (prevPoint->lat != p->lat || prevPoint->lon != p->lon )
-                   && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-                   && (p->lat != 0 || p->lon != 0 ) ) {
-                            double phi0   = DegreesToRadians(prevPoint->lat);
-                            double phi1   = DegreesToRadians(p->lat);
-                            double lamda0 = DegreesToRadians(prevPoint->lon);
-                            double lamda1 = DegreesToRadians(p->lon);
+                if ( prevPoint->lat != p->lat || prevPoint->lon != p->lon ) 
+                {
+                    geolocation prevLoc(prevPoint->lat, prevPoint->lon, prevPoint->alt);
+                    geolocation loc(p->lat, p->lon, p->alt);
 
-                            double y = sin(lamda1 - lamda0) * cos(phi1);
-                            double x = cos(phi0) * sin(phi1) - sin(phi0) * cos(phi1) * cos(lamda1 - lamda0);
-
-                            bearing = atan2(y, x);
+                    if (prevLoc.IsReasonableGeoLocation() && loc.IsReasonableGeoLocation()) 
+                    {
+                        bearing = prevLoc.BearingTo(loc);
+                    }
                 }
             }
             // else keep previous bearing (or 0 at the beginning)
