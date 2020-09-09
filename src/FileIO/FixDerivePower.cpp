@@ -21,6 +21,7 @@
 #include "Settings.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "LocationInterpolation.h"
 #include <algorithm>
 #include <QVector>
 
@@ -269,11 +270,16 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 RideFilePoint *prevPoint = ride->dataPoints()[i-1];
 
                 // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-                if (  (prevPoint->lat != p->lat || prevPoint->lon != p->lon )
-                   && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-                   && (p->lat != 0 || p->lon != 0 ) )
-                            bearing = atan2(cos(p->lat)*sin(p->lon - prevPoint->lon),
-                                            cos(prevPoint->lat)*sin(p->lat)-sin(prevPoint->lat)*cos(p->lat)*cos(p->lon - prevPoint->lon));
+                if ( prevPoint->lat != p->lat || prevPoint->lon != p->lon ) 
+                {
+                    geolocation prevLoc(prevPoint->lat, prevPoint->lon, prevPoint->alt);
+                    geolocation loc(p->lat, p->lon, p->alt);
+
+                    if (prevLoc.IsReasonableGeoLocation() && loc.IsReasonableGeoLocation()) 
+                    {
+                        bearing = prevLoc.BearingTo(loc);
+                    }
+                }
             }
             // else keep previous bearing (or 0 at the beginning)
 
