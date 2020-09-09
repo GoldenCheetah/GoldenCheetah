@@ -28,6 +28,12 @@
 #define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
 #endif
 
+static double DegreesToRadians(double degrees) {
+    static const double degToRad = MATHCONST_PI / 180.;
+
+    return degrees * degToRad;
+}
+
 // Config widget used by the Preferences/Options config panes
 class FixDerivePower;
 class FixDerivePowerConfig : public DataProcessorConfig
@@ -271,9 +277,17 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
                 if (  (prevPoint->lat != p->lat || prevPoint->lon != p->lon )
                    && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-                   && (p->lat != 0 || p->lon != 0 ) )
-                            bearing = atan2(cos(p->lat)*sin(p->lon - prevPoint->lon),
-                                            cos(prevPoint->lat)*sin(p->lat)-sin(prevPoint->lat)*cos(p->lat)*cos(p->lon - prevPoint->lon));
+                   && (p->lat != 0 || p->lon != 0 ) ) {
+                            double phi0   = DegreesToRadians(prevPoint->lat);
+                            double phi1   = DegreesToRadians(p->lat);
+                            double lamda0 = DegreesToRadians(prevPoint->lon);
+                            double lamda1 = DegreesToRadians(p->lon);
+
+                            double y = sin(lamda1 - lamda0) * cos(phi1);
+                            double x = cos(phi0) * sin(phi1) - sin(phi0) * cos(phi1) * cos(lamda1 - lamda0);
+
+                            bearing = atan2(y, x);
+                }
             }
             // else keep previous bearing (or 0 at the beginning)
 
