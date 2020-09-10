@@ -695,16 +695,6 @@ class FixGPS : public DataProcessor {
 
 static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix GPS errors"), new FixGPS());
 
-bool IsReasonableAltitude(double alt) {
-    return (alt >= -1000 && alt < 10000);
-}
-
-bool IsReasonableGeoLocation(const geolocation *ploc) {
-    return  (ploc->Lat()  && ploc->Lat()  >= double(-90)  && ploc->Lat()  <= double(90) &&
-             ploc->Long() && ploc->Long() >= double(-180) && ploc->Long() <= double(180) &&
-             IsReasonableAltitude(ploc->Alt()));
-}
-
 class SaveState
 {
     double m_t;
@@ -934,12 +924,12 @@ bool GatherForAltitudeSmoothing(const RideFile *ride, std::vector < Vector2<doub
     for (int i = 0; i < ride->dataPoints().count(); i++) {
         const RideFilePoint * pi = (ride->dataPoints()[i]);
 
+        geolocation geoloc(pi->lat, pi->lon, pi->alt);
         if (fRequireReasonableGeoloc) {
-            geolocation geoloc(pi->lat, pi->lon, pi->alt);
-            if (!IsReasonableGeoLocation(&geoloc))
+            if (!geoloc.IsReasonableGeoLocation())
                 continue;
         } else {
-            if (!IsReasonableAltitude(pi->alt))
+            if (!geoloc.IsReasonableAltitude())
                 continue;
         }
 
@@ -990,6 +980,8 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     if (degree1 >= 3) {
         // Push non-outliers to new input vector
         std::vector <Vector2<double>> inControls2;
+
+        // Preserve first and last points forces spline to cover entire route distance.
         inControls2.push_back(inControls.front());
         for (int i = 1; i < outControls.size() - 1; i++) {
             double d = fabs(inControls[i][1] - outControls[i][1]);
@@ -1089,7 +1081,7 @@ bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>>
 
         geolocation geoloc(lat, lon, alt);
 
-        if (!IsReasonableGeoLocation(&geoloc))
+        if (!geoloc.IsReasonableGeoLocation())
             continue;
 
         xyz c = geoloc.toxyz();
@@ -1132,7 +1124,10 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
     if (degree1 >= 3) {
         // Push non-outliers to new input vector
         std::vector <Vector4<double>> inControls2;
-        for (int i = 0; i < outControls.size(); i++) {
+
+        // Preserve first and last points forces spline to cover entire route distance.
+        inControls2.push_back(inControls.front());
+        for (int i = 1; i < outControls.size() - 1; i++) {
             xyz in(inControls[i][1], inControls[i][2], inControls[i][3]);
             xyz out(outControls[i][1], outControls[i][2], outControls[i][3]);
 
@@ -1141,6 +1136,7 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
                 inControls2.push_back(inControls[i]);
             }
         }
+        inControls2.push_back(inControls.back());
 
         // Redo interpolation if there are outliers or pass2 degree is different than pass1 degree.
         routeSmoothingStats.outlierCount = (unsigned)(inControls.size() - inControls2.size());
@@ -1197,7 +1193,7 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
             geolocation curLoc(pi->lat, pi->lon, fHasAlt ? pi->alt : 0.0);
 
             // Activate interpolation if this sample isn't reasonable.
-            if (!IsReasonableGeoLocation(&curLoc)) {
+            if (!curLoc.IsReasonableGeoLocation()) {
                 double km = pi->km;
 
                 // Feed interpolator until it has samples that span current distance.
@@ -1207,7 +1203,7 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
                         geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
 
                         // Only feed reasonable locations to interpolator
-                        if (IsReasonableGeoLocation(&geo)) {
+                        if (geo.IsReasonableGeoLocation()) {
                             gpi.Push(pii->km, geo);
                         }
                         ii++;
