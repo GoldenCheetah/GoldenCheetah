@@ -20,6 +20,7 @@
 #define _GC_Athlete_h 1
 
 #include "Measures.h"
+#include "DataFilter.h"
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -134,6 +135,9 @@ class Athlete : public QObject
 
         // named filters / queries
         NamedSearches *namedSearches;
+
+        // DataFilter global storage/cache
+        QMap<QString,Result> dfcache;
 
         Context *context;
 

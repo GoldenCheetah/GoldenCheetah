@@ -320,6 +320,12 @@ static struct {
                        // kind of interpolation applied (resample/interpolate are available to
                        // do that if needed.
 
+    { "store", 2 },    // store("name", value) stores a global value that can be retrieved via
+                       // the fetch("name") function below. Useful for passing data across data series
+                       // in a user chart.
+    { "fetch", 1 },    // fetch("name") retrieves a value previously stored returns 0 if the value
+                       // is not in the athlete store
+
     // add new ones above this line
     { "", -1 }
 };
@@ -4647,6 +4653,28 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                 count++;
             }
             return Result(count);
+        }
+
+        // store/fetch from athlete storage
+        if (leaf->function == "store") {
+            // name and value in parameter 1 and 2
+            QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+            Result value= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            // store it away
+            m->context->athlete->dfcache.insert(name, value);
+
+            return Result(0);
+        }
+
+        if (leaf->function == "fetch") {
+            // name and value in parameter 1 and 2
+            QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+
+            // store it away
+            Result returning = m->context->athlete->dfcache.value(name, Result(0));
+
+            return returning;
         }
 
         // access user chart curve data, if it's there
