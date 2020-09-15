@@ -372,8 +372,9 @@ MainWindow::MainWindow(const QDir &home)
     spacer->setFixedWidth(5 *dpiYFactor);
     head->addWidget(spacer);
 
-
+#ifdef Q_OS_LINUX
     // check opengl is available with version 2 or higher
+    // only do this on Linux since Windows and MacOS have opengl "issues"
     QOffscreenSurface surf;
     surf.create();
 
@@ -384,6 +385,7 @@ MainWindow::MainWindow(const QDir &home)
     // OpenGL version number
     gl_version = QString::fromUtf8((char *)(ctx.functions()->glGetString(GL_VERSION)));
     gl_major = Utils::number(gl_version);
+#endif
 
     /*----------------------------------------------------------------------
      * Central Widget

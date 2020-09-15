@@ -257,7 +257,9 @@ QString GcCrashDialog::versionHTML()
             "<br>DB Schema: %5"
             "<br>Metrics: %7"
             "<br>OS: %6"
+#ifdef Q_OS_LINUX
             "<br>OpenGL: %8"
+#endif
             "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
@@ -270,7 +272,10 @@ QString GcCrashDialog::versionHTML()
             .arg(schemaVersion)
             .arg(os)
             .arg(factory.metricCount())
-            .arg(gl_version);
+#ifdef Q_OS_LINUX
+            .arg(gl_version)
+#endif
+            ;
 
     QString lib_version = tr(
             "<table>"
