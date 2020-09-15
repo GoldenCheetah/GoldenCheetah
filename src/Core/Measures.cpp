@@ -37,7 +37,7 @@ Measure::getFingerprint() const
 {
     quint64 x = 0;
 
-    x += when.date().toJulianDay();
+    x += when.toSecsSinceEpoch();
 
     for (int i = 0; i<MAX_MEASURES; i++) x += 1000.0 * values[i];
 

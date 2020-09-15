@@ -21,6 +21,7 @@
 #include <QIntValidator>
 
 #include <assert.h>
+#include <algorithm>
 
 #include "AthletePages.h"
 #include "Units.h"
@@ -684,6 +685,7 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
 
     // get a copy of group measures if the file exists
     measures = QList<Measure>(measuresGroup->measures());
+    std::reverse(measures.begin(), measures.end());
 
     // setup measuresTree
     for (int i=0; i<measures.count(); i++) {
@@ -711,7 +713,7 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
     if (measures.count() > 0) {
         for (int k = 0; k < fieldNames.count(); k++) {
             const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
-            valuesEdit[k]->setValue(measures.last().values[k]*unitsFactor);
+            valuesEdit[k]->setValue(measures[0].values[k]*unitsFactor);
         }
     }
 
@@ -772,6 +774,7 @@ MeasuresPage::saveClicked()
     }
     if (fingerprint != b4.fingerprint) {
         // store in athlete
+        std::reverse(measures.begin(), measures.end());
         measuresGroup->setMeasures(measures);
         // now save data away if we actually got something !
         measuresGroup->write();
@@ -799,12 +802,18 @@ MeasuresPage::addOReditClicked()
     } else {
         // add new
         index = measures.count();
+        for (int i = 0; i < measures.count(); i++) {
+            if (dateTimeEdit->dateTime() > measures[i].when) {
+                index = i;
+                break;
+            }
+        }
         add = new QTreeWidgetItem;
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
         measuresTree->invisibleRootItem()->insertChild(index, add);
     }
 
-    addMeasure.when = dateTimeEdit->dateTime().toUTC();
+    addMeasure.when = dateTimeEdit->dateTime();
     for (int k = 0; k < valuesEdit.count(); k++)
         addMeasure.values[k] = valuesEdit[k]->value();
     addMeasure.comment = comment->text();
