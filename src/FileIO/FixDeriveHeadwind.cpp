@@ -21,6 +21,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "LocationInterpolation.h"
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
@@ -141,12 +142,15 @@ FixDeriveHeadwind::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         }
 
         // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-        if (  (prevPoint->lat != point->lat || prevPoint->lon != point->lon )
-            && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-            && (point->lat != 0 || point->lon != 0 ) ) {
-                bearing = atan2(cos(point->lat)*sin(point->lon - prevPoint->lon),
-                                cos(prevPoint->lat)*sin(point->lat)-sin(prevPoint->lat)*cos(point->lat)*cos(point->lon - prevPoint->lon));
+        if (prevPoint->lat != point->lat || prevPoint->lon != point->lon)
+        {
+            geolocation prevLoc(prevPoint->lat, prevPoint->lon, prevPoint->alt);
+            geolocation loc(point->lat, point->lon, point->alt);
 
+            if (prevLoc.IsReasonableGeoLocation() && loc.IsReasonableGeoLocation())
+            {
+                bearing = prevLoc.BearingTo(loc);
+            }
         } //else keep previous bearing or 0 at beginning
 
         double headwind = cos(bearing - (windheading/ 180.0 * PI)) * (windspeed) + point->kph;
