@@ -120,8 +120,8 @@ class FixRunningPowerConfig : public DataProcessorConfig
                               "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
                               "Note: when the file already contains wind data, "
                               "it will be overridden if wind speed is set\n\n"
-                              "The activity has to be a Run with Speed, "
-                              "Altitude and without Power data.")));
+                              "The activity has to be a Run with Speed and "
+                              "Altitude.")));
         }
 
         void readConfig() {
@@ -170,7 +170,6 @@ static bool FixRunningPowerAdded = DataProcessorFactory::instance().registerProc
 bool
 FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
 
     // get settings
@@ -190,8 +189,11 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
         windHeading = ((FixRunningPowerConfig*)(config))->windHeading->value() / 180 * MATHCONST_PI; // rad
     }
 
-    // if not a run or its already there do nothing !
-    if (!ride->isRun() || ride->areDataPresent()->watts) return false;
+    // if not a run do nothing !
+    if (!ride->isRun()) return false;
+
+    // if called automatically and power already present, do nothing !
+    if (!config && ride->areDataPresent()->watts) return false;
 
     // no dice if we don't have alt and speed
     if (!ride->areDataPresent()->alt || !ride->areDataPresent()->kph) return false;
@@ -200,7 +202,7 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
     double H = ride->getHeight(); //Height in m
     double M = ride->getWeight(); //Weight kg
     double Mtotal = M + MEquip;
-    double T = 15; //Temp degC in not in ride data
+    double T = 15; // Temp degC if not in ride data
     double W = 0;  // headwind (from records or based on wind parameters entered manually)
     double bearing = 0.0; //runner direction used to compute headwind
     double Cx = 0.9; // Axial force coefficient
@@ -211,8 +213,7 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
     // apply the change
     ride->command->startLUW("Estimate Running Power");
 
-    if (ride->areDataPresent()->slope && ride->areDataPresent()->alt
-     && ride->areDataPresent()->km) {
+    if (ride->areDataPresent()->slope) {
         for (int i=0; i<ride->dataPoints().count(); i++) {
             RideFilePoint *p = ride->dataPoints()[i];
 
