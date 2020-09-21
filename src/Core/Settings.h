@@ -309,10 +309,10 @@
 #define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
 
 // OSM LiveMap chart 
-#define GC_OSM_LM_BASEURL               "<athlete-preferences>osmlm/base_url"
-#define GC_OSM_LM_LAT                   "<athlete-preferences>osmlm/init_lat"
-#define GC_OSM_LM_LON                   "<athlete-preferences>osmlm/init_lon"
-#define GC_OSM_LM_ZOOM                  "<athlete-preferences>osmlm/init_zoom"
+//#define GC_OSM_LM_BASEURL               "<athlete-preferences>osmlm/base_url"
+//#define GC_OSM_LM_LAT                   "<athlete-preferences>osmlm/init_lat"
+//#define GC_OSM_LM_LON                   "<athlete-preferences>osmlm/init_lon"
+//#define GC_OSM_LM_ZOOM                  "<athlete-preferences>osmlm/init_zoom"
 
 // BodyMeasures Download
 #define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"

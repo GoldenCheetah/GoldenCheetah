@@ -57,6 +57,9 @@ class LiveMapWebPageWindow : public GcChartWindow
     Q_OBJECT
     G_OBJECT
 
+    // properties can be saved/restored/set by the layout manager
+    Q_PROPERTY(QString url READ url WRITE setUrl USER true)
+
     public:
         LiveMapWebPageWindow(Context *);
         ~LiveMapWebPageWindow();
@@ -66,8 +69,14 @@ class LiveMapWebPageWindow : public GcChartWindow
         QString currentPage;
         QString routeLatLngs;
 
+        // set/get properties
+        QString url() const { return customUrl->text(); }
+        void setUrl(QString x) { customUrl->setText(x); }
+
     public slots:
         void configChanged(qint32);
+        void ergFileSelected(ErgFile*);
+        void userUrl();
 
     private:
         Context *context;
@@ -91,15 +100,14 @@ class LiveMapWebPageWindow : public GcChartWindow
         QPushButton* rButton;
         QPushButton* applyButton;
 
-        void createHtml(QString sBaseUrl, QString sInitLat, QString sInitLon, QString sInitZoom);
-        void redrawMap();
+        void createHtml(QString sBaseUrl, QString autoRunJS);
+        void drawRoute(ErgFile* f);
 
     private slots:
         void telemetryUpdate(RealtimeData rtd);
-        void start();
+        //void start();
         void stop();
-        void pause();
-        void setMapOptions();
+        //void pause();
 
     protected:
 
