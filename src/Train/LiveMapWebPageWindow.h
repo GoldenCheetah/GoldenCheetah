@@ -105,9 +105,7 @@ class LiveMapWebPageWindow : public GcChartWindow
 
     private slots:
         void telemetryUpdate(RealtimeData rtd);
-        //void start();
         void stop();
-        //void pause();
 
     protected:
 

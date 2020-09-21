@@ -52,8 +52,6 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
      // Conent signal to recieve updates and latlon for ploting on map.
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(context, SIGNAL(stop()), this, SLOT(stop()));
-    //connect(context, SIGNAL(start()), this, SLOT(start()));
-    //connect(context, SIGNAL(pause()), this, SLOT(pause()));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
      
     //reveal controls widget
@@ -212,19 +210,11 @@ void LiveMapWebPageWindow::drawRoute(ErgFile* f) {
     view->page()->runJavaScript(code);
 }
 
-//void LiveMapWebPageWindow::start()
-//{
-//}
-
 // Reset map to preferred View when the activity is stopped.
 void LiveMapWebPageWindow::stop()
 {
     markerIsVisible = false;
 }
-
-//void LiveMapWebPageWindow::pause()
-//{
-//}
 
 void LiveMapWebPageWindow::configChanged(qint32)
 {
