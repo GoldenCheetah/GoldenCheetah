@@ -166,14 +166,15 @@ public:
     virtual void stopPlayback();
     void setContext(Context* context) { this->context = context; }
     void plotNewLatLng(double newLat, double newLong);
-    void initLiveMap();
+    void initLiveMap(Context* context);
+    void loadingLiveMap();
     int  m_Zoom;
     QString  m_osmURL;
 
 private slots:
 
 protected:
-    void createHtml(int mapZoom, QString osmURL);
+    void createHtml(QString sBaseUrl, QString autoRunJS);
     void buildRouteArrayLatLngs(Context* context);
     void resizeEvent(QResizeEvent*);
     QWebEngineView *liveMapView;
