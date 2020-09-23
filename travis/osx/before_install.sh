@@ -1,14 +1,14 @@
 #!/bin/bash
 set -ev
 
-## try early just to check, can delete later
 date
+# Don't update to use included Qt version instead of Qt 5.15.x
+export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
-brew update
 
 brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
 
-brew upgrade qt5 # to get 5.15.0
+#brew upgrade qt5 # to get 5.15.x
 /usr/local/opt/qt5/bin/qmake --version
 
 brew install gsl
