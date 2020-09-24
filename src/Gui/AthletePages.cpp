@@ -814,8 +814,11 @@ MeasuresPage::addOReditClicked()
     }
 
     addMeasure.when = dateTimeEdit->dateTime();
-    for (int k = 0; k < valuesEdit.count(); k++)
-        addMeasure.values[k] = valuesEdit[k]->value();
+    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
+    for (int k = 0; k < valuesEdit.count(); k++) {
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
+        addMeasure.values[k] = valuesEdit[k]->value() / unitsFactor;
+    }
     addMeasure.comment = comment->text();
     addMeasure.source = Measure::Manual;
     addMeasure.originalSource = "";
@@ -877,8 +880,11 @@ MeasuresPage::rangeSelectionChanged()
         Measure current = measures[index];
 
         dateTimeEdit->setDateTime(current.when);
-        for (int k = 0; k < valuesEdit.count(); k++)
-            valuesEdit[k]->setValue(current.values[k]);
+        QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
+        for (int k = 0; k < valuesEdit.count(); k++) {
+            const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
+            valuesEdit[k]->setValue(current.values[k]*unitsFactor);
+        }
         comment->setText(current.comment);
 
         updateButton->hide();
