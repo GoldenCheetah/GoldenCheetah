@@ -86,7 +86,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     }
     commonLayout->addRow(customUrlLabel, customUrl);
 
-    connect(customUrlLabel, SIGNAL(returnPressed()), this, SLOT(userUrl()));
+    connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
 
     applyButton = new QPushButton(application->style()->standardIcon(QStyle::SP_ArrowRight), tr("Apply changes"), this);
     commonLayout->addRow(applyButton);
