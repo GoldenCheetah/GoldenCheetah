@@ -38,8 +38,8 @@ mkdir appdir/lib
 cp /usr/local/lib/libssl.so.1.1 appdir/lib
 cp /usr/local/lib/libcrypto.so.1.1 appdir/lib
 
-### Add vlc
-cp -r /usr/lib/vlc appdir/lib/vlc
+### Add vlc 3
+cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
 
 ### Download current version of linuxdeployqt
 wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
