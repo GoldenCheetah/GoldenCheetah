@@ -43,9 +43,9 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 
 # SRMIO
-wget http://www.zuto.de/project/files/srmio/srmio-0.1.1~git1.tar.gz
-tar xf srmio-0.1.1~git1.tar.gz
-cd srmio-0.1.1~git1
+wget https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
+tar xf v0.1.1git1.tar.gz
+cd srmio-0.1.1git1
 ./configure --disable-shared --enable-static
 make --silent -j3
 sudo make install
