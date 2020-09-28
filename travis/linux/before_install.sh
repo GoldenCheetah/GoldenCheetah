@@ -46,6 +46,7 @@ fi
 wget https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
 tar xf v0.1.1git1.tar.gz
 cd srmio-0.1.1git1
+sh genautomake.sh
 ./configure --disable-shared --enable-static
 make --silent -j3
 sudo make install
