@@ -186,7 +186,7 @@ WebPageWindow::~WebPageWindow()
 void 
 WebPageWindow::configChanged(qint32)
 {
-
+    setProperty("color", GColor(CPLOTBACKGROUND));
     // tinted palette for headings etc
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
