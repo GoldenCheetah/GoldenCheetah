@@ -1578,6 +1578,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
         CFStringRef reasonForActivity = CFSTR("TrainSidebar::guiUpdate");
         IOPMAssertionID assertionID;
         IOReturn suspendSreensaverSuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
+
+#elif defined(WIN32)
+        // Multimedia applications, such as video players and presentation applications, must use ES_DISPLAY_REQUIRED
+        // when they display video for long periods of time without user input.
+        SetThreadExecutionState(ES_DISPLAY_REQUIRED);
 #endif
 
         if(calibrating) {
