@@ -42,6 +42,10 @@ init:
 
 # Setup MSVC - VS 2019
 - call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
+- choco install winflexbison3
+- win_bison --version
+- win_flex --version
+- exit
 
 # Setup NSIS
 - set PATH=%PATH%;C:\"Program Files (x86)"\NSIS

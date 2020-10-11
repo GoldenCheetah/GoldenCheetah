@@ -77,4 +77,15 @@ unzip awscliv2.zip
 sudo ./aws/install
 aws --version
 
+bison --version
+wget http://ftp.gnu.org/gnu/bison/bison-3.7.tar.gz
+tar -zxvf bison-3.7.tar.gz
+cd bison-3.7/
+./configure
+make
+sudo make install
+cd ..
+bison --version
+exit 1
+
 exit
