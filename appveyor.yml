@@ -61,6 +61,13 @@ install:
 # Get the libraries
 - if not exist gc-ci-libs.zip appveyor DownloadFile "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
 - 7z x -y gc-ci-libs.zip -oC:\libs
+# TODO: remove bison and flex from the archive instead of removing it after extraction
+- ps: Remove-Item C:\libs\win_bison.exe
+- ps: Remove-Item C:\libs\win_flex.exe
+- ps: Remove-Item C:\libs\bison.yacc
+- ps: Remove-Item C:\libs\custom_build_rules/*
+# winflexbison3 (not available in vcpkg)
+- choco install winflexbison3
 # GSL
 - vcpkg install gsl:x64-windows
 
@@ -123,6 +130,11 @@ before_build:
 
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
+
+# Override QMAKE_LEX and QMAKE_YACC coming from gcconfig64-Release.appveyor.pri
+# TODO: set these without full path in the new archive
+- echo QMAKE_LEX=win_flex --wincompat >> src\gcconfig.pri
+- echo QMAKE_YACC=win_bison --file-prefix=y -t >> src\gcconfig.pri
 
 # Add debug console
 #- echo CONFIG+=console >> src\gcconfig.pri
