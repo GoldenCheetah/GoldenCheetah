@@ -17,13 +17,13 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-// This grammar should work with yacc and bison, but has
-// only been tested with bison. In addition, since qmake
-// uses the -p flag to rename all the yy functions to
-// enable multiple grammars in a single executable you
-// should make sure you use the very latest bison since it
-// has been known to be problematic in the past. It is
-// know to work well with bison v2.4.1.
+
+// This grammar is only tested to work with bison >=3.4
+// In addition, since qmake uses the -p flag to rename
+// all the yy functions to enable multiple grammars in
+// a single executable you should make sure you use the
+// very latest bison since it has been known to be
+// problematic in the past.
 //
 // To make the grammar readable I have placed the code
 // for each nterm at column 40, this source file is best
