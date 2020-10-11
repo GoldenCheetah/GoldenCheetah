@@ -32,6 +32,8 @@ sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
 # SRMIO
 sed -i "" "s|#\(SRMIO_INSTALL =.*\)|\1 /usr/local|" src/gcconfig.pri
+# Bison/YACC
+echo QMAKE_YACC=/usr/local/opt/bison/bin/yacc >> src/gcconfig.pri
 # D2XX
 sed -i "" "s|libftd2xx.dylib|@executable_path/../Frameworks/libftd2xx.1.2.2.dylib|" src/FileIO/D2XX.cpp
 sed -i "" "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX|" src/gcconfig.pri

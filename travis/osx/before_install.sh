@@ -11,6 +11,7 @@ brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
 #brew upgrade qt5 # to get 5.15.x
 /usr/local/opt/qt5/bin/qmake --version
 
+brew install bison
 brew install libical
 brew upgrade libusb
 #brew install libsamplerate
