@@ -89,6 +89,8 @@ public:
         emit vo2Data(telemetry.getRf(), telemetry.getRMV(), telemetry.getVO2(), telemetry.getVCO2(), telemetry.getTv(), telemetry.getFeO2());
     }
 
+    uint8_t getCalibrationType();
+
 signals:
     void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
 

@@ -50,6 +50,8 @@ public:
     void setWindResistance(double);
     void setWheelCircumference(double);
 
+    uint8_t getCalibrationType();
+
 private slots:
     void deviceConnected();
     void deviceDisconnected();
@@ -90,7 +92,7 @@ private:
     bool has_power;
 
     // Service and Characteristic to set load
-    enum {Load_None, Tacx_UART, Wahoo_Kickr} loadType;
+    enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl} loadType;
     QLowEnergyCharacteristic loadCharacteristic;
     QLowEnergyService* loadService;
     QQueue<QByteArray> commandQueue;

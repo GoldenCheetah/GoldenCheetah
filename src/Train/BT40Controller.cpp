@@ -181,6 +181,16 @@ BT40Controller::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error)
     qWarning() << "Error while scanning BT devices:" << error;
 }
 
+uint8_t
+BT40Controller::getCalibrationType() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return caltype;
+        }
+    }
+    return CALIBRATION_TYPE_NOT_SUPPORTED;
+}
 
 void
 BT40Controller::setWheelRpm(double wrpm) {
