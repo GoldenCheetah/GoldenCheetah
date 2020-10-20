@@ -343,6 +343,13 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             loadCharacteristic = characteristic;
                             loadType = Kurt_InRide;
 
+                            calibrationData.setType(0, CALIBRATION_TYPE_SPINDOWN);
+                            calibrationData.setState(CALIBRATION_STATE_IDLE);
+                            calibrationData.setZeroOffset(0);
+                            calibrationData.setSpindownTime(0);
+                            calibrationData.setTargetSpeed(35.0);
+                            calibrationData.setSlope(0);
+
                         } else if (characteristic.uuid() == s_KurtSmartControlService_Control_UUID) {
 
                             qDebug() << "Starting indication for char with UUID: " << characteristic.uuid().toString() << " Kurt Smart_Control Control";
@@ -350,6 +357,13 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             loadService = service;
                             loadCharacteristic = characteristic;
                             loadType = Kurt_SmartControl;
+
+                            calibrationData.setType(0, CALIBRATION_TYPE_SPINDOWN);
+                            calibrationData.setState(CALIBRATION_STATE_IDLE);
+                            calibrationData.setZeroOffset(0);
+                            calibrationData.setSpindownTime(0);
+                            calibrationData.setTargetSpeed(35.0);
+                            calibrationData.setSlope(0);
 
                             QByteArray command;
                             switch (mode) {
@@ -518,19 +532,19 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
 
             // Nothing to do with this data.
         }
-
     } else if (c.uuid() == s_KurtInRideService_Power_UUID) {
 
         inride_power_data ipd = inride_process_power_data((const uint8_t*)value.constData());
 
-        qDebug() << inride_state_to_string(ipd.state) << " : " 
+        qDebug() << inride_state_to_debug_string(ipd.state, ipd.calibrationResult) << " : " 
                  << inride_command_result_to_string(ipd.commandResult) << " : " 
                  << ipd.speedKPH << ": " << ipd.cadenceRPM 
-                 << inride_calibration_result_to_string(ipd.calibrationResult)
                  << ipd.lastSpindownResultTime << " : " 
                  << ipd.spindownTime;
 
-        // Really this need to be hooked into ui.
+        calibrationData.setState(inride_state_to_calibration_state(ipd.state, ipd.calibrationResult));
+        calibrationData.setSpindownTime(ipd.spindownTime);
+
         QString notifyString;
         if (ipd.state != INRIDE_STATE_NORMAL) {
             switch (ipd.state) {
@@ -568,6 +582,8 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         double cadenceRPM = ipd.cadenceRPM;
         dynamic_cast<BT40Controller*>(parent)->setCadence(cadenceRPM);
 
+        //dynamic_cast<BT40Controller*>(parent)->setTrainerStatusString(inride_state_to_rtd_string(ipd.state, ipd.calibrationResult));
+
     } else if (c.uuid() == s_KurtSmartControlService_Power_UUID) {
 
         smart_control_power_data scpd = smart_control_process_power_data((const uint8_t*)value.constData(), value.size());
@@ -585,6 +601,40 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         // Cadence
         double cadenceRPM = scpd.cadenceRPM;
         dynamic_cast<BT40Controller*>(parent)->setCadence(cadenceRPM);
+
+    } else if (c.uuid() == s_KurtSmartControlService_Config_UUID) {
+
+        smart_control_config_data sccd = smart_control_process_config_data((const uint8_t*)value.data(), value.size());
+
+        calibrationData.setState(smart_control_state_to_calibration_state(sccd.calibrationState));
+        calibrationData.setSpindownTime(sccd.spindownTime);
+        calibrationData.setTargetSpeed(sccd.calibrationThresholdKPH);
+
+        QString notifyString;
+        switch (sccd.calibrationState) {
+        case SMART_CONTROL_CALIBRATION_STATE_COMPLETE:
+        case SMART_CONTROL_CALIBRATION_STATE_NOT_PERFORMED:
+            break;
+
+        default:
+            switch(sccd.calibrationState) {
+            case SMART_CONTROL_CALIBRATION_STATE_INITIALIZING:
+                notifyString = QString(tr("Smart Control - Initializing"));
+                break;
+            case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP:
+                notifyString = QString(tr("Smart Control - Speed Up to 35kph"));
+                break;
+            case SMART_CONTROL_CALIBRATION_STATE_START_COASTING:
+            case SMART_CONTROL_CALIBRATION_STATE_COASTING:
+                notifyString = QString(tr("Smart Control - Stop Pedalling"));
+                break;
+            case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP_DETECTED:
+                notifyString = QString(tr("Smart Control - Interference Detected - Try Again"));
+                break;
+            }
+
+            emit setNotification(notifyString, 4);
+        }
     }
 }
 
@@ -865,17 +915,6 @@ BT40Device::setWheelCircumference(double c) // in millimeters
         qDebug() << "BTLE SetWheelCircumference " << wheelSize << " " << loadCharacteristic.uuid() << command.toHex(':');
         commandSend(command);
     }
-}
-
-uint8_t
-BT40Device::getCalibrationType() {
-    switch (loadType) {
-    case Kurt_InRide:
-    case Kurt_SmartControl:
-        return CALIBRATION_TYPE_SPINDOWN;
-    }
-
-    return CALIBRATION_TYPE_NOT_SUPPORTED;
 }
 
 void

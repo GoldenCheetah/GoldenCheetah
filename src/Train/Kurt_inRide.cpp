@@ -9,25 +9,101 @@
 #include <QDebug>
 #include <QBluetoothUuid>
 
-QString inride_state_to_string(inride_state s) {
-    switch (s) {
-    case INRIDE_STATE_NORMAL:          return QString("INRIDE_STATE_NORMAL");
-    case INRIDE_STATE_SPINDOWN_IDLE:   return QString("INRIDE_STATE_SPINDOWN_IDLE");
-    case INRIDE_STATE_SPINDOWN_READY:  return QString("INRIDE_STATE_SPINDOWN_READY");
-    case INRIDE_STATE_SPINDOWN_ACTIVE: return QString("INRIDE_STATE_SPINDOWN_ACTIVE");
+#include "CalibrationData.h"
+
+// Convert inride device state into standard GC CALIBRATION_STATE.
+// Show calibration result when trainer is not calibrating,
+// show current calibration state when trainer is calibrating.
+uint8_t inride_state_to_calibration_state(inride_state state, inride_calibration_result calibration_result) {
+    switch (state) {
+    case INRIDE_STATE_NORMAL:
+        switch (calibration_result) {
+        default:
+        case INRIDE_CAL_RESULT_UNKNOWN:  return CALIBRATION_STATE_FAILURE;
+        case INRIDE_CAL_RESULT_SUCCESS:  return CALIBRATION_STATE_SUCCESS;
+        case INRIDE_CAL_RESULT_TOO_FAST: return CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_FAST;
+        case INRIDE_CAL_RESULT_TOO_SLOW: return CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW;
+        case INRIDE_CAL_RESULT_MIDDLE:   return CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW;
+        }
+        break;
+
+    case INRIDE_STATE_SPINDOWN_IDLE:
+        return CALIBRATION_STATE_POWER;
+
+    case INRIDE_STATE_SPINDOWN_READY:
+    case INRIDE_STATE_SPINDOWN_ACTIVE:
+        return CALIBRATION_STATE_COAST;
     }
-    return QString("ERROR");
+
+    return CALIBRATION_STATE_FAILURE;
 }
 
-QString inride_calibration_result_to_string(inride_calibration_result r) {
-    switch (r) {
-    case INRIDE_CAL_RESULT_UNKNOWN:  return QString("INRIDE_CAL_RESULT_UNKNOWN");
-    case INRIDE_CAL_RESULT_SUCCESS:  return QString("INRIDE_CAL_RESULT_SUCCESS");
-    case INRIDE_CAL_RESULT_TOO_FAST: return QString("INRIDE_CAL_RESULT_TOO_FAST");
-    case INRIDE_CAL_RESULT_TOO_SLOW: return QString("INRIDE_CAL_RESULT_TOO_SLOW");
-    case INRIDE_CAL_RESULT_MIDDLE:   return QString("INRIDE_CAL_RESULT_MIDDLE");
+// Create string to show complete calibration state, for debug print.
+const char* inride_state_to_debug_string(inride_state state, inride_calibration_result result) {
+    switch (state) {
+    case INRIDE_STATE_NORMAL:
+        switch (result) {
+        case INRIDE_CAL_RESULT_UNKNOWN:  return "INRIDE NORMAL          CALIBRATION:UNKNOWN";
+        case INRIDE_CAL_RESULT_SUCCESS:  return "INRIDE NORMAL          CALIBRATION:SUCCESS";
+        case INRIDE_CAL_RESULT_TOO_FAST: return "INRIDE NORMAL          CALIBRATION:TOO_FAST";
+        case INRIDE_CAL_RESULT_TOO_SLOW: return "INRIDE NORMAL          CALIBRATION:TOO_SLOW";
+        case INRIDE_CAL_RESULT_MIDDLE:   return "INRIDE NORMAL          CALIBRATION:MIDDLE";
+        }
+        break;
+    case INRIDE_STATE_SPINDOWN_IDLE:
+        switch (result) {
+        case INRIDE_CAL_RESULT_UNKNOWN:  return "INRIDE SPINDOWN_IDLE   CALIBRATION:UNKNOWN";
+        case INRIDE_CAL_RESULT_SUCCESS:  return "INRIDE SPINDOWN_IDLE   CALIBRATION:SUCCESS";
+        case INRIDE_CAL_RESULT_TOO_FAST: return "INRIDE SPINDOWN_IDLE   CALIBRATION:TOO_FAST";
+        case INRIDE_CAL_RESULT_TOO_SLOW: return "INRIDE SPINDOWN_IDLE   CALIBRATION:TOO_SLOW";
+        case INRIDE_CAL_RESULT_MIDDLE:   return "INRIDE SPINDOWN_IDLE   CALIBRATION:MIDDLE";
+        }
+        break;
+    case INRIDE_STATE_SPINDOWN_READY:
+        switch (result) {
+        case INRIDE_CAL_RESULT_UNKNOWN:  return "INRIDE SPINDOWN_READY  CALIBRATION:UNKNOWN";
+        case INRIDE_CAL_RESULT_SUCCESS:  return "INRIDE SPINDOWN_READY  CALIBRATION:SUCCESS";
+        case INRIDE_CAL_RESULT_TOO_FAST: return "INRIDE SPINDOWN_READY  CALIBRATION:TOO_FAST";
+        case INRIDE_CAL_RESULT_TOO_SLOW: return "INRIDE SPINDOWN_READY  CALIBRATION:TOO_SLOW";
+        case INRIDE_CAL_RESULT_MIDDLE:   return "INRIDE SPINDOWN_READY  CALIBRATION:MIDDLE";
+        }
+        break;
+    case INRIDE_STATE_SPINDOWN_ACTIVE:
+        switch (result) {
+        case INRIDE_CAL_RESULT_UNKNOWN:  return "INRIDE SPINDOWN_ACTIVE CALIBRATION:UNKNOWN";
+        case INRIDE_CAL_RESULT_SUCCESS:  return "INRIDE SPINDOWN_ACTIVE CALIBRATION:SUCCESS";
+        case INRIDE_CAL_RESULT_TOO_FAST: return "INRIDE SPINDOWN_ACTIVE CALIBRATION:TOO_FAST";
+        case INRIDE_CAL_RESULT_TOO_SLOW: return "INRIDE SPINDOWN_ACTIVE CALIBRATION:TOO_SLOW";
+        case INRIDE_CAL_RESULT_MIDDLE:   return "INRIDE SPINDOWN_ACTIVE CALIBRATION:MIDDLE";
+        }
+        break;
     }
-    return QString("ERROR");
+
+    return "INRIDE DEVICE UNKNOWN STATE";
+}
+
+const char* inride_state_to_rtd_string(inride_state state, inride_calibration_result result) {
+    switch (state) {
+    case INRIDE_STATE_NORMAL:
+        switch (result) {
+        case INRIDE_CAL_RESULT_UNKNOWN:  return "INRIDE NORMAL - CALIBRATION:UNKNOWN";
+        case INRIDE_CAL_RESULT_SUCCESS:  return "INRIDE NORMAL - CALIBRATION:SUCCESS";
+        case INRIDE_CAL_RESULT_TOO_FAST: return "INRIDE NORMAL - CALIBRATION:TOO_FAST";
+        case INRIDE_CAL_RESULT_TOO_SLOW: return "INRIDE NORMAL - CALIBRATION:TOO_SLOW";
+        case INRIDE_CAL_RESULT_MIDDLE:   return "INRIDE NORMAL - CALIBRATION:MIDDLE";
+        }
+        break;
+    case INRIDE_STATE_SPINDOWN_IDLE:
+        return "INRIDE SPINDOWN - STARTED, INCREASE SPEED";
+
+    case INRIDE_STATE_SPINDOWN_READY:
+        return "INRIDE SPINDOWN - READY, STOP PEDALLING";
+
+    case INRIDE_STATE_SPINDOWN_ACTIVE:
+        return "INRIDE SPINDOWN - COASTING, DO NOT PEDAL";
+    }
+
+    return "INRIDE UNKNOWN STATE";
 }
 
 QString inride_command_result_to_string(inride_command_result r) {

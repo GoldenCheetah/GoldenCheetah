@@ -12,14 +12,41 @@
 
 #include <QRandomGenerator>
 
+#include "CalibrationData.h"
+
 #define SensorHz                10000
+
+uint8_t smart_control_state_to_calibration_state(smart_control_calibration_state calibration_state) {
+
+    switch(calibration_state) {
+    case SMART_CONTROL_CALIBRATION_STATE_NOT_PERFORMED:
+        return CALIBRATION_STATE_FAILURE;
+
+    case SMART_CONTROL_CALIBRATION_STATE_INITIALIZING:
+        return CALIBRATION_STATE_STARTING;
+
+    case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP:
+        return CALIBRATION_STATE_POWER;
+
+    case SMART_CONTROL_CALIBRATION_STATE_START_COASTING:
+    case SMART_CONTROL_CALIBRATION_STATE_COASTING:
+        return CALIBRATION_STATE_COAST;
+
+    case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP_DETECTED:
+        return CALIBRATION_STATE_POWER;
+
+    case SMART_CONTROL_CALIBRATION_STATE_COMPLETE:
+        return CALIBRATION_STATE_SUCCESS;
+    }
+
+    return CALIBRATION_STATE_FAILURE;
+}
 
 typedef enum smart_control_command
 {
     SMART_CONTROL_COMMAND_SET_PERFORMANCE       = 0x00,
     SMART_CONTROL_COMMAND_SPINDOWN_CALIBRATION  = 0x03
 } smart_control_command;
-
 
 uint8_t hash8WithSeed(uint8_t hash, const uint8_t *buffer, uint8_t length)
 {
@@ -117,7 +144,7 @@ smart_control_power_data smart_control_process_power_data(const uint8_t *data, s
     return powerData;
 }
 
-smart_control_config_data smart_control_process_config_data(uint8_t *data, size_t size)
+smart_control_config_data smart_control_process_config_data(const uint8_t *data, size_t size)
 {
     uint8_t hashSeed = 0x42;
     uint8_t* inData = (uint8_t*)malloc(size);

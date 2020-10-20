@@ -65,8 +65,6 @@ struct smart_control_power_data
  */
 smart_control_power_data smart_control_process_power_data(const uint8_t *data, size_t size);
 
-
-
 /*! Smart Control Calibration State */
 typedef enum smart_control_calibration_state
 {
@@ -113,8 +111,7 @@ struct smart_control_config_data
     uint8_t brakeOffset;
     
     /*! Noise Filter Strength */
-    uint8_t noiseFilter;
-    
+    uint8_t noiseFilter;    
 };
 
 /*!
@@ -125,7 +122,10 @@ struct smart_control_config_data
  
  @return Smart Control Config Data Struct
  */
-smart_control_config_data smart_control_process_config_data(uint8_t *data, size_t size);
+smart_control_config_data smart_control_process_config_data(const uint8_t *data, size_t size);
+
+// Convert device calibration state into GC CALIBRATION_STATE*
+uint8_t smart_control_state_to_calibration_state(smart_control_calibration_state);
 
 // Note about this pack. Below structures are defined with gcc's
 // __attribute__(packed). Because the base type of the struct is byte

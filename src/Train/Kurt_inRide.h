@@ -41,6 +41,7 @@ typedef enum inride_state
     INRIDE_STATE_SPINDOWN_IDLE      = 0x10,
     INRIDE_STATE_SPINDOWN_READY     = 0x20,
     INRIDE_STATE_SPINDOWN_ACTIVE    = 0x30,
+    INRIDE_STATE_SPINDOWN_UNKNOWN   = 0x40,
 } inride_sensor_state;
 
 QString inride_state_to_string(inride_state s);
@@ -54,7 +55,10 @@ typedef enum inride_calibration_result
     INRIDE_CAL_RESULT_MIDDLE        = 0x04  // Spindown was ambigious (too slow for normal, too fast for a pro flywheel). Tighten if no pro flywheel and loosen if the pro flywheel is present.
 } inride_calibration_result;
 
-QString inride_calibration_result_to_string(inride_calibration_result r);
+uint8_t inride_state_to_calibration_state(inride_state state, inride_calibration_result calibration_state);
+
+const char* inride_state_to_rtd_string(inride_state state, inride_calibration_result result);
+const char* inride_state_to_debug_string(inride_state state, inride_calibration_result result);
 
 // Use Command Results for debug purposes only. If 2 commands are sent in-between the power updates, command results would be lost (not guaranteed).
 typedef enum inride_command_result

@@ -2271,7 +2271,23 @@ void TrainSidebar::updateCalibration()
                     finishCalibration = true;
                 break;
 
+            case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_FAST:
+                status = QString(tr("Calibration Failed: Loosen Roller"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW:
+                status = QString(tr("Calibration Failed: Tighten Roller"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
             }
+
             break;
 
         case CALIBRATION_TYPE_ZERO_OFFSET:

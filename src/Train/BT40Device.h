@@ -24,6 +24,8 @@
 #include <QLowEnergyService>
 #include <QQueue>
 
+#include "CalibrationData.h"
+
 typedef struct btle_sensor_type {
     const char *descriptive_name;
     const char *iconname;
@@ -50,7 +52,12 @@ public:
     void setWindResistance(double);
     void setWheelCircumference(double);
 
-    uint8_t getCalibrationType();
+    uint8_t  getCalibrationType()         { return calibrationData.getType(); }
+    uint8_t  getCalibrationState()        { return calibrationData.getState(); }
+    uint16_t getCalibrationZeroOffset()   { return calibrationData.getZeroOffset(); }
+    uint16_t getCalibrationSpindownTime() { return calibrationData.getSpindownTime(); }
+    double   getCalibrationTargetSpeed()  { return calibrationData.getTargetSpeed(); }
+    uint16_t getCalibrationSlope()        { return calibrationData.getSlope(); }
 
 private slots:
     void deviceConnected();
@@ -90,6 +97,7 @@ private:
     double windResistance;
     double wheelSize;
     bool has_power;
+    CalibrationData calibrationData;
 
     // Service and Characteristic to set load
     enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl} loadType;
