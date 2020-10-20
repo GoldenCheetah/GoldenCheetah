@@ -549,8 +549,8 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     upSeriesButton = new QPushButton(tr("Up"));
     downSeriesButton = new QPushButton(tr("Down"));
 #endif
-    //connect(upSeriesButton, SIGNAL(clicked()), this, SLOT(moveSeriesUp()));
-    //connect(downSeriesButton, SIGNAL(clicked()), this, SLOT(moveSeriesDown()));
+    connect(upSeriesButton, SIGNAL(clicked()), this, SLOT(moveSeriesUp()));
+    connect(downSeriesButton, SIGNAL(clicked()), this, SLOT(moveSeriesDown()));
 
 
     QHBoxLayout *seriesButtons = new QHBoxLayout;
@@ -781,6 +781,7 @@ UserChartSettings::editSeries()
         chartConfigChanged();
     }
 }
+
 void
 UserChartSettings::deleteSeries()
 {
@@ -790,6 +791,38 @@ UserChartSettings::deleteSeries()
     int index = seriesTable->row(items.first());
     seriesinfo.removeAt(index);
     refreshSeriesTab();
+    emit chartConfigChanged();
+}
+
+void
+UserChartSettings::moveSeriesUp()
+{
+    QList<QTableWidgetItem*> items = seriesTable->selectedItems();
+    if (items.count() < 1) return; // nothing selected
+
+    int index = seriesTable->row(items.first());
+    if (index == 0) return; // already at the top
+
+    // move and update the table preserving selection
+    seriesinfo.move(index, index-1);
+    refreshSeriesTab();
+    seriesTable->setCurrentCell(index-1, 0);
+    emit chartConfigChanged();
+}
+
+void
+UserChartSettings::moveSeriesDown()
+{
+    QList<QTableWidgetItem*> items = seriesTable->selectedItems();
+    if (items.count() < 1) return; // nothing selected
+
+    int index = seriesTable->row(items.first());
+    if (index == seriesinfo.count()-1) return; // already at the bottom
+
+    // move and update the table preserving selection
+    seriesinfo.move(index, index+1);
+    refreshSeriesTab();
+    seriesTable->setCurrentCell(index+1, 0);
     emit chartConfigChanged();
 }
 
