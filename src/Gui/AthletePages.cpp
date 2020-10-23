@@ -59,6 +59,7 @@
 //
 CredentialsPage::CredentialsPage(Context *context) : context(context)
 {
+    setBackgroundRole(QPalette::Base);
     QGridLayout *mainLayout = new QGridLayout(this);
 
     addButton = new QPushButton(tr("+"));
@@ -195,11 +196,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
 
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     QLabel *nicklabel = new QLabel(tr("Nickname"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
@@ -431,11 +427,6 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 {
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     //
     // W'bal Tau
@@ -517,11 +508,6 @@ BackupPage::BackupPage(Context *context) : context(context)
 {
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     //
     // Auto Backup
@@ -587,12 +573,6 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *measuresGrid = new QGridLayout;
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     QLabel* seperatorText = new QLabel(tr("Time dependent %1 measures").arg(measuresGroup->getName()));
     all->addWidget(seperatorText);
