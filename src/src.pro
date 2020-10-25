@@ -623,6 +623,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
     SOURCES += Train/DaumController.cpp Train/Daum.cpp
     HEADERS += Train/DaumController.h Train/Daum.h
+    SOURCES += Train/Kurt_inRide.cpp Train/Kurt_smartControl.cpp
+    HEADERS += Train/Kurt_inRide.h Train/Kurt_smartControl.h    
 
     # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
     greaterThan(QT_MINOR_VERSION, 4) {

@@ -22,6 +22,8 @@
 #include "VMProWidget.h"
 
 #include "ANTMessage.h"
+#include "Kurt_inRide.h"
+#include "Kurt_SmartControl.h"
 
 #define VO2MASTERPRO_SERVICE_UUID "{00001523-1212-EFDE-1523-785FEABCD123}"
 #define VO2MASTERPRO_VENTILATORY_CHAR_UUID "{00001527-1212-EFDE-1523-785FEABCD123}"
@@ -39,11 +41,16 @@
 #define WAHOO_BRAKE_CONTROL_UUID "{A026E005-0A7D-4AB3-97FA-F1500F9FEB8B}"
 
 QMap<QBluetoothUuid, btle_sensor_type_t> BT40Device::supportedServices = {
-    { QBluetoothUuid(QBluetoothUuid::HeartRate), { "Heartrate", ":images/IconHR.png" }},
-    { QBluetoothUuid(QBluetoothUuid::CyclingPower), { "Power", ":images/IconPower.png" }},
-    { QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence), { "Speed + Cadence", ":images/IconCadence.png" }},
-    { QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID)), { "VM Pro", ":images/IconCadence.png" }},
-    { QBluetoothUuid(QString(BLE_TACX_UART_UUID)), { "Tacx FE-C over BLE", ":images/IconPower.png" }},
+    { QBluetoothUuid(QBluetoothUuid::HeartRate),                { "Heartrate", ":images/IconHR.png" }},
+    { QBluetoothUuid(QBluetoothUuid::CyclingPower),             { "Power", ":images/IconPower.png" }},
+    { QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence),   { "Speed + Cadence", ":images/IconCadence.png" }},
+    { QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID)),       { "VM Pro", ":images/IconCadence.png" }},
+    { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              { "Tacx FE-C over BLE", ":images/IconPower.png" }},
+    { s_KurtInRideService_UUID,                                 { "Kurt Kinetic Inride over BLE", ":images/IconPower.png" }},
+    { s_KurtSmartControlService_UUID,                           { "Kurt Kinetic Smart Control over BLE", ":images/IconPower.png" }},
+
+    // This will be needed if we decide to query DeviceInfo for SystemID
+    //{ QBluetoothUuid(QBluetoothUuid::DeviceInformation),        { "DeviceInformation", ":images / IconPower.png"}},
 };
 
 BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(parent), m_currentDevice(devinfo)
@@ -134,6 +141,18 @@ BT40Device::deviceDisconnected()
             controller->setVO2_VCO2(0,0);
             controller->setTv(0);
             controller->setFeO2(0);
+        } else if (service->serviceUuid() == s_KurtInRideService_UUID) {
+            BT40Controller* controller = dynamic_cast<BT40Controller*>(parent);
+            // disconnect behavior...
+            controller->setWatts(0.0);
+            controller->setWheelRpm(0.0);
+            controller->setCadence(0.0);
+        } else if (service->serviceUuid() == s_KurtSmartControlService_UUID) {
+            BT40Controller* controller = dynamic_cast<BT40Controller*>(parent);
+            // disconnect behavior...
+            controller->setWatts(0.0);
+            controller->setWheelRpm(0.0);
+            controller->setCadence(0.0);
         }
     }
 
@@ -265,6 +284,22 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     characteristics.append(service->characteristic(
                                 QBluetoothUuid(QString(BLE_TACX_UART_CHAR_WRITE))));
 
+                } else if (service->serviceUuid() == s_KurtInRideService_UUID) {
+
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
+                        " / KINETIC_INRIDE", 4);
+                    
+                    characteristics.append(service->characteristic(s_KurtInRideService_Power_UUID));
+                    characteristics.append(service->characteristic(s_KurtInRideService_Config_UUID));
+                    characteristics.append(service->characteristic(s_KurtInRideService_Control_UUID));
+                }
+                else if (service->serviceUuid() == s_KurtSmartControlService_UUID) {
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
+                        " / KINETIC_SMART_CONTROL", 4);
+
+                    characteristics.append(service->characteristic(s_KurtSmartControlService_Power_UUID));
+                    characteristics.append(service->characteristic(s_KurtSmartControlService_Config_UUID));
+                    characteristics.append(service->characteristic(s_KurtSmartControlService_Control_UUID));
                 }
 
                 foreach(QLowEnergyCharacteristic characteristic, characteristics)
@@ -295,6 +330,53 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                                 setWindSpeed(windSpeed);
                                 if (mode == RT_MODE_ERGO) setLoad(load);
                                 else setGradient(gradient);
+                            }
+                        } else if(characteristic.uuid() == s_KurtInRideService_Control_UUID) {
+
+                            uint8_t systemID[6];
+                            inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
+
+                            qDebug() << "Starting indication for char with UUID: " << characteristic.uuid().toString() << " Kurt Inride Control";
+                            qDebug() << "InRide SystemID:" << hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
+
+                            loadService = service;
+                            loadCharacteristic = characteristic;
+                            loadType = Kurt_InRide;
+
+                            calibrationData.setType(0, CALIBRATION_TYPE_SPINDOWN);
+                            calibrationData.setState(CALIBRATION_STATE_IDLE);
+                            calibrationData.setZeroOffset(0);
+                            calibrationData.setSpindownTime(0);
+                            calibrationData.setTargetSpeed(35.0);
+                            calibrationData.setSlope(0);
+
+                        } else if (characteristic.uuid() == s_KurtSmartControlService_Control_UUID) {
+
+                            qDebug() << "Starting indication for char with UUID: " << characteristic.uuid().toString() << " Kurt Smart_Control Control";
+
+                            loadService = service;
+                            loadCharacteristic = characteristic;
+                            loadType = Kurt_SmartControl;
+
+                            calibrationData.setType(0, CALIBRATION_TYPE_SPINDOWN);
+                            calibrationData.setState(CALIBRATION_STATE_IDLE);
+                            calibrationData.setZeroOffset(0);
+                            calibrationData.setSpindownTime(0);
+                            calibrationData.setTargetSpeed(35.0);
+                            calibrationData.setSlope(0);
+
+                            QByteArray command;
+                            switch (mode) {
+                            case RT_MODE_SLOPE:
+                                loadService->writeCharacteristic(loadCharacteristic,
+                                    smart_control_set_mode_simulation_command(weight, rollingResistance, windResistance, gradient, windSpeed),
+                                    QLowEnergyService::WriteWithResponse);
+                                break;
+                            case RT_MODE_ERGO:
+                                loadService->writeCharacteristic(loadCharacteristic,
+                                    smart_control_set_mode_erg_command(load),
+                                    QLowEnergyService::WriteWithResponse);
+                                break;
                             }
 
                         } else {
@@ -443,6 +525,116 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         controller->setRespiratoryMinuteVolume((double)rmv/100.0f);
         controller->setFeO2((double)feo2/100.0f);
         controller->emitVO2Data();
+    } else if (c.uuid() == s_KurtInRideService_Config_UUID) {
+
+        if (value.size() == 20) {
+            inride_config_data icd = inride_process_config_data((const uint8_t*)value.constData());
+
+            // Nothing to do with this data.
+        }
+    } else if (c.uuid() == s_KurtInRideService_Power_UUID) {
+
+        inride_power_data ipd = inride_process_power_data((const uint8_t*)value.constData());
+
+        qDebug() << inride_state_to_debug_string(ipd.state, ipd.calibrationResult) << " : " 
+                 << inride_command_result_to_string(ipd.commandResult) << " : " 
+                 << ipd.speedKPH << ": " << ipd.cadenceRPM 
+                 << ipd.lastSpindownResultTime << " : " 
+                 << ipd.spindownTime;
+
+        calibrationData.setState(inride_state_to_calibration_state(ipd.state, ipd.calibrationResult));
+        calibrationData.setSpindownTime(ipd.spindownTime);
+
+        QString notifyString;
+        if (ipd.state != INRIDE_STATE_NORMAL) {
+            switch (ipd.state) {
+            case INRIDE_STATE_SPINDOWN_IDLE:
+                notifyString = QString("SPINDOWN_IDLE  -INCREASE TO 35KPH:");
+                break;
+            case INRIDE_STATE_SPINDOWN_READY:
+                notifyString = QString("SPINDOWN_READY -STOP PEDALLING   : ");
+                break;
+            case INRIDE_STATE_SPINDOWN_ACTIVE:
+                notifyString = QString("SPINDOWN_ACTIVE-COAST TO STOP    : ");
+                break;
+            }
+        
+            notifyString.append(QString::number(ipd.speedKPH));
+        
+            emit setNotification(notifyString, 4);
+        }
+
+        // Notify if spindown changed, that means calibration succeeded.
+        if (ipd.lastSpindownResultTime != ipd.spindownTime) {
+            emit setNotification(tr("InRide Spindown Updated: ") + QString::number(ipd.spindownTime), 4);
+        }
+
+        double power = ipd.power;
+        dynamic_cast<BT40Controller*>(parent)->setWatts(power);
+
+        // Convert kurt speed in kph to wheel rpm, using wheelsize (mm)
+        // Just so caller can convert wheel rpm back to kph... anyway...
+
+        double kph = ipd.speedKPH;
+        double wheelRpm = kph * (1000. / wheelSize) * (1000. / 60.);
+        dynamic_cast<BT40Controller*>(parent)->setWheelRpm(wheelRpm);
+
+        double cadenceRPM = ipd.cadenceRPM;
+        dynamic_cast<BT40Controller*>(parent)->setCadence(cadenceRPM);
+
+        //dynamic_cast<BT40Controller*>(parent)->setTrainerStatusString(inride_state_to_rtd_string(ipd.state, ipd.calibrationResult));
+
+    } else if (c.uuid() == s_KurtSmartControlService_Power_UUID) {
+
+        smart_control_power_data scpd = smart_control_process_power_data((const uint8_t*)value.constData(), value.size());
+
+        // Power
+        double power = scpd.power;
+        dynamic_cast<BT40Controller*>(parent)->setWatts(power);
+
+        // WheelRpm
+        double kph = scpd.speedKPH;
+        // Convert kurt speed in kph to wheel rpm, using wheelsize (mm)
+        double wheelRpm = kph * (1000. / wheelSize) * (1000. / 60.);
+        dynamic_cast<BT40Controller*>(parent)->setWheelRpm(wheelRpm);
+
+        // Cadence
+        double cadenceRPM = scpd.cadenceRPM;
+        dynamic_cast<BT40Controller*>(parent)->setCadence(cadenceRPM);
+
+    } else if (c.uuid() == s_KurtSmartControlService_Config_UUID) {
+
+        smart_control_config_data sccd = smart_control_process_config_data((const uint8_t*)value.data(), value.size());
+
+        calibrationData.setState(smart_control_state_to_calibration_state(sccd.calibrationState));
+        calibrationData.setSpindownTime(sccd.spindownTime);
+        calibrationData.setTargetSpeed(sccd.calibrationThresholdKPH);
+
+        QString notifyString;
+        switch (sccd.calibrationState) {
+        case SMART_CONTROL_CALIBRATION_STATE_COMPLETE:
+        case SMART_CONTROL_CALIBRATION_STATE_NOT_PERFORMED:
+            break;
+
+        default:
+            switch(sccd.calibrationState) {
+            case SMART_CONTROL_CALIBRATION_STATE_INITIALIZING:
+                notifyString = QString(tr("Smart Control - Initializing"));
+                break;
+            case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP:
+                notifyString = QString(tr("Smart Control - Speed Up to 35kph"));
+                break;
+            case SMART_CONTROL_CALIBRATION_STATE_START_COASTING:
+            case SMART_CONTROL_CALIBRATION_STATE_COASTING:
+                notifyString = QString(tr("Smart Control - Stop Pedalling"));
+                break;
+            case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP_DETECTED:
+                notifyString = QString(tr("Smart Control - Interference Detected - Try Again"));
+                break;
+            }
+
+            emit setNotification(notifyString, 4);
+        }
     }
 }
 
@@ -593,12 +785,79 @@ void BT40Device::setGradient(double g)
         qDebug() << "BTLE SetGradient " << gradient << " " << loadCharacteristic.uuid() << command.toHex(':');
         commandSend(command);
         prevGradient = gradient;
+    } else if(loadType == Kurt_SmartControl) {
+        // Kurt_SmartControl is sent complete info with every update. Avoid a notification for every change by
+        // only sending update for load and gradient notification
+        qDebug() << tr("Kurt_SmartControl: write gradient") << gradient;
+        loadService->writeCharacteristic(loadCharacteristic,
+            smart_control_set_mode_simulation_command(weight, rollingResistance, windResistance, gradient, windSpeed),
+            QLowEnergyService::WriteWithResponse);
     }
 }
 
 void
 BT40Device::setMode(int m)
 {
+    // Enter Calibration Mode.
+    if (m == RT_MODE_CALIBRATE && mode != RT_MODE_CALIBRATE) {
+        switch (loadType) {
+        case Kurt_InRide:
+            {
+                uint8_t systemID[6];
+                inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
+
+                qDebug() << tr("Kurt_InRide: STARTING CALIBRATION:") << 
+                    hex <<
+                    systemID[0] << systemID[1] << systemID[2] <<
+                    systemID[3] << systemID[4] << systemID[5];
+
+                loadService->writeCharacteristic(loadCharacteristic,
+                    inride_create_start_calibration_command_data(systemID),
+                    QLowEnergyService::WriteWithResponse);
+
+                break;
+            }
+        case Kurt_SmartControl:
+            {
+                qDebug() << tr("Kurt_SmartControl: STARTING CALIBRATION");
+
+                loadService->writeCharacteristic(loadCharacteristic,
+                    smart_control_start_calibration_command(false),
+                    QLowEnergyService::WriteWithResponse);
+                break;
+            }
+        }
+    }
+    // Leaving Calibration Mode
+    else if (m != RT_MODE_CALIBRATE && mode == RT_MODE_CALIBRATE) {
+        switch (loadType) {
+        case Kurt_InRide:
+            {
+                uint8_t systemID[6];
+                inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
+
+                qDebug() << tr("Kurt_InRide: STOPPING CALIBRATION, systemID:") <<
+                    hex <<
+                    systemID[0] << systemID[1] << systemID[2] <<
+                    systemID[3] << systemID[4] << systemID[5];
+
+                loadService->writeCharacteristic(loadCharacteristic,
+                    inride_create_stop_calibration_command_data(systemID),
+                    QLowEnergyService::WriteWithResponse);
+
+                break;
+            }
+        case Kurt_SmartControl:
+            {
+                qDebug() << tr("Kurt_SmartControl: STOPPING CALIBRATION");
+                loadService->writeCharacteristic(loadCharacteristic,
+                    smart_control_stop_calibration_command(),
+                    QLowEnergyService::WriteWithResponse);
+                break;
+            }
+        }
+    }
+
     mode = m;
 }
 
@@ -671,6 +930,11 @@ BT40Device::setLoadErg(double l)  // Load in Watts
         command[2] = (char)(((int)load) >> 8);
         qDebug() << "BTLE SetLoadErg " << load << " " << loadCharacteristic.uuid() << command.toHex(':');
         commandSend(command);
+    } else if (loadType == Kurt_SmartControl) {
+        qDebug() << tr("Kurt_SmartControl: set_mode_erg ") << load;
+        loadService->writeCharacteristic(loadCharacteristic,
+            smart_control_set_mode_erg_command(load),
+            QLowEnergyService::WriteWithResponse);
     }
 }
 
@@ -688,6 +952,12 @@ BT40Device::setLoadIntensity(double l)  // between 0 and 1
         command[2] = (char)(value >> 8);
         qDebug() << "BTLE SetLoadIntensity " << load << " " << loadCharacteristic.uuid() << command.toHex(':');
         commandSend(command);
+    } else if (loadType == Kurt_SmartControl) {
+        uint8_t level = (uint8_t)(l * 9); // map [0, 1] to unsigned integer [0, 9]
+        qDebug() << tr("Kurt_SmartControl: set_mode_fluid ") << level;
+        loadService->writeCharacteristic(loadCharacteristic,
+            smart_control_set_mode_fluid_command(level),
+            QLowEnergyService::WriteWithResponse);
     }
 }
 
@@ -703,6 +973,11 @@ BT40Device::setLoadLevel(int l)  // From 0 to 9
         command[1] = (char)load;
         qDebug() << "BTLE SetLoadLevel " << load << " " << loadCharacteristic.uuid() << command.toHex(':');
         commandSend(command);
+    } else if (loadType == Kurt_SmartControl) {
+        qDebug() << "Kurt_SmartControl: set_mode_fluid " << load;
+        loadService->writeCharacteristic(loadCharacteristic,
+            smart_control_set_mode_fluid_command(load),
+            QLowEnergyService::WriteWithResponse);
     }
 }
 

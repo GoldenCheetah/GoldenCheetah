@@ -181,6 +181,71 @@ BT40Controller::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error)
     qWarning() << "Error while scanning BT devices:" << error;
 }
 
+uint8_t
+BT40Controller::getCalibrationType() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return caltype;
+        }
+    }
+    return CALIBRATION_TYPE_NOT_SUPPORTED;
+}
+
+uint8_t
+BT40Controller::getCalibrationState() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationState();
+        }
+    }
+    return CALIBRATION_STATE_IDLE;
+}
+
+double
+BT40Controller::getCalibrationTargetSpeed() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationTargetSpeed();
+        }
+    }
+    return 0;
+}
+
+uint16_t
+BT40Controller::getCalibrationSpindownTime() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationSpindownTime();
+        }
+    }
+    return 0;
+}
+
+uint16_t
+BT40Controller::getCalibrationZeroOffset() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationZeroOffset();
+        }
+    }
+    return 0;
+}
+
+uint16_t
+BT40Controller::getCalibrationSlope() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationSlope();
+        }
+    }
+    return 0;
+}
 
 void
 BT40Controller::setWheelRpm(double wrpm) {
