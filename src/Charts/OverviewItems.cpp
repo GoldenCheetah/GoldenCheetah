@@ -758,8 +758,6 @@ MetricOverviewItem::setDateRange(DateRange dr)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (std::isinf(v) || std::isnan(v)) v=0;
-    m->setValue(v);
-    m->setCount(c);
     if (m) {
         value = m->toString(GlobalContext::context()->useMetricUnits, v);
     } else {
@@ -1434,6 +1432,8 @@ IntervalOverviewItem::setDateRange(DateRange dr)
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
     const RideMetric *ym = factory.rideMetric(ysymbol);
+    if (!xm || !ym) return; // avoid crashes when metrics are not available
+
     xdp = xm->precision();
     ydp = ym->precision();
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
@@ -1507,6 +1507,7 @@ IntervalOverviewItem::setData(RideItem *item)
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
     const RideMetric *ym = factory.rideMetric(ysymbol);
+    if (!xm || !ym) return; // avoid crashes when metrics are not available
     xdp = xm->precision();
     ydp = ym->precision();
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
