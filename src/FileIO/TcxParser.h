@@ -66,6 +66,7 @@ private:
 
     bool   first; // first ride found, when it may contain collections!
     bool   creator;
+    bool   training; // detailed-sport-info
 
     double power;
     double cadence;

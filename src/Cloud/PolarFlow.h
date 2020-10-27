@@ -44,41 +44,71 @@ class PolarFlow : public CloudService {
         ~PolarFlow();
 
         QString id() const { return "PolarFlow"; }
-        QString uiName() const { return tr("PolarFlow"); }
+        QString uiName() const { return tr("Polar Flow"); }
         QString description() const { return (tr("Download from the popular Polar website.")); }
         QImage logo() const { return QImage(":images/services/polarflow.png"); }
 
-        // polar
-        virtual int capabilities() const { return OAuth | Download | Query; }
-
-        // open/connect and close/disconnect
-        bool open(QStringList &errors);
+        // open/connect and close/disconnect transaction
+        bool open(QStringList &errors); // open transaction
+        bool commit(QStringList &errors); // commit transaction
         bool close();
 
-        // read a file
-        bool readFile(QByteArray *data, QString remotename, QString remoteid);
+        // polar has more types of service - NOT Default
+        //virtual int type() { return Activities | Measures; }
 
-        // dirent style api
-        CloudServiceEntry *root() { return root_; }
-        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
+        // polar capabilities of service - NOT Default
+        virtual int capabilities() const { return OAuth | Download | Query; }
+
+        QString authiconpath() const { return QString(":images/services/polarflow.png"); }
+
+        // read a file
+        bool readFile(QByteArray *data, QString remotename, QString remoteid); //
+
+        // write a file
+        bool writeFile(QByteArray &data, QString remotename, RideFile *ride); //
+
+        // populate exercise list
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors); // CloudService.h 171 -> not implemented
+        //QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
     public slots:
 
         // getting data
-        void readyRead(); // a readFile operation has work to do
-        void readFileCompleted();
+        void readyRead(); //
+        void readFileCompleted(); //
+
+        // sending data - NOT for now
+        void writeFileCompleted(); //
 
     private:
         Context *context;
         QNetworkAccessManager *nam;
         QNetworkReply *reply;
-        CloudServiceEntry *root_;
 
         QMap<QNetworkReply*, QByteArray*> buffers;
 
-        QString userId;
+        QByteArray* prepareResponse(QByteArray* data, QString &name); // Get exercise summary
+
+        int isoDateToSeconds(QString &string); // get a duration out of ISO-Date Format
+        //QJsonObject createSampleStream(QJsonDocument &document, int loopnumber); // Create "Strava"-like Streams from Polar Samples
+        QJsonObject createSampleStream(QJsonDocument &sampletype_Doc, int actualSampleLoopNumber, int timeSamplesLoopNumber); // Create "Strava"-like Streams from Polar Samples
+
+        void clearJsonObject(QJsonObject &object); // clear old Stream
+        //void addSamples(RideFile* ret, QString exerciseId, QString fileSuffix); // Get available samples and Get Samples
+        void addSamples(RideFile* ret, QString exerciseId); // Get available samples and Get Samples
+
+        void fixLapSwim(RideFile* ret, QJsonArray laps);
+        void fixSmartRecording(RideFile* ret);
+
+        QString saveFile(QByteArray &array, QString exerciseId, QString filetype, QDateTime starttime, QString detailedSportInfo_Str); // Save Data File
+        QString getFile(QString exerciseId, QString filetype, QDateTime starttime, QString detailedSportInfo_Str); // Get Data File
+
+        void ImportFiles(QJsonObject &object, QString exerciseId);
+
+        void addExerciseSummaryInformation(RideFile* ret, QJsonObject &object); //, int duration_time);
 
     private slots:
         void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
+
 };
 #endif

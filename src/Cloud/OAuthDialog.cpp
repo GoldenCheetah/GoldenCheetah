@@ -386,6 +386,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         QString refresh_token;
         QString access_token;
         QString auth_token;
+        QString transaction_id;
         double polar_userid=0;
 
         // parse the response and extract the tokens, pretty much the same for all services
@@ -395,7 +396,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         if (parseError.error == QJsonParseError::NoError) {
             refresh_token = document.object()["refresh_token"].toString();
             access_token = document.object()["access_token"].toString();
-            if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
+            if (site == POLAR) polar_userid = document.object()["x_user_id"].toDouble();
             if (site == RIDEWITHGPS) access_token = document.object()["user"].toObject()["auth_token"].toString();
             if (site == WITHINGS) {
                 refresh_token = document.object()["body"].toObject()["refresh_token"].toString();
@@ -424,6 +425,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
             service->setSetting(GC_POLARFLOW_TOKEN, access_token);
             service->setSetting(GC_POLARFLOW_USER_ID, polar_userid);
+            service->setSetting(GC_POLARFLOW_TRANSACTION_ID, transaction_id);
 
             // we now need to bind the user, this is a one time deal.
             QString url = QString("%1/v3/users").arg(GC_POLARFLOW_URL);

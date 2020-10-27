@@ -38,6 +38,7 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
     first = true;
     creator = false;
+    training = false; // detailed-sport-info
 
 }
 
@@ -120,6 +121,8 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
 
     } else if (qName == "Creator") {
         creator = true;
+    } else if (qName == "Training") {
+        training = true;
     }
 
     return true;
@@ -159,8 +162,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             alt = buffer.toDouble();
         }
     } else if (qName == "LongitudeDegrees") {
-
-        char *p; 
+        char *p;
         setlocale(LC_NUMERIC,"C"); // strtod is locale dependent!
         lon = strtod(buffer.toLatin1(), &p);
         setlocale(LC_NUMERIC,"");
@@ -440,6 +442,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     } else if (creator && qName == "Name") {
         if (!buffer.isEmpty())
             rideFile->setDeviceType(buffer);
+    } else if (qName == "Training") {
+        training = false;
+    } else if (training && qName == "Name") {
+        if (!buffer.isEmpty())
+            rideFile->setTag("SubSport", buffer);
     }
     return true;
 }

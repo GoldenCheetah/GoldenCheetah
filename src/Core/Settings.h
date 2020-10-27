@@ -411,6 +411,16 @@
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
+#define GC_POLARFLOW_TRANSACTION_ID    "<athlete-private>polarflow_transaction_id"
+#define GC_POLARFLOW_EXERCISE_ID       "<athlete-private>polarflow_exercise_id"
+#define GC_POLARFLOW_LAST_EXERCISE_ID  "<athlete-private>polarflow_last_exercise_id"
+#define GC_POLARFLOW_SAMPLE_SIZE       "<athlete-private>polarflow_sample_size"
+#define GC_POLARFLOW_SAMPLE_RECORDINGRATE   "<athlete-private>polarflow_sample_recording_rate"
+#define GC_POLARFLOW_SAMPLE_ID          "<athlete-private>polarflow_sample_id"
+#define GC_POLARFLOW_TIMESAMPLES_LOOPNUMBER   "<athlete-private>polarflow_timestream_loop_number"
+#define GC_POLARFLOW_ACTIVITY_NAME     "<athlete-private>polarflow_activity_name"
+#define GC_POLARFLOW_ACTIVITY_COUNTER  "<athlete-private>polarflow_activity_counter"
+#define GC_POLARFLOW_STATUS_CODE       "<athlete-private>polarflow_status_code"
 
 // SportTracks
 #define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
