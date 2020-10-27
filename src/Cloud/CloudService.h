@@ -149,7 +149,7 @@ class CloudService : public QObject {
         // AthleteID can only be provided if the service implements the listAthletes and selectAthlete
         // entry points -- to list and accept the choice of athlete by the user
         enum CloudServiceSetting { Username, Password, OAuthToken, Key, URL, DefaultURL, Folder, AthleteID,
-                                   Local1, Local2, Local3, Local4, Local5, Local6,
+                                   Local1, Local2, Local3, Local4, Local5, Local6, Local7,
                                    Combo1, Metadata1, Consent } setting_;
         QHash<CloudServiceSetting, QString> settings;
 
