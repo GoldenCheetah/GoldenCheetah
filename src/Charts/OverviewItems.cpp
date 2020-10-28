@@ -759,7 +759,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
     RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (std::isinf(v) || std::isnan(v)) v=0;
     if (m) {
-        value = m->toString(GlobalContext::context()->useMetricUnits, v);
+        value = m->toString(false, v); // do not convert metric units as already done.
     } else {
         value = Utils::removeDP(QString("%1").arg(v));
         if (value == "nan") value ="";
