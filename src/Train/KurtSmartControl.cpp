@@ -5,7 +5,7 @@
 //
 //  Integrated into golden cheetah by Eric Christoffersen 2020 (impolexg@outlook.com)
 
-#include "Kurt_SmartControl.h"
+#include "KurtSmartControl.h"
 
 #include <random>
 #include <mutex>
