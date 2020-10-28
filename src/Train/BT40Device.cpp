@@ -22,8 +22,8 @@
 #include "VMProWidget.h"
 
 #include "ANTMessage.h"
-#include "Kurt_inRide.h"
-#include "Kurt_SmartControl.h"
+#include "KurtInRide.h"
+#include "KurtSmartControl.h"
 
 #define VO2MASTERPRO_SERVICE_UUID "{00001523-1212-EFDE-1523-785FEABCD123}"
 #define VO2MASTERPRO_VENTILATORY_CHAR_UUID "{00001527-1212-EFDE-1523-785FEABCD123}"
@@ -531,6 +531,7 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
             inride_config_data icd = inride_process_config_data((const uint8_t*)value.constData());
 
             // Nothing to do with this data.
+            Q_UNUSED(icd);
         }
     } else if (c.uuid() == s_KurtInRideService_Power_UUID) {
 
