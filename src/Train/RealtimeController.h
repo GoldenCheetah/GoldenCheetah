@@ -36,6 +36,13 @@ struct VirtualPowerTrainer {
     const char*            m_pName;
     const PolyFit<double>* m_pf;
     bool                   m_fUseWheelRpm;
+    double                 m_rotationalInertiaKG;
+
+    VirtualPowerTrainer() :
+        m_pName(""), m_pf(NULL), m_fUseWheelRpm(false), m_rotationalInertiaKG(0.) {}
+
+    VirtualPowerTrainer(const char* pName, const PolyFit<double>*pf, bool fUseWheelRpm, double rotationalInertiaKG = 0.) :
+        m_pName(pName),m_pf(pf), m_fUseWheelRpm(fUseWheelRpm), m_rotationalInertiaKG(rotationalInertiaKG) {}
 
     void to_string(std::string& s) const;
 };
@@ -129,6 +136,10 @@ private:
 
     const PolyFit<double>* polyFit; // Speed to power fit.
     bool fUseWheelRpm;              // If power is derived from wheelrpm instead of speed.
+    double rotationalInertiaKG;
+
+    double inertiaPrevRpm;
+    std::chrono::high_resolution_clock::time_point inertiaPrevTime;
 
 public:
     VirtualPowerTrainerManager virtualPowerTrainerManager;

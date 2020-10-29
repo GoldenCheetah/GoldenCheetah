@@ -76,9 +76,10 @@ public:
     DeviceScanner *scanner;
 
     // Device Data
-    int virtualPowerIndex;      // index of selected virtual power function
-    int wheelSize;
-    int strideLength;
+    int    virtualPowerIndex;      // index of selected virtual power function
+    int    wheelSize;
+    int    strideLength;
+    double rotationalInertiaKG; // rotational inertia of system flywheel, in grams
 
 public slots:
 
@@ -239,12 +240,13 @@ private:
     AddDeviceWizard* wizard;
     RealtimeController* controller; // copy of controller, for lazy re-init
 
-    QLineEdit* name;
-    QComboBox* virtualPower;
-    QComboBox* rimSizeCombo;
-    QComboBox* tireSizeCombo;
-    QLineEdit* wheelSizeEdit;
-    QLineEdit* stridelengthEdit;
+    QLineEdit*      name;
+    QComboBox*      virtualPower;
+    QComboBox*      rimSizeCombo;
+    QComboBox*      tireSizeCombo;
+    QLineEdit*      wheelSizeEdit;
+    QLineEdit*      stridelengthEdit;
+    QDoubleSpinBox* rotationalInertiaKGEdit;
 
     QLabel*         virtualPowerNameLabel;
     QLineEdit*      virtualPowerNameEdit;

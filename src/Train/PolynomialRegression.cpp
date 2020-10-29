@@ -79,6 +79,13 @@ struct FractionalPolynomialFitter : public T {
         return (pow(v, arr[0]) * arr[1]) + arr[2];
     }
 
+    T_fptype Slope(T_fptype v) const {
+        // Scale v, for example mph -> kph
+        v = v * scale;
+
+        return (v * pow(v, arr[0] - 1));
+    }
+
     void append(std::string& s) const {
         T_AppendVirtualPowerDescriptionString(s, "FPR", 3, 0, &(arr[0]), scale);
     }
@@ -146,6 +153,50 @@ struct RationalFitter : public T {
         }
 
         T_fptype r = n / d;
+
+        return r;
+    }
+
+    // Slope of rational polynomial using quotiant rule
+    T_fptype Slope(T_fptype v) const {
+        // Scale v, for example mph -> kph
+        v = v * scale;
+
+        // Compute Numerator Slope
+        static const T_fptype s_zero = 0.;
+        static const T_fptype s_one = 1.;
+        T_fptype numerSlope = s_zero;
+        T_fptype p = s_one;
+        T_fptype count = s_one;
+        if (T_num > 1)
+            for (size_t i = 1; i < T_num; i++, count = count + 1, p = p * v)
+                if (!IsZero2(arr[i], s_one))
+                    numerSlope = numerSlope + arr[i] * p * count;
+
+        // If no denominator coeficients then implicit divide 1. Done-ski.
+        if (T_size == T_num) return numerSlope;
+
+        // Compute Denominator Slope
+        T_fptype denomSlope = s_zero; // d starts at 0
+        p = s_one;
+        count = s_one;
+        for (size_t i = T_num; i < T_size; i++, count = count + 1, p = p * v)
+            denomSlope = denomSlope + (arr[i] * p * count);
+
+        // Determine numerator fit value.
+        T_fptype numerFit = s_zero;
+        p = s_one; // power starts with x^0 (== 1)
+        for (size_t i = 0; i < T_num; i++, p = p * v)
+            numerFit = numerFit + (arr[i] * p);
+
+        // Determine denominator fit value
+        T_fptype denomFit = s_one; // d starts at 1
+        p = v;                     // loop starts with p = x^1
+        for (size_t i = T_num; i < T_size; i++, p = p * v)
+            denomFit = denomFit + (arr[i] * p);
+
+        // Quotiant Rule:
+        T_fptype r = ((numerSlope * denomFit) - (numerFit * denomSlope)) / (denomFit * denomFit);
 
         return r;
     }
@@ -229,7 +280,198 @@ PolyFit<double>* PolyFitGenerator::GetFractionalPolyFit(const std::vector<double
     return s_PolyFitGenerator.GetFractionalPolyFit(coefs, scale);
 }
 
+bool printAndTestAgainstExpected(PolyFit<double>* poly, std::vector<std::array<double, 3>>& expected) {
+    static const double s_CloseEnough = 0.0000001;
+    bool sawFailure = false;
+
+    for (int i = 0; i < expected.size(); i++) {
+        double fit = poly->Fit(expected[i][0]);
+        double slope = poly->Slope(expected[i][0]);
+        std::cout << "{" << i << " , " << fit << " , " << slope << "}" << std::endl;
+        double delta = fit - expected[i][1];
+        if (fabs(delta) > s_CloseEnough) {
+            std::cout << "i:" << i << ": wrong fit, got:" << fit << " expected " << expected[i][1] << std::endl;
+            sawFailure = true;
+        }
+        delta = slope - expected[i][2];
+        if (fabs(delta) > s_CloseEnough) {
+            std::cout << "i:" << i << ": wrong slope, got:" << slope << " expected " << expected[i][2] << std::endl;
+            sawFailure = true;
+        }
+    }
+    if (sawFailure) std::cout << "Failed!" << std::endl;
+    else std::cout << "Passed." << std::endl;
+
+    return sawFailure;
+}
+
 void PolynomialRegressionTest(void) {
+
+    // Test slope capability of fitted poly.
+    // Each triple is v, watts at v, power slope at v
+    // The immediates were computed offline, now compare
+    // test values against fit and slope.
+
+    {
+        std::cout << "POLYFIT y = x ^ 2" << std::endl;
+        std::vector<double> coefs = { 0,0,1 };
+        std::vector<std::array<double, 3>> expected = {
+            { 0 , 0  , 0  },
+            { 1 , 1  , 2  },
+            { 2 , 4  , 4  },
+            { 3 , 9  , 6  },
+            { 4 , 16 , 8  },
+            { 5 , 25 , 10 },
+            { 6 , 36 , 12 },
+            { 7 , 49 , 14 },
+            { 8 , 64 , 16 },
+            { 9 , 81 , 18 }
+        };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetPolyFit(coefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "POLYFIT y = 2 * x ^ 2" << std::endl;
+        std::vector<double> coefs = { 0,0,2 };
+        std::vector<std::array<double, 3>> expected = {
+            { 0 , 0   , 0  },
+            { 1 , 2   , 4  },
+            { 2 , 8   , 8  },
+            { 3 , 18  , 12 },
+            { 4 , 32  , 16 },
+            { 5 , 50  , 20 },
+            { 6 , 72  , 24 },
+            { 7 , 98  , 28 },
+            { 8 , 128 , 32 },
+            { 9 , 162 , 36 } };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetPolyFit(coefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "POLYFIT y = 4 * x ^ 5 + 3 x ^ 2 + 2 x + 7" << std::endl;
+        std::vector<double> coefs = { 7,2,3,0,4 };
+        std::vector<std::array<double, 3>> expected = {
+            {0 , 7     , 2     },
+            {1 , 16    , 24    },
+            {2 , 87    , 142   },
+            {3 , 364   , 452   },
+            {4 , 1087  , 1050  },
+            {5 , 2592  , 2032  },
+            {6 , 5311  , 3494  },
+            {7 , 9772  , 5532  },
+            {8 , 16599 , 8242  },
+            {9 , 26512 , 11720 }
+        };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetPolyFit(coefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "FRACTIONAL FIT y = x ^ 2" << std::endl;
+        std::vector<double> coefs = { 2,1,0 };
+        std::vector<std::array<double, 3>> expected = {
+            { 0 , 0   , 0  },
+            { 1 , 1   , 2  },
+            { 2 , 4   , 4  },
+            { 3 , 9   ,  6 },
+            { 4 , 16  , 8 },
+            { 5 , 25  , 10 },
+            { 6 , 36  , 12 },
+            { 7 , 49  , 14 },
+            { 8 , 64  , 16 },
+            { 9 , 81  , 18 } };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetFractionalPolyFit(coefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "RATIONAL FIT y = x ^ 2" << std::endl;
+        std::vector<double> coefs = { 0,0,1 };
+        std::vector<double> denCoefs = { 0 };
+        std::vector<std::array<double, 3>> expected = {
+            { 0 , 0   , 0  },
+            { 1 , 1   , 2  },
+            { 2 , 4   , 4  },
+            { 3 , 9  ,  6 },
+            { 4 , 16  , 8 },
+            { 5 , 25  , 10 },
+            { 6 , 36  , 12 },
+            { 7 , 49  , 14 },
+            { 8 , 64 , 16 },
+            { 9 , 81 , 18 } };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetRationalPolyFit(coefs, denCoefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "RATIONAL FIT y = (x ^ 2) / (1 + (x ^ 3))" << std::endl;
+        std::vector<double> coefs = { 0,0,1 };
+        std::vector<double> denCoefs = { 0,0,1 };
+        std::vector<std::array<double, 3>> expected = {
+            {0	, 0	          ,  0             },
+            {1	, 0.5	      ,  0.25          },
+            {2	, 0.4444444444 , -0.1481481481 },
+            {3	, 0.3214285714 , -0.09566326531},
+            {4	, 0.2461538462 , -0.05869822485},
+            {5	, 0.1984126984 , -0.03873771731},
+            {6	, 0.1658986175 , -0.02726751471},
+            {7	, 0.1424418605 , -0.02017137642},
+            {8	, 0.1247563353 , -0.01550334576},
+            {9	, 0.1109589041 , -0.01227810096}
+        };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetRationalPolyFit(coefs, denCoefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "RATIONAL FIT y = (1 + (x ^ 2)) / (1 + (x ^ 2))" << std::endl;
+        std::vector<double> coefs = { 1,0,1 };
+        std::vector<double> denCoefs = { 0,1 };
+        std::vector<std::array<double, 3>> expected = {
+            {0 , 1 , 0},
+            {1 , 1 , 0},
+            {2 , 1 , 0},
+            {3 , 1 , 0},
+            {4 , 1 , 0},
+            {5 , 1 , 0},
+            {6 , 1 , 0},
+            {7 , 1 , 0},
+            {8 , 1 , 0},
+            {9 , 1 , 0}
+        };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetRationalPolyFit(coefs, denCoefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
+
+    {
+        std::cout << "RATIONAL FIT y = (x ^ 2) / (1 + (x ^ 2))" << std::endl;
+        std::vector<double> coefs = { 0,0,1 };
+        std::vector<double> denCoefs = { 0,1 };
+        std::vector<std::array<double, 3>> expected = {
+            {0 , 0        , 0}         ,
+            {1 , 0.5      , 0.5}       ,
+            {2 , 0.8      , 0.16}      ,
+            {3 , 0.9      , 0.06}      ,
+            {4 , 0.941176 , 0.0276817} ,
+            {5 , 0.961538 , 0.0147929} ,
+            {6 , 0.972973 , 0.00876552},
+            {7 , 0.98     , 0.0056}    ,
+            {8 , 0.984615 , 0.00378698},
+            {9 , 0.987805 , 0.00267698}
+        };
+
+        PolyFit<double>* poly = PolyFitGenerator::GetRationalPolyFit(coefs, denCoefs);
+        printAndTestAgainstExpected(poly, expected);
+    }
 
     // Some struct that matches data layout. Main thing is that
     // 'time' and 'speed' fields exist and line up with the data.

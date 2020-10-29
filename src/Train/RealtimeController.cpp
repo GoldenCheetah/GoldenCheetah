@@ -25,14 +25,15 @@ void VirtualPowerTrainer::to_string(std::string& s) const {
     // poly|wheelrpm|name
     s.clear();
     m_pf->append(s);
+    s.append(m_fUseWheelRpm ? "|1|" : "|0|");
+    s.append(m_pName);
     s.append("|");
-    s.append(m_fUseWheelRpm ? "1|" : "0|");
-    s.append(m_pName); // name hangs off the end
+    s.append(QString::number(m_rotationalInertiaKG, 'f', 3).toStdString());
 }
 
 // Abstract base class for Realtime device controllers
 
-RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) : parent(parent), dc(dc), polyFit(NULL), fUseWheelRpm(false)
+RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) : parent(parent), dc(dc), polyFit(NULL), fUseWheelRpm(false),inertiaPrevRpm(0), inertiaPrevTime()
 {
     if (dc != NULL)
     {
@@ -64,8 +65,30 @@ void RealtimeController::processRealtimeData(RealtimeData &rtData)
     // Compute speed from power if a post-process is defined. At this point the postprocess id
     // has been instantiated into polyfit.
     if (polyFit) {
-        double v = (fUseWheelRpm) ? rtData.getWheelRpm() : rtData.getSpeed();
-        rtData.setWatts(polyFit->Fit(v));
+        double wheelRpm = rtData.getWheelRpm();
+        double v = (fUseWheelRpm) ? wheelRpm : rtData.getSpeed();
+        double watts = polyFit->Fit(v);
+
+        // Compute power to/from flywheel inertia
+        if (rotationalInertiaKG) {
+            std::chrono::high_resolution_clock::time_point newSampleTime = std::chrono::high_resolution_clock::now();
+
+            // Compute milliseconds since last sample.
+            double ms = std::chrono::duration_cast<std::chrono::milliseconds>(newSampleTime - inertiaPrevTime).count();
+
+            // If time is less than a second then compute power interation with flywheel
+            if (ms > 0. && ms < 1000.) {
+                double deltaRpm = wheelRpm - inertiaPrevRpm;
+                double deltaInertialWatts = (0.5 * rotationalInertiaKG * deltaRpm * deltaRpm) / (1000. * ms);
+
+                watts += deltaInertialWatts;
+            }
+
+            inertiaPrevTime = newSampleTime;
+            inertiaPrevRpm = wheelRpm;
+        }
+
+        rtData.setWatts(watts);
     }
 }
 
@@ -540,16 +563,17 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
     // DEF,COEFS,SCALE,RPM,NAME
 
     // DEF:   tla,coefcount,numeratorcount
-    // COEFS:|coefs,...
-    // SCALE:|scale}
-    // RPM:  |wheelrpm
-    // NAME: |name
+    // COEFS:   |coefs,...
+    // SCALE:   |scale}
+    // RPM:     |wheelrpm
+    // NAME:    |name
+    // INERTIA: |rotationInertiaGrams
 
     do {
         QStringList pieces = string.split("|");
 
         size_t size = pieces.size();
-        if (size != 5) break;
+        if (size != 5 && size != 6) break; // no inertia supported for back compat
 
         // section 0 DEF
         QStringList defPieces = pieces.at(0).split(QRegExp(QRegExp::escape(",")));
@@ -593,15 +617,19 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         // section 4 Name
         QString namePiece = pieces.at(4);
 
+        // section 5 OPTIONAL: Rotational Inertia (grams)
+        double rotationalInertiaKG = 0;
+        if (size = 6)
+            rotationalInertiaKG = pieces.at(5).toDouble();
+
         // Finished with parse errors. All memory allocated is held by new
         // VirtualPowerTrainer and freed by manager when manager is destroyed.
-
 
         std::string name = namePiece.toStdString();
         char* pNameCopy = new char[name.size() + 1];
         strcpy(pNameCopy, name.c_str());
 
-        VirtualPowerTrainer* p = new VirtualPowerTrainer;
+        VirtualPowerTrainer* p = new VirtualPowerTrainer();
 
         p->m_pName = pNameCopy;
 
@@ -613,6 +641,8 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
             p->m_pf = PolyFitGenerator::GetRationalPolyFit(num, den, scale);
 
         p->m_fUseWheelRpm = fUseWheelRpm;
+
+        p->m_rotationalInertiaKG = rotationalInertiaKG;
 
         PushCustomVirtualPowerTrainer(p);
 
@@ -663,9 +693,11 @@ RealtimeController::processSetup()
     if (pTrainer) {
         polyFit = pTrainer->m_pf;
         fUseWheelRpm = pTrainer->m_fUseWheelRpm;
+        rotationalInertiaKG = pTrainer->m_rotationalInertiaKG;
     } else {
         polyFit = NULL;
         fUseWheelRpm = false;
+        rotationalInertiaKG = 0.;
     }
 }
 

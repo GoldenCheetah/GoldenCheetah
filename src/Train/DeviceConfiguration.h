@@ -39,6 +39,7 @@ class DeviceConfiguration
 
     QString defaultString;      // PHCS for power/heartrate/cadence/speed from this device
     int wheelSize;              // set wheel size for each device
+    double rotationalInertiaKG; // flywheel inertia in kg
     int stridelength;           // stride length in cm
 
     int postProcess;
