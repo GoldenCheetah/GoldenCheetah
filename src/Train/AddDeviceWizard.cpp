@@ -47,6 +47,7 @@ AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow
 
     virtualPowerIndex = 0;           // index of selected virtual power function
     wheelSize = 0;
+    inertialMomentKGM2 = 0;
     strideLength = 0;
 
     // delete when done
@@ -1196,13 +1197,17 @@ AddVirtualPower::myCreateCustomPowerCurve() {
 
     VirtualPowerTrainer* p = new VirtualPowerTrainer;
 
-    std::string name = virtualPowerNameEdit->text().toStdString();
-    char* pNameCopy = new char[name.size() + 1];
-    strcpy(pNameCopy, name.c_str());
+    // At this point ensure there are no '|' in name, since if encoded it would confuse decoding.
+    QStringList namePieces = virtualPowerNameEdit->text().split("|");
+
+    // No point being fancy, simply take the name before the '|'.
+    char* pNameCopy = new char[strlen(namePieces.at(0).toStdString().c_str()) + 1];
+    strcpy(pNameCopy, namePieces.at(0).toStdString().c_str());
 
     p->m_pName = pNameCopy; // freed by manager when manager is destroyed.
     p->m_pf = pf;
     p->m_fUseWheelRpm = false;
+    p->m_inertialMomentKGM2 = inertialMomentKGM2Edit->value();
 
     controller->virtualPowerTrainerManager.PushCustomVirtualPowerTrainer(p);
 
@@ -1315,6 +1320,17 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
     wheelSizeLayout->addWidget(wheelSizeEdit);
     wheelSizeLayout->addWidget(wheelSizeUnitLabel);
 
+    inertialMomentKGM2Edit = new QDoubleSpinBox(this);
+    inertialMomentKGM2Edit->setRange(0, 100);
+    inertialMomentKGM2Edit->setDecimals(3);
+    inertialMomentKGM2Edit->setSingleStep(.1);
+    inertialMomentKGM2Edit->setValue(0.);
+    inertialMomentKGM2Edit->setToolTip(tr("Trainer's Moment of Inertia (KG M^2)"));
+
+    QHBoxLayout* inertialMomentKGM2Layout = new QHBoxLayout;
+    inertialMomentKGM2Layout->addWidget(inertialMomentKGM2Edit);
+    inertialMomentKGM2Layout->addStretch();
+
     stridelengthEdit = new QLineEdit(this);
     stridelengthEdit->setText("115");
     QHBoxLayout* stridelengthLayout = new QHBoxLayout;
@@ -1327,6 +1343,7 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
 
     form2layout->addRow(new QLabel(tr("Wheel Size"), this), wheelSizeLayout);
     form2layout->addRow(new QLabel(tr("Stride Length (cm)"), this), stridelengthLayout);
+    form2layout->addRow(new QLabel(tr("Rotational Inertia (KG M^2)"), this), inertialMomentKGM2Layout);
 
     hlayout->addLayout(form2layout);
 
@@ -1537,6 +1554,7 @@ AddFinal::validatePage()
 
         add.postProcess = wizard->virtualPowerIndex;
         add.wheelSize = wizard->wheelSize;
+        add.inertialMomentKGM2 = wizard->inertialMomentKGM2;
         add.stridelength = wizard->strideLength;
         add.controller = wizard->controller;
 

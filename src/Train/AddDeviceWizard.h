@@ -76,9 +76,10 @@ public:
     DeviceScanner *scanner;
 
     // Device Data
-    int virtualPowerIndex;      // index of selected virtual power function
-    int wheelSize;
-    int strideLength;
+    int    virtualPowerIndex;      // index of selected virtual power function
+    int    wheelSize;
+    int    strideLength;
+    double inertialMomentKGM2;  // inertial moment of trainer in (KG M^2)
 
 public slots:
 
@@ -239,12 +240,13 @@ private:
     AddDeviceWizard* wizard;
     RealtimeController* controller; // copy of controller, for lazy re-init
 
-    QLineEdit* name;
-    QComboBox* virtualPower;
-    QComboBox* rimSizeCombo;
-    QComboBox* tireSizeCombo;
-    QLineEdit* wheelSizeEdit;
-    QLineEdit* stridelengthEdit;
+    QLineEdit*      name;
+    QComboBox*      virtualPower;
+    QComboBox*      rimSizeCombo;
+    QComboBox*      tireSizeCombo;
+    QLineEdit*      wheelSizeEdit;
+    QLineEdit*      stridelengthEdit;
+    QDoubleSpinBox* inertialMomentKGM2Edit;
 
     QLabel*         virtualPowerNameLabel;
     QLineEdit*      virtualPowerNameEdit;

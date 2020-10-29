@@ -78,9 +78,12 @@ void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
 }
-void RealtimeData::setWheelRpm(double wheelRpm)
+void RealtimeData::setWheelRpm(double wheelRpm, bool fMarkWheelRpmTime)
 {
     this->wheelRpm = wheelRpm;
+
+    if (fMarkWheelRpmTime)
+        this->wheelRpmSampleTime = std::chrono::high_resolution_clock::now();
 }
 void RealtimeData::setCadence(double aCadence)
 {
@@ -200,6 +203,10 @@ double RealtimeData::getVirtualSpeed() const
 double RealtimeData::getWheelRpm() const
 {
     return wheelRpm;
+}
+std::chrono::high_resolution_clock::time_point RealtimeData::getWheelRpmSampleTime() const
+{
+    return this->wheelRpmSampleTime;
 }
 double RealtimeData::getCadence() const
 {

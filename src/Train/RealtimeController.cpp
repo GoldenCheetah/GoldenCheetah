@@ -25,14 +25,18 @@ void VirtualPowerTrainer::to_string(std::string& s) const {
     // poly|wheelrpm|name
     s.clear();
     m_pf->append(s);
+    s.append(m_fUseWheelRpm ? "|1|" : "|0|");
+    s.append(m_pName);
     s.append("|");
-    s.append(m_fUseWheelRpm ? "1|" : "0|");
-    s.append(m_pName); // name hangs off the end
+    s.append(QString::number(m_inertialMomentKGM2, 'f', 3).toStdString());
 }
 
 // Abstract base class for Realtime device controllers
 
-RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) : parent(parent), dc(dc), polyFit(NULL), fUseWheelRpm(false)
+RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) :
+    parent(parent), dc(dc), polyFit(NULL), fUseWheelRpm(false), 
+    inertialMomentKGM2(0.), fAdvancedSpeedPowerMapping(true),
+    prevTime(), prevRpm(0.), prevWatts(0.)
 {
     if (dc != NULL)
     {
@@ -59,13 +63,114 @@ bool RealtimeController::doesLoad() { return false; }
 void RealtimeController::getRealtimeData(RealtimeData &) { }
 void RealtimeController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
 
+// Estimate Power From Speed
+//
+// Simply mapping current speed sample to power has significant error for intervals
+// where speed has changed.
+//
+// - Determine average power during time span since previous device speed update.
+//     Uses average power over interval because point power is significantly
+//     wrong for intervals where speed has changed. An average still isn't perfect
+//     because acceleration probably isn't constant, probably the best general
+//     approach would weight lower velocities more heavily since for a speed/power
+//     curve the acceleration is greater at higher velocities.
+//
+// - Determine change in power due to change of device flywheel inertia.
+//     Inertial energy is what goes into spinning the trainer's flywheel (and rear
+//     wheel for wheel-on trainer). The InertialMomentKGM2 value is the 'I' of the
+//     bicycle and trainer. The inertial adjustment computes energy that has entered
+//     or left the trainer system in the form of rotational inertia, as must occur
+//     when speed changes.
+double RealtimeController::estimatePowerFromSpeed(double v, double wheelRpm, const std::chrono::high_resolution_clock::time_point & wheelRpmSampleTime) {
+
+    // Early Out: Simply compute power with raw fit function.
+    if (!fAdvancedSpeedPowerMapping) {
+        return polyFit->Fit(v);
+    }
+
+    // milliseconds since previous device rpm data
+    double ms = std::chrono::duration_cast<std::chrono::milliseconds>(wheelRpmSampleTime - prevTime).count();
+
+    // If sample data time has not changed then skip calculation and use old value.
+    if (ms <= 0.) {
+        return prevWatts;
+    }
+
+    // If speed has not changed significantly then skip calculation and use old value.
+    // Compute previous velocity using difference between old and new wheel rpm.    
+
+    double previousV = wheelRpm ? (prevRpm * (v / wheelRpm)) : 0.;
+    double deltaV = v - previousV;
+
+    static const double s_KphEpsilon = 0.01;
+    if (fabs(deltaV) < s_KphEpsilon) {
+        return prevWatts;
+    }
+
+    // Otherwise compute power from speed, previous speed and time delta.
+    double watts = 0;
+
+    // -------------------------------------------------------------------------------------
+    // Average Power Since Previous Data
+
+    // Average speed is area under power curve in speed range, divided by change
+    // in speed. Integrate across velocity interval then divide by delta v.
+    //
+    // Note that this will still overweight higher velocity since gradient is
+    // steeper at higher velocities.
+    watts = polyFit->Integrate(previousV, v) / deltaV;
+
+    // -------------------------------------------------------------------------------------
+    // Watt adjustment due to inertia change.
+    double dInertialWatts = 0.;
+
+    // If trainer's inertialMoment is defined
+    if (inertialMomentKGM2) {
+        // If time is less than 2 seconds then compute power interaction with trainer's moment of inertia
+        // Time greater than 2 seconds... something is wrong with sample rate, skip the
+        // adjustment to avoid power spikes.
+        static const double s_OutOfRangeTimeSampleMS = 2000;
+        if (ms <= s_OutOfRangeTimeSampleMS) {
+            // Compute Deltas
+            double dRadiansPS = (2 * M_PI * 60.) * (wheelRpm - prevRpm);          // rotations/minute to radians/second
+            double dRadiansPSSquared = dRadiansPS * fabs(dRadiansPS);             // sign preserving ^2
+            double dInertialJoules = inertialMomentKGM2 * dRadiansPSSquared / 2.; // K = m I w^2 / 2
+            dInertialWatts = dInertialJoules / (ms * 1000.);                      // watts = K / s
+        }
+    }
+
+    // Debug Summary
+    static const bool fPrintDebugSummary = true;
+    if (fPrintDebugSummary) {
+        double wattFit = polyFit->Fit(v);
+        qDebug() << "v: " << v << " Watts:" << (watts + dInertialWatts) << " accelAdjustment:" << (watts - wattFit) 
+            << " inertialAdjustment: " << dInertialWatts << " totalAdjust:" << ((watts+dInertialWatts) - wattFit);
+    }
+
+    // Keep Power Non-Negative
+    //
+    // Note: Negative watts while coasting indicates an error in the device inertia, or in the device
+    // speed to power fit function, but could also occur if rider uses their brakes.
+    watts = std::max(0., watts + dInertialWatts);
+
+    // Store watts, rpm and sample time for use as tehe next 'previous sample.'
+    prevWatts = watts;
+    prevRpm = wheelRpm;
+    prevTime = wheelRpmSampleTime;
+
+    return watts;
+}
+
 void RealtimeController::processRealtimeData(RealtimeData &rtData)
 {
     // Compute speed from power if a post-process is defined. At this point the postprocess id
     // has been instantiated into polyfit.
     if (polyFit) {
-        double v = (fUseWheelRpm) ? rtData.getWheelRpm() : rtData.getSpeed();
-        rtData.setWatts(polyFit->Fit(v));
+        double wheelRpm = rtData.getWheelRpm();
+        double v = (fUseWheelRpm) ? wheelRpm : rtData.getSpeed();
+        double watts = estimatePowerFromSpeed(v, wheelRpm, rtData.getWheelRpmSampleTime());
+
+        rtData.setWatts(watts);
     }
 }
 
@@ -540,21 +645,22 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
     // DEF,COEFS,SCALE,RPM,NAME
 
     // DEF:   tla,coefcount,numeratorcount
-    // COEFS:|coefs,...
-    // SCALE:|scale}
-    // RPM:  |wheelrpm
-    // NAME: |name
+    // COEFS:   |coefs,...
+    // SCALE:   |scale}
+    // RPM:     |wheelrpm
+    // NAME:    |name
+    // INERTIA: |rotationInertiaGrams
 
     do {
         QStringList pieces = string.split("|");
 
-        size_t size = pieces.size();
-        if (size != 5) break;
+        size_t pieceCount = pieces.size();
+        if (pieceCount != 5 && pieceCount != 6) break; // no inertia supported for back compat
 
         // section 0 DEF
         QStringList defPieces = pieces.at(0).split(QRegExp(QRegExp::escape(",")));
-        size = defPieces.size();
-        if (size != 3) break; // bad prefix section count...
+        size_t defCount = defPieces.size();
+        if (defCount != 3) break; // bad prefix section count...
 
         // 0,0 DEF:TLA
         bool isFractional = false;
@@ -572,8 +678,8 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
 
         // section 1 COEFS
         QStringList coefs = pieces.at(1).split(QRegExp(QRegExp::escape(",")));
-        size = coefs.size();
-        if (size != coefCount) break; // wrong number of coefs in string
+        size_t coefPieceCount = coefs.size();
+        if (coefPieceCount != coefCount) break; // wrong number of coefs in string
 
         // Distribute coefs to numerator and denominator coefficient arrays.
         // Denominator always has an implict constant 1. If denominator array
@@ -593,15 +699,19 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         // section 4 Name
         QString namePiece = pieces.at(4);
 
+        // section 5 OPTIONAL: Rotational Inertia (grams)
+        double inertialMomentKGM2 = 0;
+        if (pieceCount == 6)
+            inertialMomentKGM2 = pieces.at(5).toDouble();
+
         // Finished with parse errors. All memory allocated is held by new
         // VirtualPowerTrainer and freed by manager when manager is destroyed.
-
 
         std::string name = namePiece.toStdString();
         char* pNameCopy = new char[name.size() + 1];
         strcpy(pNameCopy, name.c_str());
 
-        VirtualPowerTrainer* p = new VirtualPowerTrainer;
+        VirtualPowerTrainer* p = new VirtualPowerTrainer();
 
         p->m_pName = pNameCopy;
 
@@ -613,6 +723,8 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
             p->m_pf = PolyFitGenerator::GetRationalPolyFit(num, den, scale);
 
         p->m_fUseWheelRpm = fUseWheelRpm;
+
+        p->m_inertialMomentKGM2 = inertialMomentKGM2;
 
         PushCustomVirtualPowerTrainer(p);
 
@@ -663,10 +775,16 @@ RealtimeController::processSetup()
     if (pTrainer) {
         polyFit = pTrainer->m_pf;
         fUseWheelRpm = pTrainer->m_fUseWheelRpm;
+        inertialMomentKGM2 = pTrainer->m_inertialMomentKGM2;
     } else {
         polyFit = NULL;
         fUseWheelRpm = false;
+        inertialMomentKGM2 = 0.;
     }
+
+    prevWatts = 0;
+    prevRpm = 0;
+    prevTime = std::chrono::high_resolution_clock::time_point();
 }
 
 void

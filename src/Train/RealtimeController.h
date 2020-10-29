@@ -36,6 +36,13 @@ struct VirtualPowerTrainer {
     const char*            m_pName;
     const PolyFit<double>* m_pf;
     bool                   m_fUseWheelRpm;
+    double                 m_inertialMomentKGM2;
+
+    VirtualPowerTrainer() :
+        m_pName(""), m_pf(NULL), m_fUseWheelRpm(false), m_inertialMomentKGM2(0.) {}
+
+    VirtualPowerTrainer(const char* pName, const PolyFit<double>*pf, bool fUseWheelRpm, double inertialMomentKGM2 = 0.) :
+        m_pName(pName),m_pf(pf), m_fUseWheelRpm(fUseWheelRpm), m_inertialMomentKGM2(inertialMomentKGM2) {}
 
     void to_string(std::string& s) const;
 };
@@ -115,6 +122,10 @@ public:
     void   setCalibrationTimestamp();
     QTime  getCalibrationTimestamp();
 
+private:
+    double estimatePowerFromSpeed(double v, double wheelRpm, const std::chrono::high_resolution_clock::time_point& wheelRpmSampleTime);
+public:
+
     // post process, based upon device configuration
     void processRealtimeData(RealtimeData &rtData);
     void processSetup();
@@ -129,6 +140,12 @@ private:
 
     const PolyFit<double>* polyFit; // Speed to power fit.
     bool fUseWheelRpm;              // If power is derived from wheelrpm instead of speed.
+    double inertialMomentKGM2;
+
+    bool fAdvancedSpeedPowerMapping;
+    std::chrono::high_resolution_clock::time_point prevTime;
+    double prevRpm;
+    double prevWatts;
 
 public:
     VirtualPowerTrainerManager virtualPowerTrainerManager;

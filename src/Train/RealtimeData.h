@@ -67,7 +67,7 @@ public:
     void setSpeed(double speed);
     void setWbal(double speed);
     void setVirtualSpeed(double speed);
-    void setWheelRpm(double wheelRpm);
+    void setWheelRpm(double wheelRpm, bool fMarkTimeSample = false);
     void setCadence(double aCadence);
     void setLoad(double load);
     void setSlope(double slope);
@@ -126,6 +126,7 @@ public:
     double getWbal() const;
     double getVirtualSpeed() const;
     double getWheelRpm() const;
+    std::chrono::high_resolution_clock::time_point getWheelRpmSampleTime() const;
     double getCadence() const;
     double getLoad() const;
     double getSlope() const;
@@ -173,6 +174,8 @@ private:
     double torque; // raw torque data for calibration display
     double latitude, longitude, altitude;
     double vo2, vco2, rf, rmv, tv, feo2;
+
+    std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 
     // derived data
     double distance;
