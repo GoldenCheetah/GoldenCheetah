@@ -820,7 +820,7 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 
             double value = metrics_[m->index()];
             if (std::isinf(value) || std::isnan(value)) value=0;
-            returning = m->toString(useMetricUnits, value);
+            returning = m->toString(m->value(value, useMetricUnits));
         }
     }
     return returning;

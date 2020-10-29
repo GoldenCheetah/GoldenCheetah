@@ -57,8 +57,8 @@ class PeakPace : public RideMetric {
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
     }
-    QString toString(bool metric, double v) const {
-        return time_to_string(value(v, metric)*60, true);
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
     void setSecs(double secs) { this->secs=secs; }
 
@@ -407,8 +407,8 @@ class PeakPaceSwim : public RideMetric {
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
     }
-    QString toString(bool metric, double v) const {
-        return time_to_string(value(v, metric)*60, true);
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
     void setSecs(double secs) { this->secs=secs; }
 
@@ -743,8 +743,8 @@ class BestTime : public RideMetric {
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
     }
-    QString toString(bool metric, double v) const {
-        return time_to_string(value(v, metric)*60, true);
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
     void setMeters(double meters) { this->meters=meters; }
 

@@ -158,8 +158,8 @@ class XPaceSwim : public RideMetric {
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60);
     }
-    QString toString(bool metric, double v) const {
-        return time_to_string(value(v, metric)*60);
+    QString toString(double v) const {
+        return time_to_string(v*60);
     }
     void initialize() {
         setName(tr("xPace Swim"));

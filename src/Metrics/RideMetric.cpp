@@ -317,9 +317,9 @@ RideMetric::toString(bool useMetricUnits) const
 }
 
 QString
-RideMetric::toString(bool useMetricUnits, double v) const
+RideMetric::toString(double v) const
 {
-    if (isDate()) { QDate date(1900,01,01); date = date.addDays(value(v, useMetricUnits)); return date.toString("dd MMM yy"); }
-    if (isTime()) return time_to_string(value(v, useMetricUnits));
-    return QString("%1").arg(value(v, useMetricUnits), 0, 'f', this->precision());
+    if (isDate()) { QDate date(1900,01,01); date = date.addDays(v); return date.toString("dd MMM yy"); }
+    if (isTime()) return time_to_string(v);
+    return QString("%1").arg(v, 0, 'f', this->precision());
 }

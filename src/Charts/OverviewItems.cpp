@@ -686,9 +686,9 @@ MetricOverviewItem::setData(RideItem *item)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *m = factory.rideMetric(symbol);
     if (m) {
-        upper = m->toString(GlobalContext::context()->useMetricUnits, max);
-        lower = m->toString(GlobalContext::context()->useMetricUnits, min);
-        mean = m->toString(GlobalContext::context()->useMetricUnits, avg);
+        upper = m->toString(max);
+        lower = m->toString(min);
+        mean = m->toString(avg);
     }
 }
 
@@ -759,7 +759,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
     RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (std::isinf(v) || std::isnan(v)) v=0;
     if (m) {
-        value = m->toString(GlobalContext::context()->useMetricUnits, v);
+        value = m->toString(v);
     } else {
         value = Utils::removeDP(QString("%1").arg(v));
         if (value == "nan") value ="";
@@ -3301,8 +3301,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     const RideMetric *m = factory.rideMetric(parent->xsymbol);
     QString smin, smax;
     if (m) {
-        smin = m->toString(GlobalContext::context()->useMetricUnits, round(minx+xoff));
-        smax = m->toString(GlobalContext::context()->useMetricUnits, round(maxx+xoff));
+        smin = m->toString(round(minx+xoff));
+        smax = m->toString(round(maxx+xoff));
     } else {
         smin = QString("%1").arg(round(minx+xoff));
         smax = QString("%1").arg(round(maxx+xoff));
@@ -3343,7 +3343,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // xlabel
         const RideMetric *m = factory.rideMetric(parent->xsymbol);
         QString xlab;
-        if (m)  xlab = m->toString(GlobalContext::context()->useMetricUnits, nearest.x+xoff);
+        if (m)  xlab = m->toString(nearest.x+xoff);
         else xlab = Utils::removeDP(QString("%1").arg(nearest.x+xoff,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
@@ -3353,7 +3353,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // ylabel
         m = factory.rideMetric(parent->ysymbol);
         QString ylab;
-        if (m)  ylab = m->toString(GlobalContext::context()->useMetricUnits, nearest.y+yoff);
+        if (m)  ylab = m->toString(nearest.y+yoff);
         else ylab = Utils::removeDP(QString("%1").arg(nearest.y+yoff,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
