@@ -48,8 +48,8 @@ do
 done
 popd
 
-# Final deployment to generate dmg
-/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
+# Final deployment to generate dmg (it may take more than 10' wihout output)
+travis_wait /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
 export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
