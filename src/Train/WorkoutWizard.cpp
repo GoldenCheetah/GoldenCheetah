@@ -615,9 +615,16 @@ void GradientPage::SaveWorkout()
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
-        // header indicates metric units, so convert accordingly
-        double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
-        stream << currentX << " " << p.second << " 0" << endl;
+        if(p.first == "LAP")
+        {
+            stream << "LAP" << endl;
+        }
+        else
+        {
+            // header indicates metric units, so convert accordingly
+            double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
+            stream << currentX << " " << p.second << " 0" << endl;
+        }
     }
     stream << "[END COURSE DATA]" << endl;
     f.close();
