@@ -86,6 +86,7 @@ class OverviewItemConfig : public QWidget
 
         QLineEdit *name, *string1; // all of them
         QDoubleSpinBox *double1, *double2; // KPI
+        QCheckBox *cb1; // KPI
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
@@ -98,7 +99,7 @@ class KPIOverviewItem : public ChartSpaceItem
 
     public:
 
-        KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units);
+        KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime);
         ~KPIOverviewItem();
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
@@ -108,11 +109,12 @@ class KPIOverviewItem : public ChartSpaceItem
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts"); }
+        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts", false); }
 
         // settings
         double start, stop;
         QString program, units;
+        bool istime;
 
         // computed and ready for painting
         QString value;

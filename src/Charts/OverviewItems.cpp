@@ -32,6 +32,7 @@
 
 #include "DataFilter.h"
 #include "Utils.h"
+#include "TimeUtils.h"
 #include "Tab.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
@@ -100,7 +101,7 @@ RPEOverviewItem::~RPEOverviewItem()
     delete sparkline;
 }
 
-KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units) : ChartSpaceItem(parent, name)
+KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime) : ChartSpaceItem(parent, name)
 {
 
     this->type = OverviewItemType::KPI;
@@ -108,6 +109,7 @@ KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start,
     this->stop = stop;
     this->program = program;
     this->units = units;
+    this->istime = istime;
 
     value ="0";
     progressbar = new ProgressBar(this, start, stop, value.toDouble());
@@ -432,6 +434,7 @@ KPIOverviewItem::setData(RideItem *item)
     value = QString("%1").arg(res.number());
     if (value == "nan") value ="";
     value=Utils::removeDP(value);
+    if (istime) value = time_to_string(value.toDouble(), true);
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
@@ -451,6 +454,7 @@ KPIOverviewItem::setDateRange(DateRange dr)
     value = QString("%1").arg(res.number());
     if (value == "nan") value ="";
     value=Utils::removeDP(value);
+    if (istime) value = time_to_string(value.toDouble(), true);
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
@@ -1718,7 +1722,7 @@ void
 KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     double addy = 0;
-    if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
+    if (units != "") addy = QFontMetrics(parent->smallfont).height();
 
     // mid is slightly higher to account for space around title, move mid up
     double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
@@ -2478,6 +2482,11 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
         connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
 
+        // istime
+        cb1 = new QCheckBox(this);
+        layout->addRow(tr("Time"), cb1);
+        connect(cb1, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
+
         // units
         string1 = new QLineEdit(this);
         layout->addRow(tr("Units"), string1);
@@ -2588,6 +2597,7 @@ OverviewItemConfig::setWidgets()
             editor->setText(mi->program);
             double1->setValue(mi->start);
             double2->setValue(mi->stop);
+            cb1->setChecked(mi->istime);
             string1->setText(mi->units);
         }
     }
@@ -2691,6 +2701,7 @@ OverviewItemConfig::dataChanged()
         {
             KPIOverviewItem *mi = dynamic_cast<KPIOverviewItem*>(item);
             mi->name = name->text();
+            mi->istime = cb1->isChecked();
             mi->units = string1->text();
             mi->program = editor->toPlainText();
             mi->start = double1->value();

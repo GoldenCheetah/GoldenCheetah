@@ -157,6 +157,7 @@ OverviewWindow::getConfiguration() const
                 KPIOverviewItem *kpi = reinterpret_cast<KPIOverviewItem*>(item);
                 config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect(kpi->program)) + "\",";
                 config += "\"units\":\"" + QString("%1").arg(kpi->units) + "\",";
+                config += "\"istime\":" + QString("%1").arg(kpi->istime) + ",";
                 config += "\"start\":" + QString("%1").arg(kpi->start) + ",";
                 config += "\"stop\":" + QString("%1").arg(kpi->stop) + ",";
             }
@@ -283,17 +284,17 @@ OverviewWindow::setConfiguration(QString config)
             ChartSpaceItem *add;
 
             // column 0
-            add = new KPIOverviewItem(space, tr("Distance"), 0, 10000, "{ round(sum(metrics(Distance))); }", "km");
+            add = new KPIOverviewItem(space, tr("Distance"), 0, 10000, "{ round(sum(metrics(Distance))); }", "km", false);
             space->addItem(0,0,8, add);
 
             add = new TopNOverviewItem(space, tr("Going Long"), "total_distance");
             space->addItem(1,0,25, add);
 
-            add = new KPIOverviewItem(space, tr("Weekly Hours"), 0, 15, "{ weeks <- (daterange(stop)-daterange(start))/7; round(10*sum(metrics(Duration)/3600)/weeks)/10; }", tr("hours"));
+            add = new KPIOverviewItem(space, tr("Weekly Hours"), 0, 15, "{ weeks <- (daterange(stop)-daterange(start))/7; sum(metrics(Duration))/weeks; }", tr("hh:mm:ss"), true);
             space->addItem(2,0,7, add);
 
             // column 1
-            add = new KPIOverviewItem(space, tr("Peak Power Index"), 0, 150, "{ round(sort(descend, metrics(Power_Index))[0]); }", "%");
+            add = new KPIOverviewItem(space, tr("Peak Power Index"), 0, 150, "{ round(sort(descend, metrics(Power_Index))[0]); }", "%", false);
             space->addItem(0,1,8, add);
 
             add = new MetricOverviewItem(space, tr("Max Power"), "max_power");
@@ -309,7 +310,7 @@ OverviewWindow::setConfiguration(QString config)
             space->addItem(4,1,7, add);
 
             // column 2
-            add = new KPIOverviewItem(space, tr("Total Hours"), 0, 0, "{ round(sum(metrics(Duration))/3600); }", "hours");
+            add = new KPIOverviewItem(space, tr("Total Hours"), 0, 0, "{ sum(metrics(Duration)); }", "hh:mm:ss", true);
             space->addItem(0,2,8, add);
 
             add = new TopNOverviewItem(space, tr("Going Hard"), "skiba_wprime_exp");
@@ -319,13 +320,13 @@ OverviewWindow::setConfiguration(QString config)
             space->addItem(2,2,7, add);
 
             // column 3
-            add = new KPIOverviewItem(space, tr("W' Ratio"), 0, 100, "{ round((sum(metrics(W'_Work)) / sum(metrics(Work))) * 100); }", "%");
+            add = new KPIOverviewItem(space, tr("W' Ratio"), 0, 100, "{ round((sum(metrics(W'_Work)) / sum(metrics(Work))) * 100); }", "%", false);
             space->addItem(0,3,8, add);
 
-            add = new KPIOverviewItem(space, tr("Peak CP Estimate "), 0, 360, "{ round(max(estimates(cp3,cp))); }", "watts");
+            add = new KPIOverviewItem(space, tr("Peak CP Estimate "), 0, 360, "{ round(max(estimates(cp3,cp))); }", "watts", false);
             space->addItem(1,3,7, add);
 
-            add = new KPIOverviewItem(space, tr("Peak W' Estimate "), 0, 25, "{ round(max(estimates(cp3,w')/1000)*10)/10; }", "kJ");
+            add = new KPIOverviewItem(space, tr("Peak W' Estimate "), 0, 25, "{ round(max(estimates(cp3,w')/1000)*10)/10; }", "kJ", false);
             space->addItem(2,3,7, add);
 
 
@@ -342,7 +343,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new TopNOverviewItem(space, tr("Going Deep"), "skiba_wprime_low");
             space->addItem(1,4,25, add);
 
-            add = new KPIOverviewItem(space, tr("IF > 0.85"), 0, 0, "{ count(metrics(IF)[x>0.85]); }", "activities");
+            add = new KPIOverviewItem(space, tr("IF > 0.85"), 0, 0, "{ count(metrics(IF)[x>0.85]); }", "activities", false);
             space->addItem(2,4,7, add);
 
         }
@@ -480,8 +481,8 @@ OverviewWindow::setConfiguration(QString config)
                     double start=obj["start"].toDouble();
                     double stop =obj["stop"].toDouble();
                     QString units =obj["units"].toString();
-
-                    add = new KPIOverviewItem(space, name, start, stop, program, units);
+                    bool istime =obj["istime"].toInt();
+                    add = new KPIOverviewItem(space, name, start, stop, program, units, istime);
                     add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
                 }
