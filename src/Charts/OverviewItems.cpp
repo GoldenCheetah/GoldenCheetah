@@ -1773,7 +1773,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         // percentage in mid font...
         if (geometry().height() >= (ROWHEIGHT*8)) {
 
-            double percent = round((value.toDouble()-start)/(stop-start) * 100.0);
+            double percent = round((progressbar->getCurrentValue()-start)/(stop-start) * 100.0);
             QString percenttext = Utils::removeDP(QString("%1%").arg(percent));
 
             QFontMetrics mfm(parent->midfont);
