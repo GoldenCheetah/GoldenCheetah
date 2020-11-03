@@ -1202,13 +1202,34 @@ struct FitFileReaderState
         session_data_info_.clear();
     }
 
+  template<typename T>
+  struct opt {
+    bool m_has_value;
+    T    m_value;
+    operator bool() { return m_has_value; }
+    opt() : m_has_value(false) {}
+    opt(const T& v) : m_has_value(true), m_value(v) {}
+    opt(const opt<T>&) = default;
+    opt<T>& operator=(const T& v) { m_has_value = true; m_value = v; return *this; }
+
+    T value() const {
+      if (!m_has_value)
+        throw std::exception();
+      return m_value;
+    }
+    operator T() { return value(); }
+    
+
+  };
+
     void decodeDeviceInfo(const FitDefinition &def, int,
                           const std::vector<FitValue>& values) {
         int i = 0;
 
         int index=-1;
         int manu = -1, prod = -1, version = -1, type = -1;
-        quint32 serial = 0;
+        opt<quint32> serial;
+        opt<quint32> antid = 0;
         quint8 battery_status = 0;
         fit_string_value name;
 
@@ -1231,6 +1252,9 @@ struct FitFileReaderState
                      break;
                 case 3:   // serial number
                      serial = value.v;
+                     break;
+                case 21: // ant/btle id
+                     antid = value.v;
                      break;
                 case 4:   // product
                      prod = value.v;
@@ -1269,8 +1293,10 @@ struct FitFileReaderState
             deviceInfo += QString(" %1").arg(name.c_str());
         if (version>0)
             deviceInfo += QString(" (v%1)").arg(version/100.0);
-        if (serial > 0 && serial < std::numeric_limits<quint32>::max())
-            deviceInfo += QString(" ID:%1").arg(serial);
+        if (serial)
+          deviceInfo += QString(" SN:%1").arg(serial.value());
+        if (antid)
+          deviceInfo += QString(" ID:%1").arg(antid.value());
         if (battery_status > 0 && battery_status < 8)
             deviceInfo += QString(" BAT:%1").arg(getBatteryStatus(battery_status));
 
