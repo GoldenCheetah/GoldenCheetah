@@ -434,10 +434,12 @@ KPIOverviewItem::setData(RideItem *item)
     value = QString("%1").arg(res.number());
     if (value == "nan") value ="";
     value=Utils::removeDP(value);
-    if (istime) value = time_to_string(value.toDouble(), true);
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
+
+    // convert value to hh:mm:ss when istime
+    if (istime) value = time_to_string(value.toDouble(), true);
 
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
@@ -454,10 +456,12 @@ KPIOverviewItem::setDateRange(DateRange dr)
     value = QString("%1").arg(res.number());
     if (value == "nan") value ="";
     value=Utils::removeDP(value);
-    if (istime) value = time_to_string(value.toDouble(), true);
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
+
+    // convert value to hh:mm:ss when istime
+    if (istime) value = time_to_string(value.toDouble(), true);
 
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
@@ -1761,8 +1765,8 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        QString stoptext = Utils::removeDP(QString("%1").arg(stop));
-        QString starttext = Utils::removeDP(QString("%1").arg(start));
+        QString stoptext = istime ? time_to_string(stop, true) : Utils::removeDP(QString("%1").arg(stop));
+        QString starttext = istime ? time_to_string (start, true) : Utils::removeDP(QString("%1").arg(start));
         painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(stoptext), bottom), stoptext);
         painter->drawText(QPointF(left, bottom), starttext);
 

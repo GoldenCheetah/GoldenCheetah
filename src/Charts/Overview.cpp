@@ -290,7 +290,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new TopNOverviewItem(space, tr("Going Long"), "total_distance");
             space->addItem(1,0,25, add);
 
-            add = new KPIOverviewItem(space, tr("Weekly Hours"), 0, 15, "{ weeks <- (daterange(stop)-daterange(start))/7; sum(metrics(Duration))/weeks; }", tr("hh:mm:ss"), true);
+            add = new KPIOverviewItem(space, tr("Weekly Hours"), 0, 15*3600, "{ weeks <- (daterange(stop)-daterange(start))/7; sum(metrics(Duration))/weeks; }", tr("hh:mm:ss"), true);
             space->addItem(2,0,7, add);
 
             // column 1
