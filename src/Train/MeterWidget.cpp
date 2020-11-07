@@ -464,7 +464,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     if (cyclistX < m_Width * 0.5)
         gradientDrawX += 5.;
     else
-        gradientDrawX =- 45.;
+        gradientDrawX -= 45.;
 
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 
