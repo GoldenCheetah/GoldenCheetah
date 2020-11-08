@@ -257,7 +257,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     editSearch = new SearchBox(context, this, true);
     row2->addWidget(editSearch);
 
-    // add/update buttons
+    // add/update/up/down buttons
     QHBoxLayout *row3 = new QHBoxLayout;
     layout->addLayout(row3);
     row3->addStretch();
@@ -265,6 +265,10 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     row3->addWidget(addButton);
     updateButton = new QPushButton(tr("Update"), this);
     row3->addWidget(updateButton);
+    upButton = new QPushButton(tr("Up"), this);
+    row3->addWidget(upButton);
+    downButton = new QPushButton(tr("Down"), this);
+    row3->addWidget(downButton);
 
     // Selection List
     searchList = new QTreeWidget(this);
@@ -314,6 +318,8 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
 }
 
 void
@@ -374,6 +380,46 @@ EditNamedSearches::updateClicked()
 }
 
 void
+EditNamedSearches::upClicked()
+{
+    if (active || searchList->currentItem() == NULL) return;
+    active = true;
+
+    int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
+    int newIndex = index - 1;
+
+    if (index > 0) {
+        context->athlete->namedSearches->getList().swapItemsAt(newIndex, index);
+        QTreeWidgetItem* child = searchList->invisibleRootItem()->takeChild(index);
+        searchList->invisibleRootItem()->insertChild(newIndex, child);
+        searchList->setCurrentItem(child);
+    }
+
+    active = false;
+    selectionChanged(); // QT signals whilst rows are being removed, this is very confusing
+}
+
+void
+EditNamedSearches::downClicked()
+{
+    if (active || searchList->currentItem() == NULL) return;
+    active = true;
+
+    int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
+    int newIndex = index + 1;
+
+    if (index < (context->athlete->namedSearches->getList().size() - 1)) {
+        context->athlete->namedSearches->getList().swapItemsAt(newIndex, index);
+        QTreeWidgetItem* child = searchList->invisibleRootItem()->takeChild(index);
+        searchList->invisibleRootItem()->insertChild(newIndex, child);
+        searchList->setCurrentItem(child);
+    }
+
+    active = false;
+    selectionChanged(); // QT signals whilst rows are being removed, this is very confusing
+}
+
+void
 EditNamedSearches::deleteClicked()
 {
     if (active || searchList->currentItem() == NULL) return;
@@ -391,7 +437,7 @@ EditNamedSearches::deleteClicked()
 void EditNamedSearches::closeEvent(QCloseEvent*) { writeSearches(); }
 void EditNamedSearches::reject() { writeSearches(); }
 
-void 
+void
 EditNamedSearches::writeSearches()
 {
     context->athlete->namedSearches->write();
