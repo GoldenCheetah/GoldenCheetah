@@ -140,7 +140,7 @@ double RealtimeController::estimatePowerFromSpeed(double v, double wheelRpm, con
     }
 
     // Debug Summary
-    static const bool fPrintDebugSummary = true;
+    static const bool fPrintDebugSummary = false;
     if (fPrintDebugSummary) {
         double wattFit = polyFit->Fit(v);
         qDebug() << "v: " << v << " Watts:" << (watts + dInertialWatts) << " accelAdjustment:" << (watts - wattFit) 
