@@ -367,10 +367,10 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(runScript()));
 
-            // refresh when intervals changed / selected
-            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript())); // not needed since get signal below
-            //connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
-            //connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
+            // refresh when ride or intervals changed / selected
+            connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+            connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
+            connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
 
         } else {
             connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(runScript()));
