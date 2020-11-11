@@ -47,7 +47,7 @@ TodaysPlanBodyMeasures::onSslErrors(QNetworkReply *reply, const QList<QSslError>
 
 
 bool
-TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data) {
+TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<Measure> &data) {
 
     // do we have a token
     QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
@@ -143,15 +143,15 @@ TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTim
                 for (int j=0; j<atts.size(); j++) {
                     QJsonObject record = atts.at(j).toObject();
                     if (record.contains("ts") && record.contains("weight")) {
-                        BodyMeasure add;
+                        Measure add;
                         add.when = QDateTime::fromMSecsSinceEpoch(record["ts"].toDouble());
-                        add.weightkg = record["weight"].toDouble();
-                        add.boneskg = record["boneMass"].toDouble();
-                        add.fatkg = record["fatMass"].toDouble();
-                        add.musclekg = record["muscleMass"].toDouble();
-                        add.fatpercent = record["fat"].toDouble();
+                        add.values[Measure::WeightKg] = record["weight"].toDouble();
+                        add.values[Measure::BonesKg] = record["boneMass"].toDouble();
+                        add.values[Measure::FatKg] = record["fatMass"].toDouble();
+                        add.values[Measure::MuscleKg] = record["muscleMass"].toDouble();
+                        add.values[Measure::FatPercent] = record["fat"].toDouble();
                         add.originalSource = record["source"].toString();
-                        add.source = BodyMeasure::TodaysPlan;
+                        add.source = Measure::TodaysPlan;
                         data.append(add);
                     }
 

@@ -175,7 +175,11 @@ APIWebService::listAthletes(HttpRequest &, HttpResponse &response)
         // sure fire sign the athlete has been upgraded to post 3.2 and not some
         // random directory full of other things & check something basic is set
         QString ridedb = home.absolutePath() + "/" + name + "/cache/rideDB.json";
-        if (QFile(ridedb).exists() && appsettings->cvalue(name, GC_SEX, "") != "") {
+        if (QFile(ridedb).exists()) {
+            // we need to initialize athlete settings for cvalue to work
+            appsettings->initializeQSettingsAthlete(home.absolutePath(), name);
+            if (appsettings->cvalue(name, GC_SEX, "") == "") continue;
+
             // we got one
             QString line = name;
             line += ", " + appsettings->cvalue(name, GC_DOB).toDate().toString("yyyy/MM/dd");
@@ -630,19 +634,21 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
 void
 APIWebService::listMeasures(QString athlete, QStringList paths, HttpRequest &request, HttpResponse &response)
 {
+    QDir configDir(home.absolutePath() + "/" + athlete + "/config");
+
     // list activities and associated metrics
     response.setHeader("Content-Type", "text; charset=ISO-8859-1");
 
     if (paths.isEmpty()) {
 
-        foreach (QString group, Measures().getGroupSymbols()) {
+        foreach (QString group, Measures(configDir).getGroupSymbols()) {
             response.write(group.toLocal8Bit());
             response.write("\n");
         }
         return;
     }
 
-    Measures measures = Measures(QDir(home.absolutePath() + "/" + athlete + "/config"), true);
+    Measures measures = Measures(configDir, true);
     int group_index = measures.getGroupSymbols().indexOf(paths[0]);
     MeasuresGroup* measuresGroup = measures.getGroup(group_index);
     if (group_index < 0 || measuresGroup == NULL) {

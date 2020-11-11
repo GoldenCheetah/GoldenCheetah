@@ -316,6 +316,16 @@ static struct {
     { "filename", 0 }, // filename() - returns a string or vector of strings for a range, can be used
                        // when plotting on trends chart to enable click thru to activity view
 
+    { "xdata", 2 },    // xdata("series", "column" | km | secs) - get xdata samples without any
+                       // kind of interpolation applied (resample/interpolate are available to
+                       // do that if needed.
+
+    { "store", 2 },    // store("name", value) stores a global value that can be retrieved via
+                       // the fetch("name") function below. Useful for passing data across data series
+                       // in a user chart.
+    { "fetch", 1 },    // fetch("name") retrieves a value previously stored returns 0 if the value
+                       // is not in the athlete store
+
     // add new ones above this line
     { "", -1 }
 };
@@ -1790,6 +1800,31 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("should be mid(a,pos,count)"));
                     }
 
+                } else if (leaf->function == "xdata") {
+
+                    // will only get here if we have 2 parameters
+                    Leaf *first=leaf->fparms[0];
+                    Leaf *second=leaf->fparms[1];
+
+                    if (first->type != Leaf::String) {
+                        DataFiltererrors << QString(tr("XDATA expects a string for the first parameters"));
+                        leaf->inerror = true;
+                    }
+
+                    if (second->type == Leaf::Symbol) {
+
+                        QString symbol = *(leaf->fparms[1]->lvalue.n);
+                        if (symbol != "km" && symbol != "secs") {
+                            DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                            leaf->inerror = true;
+                        }
+
+                    } else if (second->type != Leaf::String) {
+
+                        DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                        leaf->inerror = true;
+                    }
+
                 } else if (leaf->function == "samples") {
 
                     if (leaf->fparms.count() < 1) {
@@ -2916,20 +2951,20 @@ void DataFilter::configChanged(qint32)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         QString symbol = factory.metricName(i);
-        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
 
         rt.lookupMap.insert(name.replace(" ","_"), symbol);
         rt.lookupType.insert(name.replace(" ","_"), true);
     }
 
     // now add the ride metadata fields -- should be the same generally
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             QString underscored = field.name;
-            if (!context->specialFields.isMetric(underscored)) {
+            if (!GlobalContext::context()->specialFields.isMetric(underscored)) {
 
                 // translate to internal name if name has non Latin1 characters
-                underscored = context->specialFields.internalName(underscored);
-                field.name = context->specialFields.internalName((field.name));
+                underscored = GlobalContext::context()->specialFields.internalName(underscored);
+                field.name = GlobalContext::context()->specialFields.internalName((field.name));
 
                 rt.lookupMap.insert(underscored.replace(" ","_"), field.name);
                 rt.lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
@@ -3324,7 +3359,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                 return Result(HEIGHT);
             }
             if (symbol == "units") {
-                return Result(m->context->athlete->useMetricUnits ? 1 : 0);
+                return Result(GlobalContext::context()->useMetricUnits ? 1 : 0);
             }
         }
 
@@ -3710,6 +3745,45 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             return returning;
         }
 
+        if (leaf->function == "xdata") {
+            Result returning(0);
+
+            QString name = *(leaf->fparms[0]->lvalue.s);
+            QString series; // name, km or secs
+            bool km=false, secs=false;
+
+            if (leaf->fparms[1]->type == Leaf::String) series = *(leaf->fparms[1]->lvalue.s);
+            if (leaf->fparms[1]->type == Leaf::Symbol) {
+                series = *(leaf->fparms[1]->lvalue.n);
+                if (series == "km") km = true;
+                if (series == "secs") secs = true;
+            }
+
+            // lets get the xdata series - only if the item is already open to avoid accidentally
+            // iterating over all ride data, same approach as in the samples function below
+            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+                return Result(0);
+
+            } else {
+                XDataSeries *xds = m->ride()->xdata(name);
+                if (xds == NULL) return returning;
+
+                // now we need to get all the values into returning
+                int index=0;
+                if (km || secs || (index=xds->valuename.indexOf(series)) != -1) {
+                    foreach(XDataPoint *p, xds->datapoints) {
+                        double value=0;
+                        if (km) value = p->km;
+                        else if (secs) value = p->secs;
+                        else if (index >=0)  value =p->number[index];
+
+                        returning.asNumeric() << value;
+                        returning.number()  += value;
+                    }
+                }
+            }
+            return returning;
+        }
         if (leaf->function == "samples") {
 
             // nothing to return -- note we check if the ride is open
@@ -4579,6 +4653,28 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                 count++;
             }
             return Result(count);
+        }
+
+        // store/fetch from athlete storage
+        if (leaf->function == "store") {
+            // name and value in parameter 1 and 2
+            QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+            Result value= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            // store it away
+            m->context->athlete->dfcache.insert(name, value);
+
+            return Result(0);
+        }
+
+        if (leaf->function == "fetch") {
+            // name and value in parameter 1 and 2
+            QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
+
+            // store it away
+            Result returning = m->context->athlete->dfcache.value(name, Result(0));
+
+            return returning;
         }
 
         // access user chart curve data, if it's there
@@ -6197,10 +6293,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             lhsdouble = 1; // if in doubt
             if (m->ride(false)) lhsdouble = m->ride(false)->recIntSecs();
             lhsisNumber = true;
-
-        } else if (!symbol.compare("Device", Qt::CaseInsensitive)) {
-
-            if (m->ride(false)) lhsstring = m->ride(false)->deviceType();
 
         } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
 

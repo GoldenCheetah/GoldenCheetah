@@ -173,7 +173,7 @@ public:
 
     // Convert value to string, taking into account metric pref
     virtual QString toString(bool useMetricUnits) const;
-    virtual QString toString(bool useMetricUnits, double value) const;
+    virtual QString toString(double value) const;
 
     // Criterium to compare values, overridden by Pace metrics
     // Default just see if it is a RideMetric::Low

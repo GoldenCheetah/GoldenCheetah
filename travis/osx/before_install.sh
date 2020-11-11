@@ -1,14 +1,14 @@
 #!/bin/bash
 set -ev
 
-## try early just to check, can delete later
 date
+# Don't update to use included Qt version instead of Qt 5.15.x
+export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
-brew update
 
 brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
 
-brew upgrade qt5 # to get 5.15.0
+#brew upgrade qt5 # to get 5.15.x
 /usr/local/opt/qt5/bin/qmake --version
 
 brew install gsl
@@ -31,6 +31,16 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 sudo cp D2XX/libftd2xx.1.2.2.dylib /usr/local/lib
 
+# VLC
+if [[ -z "$(ls -A VLC)" ]]; then
+    curl -O http://download.videolan.org/pub/videolan/vlc/3.0.8/macosx/vlc-3.0.8.dmg
+    hdiutil mount vlc-3.0.8.dmg
+    cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/include" VLC/include
+    cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/lib" VLC/lib
+    cp -R "/Volumes/VLC media player/VLC.app/Contents/MacOS/plugins" VLC/plugins
+    rm -f VLC/plugins/plugins.dat
+fi
+sudo cp VLC/lib/libvlc*.dylib /usr/local/lib
 
 # AWS client to upload binaries to S3 bucket
 brew install awscli

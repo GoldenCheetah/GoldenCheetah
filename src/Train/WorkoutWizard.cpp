@@ -541,7 +541,7 @@ void GradientPage::initializePage()
 {
     int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
     ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
-    metricUnits = hackContext->athlete->useMetricUnits;
+    metricUnits = GlobalContext::context()->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
     setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is +-40."));
@@ -615,9 +615,16 @@ void GradientPage::SaveWorkout()
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
-        // header indicates metric units, so convert accordingly
-        double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
-        stream << currentX << " " << p.second << " 0" << endl;
+        if(p.first == "LAP")
+        {
+            stream << "LAP" << endl;
+        }
+        else
+        {
+            // header indicates metric units, so convert accordingly
+            double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
+            stream << currentX << " " << p.second << " 0" << endl;
+        }
     }
     stream << "[END COURSE DATA]" << endl;
     f.close();
@@ -642,7 +649,7 @@ void ImportPage::initializePage()
         setSubTitle(tr("Import current activity as a Gradient ride (slope based)"));
         setFinalPage(true);
         plot = new WorkoutPlot();
-        metricUnits = hackContext->athlete->useMetricUnits;
+        metricUnits = GlobalContext::context()->useMetricUnits;
         QString s = (metricUnits ? tr("KM") : tr("Miles"));
         QString distance = QString(tr("Distance (")) + s + QString(")");
         plot->setXAxisTitle(distance);

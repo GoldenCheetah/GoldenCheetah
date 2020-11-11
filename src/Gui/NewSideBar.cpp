@@ -141,7 +141,7 @@ NewSideBarItem::NewSideBarItem(NewSideBar *sidebar, int id, QImage icon, QString
 
     // trap events
     installEventFilter(this);
-    connect(sidebar->context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(0);
 

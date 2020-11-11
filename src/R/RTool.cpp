@@ -1004,12 +1004,12 @@ RTool::dfForRideItem(const RideItem *ri)
 
     // count the number of meta fields to add
     int meta = 0;
-    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+    if (rtool->context) {
 
         // count active fields
-        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition def, GlobalContext::context()->rideMetadata->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !rtool->context->specialFields.isMetric(def.name))
+                !GlobalContext::context()->specialFields.isMetric(def.name))
                 meta++;
         }
     }
@@ -1084,11 +1084,11 @@ RTool::dfForRideItem(const RideItem *ri)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
         REAL(m)[0] = item->metrics()[i] * (useMetricUnits ? 1.0f : metric->conversion()) + (useMetricUnits ? 0.0f : metric->conversionSum());
 
         // add to the list
@@ -1106,11 +1106,11 @@ RTool::dfForRideItem(const RideItem *ri)
     //
     // META
     //
-    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            rtool->context->specialFields.isMetric(field.name)) continue;
+            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1174,12 +1174,12 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
     // count the number of meta fields to add
     int meta = 0;
-    if (rtool->context && rtool->context->athlete->rideMetadata()) {
+    if (rtool->context) {
 
         // count active fields
-        foreach(FieldDefinition def, rtool->context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition def, GlobalContext::context()->rideMetadata->getFields()) {
             if (def.name != "" && def.tab != "" &&
-                !rtool->context->specialFields.isMetric(def.name))
+                !GlobalContext::context()->specialFields.isMetric(def.name))
                 meta++;
         }
     }
@@ -1298,11 +1298,11 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
@@ -1328,11 +1328,11 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     //
     // META
     //
-    foreach(FieldDefinition field, rtool->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // don't add incomplete meta definitions or metric override fields
         if (field.name == "" || field.tab == "" ||
-            rtool->context->specialFields.isMetric(field.name)) continue;
+            GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // Create a string vector
         SEXP m;
@@ -1553,11 +1553,11 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(RideItem *item, rtool->context->athlete->rideCache->rides()) {
@@ -1976,11 +1976,11 @@ RTool::activityIntervals(SEXP pTypes, SEXP datetime)
 
         QString symbol = factory.metricName(i);
         const RideMetric *metric = factory.rideMetric(symbol);
-        QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
         name = name.replace(" ","_");
         name = name.replace("'","_");
 
-        bool useMetricUnits = rtool->context->athlete->useMetricUnits;
+        bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
         int index=0;
         foreach(IntervalItem *interval, ride->intervals()) {
@@ -3370,7 +3370,7 @@ RTool::pmc(SEXP pAll, SEXP pMetric)
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++) {
             QString symbol = factory.metricName(i);
-            QString name = rtool->context->specialFields.internalName(factory.rideMetric(symbol)->name());
+            QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
             name.replace(" ","_");
 
             if (name == metric) {

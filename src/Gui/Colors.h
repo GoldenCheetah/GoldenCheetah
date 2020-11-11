@@ -138,14 +138,26 @@ class GCColor : public QObject
 
 };
 
+// color chooser that also supports the standard colors (CPLOTMARKER, CPOWER)
+// and returns them as a QColor(1,1,1,<int>) where <int> is the color number
+// .e.g CPOWER is 18, see below for full list
+#if 0
+class GColorDialog : public QDialog
+{
+    GColorDialog(QWidget *parent);
+
+};
+#endif
+
 // return a color for a ride file
+class GlobalContext;
 class ColorEngine : public QObject
 {
     Q_OBJECT
     G_OBJECT
 
     public:
-        ColorEngine(Context *);
+        ColorEngine(GlobalContext *);
 
         QColor colorFor(QString);
         QColor defaultColor, reverseColor;
@@ -155,7 +167,7 @@ class ColorEngine : public QObject
 
     private:
         QMap<QString, QColor> workoutCodes;
-        Context *context;
+        GlobalContext *gc; // bootstrapping
 };
 
 

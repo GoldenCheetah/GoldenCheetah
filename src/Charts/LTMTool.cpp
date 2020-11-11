@@ -198,7 +198,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         // set default for the user overiddable fields
         adds.uname  = adds.name;
-        adds.units = adds.metric->units(context->athlete->useMetricUnits);
+        adds.units = adds.metric->units(GlobalContext::context()->useMetricUnits);
         adds.uunits = adds.units;
 
         // default units to metric name if it is blank
@@ -218,7 +218,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     // metadata metrics
     SpecialFields sp;
-    foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach (FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
@@ -1478,8 +1478,8 @@ LTMTool::applySettings()
                 // usemetricUnits changed since charts.xml was
                 // written
                 if (saved && saved->conversion() != 1.0 &&
-                    metrics[i].uunits.contains(saved->units(!context->athlete->useMetricUnits)))
-                    metrics[i].uunits.replace(saved->units(!context->athlete->useMetricUnits), saved->units(context->athlete->useMetricUnits));
+                    metrics[i].uunits.contains(saved->units(!GlobalContext::context()->useMetricUnits)))
+                    metrics[i].uunits.replace(saved->units(!GlobalContext::context()->useMetricUnits), saved->units(GlobalContext::context()->useMetricUnits));
 
 
                 break;
@@ -2654,12 +2654,9 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(penColor);
-
     // don't use native dialog, since there is a nasty bug causing focus loss
     // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = picker.getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor color = QColorDialog::getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     if (color.isValid()) {
         setButtonIcon(penColor=color);

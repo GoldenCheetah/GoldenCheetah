@@ -150,6 +150,7 @@ class MainWindow : public QMainWindow
         void openTab(QString name);
         void loadCompleted(QString name, Context *context);
         void closeTabClicked(int index); // user clicked to close tab
+        bool closeTab(QString name); // close named athlete
         bool closeTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
         void removeTab(Tab*);  // remove without question
@@ -213,9 +214,8 @@ class MainWindow : public QMainWindow
         void showWorkoutWizard();
         void importWorkout();
 
-        // Measures View
-        void downloadBodyMeasures();
-        void downloadHrvMeasures();
+        // Measures
+        void downloadMeasures();
 
         // cloud
         void uploadCloud(QAction *);

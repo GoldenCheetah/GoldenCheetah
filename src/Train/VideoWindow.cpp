@@ -18,6 +18,7 @@
 */
 
 #include <QGraphicsPathItem>
+#include <QtGlobal>
 #include "VideoWindow.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -43,6 +44,11 @@ VideoWindow::VideoWindow(Context *context)  :
     //
     // USE VLC VIDEOPLAYER
     //
+
+#ifdef Q_OS_MAC
+    QString VLC_PLUGIN_PATH = QProcessEnvironment::systemEnvironment().value("VLC_PLUGIN_PATH", "");
+    if (VLC_PLUGIN_PATH.isEmpty()) qputenv("VLC_PLUGIN_PATH", QString(QCoreApplication::applicationDirPath() + "/../Frameworks/plugins").toUtf8());
+#endif
 
     // config parameters to libvlc
     const char * const vlc_args[] = {
@@ -334,7 +340,7 @@ void VideoWindow::resumePlayback()
 
 void VideoWindow::telemetryUpdate(RealtimeData rtd)
 {
-    bool metric = context->athlete->useMetricUnits;
+    bool metric = GlobalContext::context()->useMetricUnits;
 
     foreach(MeterWidget* p_meterWidget , m_metersWidget)
     {
@@ -416,7 +422,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 p_meterWidget->AltText = tr("w") +  p_meterWidget->AltTextSuffix;
             } else {
                 p_meterWidget->Value = rtd.getSlope();
-                p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+                p_meterWidget->Text = ((-1.0 < p_meterWidget->Value && p_meterWidget->Value < 0.0) ? QString("-") : QString("")) + QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
                 p_meterWidget->AltText = QString(".") + QString::number(abs((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10))) + tr("%") + p_meterWidget->AltTextSuffix;
             }
         }

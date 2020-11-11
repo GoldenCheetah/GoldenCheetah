@@ -86,6 +86,7 @@ class OverviewItemConfig : public QWidget
 
         QLineEdit *name, *string1; // all of them
         QDoubleSpinBox *double1, *double2; // KPI
+        QCheckBox *cb1; // KPI
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
@@ -98,7 +99,7 @@ class KPIOverviewItem : public ChartSpaceItem
 
     public:
 
-        KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units);
+        KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime);
         ~KPIOverviewItem();
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
@@ -108,11 +109,12 @@ class KPIOverviewItem : public ChartSpaceItem
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts"); }
+        static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts", false); }
 
         // settings
         double start, stop;
         QString program, units;
+        bool istime;
 
         // computed and ready for painting
         QString value;
@@ -654,4 +656,45 @@ class ProgressBar : public QObject, public QGraphicsItem
 
         QPropertyAnimation *animator;
 };
+
+// simple button to use on graphics views
+class Button : public QObject, public QGraphicsItem
+{
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
+
+    public:
+        Button(QGraphicsItem *parent, QString text);
+
+        void setText(QString text) { this->text = text; update(); }
+        void setFont(QFont font) { this->font = font; }
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+
+        // needed as pure virtual in QGraphicsItem
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+
+        QRectF boundingRect() const {
+            QPointF pos=mapToParent(geom.x(), geom.y());
+            return QRectF(pos.x(), pos.y(), geom.width(), geom.height());
+        }
+
+        // for interaction
+        bool sceneEvent(QEvent *event);
+
+    signals:
+        void clicked();
+
+    private:
+        QGraphicsItem *parent;
+        QString text;
+        QFont font;
+
+        QRectF geom;
+        enum { None, Clicked } state;
+};
+
 #endif // _GC_OverviewItem_h

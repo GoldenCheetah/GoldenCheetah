@@ -44,6 +44,8 @@
 #define SPACING 80
 #define ROWHEIGHT 80
 
+extern double gl_major;
+
 class ChartSpace;
 class ChartSpaceItemFactory;
 
@@ -66,13 +68,18 @@ class ChartSpaceItem : public QGraphicsWidget
 
         virtual QWidget *config()=0; // must supply a widget to configure
 
+        // turn off/on the config corner button
+        void setShowConfig(bool x) { showconfig=x; update(); }
+        bool showConfig() const { return showconfig; }
+
         // what type am I- managed by user
         int type;
 
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), invisible(false)  {
+                                       placing(false), drag(false), invisible(false),
+                                       showconfig(true)  {
 
             setAutoFillBackground(false);
             setFlags(flags() | QGraphicsItem::ItemClipsToShape); // don't paint outside the card
@@ -83,6 +90,15 @@ class ChartSpaceItem : public QGraphicsWidget
             // a sensible default?
             type = 0;
             delcounter=0;
+
+#if 0
+            effect = new QGraphicsDropShadowEffect();
+            effect->setXOffset(6);
+            effect->setYOffset(6);
+            effect->setColor(QColor(127,127,127,64));
+            effect->setBlurRadius(10);
+            this->setGraphicsEffect(effect);
+#endif
 
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
@@ -119,6 +135,8 @@ class ChartSpaceItem : public QGraphicsWidget
         bool onscene, placing, drag;
         bool incorner;
         bool invisible;
+        bool showconfig;
+        QGraphicsDropShadowEffect *effect;
 
         // base paint
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);

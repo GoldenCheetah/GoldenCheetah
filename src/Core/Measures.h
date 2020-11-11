@@ -26,6 +26,7 @@
 #include <QString>
 #include <QStringList>
 
+#define MAX_MEASURES 16
 class Measure {
     Q_DECLARE_TR_FUNCTIONS(Measure)
 public:
@@ -33,14 +34,28 @@ public:
     enum measuresource { Manual, Withings, TodaysPlan, CSV };
     typedef enum measuresource MeasureSource;
 
-    Measure() : when(QDateTime()), comment("") {}
+    enum bodymeasuretype { WeightKg = 0, FatKg = 1, MuscleKg = 2, BonesKg = 3, LeanKg = 4, FatPercent = 5 };
+
+    Measure() : when(QDateTime()), comment(""),
+                source(Manual), originalSource("") {
+        for (int i = 0; i<MAX_MEASURES; i++) values[i] = 0.0;
+    }
+    Measure(const Measure &other) {
+        this->when = other.when;
+        this->comment = other.comment;
+        this->source = other.source;
+        this->originalSource = other.originalSource;
+        for (int i = 0; i<MAX_MEASURES; i++) this->values[i] = other.values[i];
+    }
     virtual ~Measure() {}
 
-    QDateTime when;         // when was this reading taken
-    QString comment;        // user commentary regarding this measurement
+    QDateTime when;              // when was this reading taken
+    QString comment;             // user commentary regarding this measurement
 
     MeasureSource source;
-    QString originalSource; // if delivered from the cloud service
+    QString originalSource;      // if delivered from the cloud service
+
+    double values[MAX_MEASURES]; // field values for standard measures
 
     // used by qSort()
     bool operator< (Measure right) const {
@@ -57,21 +72,45 @@ public:
 class MeasuresGroup {
 
 public:
+    // Default constructor intended to access metadata,
+    // directory and withData must be provided to access data.
+    MeasuresGroup(QString symbol, QString name, QStringList symbols, QStringList names, QStringList metricUnits, QStringList imperialUnits, QList<double> unitsFactors, QList<QStringList> headers,  QDir dir=QDir(), bool withData=false);
+    MeasuresGroup(QDir dir=QDir(), bool withData=false) : dir(dir), withData(withData) {}
     virtual ~MeasuresGroup() {}
+    virtual void write();
+    virtual QList<Measure>& measures() { return measures_; }
+    virtual void setMeasures(QList<Measure>&x);
+    virtual void getMeasure(QDate date, Measure&) const;
 
     // Common access to Measures
-    virtual QString getSymbol() const = 0;
-    virtual QString getName() const = 0;
-    virtual QStringList getFieldSymbols() const= 0;
-    virtual QStringList getFieldNames() const = 0;
-    virtual QDate getStartDate() const = 0;
-    virtual QDate getEndDate() const = 0;
-    virtual QString getFieldUnits(int field, bool useMetricUnits=true) const = 0;
-    virtual double getFieldValue(QDate date, int field=0, bool useMetricUnits=true) const = 0;
+    virtual QString getSymbol() const { return symbol; }
+    virtual QString getName() const { return name; }
+    virtual QStringList getFieldSymbols() const { return symbols; }
+    virtual QStringList getFieldNames() const { return names; }
+    virtual QStringList getFieldHeaders(int field) const { return headers.value(field); }
+    virtual QString getFieldUnits(int field, bool useMetricUnits=true) const { return useMetricUnits ? metricUnits.value(field) : imperialUnits.value(field); }
+    virtual QList<double> getFieldUnitsFactors() const { return unitsFactors; }
+    virtual double getFieldValue(QDate date, int field=0, bool useMetricUnits=true) const;
+    virtual QDate getStartDate() const;
+    virtual QDate getEndDate() const;
+
+protected:
+    const QDir dir;
+    const bool withData;
+
+private:
+    const QString symbol, name;
+    const QStringList symbols, names, metricUnits, imperialUnits;
+    const QList<double> unitsFactors;
+    const QList<QStringList> headers;
+    QList<Measure> measures_;
+
+    bool serialize(QString, QList<Measure> &);
+    bool unserialize(QFile &, QList<Measure> &);
 };
 
 class Measures {
-
+    Q_DECLARE_TR_FUNCTIONS(Measures)
 public:
     // Default constructor intended to access metadata,
     // directory and withData must be provided to access data.

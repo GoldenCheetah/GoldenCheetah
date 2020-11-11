@@ -1654,7 +1654,7 @@ CloudServiceSyncDialog::saveRide(RideFile *ride, QStringList &errors)
     }
 
     // process linked defaults
-    context->athlete->rideMetadata()->setLinkedDefaults(ride);
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
     // run the processor first... import
     DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
@@ -1945,7 +1945,7 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
     }
 
     // process linked defaults
-    context->athlete->rideMetadata()->setLinkedDefaults(ride);
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
     // run the processor first... import
     DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");

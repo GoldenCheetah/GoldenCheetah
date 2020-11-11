@@ -50,6 +50,7 @@
 #include "WorkoutPlotWindow.h"
 #include "WorkoutWindow.h"
 #include "WebPageWindow.h"
+#include "LiveMapWebPageWindow.h"
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
@@ -76,7 +77,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[35] = {
+  static GcWindowRegistry GcWindowsInit[34] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Overview "),GcWindowTypes::OverviewTrends },
     { VIEW_HOME|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
@@ -89,9 +90,9 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
     { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Summary"),GcWindowTypes::RideSummary },
-    { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
-    { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
-    { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
+    { VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
+    //{ VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
+    //{ VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Performance"),GcWindowTypes::AllPlot },
     { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
@@ -115,6 +116,7 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
+    { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
     { VIEW_ANALYSIS|VIEW_HOME|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
@@ -206,11 +208,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Model: returning = new GcChartWindow(context); break;
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
-    case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;
+    case GcWindowTypes::RideEditor: returning = NULL; break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(context, true); break;
     case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(context, false); break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
-    case GcWindowTypes::Summary: returning = new SummaryWindow(context); break;
+    case GcWindowTypes::Summary: returning = NULL; break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
 #ifdef GC_VIDEO_NONE
@@ -237,6 +239,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
 
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
+    case GcWindowTypes::LiveMapWebPageWindow: returning = new LiveMapWebPageWindow(context); break;
 #if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else

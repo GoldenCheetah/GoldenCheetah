@@ -1518,6 +1518,12 @@ void TrainSidebar::Connect()
     activeDevices = devices();
 
     foreach(int dev, activeDevices) {
+        Devices[dev].controller->setWheelCircumference(Devices[dev].wheelSize);
+        Devices[dev].controller->setRollingResistance(bicycle.RollingResistance());
+        Devices[dev].controller->setWindResistance(bicycle.WindResistance());
+        Devices[dev].controller->setWeight(bicycle.MassKG());
+        Devices[dev].controller->setWindSpeed(0); // Move to loadUpdate when wind simulation is added
+
         Devices[dev].controller->start();
         Devices[dev].controller->resetCalibrationState();
         connect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
@@ -1572,6 +1578,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
         CFStringRef reasonForActivity = CFSTR("TrainSidebar::guiUpdate");
         IOPMAssertionID assertionID;
         IOReturn suspendSreensaverSuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
+
+#elif defined(WIN32)
+        // Multimedia applications, such as video players and presentation applications, must use ES_DISPLAY_REQUIRED
+        // when they display video for long periods of time without user input.
+        SetThreadExecutionState(ES_DISPLAY_REQUIRED);
 #endif
 
         if(calibrating) {
@@ -1953,11 +1964,6 @@ void TrainSidebar::steerScroll(int scrollAmount)
         context->notifySteerScroll(scrollAmount);
 }
 
-// can be called from the controller
-void TrainSidebar::nextDisplayMode()
-{
-}
-
 void TrainSidebar::warnnoConfig()
 {
     QMessageBox::warning(this, tr("No Devices Configured"), tr("Please configure a device in Preferences."));
@@ -2270,7 +2276,23 @@ void TrainSidebar::updateCalibration()
                     finishCalibration = true;
                 break;
 
+            case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_FAST:
+                status = QString(tr("Calibration Failed: Loosen Roller"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW:
+                status = QString(tr("Calibration Failed: Tighten Roller"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
             }
+
             break;
 
         case CALIBRATION_TYPE_ZERO_OFFSET:

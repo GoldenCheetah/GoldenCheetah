@@ -436,7 +436,7 @@ RideFile::colorFor(SeriesType series)
 QString
 RideFile::unitName(SeriesType series, Context *context)
 {
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     switch (series) {
     case RideFile::secs: return QString(tr("seconds"));
@@ -496,7 +496,7 @@ RideFile::unitName(SeriesType series, Context *context)
 QString
 RideFile::formatValueWithUnit(double value, SeriesType series, Conversion conversion, Context *context, bool isSwim)
 {
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     if (series == RideFile::kph && conversion == RideFile::pace)
         return kphToPace(value, useMetricUnits, isSwim);

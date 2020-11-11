@@ -451,7 +451,7 @@ DownloadRideDialog::downloadClicked()
             // add Sport Tag when device is bike only
             if (devtype->isBikeOnly()) ride->setTag("Sport", "Bike");
             // process linked defaults
-            context->athlete->rideMetadata()->setLinkedDefaults(ride);
+            GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
             JsonFileReader reader;
             // write to tempActivties first (until RideCache is updated without crash)

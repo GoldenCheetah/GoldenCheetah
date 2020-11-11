@@ -2,8 +2,8 @@
 set -ev
 
 # Python 3.7.8
-curl -O https://www.python.org/ftp/python/3.7.8/python-3.7.8-macosx10.9.pkg
-sudo installer -pkg python-3.7.8-macosx10.9.pkg -target /
+curl -O https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg
+sudo installer -pkg python-3.7.9-macosx10.9.pkg -target /
 
 python3.7 --version
 python3.7-config --prefix
@@ -14,7 +14,7 @@ if [ -z "$(ls -A site-packages)" ]; then
 fi
 
 # Python SIP
-curl -O https://www.riverbankcomputing.com/static/Downloads/sip/4.19.8/sip-4.19.8.tar.gz
+curl -L -O https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
 python3.7 configure.py
@@ -49,8 +49,10 @@ sed -i "" "s|#\(LMFIT_INSTALL =\).*|\1 /usr/local|" src/gcconfig.pri
 sed -i "" "s|#\(DEFINES += GC_HAVE_LION*\)|\1|" src/gcconfig.pri
 sed -i "" "s|#\(HTPATH = ../httpserver.*\)|\1 |" src/gcconfig.pri
 sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
-##sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri ## we want this for now till AVKit fixup or an alternative is proved to work
-##sed -i "" "s|#\(DEFINES += GC_VIDEO_QT5.*\)|\1 |" src/gcconfig.pri  ## this amkes Train mode to crash in v3.5
+# VLC & VIDEO
+sed -i "" "s|#\(VLC_INSTALL =.*\)|\1 ../VLC|" src/gcconfig.pri
+sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
+sed -i "" "s|#\(DEFINES += GC_VIDEO_VLC.*\)|\1 |" src/gcconfig.pri
 ##Issues with c++11 and stdlib on travis and dependencies
 sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
 echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri

@@ -1,5 +1,7 @@
 #include "AthleteView.h"
+#include "AthleteConfigDialog.h"
 #include "TabView.h"
+#include "JsonRideFile.h" // for DATETIME_FORMAT
 
 // athlete card
 static bool _registerItems()
@@ -15,14 +17,16 @@ static bool registered = _registerItems();
 static const int gl_athletes_per_row = 5;
 static const int gl_athletes_deep = 15;
 static const int gl_avatar_width = 5;
-static const int gl_progress_width = ROWHEIGHT / 2;
+static const int gl_progress_width = ROWHEIGHT/2;
+static const int gl_button_height = ROWHEIGHT*1.5;
+static const int gl_button_width = ROWHEIGHT*5;
 
 AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::ATHLETES)
 {
     // fixed width - 1200 col width, 70 margins + scrollbar
     setFixedZoom(50 + (gl_athletes_per_row*1200) + ((gl_athletes_per_row+1) * 70));
 
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // lets look for athletes
     int row=0, col=0;
@@ -30,6 +34,12 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     while (i.hasNext()) {
 
         QString name = i.next();
+
+        // if there is no avatar its not a real folder, even a blank athlete
+        // will get the default avatar. This is to avoid having to work out
+        // what all the random folders are that Qt creates on Windows when
+        // using QtWebEngine, or Python or R or created by user scripts
+        if (!QFile(gcroot + "/" + name + "/config/avatar.png").exists()) continue;
 
         // add a card for each athlete
         AthleteCard *ath = new AthleteCard(this, name);
@@ -47,6 +57,9 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
 
     // setup geometry
     updateGeometry();
+
+    // athelte config dialog...
+    connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
 void
@@ -57,19 +70,17 @@ AthleteView::configChanged(qint32)
 
 }
 
-AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(parent, path), path(path)
+void
+AthleteView::configItem(ChartSpaceItem*item)
 {
-    // context and signals
-    if (parent->context->athlete->cyclist == path) {
-        context = parent->context;
-        loadprogress = 100;
-    } else {
-        context = NULL;
-        loadprogress = 0;
-    }
+    AthleteCard *card = static_cast<AthleteCard*>(item);
+    card->configAthlete();
+}
 
-    connect(parent->context->mainWindow, SIGNAL(openingAthlete(QString,Context*)), this, SLOT(opening(QString,Context*)));
-    connect(parent->context, SIGNAL(athleteClose(QString,Context*)), this, SLOT(closing(QString,Context*)));
+AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(parent, path), path(path), refresh(false)
+{
+    // no config icon thanks
+    setShowConfig(false);
 
     // avatar
     QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
@@ -84,22 +95,97 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     painter.drawEllipse(0, 0, img.width(), img.height());
     avatar = canvas.toImage();
 
-#if 0
-    // ridecache raw
-    if (loadprogress == 0) {
-        QTime timer;
-        timer.start();
-        QFile rideDB(gcroot + "/" + path + "/cache/rideDB.json");
-        if (rideDB.exists() && rideDB.open(QFile::ReadOnly)) {
+    // open close button
+    button = new Button(this, tr("Open"));
+    button->setFont(parent->midfont);
+    button->setGeometry(geometry().width()-(gl_button_width+ROWHEIGHT), geometry().height()-(gl_button_height+ROWHEIGHT),
+                        gl_button_width, gl_button_height);
+    connect(button, SIGNAL(clicked()), this, SLOT(clicked()));
 
-            QByteArray contents = rideDB.readAll();
-            rideDB.close();
-            QJsonDocument json = QJsonDocument::fromJson(contents);
-        }
-        fprintf(stderr, "'%s' read rideDB took %d usecs\n", path.toStdString().c_str(), timer.elapsed()); fflush(stderr);
+    // context and signals
+    if (parent->context->athlete->cyclist == path) {
+        context = parent->context;
+        loadprogress = 100;
+        anchor=true;
+        setShowConfig(true);
+        button->setText("Close");
+        button->hide();
+
+        // watch metric updates
+        connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
+        connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
+        connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate))); // we might miss 1st one
+
+    } else {
+        context = NULL;
+        loadprogress = 0;
+        anchor=false;
     }
-#endif
 
+    connect(parent->context->mainWindow, SIGNAL(openingAthlete(QString,Context*)), this, SLOT(opening(QString,Context*)));
+    connect(parent->context, SIGNAL(athleteClose(QString,Context*)), this, SLOT(closing(QString,Context*)));
+
+    // set stats to none
+    count=0;
+    last=QDateTime();
+
+    // need to fetch by looking at file names, rideDB parse is too expensive here
+    if (loadprogress == 0) {
+
+        // unloaded athletes we just say when last activity was
+        QDate today = QDateTime::currentDateTime().date();
+        QDir dir(gcroot + "/" + path + "/activities");
+        QStringListIterator i(RideFileFactory::instance().listRideFiles(dir));
+        while (i.hasNext()) {
+
+            QString name = i.next();
+            QDateTime date;
+
+            if (RideFile::parseRideFileName(name, &date)) {
+
+                //int ago= date.date().daysTo(today);
+                if (last==QDateTime() || date > last) last = date;
+                count++;
+            }
+        }
+
+        // when was rideDB.json last updated- thats when the athlete was last viewed
+        //QFileInfo fi(gcroot + "/" + path + "/cache/rideDB.json");
+        //fprintf(stderr, "%s: last accessed %s\n", path.toStdString().c_str(), fi.lastModified().date().toString().toStdString().c_str());
+
+    } else {
+
+        // use ridecache
+        refreshStats();
+    }
+}
+
+void
+AthleteCard::refreshStats()
+{
+    if (context == NULL) return;
+
+    // last 90 days
+    count=context->athlete->rideCache->rides().count();
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+        // last activity date?
+        if (last==QDateTime() || item->dateTime > last) last = item->dateTime;
+    }
+}
+
+void
+AthleteCard::configAthlete()
+{
+    AthleteConfigDialog *dialog = new AthleteConfigDialog(context->athlete->home->root(), context);
+    dialog->exec();
+}
+
+void
+AthleteCard::clicked()
+{
+    if (loadprogress==100) parent->context->mainWindow->closeTab(path);
+    else parent->context->mainWindow->openTab(path);
 }
 
 void
@@ -109,18 +195,55 @@ AthleteCard::opening(QString name, Context*context)
     if (name == path) {
         this->context = context;
         loadprogress = 100;
+        button->setText("Close");
+        button->hide();
         connect(context,SIGNAL(loadProgress(QString,double)), this, SLOT(loadProgress(QString,double)));
+        connect(context,SIGNAL(loadDone(QString,Context*)), this, SLOT(loadDone(QString,Context*)));
         connect(context,SIGNAL(athleteClose(QString,Context*)), this, SLOT(closing(QString,Context*)));
-    }
 
+        // refresh updates
+        connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
+        connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
+        connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate))); // we might miss 1st one
+    }
+}
+
+// track refreshes
+void AthleteCard::refreshStart() { refresh = true; update(); }
+void AthleteCard::refreshEnd() { refresh = false; update(); }
+void AthleteCard::refreshUpdate(QDate) { refresh = true; update();  }
+
+void AthleteCard::itemGeometryChanged()
+{
+    button->setGeometry(geometry().width()-(gl_button_width+ROWHEIGHT), geometry().height()-(gl_button_height+ROWHEIGHT),
+                        gl_button_width, gl_button_height);
+}
+
+void AthleteCard::loadDone(QString name, Context *)
+{
+    if (this->name == name) {
+        setShowConfig(true);
+        loadprogress = 100;
+        refreshStats();
+        if (!anchor) button->show();
+        update();
+    }
+}
+
+void AthleteCard::dragChanged(bool drag)
+{
+    if (drag || (loadprogress != 100 && loadprogress != 0)) button->hide();
+    else if (!anchor) button->show();
 }
 
 void
-AthleteCard::closing(QString name, Context *context)
+AthleteCard::closing(QString name, Context *)
 {
     if (name == path) {
+        setShowConfig(false);
         this->context = NULL;
         loadprogress = 0;
+        button->setText("Open");
         update();
     }
 }
@@ -139,7 +262,26 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
     painter->drawImage(img, avatar);
 
+    // last workout if nothing recent
+    if (/*maxy == 0 && */last != QDateTime() || count == 0) {
+        QRectF rectf = QRectF(ROWHEIGHT,geometry().height()-(ROWHEIGHT*5), geometry().width()-(ROWHEIGHT*2), ROWHEIGHT*1.5);
+        QString message;
+        if (count == 0) message = "No activities.";
+        else message = QString("Last workout %1 days ago").arg(last.daysTo(QDateTime::currentDateTime()));
+        painter->setFont(parent->midfont);
+        painter->setPen(QColor(150,150,150));
+        painter->drawText(rectf, message, Qt::AlignHCenter | Qt::AlignVCenter);
+    }
+
     // load status
     QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (loadprogress/100), gl_progress_width);
     painter->fillRect(progressbar, QBrush(GColor(CPLOTMARKER)));
+
+    // refresh status
+    if (refresh && Context::isValid(context)) {
+        QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (double(context->athlete->rideCache->progress())/100), gl_progress_width);
+        QColor over(Qt::white);
+        over.setAlpha(128);
+        painter->fillRect(progressbar, QBrush(over));
+    }
 }

@@ -49,6 +49,18 @@
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
+class RideCacheLoader : public QThread
+{
+public:
+
+    RideCacheLoader(RideCache *cache) : cache(cache) {}
+    void run() { cache->load(); }
+
+private:
+
+        RideCache *cache;
+};
+
 RideCache::RideCache(Context *context) : context(context)
 {
     directory = context->athlete->home->activities();
@@ -88,7 +100,7 @@ RideCache::RideCache(Context *context) : context(context)
         }
 
         // reset special fields to take into account user metrics
-        context->specialFields = SpecialFields();
+        GlobalContext::context()->specialFields = SpecialFields();
     }
 
     // set the list
@@ -128,8 +140,15 @@ RideCache::RideCache(Context *context) : context(context)
     qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
 
     // load the store - will unstale once cache restored
-    load();
+    RideCacheLoader *rideCacheLoader = new RideCacheLoader(this);
+    connect(rideCacheLoader, SIGNAL(finished()), this, SLOT(postLoad()));
+    connect(rideCacheLoader, SIGNAL(finished()), this, SIGNAL(loadComplete()));
+    rideCacheLoader->start();
+}
 
+void
+RideCache::postLoad()
+{
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
@@ -199,6 +218,7 @@ RideCache::initEstimates()
 void
 RideCache::configChanged(qint32 what)
 {
+
     // if the wbal formula changed invalidate all cached values
     if (what & CONFIG_WBAL) {
         foreach(RideItem *item, rides()) {
@@ -209,7 +229,7 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
+            item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
         }
     }
 
@@ -461,6 +481,9 @@ RideCache::writeAsCSV(QString filename)
 void
 itemRefresh(RideItem *&item)
 {
+    // debugging below to watch refreshing take place
+    //fprintf(stderr, "%s %s refresh\n", item->context->athlete->cyclist.toStdString().c_str(), item->dateTime.toString().toStdString().c_str()); fflush(stderr);
+
     // need parser to be reentrant !item->refresh();
     if (item->isstale) {
         item->refresh();

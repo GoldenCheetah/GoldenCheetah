@@ -184,7 +184,7 @@ RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
         spdtot += spd; spdtot -= spdHist[spdindex]; spdHist[spdindex] = spd;
         spdindex++; if (spdindex >= rtPlot->smooth) spdindex = 0;
         spd = spdtot / rtPlot->smooth;
-        if (!context->athlete->useMetricUnits) spd *= MILES_PER_KM;
+        if (!GlobalContext::context()->useMetricUnits) spd *= MILES_PER_KM;
         rtPlot->spdData->addData(spd);
 
         // Power

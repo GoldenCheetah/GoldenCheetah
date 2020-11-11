@@ -63,7 +63,7 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     ltmPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
 
     // read metadata.xml
-    QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";
+    QString filename = QDir(gcroot).canonicalPath()+"/metadata.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
     RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);

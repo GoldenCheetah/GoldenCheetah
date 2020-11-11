@@ -69,6 +69,36 @@ class Athlete;
 class MainWindow;
 class Tab;
 class NavigationModel;
+class RideMetadata;
+class ColorEngine;
+
+
+class GlobalContext : public QObject
+{
+    Q_OBJECT
+
+    public:
+
+        GlobalContext();
+        static GlobalContext *context();
+        void notifyConfigChanged(qint32);
+
+        // metadata etc
+        RideMetadata *rideMetadata;
+        SpecialFields specialFields;
+        ColorEngine *colorEngine;
+
+        // metric units
+        bool useMetricUnits;
+
+    public slots:
+        void readConfig(qint32);
+        void userMetricsConfigChanged();
+
+    signals:
+        void configChanged(qint32); // for global widgets that aren't athlete specific
+
+};
 
 class Context : public QObject
 {
@@ -77,6 +107,9 @@ class Context : public QObject
     public:
         Context(MainWindow *mainWindow);
         ~Context();
+
+        // check if valid (might be deleted)
+        static bool isValid(Context *);
 
         // mainwindow state
         NavigationModel *nav;
@@ -101,7 +134,6 @@ class Context : public QObject
         VideoSyncFile *videosync; // the currently selected videosync file
         QString videoFilename;
         long now; // point in time during train session
-        SpecialFields specialFields;
 
         // search filter
         bool isfiltered;
@@ -131,14 +163,13 @@ class Context : public QObject
         // *********************************************
         // APPLICATION EVENTS
         // *********************************************
-        void notifyConfigChanged(qint32); // used by ConfigDialog to notify Context *
-                                            // when config has changed - and to get a
-                                            // signal emitted to notify its children
+        void notifyConfigChanged(qint32); // Global and athlete specific changes communicated via this signal
 
         // athlete load/close
         void notifyLoadProgress(QString folder, double progress) { emit loadProgress(folder,progress); }
-        void notifyLoadCompleted(QString folder, Context *context) { emit loadCompleted(folder,context); }
+        void notifyLoadCompleted(QString folder, Context *context) { emit loadCompleted(folder,context); } // Athlete loaded
         void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
+        void notifyLoadDone(QString folder, Context *context) { emit loadDone(folder, context); } // MainWindow finished
 
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
@@ -227,13 +258,12 @@ class Context : public QObject
         // loading an athlete
         void loadProgress(QString,double);
         void loadCompleted(QString, Context*);
+        void loadDone(QString, Context*);
         void athleteClose(QString, Context*);
 
         // global filter changed
         void filterChanged();
         void homeFilterChanged();
-
-        void configChanged(qint32);
 
         void workoutsChanged(); // added or deleted a workout in train view
         void VideoSyncChanged(); // added or deleted a workout in train view
@@ -241,6 +271,7 @@ class Context : public QObject
         void presetSelected(int);
 
         // user metrics
+        void configChanged(qint32);
         void userMetricsChanged();
 
         // view changed

@@ -47,8 +47,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     this->mainwindow = mainwindow;
     _groupBy = -1;
     fontHeight = QFontMetrics(QFont()).height();
-    ColorEngine ce(context);
-    reverseColor = ce.reverseColor;
+    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
     currentItem = NULL;
 
     init = false;
@@ -167,9 +166,8 @@ RideNavigator::~RideNavigator()
 void
 RideNavigator::configChanged(qint32 state)
 {
-    ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();
-    reverseColor = ce.reverseColor;
+    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
@@ -282,7 +280,7 @@ RideNavigator::resetView()
 
     // add metadata fields...
     SpecialFields sp; // all the special fields are in here...
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
@@ -1077,7 +1075,7 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
         rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight((rideNavigator->fontHeight+2) * 3);
+        s.setHeight((rideNavigator->fontHeight+2) * 4);
     } else s.setHeight(rideNavigator->fontHeight + 2);
     return s;
 }
@@ -1211,12 +1209,12 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 3);
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
+            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
             //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 

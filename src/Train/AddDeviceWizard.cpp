@@ -1452,7 +1452,9 @@ AddVirtualPower::calcWheelSize()
     int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
     if (diameter > 0)
         wheelSizeEdit->setText(QString("%1").arg(diameter));
-    wizard->wheelSize = diameter;
+    bool fValidDouble = false;
+    double wheelSize = wheelSizeEdit->text().toDouble(&fValidDouble);
+    wizard->wheelSize = fValidDouble ? wheelSize : 0.;
 }
 
 void

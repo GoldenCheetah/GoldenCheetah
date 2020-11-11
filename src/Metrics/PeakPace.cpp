@@ -43,15 +43,22 @@ class PeakPace : public RideMetric {
     bool isLowerBetter() const { return true; }
     // Overrides to use Pace units setting
     QString units(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         return RideMetric::units(metricRunPace);
     }
     double value(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_PACE, true).toBool();
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         return RideMetric::value(metricRunPace);
+    }
+    double value(double v, bool) const {
+        bool metricRunPace = appsettings->value(NULL, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(v, metricRunPace);
     }
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
+    }
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
     void setSecs(double secs) { this->secs=secs; }
 
@@ -386,15 +393,22 @@ class PeakPaceSwim : public RideMetric {
     bool isLowerBetter() const { return true; }
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
-        bool metricSwimPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        bool metricSwimPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
         return RideMetric::units(metricSwimPace);
     }
     double value(bool) const {
-        bool metricSwimPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        bool metricSwimPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
         return RideMetric::value(metricSwimPace);
+    }
+    double value(double v, bool) const {
+        bool metricSwimPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(v, metricSwimPace);
     }
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
+    }
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
     void setSecs(double secs) { this->secs=secs; }
 
@@ -728,6 +742,9 @@ class BestTime : public RideMetric {
     bool isLowerBetter() const { return true; }
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
+    }
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
     void setMeters(double meters) { this->meters=meters; }
 

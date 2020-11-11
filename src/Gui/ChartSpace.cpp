@@ -31,6 +31,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+double gl_major;
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
@@ -48,6 +49,17 @@ ChartSpace::ChartSpace(Context *context, int scope) :
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(this);
+
+#ifdef Q_OS_LINUX
+    // if we have OpenGL and its 2.0 or higher, lets use it.
+    // this is pretty much any GPU since 2004 and keeps Qt happy.
+    // we only do this on Linux since Windows and MacOS have issues
+    // on Windows AMD Radeon drivers are dreadful and on MacOS
+    // OpenGL support is deprecated and users have reported rendering
+    // issues when this is enabled.
+    if (gl_major >= 2.0)  view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
+#endif
+
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
 
@@ -236,6 +248,7 @@ ChartSpaceItem::sceneEvent(QEvent *event)
 bool
 ChartSpaceItem::inHotspot()
 {
+    if (showconfig == false) return false;
 
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
     QPointF spos = parent->view->mapToScene(vpos);
@@ -248,6 +261,8 @@ ChartSpaceItem::inHotspot()
 bool
 ChartSpaceItem::inCorner()
 {
+    if (showconfig == false) return false;
+
     QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
     QPointF spos = parent->view->mapToScene(vpos);
 
@@ -296,33 +311,37 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     if (drag) return;
 
     // not dragging so we can get to work painting the rest
-    if (parent->state != ChartSpace::DRAG && underMouse()) {
 
-        if (inCorner()) {
+    // config icon
+    if (showconfig) {
+        if (parent->state != ChartSpace::DRAG && underMouse()) {
 
-            // if hovering over the button show a background to indicate
-            // that pressing a button is good
-            QPainterPath path;
-            path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
-                                ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
-            painter->setPen(Qt::NoPen);
-            QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
-            painter->setBrush(darkgray);
-            painter->drawPath(path);
-            painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
-            painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, ROWHEIGHT/5, ROWHEIGHT+40, ROWHEIGHT+40-(ROWHEIGHT/5)), QBrush(darkgray));
+            if (inCorner()) {
 
-            // draw the config button and make it more obvious
-            // when hovering over the card
-            painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                // if hovering over the button show a background to indicate
+                // that pressing a button is good
+                QPainterPath path;
+                path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
+                                    ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
+                painter->setBrush(darkgray);
+                painter->drawPath(path);
+                painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
+                painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, ROWHEIGHT/5, ROWHEIGHT+40, ROWHEIGHT+40-(ROWHEIGHT/5)), QBrush(darkgray));
 
-        } else {
+                // draw the config button and make it more obvious
+                // when hovering over the card
+                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
 
-            // hover on card - make it more obvious there is a config button
-            painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
-        }
+            } else {
 
-    } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                // hover on card - make it more obvious there is a config button
+                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+            }
+
+        } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+    }
 
     // thin border
     if (!drag) {
@@ -337,7 +356,10 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
         painter->drawPath(path);
     }
 
+    // item paints itself and can completely repaint everything
+    // including the title etc, in case this is useful
     itemPaint(painter, opt, widget);
+
 }
 
 static bool ChartSpaceItemSort(const ChartSpaceItem* left, const ChartSpaceItem* right)

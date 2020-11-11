@@ -67,8 +67,7 @@
 #include "GenerateHeatMapDialog.h"
 #include "BatchExportDialog.h"
 #include "TodaysPlan.h"
-#include "BodyMeasuresDownload.h"
-#include "HrvMeasuresDownload.h"
+#include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
@@ -123,6 +122,9 @@
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
 extern QDesktopWidget *desktop;
+extern ConfigDialog *configdialog_ptr;
+extern QString gl_version;
+extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
 
 MainWindow::MainWindow(const QDir &home)
 {
@@ -240,7 +242,7 @@ MainWindow::MainWindow(const QDir &home)
     // we can click on the quick icons, but they aren't selectable views
     sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7);
     sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("settings"), 8);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8);
     sidebar->setItemSelectable(8, false);
 
     connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
@@ -370,13 +372,27 @@ MainWindow::MainWindow(const QDir &home)
     spacer->setFixedWidth(5 *dpiYFactor);
     head->addWidget(spacer);
 
+#ifdef Q_OS_LINUX
+    // check opengl is available with version 2 or higher
+    // only do this on Linux since Windows and MacOS have opengl "issues"
+    QOffscreenSurface surf;
+    surf.create();
+
+    QOpenGLContext ctx;
+    ctx.create();
+    ctx.makeCurrent(&surf);
+
+    // OpenGL version number
+    gl_version = QString::fromUtf8((char *)(ctx.functions()->glGetString(GL_VERSION)));
+    gl_major = Utils::number(gl_version);
+#endif
 
     /*----------------------------------------------------------------------
      * Central Widget
      *--------------------------------------------------------------------*/
 
     tabbar = new DragBar(this);
-    tabbar->setTabsClosable(true);
+    tabbar->setTabsClosable(false); // use athlete view
 #ifdef Q_OS_MAC
     tabbar->setDocumentMode(true);
 #endif
@@ -399,7 +415,7 @@ MainWindow::MainWindow(const QDir &home)
 
     connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchTab(int)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
-    connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int)));
+    //connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int))); // use athlete view
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -438,8 +454,8 @@ MainWindow::MainWindow(const QDir &home)
     // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
 
-    openTabMenu = fileMenu->addMenu(tr("Open..."));
-    connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
+    //openTabMenu = fileMenu->addMenu(tr("Open...")); use athlete view
+    //connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
@@ -454,7 +470,7 @@ MainWindow::MainWindow(const QDir &home)
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
-    fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
+    //fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab())); use athlete view
 
     HelpWhatsThis *fileMenuHelp = new HelpWhatsThis(fileMenu);
     fileMenu->setWhatsThis(fileMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Athlete));
@@ -491,8 +507,7 @@ MainWindow::MainWindow(const QDir &home)
 
     uploadMenu = shareMenu->addMenu(tr("Upload Activity..."));
     syncMenu = shareMenu->addMenu(tr("Synchronise Activities..."));
-    shareMenu->addAction(tr("Get &Body Measurements..."), this, SLOT (downloadBodyMeasures()));
-    shareMenu->addAction(tr("Get &HRV Measurements..."), this, SLOT (downloadHrvMeasures()));
+    shareMenu->addAction(tr("Get &Daily Measurements..."), this, SLOT (downloadMeasures()));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
     checkAction->setShortcut(tr("Ctrl-C"));
@@ -661,8 +676,8 @@ MainWindow::MainWindow(const QDir &home)
 
     installEventFilter(this);
 
-    // catch config changes
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    // catch global config changes
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(CONFIG_APPEARANCE);
 
     init = true;
@@ -988,11 +1003,14 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
+    // Create a new config dialog only if it doesn't exist
+    ConfigDialog *cd = configdialog_ptr ? configdialog_ptr
+                                        : new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
     cd->show();
+    cd->raise();
 }
 
 void
@@ -1057,6 +1075,7 @@ MainWindow::~MainWindow()
 {
     // aside from the tabs, we may need to clean
     // up any dangling widgets created in MainWindow::MainWindow (?)
+    if (configdialog_ptr) configdialog_ptr->close();
 }
 
 // global search/data filter
@@ -1727,6 +1746,9 @@ MainWindow::loadCompleted(QString name, Context *context)
     // to show it to avoid crappy paint artefacts
     showTabbar(true);
 
+    // tell everyone
+    currentTab->context->notifyLoadDone(name, context);
+
     // now do the automatic ride file import
     context->athlete->importFilesWhenOpeningAthlete();
 }
@@ -1749,6 +1771,18 @@ MainWindow::closeTabClicked(int index)
 
     // lets wipe it
     removeTab(tab);
+}
+
+bool
+MainWindow::closeTab(QString name)
+{
+    for(int i=0; i<tabbar->count(); i++) {
+        if (name == tabbar->tabText(i)) {
+            closeTabClicked(i);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool
@@ -1783,6 +1817,9 @@ MainWindow::removeTab(Tab *tab)
     setUpdatesEnabled(false);
 
     if (tabList.count() == 2) showTabbar(false); // don't need it for one!
+
+    // cancel ridecache refresh if its in progress
+    tab->context->athlete->rideCache->cancel();
 
     // save the named searches
     tab->context->athlete->namedSearches->write();
@@ -1936,6 +1973,7 @@ MainWindow::switchTab(int index)
 
     setUpdatesEnabled(false);
 
+#if 0 // use athlete view, these buttons don't exist
 #ifdef Q_OS_MAC // close buttons on the left on Mac
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
@@ -1944,6 +1982,7 @@ MainWindow::switchTab(int index)
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
     tabbar->tabButton(index, QTabBar::RightSide)->show();
+#endif
 #endif
 
     // save how we are
@@ -2157,10 +2196,8 @@ MainWindow::configChanged(qint32)
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    if (GCColor::isFlat())
-        tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
-    else
-        tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
+    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CCHROME)));
     tabbar->setPalette(tabbarPalette);
     athleteView->setPalette(tabbarPalette);
 
@@ -2174,19 +2211,10 @@ MainWindow::configChanged(qint32)
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::downloadBodyMeasures()
+MainWindow::downloadMeasures()
 {
 
-    BodyMeasuresDownload dialog(currentTab->context);
-    dialog.exec();
-
-}
-
-void
-MainWindow::downloadHrvMeasures()
-{
-
-    HrvMeasuresDownload dialog(currentTab->context);
+    MeasuresDownload dialog(currentTab->context);
     dialog.exec();
 
 }

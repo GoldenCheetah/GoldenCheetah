@@ -24,13 +24,13 @@
 
 #include "qwt_math.h"
 
-struct geolocation;
-
 #if defined(_MSC_VER)
 #define NOINLINE __declspec(noinline)
 #else
 #define NOINLINE
 #endif
+
+struct geolocation;
 
 class v3
 {
@@ -124,12 +124,19 @@ struct geolocation : v3
         return dist;
     }
 
+    bool IsReasonableAltitude() const {
+        return (this->Alt() >= -1000 && this->Alt() < 10000);
+    }
+
     bool IsReasonableGeoLocation() const {
         return  (this->Lat() && this->Lat() >= double(-90) && this->Lat() <= double(90) &&
             this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
-            this->Alt() >= -1000 && this->Alt() < 10000);
+            IsReasonableAltitude());
     }
 
+    // Compute initial bearing from this geoloc to another, in RADIANS.
+    // Note that unless bearing is 0 or pi it will vary on the path from one to the other.
+    double BearingTo(const geolocation& to) const;
 };
 
 // Class to wrap classic game spherical interpolation

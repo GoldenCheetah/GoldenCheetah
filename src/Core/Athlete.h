@@ -20,6 +20,7 @@
 #define _GC_Athlete_h 1
 
 #include "Measures.h"
+#include "DataFilter.h"
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -76,13 +77,8 @@ class Athlete : public QObject
         // basic athlete info
         QString cyclist; // the cyclist name
         QUuid id; // unique identifier
-        bool useMetricUnits;
         AthleteDirectoryStructure *home;
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
-
-        // metadata definitions
-        RideMetadata *rideMetadata_;
-        ColorEngine *colorEngine;
 
         // zones
         const Zones *zones(bool isRun) const { return zones_[isRun]; }
@@ -132,9 +128,6 @@ class Athlete : public QObject
         RideImportWizard *autoImport;
         RideAutoImportConfig *autoImportConfig;
 
-        // ride metadata definitions
-        RideMetadata *rideMetadata() { return rideMetadata_; }
-
         // preset charts
         QList<LTMSettings> presets;
         void loadCharts(); // load charts.xml
@@ -142,6 +135,9 @@ class Athlete : public QObject
 
         // named filters / queries
         NamedSearches *namedSearches;
+
+        // DataFilter global storage/cache
+        QMap<QString,Result> dfcache;
 
         Context *context;
 
@@ -223,19 +219,6 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_snippets;
             QString athlete_media;
 
-};
-
-class MainWindow;
-class AthleteLoader : public QThread
-{
-    public:
-
-        // load an athlete in background
-        AthleteLoader(Context *context) : context(context) {}
-        void run() override;
-
-    private:
-        Context *context;
 };
 
 #endif

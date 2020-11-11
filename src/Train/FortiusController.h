@@ -20,8 +20,6 @@
 #include "RealtimeController.h"
 #include "Fortius.h"
 
-#include <QMessageBox>
-
 // Abstract base class for Realtime device controllers
 
 #ifndef _GC_FortiusController_h
@@ -52,6 +50,7 @@ public:
     void setLoad(double);
     void setGradient(double);
     void setMode(int);
+    void setWeight(double);
 };
 
 #endif // _GC_FortiusController_h

@@ -53,34 +53,6 @@ class GeneralConfig : public QWidget
 
 };
 
-// ATHLETE PAGE
-class AthleteConfig : public QWidget
-{
-    Q_OBJECT
-
-    public:
-        AthleteConfig(QDir home, Context *context);
-        AboutRiderPage *athletePage;
-        AboutModelPage *modelPage;
-        CredentialsPage *credentialsPage;
-        RiderPhysPage *athletePhysPage;
-        HrvPage *hrvPage;
-
-    public slots:
-        qint32 saveClicked();
-    
-    private:
-        QDir home;
-        Context *context;
-
-        // about me, power ones and hr zones
-        ZonePage *zonePage;
-        HrZonePage *hrZonePage;
-        PaceZonePage *paceZonePage;
-        AutoImportPage *autoImportPage;
-        BackupPage *backupPage;
-};
-
 // APPEARANCE PAGE
 class AppearanceConfig : public QWidget
 {
@@ -184,6 +156,7 @@ class ConfigDialog : public QMainWindow
 
     public:
         ConfigDialog(QDir home, Context *context);
+        ~ConfigDialog();
 
     public slots:
         void changePage(int);
@@ -201,7 +174,6 @@ class ConfigDialog : public QMainWindow
 
         // the config pages
         GeneralConfig *general;
-        AthleteConfig *athlete;
         AppearanceConfig *appearance;
         DataConfig *data;
         MetricConfig *metric;

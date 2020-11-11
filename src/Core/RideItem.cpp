@@ -469,7 +469,7 @@ RideItem::checkStale()
     if (isstale) return true;
 
     // just change it .. its as quick to change as it is to check !
-    color = context->athlete->colorEngine->colorFor(getText(context->athlete->rideMetadata()->getColorField(), ""));
+    color = GlobalContext::context()->colorEngine->colorFor(getText(GlobalContext::context()->rideMetadata->getColorField(), ""));
 
     // upgraded metrics
     if (udbversion != UserMetricSchemaVersion || dbversion != DBSchemaVersion) {
@@ -596,7 +596,7 @@ RideItem::refresh()
         isRun = f->isRun();
         isSwim = f->isSwim();
         isXtrain = f->isXtrain();
-        color = context->athlete->colorEngine->colorFor(f->getTag(context->athlete->rideMetadata()->getColorField(), ""));
+        color = GlobalContext::context()->colorEngine->colorFor(f->getTag(GlobalContext::context()->rideMetadata->getColorField(), ""));
         present = f->getTag("Data", "");
         samples = f->dataPoints().count() > 0;
 
@@ -666,7 +666,7 @@ RideItem::refresh()
         metacrc = metaCRC();
 
         // Construct the summary text used on the calendar
-        metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(this));
+        metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(this));
 
         // close if we opened it
         if (doclose) {
@@ -690,17 +690,13 @@ double
 RideItem::getWeight(int type)
 {
     // get any body measurements first
-    BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
-    pBodyMeasures->getBodyMeasure(dateTime.date(), weightData);
+    MeasuresGroup* pBodyMeasures = context->athlete->measures->getGroup(Measures::Body);
+    double m = pBodyMeasures->getFieldValue(dateTime.date(), type);
 
     // return what was asked for!
-    switch(type) {
-
-    default: // just get weight in kilos
-    case BodyMeasure::WeightKg:
-    {
+    if (type == Measure::WeightKg) {
         // get weight from whatever we got
-        weight = weightData.weightkg;
+        weight = m;
 
         // from metadata
         if (weight <= 0.00) weight = metadata_.value("Weight", "0.0").toDouble();
@@ -712,34 +708,36 @@ RideItem::getWeight(int type)
         if (weight <= 0.00) weight = 80.00;
 
         return weight;
+    } else {
+        // all the other weight measures supported by BodyMetrics
+        return m;
     }
-
-    // all the other weight measures supported by BodyMetrics
-    case BodyMeasure::FatKg : return weightData.fatkg;
-    case BodyMeasure::MuscleKg : return weightData.musclekg;
-    case BodyMeasure::BonesKg : return weightData.boneskg;
-    case BodyMeasure::LeanKg : return weightData.leankg;
-    case BodyMeasure::FatPercent : return weightData.fatpercent;
-
-    }
-    return weight;
 }
 
 double
-RideItem::getHrvMeasure(int type)
+RideItem::getHrvMeasure(QString fieldSymbol)
 {
     // get HRV measure for the date of the ride
-    return context->athlete->measures->getFieldValue(Measures::Hrv, dateTime.date(), type);
+    MeasuresGroup *pHrvMeasures = context->athlete->measures->getGroup(Measures::Hrv);
+    if (pHrvMeasures) {
+        return pHrvMeasures->getFieldValue(dateTime.date(), pHrvMeasures->getFieldSymbols().indexOf(fieldSymbol));
+    } else {
+        return 0.0;
+    }
 }
 
 unsigned short
 RideItem::getHrvFingerprint()
 {
     // get HRV measure for the date of the ride
-    HrvMeasure hrvMeasure;
-    HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
-    pHrvMeasures->getHrvMeasure(dateTime.date(), hrvMeasure);
-    return hrvMeasure.getFingerprint();
+    MeasuresGroup* pHrvMeasures = context->athlete->measures->getGroup(Measures::Hrv);
+    if (pHrvMeasures) {
+        Measure hrvMeasure;
+        pHrvMeasures->getMeasure(dateTime.date(), hrvMeasure);
+        return hrvMeasure.getFingerprint();
+    } else {
+        return 0;
+    }
 }
 
 double
@@ -822,7 +820,7 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 
             double value = metrics_[m->index()];
             if (std::isinf(value) || std::isnan(value)) value=0;
-            returning = m->toString(useMetricUnits, value);
+            returning = m->toString(m->value(value, useMetricUnits));
         }
     }
     return returning;
@@ -997,7 +995,7 @@ RideItem::updateIntervals()
                                 tr("1 minute"), tr("5 minutes"), tr("10 minutes"), tr("20 minutes"), tr("30 minutes"), tr("45 minutes"),
                                 tr("1 hour") };
 
-        bool metric = appsettings->value(this, context->athlete->paceZones(f->isSwim())->paceSetting(), true).toBool();
+        bool metric = appsettings->value(this, context->athlete->paceZones(f->isSwim())->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
         for(int i=0; durations[i] != 0; i++) {
 
             // go hunting for best peak
@@ -1448,6 +1446,15 @@ RideItem::updateIntervals()
         // set intervals for routes
         QList<IntervalItem*> here;
         context->athlete->routes->search(this, f, here);
+
+        // Sort routes so they are added by start time to the activity.
+        std::sort(
+            here.begin(),
+            here.end(),
+            [](IntervalItem* i1, IntervalItem* i2) {
+                return *i1 < *i2;
+            }
+        );
 
         // add to ride !
         foreach(IntervalItem *add, here) {

@@ -143,6 +143,8 @@ class UserChartSettings : public QWidget {
         void seriesClicked(int,int);
         void addSeries();
         void deleteSeries();
+        void moveSeriesUp();
+        void moveSeriesDown();
 
         // configuration - axes
         void refreshAxesTab(); // update gui with current config

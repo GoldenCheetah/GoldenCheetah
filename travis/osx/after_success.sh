@@ -7,6 +7,10 @@ GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
 echo "About to create dmg file and fix up"
 mkdir GoldenCheetah.app/Contents/Frameworks
 
+# Add VLC dylibs and plugins
+cp ../VLC/lib/libvlc.dylib ../VLC/lib/libvlccore.dylib GoldenCheetah.app/Contents/Frameworks
+cp -R ../VLC/plugins GoldenCheetah.app/Contents/Frameworks
+
 # This is a hack to include libicudata.*.dylib, not handled by macdployqt[fix]
 cp /usr/local/opt/icu4c/lib/libicudata.*.dylib GoldenCheetah.app/Contents/Frameworks
 
@@ -30,6 +34,10 @@ cp -R ../site-packages GoldenCheetah.app/Contents/Frameworks/Python.framework/Ve
 /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -executable=GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 
 # Fix QtWebEngineProcess due to bug in macdployqt from homebrew
+if [ ! -f GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess ]; then
+    cp -Rafv /usr/local/Cellar/qt/5.15.?/lib/QtWebEngineCore.framework/Versions/5/Helpers/QtWebEngineProcess.app/Contents GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Versions/5/Helpers/QtWebEngineProcess.app
+fi
+
 pushd GoldenCheetah.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/MacOS
 for LIB in QtGui QtCore QtWebEngineCore QtQuick QtWebChannel QtNetwork QtPositioning QtQmlModels QtQml
 do
@@ -40,8 +48,9 @@ do
 done
 popd
 
-# Final deployment to generate dmg
-/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
+# Final deployment to generate dmg (may take longer than 10' wihout output)
+python3.7 -m pip install travis-wait-improved
+/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 20m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
 export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
@@ -63,7 +72,7 @@ aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
 aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
 else
-curl --max-time 150 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --max-time 300 --upload-file $FINAL_NAME https://free.keep.sh/$FINAL_NAME
 fi
 
 echo "Make sure we are back in the Travis build directory"

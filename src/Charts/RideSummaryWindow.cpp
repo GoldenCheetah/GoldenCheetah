@@ -418,7 +418,7 @@ RideSummaryWindow::htmlSummary()
 
     if (!ride && !ridesummary) return ""; // didn't parse!
 
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     // ride summary and there were ridefile read errors?
     if (ridesummary && !ride) {
@@ -1882,8 +1882,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 relevantMetricsList << symbol;
 
                 QString name, units;
-                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
-                        units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(GlobalContext::context()->useMetricUnits) == "seconds" || m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")))
+                        units = m->units(GlobalContext::context()->useMetricUnits);
                 if (units != "") name = QString("%1 (%2)").arg(addTooltip(m->name(), m->description())).arg(units);
                 else name = QString("%1").arg(addTooltip(m->name(), m->description()));
 
@@ -1918,8 +1918,8 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     // get value and convert if needed (use local context for units)
                     double value = metrics->getForSymbol(symbol) 
-                                * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
-                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
+                                * (GlobalContext::context()->useMetricUnits ? 1 : m->conversion()) 
+                                + (GlobalContext::context()->useMetricUnits ? 0 : m->conversionSum());
 
                     // use right precision
                     QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
@@ -1935,8 +1935,8 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         // calculate me vs the original
                         double value0 = intervalMetrics[0]->getForSymbol(symbol) 
-                                * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
-                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
+                                * (GlobalContext::context()->useMetricUnits ? 1 : m->conversion()) 
+                                + (GlobalContext::context()->useMetricUnits ? 0 : m->conversionSum());
 
                         value -= value0; // delta
 
@@ -2249,8 +2249,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 relevantMetricsList << symbol;
 
                 QString name, units;
-                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
-                    units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(GlobalContext::context()->useMetricUnits) == "seconds" || m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")))
+                    units = m->units(GlobalContext::context()->useMetricUnits);
                 if (units != "") name = QString("%1 (%2)").arg(addTooltip(m->name(), m->description())).arg(units);
                 else name = QString("%1").arg(addTooltip(m->name(), m->description()));
 
@@ -2281,7 +2281,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     // get value and convert if needed (use local context for units)
                     double value = dr.context->athlete->rideCache->getAggregate(symbol, dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                     // use right precision
                     QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
@@ -2298,7 +2298,7 @@ RideSummaryWindow::htmlCompareSummary() const
                         // calculate me vs the original
                         double value0 = context->compareDateRanges[0].context->athlete->rideCache->getAggregate(symbol,
                                                                                  context->compareDateRanges[0].specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         value -= value0; // delta
 
@@ -2380,11 +2380,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     foreach (ZoneInfo zone, zones) {
 
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZones[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZones[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         idx++;
 
@@ -2439,20 +2439,20 @@ RideSummaryWindow::htmlCompareSummary() const
 #if 0 // See bug #1305
                         // above cp W'bal time in zone
                         int cptimeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int cpdt = cptimeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 #endif // See bug #1305
 
                         // all W'bal time in zone
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         idx++;
 
@@ -2521,11 +2521,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     foreach (HrZoneInfo zone, zones) {
 
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesHR[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesHR[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
                         idx++;
 
                         // time and then +time
@@ -2594,11 +2594,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     foreach (PaceZoneInfo zone, zones) {
 
                         int timeZone = dr.context->athlete->rideCache->getAggregate(paceTimeInZones[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(paceTimeInZones[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         idx++;
 

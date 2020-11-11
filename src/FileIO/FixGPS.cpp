@@ -391,18 +391,17 @@ class FixGPSConfig : public DataProcessorConfig
 
             // Altitude Outlier Criteria
 
-            outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier criteria %:"));
+            outlierLabel = new QLabel(fUseShortDescription ? tr("Crit") : tr("Altitude Outlier Criteria - Centimeters:"));
             outlierSpinBox = new QDoubleSpinBox();
             outlierSpinBox->setRange(0.001, 10000);
             outlierSpinBox->setSingleStep(10);
             outlierSpinBox->setDecimals(3);
             outlierSpinBox->setValue(appsettings->value(this, GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT, s_Default_AltitudeOutlierPercent).toInt());
-            outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA (%)\n"
+            outlierSpinBox->setToolTip(tr("ALTITUDE OUTLIER CRITERIA - CENTIMETERS:\n"
                                           "An outlier point is one so eggregiously out of range that it should not be used to\n"
                                           "build the smoothing spline. A clear example consider a point at the north pole that\n"
-                                          "is part of a route in Seattle. This outlier criteria is the multiple of the data to\n"
-                                          "spline stddev past which a value will be considered an outlier and not used to compute\n"
-                                          "the final smoothing spline.\n"));
+                                          "is part of a route in Seattle. This outlier criteria is distance in centimeters from\n"
+                                          "spline.\n"));
 
             // ROUTE SMOOTHING CONTROLS
 
@@ -440,18 +439,18 @@ class FixGPSConfig : public DataProcessorConfig
                                                "the ridefile and can vary by sample. This is the degree to be\n"
                                                "used for the second pass spline made after outliers are removed.\n"));
 
-            outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria %:"));
+            outlierLabelRoute = new QLabel(fUseShortDescription ? tr("Crit") : tr("Route Outlier criteria - Centimeters:"));
             outlierSpinBoxRoute = new QDoubleSpinBox();
             outlierSpinBoxRoute->setRange(0.001, 10000);
             outlierSpinBoxRoute->setSingleStep(10);
             outlierSpinBoxRoute->setDecimals(3);
             outlierSpinBoxRoute->setValue(appsettings->value(this, GC_FIXGPS_ROUTE_OUTLIER_PERCENT, s_Default_RouteOutlierPercent).toInt());
-            outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA (%)"
+            outlierSpinBoxRoute->setToolTip(tr("ROUTE OUTLIER CRITERIA - CENTIMETERS"
                                                "An outlier point is one so eggregiously out of range that it should not be used to\n"
                                                "build the smoothing spline. A clear example consider a point at the north pole that\n"
-                                               "is part of a route in Seattle. This outlier criteria is the multiple of the data to\n"
-                                               "spline stddev past which a value will be considered an outlier and not used to compute\n"
-                                               "the final smoothing spline.\n"));
+                                               "is part of a route in Seattle. This outlier criteria is the distance from spline in\n"
+                                               "centimeters past which a value will be considered an outlier and not used to compute the\n"
+                                               "final smoothing spline.\n"));
 
             // If no ridefile is provided then present simple dialog
             if (rideFile == NULL)
@@ -696,16 +695,6 @@ class FixGPS : public DataProcessor {
 
 static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix GPS errors"), new FixGPS());
 
-bool IsReasonableAltitude(double alt) {
-    return (alt >= -1000 && alt < 10000);
-}
-
-bool IsReasonableGeoLocation(const geolocation *ploc) {
-    return  (ploc->Lat()  && ploc->Lat()  >= double(-90)  && ploc->Lat()  <= double(90) &&
-             ploc->Long() && ploc->Long() >= double(-180) && ploc->Long() <= double(180) &&
-             IsReasonableAltitude(ploc->Alt()));
-}
-
 class SaveState
 {
     double m_t;
@@ -795,6 +784,9 @@ double EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilo
 
     double t = prevT;
     double step = std::max(0.1, 1 / (double)sampleCount); // default step size if gradient descent isn't used.
+
+    step = std::min(step, (1. - t) / 2.);
+
     bool fGoingUp = true;
     bool fGradientPossible = true;
     double achievedPrecision = 1000000.;
@@ -855,6 +847,8 @@ double EvalAtTargetDistance(T_Curve &curve, double targetDistance, double epsilo
                         step = evalStep;
                         fGoingUp = (step > 0);
                         fSuccess = true;
+                    } else {
+                        fGradientPossible = false;
                     }
                 }
             }
@@ -930,12 +924,12 @@ bool GatherForAltitudeSmoothing(const RideFile *ride, std::vector < Vector2<doub
     for (int i = 0; i < ride->dataPoints().count(); i++) {
         const RideFilePoint * pi = (ride->dataPoints()[i]);
 
+        geolocation geoloc(pi->lat, pi->lon, pi->alt);
         if (fRequireReasonableGeoloc) {
-            geolocation geoloc(pi->lat, pi->lon, pi->alt);
-            if (!IsReasonableGeoLocation(&geoloc))
+            if (!geoloc.IsReasonableGeoLocation())
                 continue;
         } else {
-            if (!IsReasonableAltitude(pi->alt))
+            if (!geoloc.IsReasonableAltitude())
                 continue;
         }
 
@@ -986,12 +980,16 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     if (degree1 >= 3) {
         // Push non-outliers to new input vector
         std::vector <Vector2<double>> inControls2;
-        for (int i = 0; i < outControls.size(); i++) {
-            double d = inControls[i][1] - outControls[i][1];
-            if (outlierCriteria > sqrt(d*d)) {
+
+        // Preserve first and last points forces spline to cover entire route distance.
+        inControls2.push_back(inControls.front());
+        for (int i = 1; i < outControls.size() - 1; i++) {
+            double d = fabs(inControls[i][1] - outControls[i][1]);
+            if (outlierCriteria > d) {
                 inControls2.push_back(inControls[i]);
             }
         }
+        inControls2.push_back(inControls.back());
 
         // If there are outliers or second pass degree is different than first:
         // Create new bspline from non-outliers and redo interpolation.
@@ -1017,16 +1015,23 @@ bool smoothAltitude(const std::vector<Vector2<double>> &inControls, unsigned deg
     double slopeDistance = 0;
     double prevSlope = 0;
     for (int i = 1; i < outControls.size(); i++) {
-        double run = 10*(outControls[i][0] - outControls[i-1][0]);
+        // Use input distance because altitude smoothing does not rewrite it.
+        double run = inControls[i][0] - inControls[i-1][0];
         double rise = outControls[i][1] - outControls[i-1][1];
-        double slope = run ? (rise / run) : prevSlope;
+
+        double run10 = run * 10.;
+
+        double slope = prevSlope;
+
+        // Slope is noisy at end of route. Only compute new slope if outside a step of end of route. 
+        if (run && (inControls[i][0] + run < inControls.back()[0]))
+            slope = (rise / run10);
 
         stats.minSlope = std::min(stats.minSlope, slope);
         stats.maxSlope = std::max(stats.maxSlope, slope);
+        stats.sampleDistanceStdDev += (1000 * run10 * 1000 * run10);
 
-        slopeDistance += slope * run;
-
-        stats.sampleDistanceStdDev += (1000 * run * 1000 * run);
+        slopeDistance += slope * run10;
 
         prevSlope = slope;
     }
@@ -1076,7 +1081,7 @@ bool GatherForRouteSmoothing(const RideFile * ride, std::vector<Vector4<double>>
 
         geolocation geoloc(lat, lon, alt);
 
-        if (!IsReasonableGeoLocation(&geoloc))
+        if (!geoloc.IsReasonableGeoLocation())
             continue;
 
         xyz c = geoloc.toxyz();
@@ -1119,15 +1124,19 @@ bool smoothRoute(const std::vector<Vector4<double>> &inControls, unsigned degree
     if (degree1 >= 3) {
         // Push non-outliers to new input vector
         std::vector <Vector4<double>> inControls2;
-        for (int i = 0; i < outControls.size(); i++) {
+
+        // Preserve first and last points forces spline to cover entire route distance.
+        inControls2.push_back(inControls.front());
+        for (int i = 1; i < outControls.size() - 1; i++) {
             xyz in(inControls[i][1], inControls[i][2], inControls[i][3]);
             xyz out(outControls[i][1], outControls[i][2], outControls[i][3]);
 
             double d = out.subtract(in).magnitude();
-            if (outlierCriteria > sqrt(d*d)) {
+            if (outlierCriteria > d) {
                 inControls2.push_back(inControls[i]);
             }
         }
+        inControls2.push_back(inControls.back());
 
         // Redo interpolation if there are outliers or pass2 degree is different than pass1 degree.
         routeSmoothingStats.outlierCount = (unsigned)(inControls.size() - inControls2.size());
@@ -1184,7 +1193,7 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
             geolocation curLoc(pi->lat, pi->lon, fHasAlt ? pi->alt : 0.0);
 
             // Activate interpolation if this sample isn't reasonable.
-            if (!IsReasonableGeoLocation(&curLoc)) {
+            if (!curLoc.IsReasonableGeoLocation()) {
                 double km = pi->km;
 
                 // Feed interpolator until it has samples that span current distance.
@@ -1194,7 +1203,7 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
                         geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
 
                         // Only feed reasonable locations to interpolator
-                        if (IsReasonableGeoLocation(&geo)) {
+                        if (geo.IsReasonableGeoLocation()) {
                             gpi.Push(pii->km, geo);
                         }
                         ii++;
@@ -1249,12 +1258,12 @@ bool FixGPS::postProcess(RideFile *ride, DataProcessorConfig *config, QString op
         fDoSmoothAltitude    = ((FixGPSConfig*)(config))->doSmoothAltitude->checkState();
         degree0              = ((FixGPSConfig*)(config))->degree0SpinBox->value();
         degree1              = ((FixGPSConfig*)(config))->degree1SpinBox->value();
-        outlierCriteria      = (((FixGPSConfig*)(config))->outlierSpinBox->value()) / 100.;
+        outlierCriteria      = (((FixGPSConfig*)(config))->outlierSpinBox->value()) / 100.;      // cm to m
 
         fDoSmoothRoute       = ((FixGPSConfig*) (config))->doSmoothRoute->checkState();
         degree0Route         = ((FixGPSConfig*) (config))->degree0SpinBoxRoute->value();
         degree1Route         = ((FixGPSConfig*) (config))->degree1SpinBoxRoute->value();
-        outlierCriteriaRoute = (((FixGPSConfig*)(config))->outlierSpinBoxRoute->value()) / 100.;
+        outlierCriteriaRoute = (((FixGPSConfig*)(config))->outlierSpinBoxRoute->value()) / 100.; // cm to m
     } else {
         fDoSmoothAltitude     = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DOAPPLY, Qt::Unchecked).toBool();
         degree0               = appsettings->value(NULL, GC_FIXGPS_ALTITUDE_FIX_DEGREE, 200).toUInt();

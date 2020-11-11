@@ -913,8 +913,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     if (metadata.toUpper() != "NONE" && metadata != "") {
 
         // first lets read in meta config
-        QDir config(home.absolutePath() + "/" + athlete + "/config");
-        QString metaConfig = config.canonicalPath()+"/metadata.xml";
+        QString metaConfig = home.canonicalPath()+"/metadata.xml";
         if (!QFile(metaConfig).exists()) metaConfig = ":/xml/metadata.xml";
 
         // params to readXML - we ignore them

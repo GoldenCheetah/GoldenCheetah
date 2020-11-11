@@ -38,8 +38,8 @@ mkdir appdir/lib
 cp /usr/local/lib/libssl.so.1.1 appdir/lib
 cp /usr/local/lib/libcrypto.so.1.1 appdir/lib
 
-### Add vlc
-cp -r /usr/lib/vlc appdir/lib/vlc
+### Add vlc 3
+cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
 
 ### Download current version of linuxdeployqt
 wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
@@ -49,10 +49,10 @@ chmod a+x linuxdeployqt-6-x86_64.AppImage
 ./linuxdeployqt-6-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0
 
 # Add Python and core modules
-wget https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.8-cp37-cp37m-manylinux1_x86_64.AppImage
-chmod +x python3.7.8-cp37-cp37m-manylinux1_x86_64.AppImage
-./python3.7.8-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
-rm -f python3.7.8-cp37-cp37m-manylinux1_x86_64.AppImage
+wget https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
+chmod +x python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
+./python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
+rm -f python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
 export PATH="$(pwd)/squashfs-root/usr/bin:$PATH"
 pip install --upgrade pip
 pip install -r Python/requirements.txt
@@ -92,7 +92,7 @@ aws s3 rm s3://goldencheetah-binaries/Linux --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/Linux/$FINAL_NAME
 aws s3 cp --acl public-read GCversionLinux.txt s3://goldencheetah-binaries/Linux/GCversionLinux.txt
 else
-curl --max-time 300 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --max-time 300 --upload-file $FINAL_NAME https://free.keep.sh/$FINAL_NAME
 fi
 
 cd ${TRAVIS_BUILD_DIR}

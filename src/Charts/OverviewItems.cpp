@@ -32,6 +32,7 @@
 
 #include "DataFilter.h"
 #include "Utils.h"
+#include "TimeUtils.h"
 #include "Tab.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
@@ -100,7 +101,7 @@ RPEOverviewItem::~RPEOverviewItem()
     delete sparkline;
 }
 
-KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units) : ChartSpaceItem(parent, name)
+KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime) : ChartSpaceItem(parent, name)
 {
 
     this->type = OverviewItemType::KPI;
@@ -108,6 +109,7 @@ KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start,
     this->stop = stop;
     this->program = program;
     this->units = units;
+    this->istime = istime;
 
     value ="0";
     progressbar = new ProgressBar(this, start, stop, value.toDouble());
@@ -322,7 +324,7 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
+    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 
     // prepare the gold, silver and bronze medal
     gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
@@ -348,7 +350,7 @@ TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString sym
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(parent->context->athlete->useMetricUnits);
+    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 
     animator=new QPropertyAnimation(this, "transition");
 }
@@ -381,7 +383,7 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 
     //  Get the field type
     fieldtype = -1;
-    foreach(FieldDefinition p, parent->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
         if (p.name == symbol) {
             fieldtype = p.type;
             break;
@@ -436,6 +438,9 @@ KPIOverviewItem::setData(RideItem *item)
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
 
+    // convert value to hh:mm:ss when istime
+    if (istime) value = time_to_string(value.toDouble(), true);
+
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
 }
@@ -454,6 +459,9 @@ KPIOverviewItem::setDateRange(DateRange dr)
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
+
+    // convert value to hh:mm:ss when istime
+    if (istime) value = time_to_string(value.toDouble(), true);
 
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
@@ -542,9 +550,9 @@ MetricOverviewItem::setData(RideItem *item)
     QList<QPointF> points;
 
     // get the metric value
-    value = item->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+    value = item->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
     if (value == "nan") value ="";
-    double v = (units == tr("seconds")) ? item->getForSymbol(symbol, parent->context->athlete->useMetricUnits) : value.toDouble();
+    double v = (units == tr("seconds")) ? item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits) : value.toDouble();
     if (std::isinf(v) || std::isnan(v)) v=0;
 
     points << QPointF(SPARKDAYS, v);
@@ -568,9 +576,9 @@ MetricOverviewItem::setData(RideItem *item)
         // only activities with matching sport flags
         if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
 
-            if (units == tr("seconds")) v = prior->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+            if (units == tr("seconds")) v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             else {
-                QString vs = prior->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+                QString vs = prior->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
                 if (vs == "nan") vs="0";
                 v = vs.toDouble();
             }
@@ -613,7 +621,7 @@ MetricOverviewItem::setData(RideItem *item)
     int career=0; // Career
     bool first=true;
     index = parent->context->athlete->rideCache->rides().count()-1;
-    v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+    v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
     while(index >=0) { // ultimately go no further back than first ever ride
 
         // get value from items before me
@@ -686,15 +694,17 @@ MetricOverviewItem::setData(RideItem *item)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *m = factory.rideMetric(symbol);
     if (m) {
-        upper = m->toString(parent->context->athlete->useMetricUnits, max);
-        lower = m->toString(parent->context->athlete->useMetricUnits, min);
-        mean = m->toString(parent->context->athlete->useMetricUnits, avg);
+        upper = m->toString(max);
+        lower = m->toString(min);
+        mean = m->toString(avg);
     }
 }
 
 void
 MetricOverviewItem::setDateRange(DateRange dr)
 {
+    if (!metric) return; // avoid crashes when metric is not available
+
     // for metrics lets truncate to today
     if (dr.to > QDate::currentDate()) dr.to = QDate::currentDate();
 
@@ -711,7 +721,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
         if (!spec.pass(item)) continue;
 
         // get value and count
-        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double value = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
         double count = item->getCountForSymbol(symbol);
         if (count <= 0) count = 1;
 
@@ -756,10 +766,8 @@ MetricOverviewItem::setDateRange(DateRange dr)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (std::isinf(v) || std::isnan(v)) v=0;
-    m->setValue(v);
-    m->setCount(c);
     if (m) {
-        value = m->toString(parent->context->athlete->useMetricUnits, v);
+        value = m->toString(v);
     } else {
         value = Utils::removeDP(QString("%1").arg(v));
         if (value == "nan") value ="";
@@ -779,7 +787,7 @@ MetricOverviewItem::setDateRange(DateRange dr)
 
         if (!spec.pass(item)) continue;
 
-        double v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
 
         // no zero values
         if (v == 0) continue;
@@ -816,6 +824,8 @@ static bool entrylessthan(struct topnentry &a, const topnentry &b)
 void
 TopNOverviewItem::setDateRange(DateRange dr)
 {
+    if (!metric) return; // avoid crashes when metric is not available
+
     // clear out the old values
     ranked.clear();
 
@@ -834,8 +844,8 @@ TopNOverviewItem::setDateRange(DateRange dr)
         if (!spec.pass(item)) continue;
 
         // get value and count
-        double v = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
-        QString value = item->getStringForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
+        QString value = item->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
         int index = stressdata.indexOf(item->dateTime.date());
         double tsb = 0;
         if (index >= 0 && index < stressdata.sb().count()) tsb = stressdata.sb()[index];
@@ -985,6 +995,8 @@ static bool lessthan(const aggmeta &a, const aggmeta &b)
 void
 DonutOverviewItem::setDateRange(DateRange dr)
 {
+    if (!metric) return; // avoid crashes when metric is not available
+
     // stop any animation before starting, just in case- stops a crash
     // when we update a chart in the middle of its animation
     if (chart) chart->setAnimationOptions(QChart::NoAnimation);;
@@ -1020,7 +1032,7 @@ DonutOverviewItem::setDateRange(DateRange dr)
         }
 
         // get metric value and count
-        double value = item->getForSymbol(symbol, parent->context->athlete->useMetricUnits);
+        double value = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
         double count = item->getCountForSymbol(symbol);
         if (count <= 0) count = 1;
 
@@ -1293,7 +1305,7 @@ ZoneOverviewItem::setData(RideItem *item)
                 }
 
                 // update as percent of total
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<categories.count(); i++) {
                     double time =round(item->getForSymbol(timeInZonesHR[i]));
                     if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                     else barset->replace(i, 0);
@@ -1331,7 +1343,7 @@ ZoneOverviewItem::setData(RideItem *item)
                 }
 
                 // update as percent of total
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<categories.count(); i++) {
                     double time =round(item->getForSymbol(timeInZones[i]));
                     if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                     else barset->replace(i, 0);
@@ -1368,7 +1380,7 @@ ZoneOverviewItem::setData(RideItem *item)
                 }
 
                 // update as percent of total
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<categories.count(); i++) {
                     double time =round(item->getForSymbol(paceTimeInZones[i]));
                     if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                     else barset->replace(i, 0);
@@ -1428,6 +1440,8 @@ IntervalOverviewItem::setDateRange(DateRange dr)
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
     const RideMetric *ym = factory.rideMetric(ysymbol);
+    if (!xm || !ym) return; // avoid crashes when metrics are not available
+
     xdp = xm->precision();
     ydp = ym->precision();
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
@@ -1451,9 +1465,9 @@ IntervalOverviewItem::setDateRange(DateRange dr)
 
 
         // get the x and y VALUE
-        double x = item->getForSymbol(xsymbol, parent->context->athlete->useMetricUnits);
-        double y = item->getForSymbol(ysymbol, parent->context->athlete->useMetricUnits);
-        double z = item->getForSymbol(zsymbol, parent->context->athlete->useMetricUnits);
+        double x = item->getForSymbol(xsymbol, GlobalContext::context()->useMetricUnits);
+        double y = item->getForSymbol(ysymbol, GlobalContext::context()->useMetricUnits);
+        double z = item->getForSymbol(zsymbol, GlobalContext::context()->useMetricUnits);
 
         // truncate dates and use offsets
         if (first && xm->isDate())  xoff = x;
@@ -1501,6 +1515,7 @@ IntervalOverviewItem::setData(RideItem *item)
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
     const RideMetric *ym = factory.rideMetric(ysymbol);
+    if (!xm || !ym) return; // avoid crashes when metrics are not available
     xdp = xm->precision();
     ydp = ym->precision();
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
@@ -1514,9 +1529,9 @@ IntervalOverviewItem::setData(RideItem *item)
     QList<BPointF> points;
     foreach(IntervalItem *interval, item->intervals()) {
         // get the x and y VALUE
-        double x = interval->getForSymbol(xsymbol, parent->context->athlete->useMetricUnits);
-        double y = interval->getForSymbol(ysymbol, parent->context->athlete->useMetricUnits);
-        double z = interval->getForSymbol(zsymbol, parent->context->athlete->useMetricUnits);
+        double x = interval->getForSymbol(xsymbol, GlobalContext::context()->useMetricUnits);
+        double y = interval->getForSymbol(ysymbol, GlobalContext::context()->useMetricUnits);
+        double z = interval->getForSymbol(zsymbol, GlobalContext::context()->useMetricUnits);
 
         BPointF add;
         add.x = x;
@@ -1711,7 +1726,7 @@ void
 KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     double addy = 0;
-    if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
+    if (units != "") addy = QFontMetrics(parent->smallfont).height();
 
     // mid is slightly higher to account for space around title, move mid up
     double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
@@ -1750,15 +1765,15 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        QString stoptext = Utils::removeDP(QString("%1").arg(stop));
-        QString starttext = Utils::removeDP(QString("%1").arg(start));
+        QString stoptext = istime ? time_to_string(stop, true) : Utils::removeDP(QString("%1").arg(stop));
+        QString starttext = istime ? time_to_string (start, true) : Utils::removeDP(QString("%1").arg(start));
         painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(stoptext), bottom), stoptext);
         painter->drawText(QPointF(left, bottom), starttext);
 
         // percentage in mid font...
         if (geometry().height() >= (ROWHEIGHT*8)) {
 
-            double percent = round((value.toDouble()-start)/(stop-start) * 100.0);
+            double percent = round((progressbar->getCurrentValue()-start)/(stop-start) * 100.0);
             QString percenttext = Utils::removeDP(QString("%1%").arg(percent));
 
             QFontMetrics mfm(parent->midfont);
@@ -2471,6 +2486,11 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
         connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
 
+        // istime
+        cb1 = new QCheckBox(this);
+        layout->addRow(tr("Time"), cb1);
+        connect(cb1, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
+
         // units
         string1 = new QLineEdit(this);
         layout->addRow(tr("Units"), string1);
@@ -2581,6 +2601,7 @@ OverviewItemConfig::setWidgets()
             editor->setText(mi->program);
             double1->setValue(mi->start);
             double2->setValue(mi->stop);
+            cb1->setChecked(mi->istime);
             string1->setText(mi->units);
         }
     }
@@ -2614,7 +2635,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
-                mi->units = metric1->rideMetric()->units(mi->parent->context->athlete->useMetricUnits);
+                mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
         }
         break;
@@ -2634,7 +2655,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (metric1->isValid()) {
                 mi->symbol = metric1->rideMetric()->symbol();
-                mi->units = metric1->rideMetric()->units(mi->parent->context->athlete->useMetricUnits);
+                mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
         }
         break;
@@ -2684,6 +2705,7 @@ OverviewItemConfig::dataChanged()
         {
             KPIOverviewItem *mi = dynamic_cast<KPIOverviewItem*>(item);
             mi->name = name->text();
+            mi->istime = cb1->isChecked();
             mi->units = string1->text();
             mi->program = editor->toPlainText();
             mi->start = double1->value();
@@ -3294,8 +3316,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     const RideMetric *m = factory.rideMetric(parent->xsymbol);
     QString smin, smax;
     if (m) {
-        smin = m->toString(parent->parent->context->athlete->useMetricUnits, round(minx+xoff));
-        smax = m->toString(parent->parent->context->athlete->useMetricUnits, round(maxx+xoff));
+        smin = m->toString(round(minx+xoff));
+        smax = m->toString(round(maxx+xoff));
     } else {
         smin = QString("%1").arg(round(minx+xoff));
         smax = QString("%1").arg(round(maxx+xoff));
@@ -3336,7 +3358,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // xlabel
         const RideMetric *m = factory.rideMetric(parent->xsymbol);
         QString xlab;
-        if (m)  xlab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.x+xoff);
+        if (m)  xlab = m->toString(nearest.x+xoff);
         else xlab = Utils::removeDP(QString("%1").arg(nearest.x+xoff,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
@@ -3346,7 +3368,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // ylabel
         m = factory.rideMetric(parent->ysymbol);
         QString ylab;
-        if (m)  ylab = m->toString(parent->parent->context->athlete->useMetricUnits, nearest.y+yoff);
+        if (m)  ylab = m->toString(nearest.y+yoff);
         else ylab = Utils::removeDP(QString("%1").arg(nearest.y+yoff,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
@@ -3734,4 +3756,88 @@ ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     QRectF bar(box.left(), box.top(), box.width() * factor, ROWHEIGHT/3.0);
     painter->fillRect(bar, QBrush(GColor(CPLOTMARKER)));
 
+}
+
+Button::Button(QGraphicsItem*parent, QString text) : QGraphicsItem(parent), text(text), state(None)
+{
+    // not much really
+    setZValue(11);
+    setAcceptHoverEvents(true);
+}
+
+void
+Button::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width, height);
+}
+
+void
+Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+
+    // button background
+    QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+    pc.setAlpha(128);
+    painter->setPen(QPen(pc));
+    QPointF pos=mapToParent(geom.x(), geom.y());
+    if (isUnderMouse()) {
+        QColor hover=GColor(CPLOTMARKER);
+        if (state==Clicked) hover.setAlpha(200);
+        else hover.setAlpha(100);
+        painter->setBrush(QBrush(hover));
+    } else painter->setBrush(QBrush(GColor(CCARDBACKGROUND)));
+    painter->drawRoundedRect(pos.x(), pos.y(), geom.width(), geom.height(), 20, 20);
+
+    // text using large font clipped
+    if (isUnderMouse()) {
+        QColor tc = GCColor::invertColor(CPLOTMARKER);
+        tc.setAlpha(200);
+        painter->setPen(tc);
+    } else {
+        QColor tc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+        tc.setAlpha(200);
+        painter->setPen(tc);
+    }
+    painter->setFont(font);
+    painter->drawText(geom, text, Qt::AlignHCenter | Qt::AlignVCenter);
+}
+
+bool
+Button::sceneEvent(QEvent *event)
+{
+
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+        // mouse moved so hover paint anyway
+        update();
+
+    }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+
+        if (isUnderMouse() && state == Clicked) {
+            state = None;
+            update();
+            QApplication::processEvents();
+            emit clicked();
+        } else {
+            state = None;
+            update();
+            QApplication::processEvents();
+        }
+
+
+    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+        if (isUnderMouse()) state = Clicked;
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        update();
+    }
+    return false;
 }
