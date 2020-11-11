@@ -422,7 +422,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 p_meterWidget->AltText = tr("w") +  p_meterWidget->AltTextSuffix;
             } else {
                 p_meterWidget->Value = rtd.getSlope();
-                p_meterWidget->Text = QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+                p_meterWidget->Text = ((-1.0 < p_meterWidget->Value && p_meterWidget->Value < 0.0) ? QString("-") : QString("")) + QString::number((int)p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
                 p_meterWidget->AltText = QString(".") + QString::number(abs((int)(p_meterWidget->Value * 10.0) - (((int) p_meterWidget->Value) * 10))) + tr("%") + p_meterWidget->AltTextSuffix;
             }
         }
