@@ -1447,6 +1447,15 @@ RideItem::updateIntervals()
         QList<IntervalItem*> here;
         context->athlete->routes->search(this, f, here);
 
+        // Sort routes so they are added by start time to the activity.
+        std::sort(
+            here.begin(),
+            here.end(),
+            [](IntervalItem* i1, IntervalItem* i2) {
+                return *i1 < *i2;
+            }
+        );
+
         // add to ride !
         foreach(IntervalItem *add, here) {
             add->rideInterval = NULL;
