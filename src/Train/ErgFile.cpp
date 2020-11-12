@@ -1381,7 +1381,7 @@ ErgFile::~ErgFile()
 }
 
 bool
-ErgFile::isValid()
+ErgFile::isValid() const
 {
     return valid;
 }
@@ -1617,12 +1617,12 @@ int ErgFile::nextText(long x)
 void
 ErgFile::calculateMetrics()
 {
-
     // reset metrics
     XP = CP = AP = IsoPower = IF = RI = BikeStress = BS = SVI = VI = 0;
     ELE = ELEDIST = GRADE = 0;
 
-    maxY = 0; // we need to reset it
+    minY = 0;
+    maxY = 0;
 
     // is it valid?
     if (!isValid()) return;
@@ -1631,24 +1631,29 @@ ErgFile::calculateMetrics()
 
         ErgFilePoint last;
         bool first = true;
-        foreach (ErgFilePoint p, Points) {
-
-            // set the maximum Y value
-            if (p.y > maxY) maxY= p.y;
+        foreach(ErgFilePoint p, Points) {
 
             if (first == true) {
+                minY = p.y;
+                maxY = p.y;
                 first = false;
-            } else if (p.y > last.y) {
+            }
+            else {
+                minY = std::min(minY, p.y);
+                maxY = std::max(maxY, p.y);
 
-                ELEDIST += p.x - last.x;
-                ELE += p.y - last.y;
+                if (p.y > last.y) {
+                    ELEDIST += p.x - last.x;
+                    ELE += p.y - last.y;
+                }
             }
             last = p;
         }
         if (ELE == 0 || ELEDIST == 0) GRADE = 0;
-        else GRADE = ELE/ELEDIST * 100;
+        else GRADE = ELE / ELEDIST * 100;
 
-    } else {
+    }
+    else {
 
         QVector<double> rolling(30);
         rolling.fill(0.0f);
@@ -1675,28 +1680,37 @@ ErgFile::calculateMetrics()
         int skcount = 0;
 
         ErgFilePoint last;
-        foreach (ErgFilePoint p, Points) {
+        bool first = true;
+        foreach(ErgFilePoint p, Points) {
 
-            // set the maximum Y value
-            if (p.y > maxY) maxY= p.y;
+            // set the minimum/maximum Y value
+            if (first) {
+                minY = p.y;
+                maxY = p.y;
+                first = false;
+            }
+            else {
+                minY = std::min(minY, p.y);
+                maxY = std::min(maxY, p.y);
+            }
 
             while (nextSecs < p.x) {
 
                 // CALCULATE IsoPower
                 apsum += last.y;
-                sum +=  last.y;
+                sum += last.y;
                 sum -= rolling[index];
 
                 // update 30s circular buffer
                 rolling[index] = last.y;
-                if (index == 29) index=0;
+                if (index == 29) index = 0;
                 else index++;
 
-                total += pow(sum/30, 4);
-                count ++;
+                total += pow(sum / 30, 4);
+                count++;
 
                 // CALCULATE XPOWER
-                while ((weighted > NEGLIGIBLE) && ((nextSecs / 1000) > (lastSecs/1000) + 1000 + EPSILON)) {
+                while ((weighted > NEGLIGIBLE) && ((nextSecs / 1000) > (lastSecs / 1000) + 1000 + EPSILON)) {
                     weighted *= attenuation;
                     lastSecs += 1000;
                     sktotal += pow(weighted, 4.0);
