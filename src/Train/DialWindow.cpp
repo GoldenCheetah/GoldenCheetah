@@ -253,7 +253,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Distance:
     case RealtimeData::LapDistance:
+    case RealtimeData::RouteDistance:
         if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
+        // Default floating point rounds to nearest. For distance we'd like to not see the
+        // next biggest number until we're actually there... Truncate to meter.
+        value = ((double)((unsigned)(value * 1000.))) / 1000.;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
