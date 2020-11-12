@@ -3208,9 +3208,9 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
         // type
         add->setText(1, Season::types[static_cast<int>(season.type)]);
         // from
-        add->setText(2, season.start.toString(tr("ddd MMM d, yyyy")));
+        add->setText(2, season.getStart().toString(tr("ddd MMM d, yyyy")));
         // to
-        add->setText(3, season.end.toString(tr("ddd MMM d, yyyy")));
+        add->setText(3, season.getEnd().toString(tr("ddd MMM d, yyyy")));
         // guid -- hidden
         add->setText(4, season.id().toString());
 
