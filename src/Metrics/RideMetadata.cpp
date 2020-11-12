@@ -316,7 +316,7 @@ RideMetadata::configChanged(qint32)
 
                     bool found=false;
                     foreach(DefaultDefinition e, defaultDefinitions) {
-                        if (e.field == x.field) found=true;
+                        if (e.field == x.field && e.value == x.value) found=true;
                     }
                     if (!found) {
                         defaultDefinitions.append(x);
