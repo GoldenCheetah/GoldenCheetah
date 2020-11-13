@@ -2495,7 +2495,7 @@ void TrainSidebar::Lower()
 
     if (context->currentErgFile()) {
         // adjust the workout IF
-        adjustIntensity(lastAppliedIntensity-5);
+        adjustIntensity(std::max<int>(5, lastAppliedIntensity - 5));
 
     } else {
 
@@ -2570,8 +2570,11 @@ void TrainSidebar::adjustIntensity(int value)
             if (insertedNow == false) {
 
                 if (i) {
-                    // add a point to adjust from
-                    ErgFilePoint add;
+                    // This pass simply modifies load or gradient.
+                    // Start with copy of 'last', then overwrite only the part we wish to change,
+                    // this is necessary so crs point will start with an intact geolocation and not
+                    // zeros.
+                    ErgFilePoint add = last;
                     add.x = context->getNow();
                     add.val = last.val / from * to;
 
