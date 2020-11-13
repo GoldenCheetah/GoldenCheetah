@@ -118,7 +118,7 @@ class ErgFile
         void parseErg2(QString p = "");  // ergdb
         void parseTTS();                 // its ahh tts
 
-        bool isValid();                  // is the file valid or not?
+        bool isValid() const;            // is the file valid or not?
 
         double Cp;
         int format;                      // ERG, CRS, MRC, ERG2 currently supported
@@ -150,7 +150,7 @@ class ErgFile
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
         int mode;
-        bool    StrictGradient; // should gradient be strict or smoothed?
+        bool    StrictGradient;        // should gradient be strict or smoothed?
 
         int leftPoint, rightPoint;     // current points we are between
         int interpolatorReadIndex;     // next point to be fed to interpolator
@@ -159,15 +159,15 @@ class ErgFile
         QList<ErgFileLap>   Laps;      // interval markers in the file
         QList<ErgFileText>  Texts;     // texts to display
 
-        GeoPointInterpolator gpi; // Location interpolator
+        GeoPointInterpolator gpi;      // Location interpolator
 
-        void calculateMetrics(); // calculate IsoPower value for ErgFile
+        void calculateMetrics();       // calculate IsoPower value for ErgFile
 
         // Metrics for this workout
-        double maxY;                // maximum Y value
+        double minY, maxY;             // minimum and maximum Y value
         double CP;
         double AP, IsoPower, IF, BikeStress, VI; // Coggan for erg / mrc
-        double XP, RI, BS, SVI; // Skiba for erg / mrc
+        double XP, RI, BS, SVI;        // Skiba for erg / mrc
         double ELE, ELEDIST, GRADE;    // crs
 
         Context *context;
