@@ -1682,6 +1682,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setSpeed(local.getSpeed());
                     rtData.setDistance(local.getDistance());
                     rtData.setRouteDistance(local.getRouteDistance());
+                    rtData.setDistanceRemaining(local.getDistanceRemaining());
                     rtData.setLapDistance(local.getLapDistance());
                     rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
                 }
@@ -1753,6 +1754,13 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // Trust ergFile for location data, if available.
                 bool fAltitudeSet = false;
                 if (!(status&RT_MODE_ERGO) && ergFile) {
+
+                    // update DistanceRemaining
+                    if (ergFile->Duration/1000.0 > displayWorkoutDistance)
+                        rtData.setDistanceRemaining(ergFile->Duration/1000.0 - displayWorkoutDistance);
+                    else
+                        rtData.setDistanceRemaining(0.0);
+
                     if (!ergFile->StrictGradient) {
                         // Attempt to obtain location and derived slope from altitude in ergfile.
                         geolocation geoloc;

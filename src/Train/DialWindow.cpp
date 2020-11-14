@@ -254,6 +254,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::Distance:
     case RealtimeData::LapDistance:
     case RealtimeData::RouteDistance:
+    case RealtimeData::DistanceRemaining:
         if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         // Default floating point rounds to nearest. For distance we'd like to not see the
         // next biggest number until we're actually there... Truncate to meter.
@@ -584,6 +585,10 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTimeRemaining:
     case RealtimeData::ErgTimeRemaining:
     case RealtimeData::Distance:
+    case RealtimeData::RouteDistance:
+    case RealtimeData::DistanceRemaining:
+    case RealtimeData::Latitude:
+    case RealtimeData::Longitude:
     case RealtimeData::LapDistance:
     case RealtimeData::LapDistanceRemaining:
     case RealtimeData::LRBalance:
