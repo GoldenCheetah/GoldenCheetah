@@ -919,6 +919,9 @@ void ErgFile::parseTTS()
         return;
     }
 
+    Name = QString::fromStdWString(ttsReader.getRouteName());               // description in file
+    Description = QString::fromStdWString(ttsReader.getRouteDescription()); // long narrative for workout
+
     const NS_TTSReader::Point *prevPoint, *point, *nextPoint;
 
     prevPoint = NULL;
