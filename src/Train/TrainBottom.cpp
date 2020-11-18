@@ -107,6 +107,19 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_lapButton->setShortcut(Qt::Key_0);
     toolbuttons->addWidget(m_lapButton);
 
+    QIcon fwdLapIcon(":images/oxygen/fwd.png");
+    fwdLap = new QPushButton(fwdLapIcon, "", this);
+    fwdLap->setFocusPolicy(Qt::NoFocus);
+    fwdLap->setIconSize(QSize(64,64));
+    fwdLap->setAutoFillBackground(false);
+    fwdLap->setAutoDefault(false);
+    fwdLap->setFlat(true);
+    fwdLap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    fwdLap->setAutoRepeat(true);
+    fwdLap->setAutoRepeatDelay(200);
+    fwdLap->setShortcut(Qt::Key_MediaLast);
+    toolbuttons->addWidget(fwdLap);
+
     QIcon calIcon(":images/oxygen/cal.png");
     cal = new QPushButton(calIcon, "", this);
     cal->setFocusPolicy(Qt::NoFocus);
@@ -183,6 +196,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(m_rewindButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Rewind()));
     connect(m_forwardButton, SIGNAL(clicked()), m_trainSidebar, SLOT(FFwd()));
     connect(m_lapButton, SIGNAL(clicked()), m_trainSidebar, SLOT(newLap()));
+    connect(fwdLap, SIGNAL(clicked()), m_trainSidebar, SLOT(FFwdLap()));
     connect(m_stopButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Stop()));
     connect(m_trainSidebar->context, SIGNAL(start()), this, SLOT(updatePlayButtonIcon()));
     connect(m_trainSidebar->context, SIGNAL(pause()), this, SLOT(updatePlayButtonIcon()));
@@ -275,6 +289,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -291,6 +306,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -307,6 +323,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -323,6 +340,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(true);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -339,6 +357,7 @@ void TrainBottom::statusChanged(int status)
         m_forwardButton->setEnabled(true);
         m_rewindButton->setEnabled(true);
         m_lapButton->setEnabled(true);
+        fwdLap->setEnabled(true);
         cal->setEnabled(true);
         loadUp->setEnabled(true);
         loadDown->setEnabled(true);

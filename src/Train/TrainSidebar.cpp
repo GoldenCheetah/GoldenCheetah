@@ -2479,8 +2479,21 @@ void TrainSidebar::FFwdLap()
         context->notifySeek(load_msecs);
     } else {
         lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
-        if (lapmarker >= 0.) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
+        if (lapmarker >= 0.) {
+            if (context->currentVideoSyncFile()) {
+                // in case of video with RLV file sync just ask to go forward
+                context->notifySeek(lapmarker/1000.0 - displayWorkoutDistance);
+            } else {
+                // jump forward to lapmarker
+                displayWorkoutDistance = lapmarker/1000.0;
+            }
+        }
     }
+
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
+
+    if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
 }
 
 // higher load/gradient
