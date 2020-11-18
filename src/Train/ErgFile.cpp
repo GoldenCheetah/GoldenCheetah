@@ -838,12 +838,17 @@ void ErgFile::parseFromRideFileFactory()
         Points.append(add);
     }
 
-    // Add interval names as text cues
-    foreach(const RideFileInterval* lap, ride->intervals()) {
+    // Add intervals as lap markers and names as text cues
+    int lapNum = 1;
+    auto intervals = ride->intervals();
+    std::sort(intervals.begin(), intervals.end(), [](RideFileInterval* i1, RideFileInterval* i2) { return *i1 < *i2; });
+    foreach(const RideFileInterval* lap, intervals) {
         double x = ride->timeToDistance(lap->start) * 1000.0;
         int duration = lap->stop - lap->start + 1;
-        if (x > 0 && duration > 0 && !lap->name.isEmpty())
+        if (x > 0 && duration > 0 && !lap->name.isEmpty()) {
+            Laps<<ErgFileLap(x, lapNum++, lap->name);
             Texts<<ErgFileText(x, duration, lap->name);
+        }
     }
 
     gpxFile.close();
