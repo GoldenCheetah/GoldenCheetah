@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "ErgFilePlot.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
@@ -271,6 +272,10 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     todayButton->addItem(tr("Last Saturday"));
     todayButton->addItem(tr("Last Sunday"));
     todayButton->addItem(tr("Choose Date"));
+    workoutNameToRoute = new QComboBox();
+    workoutNameToRoute->addItem(tr("Select import type..."));
+    workoutNameToRoute->addItem(tr("Train / Workout"));
+    workoutNameToRoute->addItem(tr("Import from file"));
     cancelButton = new QPushButton(tr("Cancel"));
     cancelButton->setAutoDefault(false);
     abortButton = new QPushButton(tr("Abort"));
@@ -279,6 +284,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     // they only appear whilst we are asking the user for dates
     cancelButton->setHidden(true);
     todayButton->setHidden(true);
+    workoutNameToRoute->setHidden(true);
     //overFiles->setHidden(true);  // deprecate for this release... XXX
     //overwriteFiles = false;
 
@@ -377,6 +383,8 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     buttons->addWidget(phaseLabel);
     buttons->addStretch();
     buttons->addWidget(todayButton);
+    buttons->addStretch();
+    buttons->addWidget(workoutNameToRoute); // Add Workout name as Route when importing activity
     buttons->addStretch();
     // buttons->addWidget(overFiles); // deprecate for this release... XXX
     buttons->addWidget(cancelButton);
@@ -760,6 +768,7 @@ RideImportWizard::process()
 
    cancelButton->setHidden(false);
    todayButton->setHidden(false);
+   workoutNameToRoute->setHidden(false);
    //overFiles->setHidden(false); // deprecate for this release... XXX
 
    if (needdates == 0) {
@@ -785,6 +794,7 @@ RideImportWizard::process()
    if (autoImportMode && filenames.count()== 0) {
        cancelButton->setHidden(true);
        todayButton->setHidden(true);
+       workoutNameToRoute->setHidden(true);
        abortButton->setDisabled(false);
        phaseLabel->setText(tr("No files for automatic import selected."));
        abortButton->setText(tr("Finish"));
@@ -989,6 +999,7 @@ RideImportWizard::abortClicked()
     aborted = false;
     cancelButton->setHidden(true);
     todayButton->setHidden(true);
+    workoutNameToRoute->setHidden(true);
     //overFiles->setHidden(true);  // deprecate for this release XXX
 
     // now set this fields uneditable again ... yeesh.
@@ -1083,6 +1094,20 @@ RideImportWizard::abortClicked()
             ride->setTag("Filename", activitiesTarget);
             if (errors.count() > 0)
                 ride->setTag("Import errors", errors.join("\n"));
+
+            // Add Workout name OR Filename as "Route" IF one of the options is selected
+            if(workoutNameToRoute->currentIndex() == 1){ // Adds Workout name as Route
+                QStringList workoutNameList = context->currentErgFile()->filename.split("/");
+                QString workoutName = workoutNameList.last();
+                workoutNameList = workoutName.split(".");
+                ride->setTag("Route", workoutNameList.first());
+            }
+            if(workoutNameToRoute->currentIndex() == 2){ // Adds filename of imported file(s) as Route
+                QStringList importFileNameList = filenames[i].split("/");
+                QString importFileName = importFileNameList.last();
+                importFileNameList = importFileName.split(".");
+                ride->setTag("Route", importFileNameList.first());
+            }
 
             // process linked defaults
             GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);

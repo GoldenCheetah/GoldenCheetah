@@ -87,6 +87,7 @@ private:
     QPushButton *abortButton; // also used for save and finish
     QPushButton *cancelButton; // cancel when asking for dates
     QComboBox *todayButton;    // set date to today when asking for dates
+    QComboBox *workoutNameToRoute;  // Option to populate Route field
     // QCheckBox *overFiles;      // chance to set overwrite when asking for dates // deprecate for this release... XXX
     // bool overwriteFiles; // flag to overwrite files from checkbox               // deprecate for this release... XXX
     Context *context; // caller
